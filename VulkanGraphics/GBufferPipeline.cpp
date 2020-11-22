@@ -17,7 +17,7 @@ GBufferPipeline::~GBufferPipeline()
 
 void GBufferPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
 {
-    std::array<DescriptorSetLayoutBindingInfo, 11> LayoutBindingInfo = {};
+    std::array<DescriptorSetLayoutBindingInfo, 10> LayoutBindingInfo = {};
 
     LayoutBindingInfo[0].Binding = 0;
     LayoutBindingInfo[0].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -59,9 +59,9 @@ void GBufferPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
     LayoutBindingInfo[9].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     LayoutBindingInfo[9].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-    LayoutBindingInfo[10].Binding = 10;
-    LayoutBindingInfo[10].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    LayoutBindingInfo[10].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    //LayoutBindingInfo[10].Binding = 10;
+    //LayoutBindingInfo[10].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    //LayoutBindingInfo[10].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     GraphicsPipeline::CreateDescriptorSetLayout(renderer, std::vector<DescriptorSetLayoutBindingInfo>(LayoutBindingInfo.begin(), LayoutBindingInfo.end()));
 }

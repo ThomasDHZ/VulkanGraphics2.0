@@ -22,22 +22,22 @@ private:
 		app->framebufferResized = true;
 	}
 
-	FrameBufferMesh frameBuffer;
+	//FrameBufferMesh frameBuffer;
 
 	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
-	void SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
-	void GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
-	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
-	void ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex);
+	//void SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
+	//void GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
+	//void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
+	//void ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex);
 
 public:
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	MainRenderPass mainRenderPass;
-	SceneRenderPass sceneRenderPass;
-	GBufferRenderPass gBufferRenderPass;
-	FrameBufferRenderPass frameBufferRenderPass;
-	ShadowRenderPass shadowRenderPass;
+	//SceneRenderPass sceneRenderPass;
+	//GBufferRenderPass gBufferRenderPass;
+	//FrameBufferRenderPass frameBufferRenderPass;
+	//ShadowRenderPass shadowRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 
 	RenderManager();

@@ -23,7 +23,6 @@ public:
 
 	std::shared_ptr<FrameBufferRenderingPipeline> frameBufferPipeline;
 
-	void CMDDraw(VulkanEngine& engine);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 

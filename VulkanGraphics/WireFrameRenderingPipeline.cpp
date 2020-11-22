@@ -57,12 +57,11 @@ void WireFrameRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& rendere
 
     LayoutBindingInfo[9].Binding = 9;
     LayoutBindingInfo[9].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    LayoutBindingInfo[9].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    LayoutBindingInfo[9].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
     LayoutBindingInfo[10].Binding = 10;
     LayoutBindingInfo[10].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    LayoutBindingInfo[10].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
+    LayoutBindingInfo[10].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
     GraphicsPipeline::CreateDescriptorSetLayout(renderer, std::vector<DescriptorSetLayoutBindingInfo>(LayoutBindingInfo.begin(), LayoutBindingInfo.end()));
 }
