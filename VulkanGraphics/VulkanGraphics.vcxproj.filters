@@ -25,9 +25,6 @@
     <Filter Include="Header Files\Renderer">
       <UniqueIdentifier>{9824d86f-db60-4b22-b8b7-76a47911bec9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Vulkan">
-      <UniqueIdentifier>{41ed92d8-833e-4c92-9785-e05018f3b8b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Vulkan">
       <UniqueIdentifier>{d308bcc6-e562-4919-a575-23bd17ca8040}</UniqueIdentifier>
     </Filter>
@@ -42,6 +39,9 @@
     </Filter>
     <Filter Include="Source Files\Mesh">
       <UniqueIdentifier>{65ee210d-360e-4fd7-bb30-eaf5bbf194c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vulkan">
+      <UniqueIdentifier>{41ed92d8-833e-4c92-9785-e05018f3b8b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +225,36 @@
     <ClCompile Include="Frame2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MegaMan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferNormalTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferPositionTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="GBufferPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GBufferRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="LightManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugLightMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugLightRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shader.frag">
@@ -261,6 +291,18 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\SkyBoxShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\GBufferShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\GBufferShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\FlatShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\FlatShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -452,6 +494,36 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Frame2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MegaMan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferAlbedoTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferNormalTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferPositionTexture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="LightManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLightMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLightRenderingPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

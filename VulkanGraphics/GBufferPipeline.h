@@ -1,15 +1,16 @@
 #pragma once
 #include "GraphicsPipeline.h"
 
-class SceneRenderingPipeline : public GraphicsPipeline
+class GBufferPipeline : public GraphicsPipeline
 {
 private:
 	void CreateDescriptorSetLayout(VulkanEngine& renderer);
 	void CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
 public:
-	SceneRenderingPipeline();
-	SceneRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass);
-	~SceneRenderingPipeline();
+	GBufferPipeline();
+	GBufferPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	~GBufferPipeline();
 
 	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
 };
+
