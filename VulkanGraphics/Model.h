@@ -58,6 +58,7 @@ public:
 
 
 	Model();
+	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
 	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags);
 	~Model();
 
@@ -66,5 +67,5 @@ public:
 	void UpdateImGUI();
 	void Destroy(VulkanEngine& engine);
 
-	int GetRenderFlags() { return RenderFlags; }
+	int GetRenderFlags() { return MeshList[0]->GetRenderFlags(); }
 };

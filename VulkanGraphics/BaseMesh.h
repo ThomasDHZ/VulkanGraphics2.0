@@ -17,8 +17,11 @@ const  std::string DefaultTexture = "C:/Users/dhz/source/repos/Vulkan_SkeletonTe
 enum RenderDrawFlags
 {
     RenderNormally = 1 << 0,
-    RenderWireFrame = 1 << 1,
-    RenderShadow = 1 << 2
+    RenderAnimated = 1 << 1,
+    RenderWireFrame = 1 << 2,
+    RenderWireFrameAnimated = 1 << 3,
+    RenderShadow = 1 << 4,
+    RenderLightDebug = 1 << 5
 };
 
 struct MeshTextures
@@ -54,22 +57,6 @@ struct Material
 struct MeshProperties
 {
     Material material;
-    alignas(8) glm::vec2 UVOffset = glm::vec2(0.0f, 0.0f);
-    alignas(4) int UseDiffuseMapBit = 0;
-    alignas(4) int UseSpecularMapBit = 0;
-    alignas(4) int UseNormalMapBit = 0;
-    alignas(4) int UseDepthMapBit = 0;
-    alignas(4) int UseAlphaMapBit = 0;
-    alignas(4) int UseEmissionMapBit = 0;
-    alignas(4) int UseReflectionMapBit = 0;
-    alignas(4) int UseSkyBoxBit;
-    alignas(4) float minLayers;
-    alignas(4) float maxLayers;
-    alignas(4) float heightScale;
-    alignas(4) float timer;
-    alignas(4) int ReflectSprite;
-    alignas(8) glm::vec2 UVScale = glm::vec2(1.0f, 1.0f);
-    alignas(4) float EmissionStrength = 1.0f;
 };
 
 struct MeshData
@@ -102,8 +89,6 @@ protected:
     std::shared_ptr<Texture> EmissionTexture;
     std::shared_ptr<Texture> ReflectionTexture;
     std::shared_ptr<CubeMapTexture> SkyBoxTexture;
-
-
 
     bool MeshDeletedFlag = false;
 

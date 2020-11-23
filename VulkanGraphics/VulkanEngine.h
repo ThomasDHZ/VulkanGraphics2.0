@@ -15,41 +15,6 @@ const std::vector<const char*> deviceExtensions = {
 };
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-struct VulkanRendererSettings
-{
-	bool ShowMeshLines = false;
-	bool ShowSkyBox = true;
-	bool ShowDebugLightMesh = true;
-	bool ShowDebugCollisionMesh = false;
-	bool TwoDMode = false;
-
-	bool operator!=(const VulkanRendererSettings& OtherSettings)
-	{
-		return (ShowMeshLines != OtherSettings.ShowMeshLines ||
-			ShowSkyBox != OtherSettings.ShowSkyBox ||
-			ShowDebugLightMesh != OtherSettings.ShowDebugLightMesh ||
-			ShowDebugCollisionMesh != OtherSettings.ShowDebugCollisionMesh ||
-			TwoDMode != OtherSettings.TwoDMode);
-	}
-};
-
-struct VulkanDriver
-{
-	std::shared_ptr<VkInstance> Instance;
-	std::shared_ptr<VkDevice> Device;
-	std::shared_ptr<VkPhysicalDevice> PhysicalDevice;
-	std::shared_ptr<VkSurfaceKHR> Surface;
-	std::shared_ptr<VkQueue> GraphicsQueue;
-	std::shared_ptr<VkQueue> PresentQueue;
-	std::shared_ptr<VkCommandPool> RenderCommandPool;
-	std::shared_ptr<VkSwapchainKHR> SwapChain;
-	std::shared_ptr<std::vector<VkImage>> SwapChainImages;
-	std::shared_ptr<std::vector<VkImageView>> SwapChainImageViews;
-	std::shared_ptr<VkExtent2D> SwapChainResolution;
-	VkSurfaceFormatKHR SwapChainImageFormat;
-	uint32_t SwapChainMinImageCount;
-	uint32_t SwapChainImageCount;
-};
 
 class VulkanEngine
 {
@@ -110,7 +75,6 @@ public:
 	~VulkanEngine();
 
 	uint32_t DrawFrame = 0;
-	VulkanRendererSettings Settings;
 	void Destory();
 
 	VkInstance GetVulkanInstance() { return Instance; }

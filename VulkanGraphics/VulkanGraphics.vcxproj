@@ -215,9 +215,9 @@
     <ClCompile Include="VulkanSwapChain.cpp" />
     <ClCompile Include="VulkanUniformBuffer.cpp" />
     <ClCompile Include="VulkanWindow.cpp" />
-    <ClCompile Include="WireFrameRenderingPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\AnimatedShader3D.vert" />
     <None Include="Shaders\BloomShader.frag" />
     <None Include="Shaders\BloomShader.vert" />
     <None Include="Shaders\FlatShader.frag" />
@@ -226,8 +226,8 @@
     <None Include="Shaders\FrameBufferShader.vert" />
     <None Include="Shaders\GBufferShader.frag" />
     <None Include="Shaders\GBufferShader.vert" />
-    <None Include="Shaders\Shader.frag" />
-    <None Include="Shaders\Shader.vert" />
+    <None Include="Shaders\Shader3D.frag" />
+    <None Include="Shaders\Shader3D.vert" />
     <None Include="Shaders\ShadowShader.frag" />
     <None Include="Shaders\ShadowShader.vert" />
     <None Include="Shaders\SkyBoxShader.frag" />
@@ -308,7 +308,6 @@
     <ClInclude Include="VulkanSwapChain.h" />
     <ClInclude Include="VulkanUniformBuffer.h" />
     <ClInclude Include="VulkanWindow.h" />
-    <ClInclude Include="WireFrameRenderingPipeline.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

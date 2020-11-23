@@ -11,7 +11,7 @@ TextureRenderer::TextureRenderer(VulkanEngine& engine)
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass);
+    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
 }
 
 TextureRenderer::~TextureRenderer()
@@ -110,7 +110,7 @@ void TextureRenderer::CreateRendererFramebuffers(VulkanEngine& engine)
 void TextureRenderer::UpdateSwapChain(VulkanEngine& engine)
 {
     DepthTexture->RecreateRendererTexture(engine);
-    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

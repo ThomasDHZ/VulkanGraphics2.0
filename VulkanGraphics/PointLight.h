@@ -23,6 +23,7 @@ public:
 	PointLight(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout& layout, int renderBit, glm::vec3 position);
 	~PointLight();
 
+	void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
 	void Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera);
 	void Destory(VulkanEngine& engine);
 };

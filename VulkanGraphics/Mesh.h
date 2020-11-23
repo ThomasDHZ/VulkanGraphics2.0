@@ -110,9 +110,9 @@ public:
     Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, int renderFlags);
     Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, int renderFlags);
     Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, CustomBuffer customBuffer, int renderFlags);
-    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const MeshData& meshData, VkDescriptorSetLayout layout, int renderFlags);
-    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
-    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const MeshData& meshData, VkDescriptorSetLayout layout, int renderFlags);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags);
     ~Mesh();
 
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);

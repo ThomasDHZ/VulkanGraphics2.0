@@ -79,7 +79,7 @@ void FrameBufferMesh::Update(VulkanEngine& renderer)
     frameBufferSettings.UpdateUniformBuffer(renderer, static_cast<void*>(&settings));
 }
 
-void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout)
+void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout& layout)
 {
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     DescriptorPool = VK_NULL_HANDLE;

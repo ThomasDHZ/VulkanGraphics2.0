@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Vulkan">
       <UniqueIdentifier>{41ed92d8-833e-4c92-9785-e05018f3b8b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Pipeline">
+      <UniqueIdentifier>{46c173f6-e10e-4788-9911-364698a6e2ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Pipeline">
+      <UniqueIdentifier>{4fa6ccf2-3264-4af8-ad13-60aaf10302dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -141,22 +147,13 @@
     <ClCompile Include="BaseMesh.cpp">
       <Filter>Source Files\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files\Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="ForwardRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AnimationPlayer3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WireFrameRenderingPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShadowRenderPass.cpp">
@@ -165,29 +162,17 @@
     <ClCompile Include="SceneRenderPass.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="SceneRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FrameBufferMesh.cpp">
       <Filter>Source Files\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="FrameBufferRenderPass.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="FrameBufferRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextureRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="SkyBoxMesh.cpp">
       <Filter>Source Files\Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="SkyBoxPipeline.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\Mesh</Filter>
@@ -237,9 +222,6 @@
     <ClCompile Include="RenderedGBufferPositionTexture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="GBufferPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GBufferRenderPass.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
@@ -252,17 +234,32 @@
     <ClCompile Include="DebugLightMesh.cpp">
       <Filter>Source Files\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowRenderingPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneRenderingPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferRenderingPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
     <ClCompile Include="DebugLightRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardRenderingPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="GBufferPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Shader.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\Shader.vert">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shaders\WireFrameShader.frag">
       <Filter>Shader</Filter>
     </None>
@@ -303,6 +300,15 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\FlatShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\AnimatedShader3D.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\Shader3D.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\Shader3D.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -412,22 +418,13 @@
     <ClInclude Include="BaseMesh.h">
       <Filter>Header Files\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Header Files\Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="ForwardRenderingPipeline.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AnimationPlayer3D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WireFrameRenderingPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShadowRenderPass.h">
@@ -436,20 +433,11 @@
     <ClInclude Include="SceneRenderPass.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="SceneRenderingPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadowRenderingPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FrameBufferMesh.h">
       <Filter>Header Files\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="FrameBufferRenderPass.h">
       <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBufferRenderingPipeline.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureRenderer.h">
       <Filter>Header Files\Renderer</Filter>
@@ -508,9 +496,6 @@
     <ClInclude Include="RenderedGBufferPositionTexture.h">
       <Filter>Header Files\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="GBufferPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GBufferRenderPass.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -523,8 +508,26 @@
     <ClInclude Include="DebugLightMesh.h">
       <Filter>Header Files\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowRenderingPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneRenderingPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderingPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardRenderingPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
     <ClInclude Include="DebugLightRenderingPipeline.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

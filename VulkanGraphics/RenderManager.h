@@ -10,6 +10,7 @@
 #include "FrameBufferRenderPass.h"
 #include "FrameBufferMesh.h"
 #include "GBufferRenderPass.h"
+#include "LightManager.h"
 
 class RenderManager
 {
@@ -24,7 +25,7 @@ private:
 
 	//FrameBufferMesh frameBuffer;
 
-	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
+	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);
 	//void SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
 	//void GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
 	//void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
@@ -44,10 +45,10 @@ public:
 	RenderManager(VulkanEngine& vEngine, GLFWwindow* window);
 	~RenderManager();
 
-	void CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox);
-	void UpdateCommandBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox);
-	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox);
-	void Draw(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox);
+	void CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
+	void UpdateCommandBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
+	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
+	void Draw(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
 	void Destroy(VulkanEngine& engine);
 };
 

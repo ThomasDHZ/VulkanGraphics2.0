@@ -29,7 +29,7 @@ Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const st
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const MeshData& meshData, VkDescriptorSetLayout layout, int renderFlags) : BaseMesh(engine, meshData, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const MeshData& meshData, VkDescriptorSetLayout layout, int renderFlags) : BaseMesh(engine, meshData, renderFlags)
 {
     CustomBuffer EmptyBuffer;
     EmptyBuffer.ByteSize = sizeof(Empty);
@@ -52,7 +52,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager,
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     CustomBuffer EmptyBuffer;
     EmptyBuffer.ByteSize = sizeof(Empty);
@@ -71,7 +71,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager,
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     ExtendedMeshProperitesBuffer = customBuffer;
 
@@ -98,50 +98,50 @@ void Mesh::SetTransformMatrix(glm::mat4 NewTranformMatrix)
 
 void Mesh::CreateMaterialProperties(MeshTextures textures)
 {
-    if (textures.DiffuseMap != DefaultTexture)
-    {
-        properites.UseDiffuseMapBit = 1;
-    }
+    //if (textures.DiffuseMap != DefaultTexture)
+    //{
+    //    properites.UseDiffuseMapBit = 1;
+    //}
 
-    if (textures.SpecularMap != DefaultTexture)
-    {
-        properites.UseSpecularMapBit = 1;
-    }
+    //if (textures.SpecularMap != DefaultTexture)
+    //{
+    //    properites.UseSpecularMapBit = 1;
+    //}
 
-    if (textures.NormalMap != DefaultTexture)
-    {
-        properites.UseNormalMapBit = 1;
-    }
+    //if (textures.NormalMap != DefaultTexture)
+    //{
+    //    properites.UseNormalMapBit = 1;
+    //}
 
-    if (textures.DepthMap != DefaultTexture)
-    {
-        properites.UseDepthMapBit = 1;
-    }
+    //if (textures.DepthMap != DefaultTexture)
+    //{
+    //    properites.UseDepthMapBit = 1;
+    //}
 
-    if (textures.AlphaMap != DefaultTexture)
-    {
-        properites.UseAlphaMapBit = 1;
-    }
+    //if (textures.AlphaMap != DefaultTexture)
+    //{
+    //    properites.UseAlphaMapBit = 1;
+    //}
 
-    if (textures.EmissionMap != DefaultTexture)
-    {
-        properites.UseEmissionMapBit = 1;
-    }
+    //if (textures.EmissionMap != DefaultTexture)
+    //{
+    //    properites.UseEmissionMapBit = 1;
+    //}
 
-    if (textures.ReflectionMap != DefaultTexture)
-    {
-        properites.UseReflectionMapBit = 1;
-    }
+    //if (textures.ReflectionMap != DefaultTexture)
+    //{
+    //    properites.UseReflectionMapBit = 1;
+    //}
 
-    properites.UseDiffuseMapBit = 1;
-    properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    properites.material.shininess = 32;
-    properites.material.reflectivness = 0;
-    properites.minLayers = 8.0f;
-    properites.maxLayers = 32.0f;
-    properites.heightScale = 0.1f;
+    //properites.UseDiffuseMapBit = 1;
+    //properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+    //properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+    //properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //properites.material.shininess = 32;
+    //properites.material.reflectivness = 0;
+    //properites.minLayers = 8.0f;
+    //properites.maxLayers = 32.0f;
+    //properites.heightScale = 0.1f;
 }
 
 void Mesh::CreateUniformBuffers(VulkanEngine& engine)
@@ -225,15 +225,15 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
 
     ubo.model = ubo.model * ModelMatrix;
 
-    properites.UseDiffuseMapBit = 1;
+    //properites.UseDiffuseMapBit = 1;
     properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
     properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
     properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
     properites.material.shininess = 32;
     properites.material.reflectivness = 0;
-    properites.minLayers = 8.0f;
-    properites.maxLayers = 32.0f;
-    properites.heightScale = 0.1f;
+    //properites.minLayers = 8.0f;
+    //properites.maxLayers = 32.0f;
+    //properites.heightScale = 0.1f;
 
     //properites.timer = glfwGetTime();
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);
@@ -254,15 +254,15 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
         ubo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
     }
 
-    properites.UseDiffuseMapBit = 1;
+    //properites.UseDiffuseMapBit = 1;
     properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
     properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
     properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
     properites.material.shininess = 32;
     properites.material.reflectivness = 0;
-    properites.minLayers = 8.0f;
-    properites.maxLayers = 32.0f;
-    properites.heightScale = 0.1f;
+    //properites.minLayers = 8.0f;
+    //properites.maxLayers = 32.0f;
+    //properites.heightScale = 0.1f;
 
     //properites.timer = glfwGetTime();
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);

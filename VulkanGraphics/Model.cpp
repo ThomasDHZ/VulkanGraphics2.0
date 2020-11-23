@@ -5,6 +5,11 @@ Model::Model()
 {
 }
 
+Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags)
+{
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, vertexdata, indicesdata, textures, layout, renderFlags)));
+}
+
 Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags)
 {
 	RenderFlags = renderFlags;
@@ -595,9 +600,14 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& cam
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	modelMatrix = glm::scale(modelMatrix, ModelScale);
 
-	LoadMeshTransform(0, modelMatrix);
-	AnimationPlayer.Update();
-	
+	if (NodeMapList.size() > 0)
+	{
+		LoadMeshTransform(0, modelMatrix);
+	}
+	if (BoneList.size() > 0)
+	{
+		AnimationPlayer.Update();
+	}
 	for (auto mesh : MeshList)
 	{
 		//mesh->properites.material.specular = glm::vec3(0.02f);

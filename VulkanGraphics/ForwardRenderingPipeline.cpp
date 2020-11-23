@@ -5,10 +5,10 @@ ForwardRenderingPipeline::ForwardRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-ForwardRenderingPipeline::ForwardRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass) : GraphicsPipeline(renderer)
+ForwardRenderingPipeline::ForwardRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags) : GraphicsPipeline(renderer)
 {
     CreateDescriptorSetLayout(renderer);
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, PipelineBitFlags);
 }
 
 ForwardRenderingPipeline::~ForwardRenderingPipeline()
@@ -17,59 +17,47 @@ ForwardRenderingPipeline::~ForwardRenderingPipeline()
 
 void ForwardRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
 {
-    std::array<DescriptorSetLayoutBindingInfo, 11> LayoutBindingInfo = {};
-
-    LayoutBindingInfo[0].Binding = 0;
-    LayoutBindingInfo[0].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    LayoutBindingInfo[0].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    LayoutBindingInfo[1].Binding = 1;
-    LayoutBindingInfo[1].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[1].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[2].Binding = 2;
-    LayoutBindingInfo[2].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[2].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[3].Binding = 3;
-    LayoutBindingInfo[3].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[3].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[4].Binding = 4;
-    LayoutBindingInfo[4].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[4].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[5].Binding = 5;
-    LayoutBindingInfo[5].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[5].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[6].Binding = 6;
-    LayoutBindingInfo[6].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[6].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[7].Binding = 7;
-    LayoutBindingInfo[7].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[7].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[8].Binding = 8;
-    LayoutBindingInfo[8].DescriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    LayoutBindingInfo[8].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[9].Binding = 9;
-    LayoutBindingInfo[9].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    LayoutBindingInfo[9].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    LayoutBindingInfo[10].Binding = 10;
-    LayoutBindingInfo[10].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    LayoutBindingInfo[10].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    GraphicsPipeline::CreateDescriptorSetLayout(renderer, std::vector<DescriptorSetLayoutBindingInfo>(LayoutBindingInfo.begin(), LayoutBindingInfo.end()));
+    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT });
+    GraphicsPipeline::CreateDescriptorSetLayout(renderer, LayoutBindingInfo);
 }
 
-void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags)
 {
-    auto vertShaderCode = ReadShaderFile("shaders/vert.spv");
-    auto fragShaderCode = ReadShaderFile("shaders/frag.spv");
+    std::vector<char> vertShaderCode;
+    std::vector<char> fragShaderCode;
+    if (PipelineBitFlags & PipelineBitFlagsEnum::WireFramePipeline &&
+        PipelineBitFlags & PipelineBitFlagsEnum::NormalPipeline)
+    {
+        vertShaderCode = ReadShaderFile("shaders/Shader3DVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/WireFrameFrag.spv");
+    }
+    else if (PipelineBitFlags & PipelineBitFlagsEnum::WireFramePipeline &&
+            PipelineBitFlags & PipelineBitFlagsEnum::AnimatedPipeline) 
+    {
+        vertShaderCode = ReadShaderFile("shaders/AnimatedShader3DVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/WireFrameFrag.spv");
+    }
+    else if (PipelineBitFlags & PipelineBitFlagsEnum::NormalPipeline)
+    {
+       vertShaderCode = ReadShaderFile("shaders/Shader3DVert.spv");
+       fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
+    }
+    else if (PipelineBitFlags & PipelineBitFlagsEnum::AnimatedPipeline)
+    {
+        vertShaderCode = ReadShaderFile("shaders/AnimatedShader3DVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
+    }
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);
@@ -127,11 +115,18 @@ void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, cons
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
+    if (PipelineBitFlags & PipelineBitFlagsEnum::WireFramePipeline)
+    {
+        rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
+    }
+    else
+    {
+        rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    }
 
     VkPipelineMultisampleStateCreateInfo multisampling{};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -200,7 +195,7 @@ void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, cons
     vkDestroyShaderModule(renderer.Device, vertShaderModule, nullptr);
 }
 
-void ForwardRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void ForwardRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags)
 {
     vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
@@ -208,5 +203,5 @@ void ForwardRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, co
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
 
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, PipelineBitFlags);
 }

@@ -19,6 +19,14 @@ LightManager::~LightManager()
 {
 }
 
+void LightManager::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber)
+{
+	for (auto light : PointLightList)
+	{
+		light->Draw(RenderCommandBuffer, pipeline, FrameNumber);
+	}
+}
+
 void LightManager::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera)
 {
 	light.viewPos = static_cast<PerspectiveCamera*>(camera.get())->GetPosition();

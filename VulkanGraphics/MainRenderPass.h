@@ -5,7 +5,6 @@
 #include "VulkanEngine.h"
 #include "RenderedDepthTexture.h"
 #include "ForwardRenderingPipeline.h"
-#include "WireFrameRenderingPipeline.h"
 #include "SkyBoxPipeline.h"
 #include "DebugLightRenderingPipeline.h"
 
@@ -26,8 +25,10 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
+	std::shared_ptr<ForwardRenderingPipeline> wireFrameRendereringPipeline;
+	std::shared_ptr<ForwardRenderingPipeline> AnimatedForwardRendereringPipeline;
+	std::shared_ptr<ForwardRenderingPipeline> AnimatedWireFramedRendereringPipeline;
 	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
-	std::shared_ptr<WireFrameRenderingPipeline> wireFrameRendereringPipeline;
 	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);

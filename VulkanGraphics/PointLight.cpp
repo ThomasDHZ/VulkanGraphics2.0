@@ -17,6 +17,11 @@ PointLight::~PointLight()
 {
 }
 
+void PointLight::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber)
+{
+	DebugMesh->Draw(RenderCommandBuffer, pipeline, FrameNumber);
+}
+
 void PointLight::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera)
 {
 	MeshColor color = {};

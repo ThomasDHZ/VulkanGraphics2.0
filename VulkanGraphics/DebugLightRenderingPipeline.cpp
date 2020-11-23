@@ -17,17 +17,10 @@ DebugLightRenderingPipeline::~DebugLightRenderingPipeline()
 
 void DebugLightRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
 {
-	std::array<DescriptorSetLayoutBindingInfo, 2> LayoutBindingInfo = {};
-
-	LayoutBindingInfo[0].Binding = 0;
-	LayoutBindingInfo[0].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	LayoutBindingInfo[0].StageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-	LayoutBindingInfo[1].Binding = 1;
-	LayoutBindingInfo[1].DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	LayoutBindingInfo[1].StageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-	GraphicsPipeline::CreateDescriptorSetLayout(renderer, std::vector<DescriptorSetLayoutBindingInfo>(LayoutBindingInfo.begin(), LayoutBindingInfo.end()));
+	std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
+	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT });
+	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT });
+	GraphicsPipeline::CreateDescriptorSetLayout(renderer, LayoutBindingInfo);
 }
 
 void DebugLightRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)

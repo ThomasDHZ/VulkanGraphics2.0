@@ -1,4 +1,5 @@
 #include "MainRenderPass.h"
+#include "BaseMesh.h"
 
 MainRenderPass::MainRenderPass()
 {
@@ -11,8 +12,10 @@ MainRenderPass::MainRenderPass(VulkanEngine& engine)
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass);
-    wireFrameRendereringPipeline = std::make_shared<WireFrameRenderingPipeline>(engine, RenderPass);
+    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
+    AnimatedForwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline);
+    wireFrameRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline | PipelineBitFlagsEnum::WireFramePipeline);
+    AnimatedWireFramedRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline | PipelineBitFlagsEnum::WireFramePipeline);
     debugLightRenderingPipeline = std::make_shared<DebugLightRenderingPipeline>(engine, RenderPass);
     skyBoxPipeline = std::make_shared<SkyBoxPipeline>(engine, RenderPass);
 }
@@ -109,8 +112,10 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     DepthTexture->RecreateRendererTexture(engine);
 
-    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
-    wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
+    AnimatedForwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline);
+    wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline | PipelineBitFlagsEnum::WireFramePipeline);
+    AnimatedWireFramedRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline | PipelineBitFlagsEnum::WireFramePipeline);
     debugLightRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     skyBoxPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 
@@ -132,8 +137,11 @@ void MainRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
 
     forwardRendereringPipeline->Destroy(engine);
-    skyBoxPipeline->Destroy(engine);
     wireFrameRendereringPipeline->Destroy(engine);
+    AnimatedForwardRendereringPipeline->Destroy(engine);
+    AnimatedWireFramedRendereringPipeline->Destroy(engine);
+
+    skyBoxPipeline->Destroy(engine);
     debugLightRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
