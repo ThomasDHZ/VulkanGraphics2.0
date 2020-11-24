@@ -158,13 +158,13 @@ void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
 
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
 
@@ -200,7 +200,7 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, DescriptorSets[i], EmissionMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 7, DescriptorSets[i], ReflectionMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
-        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], LightInfo));
+        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], meshPropertiesInfo));
         DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], LightInfo));
         BaseMesh::CreateDescriptorSetsData(engine, DescriptorList);
     }
@@ -226,11 +226,11 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     ubo.model = ubo.model * ModelMatrix;
 
     //properites.UseDiffuseMapBit = 1;
-    properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    properites.material.shininess = 32;
-    properites.material.reflectivness = 0;
+    //properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+    //properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+    //properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //properites.material.shininess = 32;
+    //properites.material.reflectivness = 0;
     //properites.minLayers = 8.0f;
     //properites.maxLayers = 32.0f;
     //properites.heightScale = 0.1f;
@@ -255,11 +255,11 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     }
 
     //properites.UseDiffuseMapBit = 1;
-    properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    properites.material.shininess = 32;
-    properites.material.reflectivness = 0;
+    //properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+    //properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+    //properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //properites.material.shininess = 32;
+    //properites.material.reflectivness = 0;
     //properites.minLayers = 8.0f;
     //properites.maxLayers = 32.0f;
     //properites.heightScale = 0.1f;

@@ -41,8 +41,8 @@ struct SpotLightStruct {
 struct LightBufferObject
 {
     DirectionalLightStruct dLight;
-    PointLightStruct pLight[128];
-    SpotLightStruct sLight;
+    PointLightStruct pLight;
+   // SpotLightStruct sLight;
     alignas(16) glm::vec3 viewPos;
 };
 

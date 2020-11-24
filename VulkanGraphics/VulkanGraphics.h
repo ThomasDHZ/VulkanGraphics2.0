@@ -57,7 +57,7 @@ private:
     SkyBoxMesh Skybox;
 
     void UpdateUniformBuffer(uint32_t currentImage);
-
+    LightBufferObject lighter;
 public:
     VulkanGraphics();
     ~VulkanGraphics();

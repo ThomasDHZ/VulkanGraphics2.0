@@ -56,7 +56,7 @@ struct Material
 
 struct MeshProperties
 {
-    Material material;
+    alignas(16) glm::vec3 test = glm::vec3(1.0f, 0.0f, 0.0f);
 };
 
 struct MeshData
