@@ -8,5 +8,5 @@ layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    outColor = vec4(texture(FrameBufferTexture, fragTexCoord).rgb, 0.1f);
+    outColor = vec4(texture(FrameBufferTexture, fragTexCoord).rgb, 0.5f);
 }

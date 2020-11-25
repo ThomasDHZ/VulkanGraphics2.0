@@ -1,27 +1,7 @@
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
 
-
-#define MAXPOINTLIGHTS 128
-
-const int UseDiffuseMapBit    = 0x00000001;
-const int UseSpecularMapBit   = 0x00000002;
-const int UseNormalMapBit     = 0x00000004;
-const int UseDepthMapBit      = 0x00000008;
-const int UseAlphaMapBit      = 0x00000016;
-const int UseEmissionMapBit   = 0x00000032;
-const int UseSkyBoxBit        = 0x00000064;
-
-struct MapBits
-{
-     int UseDiffuseMapBit;
-     int UseSpecularMapBit;
-     int UseNormalMapBit;
-     int UseDepthMapBit;
-     int UseAlphaMapBit;
-     int UseEmissionMapBit;
-     int UseSkyBoxBit;
-};
+#define MAXPOINTLIGHTS 4
 
 struct Material {
     vec3 ambient;
@@ -37,6 +17,7 @@ struct DirectionalLightStruct {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    int InUseFlag;
 };
 
 struct PointLightStruct {
@@ -49,7 +30,7 @@ struct PointLightStruct {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
-    int InUse;
+    int InUseFlag;
 };
 
 struct SpotLightStruct {
@@ -77,12 +58,13 @@ layout(binding = 7) uniform sampler2D ReflectionMap;
 layout(binding = 8) uniform samplerCube SkyBox;
 layout(binding = 9) uniform MeshProperties
 {
-    vec3 test;
+    Material material;
 } meshProperties;
 layout(binding = 10) uniform Light
 {
     DirectionalLightStruct DLight;
-    PointLightStruct PLight;
+    PointLightStruct PLight[MAXPOINTLIGHTS];
+    SpotLightStruct SLight;
     vec3 viewPos;
 } light;
 
@@ -95,14 +77,27 @@ layout(location = 0) out vec4 FragColor;
 
 vec3 CalcDirLight(DirectionalLightStruct light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLightStruct light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcSpotLight(SpotLightStruct light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {  
-    vec3 norm = normalize(Normal);
-    vec3 viewDir = normalize(light.viewPos - FragPos);
+    vec3 V = normalize(light.viewPos - FragPos);
+    vec3 N = normalize(Normal);
 
-    vec3 result = CalcDirLight(light.DLight, norm, viewDir);
-    result += CalcPointLight(light.PLight, norm, FragPos, viewDir);  
+    vec3 TangentLightDirection = TBN * light.DLight.direction;
+    vec3 TangentViewPos  = TBN * light.viewPos;
+    vec3 TangentFragPos  = TBN * FragPos;
+
+
+    vec3 result = CalcDirLight(light.DLight, N, V);
+    for(int x = 0; x < MAXPOINTLIGHTS; x++)
+    {
+      if(light.PLight[x].InUseFlag == 1)
+      {
+             result += CalcPointLight(light.PLight[x], N, FragPos, V);  
+      } 
+    }
+    result += CalcSpotLight(light.SLight, N, FragPos, V); 
 
     FragColor = vec4(result, 1.0);
 }
@@ -114,7 +109,7 @@ vec3 CalcDirLight(DirectionalLightStruct light, vec3 normal, vec3 viewDir)
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), meshProperties.material.shininess);
     // combine results
     vec3 ambient = light.ambient * vec3(texture(DiffuseMap, TexCoords));
     vec3 diffuse = light.diffuse * diff * vec3(texture(DiffuseMap, TexCoords));
@@ -129,7 +124,7 @@ vec3 CalcPointLight(PointLightStruct light, vec3 normal, vec3 fragPos, vec3 view
     float diff = max(dot(normal, lightDir), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), meshProperties.material.shininess);
     // attenuation
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
@@ -140,5 +135,30 @@ vec3 CalcPointLight(PointLightStruct light, vec3 normal, vec3 fragPos, vec3 view
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
+    return (ambient + diffuse + specular);
+}
+
+vec3 CalcSpotLight(SpotLightStruct light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), meshProperties.material.shininess);
+    // attenuation
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+    // spotlight intensity
+    float theta = dot(lightDir, normalize(-light.direction)); 
+    float epsilon = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    // combine results
+    vec3 ambient = light.ambient * vec3(texture(DiffuseMap, TexCoords));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(DiffuseMap, TexCoords));
+    vec3 specular = light.specular * spec * vec3(texture(SpecularMap, TexCoords));
+    ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
     return (ambient + diffuse + specular);
 }

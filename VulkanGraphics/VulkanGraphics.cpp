@@ -69,31 +69,43 @@ VulkanGraphics::VulkanGraphics()
     };
 
     ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally ));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderAnimated));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
 
-    ModelList[0].ModelPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-    ModelList[0].ModelRotation = glm::vec3(0.0f, 0.0f, 90.0f);
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally));
+
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderAnimated));
+
+    glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
+    for (int x = 0; x < 10; x++)
+    {
+        ModelList[x].ModelPosition = cubePositions[x];
+    }
+    //ModelList[0].ModelRotation = glm::vec3(0.0f, 0.0f, 90.0f);
     //ModelList[1].ModelPosition = glm::vec3(2.0f, 4.0f, 0.0f);
     //ModelList[2].ModelPosition = glm::vec3(3.0f, 3.0f, 0.0f);
     //ModelList[3].ModelPosition = glm::vec3(7.0f, 3.0f, 0.0f);
 
     Skybox = SkyBoxMesh(vulkanEngine, textureManager, renderManager.mainRenderPass.skyBoxPipeline->ShaderPipelineDescriptorLayout, meshTextures);
     renderManager.CMDBuffer(vulkanEngine, ModelList, Skybox, light);
-
-    //light.Update(vulkanEngine, camera);
-    LightBufferObject lighter = {};
-    lighter.dLight.diffuse = glm::vec3(-0.2f, -1.0f, -0.3f);
-    lighter.dLight.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    lighter.dLight.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
-    lighter.dLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
-
-    lighter.pLight.position = glm::vec3(0.05f, 0.05f, 0.05f);
-    lighter.pLight.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    lighter.pLight.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    lighter.pLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    lighter.pLight.constant = 1.0f;
-    lighter.pLight.linear = 0.09f;
-    lighter.pLight.quadratic = 0.032f;
 }
 
 VulkanGraphics::~VulkanGraphics()
@@ -143,34 +155,34 @@ void VulkanGraphics::MainLoop()
          //   ImGui::Image(renderManager.gBufferRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
          //   ImGui::Image(renderManager.shadowRenderPass.DepthTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             
-          /*  ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);
             ImGui::SliderFloat3("dambient", &light.light.dLight.ambient.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("ddiffuse", &light.light.dLight.diffuse.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("dspecular", &light.light.dLight.specular.x, 0.0f, 1.0f);*/
+            ImGui::SliderFloat3("dspecular", &light.light.dLight.specular.x, 0.0f, 1.0f);
 
-           // ImGui::SliderInt("Using1", &light.PointLightList[0]->pointLight.InUseFlag, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pLight", &lighter.dLight.direction.x, -10.0f, 10.0f);
-            ImGui::SliderFloat3("pambient", &lighter.dLight.ambient.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pdiffuse", &lighter.dLight.diffuse.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pspecular", &lighter.dLight.specular.x, 0.0f, 1.0f);
+            ImGui::SliderInt("Using1", &light.light.pLight[0].InUseFlag, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pLight", &light.light.pLight[0].position.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3("pambient", &light.light.pLight[0].ambient.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pdiffuse", &light.light.pLight[0].diffuse.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pspecular", &light.light.pLight[0].specular.x, 0.0f, 1.0f);
 
-           // ImGui::SliderInt("Using2", &light.PointLightList[1]->pointLight.InUseFlag, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pLight2", &lighter.pLight.position.x, -10.0f, 10.0f);
-            ImGui::SliderFloat3("pambient2", &lighter.pLight.ambient.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pdiffuse2", &lighter.pLight.diffuse.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pspecular2", &lighter.pLight.specular.x, 0.0f, 1.0f);
+            ImGui::SliderInt("Using2", &light.light.pLight[1].InUseFlag, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pLight2", &light.light.pLight[1].position.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3("pambient2", &light.light.pLight[1].ambient.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pdiffuse2", &light.light.pLight[1].diffuse.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pspecular2", &light.light.pLight[1].specular.x, 0.0f, 1.0f);
 
-            /*ImGui::SliderInt("Using3", &light.PointLightList[2]->pointLight.InUseFlag, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pLight3", &light.PointLightList[2]->pointLight.position.x, -100.0f, 100.0f);
-            ImGui::SliderFloat3("pambient3", &light.PointLightList[2]->pointLight.ambient.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pdiffuse3", &light.PointLightList[2]->pointLight.diffuse.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pspecular3", &light.PointLightList[2]->pointLight.specular.x, 0.0f, 1.0f);
+            ImGui::SliderInt("Using3", &light.light.pLight[2].InUseFlag, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pLight3", &light.light.pLight[2].position.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3("pambient3", &light.light.pLight[2].ambient.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pdiffuse3", &light.light.pLight[2].diffuse.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pspecular3", &light.light.pLight[2].specular.x, 0.0f, 1.0f);
 
-            ImGui::SliderInt("Using4", &light.PointLightList[3]->pointLight.InUseFlag, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pLight4", &light.PointLightList[3]->pointLight.position.x, -100.0f, 100.0f);
-            ImGui::SliderFloat3("pambient4", &light.PointLightList[3]->pointLight.ambient.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pdiffuse4", &light.PointLightList[3]->pointLight.diffuse.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3("pspecular4", &light.PointLightList[3]->pointLight.specular.x, 0.0f, 1.0f);*/
+            ImGui::SliderInt("Using4", &light.light.pLight[3].InUseFlag, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pLight4", &light.light.pLight[3].position.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3("pambient4", &light.light.pLight[3].ambient.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pdiffuse4", &light.light.pLight[3].diffuse.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3("pspecular4", &light.light.pLight[3].specular.x, 0.0f, 1.0f);
             
             textureManager->UpdateIMGUIVRAM();
         }
@@ -188,18 +200,12 @@ void VulkanGraphics::MainLoop()
 
 void VulkanGraphics::UpdateUniformBuffer(uint32_t currentImage)
 {
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
+    light.Update(vulkanEngine, camera);
     camera->Update(vulkanEngine);
 
-
-    lighter.viewPos = camera->GetPosition();
     for (auto& model : ModelList)
     {
-        model.Update(vulkanEngine, camera, lighter);
+        model.Update(vulkanEngine, camera, light.light);
     }
     Skybox.UpdateUniformBuffer(vulkanEngine, camera);
 }

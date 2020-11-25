@@ -47,16 +47,16 @@ struct MeshTextures
 
 struct Material
 {
-    alignas(16) glm::vec3 ambient;
-    alignas(16) glm::vec3 diffuse;
-    alignas(16) glm::vec3 specular;
-    alignas(4) float shininess;
-    alignas(4) float reflectivness;
+    alignas(16) glm::vec3 ambient = glm::vec3(1.0f, 0.0f, 0.0f);
+    alignas(16) glm::vec3 diffuse = glm::vec3(0.0f, 1.0f, 0.0f);
+    alignas(16) glm::vec3 specular = glm::vec3(0.0f, 0.0f, 1.0f);
+    alignas(4) float shininess = 32;
+    alignas(4) float reflectivness = 0;
 };
 
 struct MeshProperties
 {
-    alignas(16) glm::vec3 test = glm::vec3(1.0f, 0.0f, 0.0f);
+    alignas(16) Material material;
 };
 
 struct MeshData

@@ -188,7 +188,7 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    skybox.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.skyBoxPipeline, SwapBufferImageIndex);
+    //skybox.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.skyBoxPipeline, SwapBufferImageIndex);
     for (auto model : ModelList)
     {
         if(model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)

@@ -28,4 +28,6 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     void MouseScroll(float yoffset);
     void Update(VulkanEngine& engine) override;
+
+    glm::vec3 GetFront() { return Front; }
 };

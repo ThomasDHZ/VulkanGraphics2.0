@@ -20,7 +20,7 @@ struct PointLightStruct {
     alignas(16) glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
     alignas(16) glm::vec3 diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     alignas(16) glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    alignas(4)  int InUseFlag = 0;
+    alignas(4)  int InUseFlag = 1;
 };
 
 struct SpotLightStruct {
@@ -41,8 +41,8 @@ struct SpotLightStruct {
 struct LightBufferObject
 {
     DirectionalLightStruct dLight;
-    PointLightStruct pLight;
-   // SpotLightStruct sLight;
+    PointLightStruct pLight[4];
+    SpotLightStruct sLight;
     alignas(16) glm::vec3 viewPos;
 };
 
