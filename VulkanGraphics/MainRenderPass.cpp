@@ -12,10 +12,10 @@ MainRenderPass::MainRenderPass(VulkanEngine& engine)
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
-    AnimatedForwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline);
-    wireFrameRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline | PipelineBitFlagsEnum::WireFramePipeline);
-    AnimatedWireFramedRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline | PipelineBitFlagsEnum::WireFramePipeline);
+    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally);
+    AnimatedForwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderAnimated);
+    wireFrameRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
+    AnimatedWireFramedRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderWireFrameAnimated);
     debugLightRenderingPipeline = std::make_shared<DebugLightRenderingPipeline>(engine, RenderPass);
     skyBoxPipeline = std::make_shared<SkyBoxPipeline>(engine, RenderPass);
 }
@@ -112,10 +112,10 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     DepthTexture->RecreateRendererTexture(engine);
 
-    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
-    AnimatedForwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline);
-    wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline | PipelineBitFlagsEnum::WireFramePipeline);
-    AnimatedWireFramedRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::AnimatedPipeline | PipelineBitFlagsEnum::WireFramePipeline);
+    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally);
+    AnimatedForwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderAnimated);
+    wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
+    AnimatedWireFramedRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderWireFrameAnimated);
     debugLightRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     skyBoxPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
 

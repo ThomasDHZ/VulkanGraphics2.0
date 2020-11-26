@@ -1,5 +1,6 @@
 #include "ForwardRenderingPipeline.h"
 #include "Vertex.h"
+#include "BaseMesh.h"
 
 ForwardRenderingPipeline::ForwardRenderingPipeline() : GraphicsPipeline()
 {
@@ -36,24 +37,24 @@ void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, cons
 {
     std::vector<char> vertShaderCode;
     std::vector<char> fragShaderCode;
-    if (PipelineBitFlags & PipelineBitFlagsEnum::WireFramePipeline &&
-        PipelineBitFlags & PipelineBitFlagsEnum::NormalPipeline)
+    if (PipelineBitFlags & RenderDrawFlags::RenderWireFrame &&
+        PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
         vertShaderCode = ReadShaderFile("shaders/Shader3DVert.spv");
         fragShaderCode = ReadShaderFile("shaders/WireFrameFrag.spv");
     }
-    else if (PipelineBitFlags & PipelineBitFlagsEnum::WireFramePipeline &&
-            PipelineBitFlags & PipelineBitFlagsEnum::AnimatedPipeline) 
+    else if (PipelineBitFlags & RenderDrawFlags::RenderWireFrameAnimated &&
+            PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
         vertShaderCode = ReadShaderFile("shaders/AnimatedShader3DVert.spv");
         fragShaderCode = ReadShaderFile("shaders/WireFrameFrag.spv");
     }
-    else if (PipelineBitFlags & PipelineBitFlagsEnum::NormalPipeline)
+    else if (PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
        vertShaderCode = ReadShaderFile("shaders/Shader3DVert.spv");
        fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
     }
-    else if (PipelineBitFlags & PipelineBitFlagsEnum::AnimatedPipeline)
+    else if (PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
         vertShaderCode = ReadShaderFile("shaders/AnimatedShader3DVert.spv");
         fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
@@ -119,7 +120,8 @@ void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, cons
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
-    if (PipelineBitFlags & PipelineBitFlagsEnum::WireFramePipeline)
+    if (PipelineBitFlags & RenderDrawFlags::RenderWireFrame ||
+        PipelineBitFlags & RenderDrawFlags::RenderWireFrameAnimated)
     {
         rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
     }

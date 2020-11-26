@@ -1,14 +1,15 @@
 #include "SceneRenderingPipeline.h"
 #include "Vertex.h"
+#include "BaseMesh.h"
 
 SceneRenderingPipeline::SceneRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-SceneRenderingPipeline::SceneRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass) : GraphicsPipeline(renderer)
+SceneRenderingPipeline::SceneRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags) : GraphicsPipeline(renderer)
 {
     CreateDescriptorSetLayout(renderer);
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, PipelineBitFlags);
 }
 
 SceneRenderingPipeline::~SceneRenderingPipeline()
@@ -32,10 +33,32 @@ void SceneRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
     GraphicsPipeline::CreateDescriptorSetLayout(renderer, LayoutBindingInfo);
 }
 
-void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags)
 {
-    auto vertShaderCode = ReadShaderFile("shaders/BloomVert.spv");
-    auto fragShaderCode = ReadShaderFile("shaders/BloomFrag.spv");
+    std::vector<char> vertShaderCode;
+    std::vector<char> fragShaderCode;
+    if (PipelineBitFlags & RenderDrawFlags::RenderWireFrame &&
+        PipelineBitFlags & RenderDrawFlags::RenderNormally)
+    {
+        vertShaderCode = ReadShaderFile("shaders/WireFrameBloomShaderVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/WireFrameBloomShaderFrag.spv");
+    }
+    else if (PipelineBitFlags & RenderDrawFlags::RenderWireFrameAnimated &&
+        PipelineBitFlags & RenderDrawFlags::RenderAnimated)
+    {
+        vertShaderCode = ReadShaderFile("shaders/AnimatedBloomShaderVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/WireFrameBloomShaderFrag.spv");
+    }
+    else if (PipelineBitFlags & RenderDrawFlags::RenderNormally)
+    {
+        vertShaderCode = ReadShaderFile("shaders/BloomVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/BloomFrag.spv");
+    }
+    else if (PipelineBitFlags & RenderDrawFlags::RenderAnimated)
+    {
+        vertShaderCode = ReadShaderFile("shaders/AnimatedBloomShaderVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/BloomFrag.spv");
+    }
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);
@@ -93,11 +116,19 @@ void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const 
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
+    if (PipelineBitFlags & RenderDrawFlags::RenderWireFrame ||
+        PipelineBitFlags & RenderDrawFlags::RenderWireFrameAnimated)
+    {
+        rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
+    }
+    else
+    {
+        rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    }
 
     VkPipelineMultisampleStateCreateInfo multisampling{};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -175,7 +206,7 @@ void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const 
     vkDestroyShaderModule(renderer.Device, vertShaderModule, nullptr);
 }
 
-void SceneRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void SceneRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags)
 {
     vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
@@ -183,5 +214,5 @@ void SceneRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, cons
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
 
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, PipelineBitFlags);
 }

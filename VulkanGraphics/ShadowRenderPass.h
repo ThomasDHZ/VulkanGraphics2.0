@@ -22,7 +22,8 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
-	std::shared_ptr<ShadowRenderingPipeline> shadowdRendereringPipeline;
+	std::shared_ptr<ShadowRenderingPipeline> shadowRendereringPipeline;
+	std::shared_ptr<ShadowRenderingPipeline> AnimatedShadowRendereringPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);

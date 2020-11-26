@@ -1,4 +1,5 @@
 #include "TextureRenderer.h"
+#include "BaseMesh.h"
 
 TextureRenderer::TextureRenderer()
 {
@@ -11,7 +12,7 @@ TextureRenderer::TextureRenderer(VulkanEngine& engine)
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
+    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally);
 }
 
 TextureRenderer::~TextureRenderer()
@@ -110,7 +111,7 @@ void TextureRenderer::CreateRendererFramebuffers(VulkanEngine& engine)
 void TextureRenderer::UpdateSwapChain(VulkanEngine& engine)
 {
     DepthTexture->RecreateRendererTexture(engine);
-    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, PipelineBitFlagsEnum::NormalPipeline);
+    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

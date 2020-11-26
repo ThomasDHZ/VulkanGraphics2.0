@@ -21,7 +21,8 @@ enum RenderDrawFlags
     RenderWireFrame = 1 << 2,
     RenderWireFrameAnimated = 1 << 3,
     RenderShadow = 1 << 4,
-    RenderLightDebug = 1 << 5
+    RenderShadowAnimated = 1 << 5,
+    RenderLightDebug = 1 << 6
 };
 
 struct MeshTextures

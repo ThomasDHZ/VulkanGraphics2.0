@@ -311,6 +311,21 @@
     <None Include="Shaders\Shader3D.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\AnimatedShadowShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\AnimatedBloomShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\WireFrameBloomShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\WireFrameBloomShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\BloomFlatShader.frag">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

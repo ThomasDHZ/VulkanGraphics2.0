@@ -9,12 +9,12 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
 {
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     mainRenderPass = MainRenderPass(engine);
-   // sceneRenderPass = SceneRenderPass(engine);
+    sceneRenderPass = SceneRenderPass(engine);
     //gBufferRenderPass = GBufferRenderPass(engine);
-    //frameBufferRenderPass = FrameBufferRenderPass(engine);
-    //shadowRenderPass = ShadowRenderPass(engine);
+    frameBufferRenderPass = FrameBufferRenderPass(engine);
+    shadowRenderPass = ShadowRenderPass(engine);
 
-   // frameBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
+    frameBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 }
 
 RenderManager::~RenderManager()
@@ -40,14 +40,14 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
 
     engine.SwapChain.UpdateSwapChain(window, engine.Device, engine.PhysicalDevice, engine.Surface);
 
-    mainRenderPass.UpdateSwapChain(engine);
-    //sceneRenderPass.UpdateSwapChain(engine);
+     mainRenderPass.UpdateSwapChain(engine);
+    sceneRenderPass.UpdateSwapChain(engine);
    // gBufferRenderPass.UpdateSwapChain(engine);
-   // frameBufferRenderPass.UpdateSwapChain(engine);
-  //  shadowRenderPass.UpdateSwapChain(engine);
+    frameBufferRenderPass.UpdateSwapChain(engine);
+    shadowRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
-  //  frameBuffer.UpdateSwapChain(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
+    frameBuffer.UpdateSwapChain(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 
     CMDBuffer(engine, ModelList, skybox, lightmanager);
 }
@@ -74,10 +74,10 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelLis
             throw std::runtime_error("failed to begin recording command buffer!");
         }
         MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager);
-     //   SceneRenderCMDBuffer(engine, ModelList, skybox, i);
+        SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager);
         //GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
-       // FrameBufferRenderCMDBuffer(engine, i);
-        //ShadowRenderCMDBuffer(engine, ModelList, i);
+        FrameBufferRenderCMDBuffer(engine, i);
+        ShadowRenderCMDBuffer(engine, ModelList, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -162,13 +162,13 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::vector<M
 
 void RenderManager::Destroy(VulkanEngine& engine)
 {
-  //  frameBuffer.Destory(engine);
+    frameBuffer.Destory(engine);
 
 	mainRenderPass.Destroy(engine);
-   // sceneRenderPass.Destroy(engine);
- /*   gBufferRenderPass.Destroy(engine);
+    sceneRenderPass.Destroy(engine);
+    //gBufferRenderPass.Destroy(engine);
     shadowRenderPass.Destroy(engine);
-    frameBufferRenderPass.Destroy(engine);*/
+    frameBufferRenderPass.Destroy(engine);
 	interfaceRenderPass.Destroy(engine);
 }
 
@@ -188,7 +188,7 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    //skybox.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.skyBoxPipeline, SwapBufferImageIndex);
+    skybox.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.skyBoxPipeline, SwapBufferImageIndex);
     for (auto model : ModelList)
     {
         if(model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
@@ -215,38 +215,50 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 
-//void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
-//{
-//   // std::array<VkClearValue, 3> clearValues{};
-//   // clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-//   // clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-//   // clearValues[2].depthStencil = { 1.0f, 0 };
-//
-//   // VkRenderPassBeginInfo renderPassInfo{};
-//   // renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-//   //// renderPassInfo.renderPass = sceneRenderPass.GetRenderPass();
-//   // renderPassInfo.framebuffer = sceneRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
-//   // renderPassInfo.renderArea.offset = { 0, 0 };
-//   // renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-//   // renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-//   // renderPassInfo.pClearValues = clearValues.data();
-//
-//   // vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-//   // skybox.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.skyBoxPipeline, SwapBufferImageIndex);
-//   // for (auto model : ModelList)
-//   // {
-//   //     if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
-//   //     {
-//   //         model.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.wireFrameRendereringPipeline, SwapBufferImageIndex);
-//   //     }
-//   //     if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
-//   //     {
-//   //         model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
-//   //     }
-//   // }
-//   // vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
-//}
-//
+void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager)
+{
+    std::array<VkClearValue, 3> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[2].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = sceneRenderPass.GetRenderPass();
+    renderPassInfo.framebuffer = sceneRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    skybox.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.skyBoxPipeline, SwapBufferImageIndex);
+    for (auto model : ModelList)
+    {
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.wireFrameRendereringPipeline, SwapBufferImageIndex);
+        }
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrameAnimated)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.AnimatedWireFramedRendereringPipeline, SwapBufferImageIndex);
+        }
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
+        }
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderAnimated)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.AnimatedsceneRendereringPipeline, SwapBufferImageIndex);
+        }
+    }
+    for (auto model : lightmanager.PointLightList)
+    {
+        model->Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.debugLightRenderingPipeline, SwapBufferImageIndex);
+    }
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
 //void RenderManager::GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
 //{
 //    std::array<VkClearValue, 5> clearValues{};
@@ -275,48 +287,52 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>
 //    }
 //    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 //}
-//
-//void RenderManager::FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex)
-//{
-//    //std::array<VkClearValue, 2> clearValues{};
-//    //clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-//    //clearValues[1].depthStencil = { 1.0f, 0 };
-//
-//    //VkRenderPassBeginInfo renderPassInfo{};
-//    //renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-//    //renderPassInfo.renderPass = frameBufferRenderPass.GetRenderPass();
-//    //renderPassInfo.framebuffer = frameBufferRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
-//    //renderPassInfo.renderArea.offset = { 0, 0 };
-//    //renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-//    //renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-//    //renderPassInfo.pClearValues = clearValues.data();
-//
-//    //vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-//    //frameBuffer.Draw(commandBuffers[SwapBufferImageIndex], frameBufferRenderPass.frameBufferPipeline, SwapBufferImageIndex);
-//    //vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
-//}
-//
-//void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex)
-//{
-//    std::array<VkClearValue, 1> clearValues{};
-//    clearValues[0].depthStencil = { 1.0f, 0 };
-//
-//    VkRenderPassBeginInfo renderPassInfo2{};
-//    renderPassInfo2.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-//    renderPassInfo2.renderPass = shadowRenderPass.GetRenderPass();
-//    renderPassInfo2.framebuffer = shadowRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
-//    renderPassInfo2.renderArea.offset = { 0, 0 };
-//    renderPassInfo2.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-//    renderPassInfo2.clearValueCount = static_cast<uint32_t>(clearValues.size());
-//    renderPassInfo2.pClearValues = clearValues.data();
-//
-//    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
-//    for (auto model : ModelList)
-//    {
-//        if (model.GetRenderFlags() & RenderDrawFlags::RenderShadow)
-//        {
-//            model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.shadowdRendereringPipeline, SwapBufferImageIndex);
-//        }
-//    }
-//    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
-//}
+
+void RenderManager::FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex)
+{
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = frameBufferRenderPass.GetRenderPass();
+    renderPassInfo.framebuffer = frameBufferRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    frameBuffer.Draw(commandBuffers[SwapBufferImageIndex], frameBufferRenderPass.frameBufferPipeline, SwapBufferImageIndex);
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
+void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex)
+{
+    std::array<VkClearValue, 1> clearValues{};
+    clearValues[0].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo2{};
+    renderPassInfo2.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo2.renderPass = shadowRenderPass.GetRenderPass();
+    renderPassInfo2.framebuffer = shadowRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo2.renderArea.offset = { 0, 0 };
+    renderPassInfo2.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo2.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo2.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
+    for (auto model : ModelList)
+    {
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderShadow)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.shadowRendereringPipeline, SwapBufferImageIndex);
+        }
+        else if (model.GetRenderFlags() & RenderDrawFlags::RenderShadowAnimated)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.AnimatedShadowRendereringPipeline, SwapBufferImageIndex);
+        }
+    }
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}

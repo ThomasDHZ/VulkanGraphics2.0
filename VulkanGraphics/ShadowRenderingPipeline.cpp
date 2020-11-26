@@ -1,14 +1,15 @@
 #include "ShadowRenderingPipeline.h"
 #include "Vertex.h"
+#include "BaseMesh.h"
 
 ShadowRenderingPipeline::ShadowRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-ShadowRenderingPipeline::ShadowRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass) : GraphicsPipeline(renderer)
+ShadowRenderingPipeline::ShadowRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass, int RenderBitFlags) : GraphicsPipeline(renderer)
 {
     CreateDescriptorSetLayout(renderer);
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, RenderBitFlags);
 }
 
 ShadowRenderingPipeline::~ShadowRenderingPipeline()
@@ -32,10 +33,22 @@ void ShadowRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
     GraphicsPipeline::CreateDescriptorSetLayout(renderer, LayoutBindingInfo);
 }
 
-void ShadowRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void ShadowRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int RenderBitFlags)
 {
-    auto vertShaderCode = ReadShaderFile("shaders/ShadowVert.spv");
-    auto fragShaderCode = ReadShaderFile("shaders/ShadowFrag.spv");
+    std::vector<char> vertShaderCode;
+    std::vector<char> fragShaderCode;
+
+    if (RenderBitFlags & RenderDrawFlags::RenderShadow)
+    {
+        vertShaderCode = ReadShaderFile("shaders/ShadowVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/ShadowFrag.spv");
+    }
+    else if (RenderBitFlags & RenderDrawFlags::RenderShadowAnimated)
+    {
+        vertShaderCode = ReadShaderFile("shaders/AnimatedShadowVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
+    }
+
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);
@@ -160,7 +173,7 @@ void ShadowRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const
     vkDestroyShaderModule(renderer.Device, vertShaderModule, nullptr);
 }
 
-void ShadowRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void ShadowRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int RenderBitFlags)
 {
     vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
@@ -168,5 +181,5 @@ void ShadowRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, con
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
 
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, RenderBitFlags);
 }
