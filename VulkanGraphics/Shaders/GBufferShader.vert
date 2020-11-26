@@ -22,10 +22,8 @@ layout(location = 2) out vec3 Normal;
 
 void main() 
 {
-    mat4 BoneTransform = ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
-		 BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
-	     BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
-	     BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
+    mat4 BoneTransform = mat4(1.0f);
+    vec4 BonePosition = BoneTransform * vec4(inPosition, 1.0);
 
     vec4 BonePosisition = BoneTransform * vec4(inPosition, 1.0);
 
