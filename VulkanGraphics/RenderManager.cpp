@@ -14,9 +14,9 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
     frameBufferRenderPass = FrameBufferRenderPass(engine);
     shadowRenderPass = ShadowRenderPass(engine);
 
-    frameBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
-    SSAOFrameBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
-    SSAOBlurframeBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
+    SSAOFrameBuffer = DeferredFrameBufferMesh(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
+    SSAOBlurframeBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
+    frameBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 }
 
 RenderManager::~RenderManager()

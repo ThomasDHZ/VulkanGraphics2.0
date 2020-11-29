@@ -11,6 +11,7 @@
 #include "FrameBufferMesh.h"
 #include "GBufferRenderPass.h"
 #include "LightManager.h"
+#include "DeferredFrameBufferMesh.h"
 
 class RenderManager
 {
@@ -24,7 +25,7 @@ private:
 	}
 
 	FrameBufferMesh frameBuffer;
-	FrameBufferMesh SSAOFrameBuffer;
+	DeferredFrameBufferMesh SSAOFrameBuffer;
 	FrameBufferMesh SSAOBlurframeBuffer;
 
 	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);

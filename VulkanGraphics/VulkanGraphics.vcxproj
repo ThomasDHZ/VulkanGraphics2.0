@@ -157,6 +157,7 @@
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DebugLightMesh.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
+    <ClCompile Include="DeferredFrameBufferMesh.cpp" />
     <ClCompile Include="GBufferRenderPass.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
@@ -260,6 +261,7 @@
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DebugLightMesh.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
+    <ClInclude Include="DeferredFrameBufferMesh.h" />
     <ClInclude Include="GBufferRenderPass.h" />
     <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />

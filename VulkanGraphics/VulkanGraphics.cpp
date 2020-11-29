@@ -36,12 +36,12 @@ VulkanGraphics::VulkanGraphics()
     meshTextures.DepthMap = DefaultTexture;
     meshTextures.EmissionMap = DefaultTexture;
     meshTextures.ReflectionMap = DefaultTexture;
-    meshTextures.CubeMap[0] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/left.jpg";
-    meshTextures.CubeMap[1] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/right.jpg";
-    meshTextures.CubeMap[2] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/top.jpg";
-    meshTextures.CubeMap[3] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/bottom.jpg";
-    meshTextures.CubeMap[4] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/back.jpg";
-    meshTextures.CubeMap[5] = "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/texture/skybox/front.jpg";
+    meshTextures.CubeMap[0] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/left.jpg";
+    meshTextures.CubeMap[1] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/right.jpg";
+    meshTextures.CubeMap[2] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/top.jpg";
+    meshTextures.CubeMap[3] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/bottom.jpg";
+    meshTextures.CubeMap[4] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back.jpg";
+    meshTextures.CubeMap[5] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.jpg";
 
 
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
