@@ -1,6 +1,7 @@
 #include "Texture.h"
 #include <stdexcept>
 #include <stb_image.h>
+#include "ImGui/imgui_impl_vulkan.h"
 
 Texture::Texture()
 {
@@ -9,30 +10,38 @@ Texture::Texture()
 	Height = 0;
 }
 
-Texture::Texture(VulkanEngine& renderer, std::string TextureLocation, unsigned int textureID, TextureType textureType, VkFormat format)
+Texture::Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int textureID, TextureType textureType, VkFormat format)
 {
 	TextureID = textureID;
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 
-	LoadTexture(renderer, TextureLocation, format);
+	LoadTexture(engine, TextureLocation, format);
 }
 
-Texture::Texture(VulkanEngine& renderer, std::string TextureLocation, TextureType textureType, VkFormat format)
+Texture::Texture(VulkanEngine& engine, std::string TextureLocation, TextureType textureType, VkFormat format)
 {
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 
-	LoadTexture(renderer, TextureLocation, format);
+	LoadTexture(engine, TextureLocation, format);
 }
 
-Texture::Texture(VulkanEngine& renderer, unsigned int textureID, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType)
 {
 	TextureID = textureID;
 	TypeOfTexture = textureType;
 }
 
-Texture::Texture(VulkanEngine& renderer, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, TextureType textureType, VkFormat format)
+{
+	Width = width;
+	Height = height;
+	TypeOfTexture = textureType;
+	CreateTexture(engine, PixelList, format);
+}
+
+Texture::Texture(VulkanEngine& engine, TextureType textureType)
 {
 	TypeOfTexture = textureType;
 }
@@ -41,9 +50,9 @@ Texture::~Texture()
 {
 }
 
-void Texture::TransitionImageLayout(VulkanEngine& renderer, VkImageLayout oldLayout, VkImageLayout newLayout)
+void Texture::TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout)
 {
-	VkCommandBuffer commandBuffer = VulkanBufferManager::beginSingleTimeCommands(renderer);
+	VkCommandBuffer commandBuffer = VulkanBufferManager::beginSingleTimeCommands(engine);
 
 	VkImageMemoryBarrier barrier = {};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -89,12 +98,12 @@ void Texture::TransitionImageLayout(VulkanEngine& renderer, VkImageLayout oldLay
 	}
 
 	vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-	VulkanBufferManager::endSingleTimeCommands(renderer, commandBuffer);
+	VulkanBufferManager::endSingleTimeCommands(engine, commandBuffer);
 }
 
-void Texture::CopyBufferToImage(VulkanEngine& renderer, VkBuffer buffer)
+void Texture::CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
 {
-	VkCommandBuffer commandBuffer = VulkanBufferManager::beginSingleTimeCommands(renderer);
+	VkCommandBuffer commandBuffer = VulkanBufferManager::beginSingleTimeCommands(engine);
 
 	VkBufferImageCopy region = {};
 	region.bufferOffset = 0;
@@ -116,10 +125,10 @@ void Texture::CopyBufferToImage(VulkanEngine& renderer, VkBuffer buffer)
 	}
 
 	vkCmdCopyBufferToImage(commandBuffer, buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-	VulkanBufferManager::endSingleTimeCommands(renderer, commandBuffer);
+	VulkanBufferManager::endSingleTimeCommands(engine, commandBuffer);
 }
 
-void Texture::LoadTexture(VulkanEngine& renderer, std::string TextureLocation, VkFormat format)
+void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
 {
 	int ColorChannels;
 	stbi_uc* pixels = stbi_load(TextureLocation.c_str(), &Width, &Height, &ColorChannels, STBI_rgb_alpha);
@@ -127,7 +136,7 @@ void Texture::LoadTexture(VulkanEngine& renderer, std::string TextureLocation, V
 
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
-	VulkanBufferManager::CreateBuffer(renderer, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	VulkanBufferManager::CreateBuffer(engine, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -145,62 +154,100 @@ void Texture::LoadTexture(VulkanEngine& renderer, std::string TextureLocation, V
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	void* data;
-	vkMapMemory(renderer.Device, stagingBufferMemory, 0, imageSize, 0, &data);
+	vkMapMemory(engine.Device, stagingBufferMemory, 0, imageSize, 0, &data);
 	memcpy(data, pixels, static_cast<size_t>(imageSize));
-	vkUnmapMemory(renderer.Device, stagingBufferMemory);
+	vkUnmapMemory(engine.Device, stagingBufferMemory);
 
-	Texture::CreateTextureImage(renderer, TextureInfo);
+	Texture::CreateTextureImage(engine, TextureInfo);
 
-	TransitionImageLayout(renderer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	CopyBufferToImage(renderer, stagingBuffer);
-	TransitionImageLayout(renderer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(engine, stagingBuffer);
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	vkDestroyBuffer(renderer.Device, stagingBuffer, nullptr);
-	vkFreeMemory(renderer.Device, stagingBufferMemory, nullptr);
+	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
+	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
 }
 
-void Texture::CreateTextureImage(VulkanEngine& renderer, VkImageCreateInfo TextureInfo)
+void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format)
 {
-	if (vkCreateImage(renderer.Device, &TextureInfo, nullptr, &Image)) {
+	VkDeviceSize imageSize = Width * Height * sizeof(Pixel);
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	VulkanBufferManager::CreateBuffer(engine, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	VkImageCreateInfo TextureInfo = {};
+	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	TextureInfo.imageType = VK_IMAGE_TYPE_2D;
+	TextureInfo.extent.width = Width;
+	TextureInfo.extent.height = Height;
+	TextureInfo.extent.depth = 1;
+	TextureInfo.mipLevels = 1;
+	TextureInfo.arrayLayers = 1;
+	TextureInfo.format = format;
+	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	void* data;
+	vkMapMemory(engine.Device, stagingBufferMemory, 0, imageSize, 0, &data);
+	memcpy(data, &Pixels[0], static_cast<size_t>(imageSize));
+	vkUnmapMemory(engine.Device, stagingBufferMemory);
+
+	Texture::CreateTextureImage(engine, TextureInfo);
+
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(engine, stagingBuffer);
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
+	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
+}
+
+void Texture::CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo)
+{
+	if (vkCreateImage(engine.Device, &TextureInfo, nullptr, &Image)) {
 		throw std::runtime_error("Failed to create Image.");
 	}
 
 	VkMemoryRequirements memRequirements;
-	vkGetImageMemoryRequirements(renderer.Device, Image, &memRequirements);
+	vkGetImageMemoryRequirements(engine.Device, Image, &memRequirements);
 
 	VkMemoryAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = VulkanBufferManager::FindMemoryType(renderer, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	allocInfo.memoryTypeIndex = VulkanBufferManager::FindMemoryType(engine, memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	if (vkAllocateMemory(renderer.Device, &allocInfo, nullptr, &Memory) != VK_SUCCESS) {
+	if (vkAllocateMemory(engine.Device, &allocInfo, nullptr, &Memory) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to allocate image Memory.");
 	}
 
-	vkBindImageMemory(renderer.Device, Image, Memory, 0);
+	vkBindImageMemory(engine.Device, Image, Memory, 0);
 }
 
-void Texture::CreateTextureView(VulkanEngine& renderer, VkImageViewCreateInfo TextureImageViewInfo)
+void Texture::CreateTextureView(VulkanEngine& engine, VkImageViewCreateInfo TextureImageViewInfo)
 {
-	if (vkCreateImageView(renderer.Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void Texture::CreateTextureSampler(VulkanEngine& renderer, VkSamplerCreateInfo TextureImageSamplerInfo)
+void Texture::CreateTextureSampler(VulkanEngine& engine, VkSamplerCreateInfo TextureImageSamplerInfo)
 {
-	if (vkCreateSampler(renderer.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}
 }
 
-void Texture::Delete(VulkanEngine& renderer)
+void Texture::Delete(VulkanEngine& engine)
 {
-	vkDestroyImageView(renderer.Device, View, nullptr);
-	vkDestroyImage(renderer.Device, Image, nullptr);
-	vkFreeMemory(renderer.Device, Memory, nullptr);
-	vkDestroySampler(renderer.Device, Sampler, nullptr);
+	vkDestroyImageView(engine.Device, View, nullptr);
+	vkDestroyImage(engine.Device, Image, nullptr);
+	vkFreeMemory(engine.Device, Memory, nullptr);
+	vkDestroySampler(engine.Device, Sampler, nullptr);
 
 	View = VK_NULL_HANDLE;
 	Image = VK_NULL_HANDLE;

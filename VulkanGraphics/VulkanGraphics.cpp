@@ -13,6 +13,21 @@ VulkanGraphics::VulkanGraphics()
     textureManager = std::make_shared<TextureManager>(vulkanEngine);
     light = LightManager(vulkanEngine, textureManager, renderManager.mainRenderPass.debugLightRenderingPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderLightDebug, glm::vec3(0.0f));
 
+    std::vector<Pixel> pixels(800 * 600);
+    for (int x = 0; x < 800; x++)
+    {
+        for (int y = 0; y < 600; y++)
+        {
+            byte color = (rand() % 32768) / 32768.0f;
+            pixels[x + (y * x)].Red = color;
+            pixels[x + (y * x)].Green = color;
+            pixels[x + (y * x)].Blue = color;
+            pixels[x + (y * x)].Alpha = 255;
+        }
+    }
+    std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(vulkanEngine, 800, 600, pixels, TextureType::vkTexture2D, VK_FORMAT_R8G8B8A8_UNORM);
+    textureManager->LoadTexture(texture);
+
     MeshTextures meshTextures;
     meshTextures.DiffuseMap = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/container2.png";
     meshTextures.SpecularMap = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/container2_specular.png";
@@ -149,6 +164,8 @@ void VulkanGraphics::MainLoop()
             ImGui::CheckboxFlags("WireFrame4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
             ImGui::CheckboxFlags("Shadow4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);*/
 
+            ImGui::Image(renderManager.gBufferRenderPass.SSAOTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+            ImGui::Image(renderManager.gBufferRenderPass.SSAOBlurTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));

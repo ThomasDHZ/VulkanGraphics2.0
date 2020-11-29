@@ -164,6 +164,9 @@ void SceneRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
 
     sceneRenderingPipeline->Destroy(engine);
+    AnimatedsceneRendereringPipeline->Destroy(engine);
+    wireFrameRendereringPipeline->Destroy(engine);
+    AnimatedWireFramedRendereringPipeline->Destroy(engine);
     skyBoxPipeline->Destroy(engine);
     debugLightRenderingPipeline->Destroy(engine);
 

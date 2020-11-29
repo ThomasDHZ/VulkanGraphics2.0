@@ -1,14 +1,15 @@
 #include "GBufferPipeline.h"
 #include "Vertex.h"
+#include "BaseMesh.h"
 
 GBufferPipeline::GBufferPipeline() : GraphicsPipeline()
 {
 }
 
-GBufferPipeline::GBufferPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass) : GraphicsPipeline(renderer)
+GBufferPipeline::GBufferPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags) : GraphicsPipeline(renderer)
 {
     CreateDescriptorSetLayout(renderer);
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, PipelineBitFlags);
 }
 
 GBufferPipeline::~GBufferPipeline()
@@ -32,10 +33,20 @@ void GBufferPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
     GraphicsPipeline::CreateDescriptorSetLayout(renderer, LayoutBindingInfo);
 }
 
-void GBufferPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void GBufferPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags)
 {
-    auto vertShaderCode = ReadShaderFile("shaders/GBufferShaderVert.spv");
-    auto fragShaderCode = ReadShaderFile("shaders/GBufferShaderFrag.spv");
+    std::vector<char> vertShaderCode;
+    std::vector<char> fragShaderCode;
+    if (PipelineBitFlags & RenderDrawFlags::RenderNormally)
+    {
+        vertShaderCode = ReadShaderFile("shaders/GBufferShaderVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/GBufferShaderFrag.spv");
+    }
+    else if (PipelineBitFlags & RenderDrawFlags::RenderAnimated)
+    {
+        vertShaderCode = ReadShaderFile("shaders/AnimatedGBufferShaderVert.spv");
+        fragShaderCode = ReadShaderFile("shaders/GBufferShaderFrag.spv");
+    }
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);
@@ -193,7 +204,7 @@ void GBufferPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRende
     vkDestroyShaderModule(renderer.Device, vertShaderModule, nullptr);
 }
 
-void GBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void GBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags)
 {
     vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
@@ -201,5 +212,5 @@ void GBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRen
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
 
-    CreateShaderPipeLine(renderer, renderPass);
+    CreateShaderPipeLine(renderer, renderPass, PipelineBitFlags);
 }

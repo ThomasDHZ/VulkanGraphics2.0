@@ -24,10 +24,13 @@ private:
 	}
 
 	FrameBufferMesh frameBuffer;
+	FrameBufferMesh SSAOFrameBuffer;
+	FrameBufferMesh SSAOBlurframeBuffer;
 
 	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);
 	void SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);
 	void GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
+	void SSAORenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
 	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
 	void ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex);
 

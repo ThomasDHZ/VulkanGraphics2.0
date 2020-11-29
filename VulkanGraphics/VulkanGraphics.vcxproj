@@ -204,6 +204,9 @@
     <ClCompile Include="SkyBoxPipeline.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="SpriteTexture2D.cpp" />
+    <ClCompile Include="SSAOBlurPipeline.cpp" />
+    <ClCompile Include="SSAOPipeline.cpp" />
+    <ClCompile Include="RenderedSSAOTexture.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TextureRenderer.cpp" />
@@ -218,6 +221,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\AnimatedBloomShader.vert" />
+    <None Include="Shaders\AnimatedGBufferShader.vert" />
     <None Include="Shaders\AnimatedShader3D.vert" />
     <None Include="Shaders\AnimatedShadowShader.vert" />
     <None Include="Shaders\BloomFlatShader.frag" />
@@ -235,6 +239,10 @@
     <None Include="Shaders\ShadowShader.vert" />
     <None Include="Shaders\SkyBoxShader.frag" />
     <None Include="Shaders\SkyBoxShader.vert" />
+    <None Include="Shaders\SSAO.frag" />
+    <None Include="Shaders\SSAO.vert" />
+    <None Include="Shaders\SSAOBlur.frag" />
+    <None Include="Shaders\SSAOBlur.vert" />
     <None Include="Shaders\WireFrameBloomShader.frag" />
     <None Include="Shaders\WireFrameBloomShader.vert" />
     <None Include="Shaders\WireFrameShader.frag" />
@@ -300,6 +308,9 @@
     <ClInclude Include="SkyBoxPipeline.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteTexture2D.h" />
+    <ClInclude Include="SSAOBlurPipeline.h" />
+    <ClInclude Include="SSAOPipeline.h" />
+    <ClInclude Include="RenderedSSAOTexture.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TextureRenderer.h" />

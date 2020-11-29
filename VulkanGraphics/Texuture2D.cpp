@@ -5,10 +5,17 @@ Texture2D::Texture2D() : Texture()
 {
 }
 
-Texture2D::Texture2D(VulkanEngine& renderer, VkFormat format, std::string TextureLocation, unsigned int textureID) : Texture(renderer, TextureLocation, textureID, TextureType::vkTexture2D, format)
+Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, TextureType textureType, VkFormat format) : Texture(engine, width, height, PixelList, textureType, format)
 {
-	CreateTextureView(renderer, format);
-	CreateTextureSampler(renderer);
+	CreateTextureView(engine, format);
+	CreateTextureSampler(engine);
+	ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+Texture2D::Texture2D(VulkanEngine& engine, VkFormat format, std::string TextureLocation, unsigned int textureID) : Texture(engine, TextureLocation, textureID, TextureType::vkTexture2D, format)
+{
+	CreateTextureView(engine, format);
+	CreateTextureSampler(engine);
 	ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
@@ -16,7 +23,7 @@ Texture2D::~Texture2D()
 {
 }
 
-void Texture2D::CreateTextureView(VulkanEngine& renderer, VkFormat format)
+void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -29,10 +36,10 @@ void Texture2D::CreateTextureView(VulkanEngine& renderer, VkFormat format)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	Texture::CreateTextureView(renderer, TextureImageViewInfo);
+	Texture::CreateTextureView(engine, TextureImageViewInfo);
 }
 
-void Texture2D::CreateTextureSampler(VulkanEngine& renderer)
+void Texture2D::CreateTextureSampler(VulkanEngine& engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -49,5 +56,5 @@ void Texture2D::CreateTextureSampler(VulkanEngine& renderer)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-	Texture::CreateTextureSampler(renderer, TextureImageSamplerInfo);
+	Texture::CreateTextureSampler(engine, TextureImageSamplerInfo);
 }

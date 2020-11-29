@@ -10,6 +10,15 @@ enum TextureType
     vkRenderedTexture
 };
 
+typedef uint8_t byte;
+struct Pixel
+{
+    byte Red;
+    byte Green;
+    byte Blue;
+    byte Alpha;
+};
+
 class Texture
 {
 private:
@@ -20,13 +29,14 @@ protected:
     VkImage Image = VK_NULL_HANDLE;
     VkSampler Sampler = VK_NULL_HANDLE;
 
-    void TransitionImageLayout(VulkanEngine& renderer, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void CopyBufferToImage(VulkanEngine& renderer, VkBuffer buffer);
+    void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
 
-    virtual void LoadTexture(VulkanEngine& renderer, std::string TextureLocation, VkFormat format);
-    virtual void CreateTextureImage(VulkanEngine& renderer, VkImageCreateInfo TextureInfo);
-    virtual void CreateTextureView(VulkanEngine& renderer, VkImageViewCreateInfo TextureImageViewInfo);
-    virtual void CreateTextureSampler(VulkanEngine& renderer, VkSamplerCreateInfo TextureImageSamplerInfo);
+    virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
+    virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
+    virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
+    virtual void CreateTextureView(VulkanEngine& engine, VkImageViewCreateInfo TextureImageViewInfo);
+    virtual void CreateTextureSampler(VulkanEngine& engine, VkSamplerCreateInfo TextureImageSamplerInfo);
 
 public:
     VkImageView View = VK_NULL_HANDLE;
@@ -40,13 +50,14 @@ public:
     int Height;
 
     Texture();
-    Texture(VulkanEngine& renderer, std::string TextureLocation, unsigned int textureID, TextureType textureType, VkFormat format);
-    Texture(VulkanEngine& renderer, std::string TextureLocation, TextureType textureType, VkFormat format);
-    Texture(VulkanEngine& renderer, unsigned int textureID, TextureType textureType);
-    Texture(VulkanEngine& renderer, TextureType textureType);
+    Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int textureID, TextureType textureType, VkFormat format);
+    Texture(VulkanEngine& engine, std::string TextureLocation, TextureType textureType, VkFormat format);
+    Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType);
+    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, TextureType textureType, VkFormat format);
+    Texture(VulkanEngine& engine, TextureType textureType);
     ~Texture();
 
-    virtual void Delete(VulkanEngine& renderer);
+    virtual void Delete(VulkanEngine& engine);
 
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }

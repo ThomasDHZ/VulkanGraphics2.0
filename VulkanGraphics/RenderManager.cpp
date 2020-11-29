@@ -15,6 +15,8 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
     shadowRenderPass = ShadowRenderPass(engine);
 
     frameBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
+    SSAOFrameBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
+    SSAOBlurframeBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 }
 
 RenderManager::~RenderManager()
@@ -76,6 +78,7 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelLis
         //MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager);
         SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager);
         GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
+        SSAORenderCMDBuffer(engine, i);
         FrameBufferRenderCMDBuffer(engine, i);
         ShadowRenderCMDBuffer(engine, ModelList, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -163,6 +166,8 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::vector<M
 void RenderManager::Destroy(VulkanEngine& engine)
 {
     frameBuffer.Destory(engine);
+    SSAOFrameBuffer.Destory(engine);
+    SSAOFrameBuffer.Destory(engine);
 
 	mainRenderPass.Destroy(engine);
     sceneRenderPass.Destroy(engine);
@@ -284,8 +289,52 @@ void RenderManager::GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Mod
         {
             model.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.gBufferPipeline, SwapBufferImageIndex);
         }
+        else if (model.GetRenderFlags() & RenderDrawFlags::RenderAnimated)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.AnimatedGBufferPipeline, SwapBufferImageIndex);
+        }
     }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
+void RenderManager::SSAORenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex)
+{
+    {
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+        clearValues[1].depthStencil = { 1.0f, 0 };
+
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = gBufferRenderPass.SSAORenderPass;
+        renderPassInfo.framebuffer = gBufferRenderPass.SSAOSwapChainFramebuffers[SwapBufferImageIndex];
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        SSAOFrameBuffer.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.ssaoPipeline, SwapBufferImageIndex);
+        vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+    }
+    {
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+        clearValues[1].depthStencil = { 1.0f, 0 };
+
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = gBufferRenderPass.SSAOBlurRenderPass;
+        renderPassInfo.framebuffer = gBufferRenderPass.SSAOBlurSwapChainFramebuffers[SwapBufferImageIndex];
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        SSAOBlurframeBuffer.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.ssaoBlurPipeline, SwapBufferImageIndex);
+        vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+    }
 }
 
 void RenderManager::FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex)

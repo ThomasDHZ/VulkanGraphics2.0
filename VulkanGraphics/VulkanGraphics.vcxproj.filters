@@ -258,6 +258,15 @@
     <ClCompile Include="GraphicsPipeline.cpp">
       <Filter>Source Files\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="SSAOPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="SSAOBlurPipeline.cpp">
+      <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedSSAOTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\WireFrameShader.frag">
@@ -324,6 +333,21 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\BloomFlatShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\AnimatedGBufferShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SSAO.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SSAO.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SSAOBlur.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\SSAOBlur.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -543,6 +567,15 @@
     </ClInclude>
     <ClInclude Include="GraphicsPipeline.h">
       <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="SSAOPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="SSAOBlurPipeline.h">
+      <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedSSAOTexture.h">
+      <Filter>Header Files\Texture</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
