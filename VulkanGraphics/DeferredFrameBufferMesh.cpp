@@ -54,9 +54,9 @@ void DeferredFrameBufferMesh::CreateDescriptorSets(VulkanEngine& engine, VkDescr
     }
 }
 
-void DeferredFrameBufferMesh::Update(VulkanEngine& renderer)
+void DeferredFrameBufferMesh::Update(VulkanEngine& renderer, SSAOConfig& ssaoSettings)
 {
-    ssAOConfig.UpdateUniformBuffer(renderer, static_cast<void*>(&settings));
+    ssAOConfig.UpdateUniformBuffer(renderer, static_cast<void*>(&ssaoSettings));
 }
 
 void DeferredFrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout& layout)

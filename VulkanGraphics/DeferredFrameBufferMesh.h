@@ -4,6 +4,8 @@
 
 struct SSAOConfig
 {
+   alignas(16) glm::mat4 Projection;
+   alignas(4)  glm::vec3 Samples[64];
    alignas(4)  int KernelSize = 64;
    alignas(4)  float Radius = 0.5f;
    alignas(4)  float Bias = 0.025f;
@@ -30,7 +32,7 @@ public:
 
     SSAOConfig settings;
 
-    void Update(VulkanEngine& renderer);
+    void Update(VulkanEngine& renderer, SSAOConfig& ssaoSettings);
     void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout& layout);
     void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage);
     void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader);

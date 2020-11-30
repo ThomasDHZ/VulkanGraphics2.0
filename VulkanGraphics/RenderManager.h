@@ -31,7 +31,7 @@ private:
 	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);
 	void SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);
 	void GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
-	void SSAORenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
+	void SSAORenderCMDBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, int SwapBufferImageIndex);
 	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
 	void ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex);
 
@@ -49,10 +49,10 @@ public:
 	RenderManager(VulkanEngine& vEngine, GLFWwindow* window);
 	~RenderManager();
 
-	void CMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
-	void UpdateCommandBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
-	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
-	void Draw(VulkanEngine& engine, GLFWwindow* window, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
+	void CMDBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
+	void UpdateCommandBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
+	void UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
+	void Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager);
 	void Destroy(VulkanEngine& engine);
 };
 

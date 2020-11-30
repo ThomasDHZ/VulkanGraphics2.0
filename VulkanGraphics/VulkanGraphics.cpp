@@ -4,6 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include "VulkanGraphics.h"
+#include <random>
 
 VulkanGraphics::VulkanGraphics()
 {
@@ -14,11 +15,14 @@ VulkanGraphics::VulkanGraphics()
     light = LightManager(vulkanEngine, textureManager, renderManager.mainRenderPass.debugLightRenderingPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderLightDebug, glm::vec3(0.0f));
 
     std::vector<Pixel> pixels(800 * 600);
+    std::uniform_real_distribution<float> randomFloats(0, 255); // generates random floats between 0.0 and 1.0
+    std::default_random_engine generator;
+
     for (int x = 0; x < 800; x++)
     {
         for (int y = 0; y < 600; y++)
         {
-            byte color = (rand() % 32768) / 32768.0f;
+            byte color = (byte)randomFloats(generator);
             pixels[x + (y * x)].Red = color;
             pixels[x + (y * x)].Green = color;
             pixels[x + (y * x)].Blue = color;
@@ -120,7 +124,7 @@ VulkanGraphics::VulkanGraphics()
     //ModelList[3].ModelPosition = glm::vec3(7.0f, 3.0f, 0.0f);
 
     Skybox = SkyBoxMesh(vulkanEngine, textureManager, renderManager.mainRenderPass.skyBoxPipeline->ShaderPipelineDescriptorLayout, meshTextures);
-    renderManager.CMDBuffer(vulkanEngine, ModelList, Skybox, light);
+    renderManager.CMDBuffer(vulkanEngine, camera, ModelList, Skybox, light);
 }
 
 VulkanGraphics::~VulkanGraphics()
@@ -207,7 +211,7 @@ void VulkanGraphics::MainLoop()
 
         //renderManager.UpdateCommandBuffer(vulkanEngine, ModelList, Skybox);
         UpdateUniformBuffer(vulkanEngine.DrawFrame);
-        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), ModelList, Skybox, light);
+        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), camera, ModelList, Skybox, light);
         mouse.Update(window.GetWindowPtr(), camera);
         keyboard.Update(window.GetWindowPtr(), camera);
     }
