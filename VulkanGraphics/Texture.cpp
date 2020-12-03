@@ -2,6 +2,10 @@
 #include <stdexcept>
 #include <stb_image.h>
 #include "ImGui/imgui_impl_vulkan.h"
+#include <sstream>
+#include <iostream>
+#include <fstream>
+#include <KTXTextureLoader.h>
 
 Texture::Texture()
 {
@@ -48,6 +52,68 @@ Texture::Texture(VulkanEngine& engine, TextureType textureType)
 
 Texture::~Texture()
 {
+}
+
+void Texture::KTXTransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout)
+{
+	VkCommandBuffer commandBuffer = VulkanBufferManager::beginSingleTimeCommands(engine);
+
+	VkImageMemoryBarrier barrier = {};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldLayout;
+	barrier.newLayout = newLayout;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = Image;
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = TextureData.ArrayLayers;
+
+	VkPipelineStageFlags sourceStage;
+	VkPipelineStageFlags destinationStage;
+
+	if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+		barrier.srcAccessMask = 0;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	}
+	else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	else
+	{
+		throw std::invalid_argument("unsupported layout transition!");
+	}
+
+	vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+	VulkanBufferManager::endSingleTimeCommands(engine, commandBuffer);
+}
+
+void Texture::KTXCopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
+{
+	VkCommandBuffer commandBuffer = VulkanBufferManager::beginSingleTimeCommands(engine);
+
+	VkBufferImageCopy region = {};
+	region.bufferOffset = 0;
+	region.bufferRowLength = 0;
+	region.bufferImageHeight = 0;
+	region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	region.imageSubresource.mipLevel = 0;
+	region.imageSubresource.baseArrayLayer = 0;
+	region.imageOffset = { 0, 0, 0 };
+	region.imageExtent = { static_cast<uint32_t>(TextureData.Width), static_cast<uint32_t>(TextureData.Height), static_cast<uint32_t>(TextureData.Depth) };
+	region.imageSubresource.layerCount = TextureData.ArrayLayers;
+
+	vkCmdCopyBufferToImage(commandBuffer, buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+	VulkanBufferManager::endSingleTimeCommands(engine, commandBuffer);
 }
 
 void Texture::TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout)
@@ -126,6 +192,48 @@ void Texture::CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
 
 	vkCmdCopyBufferToImage(commandBuffer, buffer, Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 	VulkanBufferManager::endSingleTimeCommands(engine, commandBuffer);
+}
+
+void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
+{
+	KTXTextureLoader KTXLoader = KTXTextureLoader();
+	TextureData = KTXLoader.LoadKTXTexture("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/asd.ktx");
+
+	Width = TextureData.Width;
+	Height = TextureData.Height;
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	VulkanBufferManager::CreateBuffer(engine, TextureData.TextureSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+	VkImageCreateInfo TextureInfo = {};
+	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	TextureInfo.imageType = TextureData.TextureType;
+	TextureInfo.extent.width = TextureData.Width;
+	TextureInfo.extent.height = TextureData.Height;
+	TextureInfo.extent.depth = TextureData.Depth;
+	TextureInfo.mipLevels = TextureData.MipLevels;
+	TextureInfo.arrayLayers = TextureData.ArrayLayers;
+	TextureInfo.format = format;
+	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	void* data;
+	vkMapMemory(engine.Device, stagingBufferMemory, 0, TextureData.TextureSize, 0, &data);
+	memcpy(data, TextureData.TextureData.data(), TextureData.TextureSize);
+	vkUnmapMemory(engine.Device, stagingBufferMemory);
+
+	Texture::CreateTextureImage(engine, TextureInfo);
+
+	KTXTransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	KTXCopyBufferToImage(engine, stagingBuffer);
+	KTXTransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
+	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
 }
 
 void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)

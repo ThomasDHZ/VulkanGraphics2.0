@@ -78,8 +78,8 @@
     <LibraryPath>C:\VulkanSDK\1.1.130.0\Lib;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\ProgramInclude;C:\Users\dhz\Documents\Visual Studio 2019\Assimp\include;C:\Users\dhz\Documents\Visual Studio 2019\stb-master;C:\Users\dhz\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dhz\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.154.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\dhz\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.154.1\Lib;C:\Users\dhz\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)TextureLoader;$(SolutionDir)\ProgramInclude;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.154.1\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\dotha\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.154.1\Lib;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\ZZT\Documents\Visual Studio 2019\Assimp\include;C:\Users\ZZT\Documents\Visual Studio 2019\tinyobjloader-master;C:\Users\ZZT\Documents\Visual Studio 2019\stb-master;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\include;C:\Users\ZZT\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.131.2\Include;$(IncludePath)</IncludePath>
@@ -221,6 +221,7 @@
     <ClCompile Include="VulkanWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Shaders\AnimatedBloomShader.vert" />
     <None Include="Shaders\AnimatedGBufferShader.vert" />
     <None Include="Shaders\AnimatedShader3D.vert" />
@@ -327,7 +328,22 @@
     <ClInclude Include="VulkanUniformBuffer.h" />
     <ClInclude Include="VulkanWindow.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="texture\skybox\back.dds" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TextureLoader\TextureLoader.vcxproj">
+      <Project>{72fd64fc-7cba-4f55-bd9c-4f871cf973cb}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets" Condition="Exists('..\packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtex_desktop_win10.2020.11.12.1\build\native\directxtex_desktop_win10.targets'))" />
+  </Target>
 </Project>

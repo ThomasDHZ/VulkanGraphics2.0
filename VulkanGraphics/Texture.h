@@ -2,6 +2,10 @@
 #include <vulkan/vulkan.h>
 #include "VulkanEngine.h"
 #include "VulkanBufferManager.h"
+#include <Pixel.h>
+#include <KTXTextureLoader.h>
+#include <TextureInfo.h>
+#include "STBILoader.h"
 
 enum TextureType
 {
@@ -10,28 +14,23 @@ enum TextureType
     vkRenderedTexture
 };
 
-typedef uint8_t byte;
-struct Pixel
-{
-    byte Red;
-    byte Green;
-    byte Blue;
-    byte Alpha;
-};
-
 class Texture
 {
 private:
 
 protected:
-
+    TextureInfo TextureData;
     VkDeviceMemory Memory = VK_NULL_HANDLE;
     VkImage Image = VK_NULL_HANDLE;
     VkSampler Sampler = VK_NULL_HANDLE;
 
+    void KTXTransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void KTXCopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
     void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
     void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
 
+
+    virtual void LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);

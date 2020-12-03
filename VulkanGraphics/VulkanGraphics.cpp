@@ -5,9 +5,18 @@
 
 #include "VulkanGraphics.h"
 #include <random>
+#include "Pixel.h"
+#include "KTXTextureLoader.h"
+#include "DDSTextureLoader.h"
+#include <sstream>
 
 VulkanGraphics::VulkanGraphics()
 {
+
+    //DDS_HEADER header;
+    //std::ifstream file2("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.dds", std::ios::binary);
+    //file2.read(reinterpret_cast<char*>(&header), sizeof(header));
+   // GL_TEXTURE_2D
     window = VulkanWindow(800, 600, "Vulkan Engine");
     vulkanEngine = VulkanEngine(window.GetWindowPtr());
     renderManager = RenderManager(vulkanEngine, window.GetWindowPtr());
@@ -33,19 +42,19 @@ VulkanGraphics::VulkanGraphics()
     textureManager->LoadTexture(texture);
 
     MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/container2.png";
-    meshTextures.SpecularMap = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/container2_specular.png";
+    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/container2.png";
+    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/container2_specular.png";
     meshTextures.NormalMap = DefaultTexture;
     meshTextures.AlphaMap = DefaultTexture;
     meshTextures.DepthMap = DefaultTexture;
     meshTextures.EmissionMap = DefaultTexture;
     meshTextures.ReflectionMap = DefaultTexture;
-    meshTextures.CubeMap[0] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/left.jpg";
-    meshTextures.CubeMap[1] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/right.jpg";
-    meshTextures.CubeMap[2] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/top.jpg";
-    meshTextures.CubeMap[3] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/bottom.jpg";
-    meshTextures.CubeMap[4] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back.jpg";
-    meshTextures.CubeMap[5] = "C:/Users/dhz/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.jpg";
+    meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/left.jpg";
+    meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/right.jpg";
+    meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/top.jpg";
+    meshTextures.CubeMap[3] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/bottom.jpg";
+    meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back.jpg";
+    meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.jpg";
 
 
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
@@ -99,7 +108,7 @@ VulkanGraphics::VulkanGraphics()
     ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     ModelList.emplace_back(Model(vulkanEngine, textureManager, CubeVertices, CubeIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dhz/source/repos/Vulkan_SkeletonTest/Vulkan_SkeletonTest/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderShadowAnimated));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderShadowAnimated));
 
     glm::vec3 cubePositions[] = {
     glm::vec3(0.0f,  0.0f,  0.0f),
