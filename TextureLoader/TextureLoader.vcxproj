@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="GLImageDefines.h" />
+    <ClInclude Include="KTX2TextureLoader.h" />
     <ClInclude Include="KTXTextureLoader.h" />
     <ClInclude Include="LoadTexture.h" />
     <ClInclude Include="Pixel.h" />
@@ -161,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="KTX2TextureLoader.cpp" />
     <ClCompile Include="KTXTextureLoader.cpp" />
     <ClCompile Include="LoadTexture.cpp" />
     <ClCompile Include="STBILoader.cpp" />

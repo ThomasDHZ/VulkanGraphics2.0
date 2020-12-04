@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <KTXTextureLoader.h>
+#include <KTX2TextureLoader.h>
 
 Texture::Texture()
 {
@@ -20,7 +21,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 
-	LoadTexture(engine, TextureLocation, format);
+	LoadKTXTexture(engine, TextureLocation, format);
 }
 
 Texture::Texture(VulkanEngine& engine, std::string TextureLocation, TextureType textureType, VkFormat format)
@@ -28,7 +29,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, TextureType 
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 
-	LoadTexture(engine, TextureLocation, format);
+	LoadKTXTexture(engine, TextureLocation, format);
 }
 
 Texture::Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType)
@@ -196,8 +197,8 @@ void Texture::CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
 
 void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
 {
-	KTXTextureLoader KTXLoader = KTXTextureLoader();
-	TextureData = KTXLoader.LoadKTXTexture("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/asd.ktx");
+	KTX2TextureLoader KTXLoader = KTX2TextureLoader();
+	TextureData = KTXLoader.KTX2extureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/asd_KTX_ARGB_8888_4.KTX2");
 
 	Width = TextureData.Width;
 	Height = TextureData.Height;
@@ -205,7 +206,7 @@ void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, 
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
 	VulkanBufferManager::CreateBuffer(engine, TextureData.TextureSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
+	
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	TextureInfo.imageType = TextureData.TextureType;
