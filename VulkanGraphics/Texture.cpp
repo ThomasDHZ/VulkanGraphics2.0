@@ -7,6 +7,7 @@
 #include <fstream>
 #include <KTXTextureLoader.h>
 #include <KTX2TextureLoader.h>
+#include <DDSTextureLoader.h>
 
 Texture::Texture()
 {
@@ -197,8 +198,8 @@ void Texture::CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
 
 void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
 {
-	KTX2TextureLoader KTXLoader = KTX2TextureLoader();
-	TextureData = KTXLoader.KTX2extureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/asd_KTX_ARGB_8888_4.KTX2");
+	DDSTextureLoader KTXLoader = DDSTextureLoader();
+	TextureData = KTXLoader.DDSSTextureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/CubeMap.dds");
 
 	Width = TextureData.Width;
 	Height = TextureData.Height;

@@ -27,19 +27,14 @@ struct KTX2_Index
     unsigned int dfdByteLength;
     unsigned int kvdByteOffset;
     unsigned int kvdByteLength;
-    unsigned int sgdByteOffset;
-    unsigned int sgdByteOffset2;
-    unsigned int sgdByteLength;
-    unsigned int sgdByteLength2;
+    uint64_t sgdByteOffset;
+    uint64_t sgdByteLength;
 };
 struct KTX2_LevelIndex
 {
-    unsigned int byteOffset;
-    unsigned int byteOffset2;
-    unsigned int byteLength;
-    unsigned int byteLength2;
-    unsigned int uncompressedByteLength;
-    unsigned int uncompressedByteLength2;
+    uint64_t byteOffset;
+    uint64_t byteLength;
+    uint64_t uncompressedByteLength;
 };
 struct KTX_DataFormatDescriptor
 {
@@ -60,7 +55,7 @@ class KTX2TextureLoader
 private:
     KTX2_Header Header;
     KTX2_Index Index;
-    KTX2_LevelIndex LevelIndexList;
+    std::vector<KTX2_LevelIndex> LevelIndexList;
     KTX_DataFormatDescriptor DataFormatDescriptor;
     KTX2_KeyAndValueData KeyAndValueData;
     std::vector<byte> TextureData;
@@ -68,5 +63,4 @@ public:
     KTX2TextureLoader();
     ~KTX2TextureLoader();
     TextureInfo KTX2extureLoader(const std::string& TextureLocation);
-
 };
