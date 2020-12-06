@@ -41,12 +41,12 @@ void ShadowRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const
     if (RenderBitFlags & RenderDrawFlags::RenderShadow)
     {
         vertShaderCode = ReadShaderFile("shaders/ShadowVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/ShadowFrag.spv");
+        fragShaderCode = ReadShaderFile("shaders/DepthDebugFrag.spv");
     }
     else if (RenderBitFlags & RenderDrawFlags::RenderShadowAnimated)
     {
         vertShaderCode = ReadShaderFile("shaders/AnimatedShadowVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/ShadowFrag.spv");
+        fragShaderCode = ReadShaderFile("shaders/DepthDebugFrag.spv");
     }
 
 

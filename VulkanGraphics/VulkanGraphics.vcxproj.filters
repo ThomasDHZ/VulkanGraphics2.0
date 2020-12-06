@@ -357,6 +357,12 @@
     <None Include="Shaders\BloomSkyBoxShader.frag">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\DepthDebugShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\DepthDebugShader.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

@@ -5,6 +5,7 @@
 #include "VulkanEngine.h"
 #include "RenderedDepthTexture.h"
 #include "ShadowRenderingPipeline.h"
+#include "RenderedColorTexture.h"
 
 class ShadowRenderPass
 {
@@ -20,6 +21,7 @@ public:
 	~ShadowRenderPass();
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
+	std::shared_ptr<RenderedColorTexture> DebugColorTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<ShadowRenderingPipeline> shadowRendereringPipeline;

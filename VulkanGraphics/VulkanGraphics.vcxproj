@@ -230,6 +230,8 @@
     <None Include="Shaders\BloomShader.frag" />
     <None Include="Shaders\BloomShader.vert" />
     <None Include="Shaders\BloomSkyBoxShader.frag" />
+    <None Include="Shaders\DepthDebugShader.frag" />
+    <None Include="Shaders\DepthDebugShader.vert" />
     <None Include="Shaders\FlatShader.frag" />
     <None Include="Shaders\FlatShader.vert" />
     <None Include="Shaders\FrameBufferShader.frag" />
