@@ -16,7 +16,7 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
     shadowRenderPass = ShadowRenderPass(engine);
 
     SSAOFrameBuffer = DeferredFrameBufferMesh(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
-    SSAOBlurframeBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
+    //SSAOBlurframeBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
     frameBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 }
 
@@ -50,6 +50,8 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
     shadowRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
+    SSAOFrameBuffer.UpdateSwapChain(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
+   // SSAOBlurframeBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
     frameBuffer.UpdateSwapChain(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 
     CMDBuffer(engine, camera, ModelList, skybox, lightmanager);
@@ -196,7 +198,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
 {
     frameBuffer.Destory(engine);
     SSAOFrameBuffer.Destory(engine);
-    SSAOFrameBuffer.Destory(engine);
+   // SSAOBlurframeBuffer.Destory(engine);
 
 	mainRenderPass.Destroy(engine);
     sceneRenderPass.Destroy(engine);
@@ -288,7 +290,7 @@ void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model
     }
     for (auto model : lightmanager.PointLightList)
     {
-        model->Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.debugLightRenderingPipeline, SwapBufferImageIndex);
+       model->Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.debugLightRenderingPipeline, SwapBufferImageIndex);
     }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
@@ -346,24 +348,24 @@ void RenderManager::SSAORenderCMDBuffer(VulkanEngine& engine, std::shared_ptr<Pe
         SSAOFrameBuffer.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.ssaoPipeline, SwapBufferImageIndex);
         vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
     }
-    {
-        std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-        clearValues[1].depthStencil = { 1.0f, 0 };
+    //{
+    //    std::array<VkClearValue, 2> clearValues{};
+    //    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    //    clearValues[1].depthStencil = { 1.0f, 0 };
 
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = gBufferRenderPass.SSAOBlurRenderPass;
-        renderPassInfo.framebuffer = gBufferRenderPass.SSAOBlurSwapChainFramebuffers[SwapBufferImageIndex];
-        renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
+    //    VkRenderPassBeginInfo renderPassInfo{};
+    //    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    //    renderPassInfo.renderPass = gBufferRenderPass.SSAOBlurRenderPass;
+    //    renderPassInfo.framebuffer = gBufferRenderPass.SSAOBlurSwapChainFramebuffers[SwapBufferImageIndex];
+    //    renderPassInfo.renderArea.offset = { 0, 0 };
+    //    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    //    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    //    renderPassInfo.pClearValues = clearValues.data();
 
-        vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        SSAOBlurframeBuffer.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.ssaoBlurPipeline, SwapBufferImageIndex);
-        vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
-    }
+    //    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    //    SSAOBlurframeBuffer.Draw(commandBuffers[SwapBufferImageIndex], gBufferRenderPass.ssaoBlurPipeline, SwapBufferImageIndex);
+    //    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+    //}
 }
 
 void RenderManager::FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex)
@@ -409,7 +411,7 @@ void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Mode
         }
         else if (model.GetRenderFlags() & RenderDrawFlags::RenderShadowAnimated)
         {
-            model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.AnimatedShadowRendereringPipeline, SwapBufferImageIndex);
+           model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.AnimatedShadowRendereringPipeline, SwapBufferImageIndex);
         }
     }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);

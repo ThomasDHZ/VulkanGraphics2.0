@@ -348,10 +348,22 @@ void GBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
-    for (auto& framebuffer : SwapChainFramebuffers)
+    vkDestroyRenderPass(engine.Device, SSAORenderPass, nullptr);
+    SSAORenderPass = VK_NULL_HANDLE;
+
+    vkDestroyRenderPass(engine.Device, SSAOBlurRenderPass, nullptr);
+    SSAOBlurRenderPass = VK_NULL_HANDLE;
+
+    for (int x = 0; x < engine.GetSwapChainImageCount(); x++)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
+        vkDestroyFramebuffer(engine.Device, SwapChainFramebuffers[x], nullptr);
+        SwapChainFramebuffers[x] = VK_NULL_HANDLE;
+
+        vkDestroyFramebuffer(engine.Device, SSAOSwapChainFramebuffers[x], nullptr);
+        SSAOSwapChainFramebuffers[x] = VK_NULL_HANDLE;
+
+        vkDestroyFramebuffer(engine.Device, SSAOBlurSwapChainFramebuffers[x], nullptr);
+        SSAOBlurSwapChainFramebuffers[x] = VK_NULL_HANDLE;
     }
 
     CreateRenderPass(engine);
@@ -376,9 +388,21 @@ void GBufferRenderPass::Destroy(VulkanEngine& engine)
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
-    for (auto& framebuffer : SwapChainFramebuffers)
+    vkDestroyRenderPass(engine.Device, SSAORenderPass, nullptr);
+    SSAORenderPass = VK_NULL_HANDLE;
+
+    vkDestroyRenderPass(engine.Device, SSAOBlurRenderPass, nullptr);
+    SSAOBlurRenderPass = VK_NULL_HANDLE;
+
+    for (int x = 0; x < engine.GetSwapChainImageCount(); x++)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
+        vkDestroyFramebuffer(engine.Device, SwapChainFramebuffers[x], nullptr);
+        SwapChainFramebuffers[x] = VK_NULL_HANDLE;
+
+        vkDestroyFramebuffer(engine.Device, SSAOSwapChainFramebuffers[x], nullptr);
+        SSAOSwapChainFramebuffers[x] = VK_NULL_HANDLE;
+
+        vkDestroyFramebuffer(engine.Device, SSAOBlurSwapChainFramebuffers[x], nullptr);
+        SSAOBlurSwapChainFramebuffers[x] = VK_NULL_HANDLE;
     }
 }

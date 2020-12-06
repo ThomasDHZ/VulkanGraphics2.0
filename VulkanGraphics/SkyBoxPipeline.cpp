@@ -8,10 +8,10 @@ SkyBoxPipeline::SkyBoxPipeline() : GraphicsPipeline()
 {
 }
 
-SkyBoxPipeline::SkyBoxPipeline(VulkanEngine& engine, const VkRenderPass& renderPass) : GraphicsPipeline(engine)
+SkyBoxPipeline::SkyBoxPipeline(VulkanEngine& engine, const VkRenderPass& renderPass, RendererType renderType) : GraphicsPipeline(engine)
 {
 	CreateDescriptorSetLayout(engine);
-	CreateShaderPipeLine(engine, renderPass);
+	CreateShaderPipeLine(engine, renderPass, renderType);
 }
 
 SkyBoxPipeline::~SkyBoxPipeline()
@@ -26,13 +26,24 @@ void SkyBoxPipeline::CreateDescriptorSetLayout(VulkanEngine& engine)
 	GraphicsPipeline::CreateDescriptorSetLayout(engine, LayoutBindingInfo);
 }
 
-void SkyBoxPipeline::CreateShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void SkyBoxPipeline::CreateShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass, RendererType renderType)
 {
-	auto SkyBoxvertShaderCode = ReadShaderFile("shaders/SkyBoxShaderVert.spv");
-	auto SkyBoxfragShaderCode = ReadShaderFile("shaders/SkyBoxShaderFrag.spv");
 
-	VkShaderModule SkyBoxvertShaderModule = CreateShaderModule(engine, SkyBoxvertShaderCode);
-	VkShaderModule SkyBoxfragShaderModule = CreateShaderModule(engine, SkyBoxfragShaderCode);
+	std::vector<char> vertShaderCode;
+	std::vector<char> fragShaderCode;
+
+	vertShaderCode = ReadShaderFile("shaders/SkyBoxShaderVert.spv");
+	if (renderType == RendererType::RT_SceneRenderer)
+	{
+		fragShaderCode = ReadShaderFile("shaders/BloomSkyBoxShaderFrag.spv");
+	}
+	else
+	{
+		fragShaderCode = ReadShaderFile("shaders/SkyBoxShaderFrag.spv");
+	}
+
+	VkShaderModule SkyBoxvertShaderModule = CreateShaderModule(engine, vertShaderCode);
+	VkShaderModule SkyBoxfragShaderModule = CreateShaderModule(engine, fragShaderCode);
 
 	VkPipelineShaderStageCreateInfo SkyBoxvertShaderStageInfo = {};
 	SkyBoxvertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -110,12 +121,19 @@ void SkyBoxPipeline::CreateShaderPipeLine(VulkanEngine& engine, const VkRenderPa
 	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	colorBlendAttachment.blendEnable = VK_FALSE;
 
+	int ColorAttachmentCount = 1;
+	if (renderType == RendererType::RT_SceneRenderer)
+	{
+		ColorAttachmentCount = 2;
+	}
+	std::vector<VkPipelineColorBlendAttachmentState> ColorAttachmentList(ColorAttachmentCount, colorBlendAttachment);
+
 	VkPipelineColorBlendStateCreateInfo colorBlending = {};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
 	colorBlending.logicOp = VK_LOGIC_OP_COPY;
-	colorBlending.attachmentCount = 1;
-	colorBlending.pAttachments = &colorBlendAttachment;
+	colorBlending.attachmentCount = static_cast<uint32_t>(ColorAttachmentList.size());
+	colorBlending.pAttachments = ColorAttachmentList.data();
 	colorBlending.blendConstants[0] = 0.0f;
 	colorBlending.blendConstants[1] = 0.0f;
 	colorBlending.blendConstants[2] = 0.0f;
@@ -150,7 +168,7 @@ void SkyBoxPipeline::CreateShaderPipeLine(VulkanEngine& engine, const VkRenderPa
 	vkDestroyShaderModule(engine.Device, SkyBoxvertShaderModule, nullptr);
 }
 
-void SkyBoxPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void SkyBoxPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass, RendererType renderType)
 {
 	vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
 	vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
@@ -158,5 +176,5 @@ void SkyBoxPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRender
 	ShaderPipeline = VK_NULL_HANDLE;
 	ShaderPipelineLayout = VK_NULL_HANDLE;
 
-	CreateShaderPipeLine(engine, renderPass);
+	CreateShaderPipeLine(engine, renderPass, renderType);
 }

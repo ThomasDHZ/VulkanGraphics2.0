@@ -17,7 +17,7 @@ TextureInfo KTX2TextureLoader::KTX2extureLoader(const std::string& TextureLocati
 	file.read(reinterpret_cast<char*>(&Header), sizeof(Header));
 	file.read(reinterpret_cast<char*>(&Index), sizeof(Index));
 
-	LevelIndexList.resize(Header.faceCount);
+	LevelIndexList.resize(Header.levelCount);
 	file.read(reinterpret_cast<char*>(LevelIndexList.data()), sizeof(KTX2_LevelIndex) * LevelIndexList.size());
 
 	file.read(reinterpret_cast<char*>(&DataFormatDescriptor.dfdTotalSize), sizeof(DataFormatDescriptor.dfdTotalSize));
@@ -31,10 +31,6 @@ TextureInfo KTX2TextureLoader::KTX2extureLoader(const std::string& TextureLocati
 	//file.read(reinterpret_cast<char*>(&KeyAndValueData.Padding), sizeof(KeyAndValueData.Padding));
 	//file.read(reinterpret_cast<char*>(&KeyAndValueData.Padding2), sizeof(KeyAndValueData.Padding2));
 	
-
-	TextureData.resize(LevelIndexList[0].byteLength);
-	file.read(reinterpret_cast<char*>(TextureData.data()), TextureData.size());
-
 	TextureInfo info = {};
 	info.Width = Header.pixelWidth;
 	info.Height = Header.pixelHeight;
@@ -55,7 +51,6 @@ TextureInfo KTX2TextureLoader::KTX2extureLoader(const std::string& TextureLocati
 		info.ArrayLayers = 1;
 	}
 
-	file.seekg(260);
 	info.TextureData.resize(LevelIndexList[0].byteLength);
 	file.read(reinterpret_cast<char*>(info.TextureData.data()), info.TextureData.size());
 	file.close();

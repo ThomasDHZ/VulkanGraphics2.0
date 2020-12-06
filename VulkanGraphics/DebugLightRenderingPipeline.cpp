@@ -5,10 +5,10 @@ DebugLightRenderingPipeline::DebugLightRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-DebugLightRenderingPipeline::DebugLightRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass) : GraphicsPipeline(renderer)
+DebugLightRenderingPipeline::DebugLightRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass, RendererType renderType) : GraphicsPipeline(renderer)
 {
 	CreateDescriptorSetLayout(renderer);
-	CreateShaderPipeLine(renderer, renderPass);
+	CreateShaderPipeLine(renderer, renderPass, renderType);
 }
 
 DebugLightRenderingPipeline::~DebugLightRenderingPipeline()
@@ -23,11 +23,20 @@ void DebugLightRenderingPipeline::CreateDescriptorSetLayout(VulkanEngine& render
 	GraphicsPipeline::CreateDescriptorSetLayout(renderer, LayoutBindingInfo);
 }
 
-void DebugLightRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void DebugLightRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, RendererType renderType)
 {
-	auto vertShaderCode = ReadShaderFile("shaders/FlatShaderVert.spv");
-	auto fragShaderCode = ReadShaderFile("shaders/FlatShaderFrag.spv");
+	std::vector<char> vertShaderCode;
+	std::vector<char> fragShaderCode;
 
+	vertShaderCode = ReadShaderFile("shaders/FlatShaderVert.spv");
+	if (renderType == RendererType::RT_SceneRenderer)
+	{
+		fragShaderCode = ReadShaderFile("shaders/BloomFlatShaderFrag.spv");
+	}
+	else
+	{
+		fragShaderCode = ReadShaderFile("shaders/FlatShaderFrag.spv");
+	}
 	VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
 	VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);
 
@@ -101,23 +110,30 @@ void DebugLightRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, c
 	depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
 	depthStencil.depthBoundsTestEnable = VK_FALSE;
 	depthStencil.stencilTestEnable = VK_FALSE;
+	
+	VkPipelineColorBlendAttachmentState ColorAttachment;
+	ColorAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	ColorAttachment.blendEnable = VK_TRUE;
+	ColorAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	ColorAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+	ColorAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+	ColorAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+	ColorAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	ColorAttachment.alphaBlendOp = VK_BLEND_OP_SUBTRACT;
 
-	VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
-	colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-	colorBlendAttachment.blendEnable = VK_TRUE;
-	colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
-	colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-	colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-	colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+	int ColorAttachmentCount = 1;
+	if (renderType == RendererType::RT_SceneRenderer)
+	{
+		ColorAttachmentCount = 2;
+	}
+	std::vector<VkPipelineColorBlendAttachmentState> ColorAttachmentList(ColorAttachmentCount, ColorAttachment);
 
-	VkPipelineColorBlendStateCreateInfo colorBlending = {};
+	VkPipelineColorBlendStateCreateInfo colorBlending{};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	colorBlending.logicOpEnable = VK_FALSE;
 	colorBlending.logicOp = VK_LOGIC_OP_COPY;
-	colorBlending.attachmentCount = 1;
-	colorBlending.pAttachments = &colorBlendAttachment;
+	colorBlending.attachmentCount = static_cast<uint32_t>(ColorAttachmentList.size());
+	colorBlending.pAttachments = ColorAttachmentList.data();
 	colorBlending.blendConstants[0] = 0.0f;
 	colorBlending.blendConstants[1] = 0.0f;
 	colorBlending.blendConstants[2] = 0.0f;
@@ -152,7 +168,7 @@ void DebugLightRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, c
 	vkDestroyShaderModule(renderer.Device, vertShaderModule, nullptr);
 }
 
-void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, RendererType renderType)
 {
 	vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
 	vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
@@ -160,5 +176,5 @@ void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer,
 	ShaderPipeline = VK_NULL_HANDLE;
 	ShaderPipelineLayout = VK_NULL_HANDLE;
 
-	CreateShaderPipeLine(renderer, renderPass);
+	CreateShaderPipeLine(renderer, renderPass, renderType);
 }

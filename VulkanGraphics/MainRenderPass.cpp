@@ -16,8 +16,8 @@ MainRenderPass::MainRenderPass(VulkanEngine& engine)
     AnimatedForwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderAnimated);
     wireFrameRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
     AnimatedWireFramedRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderWireFrameAnimated);
-    debugLightRenderingPipeline = std::make_shared<DebugLightRenderingPipeline>(engine, RenderPass);
-    skyBoxPipeline = std::make_shared<SkyBoxPipeline>(engine, RenderPass);
+    debugLightRenderingPipeline = std::make_shared<DebugLightRenderingPipeline>(engine, RenderPass, RendererType::RT_ForwardRenderer);
+    skyBoxPipeline = std::make_shared<SkyBoxPipeline>(engine, RenderPass, RendererType::RT_ForwardRenderer);
 }
 
 MainRenderPass::~MainRenderPass()
@@ -116,8 +116,8 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
     AnimatedForwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderAnimated);
     wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
     AnimatedWireFramedRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderWireFrameAnimated);
-    debugLightRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
-    skyBoxPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    debugLightRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RendererType::RT_ForwardRenderer);
+    skyBoxPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RendererType::RT_ForwardRenderer);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

@@ -94,6 +94,19 @@ void DeferredFrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_
     CreateDescriptorSets(engine, layout);
 }
 
+void DeferredFrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> gBufferPosition, std::shared_ptr<Texture> gBufferNormal, VkDescriptorSetLayout layout)
+{
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+    DescriptorPool = VK_NULL_HANDLE;
+
+    GBufferPositionTexture = gBufferPosition;
+    GBufferNormalTexture = gBufferNormal;
+    NoiseTexture = gBufferNormal;
+
+    CreateDescriptorPool(engine);
+    CreateDescriptorSets(engine, layout);
+}
+
 void DeferredFrameBufferMesh::Destory(VulkanEngine& engine)
 {
     ssAOConfig.Destroy(engine);

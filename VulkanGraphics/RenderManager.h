@@ -26,7 +26,7 @@ private:
 
 	FrameBufferMesh frameBuffer;
 	DeferredFrameBufferMesh SSAOFrameBuffer;
-	FrameBufferMesh SSAOBlurframeBuffer;
+	//FrameBufferMesh SSAOBlurframeBuffer;
 
 	void MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);
 	void SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager);

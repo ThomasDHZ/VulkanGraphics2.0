@@ -22,7 +22,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 
-	LoadKTXTexture(engine, TextureLocation, format);
+	LoadTexture(engine, TextureLocation, format);
 }
 
 Texture::Texture(VulkanEngine& engine, std::string TextureLocation, TextureType textureType, VkFormat format)
@@ -30,7 +30,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, TextureType 
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 
-	LoadKTXTexture(engine, TextureLocation, format);
+	LoadTexture(engine, TextureLocation, format);
 }
 
 Texture::Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType)
@@ -198,8 +198,8 @@ void Texture::CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
 
 void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
 {
-	DDSTextureLoader KTXLoader = DDSTextureLoader();
-	TextureData = KTXLoader.DDSSTextureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/CubeMap.dds");
+	KTX2TextureLoader KTXLoader = KTX2TextureLoader();
+	TextureData = KTXLoader.KTX2extureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back_DDS_BC7_1.ktx2");
 
 	Width = TextureData.Width;
 	Height = TextureData.Height;
@@ -216,7 +216,7 @@ void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, 
 	TextureInfo.extent.depth = TextureData.Depth;
 	TextureInfo.mipLevels = TextureData.MipLevels;
 	TextureInfo.arrayLayers = TextureData.ArrayLayers;
-	TextureInfo.format = format;
+	TextureInfo.format = VK_FORMAT_BC7_UNORM_BLOCK;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;

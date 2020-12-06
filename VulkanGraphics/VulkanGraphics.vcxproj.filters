@@ -354,6 +354,9 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="Shaders\BloomSkyBoxShader.frag">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

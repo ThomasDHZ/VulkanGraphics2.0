@@ -46,7 +46,7 @@ void ShadowRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const
     else if (RenderBitFlags & RenderDrawFlags::RenderShadowAnimated)
     {
         vertShaderCode = ReadShaderFile("shaders/AnimatedShadowVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
+        fragShaderCode = ReadShaderFile("shaders/ShadowFrag.spv");
     }
 
 

@@ -4,11 +4,11 @@ class DebugLightRenderingPipeline : public GraphicsPipeline
 {
 private:
 	void CreateDescriptorSetLayout(VulkanEngine& renderer);
-	void CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	void CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, RendererType renderType);
 public:
 	DebugLightRenderingPipeline();
-	DebugLightRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	DebugLightRenderingPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass, RendererType renderType);
 	~DebugLightRenderingPipeline();
 
-	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, RendererType renderType);
 };
