@@ -155,17 +155,10 @@
     <ClInclude Include="GLImageDefines.h" />
     <ClInclude Include="KTX2TextureLoader.h" />
     <ClInclude Include="KTXTextureLoader.h" />
-    <ClInclude Include="LoadTexture.h" />
+    <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="STBILoader.h" />
     <ClInclude Include="TextureInfo.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="DDSTextureLoader.cpp" />
-    <ClCompile Include="KTX2TextureLoader.cpp" />
-    <ClCompile Include="KTXTextureLoader.cpp" />
-    <ClCompile Include="LoadTexture.cpp" />
-    <ClCompile Include="STBILoader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

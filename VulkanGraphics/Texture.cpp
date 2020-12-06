@@ -5,9 +5,6 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
-#include <KTXTextureLoader.h>
-#include <KTX2TextureLoader.h>
-#include <DDSTextureLoader.h>
 
 Texture::Texture()
 {
@@ -198,7 +195,7 @@ void Texture::CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
 
 void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
 {
-	KTX2TextureLoader KTXLoader = KTX2TextureLoader();
+	/*KTX2TextureLoader KTXLoader = KTX2TextureLoader();
 	TextureData = KTXLoader.KTX2extureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back_DDS_BC7_1.ktx2");
 
 	Width = TextureData.Width;
@@ -235,7 +232,7 @@ void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, 
 	KTXTransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
-	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
+	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);*/
 }
 
 void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
