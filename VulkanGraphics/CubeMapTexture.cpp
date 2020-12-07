@@ -81,23 +81,23 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 
 	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
 	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
-	//stbi_image_free(textureData[0]);
-	//stbi_image_free(textureData[1]);
-	//stbi_image_free(textureData[2]);
-	//stbi_image_free(textureData[3]);
-	//stbi_image_free(textureData[4]);
-	//stbi_image_free(textureData[5]);
+	stbi_image_free(textureData[0]);
+	stbi_image_free(textureData[1]);
+	stbi_image_free(textureData[2]);
+	stbi_image_free(textureData[3]);
+	stbi_image_free(textureData[4]);
+	stbi_image_free(textureData[5]);
 
-	//KTX2TextureLoader KTXLoader = KTX2TextureLoader();
+//	KTX2TextureLoader KTXLoader = KTX2TextureLoader();
 //TextureData = KTXLoader.KTX2extureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/CubeMap_KTX2_BC7.KTX2");
-
+//
 //Width = TextureData.Width;
 //Height = TextureData.Height;
-
+//
 //VkBuffer stagingBuffer;
 //VkDeviceMemory stagingBufferMemory;
 //VulkanBufferManager::CreateBuffer(engine, TextureData.TextureSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
+//
 //VkImageCreateInfo TextureInfo = {};
 //TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 //TextureInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -113,18 +113,18 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 //TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 //TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 //TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
+//
 //void* data;
 //vkMapMemory(engine.Device, stagingBufferMemory, 0, TextureData.TextureSize, 0, &data);
 //memcpy(data, TextureData.TextureData.data(), TextureData.TextureSize);
 //vkUnmapMemory(engine.Device, stagingBufferMemory);
-
+//
 //Texture::CreateTextureImage(engine, TextureInfo);
-
+//
 //KTXTransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 //KTXCopyBufferToImage(engine, stagingBuffer);
 //KTXTransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
+//
 //vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
 //vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
 }

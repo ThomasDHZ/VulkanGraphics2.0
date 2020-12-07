@@ -42,11 +42,11 @@ VulkanGraphics::VulkanGraphics()
     //textureManager->LoadTexture(texture);
 
     MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/container2.png";
+    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/bricks2.jpg";
     meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/container2_specular.png";
-    meshTextures.NormalMap = DefaultTexture;
+    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/bricks2_normal.jpg";
     meshTextures.AlphaMap = DefaultTexture;
-    meshTextures.DepthMap = DefaultTexture;
+    meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/bricks2_disp.jpg";
     meshTextures.EmissionMap = DefaultTexture;
     meshTextures.ReflectionMap = DefaultTexture;
     meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/left.jpg";
