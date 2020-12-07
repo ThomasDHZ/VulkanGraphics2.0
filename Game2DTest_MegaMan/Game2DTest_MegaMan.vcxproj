@@ -78,7 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.154.1\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)VulkanGraphics;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.154.1\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\lib-vc2019;C:\VulkanSDK\1.2.154.1\Lib;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,11 +143,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Enemy2D.cpp" />
+    <ClCompile Include="EnergyTank.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="LargeEnergy.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MegaMan.cpp" />
+    <ClCompile Include="MMShot.cpp" />
+    <ClCompile Include="Water2D.cpp" />
+    <ClCompile Include="WaterSurface2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Enemy2D.h" />
+    <ClInclude Include="EnergyTank.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="LargeEnergy.h" />
+    <ClInclude Include="MegaMan.h" />
+    <ClInclude Include="MMShot.h" />
+    <ClInclude Include="Water2D.h" />
+    <ClInclude Include="WaterSurface2D.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VulkanGraphics\VulkanGraphics.vcxproj">
+      <Project>{790d6c84-478c-47ae-b2f4-6e3e7cf8feb3}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

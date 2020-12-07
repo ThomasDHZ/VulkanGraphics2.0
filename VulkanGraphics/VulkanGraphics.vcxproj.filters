@@ -207,9 +207,6 @@
     <ClCompile Include="Frame2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MegaMan.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
@@ -527,9 +524,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Frame2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MegaMan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderedGBufferAlbedoTexture.h">

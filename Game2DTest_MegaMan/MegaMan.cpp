@@ -44,14 +44,13 @@
 //	CurrentAni = StandAni;
 //
 //	MeshTextures MegaManTextures = {};
-//	MegaManTextures.DiffuseMap = "texture/MegaMan_diffuseOriginal.bmp";
-//	MegaManTextures.SpecularMap = "texture/MegaMan_Specular.bmp";
-//	MegaManTextures.NormalMap = "texture/MegaMan_Normal.bmp";
-//	MegaManTextures.EmissionMap = "texture/MegaMan_Emission.bmp";
-//	MegaManTextures.AlphaMap = "texture/MegaMan_Alpha.bmp";
+//	MegaManTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_diffuseOriginal.bmp";
+//	MegaManTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_Specular.bmp";
+//	MegaManTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_Normal.bmp";
+//	MegaManTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_Alpha.bmp";
 //
 //	ObjectFlagBits = ObjectFlags::Player | ObjectFlags::ApplyGravity;
-//	//RenderBitFlags = RenderBitFlag::RenderOnTexturePass | RenderBitFlag::RenderOnMainPass | RenderBitFlag::RenderMainPass;
+//	RenderBitFlags = RenderBitFlag::RenderOnTexturePass | RenderBitFlag::RenderOnMainPass | RenderBitFlag::RenderMainPass | RenderBitFlag::RenderShadow;
 //
 //	SetUpSprite(renderer, textureManager, MegaManVertices, MegaManTextures, StartPos);
 //}

@@ -1,22 +1,26 @@
 #pragma once
-#include "../VulkanGraphics/VulkanWindow.h"
+#include "VulkanWindow.h"
+#include "VulkanEngine.h"
+#include "RenderManager.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
 class Game
 {
 
 private:
     VulkanWindow window;
-   // VulkanEngine vulkanEngine;
-    //RenderManager renderManager;
-    //LightManager light;
-    //std::shared_ptr<TextureManager> textureManager;
+    VulkanEngine vulkanEngine;
+    RenderManager renderManager;
+    LightManager light;
+    std::shared_ptr<TextureManager> textureManager;
 
-    //std::shared_ptr<PerspectiveCamera> camera;
-    //Keyboard keyboard;
-    //Mouse mouse;
+    std::shared_ptr<PerspectiveCamera> camera;
+    Keyboard keyboard;
+    Mouse mouse;
 
-    //std::vector<Model> ModelList;
-    //SkyBoxMesh Skybox;
+    std::vector<Model> ModelList;
+    SkyBoxMesh Skybox;
 
     void UpdateUniformBuffer(uint32_t currentImage);
 public:
