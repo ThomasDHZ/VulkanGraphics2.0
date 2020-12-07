@@ -40,13 +40,13 @@ void ShadowRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const
 
     if (RenderBitFlags & RenderDrawFlags::RenderShadow)
     {
-        vertShaderCode = ReadShaderFile("shaders/ShadowVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/DepthDebugFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/ShadowVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/DepthDebugFrag.spv");
     }
     else if (RenderBitFlags & RenderDrawFlags::RenderShadowAnimated)
     {
-        vertShaderCode = ReadShaderFile("shaders/AnimatedShadowVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/DepthDebugFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/AnimatedShadowVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/DepthDebugFrag.spv");
     }
 
 

@@ -39,13 +39,13 @@ void GBufferPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRende
     std::vector<char> fragShaderCode;
     if (PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
-        vertShaderCode = ReadShaderFile("shaders/GBufferShaderVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/GBufferShaderFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/GBufferShaderVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/GBufferShaderFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
-        vertShaderCode = ReadShaderFile("shaders/AnimatedGBufferShaderVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/GBufferShaderFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/AnimatedGBufferShaderVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/GBufferShaderFrag.spv");
     }
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);

@@ -40,24 +40,24 @@ void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const 
     if (PipelineBitFlags & RenderDrawFlags::RenderWireFrame &&
         PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
-        vertShaderCode = ReadShaderFile("shaders/WireFrameBloomShaderVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/WireFrameBloomShaderFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/WireFrameBloomShaderVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/WireFrameBloomShaderFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderWireFrameAnimated &&
         PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
-        vertShaderCode = ReadShaderFile("shaders/AnimatedBloomShaderVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/WireFrameBloomShaderFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/AnimatedBloomShaderVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/WireFrameBloomShaderFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
-        vertShaderCode = ReadShaderFile("shaders/BloomVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/BloomFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/BloomVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/BloomFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
-        vertShaderCode = ReadShaderFile("shaders/AnimatedBloomShaderVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/BloomFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/AnimatedBloomShaderVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/BloomFrag.spv");
     }
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);

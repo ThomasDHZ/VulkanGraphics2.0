@@ -28,14 +28,14 @@ void DebugLightRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, c
 	std::vector<char> vertShaderCode;
 	std::vector<char> fragShaderCode;
 
-	vertShaderCode = ReadShaderFile("shaders/FlatShaderVert.spv");
+	vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/FlatShaderVert.spv");
 	if (renderType == RendererType::RT_SceneRenderer)
 	{
-		fragShaderCode = ReadShaderFile("shaders/BloomFlatShaderFrag.spv");
+		fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/BloomFlatShaderFrag.spv");
 	}
 	else
 	{
-		fragShaderCode = ReadShaderFile("shaders/FlatShaderFrag.spv");
+		fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/FlatShaderFrag.spv");
 	}
 	VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
 	VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);

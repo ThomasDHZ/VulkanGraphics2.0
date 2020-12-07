@@ -24,8 +24,8 @@ void SSAOBlurPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
 
 void SSAOBlurPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
 {
-	auto vertShaderCode = ReadShaderFile("shaders/SSAOBlurVert.spv");
-	auto fragShaderCode = ReadShaderFile("shaders/SSAOBlurFrag.spv");
+	auto vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/SSAOBlurVert.spv");
+	auto fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/SSAOBlurFrag.spv");
 
 	VkShaderModule FrameBufferVertShaderModule = CreateShaderModule(renderer, vertShaderCode);
 	VkShaderModule FrameBufferFragShaderModule = CreateShaderModule(renderer, fragShaderCode);

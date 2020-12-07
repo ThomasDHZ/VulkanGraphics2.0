@@ -2,8 +2,7 @@
 #include <vulkan/vulkan.h>
 #include "VulkanEngine.h"
 #include "VulkanBufferManager.h"
-#include <TextureInfo.h>
-#include "textureloader.h"
+#include "TextureLoader.h"
 
 enum TextureType
 {

@@ -4,17 +4,20 @@
 #include "DDSTextureLoader.h"
 #include "STBILoader.h"
 #include <algorithm>
+
+#define STB_IMAGE_IMPLEMENTATION
+
 enum TextureFormatEnum : unsigned int
 {
-	File_KTX  =  1144346192,
-	File_KTX2 =  2161254544,
-	File_DDS  =  2096260224,
+	File_KTX = 1144346192,
+	File_KTX2 = 2161254544,
+	File_DDS = 2096260224,
 };
 
 static class TextureLoader
 {
 private:
-public: 
+public:
 	static TextureInfo LoadTexture(const std::string TexturePath)
 	{
 		std::string FileFormat = TexturePath.substr(TexturePath.find_last_of(".") + 1);

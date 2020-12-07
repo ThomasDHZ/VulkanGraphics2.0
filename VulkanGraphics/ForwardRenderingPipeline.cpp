@@ -40,24 +40,24 @@ void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, cons
     if (PipelineBitFlags & RenderDrawFlags::RenderWireFrame &&
         PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
-        vertShaderCode = ReadShaderFile("shaders/Shader3DVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/WireFrameFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3DVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/WireFrameFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderWireFrameAnimated &&
             PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
-        vertShaderCode = ReadShaderFile("shaders/AnimatedShader3DVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/WireFrameFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/AnimatedShader3DVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/WireFrameFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
-       vertShaderCode = ReadShaderFile("shaders/Shader3DVert.spv");
-       fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
+       vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3DVert.spv");
+       fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3DFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
-        vertShaderCode = ReadShaderFile("shaders/AnimatedShader3DVert.spv");
-        fragShaderCode = ReadShaderFile("shaders/Shader3DFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/AnimatedShader3DVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3DFrag.spv");
     }
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);

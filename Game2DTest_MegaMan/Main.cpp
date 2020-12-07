@@ -1,8 +1,10 @@
-#include "VulkanGraphics.h"
-int main() {
-    VulkanGraphics app;
+#include "Game.h"
+#include <iostream>
 
-    try 
+int main() {
+    Game app;
+
+    try
     {
         app.MainLoop();
     }
@@ -13,4 +15,3 @@ int main() {
 
     return EXIT_SUCCESS;
 }
-

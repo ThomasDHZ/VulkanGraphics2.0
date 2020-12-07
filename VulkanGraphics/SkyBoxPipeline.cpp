@@ -32,14 +32,14 @@ void SkyBoxPipeline::CreateShaderPipeLine(VulkanEngine& engine, const VkRenderPa
 	std::vector<char> vertShaderCode;
 	std::vector<char> fragShaderCode;
 
-	vertShaderCode = ReadShaderFile("shaders/SkyBoxShaderVert.spv");
+	vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/SkyBoxShaderVert.spv");
 	if (renderType == RendererType::RT_SceneRenderer)
 	{
-		fragShaderCode = ReadShaderFile("shaders/BloomSkyBoxShaderFrag.spv");
+		fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/BloomSkyBoxShaderFrag.spv");
 	}
 	else
 	{
-		fragShaderCode = ReadShaderFile("shaders/SkyBoxShaderFrag.spv");
+		fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/SkyBoxShaderFrag.spv");
 	}
 
 	VkShaderModule SkyBoxvertShaderModule = CreateShaderModule(engine, vertShaderCode);

@@ -1,22 +1,18 @@
+#include "Game.h"
 #define GLFW_INCLUDE_VULKAN
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
+#include <stb_image.h>
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "VulkanGraphics.h"
-#include <random>
-#include "Pixel.h"
-#include "KTXTextureLoader.h"
-#include "DDSTextureLoader.h"
-#include <sstream>
-
-VulkanGraphics::VulkanGraphics()
+Game::Game()
 {
-
+    
     //DDS_HEADER header;
     //std::ifstream file2("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.dds", std::ios::binary);
     //file2.read(reinterpret_cast<char*>(&header), sizeof(header));
-   // GL_TEXTURE_2D
+
     window = VulkanWindow(800, 600, "Vulkan Engine");
     vulkanEngine = VulkanEngine(window.GetWindowPtr());
     renderManager = RenderManager(vulkanEngine, window.GetWindowPtr());
@@ -136,7 +132,7 @@ VulkanGraphics::VulkanGraphics()
     renderManager.CMDBuffer(vulkanEngine, camera, ModelList, Skybox, light);
 }
 
-VulkanGraphics::~VulkanGraphics()
+Game::~Game()
 {
     renderManager.Destroy(vulkanEngine);
     light.Destory(vulkanEngine);
@@ -150,9 +146,9 @@ VulkanGraphics::~VulkanGraphics()
     window.CleanUp();
 }
 
-void VulkanGraphics::MainLoop()
+void Game::MainLoop()
 {
-    while (!glfwWindowShouldClose(window.GetWindowPtr())) 
+    while (!glfwWindowShouldClose(window.GetWindowPtr()))
     {
         glfwPollEvents();
 
@@ -165,17 +161,17 @@ void VulkanGraphics::MainLoop()
             ImGui::CheckboxFlags("WireFrame", &ModelList[0].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
             ImGui::CheckboxFlags("Shadow", &ModelList[0].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);
 
-  /*          ImGui::CheckboxFlags("Normally2", &ModelList[1].MeshList[0]->RenderFlags, RenderDrawFlags::RenderNormally);
-            ImGui::CheckboxFlags("WireFrame2", &ModelList[1].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
-            ImGui::CheckboxFlags("Shadow2", &ModelList[1].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);
+            /*          ImGui::CheckboxFlags("Normally2", &ModelList[1].MeshList[0]->RenderFlags, RenderDrawFlags::RenderNormally);
+                      ImGui::CheckboxFlags("WireFrame2", &ModelList[1].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
+                      ImGui::CheckboxFlags("Shadow2", &ModelList[1].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);
 
-            ImGui::CheckboxFlags("Normally3", &ModelList[2].MeshList[0]->RenderFlags, RenderDrawFlags::RenderNormally);
-            ImGui::CheckboxFlags("WireFrame3", &ModelList[2].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
-            ImGui::CheckboxFlags("Shadow3", &ModelList[2].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);
+                      ImGui::CheckboxFlags("Normally3", &ModelList[2].MeshList[0]->RenderFlags, RenderDrawFlags::RenderNormally);
+                      ImGui::CheckboxFlags("WireFrame3", &ModelList[2].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
+                      ImGui::CheckboxFlags("Shadow3", &ModelList[2].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);
 
-            ImGui::CheckboxFlags("Normally4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderNormally);
-            ImGui::CheckboxFlags("WireFrame4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
-            ImGui::CheckboxFlags("Shadow4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);*/
+                      ImGui::CheckboxFlags("Normally4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderNormally);
+                      ImGui::CheckboxFlags("WireFrame4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderWireFrame);
+                      ImGui::CheckboxFlags("Shadow4", &ModelList[3].MeshList[0]->RenderFlags, RenderDrawFlags::RenderShadow);*/
 
             ImGui::Image(renderManager.gBufferRenderPass.SSAOTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.gBufferRenderPass.SSAOBlurTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
@@ -184,7 +180,7 @@ void VulkanGraphics::MainLoop()
             ImGui::Image(renderManager.gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.gBufferRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
-            
+
             ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);
             ImGui::SliderFloat3("dambient", &light.light.dLight.ambient.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("ddiffuse", &light.light.dLight.diffuse.x, 0.0f, 1.0f);
@@ -213,7 +209,7 @@ void VulkanGraphics::MainLoop()
             ImGui::SliderFloat3("pambient4", &light.light.pLight[3].ambient.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("pdiffuse4", &light.light.pLight[3].diffuse.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("pspecular4", &light.light.pLight[3].specular.x, 0.0f, 1.0f);
-            
+
             textureManager->UpdateIMGUIVRAM();
         }
         ImGui::Render();
@@ -228,7 +224,7 @@ void VulkanGraphics::MainLoop()
     vkDeviceWaitIdle(vulkanEngine.Device);
 }
 
-void VulkanGraphics::UpdateUniformBuffer(uint32_t currentImage)
+void Game::UpdateUniformBuffer(uint32_t currentImage)
 {
     light.Update(vulkanEngine, camera);
     camera->Update(vulkanEngine);

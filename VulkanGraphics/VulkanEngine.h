@@ -2,7 +2,6 @@
 #include <vulkan\vulkan_core.h>
 #include <vector>
 #include <array>
-#include <GLFW\glfw3.h>
 #include "VulkanDebugger.h"
 #include "VulkanSwapChain.h"
 
