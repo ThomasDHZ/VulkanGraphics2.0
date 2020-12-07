@@ -49,6 +49,9 @@
     <Filter Include="Header Files\Pipeline">
       <UniqueIdentifier>{4fa6ccf2-3264-4af8-ad13-60aaf10302dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TextureLoader">
+      <UniqueIdentifier>{3f204b4f-deef-4e37-a917-3d6aebe664ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -592,6 +595,30 @@
     </ClInclude>
     <ClInclude Include="DeferredFrameBufferMesh.h">
       <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\TextureLoader.h">
+      <Filter>TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\DDSTextureLoader.h">
+      <Filter>TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\GLImageDefines.h">
+      <Filter>TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\KTX2TextureLoader.h">
+      <Filter>TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\KTXTextureLoader.h">
+      <Filter>TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\Pixel.h">
+      <Filter>TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\STBILoader.h">
+      <Filter>TextureLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TextureLoader\TextureInfo.h">
+      <Filter>TextureLoader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

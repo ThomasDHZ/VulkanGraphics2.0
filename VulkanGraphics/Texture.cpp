@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include <stdexcept>
-#include <stb_image.h>
 #include "ImGui/imgui_impl_vulkan.h"
 #include <sstream>
 #include <iostream>
@@ -273,6 +272,7 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 
 	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
 	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
+	stbi_image_free(pixels);
 }
 
 void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format)

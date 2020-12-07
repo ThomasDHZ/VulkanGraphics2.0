@@ -254,6 +254,14 @@
     <None Include="Shaders\WireFrameShader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\TextureLoader\DDSTextureLoader.h" />
+    <ClInclude Include="..\TextureLoader\GLImageDefines.h" />
+    <ClInclude Include="..\TextureLoader\KTX2TextureLoader.h" />
+    <ClInclude Include="..\TextureLoader\KTXTextureLoader.h" />
+    <ClInclude Include="..\TextureLoader\Pixel.h" />
+    <ClInclude Include="..\TextureLoader\STBILoader.h" />
+    <ClInclude Include="..\TextureLoader\TextureInfo.h" />
+    <ClInclude Include="..\TextureLoader\TextureLoader.h" />
     <ClInclude Include="Animation2D.h" />
     <ClInclude Include="Animation3D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />
@@ -333,11 +341,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\skybox\back.dds" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TextureLoader\TextureLoader.vcxproj">
-      <Project>{72fd64fc-7cba-4f55-bd9c-4f871cf973cb}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

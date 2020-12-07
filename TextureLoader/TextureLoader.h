@@ -2,6 +2,7 @@
 #include "KTXTextureLoader.h"
 #include "KTX2TextureLoader.h"
 #include "DDSTextureLoader.h"
+#include "STBILoader.h"
 #include <algorithm>
 enum TextureFormatEnum : unsigned int
 {
@@ -29,9 +30,10 @@ public:
 
 		return TextureInfo();
 	}
-	//static STBIContainer LoadSTBITexture(const std::string TexturePath)
-	//{
-	//	return STBILoader::LoadSTBILoader(TexturePath);
-	//}
+
+	static STBIContainer LoadSTBITexture(const std::string TexturePath)
+	{
+		return STBILoader::LoadSTBILoader(TexturePath);
+	}
 };
 

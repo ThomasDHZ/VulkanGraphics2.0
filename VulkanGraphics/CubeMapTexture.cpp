@@ -1,5 +1,4 @@
 #include "CubeMapTexture.h"
-#include <stb_image.h>
 
 CubeMapTexture::CubeMapTexture() : Texture()
 {
@@ -82,6 +81,12 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 
 	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
 	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);
+	//stbi_image_free(textureData[0]);
+	//stbi_image_free(textureData[1]);
+	//stbi_image_free(textureData[2]);
+	//stbi_image_free(textureData[3]);
+	//stbi_image_free(textureData[4]);
+	//stbi_image_free(textureData[5]);
 
 	//KTX2TextureLoader KTXLoader = KTX2TextureLoader();
 //TextureData = KTXLoader.KTX2extureLoader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/CubeMap_KTX2_BC7.KTX2");
