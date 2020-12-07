@@ -356,7 +356,6 @@
     <None Include="Shaders\SSAOBlur.vert">
       <Filter>Shader</Filter>
     </None>
-    <None Include="packages.config" />
     <None Include="Shaders\BloomSkyBoxShader.frag">
       <Filter>Shader</Filter>
     </None>
