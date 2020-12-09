@@ -108,41 +108,16 @@ vec3 SpotLight(vec3 TangentLightPos, vec3 TangentFragPos, vec3 V, vec3 N, vec2 U
 
 void main()
 {           
-    vec2 UV = TexCoords + meshProperties.UVOffset;
-    if(meshProperties.ReflectSprite == 1.0f)
-    {
-        UV.x = 1.0f - UV.x;
-    }
-    UV *= meshProperties.UVScale;
-
-    RemoveAlphaPixels(UV);
-
-    vec3 V = light.viewPos;
-    vec3 N = Normal;
-
-    vec3 TangentLightDirection = TBN * light.dLight.direction;
-    vec3 TangentLightPos = TBN * light.pLight.position;
-    vec3 TangentViewPos  = TBN * light.viewPos;
-    vec3 TangentFragPos  = TBN * FragPos;
-
-    if (meshProperties.UseNormalMapBit  == 1)
-    {
-        N = texture(normalMap, UV).rgb;
-        N = normalize(N * 2.0 - 1.0);   
-   }
-
-   vec3 result = DirectionalLight( V,  N,  UV, light.dLight);
-   result += PointLight( TangentLightPos,  TangentFragPos,  V,  N,  UV, light.pLight);
-   //result = mix(result, texture(ReflectDiffuseMap, UV).rgb, 0.15f);
-   FragColor = vec4(result, 1.0);
+   RemoveAlphaPixels(TexCoords);
+   FragColor = vec4(texture(DiffuseMap, TexCoords).rgb, 1.0);
 
    if(meshProperties.UseEmissionMapBit == 1)
    {
-      BloomColor = vec4(texture(EmissionMap, UV).rgb, 1.0f);
+      BloomColor = vec4(texture(EmissionMap, TexCoords).rgb, 1.0f);
    }
    else
    {
-      BloomColor = vec4(vec3(0.0f, 0.0f, 0.0f), 1.0f);
+      BloomColor = vec4(vec3(0.0f, 1.0f, 0.0f), 1.0f);
    }
 }
 

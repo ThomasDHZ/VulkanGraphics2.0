@@ -11,8 +11,9 @@
 #include "TextureManager.h"
 #include "VulkanUniformBuffer.h"
 #include "Bone.h"
+#include "DrawMesh.h"
 
-const  std::string DefaultTexture = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/texture.jpg";
+const  std::string DefaultTexture = "C:/Users/dotha/source/repos/VulkanGraphics/texture/DefaultTexture.png";
 
 enum RenderDrawFlags
 {
@@ -72,9 +73,10 @@ struct MeshData
     MeshProperties properties;
 };
 
-class BaseMesh
+class BaseMesh : public DrawMesh
 {
 protected:
+
 
     VertexBuffer MeshVertex;
     IndicesBuffer MeshIndices;

@@ -132,6 +132,12 @@ void SceneRenderPass::CreateRendererFramebuffers(VulkanEngine& renderer)
     }
 }
 
+void SceneRenderPass::FrameDebug()
+{
+    ImGui::Image(ColorTexture->ImGuiDescriptorSet, ImVec2(160.0f, 160.0f));
+    ImGui::Image(BloomTexture->ImGuiDescriptorSet, ImVec2(160.0f, 160.0f));
+}
+
 void SceneRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     ColorTexture->RecreateRendererTexture(engine);

@@ -36,6 +36,7 @@ public:
 	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
 	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 
+	void FrameDebug();
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 

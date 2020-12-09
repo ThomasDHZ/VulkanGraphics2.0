@@ -19,6 +19,7 @@ private:
     Keyboard keyboard;
     Mouse mouse;
 
+    std::vector<std::shared_ptr<Object2D>> SpriteList;
     std::vector<Model> ModelList;
     SkyBoxMesh Skybox;
 

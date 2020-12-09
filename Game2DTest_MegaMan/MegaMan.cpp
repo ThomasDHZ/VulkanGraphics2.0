@@ -44,10 +44,10 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<TextureManager>textureMan
 	CurrentAni = StandAni;
 
 	MeshTextures MegaManTextures = {};
-	MegaManTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_diffuse.png";
-	MegaManTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_Specular.png";
-	MegaManTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_normal.png";
-	MegaManTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/MegaMan_Alpha.png";
+	MegaManTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/MegaMan_diffuse.png";
+	MegaManTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/MegaMan_Specular.png";
+	MegaManTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/MegaMan_normal.png";
+	MegaManTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/MegaMan_Alpha.png";
 
 	ObjectFlagBits = ObjectFlags::Player | ObjectFlags::ApplyGravity;
 	SetUpSprite(engine, textureManager, MegaManVertices, MegaManTextures, StartPos, layout);

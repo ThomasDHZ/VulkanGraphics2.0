@@ -5,6 +5,7 @@
 
 #include <stb_image.h>
 #include "MegaMan.h"
+#include "EnergyTank.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 Game::Game()
@@ -39,19 +40,19 @@ Game::Game()
     //textureManager->LoadTexture(texture);
 
     MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/bricks2.jpg";
-    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/container2_specular.png";
-    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/bricks2_normal.jpg";
+    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2.jpg";
+    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/container2_specular.png";
+    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_normal.jpg";
     meshTextures.AlphaMap = DefaultTexture;
-    meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/bricks2_disp.jpg";
+    meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_disp.jpg";
     meshTextures.EmissionMap = DefaultTexture;
     meshTextures.ReflectionMap = DefaultTexture;
-    meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/left.jpg";
-    meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/right.jpg";
-    meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/top.jpg";
-    meshTextures.CubeMap[3] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/bottom.jpg";
-    meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/back.jpg";
-    meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.jpg";
+    meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
+    meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
+    meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
+    meshTextures.CubeMap[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
+    meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
+    meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
 
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
@@ -106,7 +107,7 @@ Game::Game()
     };
     
 
-    SpriteList.emplace_back(std::make_shared<MegaMan>(MegaMan(vulkanEngine, textureManager, glm::vec2(0.0f), renderManager.mainRenderPass.forwardRenderering2DPipeline->ShaderPipelineDescriptorLayout)));
+    SpriteList.emplace_back(std::make_shared<EnergyTank>(EnergyTank(vulkanEngine, textureManager, glm::vec2(0.0f), renderManager.mainRenderPass.forwardRenderering2DPipeline->ShaderPipelineDescriptorLayout)));
 
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, MegaManVertices, SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
@@ -165,7 +166,7 @@ void Game::MainLoop()
             //ImGui::Image(renderManager.gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
-            //ImGui::Image(renderManager.gBufferRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+            ImGui::Image(renderManager.sceneRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
 
             ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);
@@ -197,6 +198,7 @@ void Game::MainLoop()
             ImGui::SliderFloat3("pdiffuse4", &light.light.pLight[3].diffuse.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("pspecular4", &light.light.pLight[3].specular.x, 0.0f, 1.0f);
 
+            renderManager.sceneRenderPass.FrameDebug();
             textureManager->UpdateIMGUIVRAM();
         }
         ImGui::Render();
@@ -225,6 +227,10 @@ void Game::UpdateUniformBuffer(uint32_t currentImage)
         if (auto MM = dynamic_cast<MegaMan*>(sprite.get()))
         {
             MM->Update(window.GetWindowPtr(), vulkanEngine, camera, 1.1f, light.light, SpriteList, textureManager);
+        }
+        else
+        {
+            sprite->Update(vulkanEngine, 1.1, camera, light.light);
         }
 
    /*     sprite->Gravity(level.LevelColliderList);
