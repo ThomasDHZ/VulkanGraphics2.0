@@ -251,5 +251,8 @@ ModelManifest.xml
 *.ipch
 *.db
 *.jpg
+*.ktx
+*.ktx2
+*.dds
 *.ipch
 *.bmp
