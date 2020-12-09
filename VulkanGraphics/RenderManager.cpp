@@ -15,7 +15,7 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
     frameBufferRenderPass = FrameBufferRenderPass(engine);
     shadowRenderPass = ShadowRenderPass(engine);
 
-    SSAOFrameBuffer = DeferredFrameBufferMesh(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
+    //SSAOFrameBuffer = DeferredFrameBufferMesh(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
     //SSAOBlurframeBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
     frameBuffer = FrameBufferMesh(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 }
@@ -24,7 +24,7 @@ RenderManager::~RenderManager()
 {
 }
 
-void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager)
+void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);
@@ -43,21 +43,21 @@ void RenderManager::UpdateRenderManager(VulkanEngine& engine, GLFWwindow* window
 
     engine.SwapChain.UpdateSwapChain(window, engine.Device, engine.PhysicalDevice, engine.Surface);
 
-    // mainRenderPass.UpdateSwapChain(engine);
-    sceneRenderPass.UpdateSwapChain(engine);
-    gBufferRenderPass.UpdateSwapChain(engine);
-    frameBufferRenderPass.UpdateSwapChain(engine);
-    shadowRenderPass.UpdateSwapChain(engine);
-    interfaceRenderPass.UpdateSwapChain(engine);
+     mainRenderPass.UpdateSwapChain(engine);
+  // sceneRenderPass.UpdateSwapChain(engine);
+  //  gBufferRenderPass.UpdateSwapChain(engine);
+  //  frameBufferRenderPass.UpdateSwapChain(engine);
+   // shadowRenderPass.UpdateSwapChain(engine);
+  //  interfaceRenderPass.UpdateSwapChain(engine);
 
-    SSAOFrameBuffer.UpdateSwapChain(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
+    //SSAOFrameBuffer.UpdateSwapChain(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
    // SSAOBlurframeBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
     frameBuffer.UpdateSwapChain(engine, sceneRenderPass.ColorTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
 
-    CMDBuffer(engine, camera, ModelList, skybox, lightmanager);
+    CMDBuffer(engine, camera, ModelList, skybox, lightmanager, SpriteList);
 }
 
-void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager)
+void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
     commandBuffers.resize(mainRenderPass.SwapChainFramebuffers.size());
 
@@ -78,21 +78,21 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveC
         if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
-        //MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager);
-        SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager);
-        GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
-        SSAORenderCMDBuffer(engine, camera, i);
-        FrameBufferRenderCMDBuffer(engine, i);
-        ShadowRenderCMDBuffer(engine, ModelList, i);
+        MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList);
+      //  SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager);
+      //  GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
+       // SSAORenderCMDBuffer(engine, camera, i);
+      //  FrameBufferRenderCMDBuffer(engine, i);
+      //  ShadowRenderCMDBuffer(engine, ModelList, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
     }
 }
 
-void RenderManager::UpdateCommandBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager)
+void RenderManager::UpdateCommandBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
-    CMDBuffer(engine, camera, ModelList, skybox, lightmanager);
+    CMDBuffer(engine, camera, ModelList, skybox, lightmanager, SpriteList);
 }
 
 float lerp(float a, float b, float f)
@@ -100,7 +100,7 @@ float lerp(float a, float b, float f)
     return a + f * (b - a);
 }
 
-void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager)
+void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
     SSAOConfig config = {};
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // generates random floats between 0.0 and 1.0
@@ -124,14 +124,14 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
     config.Projection = camera->GetProjectionMatrix();
     config.Projection[1][1] *= -1;
 
-    SSAOFrameBuffer.Update(engine, config);
+  //  SSAOFrameBuffer.Update(engine, config);
 
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     VkResult result = vkAcquireNextImageKHR(engine.Device, engine.SwapChain.GetSwapChain(), UINT64_MAX, engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &engine.DrawFrame);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        UpdateRenderManager(engine, window, camera, ModelList, skybox, lightmanager);
+        UpdateRenderManager(engine, window, camera, ModelList, skybox, lightmanager, SpriteList);
         return;
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -185,7 +185,7 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
         framebufferResized = false;
-        UpdateRenderManager(engine, window, camera, ModelList, skybox, lightmanager);
+        UpdateRenderManager(engine, window, camera, ModelList, skybox, lightmanager, SpriteList);
     }
     else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");
@@ -208,7 +208,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
 	interfaceRenderPass.Destroy(engine);
 }
 
-void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager)
+void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -225,6 +225,10 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     skybox.Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.skyBoxPipeline, SwapBufferImageIndex);
+    for (auto sprite : SpriteList)
+    {
+        sprite->Draw(commandBuffers[SwapBufferImageIndex], mainRenderPass.forwardRenderering2DPipeline, SwapBufferImageIndex);
+    }
     for (auto model : ModelList)
     {
         if(model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)

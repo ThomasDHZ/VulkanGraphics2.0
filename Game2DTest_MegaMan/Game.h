@@ -4,7 +4,8 @@
 #include "RenderManager.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-
+#include <Object2D.h>
+#include "OrthographicCamera.h"
 class Game
 {
 
@@ -16,9 +17,11 @@ private:
     std::shared_ptr<TextureManager> textureManager;
 
     std::shared_ptr<PerspectiveCamera> camera;
+    std::shared_ptr<OrthographicCamera> orthocamera;
     Keyboard keyboard;
     Mouse mouse;
 
+    std::vector<std::shared_ptr<Object2D>> SpriteList;
     std::vector<Model> ModelList;
     SkyBoxMesh Skybox;
 

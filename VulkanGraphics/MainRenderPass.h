@@ -7,6 +7,7 @@
 #include "ForwardRenderingPipeline.h"
 #include "SkyBoxPipeline.h"
 #include "DebugLightRenderingPipeline.h"
+#include "ForwardRenderering2DPipeline.h"
 
 class MainRenderPass
 {
@@ -28,6 +29,7 @@ public:
 	std::shared_ptr<ForwardRenderingPipeline> wireFrameRendereringPipeline;
 	std::shared_ptr<ForwardRenderingPipeline> AnimatedForwardRendereringPipeline;
 	std::shared_ptr<ForwardRenderingPipeline> AnimatedWireFramedRendereringPipeline;
+	std::shared_ptr<ForwardRenderering2DPipeline> forwardRenderering2DPipeline;
 	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
 	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 

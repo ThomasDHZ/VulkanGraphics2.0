@@ -158,6 +158,8 @@
     <ClCompile Include="DebugLightMesh.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="DeferredFrameBufferMesh.cpp" />
+    <ClCompile Include="DrawMesh.cpp" />
+    <ClCompile Include="ForwardRenderering2DPipeline.cpp" />
     <ClCompile Include="GBufferRenderPass.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
@@ -195,6 +197,7 @@
     <ClCompile Include="RenderedHDRColorTexture.cpp" />
     <ClCompile Include="RendereredTexture.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="SceneRender2DPipeline.cpp" />
     <ClCompile Include="SceneRenderingPipeline.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="ShadowRenderingPipeline.cpp" />
@@ -234,6 +237,10 @@
     <None Include="Shaders\FrameBufferShader.vert" />
     <None Include="Shaders\GBufferShader.frag" />
     <None Include="Shaders\GBufferShader.vert" />
+    <None Include="Shaders\Shader2D.frag" />
+    <None Include="Shaders\Shader2D.vert" />
+    <None Include="Shaders\Shader2D_BloomOutput.frag" />
+    <None Include="Shaders\Shader2D_BloomOutput.vert" />
     <None Include="Shaders\Shader3D.frag" />
     <None Include="Shaders\Shader3D.vert" />
     <None Include="Shaders\ShadowShader.frag" />
@@ -263,6 +270,8 @@
     <ClInclude Include="DebugLightMesh.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="DeferredFrameBufferMesh.h" />
+    <ClInclude Include="DrawMesh.h" />
+    <ClInclude Include="ForwardRenderering2DPipeline.h" />
     <ClInclude Include="GBufferRenderPass.h" />
     <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
@@ -306,6 +315,7 @@
     <ClInclude Include="RenderedHDRColorTexture.h" />
     <ClInclude Include="RendereredTexture.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="SceneRender2DPipeline.h" />
     <ClInclude Include="SceneRenderingPipeline.h" />
     <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="ShadowRenderingPipeline.h" />

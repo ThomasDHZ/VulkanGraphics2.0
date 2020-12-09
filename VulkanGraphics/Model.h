@@ -23,8 +23,6 @@ private:
 	std::string ModelName;
 	glm::mat4 ModelTransformMatrix = glm::mat4(1.0f);
 
-
-
 	std::vector<Animation3D> AnimationList;
 	std::vector<NodeMap> NodeMapList;
 	glm::mat4 GlobalInverseTransformMatrix;
@@ -54,8 +52,6 @@ public:
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
 	glm::vec3 ModelRotation = glm::vec3(0.0f);
 	glm::vec3 ModelScale = glm::vec3(1.0f);
-
-
 
 	Model();
 	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);

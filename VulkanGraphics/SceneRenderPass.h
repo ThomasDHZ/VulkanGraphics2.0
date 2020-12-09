@@ -8,6 +8,7 @@
 #include "RenderedColorTexture.h"
 #include "SkyBoxPipeline.h"
 #include "DebugLightRenderingPipeline.h"
+#include "SceneRender2DPipeline.h"
 
 class SceneRenderPass
 {
@@ -31,6 +32,7 @@ public:
 	std::shared_ptr<SceneRenderingPipeline> wireFrameRendereringPipeline;
 	std::shared_ptr<SceneRenderingPipeline> AnimatedsceneRendereringPipeline;
 	std::shared_ptr<SceneRenderingPipeline> AnimatedWireFramedRendereringPipeline;
+	std::shared_ptr<SceneRender2DPipeline> sceneRendering2DPipeline;
 	std::shared_ptr<SkyBoxPipeline> skyBoxPipeline;
 	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 

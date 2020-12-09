@@ -16,6 +16,7 @@ MainRenderPass::MainRenderPass(VulkanEngine& engine)
     AnimatedForwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderAnimated);
     wireFrameRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
     AnimatedWireFramedRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderWireFrameAnimated);
+    forwardRenderering2DPipeline = std::make_shared<ForwardRenderering2DPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
     debugLightRenderingPipeline = std::make_shared<DebugLightRenderingPipeline>(engine, RenderPass, RendererType::RT_ForwardRenderer);
     skyBoxPipeline = std::make_shared<SkyBoxPipeline>(engine, RenderPass, RendererType::RT_ForwardRenderer);
 }
@@ -116,6 +117,7 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine)
     AnimatedForwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderAnimated);
     wireFrameRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
     AnimatedWireFramedRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderWireFrameAnimated);
+    forwardRenderering2DPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderWireFrame);
     debugLightRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RendererType::RT_ForwardRenderer);
     skyBoxPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RendererType::RT_ForwardRenderer);
 
@@ -137,6 +139,7 @@ void MainRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
 
     forwardRendereringPipeline->Destroy(engine);
+    forwardRenderering2DPipeline->Destroy(engine);
     wireFrameRendereringPipeline->Destroy(engine);
     AnimatedForwardRendereringPipeline->Destroy(engine);
     AnimatedWireFramedRendereringPipeline->Destroy(engine);

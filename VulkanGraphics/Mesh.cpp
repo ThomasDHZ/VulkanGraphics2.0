@@ -13,7 +13,7 @@ Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, int rend
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, int renderFlags)
 {
     for (int x = 0; x < 300; x++)
     {
@@ -21,7 +21,7 @@ Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const st
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, CustomBuffer customBuffer, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     for (int x = 0; x < 300; x++)
     {
@@ -29,7 +29,15 @@ Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const st
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const MeshData& meshData, VkDescriptorSetLayout layout, int renderFlags) : BaseMesh(engine, meshData, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout& layout, CustomBuffer customBuffer, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+{
+    for (int x = 0; x < 300; x++)
+    {
+        ubo.BoneTransform[x] = glm::mat4(1.0f);
+    }
+}
+
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const MeshData& meshData, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, meshData, renderFlags)
 {
     CustomBuffer EmptyBuffer;
     EmptyBuffer.ByteSize = sizeof(Empty);
