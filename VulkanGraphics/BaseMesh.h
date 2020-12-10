@@ -11,7 +11,6 @@
 #include "TextureManager.h"
 #include "VulkanUniformBuffer.h"
 #include "Bone.h"
-#include "DrawMesh.h"
 
 const  std::string DefaultTexture = "C:/Users/dotha/source/repos/VulkanGraphics/texture/DefaultTexture.png";
 
@@ -73,7 +72,7 @@ struct MeshData
     MeshProperties properties;
 };
 
-class BaseMesh : public DrawMesh
+class BaseMesh 
 {
 protected:
 

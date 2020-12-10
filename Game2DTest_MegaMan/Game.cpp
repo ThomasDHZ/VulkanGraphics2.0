@@ -166,7 +166,7 @@ void Game::MainLoop()
             //ImGui::Image(renderManager.gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
-            ImGui::Image(renderManager.sceneRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+            ImGui::Image(renderManager.textureRenderPass.ColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
 
             ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);

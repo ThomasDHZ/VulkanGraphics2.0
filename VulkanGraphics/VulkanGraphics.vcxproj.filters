@@ -264,14 +264,17 @@
     <ClCompile Include="DeferredFrameBufferMesh.cpp">
       <Filter>Source Files\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="DrawMesh.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="ForwardRenderering2DPipeline.cpp">
       <Filter>Source Files\Pipeline</Filter>
     </ClCompile>
     <ClCompile Include="SceneRender2DPipeline.cpp">
       <Filter>Source Files\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="BloomRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureRenderPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -625,14 +628,17 @@
     <ClInclude Include="TextureLoader.h">
       <Filter>TextureLoader</Filter>
     </ClInclude>
-    <ClInclude Include="DrawMesh.h">
-      <Filter>Header Files\Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="ForwardRenderering2DPipeline.h">
       <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="SceneRender2DPipeline.h">
       <Filter>Header Files\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="BloomRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureRenderPass.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

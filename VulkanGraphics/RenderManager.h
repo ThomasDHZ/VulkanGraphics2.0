@@ -13,6 +13,7 @@
 #include "LightManager.h"
 #include "DeferredFrameBufferMesh.h"
 #include "Object2D.h"
+#include "TextureRenderPass.h"
 
 class RenderManager
 {
@@ -36,6 +37,7 @@ private:
 	void GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex);
 	void SSAORenderCMDBuffer(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera, int SwapBufferImageIndex);
 	void FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex);
+	void TextureRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList);
 	void ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex);
 
 public:
@@ -46,6 +48,7 @@ public:
 	GBufferRenderPass gBufferRenderPass;
 	FrameBufferRenderPass frameBufferRenderPass;
 	ShadowRenderPass shadowRenderPass;
+	TextureRenderer textureRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 
 	RenderManager();

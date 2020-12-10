@@ -7,12 +7,14 @@ TextureRenderer::TextureRenderer()
 
 TextureRenderer::TextureRenderer(VulkanEngine& engine)
 {
+    ColorTexture = std::make_shared<RenderedColorTexture>(engine);
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 
     forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally);
+    forwardRenderering2DPipeline = std::make_shared<ForwardRenderering2DPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally);
 }
 
 TextureRenderer::~TextureRenderer()
@@ -86,32 +88,35 @@ void TextureRenderer::CreateRenderPass(VulkanEngine& engine)
 void TextureRenderer::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
+    {
+        VkImageView attachments[2];
+        attachments[0] = ColorTexture->View;
+        attachments[1] = DepthTexture->View;
 
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++) {
-        std::array<VkImageView, 2> attachments = {
-            engine.SwapChain.GetSwapChainImageViews()[i],
-            DepthTexture->GetTextureView()
-        };
+        VkFramebufferCreateInfo fbufCreateInfo = {};
+        fbufCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        fbufCreateInfo.renderPass = RenderPass;
+        fbufCreateInfo.attachmentCount = 2;
+        fbufCreateInfo.pAttachments = attachments;
+        fbufCreateInfo.width = engine.SwapChain.GetSwapChainResolution().width;
+        fbufCreateInfo.height = engine.SwapChain.GetSwapChainResolution().height;
+        fbufCreateInfo.layers = 1;
 
-        VkFramebufferCreateInfo framebufferInfo{};
-        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = RenderPass;
-        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-        framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = engine.SwapChain.GetSwapChainResolution().width;
-        framebufferInfo.height = engine.SwapChain.GetSwapChainResolution().height;
-        framebufferInfo.layers = 1;
-
-        if (vkCreateFramebuffer(engine.Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create framebuffer!");
+        if (vkCreateFramebuffer(engine.Device, &fbufCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        {
+            throw std::runtime_error("failed to create vkCreateImageView!");
         }
     }
 }
 
 void TextureRenderer::UpdateSwapChain(VulkanEngine& engine)
 {
+    ColorTexture->RecreateRendererTexture(engine);
     DepthTexture->RecreateRendererTexture(engine);
+
     forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally);
+    forwardRenderering2DPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -128,9 +133,11 @@ void TextureRenderer::UpdateSwapChain(VulkanEngine& engine)
 
 void TextureRenderer::Destroy(VulkanEngine& engine)
 {
+    ColorTexture->Delete(engine);
     DepthTexture->Delete(engine);
 
     forwardRendereringPipeline->Destroy(engine);
+    forwardRenderering2DPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
