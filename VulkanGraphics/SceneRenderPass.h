@@ -9,6 +9,10 @@
 #include "SkyBoxPipeline.h"
 #include "DebugLightRenderingPipeline.h"
 #include "SceneRender2DPipeline.h"
+#include "Model.h"
+#include "SkyBoxMesh.h"
+#include "LightManager.h"
+#include "Object2D.h"
 
 class SceneRenderPass
 {
@@ -37,6 +41,7 @@ public:
 	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 
 	void FrameDebug();
+	void Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 

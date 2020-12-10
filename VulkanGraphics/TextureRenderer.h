@@ -7,6 +7,7 @@
 #include "ForwardRenderingPipeline.h"
 #include "RenderedColorTexture.h"
 #include "ForwardRenderering2DPipeline.h"
+#include "Object2D.h"
 
 class TextureRenderer
 {
@@ -27,7 +28,8 @@ public:
 
 	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
 	std::shared_ptr<ForwardRenderering2DPipeline> forwardRenderering2DPipeline;
-
+	
+	void Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 

@@ -110,6 +110,29 @@ void TextureRenderer::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
+void TextureRenderer::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList)
+{
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = RenderPass;
+    renderPassInfo.framebuffer = SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    for (auto sprite : SpriteList)
+    {
+        sprite->Draw(commandBuffers[SwapBufferImageIndex], forwardRenderering2DPipeline, SwapBufferImageIndex);
+    }
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
 void TextureRenderer::UpdateSwapChain(VulkanEngine& engine)
 {
     ColorTexture->RecreateRendererTexture(engine);

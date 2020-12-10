@@ -380,6 +380,18 @@
     <None Include="Shaders\Shader2D_BloomOutput.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\Shader3D_BloomOutput.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\Shader3D_BloomOutput.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\BloomShader2ndPass.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\BloomShader2ndPass.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

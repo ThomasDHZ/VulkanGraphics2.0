@@ -229,6 +229,8 @@
     <None Include="Shaders\BloomFlatShader.frag" />
     <None Include="Shaders\BloomShader.frag" />
     <None Include="Shaders\BloomShader.vert" />
+    <None Include="Shaders\BloomShader2ndPass.frag" />
+    <None Include="Shaders\BloomShader2ndPass.vert" />
     <None Include="Shaders\BloomSkyBoxShader.frag" />
     <None Include="Shaders\DepthDebugShader.frag" />
     <None Include="Shaders\DepthDebugShader.vert" />
@@ -244,6 +246,8 @@
     <None Include="Shaders\Shader2D_BloomOutput.vert" />
     <None Include="Shaders\Shader3D.frag" />
     <None Include="Shaders\Shader3D.vert" />
+    <None Include="Shaders\Shader3D_BloomOutput.frag" />
+    <None Include="Shaders\Shader3D_BloomOutput.vert" />
     <None Include="Shaders\ShadowShader.frag" />
     <None Include="Shaders\ShadowShader.vert" />
     <None Include="Shaders\SkyBoxShader.frag" />

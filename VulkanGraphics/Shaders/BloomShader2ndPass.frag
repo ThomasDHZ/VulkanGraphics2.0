@@ -114,10 +114,11 @@ const float weights[] = float[](0.0024499299678342,
  vec2 tex_offset = 1.0 / textureSize(DiffuseMap, 0); // gets size of single texel
      vec3 result = texture(DiffuseMap, fragTexCoord).rgb * weights[0];
 
+ 
          for(int i = 1; i < weights.length(); ++i)
          {
-            result += texture(DiffuseMap, fragTexCoord + vec2(tex_offset.x * i, 0.0)).rgb * weights[i];
-            result += texture(DiffuseMap, fragTexCoord - vec2(tex_offset.x * i, 0.0)).rgb * weights[i];
+             result += texture(DiffuseMap, fragTexCoord + vec2(0.0, tex_offset.y * i)).rgb * weights[i];
+             result += texture(DiffuseMap, fragTexCoord - vec2(0.0, tex_offset.y * i)).rgb * weights[i];
          }
 
     outColor = vec4(result, 1.0f);

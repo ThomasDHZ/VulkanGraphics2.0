@@ -138,6 +138,54 @@ void SceneRenderPass::FrameDebug()
     ImGui::Image(BloomTexture->ImGuiDescriptorSet, ImVec2(160.0f, 160.0f));
 }
 
+void SceneRenderPass::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
+{
+    std::array<VkClearValue, 3> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[2].depthStencil = { 1.0f, 0 };
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = GetRenderPass();
+    renderPassInfo.framebuffer = SwapChainFramebuffers[SwapBufferImageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    skybox.Draw(commandBuffers[SwapBufferImageIndex], skyBoxPipeline, SwapBufferImageIndex);
+    for (auto sprite : SpriteList)
+    {
+        sprite->Draw(commandBuffers[SwapBufferImageIndex], sceneRendering2DPipeline, SwapBufferImageIndex);
+    }
+    for (auto model : ModelList)
+    {
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], wireFrameRendereringPipeline, SwapBufferImageIndex);
+        }
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrameAnimated)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], AnimatedWireFramedRendereringPipeline, SwapBufferImageIndex);
+        }
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderingPipeline, SwapBufferImageIndex);
+        }
+        if (model.GetRenderFlags() & RenderDrawFlags::RenderAnimated)
+        {
+            model.Draw(commandBuffers[SwapBufferImageIndex], AnimatedsceneRendereringPipeline, SwapBufferImageIndex);
+        }
+    }
+    for (auto model : lightmanager.PointLightList)
+    {
+        model->Draw(commandBuffers[SwapBufferImageIndex], debugLightRenderingPipeline, SwapBufferImageIndex);
+    }
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+}
+
 void SceneRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     ColorTexture->RecreateRendererTexture(engine);

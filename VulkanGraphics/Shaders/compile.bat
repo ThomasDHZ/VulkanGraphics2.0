@@ -1,5 +1,8 @@
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader3D.vert -o Shader3DVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader3D.frag -o Shader3DFrag.spv
+C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader3D_AnimatedBloomShader.vert -o Shader3D_AnimatedBloomShaderVert.spv
+C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader3D_BloomOutput.vert -o Shader3D_BloomOutputVert.spv
+C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader3D_BloomOutput.frag -o Shader3D_BloomOutputFrag.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader2D.vert -o Shader2DVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader2D.frag -o Shader2DFrag.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe Shader2D_BloomOutput.vert -o Shader2D_BloomOutputVert.spv
@@ -14,6 +17,8 @@ C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe DepthDebugShader.frag -o DepthDebugFrag.s
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe AnimatedBloomShader.vert -o AnimatedBloomShaderVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe BloomShader.vert -o BloomVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe BloomShader.frag -o BloomFrag.spv
+C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe BloomShader2ndPass.vert -o BloomShader2ndPassVert.spv
+C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe BloomShader2ndPass.frag -o BloomShader2ndPassFrag.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe FrameBufferShader.vert -o FrameBufferShaderVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe FrameBufferShader.frag -o FrameBufferShaderFrag.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe WireFrameShader.vert -o WireFrameVert.spv

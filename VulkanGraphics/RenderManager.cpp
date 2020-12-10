@@ -266,50 +266,7 @@ void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>
 
 void RenderManager::SceneRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
-    std::array<VkClearValue, 3> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[2].depthStencil = { 1.0f, 0 };
-
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = sceneRenderPass.GetRenderPass();
-    renderPassInfo.framebuffer = sceneRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
-
-    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    skybox.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.skyBoxPipeline, SwapBufferImageIndex);
-    for (auto sprite : SpriteList)
-    {
-        sprite->Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRendering2DPipeline, SwapBufferImageIndex);
-    }
-    for (auto model : ModelList)
-    {
-        if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
-        {
-            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.wireFrameRendereringPipeline, SwapBufferImageIndex);
-        }
-        if (model.GetRenderFlags() & RenderDrawFlags::RenderWireFrameAnimated)
-        {
-            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.AnimatedWireFramedRendereringPipeline, SwapBufferImageIndex);
-        }
-        if (model.GetRenderFlags() & RenderDrawFlags::RenderNormally)
-        {
-            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.sceneRenderingPipeline, SwapBufferImageIndex);
-        }
-        if (model.GetRenderFlags() & RenderDrawFlags::RenderAnimated)
-        {
-            model.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.AnimatedsceneRendereringPipeline, SwapBufferImageIndex);
-        }
-    }
-    for (auto model : lightmanager.PointLightList)
-    {
-       model->Draw(commandBuffers[SwapBufferImageIndex], sceneRenderPass.debugLightRenderingPipeline, SwapBufferImageIndex);
-    }
-    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+    sceneRenderPass.Draw(engine, commandBuffers, SwapBufferImageIndex, ModelList, skybox, lightmanager, SpriteList);
 }
 
 void RenderManager::GBufferRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex)
@@ -407,25 +364,7 @@ void RenderManager::FrameBufferRenderCMDBuffer(VulkanEngine& engine, int SwapBuf
 
 void RenderManager::TextureRenderCMDBuffer(VulkanEngine& engine, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].depthStencil = { 1.0f, 0 };
-
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = textureRenderPass.GetRenderPass();
-    renderPassInfo.framebuffer = textureRenderPass.SwapChainFramebuffers[SwapBufferImageIndex];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
-
-    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    for (auto sprite : SpriteList)
-    {
-        sprite->Draw(commandBuffers[SwapBufferImageIndex], textureRenderPass.forwardRenderering2DPipeline, SwapBufferImageIndex);
-    }
-    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
+    textureRenderPass.Draw(engine, commandBuffers, SwapBufferImageIndex, SpriteList);
 }
 
 void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex)
