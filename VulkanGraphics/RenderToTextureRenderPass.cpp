@@ -110,7 +110,7 @@ void RenderToTextureRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void RenderToTextureRenderPass::Render(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList)
+void RenderToTextureRenderPass::Render(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, FrameBufferMesh& TextureRender)
 {
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -126,10 +126,7 @@ void RenderToTextureRenderPass::Render(VulkanEngine& engine, std::vector<VkComma
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    for (auto sprite : SpriteList)
-    {
-        sprite->Draw(commandBuffers[SwapBufferImageIndex], bloomPipeline, SwapBufferImageIndex);
-    }
+    TextureRender.Draw(commandBuffers[SwapBufferImageIndex], bloomPipeline, SwapBufferImageIndex);
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 

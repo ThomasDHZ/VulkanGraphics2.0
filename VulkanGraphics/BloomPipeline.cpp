@@ -36,8 +36,8 @@ void BloomPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer)
 
 void BloomPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
 {
-    auto vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/shaders/BloomShaderVert.spv");
-    auto fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/shaders/BloomShaderFrag.spv");
+    auto vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/BloomVert.spv");
+    auto fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/BloomFrag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);

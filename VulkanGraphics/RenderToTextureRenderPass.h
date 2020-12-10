@@ -5,6 +5,7 @@
 #include "RenderedColorTexture.h"
 #include "RenderedDepthTexture.h"
 #include "Object2D.h"
+#include "FrameBufferMesh.h"
 
 class RenderToTextureRenderPass
 {
@@ -27,8 +28,10 @@ public:
 	std::shared_ptr<RenderedColorTexture> ColorTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
-	void Render(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList);
+	void Render(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, FrameBufferMesh& TextureRender);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
+
+	VkRenderPass GetRenderPass() { return RenderPass; }
 };
 

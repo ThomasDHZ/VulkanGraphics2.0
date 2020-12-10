@@ -6,7 +6,7 @@ RenderManager::RenderManager()
 {
 }
 
-RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
+RenderManager::RenderManager(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, GLFWwindow* window)
 {
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     mainRenderPass = MainRenderPass(engine);
@@ -14,6 +14,7 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
     gBufferRenderPass = GBufferRenderPass(engine);
     frameBufferRenderPass = FrameBufferRenderPass(engine);
     textureRenderPass = SceneToTextureRendererPass(engine);
+    bloomRenderPass = BloomRenderPass(engine, textureManager, sceneRenderPass.BloomTexture);
     shadowRenderPass = ShadowRenderPass(engine);
 
     //SSAOFrameBuffer = DeferredFrameBufferMesh(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);

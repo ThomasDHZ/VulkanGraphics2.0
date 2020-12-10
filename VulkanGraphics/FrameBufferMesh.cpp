@@ -50,8 +50,8 @@ void FrameBufferMesh::CreateDescriptorPool(VulkanEngine& engine)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-   //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    //DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     BaseMesh::CreateDescriptorPool(engine, DescriptorPoolList);
 }
 
@@ -60,16 +60,16 @@ void FrameBufferMesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSet
     BaseMesh::CreateDescriptorSets(engine, layout);
 
     VkDescriptorImageInfo DiffuseMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
-   // VkDescriptorImageInfo BloomMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
+    VkDescriptorImageInfo BloomMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
- //       VkDescriptorBufferInfo FramebufferSettingsBuffer = AddBufferDescriptorInfo(engine, uniformBuffer.GetUniformBuffer(i), sizeof(FrameBufferSettings));
+       VkDescriptorBufferInfo FramebufferSettingsBuffer = AddBufferDescriptorInfo(engine, frameBufferSettings.GetUniformBuffer(i), sizeof(FrameBufferSettings));
 
         std::vector<VkWriteDescriptorSet> DescriptorList;
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 0, DescriptorSets[i], DiffuseMap));
-        //DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 1, DescriptorSets[i], BloomMap));
-        //DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 2, DescriptorSets[i], FramebufferSettingsBuffer));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 1, DescriptorSets[i], BloomMap));
+        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 2, DescriptorSets[i], FramebufferSettingsBuffer));
         BaseMesh::CreateDescriptorSetsData(engine, DescriptorList);
     }
 }

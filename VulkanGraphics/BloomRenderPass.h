@@ -1,33 +1,28 @@
-//#pragma once
-//#include "SceneToTextureRenderer.h"
-//#include "Mesh2D.h"
-//#include "RenderedColorTexture.h"
-//#include "BloomPipeline.h"
-//#include "BloomPipeline2nd.h"
-//
-//class BloomRenderPass
-//{
-//private:
-//	VkRenderPass RenderPass;
-//	std::vector<VkFramebuffer> SwapChainFramebuffers;
-//
-//	std::shared_ptr<BloomPipeline> bloomPipeline;
-//	std::shared_ptr<BloomPipeline2nd> bloomPipeline2nd;
-//
-//	std::shared_ptr<RenderedColorTexture> ColorTexture;
-//	std::shared_ptr<RenderedDepthTexture> DepthTexture;
-//
-//	void CreateRenderPass(VulkanEngine& engine);
-//	void CreateRendererFramebuffers(VulkanEngine& engine);
-//
-//public:
-//	BloomRenderPass();
-//	BloomRenderPass(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<GraphicsPipeline> Shader);
-//	~BloomRenderPass();
-//
-//	void Render(VulkanEngine& engine);
-//	void UpdateSwapChain(VulkanEngine& engine);
-//	void Destroy(VulkanEngine& engine);
-//
-//	std::shared_ptr<RenderedColorTexture> GetColorTexture() { return ColorTexture; };
-//};
+#pragma once
+
+#include "FrameBufferMesh.h"
+#include "RenderToTextureRenderPass.h"
+
+class BloomRenderPass
+{
+private:
+	RenderToTextureRenderPass BloomRenderer;
+	RenderToTextureRenderPass BloomRenderer2;
+	FrameBufferMesh BloomFrameBuffer;
+	FrameBufferMesh BloomFrameBuffer2;
+
+public:
+	BloomRenderPass();
+	BloomRenderPass(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage);
+	~BloomRenderPass();
+
+	void Update(VulkanEngine& engine);
+	void Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex);
+	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage);
+	void Destory(VulkanEngine& engine);
+
+	std::shared_ptr<Texture> OutputBloomImage() { return BloomRenderer2.ColorTexture; }
+	VkDescriptorSet GetIMGuiImagePass1() { return BloomRenderer.ColorTexture->ImGuiDescriptorSet; }
+	VkDescriptorSet GetIMGuiImagePass2() { return BloomRenderer2.ColorTexture->ImGuiDescriptorSet; }
+};
+

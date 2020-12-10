@@ -14,6 +14,7 @@
 #include "DeferredFrameBufferMesh.h"
 #include "Object2D.h"
 #include "SceneToTextureRendererPass.h"
+#include "BloomRenderPass.h"
 
 class RenderManager
 {
@@ -49,10 +50,11 @@ public:
 	FrameBufferRenderPass frameBufferRenderPass;
 	ShadowRenderPass shadowRenderPass;
 	SceneToTextureRendererPass textureRenderPass;
+	BloomRenderPass bloomRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 
 	RenderManager();
-	RenderManager(VulkanEngine& vEngine, GLFWwindow* window);
+	RenderManager(VulkanEngine& vEngine, std::shared_ptr<TextureManager> textureManager, GLFWwindow* window);
 	~RenderManager();
 
 	void FrameDebug();
