@@ -150,6 +150,8 @@
     <ClCompile Include="Animation3D.cpp" />
     <ClCompile Include="AnimationPlayer3D.cpp" />
     <ClCompile Include="BaseMesh.cpp" />
+    <ClCompile Include="BloomPipeline.cpp" />
+    <ClCompile Include="BloomPipeline2nd.cpp" />
     <ClCompile Include="BloomRenderPass.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
@@ -197,6 +199,7 @@
     <ClCompile Include="RenderedHDRColorTexture.cpp" />
     <ClCompile Include="RendereredTexture.cpp" />
     <ClCompile Include="RenderManager.cpp" />
+    <ClCompile Include="RenderToTextureRenderPass.cpp" />
     <ClCompile Include="SceneRender2DPipeline.cpp" />
     <ClCompile Include="SceneRenderingPipeline.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
@@ -211,8 +214,7 @@
     <ClCompile Include="RenderedSSAOTexture.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="TextureRenderer.cpp" />
-    <ClCompile Include="TextureRenderPass.cpp" />
+    <ClCompile Include="SceneToTextureRendererPass.cpp" />
     <ClCompile Include="Texuture2D.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
@@ -266,6 +268,8 @@
     <ClInclude Include="Animation3D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />
     <ClInclude Include="BaseMesh.h" />
+    <ClInclude Include="BloomPipeline.h" />
+    <ClInclude Include="BloomPipeline2nd.h" />
     <ClInclude Include="BloomRenderPass.h" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="BoxCollider.h" />
@@ -320,6 +324,7 @@
     <ClInclude Include="RenderedHDRColorTexture.h" />
     <ClInclude Include="RendereredTexture.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="RenderToTextureRenderPass.h" />
     <ClInclude Include="SceneRender2DPipeline.h" />
     <ClInclude Include="SceneRenderingPipeline.h" />
     <ClInclude Include="SceneRenderPass.h" />
@@ -337,8 +342,7 @@
     <ClInclude Include="TextureInfo.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="TextureRenderer.h" />
-    <ClInclude Include="TextureRenderPass.h" />
+    <ClInclude Include="SceneToTextureRendererPass.h" />
     <ClInclude Include="Texuture2D.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexBuffer.h" />

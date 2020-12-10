@@ -13,7 +13,7 @@
 #include "LightManager.h"
 #include "DeferredFrameBufferMesh.h"
 #include "Object2D.h"
-#include "TextureRenderPass.h"
+#include "SceneToTextureRendererPass.h"
 
 class RenderManager
 {
@@ -48,7 +48,7 @@ public:
 	GBufferRenderPass gBufferRenderPass;
 	FrameBufferRenderPass frameBufferRenderPass;
 	ShadowRenderPass shadowRenderPass;
-	TextureRenderer textureRenderPass;
+	SceneToTextureRendererPass textureRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 
 	RenderManager();

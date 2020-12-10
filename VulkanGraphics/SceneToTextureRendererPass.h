@@ -9,7 +9,7 @@
 #include "ForwardRenderering2DPipeline.h"
 #include "Object2D.h"
 
-class TextureRenderer
+class SceneToTextureRendererPass
 {
 private:
 	VkRenderPass RenderPass;
@@ -18,9 +18,9 @@ private:
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 
 public:
-	TextureRenderer();
-	TextureRenderer(VulkanEngine& engine);
-	~TextureRenderer();
+	SceneToTextureRendererPass();
+	SceneToTextureRendererPass(VulkanEngine& engine);
+	~SceneToTextureRendererPass();
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	std::shared_ptr<RenderedColorTexture> ColorTexture;

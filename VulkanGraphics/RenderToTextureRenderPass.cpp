@@ -1,27 +1,28 @@
-#include "TextureRenderer.h"
-#include "BaseMesh.h"
+#include "RenderToTextureRenderPass.h"
+#include "ImGui/imgui_impl_vulkan.h"
 
-TextureRenderer::TextureRenderer()
+RenderToTextureRenderPass::RenderToTextureRenderPass()
 {
 }
 
-TextureRenderer::TextureRenderer(VulkanEngine& engine)
+RenderToTextureRenderPass::RenderToTextureRenderPass(VulkanEngine& engine)
 {
-    ColorTexture = std::make_shared<RenderedColorTexture>(engine);
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
-
     CreateRenderPass(engine);
+    ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine));
+    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(engine));
     CreateRendererFramebuffers(engine);
 
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally);
-    forwardRenderering2DPipeline = std::make_shared<ForwardRenderering2DPipeline>(engine, RenderPass, RenderDrawFlags::RenderNormally);
+    bloomPipeline = std::make_shared<BloomPipeline>(engine, RenderPass);
+    bloomPipeline2nd = std::make_shared<BloomPipeline2nd>(engine, RenderPass);
+
+    ImGui_ImplVulkan_AddTexture(ColorTexture->ImGuiDescriptorSet, ColorTexture->GetTextureSampler(), ColorTexture->GetTextureView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-TextureRenderer::~TextureRenderer()
+RenderToTextureRenderPass::~RenderToTextureRenderPass()
 {
 }
 
-void TextureRenderer::CreateRenderPass(VulkanEngine& engine)
+void RenderToTextureRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::array<VkAttachmentDescription, 2> attchmentDescriptions = {};
 
@@ -85,32 +86,31 @@ void TextureRenderer::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void TextureRenderer::CreateRendererFramebuffers(VulkanEngine& engine)
+void RenderToTextureRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
-    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
-    {
-        VkImageView attachments[2];
-        attachments[0] = ColorTexture->View;
-        attachments[1] = DepthTexture->View;
+    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageViews().size());
+    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageViews().size(); i++) {
+        std::array<VkImageView, 2> attachments = {
+            ColorTexture->GetTextureView(),
+            DepthTexture->GetTextureView()
+        };
 
-        VkFramebufferCreateInfo fbufCreateInfo = {};
-        fbufCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        fbufCreateInfo.renderPass = RenderPass;
-        fbufCreateInfo.attachmentCount = 2;
-        fbufCreateInfo.pAttachments = attachments;
-        fbufCreateInfo.width = engine.SwapChain.GetSwapChainResolution().width;
-        fbufCreateInfo.height = engine.SwapChain.GetSwapChainResolution().height;
-        fbufCreateInfo.layers = 1;
+        VkFramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = RenderPass;
+        framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebufferInfo.pAttachments = attachments.data();
+        framebufferInfo.width = engine.SwapChain.GetSwapChainResolution().width;
+        framebufferInfo.height = engine.SwapChain.GetSwapChainResolution().height;
+        framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine.Device, &fbufCreateInfo, nullptr, &SwapChainFramebuffers[i]))
-        {
-            throw std::runtime_error("failed to create vkCreateImageView!");
+        if (vkCreateFramebuffer(engine.Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create framebuffer!");
         }
     }
 }
 
-void TextureRenderer::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList)
+void RenderToTextureRenderPass::Render(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -128,39 +128,34 @@ void TextureRenderer::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& c
     vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     for (auto sprite : SpriteList)
     {
-        sprite->Draw(commandBuffers[SwapBufferImageIndex], forwardRenderering2DPipeline, SwapBufferImageIndex);
+        sprite->Draw(commandBuffers[SwapBufferImageIndex], bloomPipeline, SwapBufferImageIndex);
     }
     vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }
 
-void TextureRenderer::UpdateSwapChain(VulkanEngine& engine)
+void RenderToTextureRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     ColorTexture->RecreateRendererTexture(engine);
     DepthTexture->RecreateRendererTexture(engine);
 
-    forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally);
-    forwardRenderering2DPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderDrawFlags::RenderNormally);
-
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
+    bloomPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    bloomPipeline2nd->UpdateGraphicsPipeLine(engine, RenderPass);
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
         vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
-
-    CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
 }
 
-void TextureRenderer::Destroy(VulkanEngine& engine)
+void RenderToTextureRenderPass::Destroy(VulkanEngine& engine)
 {
+    bloomPipeline->Destroy(engine);
+    bloomPipeline2nd->Destroy(engine);
+
     ColorTexture->Delete(engine);
     DepthTexture->Delete(engine);
-
-    forwardRendereringPipeline->Destroy(engine);
-    forwardRenderering2DPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

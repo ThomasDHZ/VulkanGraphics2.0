@@ -1,6 +1,6 @@
 #pragma once
 #include "Sprite.h"
-#include "TextureRenderer.h"
+#include "SceneToTextureRendererPass.h"
 class EnergyTank : public Sprite
 {
 private:

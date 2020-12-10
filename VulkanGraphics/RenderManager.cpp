@@ -13,7 +13,7 @@ RenderManager::RenderManager(VulkanEngine& engine, GLFWwindow* window)
     sceneRenderPass = SceneRenderPass(engine);
     gBufferRenderPass = GBufferRenderPass(engine);
     frameBufferRenderPass = FrameBufferRenderPass(engine);
-    textureRenderPass = TextureRenderer(engine);
+    textureRenderPass = SceneToTextureRendererPass(engine);
     shadowRenderPass = ShadowRenderPass(engine);
 
     //SSAOFrameBuffer = DeferredFrameBufferMesh(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);

@@ -168,9 +168,6 @@
     <ClCompile Include="FrameBufferRenderPass.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="TextureRenderer.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="SkyBoxMesh.cpp">
       <Filter>Source Files\Mesh</Filter>
     </ClCompile>
@@ -273,7 +270,16 @@
     <ClCompile Include="BloomRenderPass.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="TextureRenderPass.cpp">
+    <ClCompile Include="BloomPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BloomPipeline2nd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneToTextureRendererPass.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderToTextureRenderPass.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -520,9 +526,6 @@
     <ClInclude Include="FrameBufferRenderPass.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="TextureRenderer.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="SkyBoxMesh.h">
       <Filter>Header Files\Mesh</Filter>
     </ClInclude>
@@ -649,7 +652,16 @@
     <ClInclude Include="BloomRenderPass.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="TextureRenderPass.h">
+    <ClInclude Include="BloomPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BloomPipeline2nd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneToTextureRendererPass.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderToTextureRenderPass.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
