@@ -42,7 +42,7 @@ EnergyTank::~EnergyTank()
 {
 }
 
-void EnergyTank::Update(VulkanEngine& engine, float dt, std::shared_ptr<PerspectiveCamera> camera, LightBufferObject light)
+void EnergyTank::Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, LightBufferObject light)
 {
 	/*CurrentAni.Update();
 	ObjectMesh->properites.UVOffset = CurrentAni.GetCurrentFrame().GetUVOffset();

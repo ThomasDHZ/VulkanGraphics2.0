@@ -1,5 +1,4 @@
 #pragma once
-
 #include "FrameBufferMesh.h"
 #include "RenderToTextureRenderPass.h"
 

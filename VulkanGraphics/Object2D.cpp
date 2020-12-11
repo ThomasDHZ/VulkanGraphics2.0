@@ -17,7 +17,7 @@ void Object2D::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<Graphi
 	ObjectMesh->Draw(RenderCommandBuffer, pipeline, FrameNumber);
 }
 
-void Object2D::Update(VulkanEngine& engine, float dt, std::shared_ptr<PerspectiveCamera> camera, LightBufferObject Lightbuffer)
+void Object2D::Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer)
 {
 	AnimationHandler();
 	ObjectMesh->Update(engine, camera, Lightbuffer);

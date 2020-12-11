@@ -15,8 +15,8 @@ Game::Game()
 
     window = VulkanWindow(800, 600, "Vulkan Engine");
     vulkanEngine = VulkanEngine(window.GetWindowPtr());
-    renderManager = RenderManager(vulkanEngine, window.GetWindowPtr());
     textureManager = std::make_shared<TextureManager>(vulkanEngine);
+    renderManager = RenderManager(vulkanEngine, textureManager, window.GetWindowPtr());
     light = LightManager(vulkanEngine, textureManager, renderManager.mainRenderPass.debugLightRenderingPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderLightDebug, glm::vec3(0.0f));
 
     //std::vector<Pixel> pixels(800 * 600);
@@ -217,7 +217,8 @@ void Game::MainLoop()
 
         //renderManager.UpdateCommandBuffer(vulkanEngine, ModelList, Skybox);
         UpdateUniformBuffer(vulkanEngine.DrawFrame);
-        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), camera, ModelList, Skybox, light, SpriteList);
+        renderManager.RendererUpdate(vulkanEngine, camera);
+        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), ModelList, Skybox, light, SpriteList);
         mouse.Update(window.GetWindowPtr(), camera);
         keyboard.Update(window.GetWindowPtr(), camera);
     }

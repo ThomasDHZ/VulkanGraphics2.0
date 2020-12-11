@@ -12,7 +12,7 @@ public:
 	EnergyTank(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, glm::vec2 StartPos, VkDescriptorSetLayout& layout);
 	~EnergyTank();
 
-	void Update(VulkanEngine& engine, float dt, std::shared_ptr<PerspectiveCamera> camera, LightBufferObject light) override;
+	void Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, LightBufferObject light) override;
 	void Collision(VulkanEngine& engine, std::vector<std::shared_ptr<Object2D>>& ObjectList) override;
 };
 

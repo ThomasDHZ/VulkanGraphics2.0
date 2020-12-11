@@ -6,6 +6,7 @@
 #include "RenderedDepthTexture.h"
 #include "Object2D.h"
 #include "FrameBufferMesh.h"
+#include "DeferredFrameBufferMesh.h"
 
 class RenderToTextureRenderPass
 {
@@ -29,6 +30,7 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	void Render(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, FrameBufferMesh& TextureRender);
+	void Render2(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, FrameBufferMesh& TextureRender);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 

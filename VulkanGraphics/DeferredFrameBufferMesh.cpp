@@ -16,6 +16,7 @@ DeferredFrameBufferMesh::DeferredFrameBufferMesh(VulkanEngine& engine, std::shar
 
 DeferredFrameBufferMesh::~DeferredFrameBufferMesh()
 {
+
 }
 
 void DeferredFrameBufferMesh::CreateUniformBuffers(VulkanEngine& renderer)
@@ -54,9 +55,9 @@ void DeferredFrameBufferMesh::CreateDescriptorSets(VulkanEngine& engine, VkDescr
     }
 }
 
-void DeferredFrameBufferMesh::Update(VulkanEngine& renderer, SSAOConfig& ssaoSettings)
+void DeferredFrameBufferMesh::Update(VulkanEngine& renderer)
 {
-    ssAOConfig.UpdateUniformBuffer(renderer, static_cast<void*>(&ssaoSettings));
+   // ssAOConfig.UpdateUniformBuffer(renderer, static_cast<void*>(&ssaoSettings));
 }
 
 void DeferredFrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout& layout)
@@ -81,6 +82,7 @@ void DeferredFrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_
     CreateDescriptorPool(engine);
     CreateDescriptorSets(engine, layout);
 }
+
 
 void DeferredFrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader)
 {

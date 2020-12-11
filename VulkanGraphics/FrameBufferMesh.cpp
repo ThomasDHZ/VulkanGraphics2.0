@@ -19,16 +19,7 @@ FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureMa
     CreateDescriptorSets(engine, layout);
 }
 
-FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage) : Mesh(engine, FrameBufferVertices, FrameBufferIndices, RenderDrawFlags::RenderNormally)
-{
-    DiffuseTexture = FrameBufferImage;
-    EmissionTexture = BloomImage;
-    CreateUniformBuffers(engine);
-    CreateDescriptorPool(engine);
-    CreateDescriptorSets(engine, layout);
-}
-
-FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader) : Mesh(engine, FrameBufferVertices, FrameBufferIndices, RenderDrawFlags::RenderNormally)
+FrameBufferMesh::FrameBufferMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage) : Mesh(engine, FrameBufferVertices, FrameBufferIndices, RenderDrawFlags::RenderNormally)
 {
     DiffuseTexture = FrameBufferImage;
     EmissionTexture = BloomImage;
@@ -60,8 +51,11 @@ void FrameBufferMesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSet
     BaseMesh::CreateDescriptorSets(engine, layout);
 
     VkDescriptorImageInfo DiffuseMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
-    VkDescriptorImageInfo BloomMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
-
+    VkDescriptorImageInfo BloomMap;
+    if(EmissionTexture != nullptr)
+     BloomMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
+    else
+        BloomMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
        VkDescriptorBufferInfo FramebufferSettingsBuffer = AddBufferDescriptorInfo(engine, frameBufferSettings.GetUniformBuffer(i), sizeof(FrameBufferSettings));

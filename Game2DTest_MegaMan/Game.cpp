@@ -22,32 +22,7 @@ Game::Game()
 
     light = LightManager(vulkanEngine, textureManager, renderManager.mainRenderPass.debugLightRenderingPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderLightDebug, glm::vec3(0.0f));
 
-    //std::vector<Pixel> pixels(800 * 600);
-    //std::uniform_real_distribution<float> randomFloats(0, 255); // generates random floats between 0.0 and 1.0
-    //std::default_random_engine generator;
-
-    //for (int x = 0; x < 800; x++)
-    //{
-    //    for (int y = 0; y < 600; y++)
-    //    {
-    //        byte color = (byte)randomFloats(generator);
-    //        pixels[x + (y * x)].Red = color;
-    //        pixels[x + (y * x)].Green = color;
-    //        pixels[x + (y * x)].Blue = color;
-    //        pixels[x + (y * x)].Alpha = 255;
-    //    }
-    //}
-    //std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(vulkanEngine, 800, 600, pixels, TextureType::vkTexture2D, VK_FORMAT_R8G8B8A8_UNORM);
-    //textureManager->LoadTexture(texture);
-
     MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2.jpg";
-    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/container2_specular.png";
-    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_normal.jpg";
-    meshTextures.AlphaMap = DefaultTexture;
-    meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_disp.jpg";
-    meshTextures.EmissionMap = DefaultTexture;
-    meshTextures.ReflectionMap = DefaultTexture;
     meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
     meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
     meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
@@ -55,67 +30,10 @@ Game::Game()
     meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
     meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
-
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
-
-    const std::vector<Vertex> CubeVertices =
-    {
-        {{-0.5,-0.5,-0.5}, {0,-1,0}, {0,1}},
-        {{0.5,-0.5,-0.5}, {0,-1,0}, {1,1}},
-        {{0.5,-0.5,0.5}, {0,-1,0}, {1,0}},
-        {{-0.5,-0.5,0.5}, {0,-1,0}, {0,0}},
-        {{-0.5,0.5,-0.5}, {0,0,-1}, {0,0}},
-        {{0.5,0.5,-0.5}, {0,0,-1}, {1,0}},
-        {{0.5,-0.5,-0.5}, {0,0,-1}, {1,1}},
-        {{-0.5,-0.5,-0.5}, {0,0,-1}, {0,1}},
-        {{0.5,0.5,-0.5}, {1,0,0}, {0,0}},
-        {{0.5,0.5,0.5}, {1,0,0}, {1,0}},
-        {{0.5,-0.5,0.5}, {1,0,0}, {1,1}},
-        {{0.5,-0.5,-0.5}, {1,0,0}, {0,1}},
-        {{0.5,0.5,0.5}, {0,0,1}, {1,0}},
-        {{-0.5,0.5,0.5}, {0,0,1}, {0,0}},
-        {{-0.5,-0.5,0.5}, {0,0,1}, {0,1}},
-        {{0.5,-0.5,0.5}, {0,0,1}, {1,1}},
-        {{-0.5,0.5,0.5}, {-1,0,0}, {1,0}},
-        {{-0.5,0.5,-0.5}, {-1,0,0}, {0,0}},
-        {{-0.5,-0.5,-0.5}, {-1,0,0}, {0,1}},
-        {{-0.5,-0.5,0.5}, {-1,0,0}, {1,1}},
-        {{-0.5,0.5,-0.5}, {0,1,0}, {0,1}},
-        {{-0.5,0.5,0.5}, {0,1,0}, {0,0}},
-        {{0.5,0.5,0.5}, {0,1,0}, {1,0}},
-        {{0.5,0.5,-0.5}, {0,1,0}, {1,1}},
-    };
-
-    const std::vector<uint16_t> CubeIndices = {
-        0,1,2, 0,2,3,
-        4,5,6, 4,6,7,
-        8,9,10, 8,10,11,
-        12,13,14, 12,14,15,
-        16,17,18, 16,18,19,
-        20,21,22, 20,22,23,
-    };
-
-    const std::vector<Vertex> MegaManVertices =
-    {
-        {{0.0f, 0.0f, -0.1f},				 {0.0f, 0.0f, 1.0f}, {0.0521f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-        {{1.0f, 0.0f, -0.1f},		 {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f},  {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-        {{1.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f},  {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-        {{0.0f, 1.0f, -0.1f},		 {0.0f, 0.0f, 1.0f}, {0.0521f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}
-    };
-    const std::vector<uint16_t> SpriteIndices =
-    {
-          0, 1, 2, 2, 3, 0
-    };
     
 
     SpriteList.emplace_back(std::make_shared<EnergyTank>(EnergyTank(vulkanEngine, textureManager, glm::vec2(0.0f), renderManager.mainRenderPass.forwardRenderering2DPipeline->ShaderPipelineDescriptorLayout)));
-
-    //ModelList.emplace_back(Model(vulkanEngine, textureManager, MegaManVertices, SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-
-    //ModelList[0].ModelRotation = glm::vec3(0.0f, 0.0f, 90.0f);
-    //ModelList[1].ModelPosition = glm::vec3(2.0f, 4.0f, 0.0f);
-    //ModelList[2].ModelPosition = glm::vec3(3.0f, 3.0f, 0.0f);
-    //ModelList[3].ModelPosition = glm::vec3(7.0f, 3.0f, 0.0f);
 
     Skybox = SkyBoxMesh(vulkanEngine, textureManager, renderManager.mainRenderPass.skyBoxPipeline->ShaderPipelineDescriptorLayout, meshTextures);
     renderManager.CMDBuffer(vulkanEngine, camera, ModelList, Skybox, light, SpriteList);
@@ -168,6 +86,8 @@ void Game::MainLoop()
             //ImGui::Image(renderManager.gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             //ImGui::Image(renderManager.gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.textureRenderPass.ColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
+            ImGui::Image(renderManager.bloomRenderPass.GetIMGuiImagePass1(), ImVec2(300.0f, 300.0f));
+            ImGui::Image(renderManager.bloomRenderPass.GetIMGuiImagePass2(), ImVec2(300.0f, 300.0f));
             //ImGui::Image(renderManager.shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
 
             ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);
@@ -206,6 +126,7 @@ void Game::MainLoop()
 
         //renderManager.UpdateCommandBuffer(vulkanEngine, ModelList, Skybox);
         UpdateUniformBuffer(vulkanEngine.DrawFrame);
+        renderManager.RendererUpdate(vulkanEngine, camera);
         renderManager.Draw(vulkanEngine, window.GetWindowPtr(), camera, ModelList, Skybox, light, SpriteList);
         mouse.Update(window.GetWindowPtr(), camera);
         keyboard.Update(window.GetWindowPtr(), camera);
@@ -227,7 +148,7 @@ void Game::UpdateUniformBuffer(uint32_t currentImage)
     {
         if (auto MM = dynamic_cast<MegaMan*>(sprite.get()))
         {
-            MM->Update(window.GetWindowPtr(), vulkanEngine, camera, 1.1f, light.light, SpriteList, textureManager);
+           // MM->Update(window.GetWindowPtr(), vulkanEngine, camera, 1.1f, light.light, SpriteList, textureManager);
         }
         else
         {

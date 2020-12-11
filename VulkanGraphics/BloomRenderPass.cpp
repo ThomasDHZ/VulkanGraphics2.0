@@ -9,8 +9,8 @@ BloomRenderPass::BloomRenderPass(VulkanEngine& engine, std::shared_ptr<TextureMa
 	BloomRenderer = RenderToTextureRenderPass(engine);
 	BloomRenderer2 = RenderToTextureRenderPass(engine);
 
-	BloomFrameBuffer = FrameBufferMesh(engine, textureManager, FrameBufferImage, BloomRenderer.bloomPipeline->ShaderPipelineDescriptorLayout);
-	BloomFrameBuffer2 = FrameBufferMesh(engine, textureManager, FrameBufferImage, BloomRenderer.bloomPipeline->ShaderPipelineDescriptorLayout);
+	BloomFrameBuffer = FrameBufferMesh(engine, FrameBufferImage, BloomRenderer.bloomPipeline->ShaderPipelineDescriptorLayout);
+	BloomFrameBuffer2 = FrameBufferMesh(engine, BloomRenderer.ColorTexture, BloomRenderer.bloomPipeline->ShaderPipelineDescriptorLayout);
 }
 
 BloomRenderPass::~BloomRenderPass()
@@ -26,7 +26,7 @@ void BloomRenderPass::Update(VulkanEngine& engine)
 void BloomRenderPass::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex)
 {
 	BloomRenderer.Render(engine, commandBuffers, SwapBufferImageIndex, BloomFrameBuffer);
-	BloomRenderer2.Render(engine, commandBuffers, SwapBufferImageIndex, BloomFrameBuffer2);
+	BloomRenderer2.Render2(engine, commandBuffers, SwapBufferImageIndex, BloomFrameBuffer2);
 }
 
 void BloomRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage)
