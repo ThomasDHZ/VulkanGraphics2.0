@@ -26,7 +26,7 @@ RenderManager::~RenderManager()
 {
 }
 
-void RenderManager::ResizeWindowUpdate(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
+void RenderManager::ResizeWindowUpdate(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
     int width = 0, height = 0;
     glfwGetFramebufferSize(window, &width, &height);
@@ -46,10 +46,11 @@ void RenderManager::ResizeWindowUpdate(VulkanEngine& engine, GLFWwindow* window,
     engine.SwapChain.UpdateSwapChain(window, engine.Device, engine.PhysicalDevice, engine.Surface);
 
     /// mainRenderPass.UpdateSwapChain(engine);
-   sceneRenderPass.UpdateSwapChain(engine);
+     sceneRenderPass.UpdateSwapChain(engine);
   //  gBufferRenderPass.UpdateSwapChain(engine);
   //  frameBufferRenderPass.UpdateSwapChain(engine);
    // shadowRenderPass.UpdateSwapChain(engine);
+    bloomRenderPass.UpdateSwapChain(engine, textureManager, sceneRenderPass.BloomTexture);
     interfaceRenderPass.UpdateSwapChain(engine);
 
     //SSAOFrameBuffer.UpdateSwapChain(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
@@ -139,14 +140,14 @@ void RenderManager::UpdateCommandBuffer(VulkanEngine& engine, std::shared_ptr<Ca
     CMDBuffer(engine, camera, ModelList, skybox, lightmanager, SpriteList);
 }
 
-void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
+void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     VkResult result = vkAcquireNextImageKHR(engine.Device, engine.SwapChain.GetSwapChain(), UINT64_MAX, engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &engine.DrawFrame);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        ResizeWindowUpdate(engine, window, camera, ModelList, skybox, lightmanager, SpriteList);
+        ResizeWindowUpdate(engine, window, textureManager, camera, ModelList, skybox, lightmanager, SpriteList);
         return;
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -200,7 +201,7 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
         framebufferResized = false;
-        ResizeWindowUpdate(engine, window, camera, ModelList, skybox, lightmanager, SpriteList);
+        ResizeWindowUpdate(engine, window, textureManager, camera, ModelList, skybox, lightmanager, SpriteList);
     }
     else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");
@@ -220,6 +221,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
     gBufferRenderPass.Destroy(engine);
     shadowRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
+    bloomRenderPass.Destory(engine);
 	interfaceRenderPass.Destroy(engine);
 }
 

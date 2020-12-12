@@ -226,6 +226,7 @@
   <ItemGroup>
     <None Include="Shaders\AnimatedBloomShader.vert" />
     <None Include="Shaders\AnimatedGBufferShader.vert" />
+    <None Include="Shaders\AnimatedShader3D.frag" />
     <None Include="Shaders\AnimatedShader3D.vert" />
     <None Include="Shaders\AnimatedShadowShader.vert" />
     <None Include="Shaders\BloomFlatShader.frag" />
@@ -248,6 +249,7 @@
     <None Include="Shaders\Shader2D_BloomOutput.vert" />
     <None Include="Shaders\Shader3D.frag" />
     <None Include="Shaders\Shader3D.vert" />
+    <None Include="Shaders\Shader3D_AnimatedBloomShader.vert" />
     <None Include="Shaders\Shader3D_BloomOutput.frag" />
     <None Include="Shaders\Shader3D_BloomOutput.vert" />
     <None Include="Shaders\ShadowShader.frag" />

@@ -20,6 +20,6 @@ void main() {
    // vec3 color = pow(result, vec3(1.0/settings.Gamma));
    // outColor = vec4(color, 0.1f);
    vec3 result = texture(FrameBufferTexture, fragTexCoord).rgb;
-   result += texture(BloomTexture, fragTexCoord).rgb;
+ //  result += texture(BloomTexture, fragTexCoord).rgb;
        outColor = vec4(result, 1.0f);
 }

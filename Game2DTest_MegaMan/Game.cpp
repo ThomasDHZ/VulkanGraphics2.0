@@ -127,7 +127,7 @@ void Game::MainLoop()
         //renderManager.UpdateCommandBuffer(vulkanEngine, ModelList, Skybox);
         UpdateUniformBuffer(vulkanEngine.DrawFrame);
         renderManager.RendererUpdate(vulkanEngine, camera);
-        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), camera, ModelList, Skybox, light, SpriteList);
+        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), textureManager, camera, ModelList, Skybox, light, SpriteList);
         mouse.Update(window.GetWindowPtr(), camera);
         keyboard.Update(window.GetWindowPtr(), camera);
     }

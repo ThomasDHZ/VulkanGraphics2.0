@@ -61,8 +61,8 @@ public:
 	void CMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
 	void RendererUpdate(VulkanEngine& engine, std::shared_ptr<Camera> camera);
 	void UpdateCommandBuffer(VulkanEngine& engine, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
-	void ResizeWindowUpdate(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
-	void Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
+	void ResizeWindowUpdate(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
+	void Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
 	void Destroy(VulkanEngine& engine);
 };
 

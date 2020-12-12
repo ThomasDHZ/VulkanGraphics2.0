@@ -29,7 +29,7 @@ EnergyTank::EnergyTank(VulkanEngine& engine, std::shared_ptr<TextureManager>text
 	EnergyTank.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/EnergyTank_Specular.png";
 	EnergyTank.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/EnergyTank_Normal.png";
 	EnergyTank.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/EnergyTank_Alpha.png";
-	EnergyTank.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/EnergyTank_Bloom.png";
+	EnergyTank.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/EnergyTank_Bloom.png";
 
 	ObjectFlagBits = ObjectFlags::Collectible;
 	//RenderBitFlags = RenderBitFlag::RenderOnTexturePass | RenderBitFlag::RenderOnMainPass | RenderBitFlag::RenderMainPass;
