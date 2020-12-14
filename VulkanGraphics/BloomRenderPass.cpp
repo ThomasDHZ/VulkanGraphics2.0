@@ -34,8 +34,8 @@ void BloomRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Text
 	BloomRenderer.UpdateSwapChain(engine);
 	BloomRenderer2.UpdateSwapChain(engine);
 
-	//BloomFrameBuffer.ScreenResizeUpdate(engine, textureManager, FrameBufferImage, FrameBufferImage, 5, BloomRenderer.bloomPipeline);
-	//BloomFrameBuffer2.ScreenResizeUpdate(engine, textureManager, BloomRenderer.ColorTexture, BloomRenderer.ColorTexture, 6, BloomRenderer.bloomPipeline2nd);
+	BloomFrameBuffer.UpdateSwapChain(engine, FrameBufferImage, BloomRenderer.bloomPipeline->ShaderPipelineDescriptorLayout);
+	BloomFrameBuffer2.UpdateSwapChain(engine, BloomRenderer.ColorTexture, BloomRenderer.bloomPipeline->ShaderPipelineDescriptorLayout);
 }
 
 void BloomRenderPass::Destory(VulkanEngine& engine)

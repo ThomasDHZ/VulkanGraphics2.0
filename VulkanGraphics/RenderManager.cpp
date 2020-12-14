@@ -212,17 +212,18 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
 
 void RenderManager::Destroy(VulkanEngine& engine)
 {
+    //SSAOFrameBuffer.Destory(engine);
+    //SSAOBlurframeBuffer.Destroy(engine);
     frameBuffer.Destory(engine);
-    SSAOFrameBuffer.Destory(engine);
-   // SSAOBlurframeBuffer.Destory(engine);
 
-	mainRenderPass.Destroy(engine);
+    interfaceRenderPass.Destroy(engine);
+    mainRenderPass.Destroy(engine);
     sceneRenderPass.Destroy(engine);
     gBufferRenderPass.Destroy(engine);
-    shadowRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
+    textureRenderPass.Destroy(engine);
     bloomRenderPass.Destory(engine);
-	interfaceRenderPass.Destroy(engine);
+    shadowRenderPass.Destroy(engine);
 }
 
 void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)

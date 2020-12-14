@@ -38,8 +38,6 @@ C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe SSAO.vert -o SSAOVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe SSAO.frag -o SSAOFrag.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe SSAOBlur.vert -o SSAOBlurVert.spv
 C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe SSAOBlur.frag -o SSAOBlurFrag.spv
-C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe shader.vert -o vert.spv
-C:/VulkanSDK/1.2.154.1/Bin32/glslc.exe shader.frag -o frag.spv
 C:/VulkanSDK/1.2.154.1/Bin32/dxc.exe -spirv -T ps_6_1 PixelShader.hlsl -Fo PixelShader.spv
 C:/VulkanSDK/1.2.154.1/Bin32/dxc.exe -spirv -T vs_6_1 VertexShader.hlsl -Fo VertexShader.spv
 pause

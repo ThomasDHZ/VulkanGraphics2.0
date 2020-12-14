@@ -453,19 +453,30 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
 	//}
 
-	//if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &Properties.properties.material.shininess))
-	//{
-	//	Properties.properties.material.shininess = 32.0f;
-	//}
+	aiColor3D color(0.f, 0.f, 0.f);
+	material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+	Properties.properties.material.diffuse.r = color.r;
+	Properties.properties.material.diffuse.g = color.g;
+	Properties.properties.material.diffuse.b = color.b;
 
-	//if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &Properties.properties.material.reflectivness))
-	//{
-	//	Properties.properties.material.reflectivness = 1.0f - Properties.properties.material.reflectivness;
-	//}
-	//else
-	//{
-	//	Properties.properties.material.reflectivness = 0.0f;
-	//}
+	material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+	Properties.properties.material.specular.r = color.r;
+	Properties.properties.material.specular.g = color.g;
+	Properties.properties.material.specular.b = color.b;
+
+	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &Properties.properties.material.shininess))
+	{
+		Properties.properties.material.shininess = 32.0f;
+	}
+
+	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &Properties.properties.material.reflectivness))
+	{
+		Properties.properties.material.reflectivness = 1.0f - Properties.properties.material.reflectivness;
+	}
+	else
+	{
+		Properties.properties.material.reflectivness = 0.0f;
+	}
 
 	//aiString TextureLocation;
 	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
@@ -629,9 +640,9 @@ void Model::UpdateImGUI()
 		{
 			ImGui::NextColumn();
 			ImGui::Text(MeshList[x]->GetMeshName().c_str());
-			//ImGui::SliderFloat3("Position", &MeshList[x]->MeshPosition.x, 0.0f, 20.0f);
-			//ImGui::SliderFloat3("Rotation", &MeshList[x]->MeshRotate.x, 0.0f, 360.0f);
-			//ImGui::SliderFloat3("Scale", &MeshList[x]->MeshScale.x, 0.0f, 20.0f);
+			ImGui::SliderFloat3("Position", &MeshList[x]->MeshPosition.x, 0.0f, 20.0f);
+			ImGui::SliderFloat3("Rotation", &MeshList[x]->MeshRotate.x, 0.0f, 360.0f);
+			ImGui::SliderFloat3("Scale", &MeshList[x]->MeshScale.x, 0.0f, 20.0f);
 			ImGui::NextColumn();
 		}
 		ImGui::TreePop();
@@ -648,6 +659,9 @@ void Model::UpdateImGUI()
 	//		AnimationPlayer.SetPlayAnimationFlag(true);
 	//	}
 	//}
+	ImGui::SliderFloat3("Position", &MeshList[0]->MeshPosition.x, 0.0f, 20.0f);
+	ImGui::SliderFloat3("Rotation", &MeshList[0]->MeshRotate.x, 0.0f, 360.0f);
+	ImGui::SliderFloat3("Scale", &MeshList[0]->MeshScale.x, 0.0f, 20.0f);
 	ImGui::SliderFloat("Anibar", AnimationPlayer.GetAnimationTimePtr(), 0.0f, AnimationPlayer.GetAnimationLength());
 	ImGui::SliderFloat("PlaySpeed", AnimationPlayer.GetAnimationPlaySpeedPtr(), 0.0f, 10.0f);
 	ImGui::End();

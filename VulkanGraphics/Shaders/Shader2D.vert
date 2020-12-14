@@ -30,6 +30,6 @@ void main()
     vec3 B = normalize(mat3(ubo.model) * aBitangent);
     vec3 N = normalize(mat3(ubo.model) * aNormal);
     TBN = transpose(mat3(T, B, N));
-
+    
     gl_Position = ubo.projection * ubo.view * ubo.model * vec4(aPos, 1.0);
 }

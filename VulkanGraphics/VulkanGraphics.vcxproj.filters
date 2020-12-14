@@ -404,6 +404,15 @@
     <None Include="Shaders\Shader2D_BloomOutput.frag">
       <Filter>Shader</Filter>
     </None>
+    <None Include="include.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\shader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\shader.frag">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -675,5 +684,13 @@
     <Image Include="texture\skybox\back.dds">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

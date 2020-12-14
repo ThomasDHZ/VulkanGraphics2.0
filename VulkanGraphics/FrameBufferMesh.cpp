@@ -96,7 +96,7 @@ void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Text
     CreateDescriptorSets(engine, layout);
 }
 
-void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, std::shared_ptr<Texture> FrameBufferImage, std::shared_ptr<Texture> BloomImage, int effectRenderer, std::shared_ptr<GraphicsPipeline> shader)
+void FrameBufferMesh::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Texture> FrameBufferImage, VkDescriptorSetLayout layout, std::shared_ptr<Texture> BloomImage)
 {
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     DescriptorPool = VK_NULL_HANDLE;

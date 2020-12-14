@@ -57,7 +57,7 @@ struct Material
 
 struct MeshProperties
 {
-    alignas(16) Material material;
+    Material material;
 };
 
 struct MeshData
