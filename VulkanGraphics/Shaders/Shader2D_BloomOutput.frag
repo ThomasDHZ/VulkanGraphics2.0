@@ -56,6 +56,22 @@ layout(binding = 5) uniform sampler2D EmissionMap;
 layout(binding = 6) uniform MeshProperties
 {
     Material material;
+    vec2 UVOffset;
+    int UseDiffuseMapBit;
+    int UseSpecularMapBit;
+    int UseNormalMapBit;
+    int UseDepthMapBit;
+    int UseAlphaMapBit;
+    int UseEmissionMapBit;
+    int UseReflectionMapBit;
+    int UseSkyBoxBit;
+    float minLayers;
+    float maxLayers;
+    float heightScale;
+    float timer;
+    int ReflectSprite;
+    vec2 UVScale;
+    float EmissionStrength;
 } meshProperties;
 layout(binding = 7) uniform Light
 {

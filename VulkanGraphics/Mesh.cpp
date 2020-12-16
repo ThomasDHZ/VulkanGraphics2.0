@@ -106,50 +106,49 @@ void Mesh::SetTransformMatrix(glm::mat4 NewTranformMatrix)
 
 void Mesh::CreateMaterialProperties(MeshTextures textures)
 {
-    //if (textures.DiffuseMap != DefaultTexture)
-    //{
-    //    properites.UseDiffuseMapBit = 1;
-    //}
+    if (textures.DiffuseMap != DefaultTexture)
+    {
+        properites.UseDiffuseMapBit = 1;
+    }
 
-    //if (textures.SpecularMap != DefaultTexture)
-    //{
-    //    properites.UseSpecularMapBit = 1;
-    //}
+    if (textures.SpecularMap != DefaultTexture)
+    {
+        properites.UseSpecularMapBit = 1;
+    }
 
-    //if (textures.NormalMap != DefaultTexture)
-    //{
-    //    properites.UseNormalMapBit = 1;
-    //}
+    if (textures.NormalMap != DefaultTexture)
+    {
+        properites.UseNormalMapBit = 1;
+    }
 
-    //if (textures.DepthMap != DefaultTexture)
-    //{
-    //    properites.UseDepthMapBit = 1;
-    //}
+    if (textures.DepthMap != DefaultTexture)
+    {
+        properites.UseDepthMapBit = 1;
+    }
 
-    //if (textures.AlphaMap != DefaultTexture)
-    //{
-    //    properites.UseAlphaMapBit = 1;
-    //}
+    if (textures.AlphaMap != DefaultTexture)
+    {
+        properites.UseAlphaMapBit = 1;
+    }
 
-    //if (textures.EmissionMap != DefaultTexture)
-    //{
-    //    properites.UseEmissionMapBit = 1;
-    //}
+    if (textures.EmissionMap != DefaultTexture)
+    {
+        properites.UseEmissionMapBit = 1;
+    }
 
-    //if (textures.ReflectionMap != DefaultTexture)
-    //{
-    //    properites.UseReflectionMapBit = 1;
-    //}
+    if (textures.ReflectionMap != DefaultTexture)
+    {
+        properites.UseReflectionMapBit = 1;
+    }
 
-    //properites.UseDiffuseMapBit = 1;
-    //properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-    //properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    //properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    //properites.material.shininess = 32;
-    //properites.material.reflectivness = 0;
-    //properites.minLayers = 8.0f;
-    //properites.maxLayers = 32.0f;
-    //properites.heightScale = 0.1f;
+    properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+    properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+    properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    properites.material.shininess = 32;
+    properites.material.reflectivness = 0;
+    properites.minLayers = 8.0f;
+    properites.maxLayers = 32.0f;
+    properites.heightScale = 0.1f;
 }
 
 void Mesh::CreateUniformBuffers(VulkanEngine& engine)
@@ -165,6 +164,7 @@ void Mesh::CreateDescriptorPool(VulkanEngine& engine) {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
 
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
@@ -190,6 +190,7 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
     VkDescriptorImageInfo AlphaMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AlphaTexture);
     VkDescriptorImageInfo EmissionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
     VkDescriptorImageInfo ReflectionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ReflectionTexture);
+    VkDescriptorImageInfo ShadowMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
     VkDescriptorImageInfo SkyBoxMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SkyBoxTexture);
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
@@ -207,9 +208,10 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 5, DescriptorSets[i], AlphaMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, DescriptorSets[i], EmissionMap));
         DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 7, DescriptorSets[i], ReflectionMap));
-        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], SkyBoxMap));
-        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 9, DescriptorSets[i], meshPropertiesInfo));
-        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], LightInfo));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 8, DescriptorSets[i], ShadowMap));
+        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 9, DescriptorSets[i], SkyBoxMap));
+        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 10, DescriptorSets[i], meshPropertiesInfo));
+        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 11, DescriptorSets[i], LightInfo));
         BaseMesh::CreateDescriptorSetsData(engine, DescriptorList);
     }
 }

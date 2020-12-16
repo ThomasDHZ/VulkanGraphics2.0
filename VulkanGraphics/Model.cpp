@@ -285,9 +285,9 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
 	MeshTextures meshTextures;
-	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/Models/TestAnimModel/diffuse.png";
+	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp";
 	meshTextures.SpecularMap = DefaultTexture;
-	meshTextures.NormalMap = DefaultTexture;
+	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp";
 	meshTextures.AlphaMap = DefaultTexture;
 	meshTextures.DepthMap = DefaultTexture;
 	meshTextures.EmissionMap = DefaultTexture;

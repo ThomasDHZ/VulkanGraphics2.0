@@ -15,7 +15,7 @@ LightManager::LightManager(VulkanEngine& engine, std::shared_ptr<TextureManager>
 	//PointLightList.emplace_back(std::make_shared<PointLight>(PointLight(engine, textureManager, layout, renderBit, Pos)));
 
 	light.dLight.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
-	light.dLight.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+	light.dLight.ambient = glm::vec3(0.45f, 0.45f, 0.45f);
 	light.dLight.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
 	light.dLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
 

@@ -39,7 +39,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -78,8 +78,8 @@
     <LibraryPath>C:\VulkanSDK\1.1.130.0\Lib;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)TextureLoader;$(SolutionDir)\ProgramInclude;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.154.1\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\dotha\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.154.1\Lib;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)TextureLoader;$(SolutionDir)\ProgramInclude;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.162.0\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\dotha\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.162.0\Lib;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\ZZT\Documents\Visual Studio 2019\Assimp\include;C:\Users\ZZT\Documents\Visual Studio 2019\tinyobjloader-master;C:\Users\ZZT\Documents\Visual Studio 2019\stb-master;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\include;C:\Users\ZZT\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.131.2\Include;$(IncludePath)</IncludePath>
@@ -162,6 +162,8 @@
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="DeferredFrameBufferMesh.cpp" />
     <ClCompile Include="ForwardRenderering2DPipeline.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="GBufferRenderPass.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
@@ -224,7 +226,6 @@
     <ClCompile Include="VulkanWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="include.hlsli" />
     <None Include="Shaders\AnimatedBloomShader.vert" />
     <None Include="Shaders\AnimatedGBufferShader.vert" />
     <None Include="Shaders\AnimatedShader3D.frag" />
@@ -244,8 +245,6 @@
     <None Include="Shaders\FrameBufferShader.vert" />
     <None Include="Shaders\GBufferShader.frag" />
     <None Include="Shaders\GBufferShader.vert" />
-    <None Include="Shaders\shader.frag" />
-    <None Include="Shaders\shader.vert" />
     <None Include="Shaders\Shader2D.frag" />
     <None Include="Shaders\Shader2D.vert" />
     <None Include="Shaders\Shader2D_BloomOutput.frag" />
@@ -286,6 +285,7 @@
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="DeferredFrameBufferMesh.h" />
     <ClInclude Include="ForwardRenderering2DPipeline.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GBufferRenderPass.h" />
     <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
@@ -360,21 +360,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\skybox\back.dds" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="PixelShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="VertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

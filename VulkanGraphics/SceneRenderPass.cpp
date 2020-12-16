@@ -138,7 +138,7 @@ void SceneRenderPass::FrameDebug()
     ImGui::Image(BloomTexture->ImGuiDescriptorSet, ImVec2(160.0f, 160.0f));
 }
 
-void SceneRenderPass::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
+void SceneRenderPass::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList, std::vector<Mesh>& MeshList)
 {
     std::array<VkClearValue, 3> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -177,6 +177,25 @@ void SceneRenderPass::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& c
         if (model.GetRenderFlags() & RenderDrawFlags::RenderAnimated)
         {
             model.Draw(commandBuffers[SwapBufferImageIndex], AnimatedsceneRendereringPipeline, SwapBufferImageIndex);
+        }
+    }
+    for (auto mesh : MeshList)
+    {
+        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
+        {
+            mesh.Draw(commandBuffers[SwapBufferImageIndex], wireFrameRendereringPipeline, SwapBufferImageIndex);
+        }
+        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderWireFrameAnimated)
+        {
+            mesh.Draw(commandBuffers[SwapBufferImageIndex], AnimatedWireFramedRendereringPipeline, SwapBufferImageIndex);
+        }
+        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderNormally)
+        {
+            mesh.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderingPipeline, SwapBufferImageIndex);
+        }
+        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderAnimated)
+        {
+            mesh.Draw(commandBuffers[SwapBufferImageIndex], AnimatedsceneRendereringPipeline, SwapBufferImageIndex);
         }
     }
     for (auto model : lightmanager.PointLightList)

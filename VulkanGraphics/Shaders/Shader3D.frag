@@ -48,6 +48,7 @@ struct SpotLightStruct {
     vec3 specular;       
 };
 
+#define MAXPOINTLIGHTS 4
 layout(binding = 1) uniform sampler2D DiffuseMap;
 layout(binding = 2) uniform sampler2D SpecularMap;
 layout(binding = 3) uniform sampler2D normalMap;
@@ -55,16 +56,33 @@ layout(binding = 4) uniform sampler2D depthMap;
 layout(binding = 5) uniform sampler2D AlphaMap;
 layout(binding = 6) uniform sampler2D EmissionMap;
 layout(binding = 7) uniform sampler2D ReflectionMap;
-layout(binding = 8) uniform samplerCube SkyBox;
-layout(binding = 9) uniform MeshProperties
+layout(binding = 8) uniform sampler2D ShadowMap;
+layout(binding = 9) uniform samplerCube SkyBox;
+layout(binding = 10) uniform MeshProperties
 {
     Material material;
+   // MapBits mapBitsFlags;
+   vec2 UVOffset;
+        int UseDiffuseMapBit;
+     int UseSpecularMapBit;
+     int UseNormalMapBit;
+     int UseDepthMapBit;
+     int UseAlphaMapBit;
+     int UseEmissionMapBit;
+     int UseReflectionMapBit;
+     int UseSkyBoxBit;
+    float minLayers;
+    float maxLayers;
+    float heightScale;
+    float timer;
+    int ReflectSprite;
+    vec2 UVScale;
 } meshProperties;
-layout(binding = 10) uniform Light
+layout(binding = 11) uniform Light
 {
-    DirectionalLightStruct DLight;
-    PointLightStruct PLight[MAXPOINTLIGHTS];
-    SpotLightStruct SLight;
+    DirectionalLightStruct dLight;
+    PointLightStruct pLight[MAXPOINTLIGHTS];
+    SpotLightStruct sLight;
     vec3 viewPos;
 } light;
 
@@ -84,20 +102,20 @@ void main()
     vec3 V = normalize(light.viewPos - FragPos);
     vec3 N = normalize(Normal);
 
-    vec3 TangentLightDirection = TBN * light.DLight.direction;
+    vec3 TangentLightDirection = TBN * light.dLight.direction;
     vec3 TangentViewPos  = TBN * light.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
 
 
-    vec3 result = CalcDirLight(light.DLight, N, V);
+    vec3 result = CalcDirLight(light.dLight, N, V);
     for(int x = 0; x < MAXPOINTLIGHTS; x++)
     {
-      if(light.PLight[x].InUseFlag == 1)
+      if(light.pLight[x].InUseFlag == 1)
       {
-             result += CalcPointLight(light.PLight[x], N, FragPos, V);  
+             result += CalcPointLight(light.pLight[x], N, FragPos, V);  
       } 
     }
-    result += CalcSpotLight(light.SLight, N, FragPos, V); 
+    result += CalcSpotLight(light.sLight, N, FragPos, V); 
 
     FragColor = vec4(result, 1.0);
 }

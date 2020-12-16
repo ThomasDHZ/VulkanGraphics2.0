@@ -58,6 +58,22 @@ struct Material
 struct MeshProperties
 {
     Material material;
+    alignas(8) glm::vec2 UVOffset = glm::vec2(0.0f, 0.0f);
+    alignas(4) int UseDiffuseMapBit = 0;
+    alignas(4) int UseSpecularMapBit = 0;
+    alignas(4) int UseNormalMapBit = 0;
+    alignas(4) int UseDepthMapBit = 0;
+    alignas(4) int UseAlphaMapBit = 0;
+    alignas(4) int UseEmissionMapBit = 0;
+    alignas(4) int UseReflectionMapBit = 0;
+    alignas(4) int UseSkyBoxBit;
+    alignas(4) float minLayers;
+    alignas(4) float maxLayers;
+    alignas(4) float heightScale;
+    alignas(4) float timer;
+    alignas(4) int ReflectSprite;
+    alignas(8) glm::vec2 UVScale = glm::vec2(1.0f, 1.0f);
+    alignas(4) float EmissionStrength = 1.0f;
 };
 
 struct MeshData

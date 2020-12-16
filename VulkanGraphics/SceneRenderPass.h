@@ -41,7 +41,7 @@ public:
 	std::shared_ptr<DebugLightRenderingPipeline> debugLightRenderingPipeline;
 
 	void FrameDebug();
-	void Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList);
+	void Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& commandBuffers, int SwapBufferImageIndex, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList, std::vector<Mesh>& MeshList);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 

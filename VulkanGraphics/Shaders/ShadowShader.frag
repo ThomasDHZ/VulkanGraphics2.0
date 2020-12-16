@@ -44,7 +44,7 @@ struct SpotLightStruct {
     vec3 diffuse;
     vec3 specular;       
 };
-
+#define MAXPOINTLIGHTS 4
 layout(binding = 1) uniform sampler2D DiffuseMap;
 layout(binding = 2) uniform sampler2D SpecularMap;
 layout(binding = 3) uniform sampler2D normalMap;
@@ -52,8 +52,9 @@ layout(binding = 4) uniform sampler2D depthMap;
 layout(binding = 5) uniform sampler2D AlphaMap;
 layout(binding = 6) uniform sampler2D EmissionMap;
 layout(binding = 7) uniform sampler2D ReflectionMap;
-layout(binding = 8) uniform samplerCube SkyBox;
-layout(binding = 9) uniform MeshProperties
+layout(binding = 8) uniform sampler2D ShadowMap;
+layout(binding = 9) uniform samplerCube SkyBox;
+layout(binding = 10) uniform MeshProperties
 {
     Material material;
    // MapBits mapBitsFlags;
@@ -72,12 +73,11 @@ layout(binding = 9) uniform MeshProperties
     float timer;
     int ReflectSprite;
     vec2 UVScale;
-    float EmissionStrength;
 } meshProperties;
-layout(binding = 10) uniform Light
+layout(binding = 11) uniform Light
 {
     DirectionalLightStruct dLight;
-    PointLightStruct pLight[1];
+    PointLightStruct pLight[MAXPOINTLIGHTS];
     SpotLightStruct sLight;
     vec3 viewPos;
 } light;

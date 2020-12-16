@@ -282,6 +282,12 @@
     <ClCompile Include="BloomPipeline.cpp">
       <Filter>Source Files\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\WireFrameShader.frag">
@@ -402,15 +408,6 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\Shader2D_BloomOutput.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="include.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\shader.vert">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\shader.frag">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -679,18 +676,13 @@
     <ClInclude Include="BloomPipeline2nd.h">
       <Filter>Header Files\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\skybox\back.dds">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="PixelShader.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>
