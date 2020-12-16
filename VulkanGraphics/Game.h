@@ -25,7 +25,8 @@ private:
     SkyBoxMesh Skybox;
 
     void UpdateUniformBuffer(uint32_t currentImage);
-    void renderSphere();
+    std::vector<Vertex> CalcVertex();
+
 public:
     Game();
     ~Game();

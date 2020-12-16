@@ -46,6 +46,7 @@ Game::Game()
     meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_height.bmp";
     meshTextures.EmissionMap = DefaultTexture;
     meshTextures.ReflectionMap = DefaultTexture;
+    meshTextures.RendererShadowMap = renderManager.shadowRenderPass.DepthTexture;
     meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
     meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
     meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
@@ -56,54 +57,22 @@ Game::Game()
 
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
 
-    const std::vector<Vertex> CubeVertices =
+    const std::vector<uint16_t> SpriteIndices =
     {
-        {{-0.5,-0.5,-0.5}, {0,-1,0}, {0,1}},
-        {{0.5,-0.5,-0.5}, {0,-1,0}, {1,1}},
-        {{0.5,-0.5,0.5}, {0,-1,0}, {1,0}},
-        {{-0.5,-0.5,0.5}, {0,-1,0}, {0,0}},
-        {{-0.5,0.5,-0.5}, {0,0,-1}, {0,0}},
-        {{0.5,0.5,-0.5}, {0,0,-1}, {1,0}},
-        {{0.5,-0.5,-0.5}, {0,0,-1}, {1,1}},
-        {{-0.5,-0.5,-0.5}, {0,0,-1}, {0,1}},
-        {{0.5,0.5,-0.5}, {1,0,0}, {0,0}},
-        {{0.5,0.5,0.5}, {1,0,0}, {1,0}},
-        {{0.5,-0.5,0.5}, {1,0,0}, {1,1}},
-        {{0.5,-0.5,-0.5}, {1,0,0}, {0,1}},
-        {{0.5,0.5,0.5}, {0,0,1}, {1,0}},
-        {{-0.5,0.5,0.5}, {0,0,1}, {0,0}},
-        {{-0.5,-0.5,0.5}, {0,0,1}, {0,1}},
-        {{0.5,-0.5,0.5}, {0,0,1}, {1,1}},
-        {{-0.5,0.5,0.5}, {-1,0,0}, {1,0}},
-        {{-0.5,0.5,-0.5}, {-1,0,0}, {0,0}},
-        {{-0.5,-0.5,-0.5}, {-1,0,0}, {0,1}},
-        {{-0.5,-0.5,0.5}, {-1,0,0}, {1,1}},
-        {{-0.5,0.5,-0.5}, {0,1,0}, {0,1}},
-        {{-0.5,0.5,0.5}, {0,1,0}, {0,0}},
-        {{0.5,0.5,0.5}, {0,1,0}, {1,0}},
-        {{0.5,0.5,-0.5}, {0,1,0}, {1,1}},
+          0, 1, 2, 2, 3, 0
     };
 
-    const std::vector<uint16_t> CubeIndices = {
-        0,1,2, 0,2,3,
-        4,5,6, 4,6,7,
-        8,9,10, 8,10,11,
-        12,13,14, 12,14,15,
-        16,17,18, 16,18,19,
-        20,21,22, 20,22,23,
-    };
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
-    renderSphere();
-    renderSphere();
-    renderSphere();
-    renderSphere();
-    renderSphere();
-
-    renderSphere();
-    renderSphere();
-    renderSphere();
-    renderSphere();
-    renderSphere();
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
     ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Donut/Donut.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
@@ -240,85 +209,71 @@ void Game::UpdateUniformBuffer(uint32_t currentImage)
     Skybox.UpdateUniformBuffer(vulkanEngine, camera);
 }
 
-void Game::renderSphere()
+std::vector<Vertex> Game::CalcVertex()
 {
-    std::vector<glm::vec3> positions;
-    std::vector<glm::vec2> uv;
-    std::vector<glm::vec3> normals;
-    std::vector<uint16_t> indices;
+    glm::vec3 pos1(-1.0f, 1.0f, 0.0f);
+    glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
+    glm::vec3 pos3(1.0f, -1.0f, 0.0f);
+    glm::vec3 pos4(1.0f, 1.0f, 0.0f);
+    // texture coordinates
+    glm::vec2 uv1(0.0f, 1.0f);
+    glm::vec2 uv2(0.0f, 0.0f);
+    glm::vec2 uv3(1.0f, 0.0f);
+    glm::vec2 uv4(1.0f, 1.0f);
+    // normal vector
+    glm::vec3 nm(0.0f, 0.0f, 1.0f);
 
-    const unsigned int X_SEGMENTS = 64;
-    const unsigned int Y_SEGMENTS = 64;
-    const float PI = 3.14159265359;
-    for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
-    {
-        for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
-        {
-            float xSegment = (float)x / (float)X_SEGMENTS;
-            float ySegment = (float)y / (float)Y_SEGMENTS;
-            float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-            float yPos = std::cos(ySegment * PI);
-            float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+    // calculate tangent/bitangent vectors of both triangles
+    glm::vec3 tangent1, bitangent1;
+    glm::vec3 tangent2, bitangent2;
+    // triangle 1
+    // ----------
+    glm::vec3 edge1 = pos2 - pos1;
+    glm::vec3 edge2 = pos3 - pos1;
+    glm::vec2 deltaUV1 = uv2 - uv1;
+    glm::vec2 deltaUV2 = uv3 - uv1;
 
-            positions.push_back(glm::vec3(xPos, yPos, zPos));
-            uv.push_back(glm::vec2(xSegment, ySegment));
-            normals.push_back(glm::vec3(xPos, yPos, zPos));
-        }
-    }
+    float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
-    bool oddRow = false;
-    for (unsigned int y = 0; y < Y_SEGMENTS; ++y)
-    {
-        if (!oddRow) // even rows: y == 0, y == 2; and so on
-        {
-            for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
-            {
-                indices.push_back(y * (X_SEGMENTS + 1) + x);
-                indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-            }
-        }
-        else
-        {
-            for (int x = X_SEGMENTS; x >= 0; --x)
-            {
-                indices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-                indices.push_back(y * (X_SEGMENTS + 1) + x);
-            }
-        }
-        oddRow = !oddRow;
-    }
+    tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent1 = glm::normalize(tangent1);
 
-    std::vector<Vertex> data;
-    for (std::size_t i = 0; i < positions.size(); ++i)
-    {
-        Vertex vert;
-        vert.Position = positions[i];
-        if (uv.size() > 0)
-        {
-            vert.TexureCoord = uv[i];
-        }
-        if (normals.size() > 0)
-        {
-            vert.Normal = normals[i];
-        }
-        data.emplace_back(vert);
-    }
+    bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent1 = glm::normalize(bitangent1);
 
-    MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2.jpg";
-    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/container2_specular.png";
-    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_normal.jpg";
-    meshTextures.AlphaMap = DefaultTexture;
-    meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_disp.jpg";
-    meshTextures.EmissionMap = DefaultTexture;
-    meshTextures.ReflectionMap = DefaultTexture;
-    meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
-    meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
-    meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
-    meshTextures.CubeMap[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
-    meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
-    meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
+    // triangle 2
+    // ----------
+    edge1 = pos3 - pos1;
+    edge2 = pos4 - pos1;
+    deltaUV1 = uv3 - uv1;
+    deltaUV2 = uv4 - uv1;
 
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, data, indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
+    tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent2 = glm::normalize(tangent2);
+
+
+    bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent2 = glm::normalize(bitangent2);
+
+
+    return {
+        // positions            // normal         // texcoords  // tangent                          // bitangent
+        {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent1.x, tangent1.y, tangent1.z}, {bitangent1.x, bitangent1.y, bitangent1.z}},
+        {{pos2.x, pos2.y, pos2.z}, {nm.x, nm.y, nm.z}, {uv2.x, uv2.y}, {tangent1.x, tangent1.y, tangent1.z}, {bitangent1.x, bitangent1.y, bitangent1.z}},
+        {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y}, {tangent1.x, tangent1.y, tangent1.z}, {bitangent1.x, bitangent1.y, bitangent1.z}},
+
+        {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent2.x, tangent2.y, tangent2.z}, {bitangent2.x, bitangent2.y, bitangent2.z}},
+        {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y}, {tangent2.x, tangent2.y, tangent2.z}, {bitangent2.x, bitangent2.y, bitangent2.z}},
+        {{pos4.x, pos4.y, pos4.z}, {nm.x, nm.y, nm.z}, {uv4.x, uv4.y}, {tangent2.x, tangent2.y, tangent2.z}, {bitangent2.x, bitangent2.y, bitangent2.z}}
+    };
 }

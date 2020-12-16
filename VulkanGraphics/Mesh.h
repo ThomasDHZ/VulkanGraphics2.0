@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseMesh.h"
 #include "PerspectiveCamera.h"
+#include "RenderedDepthTexture.h"
 
 struct DirectionalLightStruct {
     alignas(16) glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);

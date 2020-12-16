@@ -235,7 +235,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
     // depth of current layer
     float currentLayerDepth = 0.0;
     // the amount to shift the texture coordinates per layer (from vector P)
-    vec2 P = viewDir.xy / viewDir.z * meshProperties.heightScale; 
+    vec2 P = viewDir.xy / viewDir.z * 0.1f; 
     vec2 deltaTexCoords = P / numLayers;
   
     // get initial values
@@ -280,7 +280,7 @@ void main()
     vec3 V = light.viewPos;
     vec3 N = Normal;
 
-    vec3 TangentLightPos = TBN * light.dLight.direction;
+    vec3 TangentLightPos = TBN * light.pLight[0].position;
     vec3 TangentViewPos  = TBN * light.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
 
@@ -288,9 +288,9 @@ void main()
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = TexCoords;
     
-//    texCoords = ParallaxMapping(TexCoords,  viewDir);       
-//    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-//        discard;
+    texCoords = ParallaxMapping(TexCoords,  viewDir);       
+    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+        discard;
 
     // obtain normal from normal map
     vec3 normal = texture(normalMap, texCoords).rgb;

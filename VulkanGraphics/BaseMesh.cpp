@@ -152,6 +152,8 @@ void BaseMesh::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager
         ReflectionTexture = textureManager->LoadTexture(engine, textures.ReflectionMap, VK_FORMAT_R8G8B8A8_UNORM);
     }
 
+    ShadowTexture = textures.RendererShadowMap;
+
     if (!textures.CubeMap[0].empty() &&
         !textures.CubeMap[1].empty() &&
         !textures.CubeMap[2].empty() &&

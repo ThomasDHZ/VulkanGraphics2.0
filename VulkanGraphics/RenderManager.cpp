@@ -46,10 +46,10 @@ void RenderManager::ResizeWindowUpdate(VulkanEngine& engine, GLFWwindow* window,
     engine.SwapChain.UpdateSwapChain(window, engine.Device, engine.PhysicalDevice, engine.Surface);
 
     /// mainRenderPass.UpdateSwapChain(engine);
+    shadowRenderPass.UpdateSwapChain(engine);
      sceneRenderPass.UpdateSwapChain(engine);
   //  gBufferRenderPass.UpdateSwapChain(engine);
   //  frameBufferRenderPass.UpdateSwapChain(engine);
-    shadowRenderPass.UpdateSwapChain(engine);
     bloomRenderPass.UpdateSwapChain(engine, textureManager, sceneRenderPass.BloomTexture);
     interfaceRenderPass.UpdateSwapChain(engine);
 
@@ -89,13 +89,13 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> came
             throw std::runtime_error("failed to begin recording command buffer!");
         }
      //   MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList);
+        ShadowRenderCMDBuffer(engine, ModelList, i);
         SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList, MeshList);
       //  GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
        // SSAORenderCMDBuffer(engine, camera, i);
         TextureRenderCMDBuffer(engine, i, SpriteList);
         bloomRenderPass.Draw(engine, commandBuffers, i);
         FrameBufferRenderCMDBuffer(engine, i);
-        ShadowRenderCMDBuffer(engine, ModelList, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }

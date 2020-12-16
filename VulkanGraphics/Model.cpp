@@ -285,11 +285,11 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
 	MeshTextures meshTextures;
-	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp";
+	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2.jpg";
 	meshTextures.SpecularMap = DefaultTexture;
-	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp";
+	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_normal.jpg";
 	meshTextures.AlphaMap = DefaultTexture;
-	meshTextures.DepthMap = DefaultTexture;
+	meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_disp.jpg";
 	meshTextures.EmissionMap = DefaultTexture;
 	meshTextures.ReflectionMap = DefaultTexture;
 	meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
@@ -299,14 +299,14 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
 	meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg"; 
 
-	//Properties.properties.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-	//Properties.properties.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	//Properties.properties.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-	//Properties.properties.material.shininess = 32;
-	//Properties.properties.material.reflectivness = 0;
-	//Properties.properties.minLayers = 8.0f;
-	//Properties.properties.maxLayers = 32.0f;
-	//Properties.properties.heightScale = 0.1f;
+	Properties.properties.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+	Properties.properties.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	Properties.properties.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	Properties.properties.material.shininess = 32;
+	Properties.properties.material.reflectivness = 0;
+	Properties.properties.minLayers = 8.0f;
+	Properties.properties.maxLayers = 32.0f;
+	Properties.properties.heightScale = 0.1f;
 
 	//if (std::string(mesh->mName.C_Str()) == "Demon_HeadA")
 	//{

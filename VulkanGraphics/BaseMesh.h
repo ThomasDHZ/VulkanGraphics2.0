@@ -43,6 +43,7 @@ struct MeshTextures
     std::shared_ptr<Texture> RendererAlphaMap;
     std::shared_ptr<Texture> RendererEmissionMap;
     std::shared_ptr<Texture> RendererReflectionMap;
+    std::shared_ptr<Texture> RendererShadowMap;
     std::shared_ptr<CubeMapTexture> RendererCubeMap;
 };
 
@@ -106,6 +107,7 @@ protected:
     std::shared_ptr<Texture> AlphaTexture;
     std::shared_ptr<Texture> EmissionTexture;
     std::shared_ptr<Texture> ReflectionTexture;
+    std::shared_ptr<Texture> ShadowTexture;
     std::shared_ptr<CubeMapTexture> SkyBoxTexture;
 
     bool MeshDeletedFlag = false;
