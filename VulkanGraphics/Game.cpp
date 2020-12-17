@@ -80,7 +80,7 @@ Game::Game()
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Donut/Donut.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+   // ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Donut/Donut.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
     //glm::vec3 cubePositions[] = {
     //glm::vec3(0.0f,  0.0f,  0.0f),

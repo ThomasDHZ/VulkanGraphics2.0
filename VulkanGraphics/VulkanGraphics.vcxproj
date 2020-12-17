@@ -195,6 +195,7 @@
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
+    <ClCompile Include="RenderedGammaTexture.cpp" />
     <ClCompile Include="RenderedGBufferAlbedoTexture.cpp" />
     <ClCompile Include="RenderedGBufferNormalTexture.cpp" />
     <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
@@ -323,6 +324,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
+    <ClInclude Include="RenderedGammaTexture.h" />
     <ClInclude Include="RenderedGBufferAlbedoTexture.h" />
     <ClInclude Include="RenderedGBufferNormalTexture.h" />
     <ClInclude Include="RenderedGBufferPositionTexture.h" />

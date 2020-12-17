@@ -147,8 +147,14 @@ void main()
 
 
     vec3 reflection = Reflect(TangentViewPos, N);
-    result = mix(result, reflection, meshProperties.material.reflectivness);
-
+    if(meshProperties.UseReflectionMapBit == 1)
+    {
+        result = mix(result, reflection, texture(ReflectionMap, UV).rgb);
+    }
+    else
+    {
+        result = mix(result, reflection, meshProperties.material.reflectivness);
+    }
     FragColor = vec4(result, 1.0);
 
    if(meshProperties.UseEmissionMapBit == 1)
@@ -286,7 +292,7 @@ vec3 SpotLight(vec3 TangentLightPos, vec3 TangentFragPos, vec3 V, vec3 N, vec2 U
 
 vec3 Reflect(vec3 N, vec3 TangentViewPos)
 {
-   vec3 I = normalize(FragPos - TangentViewPos);
+   vec3 I = normalize((TBN * FragPos) - TangentViewPos);
    vec3 R = reflect(I, normalize(N));
    return texture(SkyBox, R).rgb;
 }
@@ -329,15 +335,14 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 { 
-    const float minLayers = 8;
-    const float maxLayers = 32;
-    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
+    // number of depth layers
+    float numLayers = mix(meshProperties.maxLayers, meshProperties.minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
     // depth of current layer
     float currentLayerDepth = 0.0;
     // the amount to shift the texture coordinates per layer (from vector P)
-    vec2 P = viewDir.xy / viewDir.z * 0.1f; 
+    vec2 P = viewDir.xy / viewDir.z * meshProperties.heightScale; 
     vec2 deltaTexCoords = P / numLayers;
   
     // get initial values

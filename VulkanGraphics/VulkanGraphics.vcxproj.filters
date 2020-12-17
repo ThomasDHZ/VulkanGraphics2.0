@@ -288,6 +288,9 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderedGammaTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\WireFrameShader.frag">
@@ -678,6 +681,9 @@
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGammaTexture.h">
+      <Filter>Header Files\Texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
