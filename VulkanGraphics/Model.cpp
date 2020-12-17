@@ -303,7 +303,7 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	Properties.properties.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	Properties.properties.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	Properties.properties.material.shininess = 32;
-	Properties.properties.material.reflectivness = 0;
+	Properties.properties.material.reflectivness = 50;
 	Properties.properties.minLayers = 8.0f;
 	Properties.properties.maxLayers = 32.0f;
 	Properties.properties.heightScale = 0.1f;

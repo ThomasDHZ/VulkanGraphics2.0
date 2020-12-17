@@ -13,7 +13,7 @@ Game::Game()
     //std::ifstream file2("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.dds", std::ios::binary);
     //file2.read(reinterpret_cast<char*>(&header), sizeof(header));
 
-    window = VulkanWindow(800, 600, "Vulkan Engine");
+    window = VulkanWindow(1920, 1080, "Vulkan Engine");
     vulkanEngine = VulkanEngine(window.GetWindowPtr());
     textureManager = std::make_shared<TextureManager>(vulkanEngine);
     renderManager = RenderManager(vulkanEngine, textureManager, window.GetWindowPtr());
@@ -57,42 +57,48 @@ Game::Game()
 
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
 
-    const std::vector<uint16_t> SpriteIndices =
+    const std::vector<uint16_t> indices =
     {
-          0, 1, 2, 2, 3, 0
     };
 
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), SpriteIndices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    
+
+    ModelList[1].ModelPosition = glm::vec3(2.0f, 0.0f, 0.0f);
+    ModelList[2].ModelPosition = glm::vec3(4.0f, 0.0f, 0.0f);
+    ModelList[3].ModelPosition = glm::vec3(6.0f, 0.0f, 0.0f);
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
     ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Donut/Donut.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
-    glm::vec3 cubePositions[] = {
-    glm::vec3(0.0f,  0.0f,  0.0f),
-    glm::vec3(2.0f,  5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3(2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f,  3.0f, -7.5f),
-    glm::vec3(1.3f, -2.0f, -2.5f),
-    glm::vec3(1.5f,  2.0f, -2.5f),
-    glm::vec3(1.5f,  0.2f, -1.5f),
-    glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+    //glm::vec3 cubePositions[] = {
+    //glm::vec3(0.0f,  0.0f,  0.0f),
+    //glm::vec3(2.0f,  5.0f, -15.0f),
+    //glm::vec3(-1.5f, -2.2f, -2.5f),
+    //glm::vec3(-3.8f, -2.0f, -12.3f),
+    //glm::vec3(2.4f, -0.4f, -3.5f),
+    //glm::vec3(-1.7f,  3.0f, -7.5f),
+    //glm::vec3(1.3f, -2.0f, -2.5f),
+    //glm::vec3(1.5f,  2.0f, -2.5f),
+    //glm::vec3(1.5f,  0.2f, -1.5f),
+    //glm::vec3(-1.3f,  1.0f, -1.5f)
+    //};
 
-    for (int x = 0; x < 10; x++)
+   /* for (int x = 0; x < 10; x++)
     {
         ModelList[x].ModelPosition = cubePositions[x];
-    }
+    }*/
     //ModelList[0].ModelRotation = glm::vec3(0.0f, 0.0f, 90.0f);
     //ModelList[1].ModelPosition = glm::vec3(2.0f, 4.0f, 0.0f);
     //ModelList[2].ModelPosition = glm::vec3(3.0f, 3.0f, 0.0f);
