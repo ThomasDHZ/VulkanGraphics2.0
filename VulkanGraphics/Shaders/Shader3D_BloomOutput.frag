@@ -106,23 +106,27 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3  FresnelSchlick(float cosTheta, vec3 F0);
 
 void main()
-{           
-    //RemoveAlphaPixels();
-
+{
     vec3 TangentViewPos  = TBN * light.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
     
-       // offset texture coordinates with Parallax Mapping
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = TexCoords;
-    
-    texCoords = ParallaxMapping(TexCoords,  viewDir);       
-    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-        discard;
 
-    // obtain normal from normal map
+    RemoveAlphaPixels(texCoords);
+    
+    if(meshProperties.UseDepthMapBit == 1)
+    {
+        texCoords = ParallaxMapping(TexCoords,  viewDir);       
+        if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+            discard;
+    }
+
     vec3 normal = texture(normalMap, texCoords).rgb;
-    normal = normalize(normal * 2.0 - 1.0);   
+    if(meshProperties.UseNormalMapBit == 1)
+    {
+        normal = normalize(normal * 2.0 - 1.0);   
+    }
    
     vec3 result = DirectionalLight(light.dLight, TangentFragPos, viewDir, texCoords, normal);
     for(int x = 0; x < MAXPOINTLIGHTS; x++)
@@ -137,10 +141,17 @@ void main()
     vec3 I = normalize(TangentFragPos - TangentViewPos);
     vec3 R = reflect(I, normalize(normal));
     vec3 Reflected = texture(SkyBox, R).rgb;
-    vec3 result2 = mix(result, Reflected, meshProperties.material.reflectivness);
+    if(meshProperties.UseReflectionMapBit == 1)
+    {
+        result = mix(result, Reflected, texture(ReflectionMap, texCoords).rgb);
+    }
+    else
+    {
+        result = mix(result, Reflected, meshProperties.material.reflectivness);
+    }
    
 
-    FragColor = vec4(result2, 1.0);
+    FragColor = vec4(result, 1.0);
 
    if(meshProperties.UseEmissionMapBit == 1)
    {

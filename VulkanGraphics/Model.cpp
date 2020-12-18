@@ -285,11 +285,11 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
 	MeshTextures meshTextures;
-	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2.jpg";
+	meshTextures.DiffuseMap = DefaultTexture;
 	meshTextures.SpecularMap = DefaultTexture;
-	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_normal.jpg";
+	meshTextures.NormalMap = DefaultTexture;
 	meshTextures.AlphaMap = DefaultTexture;
-	meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_disp.jpg";
+	meshTextures.DepthMap = DefaultTexture;
 	meshTextures.EmissionMap = DefaultTexture;
 	meshTextures.ReflectionMap = DefaultTexture;
 	meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
@@ -303,7 +303,7 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	Properties.properties.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	Properties.properties.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	Properties.properties.material.shininess = 32;
-	Properties.properties.material.reflectivness = 50;
+	Properties.properties.material.reflectivness = 0;
 	Properties.properties.minLayers = 8.0f;
 	Properties.properties.maxLayers = 32.0f;
 	Properties.properties.heightScale = 0.1f;
