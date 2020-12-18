@@ -134,7 +134,8 @@ void main()
         N = normalize(N * 2.0 - 1.0);   
    }
 
-    vec3 result = DirectionalLight( V,  N,  UV, light.dLight);
+  //  vec3 result = DirectionalLight( V,  N,  UV, light.dLight);
+  vec3 result = vec3(0.0f, 0.0f, 0.0f);
     for(int x = 0; x < MAXPOINTLIGHTS; x++)
     {
             if(light.pLight[x].InUseFlag == 1)

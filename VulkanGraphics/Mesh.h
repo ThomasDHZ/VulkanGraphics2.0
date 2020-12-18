@@ -12,14 +12,14 @@ struct DirectionalLightStruct {
 };
 
 struct PointLightStruct {
-    alignas(16) glm::vec3 position = glm::vec3(0.0f);
+    alignas(16) glm::vec3 position = glm::vec3(0.5f, 1.0f, 0.3f);
 
     alignas(4) float constant = 1.0f;
     alignas(4) float linear = 0.09f;
     alignas(4) float quadratic = 0.032f;
 
-    alignas(16) glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    alignas(16) glm::vec3 diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    alignas(16) glm::vec3 ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+    alignas(16) glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
     alignas(16) glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
     alignas(4)  int InUseFlag = 1;
 };

@@ -19,37 +19,37 @@ LightManager::LightManager(VulkanEngine& engine, std::shared_ptr<TextureManager>
 	light.dLight.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
 	light.dLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
 
-    light.pLight[0].position = glm::vec3(0.7f, 0.2f, 2.0f);
-    light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    light.pLight[0].constant = 1.0f;
-    light.pLight[0].linear = 0.09f;
-    light.pLight[0].quadratic = 0.032f;
-    // point light 2
-    light.pLight[0].position = glm::vec3(2.3f, -3.3f, -4.0f);
-    light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    light.pLight[0].constant = 1.0f;
-    light.pLight[0].linear = 0.09f;
-    light.pLight[0].quadratic = 0.032f;
-    // point light 3
-    light.pLight[0].position = glm::vec3(-4.0f, 2.0f, -12.0f);
-    light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    light.pLight[0].constant = 1.0f;
-    light.pLight[0].linear = 0.09f;
-    light.pLight[0].quadratic = 0.032f;
-    // point light 4
-    light.pLight[0].position = glm::vec3(0.0f, 0.0f, -3.0f);
-    light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    light.pLight[0].constant = 1.0f;
-    light.pLight[0].linear = 0.09f;
-    light.pLight[0].quadratic = 0.032f;
+    //light.pLight[0].position = glm::vec3(0.7f, 0.2f, 2.0f);
+    //light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    //light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    //light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //light.pLight[0].constant = 1.0f;
+    //light.pLight[0].linear = 0.09f;
+    //light.pLight[0].quadratic = 0.032f;
+    //// point light 2
+    //light.pLight[0].position = glm::vec3(2.3f, -3.3f, -4.0f);
+    //light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    //light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    //light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //light.pLight[0].constant = 1.0f;
+    //light.pLight[0].linear = 0.09f;
+    //light.pLight[0].quadratic = 0.032f;
+    //// point light 3
+    //light.pLight[0].position = glm::vec3(-4.0f, 2.0f, -12.0f);
+    //light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    //light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    //light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //light.pLight[0].constant = 1.0f;
+    //light.pLight[0].linear = 0.09f;
+    //light.pLight[0].quadratic = 0.032f;
+    //// point light 4
+    //light.pLight[0].position = glm::vec3(0.0f, 0.0f, -3.0f);
+    //light.pLight[0].ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    //light.pLight[0].diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
+    //light.pLight[0].specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //light.pLight[0].constant = 1.0f;
+    //light.pLight[0].linear = 0.09f;
+    //light.pLight[0].quadratic = 0.032f;
 
     light.sLight.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
     light.sLight.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
