@@ -96,7 +96,7 @@ layout(location = 1) out vec4 BloomColor;
 void RemoveAlphaPixels(vec2 UV);
 vec3 DirectionalLight(DirectionalLightStruct directionalLight, vec3 FragPosition, vec3 viewDir, vec2 UV, vec3 N);
 vec3 PointLight(PointLightStruct pointLight, vec3 FragPosition, vec3 viewDir, vec2 UV, vec3 N);
-vec3 SpotLight(vec3 TangentLightPos, vec3 TangentFragPos, vec3 V, vec3 N, vec2 UV, SpotLightStruct spotLight);
+vec3 SpotLight(SpotLightStruct spotLight, vec3 FragPosition, vec3 viewDir, vec2 UV, vec3 N);
 vec3 Reflect(vec3 N, vec3 TangentViewPos);
 float ShadowCalculation(vec4 fragPosLightSpace);
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
@@ -132,8 +132,15 @@ void main()
             result += PointLight(light.pLight[x], TangentFragPos, viewDir, texCoords, normal);
        }
     }
+    result += SpotLight(light.sLight, TangentFragPos, viewDir, texCoords, normal);
 
-    FragColor = vec4(result, 1.0);
+    vec3 I = normalize(TangentFragPos - TangentViewPos);
+    vec3 R = reflect(I, normalize(normal));
+    vec3 Reflected = texture(SkyBox, R).rgb;
+    vec3 result2 = mix(result, Reflected, meshProperties.material.reflectivness);
+   
+
+    FragColor = vec4(result2, 1.0);
 
    if(meshProperties.UseEmissionMapBit == 1)
    {
@@ -158,93 +165,108 @@ void RemoveAlphaPixels(vec2 UV)
 
 vec3 DirectionalLight(DirectionalLightStruct directionalLight, vec3 FragPosition, vec3 viewDir, vec2 UV, vec3 N)
 {
-      // get diffuse color
-        vec3 color = texture(DiffuseMap, UV).rgb;
-        // ambient
-        vec3 ambient = directionalLight.ambient * color;
-        // diffuse
-        vec3 lightDir = normalize(-(TBN * directionalLight.direction));
-        float diff = max(dot(lightDir, N), 0.0);
-        vec3 diffuse = directionalLight.diffuse * diff * color;
-        // specular    
-        vec3 reflectDir = reflect(-lightDir, N);
-        vec3 halfwayDir = normalize(lightDir + viewDir);  
-        float spec = pow(max(dot(N, halfwayDir), 0.0), 32.0);
+    vec3 color = meshProperties.material.Diffuse;
+    if(meshProperties.UseDiffuseMapBit  == 1)
+    {
+        color = texture(DiffuseMap, UV).rgb;
+    }
+      
+    vec3 ambient = directionalLight.ambient * color;
+    
+    vec3 lightDir = normalize(-(TBN * directionalLight.direction));
+    float diff = max(dot(lightDir, N), 0.0);
+    vec3 diffuse = directionalLight.diffuse * diff * color;
 
-        vec3 specular = directionalLight.specular * spec;
+    vec3 H = normalize(lightDir + viewDir);  
+    vec3 specular = vec3(1.0f, 1.0f, 1.0f);
+    if(meshProperties.UseSpecularMapBit  == 1)
+    {
+        specular = directionalLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * texture(SpecularMap, UV).rgb;
+    }
+    else
+    {
+        specular = directionalLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * meshProperties.material.specular;  
+    }
 
-    return (ambient + diffuse + specular);
+    return ambient + diffuse + specular;
 }
 
 vec3 PointLight(PointLightStruct pointLight, vec3 FragPosition, vec3 viewDir, vec2 UV, vec3 N)
 {
-           vec3 TangentLightPos = TBN * pointLight.position;
-            float distance = length(TangentLightPos - FragPosition);
-            float attenuation = 1.0 / (pointLight.constant + pointLight.linear * distance + pointLight.quadratic * (distance * distance));   
+    vec3 TangentLightPos = TBN * pointLight.position;
+    float distance = length(TangentLightPos - FragPosition);
+    float attenuation = 1.0 / (pointLight.constant + pointLight.linear * distance + pointLight.quadratic * (distance * distance));   
+           
+    vec3 color = meshProperties.material.Diffuse;
+    if(meshProperties.UseDiffuseMapBit  == 1)
+    {
+        color = texture(DiffuseMap, UV).rgb;
+    }
+        
+    vec3 ambient = pointLight.ambient * color;
+       
+    vec3 lightDir = normalize(TangentLightPos - FragPosition);
+    float diff = max(dot(lightDir, N), 0.0);
+    vec3 diffuse = pointLight.diffuse * diff * color;
 
-            // get diffuse color
-            vec3 color = texture(DiffuseMap, UV).rgb;
-            // ambient
-            vec3 ambient = pointLight.ambient * color;
-            // diffuse
-            vec3 lightDir = normalize(TangentLightPos - FragPosition);
-            float diff = max(dot(lightDir, N), 0.0);
-            vec3 diffuse = pointLight.diffuse * diff * color;
-            // specular    
-            vec3 reflectDir = reflect(-lightDir, N);
-            vec3 halfwayDir = normalize(lightDir + viewDir);  
-            float spec = pow(max(dot(N, halfwayDir), 0.0), 32.0);
-
-            vec3 specular = pointLight.specular * spec; 
+    vec3 H = normalize(lightDir + viewDir);  
+    vec3 specular = vec3(1.0f, 1.0f, 1.0f);
+    if(meshProperties.UseSpecularMapBit  == 1)
+    {
+        specular = pointLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * texture(SpecularMap, UV).rgb;
+    }
+    else
+    {
+        specular = pointLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * meshProperties.material.specular;  
+    }
   
-            ambient *= attenuation;
-            diffuse *= attenuation;
-            specular *= attenuation;
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
 
-            return ambient + diffuse + specular;
+    return ambient + diffuse + specular;
 }
 
-vec3 SpotLight(vec3 TangentLightPos, vec3 TangentFragPos, vec3 V, vec3 N, vec2 UV, SpotLightStruct spotLight)
+vec3 SpotLight(SpotLightStruct spotLight, vec3 FragPosition, vec3 viewDir, vec2 UV, vec3 N)
 {
-        float distance = length(TangentLightPos - TangentFragPos);
-        float attenuation = 1.0 / (spotLight.constant + spotLight.linear * distance + spotLight.quadratic * (distance * distance));    
+    vec3 color = meshProperties.material.Diffuse;
+    if(meshProperties.UseDiffuseMapBit  == 1)
+    {
+        color = texture(DiffuseMap, UV).rgb;
+    }
 
-		vec3 L = normalize(TangentLightPos - TangentFragPos);
-		vec3 R = reflect(-L, N);
-		vec3 H = normalize(L + V);  
+    vec3 TangentLightPos = TBN * light.sLight.position;
+    vec3 lightDir = normalize(TangentLightPos - FragPosition);
+    
+    float diff = max(dot(N, lightDir), 0.0);
+    
+    vec3 H = normalize(lightDir + viewDir);  
+    
+    float distance = length(TangentLightPos - FragPosition);
+    float attenuation = 1.0 / (light.sLight.constant + light.sLight.linear * distance + light.sLight.quadratic * (distance * distance));    
+    
+    float theta = dot(lightDir, normalize(-(TBN * light.sLight.direction)));
+    float epsilon = light.sLight.cutOff - light.sLight.outerCutOff;
+    float intensity = clamp((theta - light.sLight.outerCutOff) / epsilon, 0.0, 1.0);
+    
+    vec3 ambient = light.sLight.ambient * color;
+    vec3 diffuse = light.sLight.diffuse * diff * color;
 
-        vec3 TangentDirection = TBN * spotLight.direction;
-        float theta = dot(L, normalize(-TangentDirection)); 
-        float epsilon = spotLight.cutOff - spotLight.outerCutOff;
-        float intensity = clamp((theta - spotLight.outerCutOff) / epsilon, 0.0, 1.0);
+    vec3 specular = vec3(1.0f, 1.0f, 1.0f);
+    if(meshProperties.UseSpecularMapBit  == 1)
+    {
+        specular = spotLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * texture(SpecularMap, UV).rgb;
+    }
+    else
+    {
+        specular = spotLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * meshProperties.material.specular;  
+    }
 
-        vec3 color = vec3(1.0f, 0.0f, 0.0f);
-        if (meshProperties.UseDiffuseMapBit  == 1)
-        {    
-            color = texture(DiffuseMap, UV).rgb;
-        }
-        else
-        {
-            color = meshProperties.material.Diffuse;
-        }
-
-   		vec3 ambient = spotLight.ambient * color;
-		vec3 diffuse = spotLight.diffuse * (max(dot(L, N), 0.0) * color);
-        vec3 specular = vec3(1.0f, 1.0f, 1.0f);
-        if(meshProperties.UseSpecularMapBit  == 1)
-        {
-            specular = spotLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * texture(SpecularMap, UV).rgb;
-        }
-        else
-        {
-            specular = spotLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * meshProperties.material.specular;  
-        }
-
-        ambient *= attenuation * intensity;
-        diffuse *= attenuation * intensity;
-        specular *= attenuation * intensity;
-
-        return (ambient + diffuse + specular);
+    ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
+    
+    return ambient + diffuse + specular;
 }
 
 vec3 Reflect(vec3 N, vec3 TangentViewPos)
