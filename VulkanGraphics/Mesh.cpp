@@ -106,6 +106,15 @@ void Mesh::SetTransformMatrix(glm::mat4 NewTranformMatrix)
 
 void Mesh::CreateMaterialProperties(MeshTextures textures)
 {
+    properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+    properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+    properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    properites.material.shininess = 32;
+    properites.material.reflectivness = 0;
+    properites.minLayers = 8.0f;
+    properites.maxLayers = 32.0f;
+    properites.heightScale = 0.1f;
+
     if (textures.DiffuseMap != DefaultTexture)
     {
         properites.UseDiffuseMapBit = 1;
@@ -140,15 +149,6 @@ void Mesh::CreateMaterialProperties(MeshTextures textures)
     {
         properites.UseReflectionMapBit = 1;
     }
-
-    properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    properites.material.shininess = 32;
-    properites.material.reflectivness = 0;
-    properites.minLayers = 8.0f;
-    properites.maxLayers = 32.0f;
-    properites.heightScale = 0.1f;
 }
 
 void Mesh::CreateUniformBuffers(VulkanEngine& engine)
@@ -235,17 +235,6 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
 
     ubo.model = ubo.model * ModelMatrix;
 
-    //properites.UseDiffuseMapBit = 1;
-    //properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-    //properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    //properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    //properites.material.shininess = 32;
-    //properites.material.reflectivness = 0;
-    //properites.minLayers = 8.0f;
-    //properites.maxLayers = 32.0f;
-    //properites.heightScale = 0.1f;
-
-    //properites.timer = glfwGetTime();
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);
 }
 
@@ -268,17 +257,6 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
         ubo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
     }
 
-    //properites.UseDiffuseMapBit = 1;
-    //properites.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-    //properites.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-    //properites.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    //properites.material.shininess = 32;
-    //properites.material.reflectivness = 0;
-    //properites.minLayers = 8.0f;
-    //properites.maxLayers = 32.0f;
-    //properites.heightScale = 0.1f;
-
-    //properites.timer = glfwGetTime();
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);
 }
 
