@@ -45,6 +45,8 @@ struct LightBufferObject
     PointLightStruct pLight[4];
     SpotLightStruct sLight;
     alignas(16) glm::vec3 viewPos;
+    alignas(16) glm::vec3 lightPositions[4];
+    alignas(16) glm::vec3 lightColors[4];
 };
 
 struct MapBits

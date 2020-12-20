@@ -38,4 +38,7 @@ C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe SSAO.vert -o SSAOVert.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe SSAO.frag -o SSAOFrag.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe SSAOBlur.vert -o SSAOBlurVert.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe SSAOBlur.frag -o SSAOBlurFrag.spv
+C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe PBR_BloomOutput.vert -o PBRBloomVert.spv
+C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe PBR_BloomOutput.frag -o PBRBloomFrag.spv
+
 pause

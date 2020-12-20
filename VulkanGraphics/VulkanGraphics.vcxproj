@@ -246,6 +246,8 @@
     <None Include="Shaders\FrameBufferShader.vert" />
     <None Include="Shaders\GBufferShader.frag" />
     <None Include="Shaders\GBufferShader.vert" />
+    <None Include="Shaders\PBR_BloomOutput.frag" />
+    <None Include="Shaders\PBR_BloomOutput.vert" />
     <None Include="Shaders\Shader2D.frag" />
     <None Include="Shaders\Shader2D.vert" />
     <None Include="Shaders\Shader2D_BloomOutput.frag" />

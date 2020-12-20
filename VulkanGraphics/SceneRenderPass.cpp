@@ -179,25 +179,6 @@ void SceneRenderPass::Draw(VulkanEngine& engine, std::vector<VkCommandBuffer>& c
             model.Draw(commandBuffers[SwapBufferImageIndex], AnimatedsceneRendereringPipeline, SwapBufferImageIndex);
         }
     }
-    for (auto mesh : MeshList)
-    {
-        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderWireFrame)
-        {
-            mesh.Draw(commandBuffers[SwapBufferImageIndex], wireFrameRendereringPipeline, SwapBufferImageIndex);
-        }
-        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderWireFrameAnimated)
-        {
-            mesh.Draw(commandBuffers[SwapBufferImageIndex], AnimatedWireFramedRendereringPipeline, SwapBufferImageIndex);
-        }
-        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderNormally)
-        {
-            mesh.Draw(commandBuffers[SwapBufferImageIndex], sceneRenderingPipeline, SwapBufferImageIndex);
-        }
-        if (mesh.GetRenderFlags() & RenderDrawFlags::RenderAnimated)
-        {
-            mesh.Draw(commandBuffers[SwapBufferImageIndex], AnimatedsceneRendereringPipeline, SwapBufferImageIndex);
-        }
-    }
     for (auto model : lightmanager.PointLightList)
     {
         model->Draw(commandBuffers[SwapBufferImageIndex], debugLightRenderingPipeline, SwapBufferImageIndex);

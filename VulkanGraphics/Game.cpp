@@ -39,13 +39,13 @@ Game::Game()
 
 
     MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp";
-    meshTextures.SpecularMap = DefaultTexture;
-    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp";
-    meshTextures.AlphaMap = DefaultTexture;
-    meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_height.bmp";
+    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/albedo.png";
+    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/roughness.png";
+    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/normal.png";
+    meshTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/ao.png";
+    meshTextures.DepthMap = DefaultTexture;
     meshTextures.EmissionMap = DefaultTexture;
-    meshTextures.ReflectionMap = DefaultTexture;
+    meshTextures.ReflectionMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/metallic.png";
     meshTextures.RendererShadowMap = renderManager.shadowRenderPass.DepthTexture;
     meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
     meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
@@ -62,15 +62,16 @@ Game::Game()
     };
 
 
-    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-    //
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    
 
-    //ModelList[1].ModelPosition = glm::vec3(2.0f, 0.0f, 0.0f);
-    //ModelList[2].ModelPosition = glm::vec3(4.0f, 0.0f, 0.0f);
-    //ModelList[3].ModelPosition = glm::vec3(6.0f, 0.0f, 0.0f);
+    ModelList[1].ModelPosition = glm::vec3(2.0f, 0.0f, 0.0f);
+    ModelList[2].ModelPosition = glm::vec3(4.0f, 0.0f, 0.0f);
+    ModelList[3].ModelPosition = glm::vec3(6.0f, 0.0f, 0.0f);
+
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
@@ -81,7 +82,7 @@ Game::Game()
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
    // ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Donut/Donut.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-   ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/TestAnimModel/model.dae", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderAnimated | RenderDrawFlags::RenderShadowAnimated));
+   ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/sphere.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
     //glm::vec3 cubePositions[] = {
     //glm::vec3(0.0f,  0.0f,  0.0f),
@@ -188,9 +189,9 @@ void Game::MainLoop()
             ImGui::SliderFloat3("pdiffuse4", &light.light.pLight[3].diffuse.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("pspecular4", &light.light.pLight[3].specular.x, 0.0f, 1.0f);
 
-            renderManager.sceneRenderPass.FrameDebug();
-            ModelList[0].UpdateImGUI();
-            textureManager->UpdateIMGUIVRAM();
+           // renderManager.sceneRenderPass.FrameDebug();
+            //ModelList[0].UpdateImGUI();
+            //textureManager->UpdateIMGUIVRAM();
         }
         ImGui::Render();
 

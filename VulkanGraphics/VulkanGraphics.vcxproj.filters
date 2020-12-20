@@ -413,6 +413,12 @@
     <None Include="Shaders\Shader2D_BloomOutput.frag">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\PBR_BloomOutput.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\PBR_BloomOutput.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

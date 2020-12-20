@@ -51,14 +51,14 @@ LightManager::LightManager(VulkanEngine& engine, std::shared_ptr<TextureManager>
     //light.pLight[0].linear = 0.09f;
     //light.pLight[0].quadratic = 0.032f;
 
-    light.sLight.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
-    light.sLight.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    light.sLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    light.sLight.constant = 1.0f;
-    light.sLight.linear = 0.09f;
-    light.sLight.quadratic = 0.032f;
-    light.sLight.cutOff = glm::cos(glm::radians(12.5f));
-    light.sLight.outerCutOff = glm::cos(glm::radians(15.0f));
+    //light.sLight.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+    //light.sLight.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    //light.sLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    //light.sLight.constant = 1.0f;
+    //light.sLight.linear = 0.09f;
+    //light.sLight.quadratic = 0.032f;
+    //light.sLight.cutOff = glm::cos(glm::radians(12.5f));
+    //light.sLight.outerCutOff = glm::cos(glm::radians(15.0f));
 }
 
 LightManager::~LightManager()
@@ -83,6 +83,13 @@ void LightManager::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamer
 		PointLightList[x]->Update(engine, camera);
 		light.pLight[x] = PointLightList[x]->pointLight;
 	}
+
+
+    for (unsigned int i = 0; i < sizeof(light.lightPositions) / sizeof(light.lightPositions[0]); ++i)
+    {
+        light.lightPositions[i] = glm::vec3(0.0f, 0.0f, 10.0f) + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+        light.lightColors[i] = glm::vec3(150.0f, 150.0f, 150.0f);
+    }
 }
 
 void LightManager::Destory(VulkanEngine& engine)

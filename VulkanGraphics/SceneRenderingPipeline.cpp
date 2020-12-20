@@ -52,8 +52,8 @@ void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const 
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderNormally)
     {
-        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3D_BloomOutputVert.spv");
-        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3D_BloomOutputFrag.spv");
+        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/PBRBloomVert.spv");
+        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/PBRBloomFrag.spv");
     }
     else if (PipelineBitFlags & RenderDrawFlags::RenderAnimated)
     {
