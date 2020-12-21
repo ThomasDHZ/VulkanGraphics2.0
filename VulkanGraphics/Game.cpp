@@ -39,13 +39,13 @@ Game::Game()
 
 
     MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png";
-    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/roughness.png";
-    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/normal.png";
-    meshTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/ao.png";
+    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/albedo.png";
+    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/roughness.png";
+    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/normal.png";
+    meshTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/ao.png";
     meshTextures.DepthMap = DefaultTexture;
     meshTextures.EmissionMap = DefaultTexture;
-    meshTextures.ReflectionMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/metallic.png";
+    meshTextures.ReflectionMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/metallic.png";
     meshTextures.RendererShadowMap = renderManager.shadowRenderPass.DepthTexture;
     meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
     meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";

@@ -51,14 +51,14 @@ LightManager::LightManager(VulkanEngine& engine, std::shared_ptr<TextureManager>
     //light.pLight[0].linear = 0.09f;
     //light.pLight[0].quadratic = 0.032f;
 
-    //light.sLight.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
-    //light.sLight.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-    //light.sLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    //light.sLight.constant = 1.0f;
-    //light.sLight.linear = 0.09f;
-    //light.sLight.quadratic = 0.032f;
-    //light.sLight.cutOff = glm::cos(glm::radians(12.5f));
-    //light.sLight.outerCutOff = glm::cos(glm::radians(15.0f));
+    light.sLight.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+    light.sLight.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    light.sLight.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    light.sLight.constant = 1.0f;
+    light.sLight.linear = 0.09f;
+    light.sLight.quadratic = 0.032f;
+    light.sLight.cutOff = glm::cos(glm::radians(12.5f));
+    light.sLight.outerCutOff = glm::cos(glm::radians(15.0f));
 }
 
 LightManager::~LightManager()
