@@ -57,6 +57,7 @@ Game::Game()
 
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
     camera2 = std::make_shared<OrthographicCamera>(OrthographicCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
+    CameraList.emplace_back(std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f))));
     ActiveCamera = camera;
 
     const std::vector<uint16_t> indices =
@@ -83,7 +84,7 @@ Game::Game()
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow, renderManager.shadowRenderPass.DepthTexture));
     ModelList[0].ModelScale = glm::vec3(.2f);
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/sphere.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
@@ -164,7 +165,7 @@ void Game::MainLoop()
             ImGui::Image(renderManager.shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 
             ImGui::SliderInt("UsingD", &light.light.dLight.InUseFlag, 0.0f, 1.0f);
-            ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0, 10.0);
             ImGui::SliderFloat3("dambient", &light.light.dLight.ambient.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("ddiffuse", &light.light.dLight.diffuse.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("dspecular", &light.light.dLight.specular.x, 0.0f, 1.0f);
@@ -215,10 +216,15 @@ void Game::UpdateUniformBuffer(uint32_t currentImage)
     light.Update(vulkanEngine, ActiveCamera);
     camera->Update(vulkanEngine);
     camera2->Update(vulkanEngine);
+    CameraList[0]->SetPosition(light.light.dLight.direction.x, light.light.dLight.direction.y, light.light.dLight.direction.z);
 
+    for (auto& cameraList : CameraList)
+    {
+        cameraList->Update(vulkanEngine);
+    }
     for (auto& model : ModelList)
     {
-        model.Update(vulkanEngine, ActiveCamera, light.light);
+        model.Update(vulkanEngine, ActiveCamera, CameraList, light.light);
        // model.UpdateCameraView(vulkanEngine, camera2);
     }
 

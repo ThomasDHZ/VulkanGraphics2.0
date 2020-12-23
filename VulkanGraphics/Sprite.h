@@ -28,6 +28,6 @@ public:
 	void ApplyGravity(std::vector<std::shared_ptr<Object2D>>& ObjectList, float dt);
 	void Move(std::vector<std::shared_ptr<Object2D>>& ObjectList, glm::vec3 MoveDirection);
 
-	virtual void Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, LightBufferObject light) override;
+	virtual void Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject light) override;
 	virtual void Destory(VulkanEngine& engine) override;
 };

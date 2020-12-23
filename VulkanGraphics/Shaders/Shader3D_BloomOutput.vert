@@ -10,21 +10,23 @@ layout (location = 5) in ivec4 BoneID;
 layout (location = 6) in vec4 BoneWeights;
 
 layout(location = 0) out vec3 FragPos;
-layout(location = 1) out vec2 TexCoords;
-layout(location = 2) out vec3 Normal;
-layout(location = 3) out mat3 TBN;
+layout(location = 1) out vec4 LightSpaceMatrix;
+layout(location = 2) out vec2 TexCoords;
+layout(location = 3) out vec3 Normal;
+layout(location = 4) out mat3 TBN;
 
 layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 projection;
-        mat4 Lightmodel;
+    mat4 Lightmodel;
     mat4 Lightview;
     mat4 Lightproj;
 } ubo;
 
 void main()
 {
+    LightSpaceMatrix = ubo.Lightproj * ubo.Lightview * ubo.Lightmodel * vec4(aPos, 1.0);
     FragPos = vec3(ubo.model * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;

@@ -4,6 +4,7 @@
 #define MAXPOINTLIGHTS 4
 
 struct Material {
+    vec3 position;
     vec3 ambient;
     vec3 Diffuse;
     vec3 specular;    

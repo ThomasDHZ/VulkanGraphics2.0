@@ -31,13 +31,13 @@ private:
 
 	int RenderFlags;
 
-	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, std::shared_ptr<Texture> shadow);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint16_t> LoadIndices(aiMesh* mesh);
 	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
-	void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshData& Properties, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	void LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshData& Properties, const std::string& FilePath, aiMesh* mesh, const aiScene* scene, std::shared_ptr<Texture> shadow);
 
 	void LoadMeshTransform(const int NodeID = 0, const glm::mat4 ParentMatrix = glm::mat4(1.0f));
 	void BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight);
@@ -56,11 +56,11 @@ public:
 
 	Model();
 	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
-	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags);
+	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags, std::shared_ptr<Texture> shadow);
 	~Model();
 
 	void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
-	void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject& light);
+	void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject& light);
 	void UpdateCameraView(VulkanEngine& engine, std::shared_ptr<Camera> camera);
 	void UpdateImGUI();
 	void Destroy(VulkanEngine& engine);

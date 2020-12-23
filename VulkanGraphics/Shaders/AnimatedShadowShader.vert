@@ -32,7 +32,7 @@ void main()
 
     vec4 BonePosisition = BoneTransform * vec4(inPosition, 1.0);
 
-    gl_Position = ubo.Lightproj * ubo.Lightview * ubo.model * BonePosisition;
+    gl_Position = ubo.Lightproj * ubo.Lightview * ubo.Lightmodel * BonePosisition;
     fragTexCoord = inTexCoord;
 }
 

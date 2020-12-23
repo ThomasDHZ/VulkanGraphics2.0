@@ -17,10 +17,10 @@ void Object2D::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<Graphi
 	ObjectMesh->Draw(RenderCommandBuffer, pipeline, FrameNumber);
 }
 
-void Object2D::Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer)
+void Object2D::Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer)
 {
 	AnimationHandler();
-	ObjectMesh->Update(engine, camera, Lightbuffer);
+	ObjectMesh->Update(engine, camera, CameraList, Lightbuffer);
 	for (auto& collider : ObjectColliderList)
 	{
 		collider->Update(ObjectMesh->GetPosition3D());

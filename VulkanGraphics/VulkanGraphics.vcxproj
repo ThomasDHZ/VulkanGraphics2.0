@@ -161,6 +161,7 @@
     <ClCompile Include="DebugLightMesh.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="DeferredFrameBufferMesh.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="ForwardRenderering2DPipeline.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -288,6 +289,7 @@
     <ClInclude Include="DebugLightMesh.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="DeferredFrameBufferMesh.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="ForwardRenderering2DPipeline.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GBufferRenderPass.h" />

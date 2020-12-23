@@ -13,6 +13,7 @@ struct Material {
 }; 
 
 struct DirectionalLightStruct {
+    vec3 position;
     vec3 direction;
 	
     vec3 ambient;
@@ -86,9 +87,10 @@ layout(binding = 11) uniform Light
 } light;
 
 layout(location = 0) in vec3 FragPos;
-layout(location = 1) in vec2 TexCoords;
-layout(location = 2) in vec3 Normal;
-layout(location = 3) in mat3 TBN;
+layout(location = 1) in vec4 LightSpaceMatrix;
+layout(location = 2) in vec2 TexCoords;
+layout(location = 3) in vec3 Normal;
+layout(location = 4) in mat3 TBN;
 
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 BloomColor;
@@ -158,7 +160,7 @@ void main()
     }
    
 
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(texture(ShadowMap, texCoords).rrr, 1.0);
 
    if(meshProperties.UseEmissionMapBit == 1)
    {
@@ -206,7 +208,9 @@ vec3 DirectionalLight(DirectionalLightStruct directionalLight, vec3 FragPosition
         specular = directionalLight.specular * pow(max(dot(N, H), 0.0), meshProperties.material.shininess) * meshProperties.material.specular;  
     }
 
-    return ambient + diffuse + specular;
+    
+    float shadow = ShadowCalculation(LightSpaceMatrix);  
+    return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
 
 vec3 PointLight(PointLightStruct pointLight, vec3 FragPosition, vec3 viewDir, vec2 UV, vec3 N)

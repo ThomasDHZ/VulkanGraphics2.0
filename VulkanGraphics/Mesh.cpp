@@ -190,7 +190,7 @@ void Mesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetLayout& lay
     VkDescriptorImageInfo AlphaMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, AlphaTexture);
     VkDescriptorImageInfo EmissionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, EmissionTexture);
     VkDescriptorImageInfo ReflectionMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ReflectionTexture);
-    VkDescriptorImageInfo ShadowMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, DiffuseTexture);
+    VkDescriptorImageInfo ShadowMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, ShadowTexture);
     VkDescriptorImageInfo SkyBoxMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, SkyBoxTexture);
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
@@ -221,7 +221,7 @@ void Mesh::Update(VulkanEngine& engine)
     BaseMesh::Update(engine);
 }
 
-void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, glm::mat4 ModelMatrix, void* CustomBufferinfo)
+void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer, glm::mat4 ModelMatrix, void* CustomBufferinfo)
 {
     ubo.model = TransformMatrix;
     ubo.model = glm::translate(ubo.model, MeshPosition);
@@ -229,8 +229,8 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.model = glm::scale(ubo.model, MeshScale);
-    ubo.view = camera->GetViewMatrix();
-    ubo.proj = camera->GetProjectionMatrix();
+    ubo.view = ActiveCamera->GetViewMatrix();
+    ubo.proj = ActiveCamera->GetProjectionMatrix();
     ubo.proj[1][1] *= -1;
 
     ubo.model = ubo.model * ModelMatrix;
@@ -238,7 +238,7 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);
 }
 
-void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, glm::mat4 ModelMatrix, void* CustomBufferinfo)
+void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, glm::mat4 ModelMatrix, void* CustomBufferinfo)
 {
     ubo.model = TransformMatrix;
     ubo.model = glm::translate(ubo.model, MeshPosition);
@@ -246,15 +246,13 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.model = glm::scale(ubo.model, MeshScale);
-    ubo.view = camera->GetViewMatrix();
-    ubo.proj = camera->GetProjectionMatrix();
+    ubo.view = ActiveCamera->GetViewMatrix();
+    ubo.proj = ActiveCamera->GetProjectionMatrix();
     ubo.proj[1][1] *= -1;
 
-    auto camera2 = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height), Lightbuffer.pLight[0].position));
-    camera2->Update(engine);
-
-    ubo.Lightview = camera2->GetViewMatrix();
-    ubo.Lightproj = camera2->GetProjectionMatrix();
+    ubo.Lightmodel = ubo.model * ModelMatrix;
+    ubo.Lightview = CameraList[0]->GetViewMatrix();
+    ubo.Lightproj = CameraList[0]->GetProjectionMatrix();
     ubo.Lightproj[1][1] *= -1;
 
     ubo.model = ubo.model * ModelMatrix;

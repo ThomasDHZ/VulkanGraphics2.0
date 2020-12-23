@@ -15,6 +15,7 @@ private:
     LightManager light;
     std::shared_ptr<TextureManager> textureManager;
 
+    std::vector<std::shared_ptr<Camera>> CameraList;
     std::shared_ptr<PerspectiveCamera> camera;
     std::shared_ptr<OrthographicCamera> camera2;
     std::shared_ptr<Camera> ActiveCamera;
