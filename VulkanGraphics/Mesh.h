@@ -9,6 +9,7 @@ struct DirectionalLightStruct {
     alignas(16) glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
     alignas(16) glm::vec3 diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
     alignas(16) glm::vec3 specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    alignas(4)  int InUseFlag = 1;
 };
 
 struct PointLightStruct {
@@ -64,6 +65,9 @@ struct VertexMatrixObject {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
+    alignas(16) glm::mat4 Lightmodel;
+    alignas(16) glm::mat4 Lightview;
+    alignas(16) glm::mat4 Lightproj;
     glm::mat4 BoneTransform[300];
 };
 

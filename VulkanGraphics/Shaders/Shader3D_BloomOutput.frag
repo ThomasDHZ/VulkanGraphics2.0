@@ -128,7 +128,11 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);   
     }
    
-    vec3 result = DirectionalLight(light.dLight, TangentFragPos, viewDir, texCoords, normal);
+    vec3 result = vec3(0.0f);
+    if(light.dLight.InUseFlag == 1)
+    {
+       result = DirectionalLight(light.dLight, TangentFragPos, viewDir, texCoords, normal);
+    }
     for(int x = 0; x < MAXPOINTLIGHTS; x++)
     {
        if(light.pLight[x].InUseFlag == 1)
@@ -136,7 +140,10 @@ void main()
             result += PointLight(light.pLight[x], TangentFragPos, viewDir, texCoords, normal);
        }
     }
-    result += SpotLight(light.sLight, TangentFragPos, viewDir, texCoords, normal);
+//    if(light.sLight.InUseFlag == 1)
+//    {
+//        result += SpotLight(light.sLight, TangentFragPos, viewDir, texCoords, normal);
+//    }
 
     vec3 I = normalize(TangentFragPos - TangentViewPos);
     vec3 R = reflect(I, normalize(normal));

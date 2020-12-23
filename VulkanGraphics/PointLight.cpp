@@ -22,7 +22,7 @@ void PointLight::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<Grap
 	DebugMesh->Draw(RenderCommandBuffer, pipeline, FrameNumber);
 }
 
-void PointLight::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera)
+void PointLight::Update(VulkanEngine& engine, std::shared_ptr<Camera>& camera)
 {
 	MeshColor color = {};
 	color.Color = pointLight.diffuse;

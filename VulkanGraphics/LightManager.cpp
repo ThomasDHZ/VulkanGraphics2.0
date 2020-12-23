@@ -1,5 +1,4 @@
 #include "LightManager.h"
-#include "OrthographicCamera.h"
 
 LightManager::LightManager()
 {
@@ -73,11 +72,11 @@ void LightManager::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<Gr
 	}
 }
 
-void LightManager::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera)
+void LightManager::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera)
 {
 	light.viewPos = static_cast<PerspectiveCamera*>(camera.get())->GetPosition();
     light.sLight.position = camera->GetPosition();
-    light.sLight.direction = camera->GetFront();
+    //light.sLight.direction = camera->GetFront();
 	for (int x = 0; x < PointLightList.size(); x++)
 	{
 		PointLightList[x]->Update(engine, camera);
@@ -91,6 +90,7 @@ void LightManager::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamer
         light.lightColors[i] = glm::vec3(150.0f, 150.0f, 150.0f);
     }
 }
+
 
 void LightManager::Destory(VulkanEngine& engine)
 {

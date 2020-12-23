@@ -215,6 +215,7 @@
     <ClCompile Include="SSAOBlurPipeline.cpp" />
     <ClCompile Include="SSAOPipeline.cpp" />
     <ClCompile Include="RenderedSSAOTexture.cpp" />
+    <ClCompile Include="Test.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="SceneToTextureRendererPass.cpp" />
@@ -347,6 +348,7 @@
     <ClInclude Include="SSAOPipeline.h" />
     <ClInclude Include="RenderedSSAOTexture.h" />
     <ClInclude Include="STBILoader.h" />
+    <ClInclude Include="Test.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureInfo.h" />
     <ClInclude Include="TextureLoader.h" />

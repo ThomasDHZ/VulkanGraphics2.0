@@ -4,8 +4,9 @@
 #include "OrthographicCamera.h"
 #include <GLFW\glfw3.h>
 #include <memory>
+#include "PointLight.h"
 
-class Keyboard
+class Test
 {
 private:
 	float deltaTime = 0.0f;

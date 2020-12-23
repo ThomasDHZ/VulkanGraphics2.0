@@ -24,6 +24,6 @@ public:
 	~PointLight();
 
 	void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
-	void Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera);
+	void Update(VulkanEngine& engine, std::shared_ptr<Camera>& camera);
 	void Destory(VulkanEngine& engine);
 };

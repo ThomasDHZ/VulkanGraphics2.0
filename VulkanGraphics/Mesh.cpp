@@ -250,8 +250,14 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
     ubo.proj = camera->GetProjectionMatrix();
     ubo.proj[1][1] *= -1;
 
-    ubo.model = ubo.model * ModelMatrix;
+    auto camera2 = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height), Lightbuffer.pLight[0].position));
+    camera2->Update(engine);
 
+    ubo.Lightview = camera2->GetViewMatrix();
+    ubo.Lightproj = camera2->GetProjectionMatrix();
+    ubo.Lightproj[1][1] *= -1;
+
+    ubo.model = ubo.model * ModelMatrix;
     for (auto bone : BoneList)
     {
         ubo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;

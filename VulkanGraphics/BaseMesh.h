@@ -7,6 +7,8 @@
 #include "VertexBuffer.h"
 #include "IndicesBuffer.h"
 #include "Camera.h"
+#include "PerspectiveCamera.h"
+#include "OrthographicCamera.h"
 #include "CubeMapTexture.h"
 #include "TextureManager.h"
 #include "VulkanUniformBuffer.h"
@@ -22,7 +24,8 @@ enum RenderDrawFlags
     RenderWireFrameAnimated = 1 << 3,
     RenderShadow = 1 << 4,
     RenderShadowAnimated = 1 << 5,
-    RenderLightDebug = 1 << 6
+    RenderLightDebug = 1 << 6,
+    RenderPBR = 1 << 7
 };
 
 struct MeshTextures

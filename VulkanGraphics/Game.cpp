@@ -4,6 +4,7 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #include <stb_image.h>
+#include "Test.h"
 #define STB_IMAGE_IMPLEMENTATION
 
 Game::Game()
@@ -39,11 +40,11 @@ Game::Game()
 
 
     MeshTextures meshTextures;
-    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/albedo.png";
-    meshTextures.SpecularMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/roughness.png";
-    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/normal.png";
-    meshTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/ao.png";
-    meshTextures.DepthMap = DefaultTexture;
+    meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp";
+    meshTextures.SpecularMap = DefaultTexture;
+    meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp";
+    meshTextures.AlphaMap = DefaultTexture;
+    meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_height.bmp";
     meshTextures.EmissionMap = DefaultTexture;
     meshTextures.ReflectionMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/metallic.png";
     meshTextures.RendererShadowMap = renderManager.shadowRenderPass.DepthTexture;
@@ -54,15 +55,16 @@ Game::Game()
     meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
     meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
-
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
+    camera2 = std::make_shared<OrthographicCamera>(OrthographicCamera(glm::vec2(vulkanEngine.SwapChain.GetSwapChainResolution().width / (float)vulkanEngine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
+    ActiveCamera = camera;
 
     const std::vector<uint16_t> indices =
     {
     };
 
 
-    ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+ /*   ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
@@ -70,7 +72,7 @@ Game::Game()
 
     ModelList[1].ModelPosition = glm::vec3(2.0f, 0.0f, 0.0f);
     ModelList[2].ModelPosition = glm::vec3(4.0f, 0.0f, 0.0f);
-    ModelList[3].ModelPosition = glm::vec3(6.0f, 0.0f, 0.0f);
+    ModelList[3].ModelPosition = glm::vec3(6.0f, 0.0f, 0.0f);*/
 
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
@@ -81,8 +83,9 @@ Game::Game()
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
     //ModelList.emplace_back(Model(vulkanEngine, textureManager, CalcVertex(), indices, meshTextures, renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
-   // ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Donut/Donut.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
-   ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/sphere.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
+    ModelList[0].ModelScale = glm::vec3(.2f);
+    //ModelList.emplace_back(Model(vulkanEngine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/sphere.obj", renderManager.mainRenderPass.forwardRendereringPipeline->ShaderPipelineDescriptorLayout, RenderDrawFlags::RenderNormally | RenderDrawFlags::RenderShadow));
 
     //glm::vec3 cubePositions[] = {
     //glm::vec3(0.0f,  0.0f,  0.0f),
@@ -107,7 +110,8 @@ Game::Game()
     //ModelList[3].ModelPosition = glm::vec3(7.0f, 3.0f, 0.0f);
 
     Skybox = SkyBoxMesh(vulkanEngine, textureManager, renderManager.mainRenderPass.skyBoxPipeline->ShaderPipelineDescriptorLayout, meshTextures);
-    renderManager.CMDBuffer(vulkanEngine, camera, ModelList, Skybox, light, SpriteList, MeshList);
+    renderManager.CMDBuffer(vulkanEngine, ActiveCamera, ModelList, Skybox, light, SpriteList, MeshList);
+    renderManager.ShadowCMDBuffer(vulkanEngine, camera2, ModelList, Skybox, light, SpriteList, MeshList);
 }
 
 Game::~Game()
@@ -159,7 +163,7 @@ void Game::MainLoop()
                       //ImGui::Image(renderManager.gBufferRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(80.0f, 80.0f));
             ImGui::Image(renderManager.shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 
-
+            ImGui::SliderInt("UsingD", &light.light.dLight.InUseFlag, 0.0f, 1.0f);
             ImGui::SliderFloat3("dLight", &light.light.dLight.direction.x, -10.0f, 10.0f);
             ImGui::SliderFloat3("dambient", &light.light.dLight.ambient.x, 0.0f, 1.0f);
             ImGui::SliderFloat3("ddiffuse", &light.light.dLight.diffuse.x, 0.0f, 1.0f);
@@ -197,10 +201,10 @@ void Game::MainLoop()
 
         //renderManager.UpdateCommandBuffer(vulkanEngine, ModelList, Skybox);
         UpdateUniformBuffer(vulkanEngine.DrawFrame);
-        renderManager.RendererUpdate(vulkanEngine, camera);
-        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), textureManager, camera, ModelList, Skybox, light, SpriteList, MeshList);
-        mouse.Update(window.GetWindowPtr(), camera);
-        keyboard.Update(window.GetWindowPtr(), camera);
+        renderManager.RendererUpdate(vulkanEngine, ActiveCamera);
+        renderManager.Draw(vulkanEngine, window.GetWindowPtr(), textureManager, ActiveCamera, ModelList, Skybox, light, SpriteList, MeshList);
+        mouse.Update(window.GetWindowPtr(), ActiveCamera);
+        keyboard.Update(window.GetWindowPtr(), ActiveCamera);
     }
 
     vkDeviceWaitIdle(vulkanEngine.Device);
@@ -208,14 +212,17 @@ void Game::MainLoop()
 
 void Game::UpdateUniformBuffer(uint32_t currentImage)
 {
-    light.Update(vulkanEngine, camera);
+    light.Update(vulkanEngine, ActiveCamera);
     camera->Update(vulkanEngine);
+    camera2->Update(vulkanEngine);
 
     for (auto& model : ModelList)
     {
-        model.Update(vulkanEngine, camera, light.light);
+        model.Update(vulkanEngine, ActiveCamera, light.light);
+       // model.UpdateCameraView(vulkanEngine, camera2);
     }
-    Skybox.UpdateUniformBuffer(vulkanEngine, camera);
+
+    Skybox.UpdateUniformBuffer(vulkanEngine, ActiveCamera);
 }
 
 std::vector<Vertex> Game::CalcVertex()

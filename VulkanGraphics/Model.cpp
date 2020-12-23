@@ -458,7 +458,7 @@ void Model::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsP
 	}
 }
 
-void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light)
+void Model::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject& light)
 {
 	glm::mat4 modelMatrix = ModelTransformMatrix;
 	modelMatrix = glm::translate(modelMatrix, ModelPosition);
@@ -481,6 +481,14 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& cam
 		//mesh->properites.EmissionStrength = abs(sin(glfwGetTime()));
 		mesh->Update(engine, camera, light, BoneList, modelMatrix);
 	}
+}
+
+void Model::UpdateCameraView(VulkanEngine& engine, std::shared_ptr<Camera> camera)
+{
+	//for (auto mesh : MeshList)
+	//{
+	//	mesh->UpdateCameraView(engine, camera);
+	//}
 }
 
 void Model::UpdateImGUI()

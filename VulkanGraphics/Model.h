@@ -4,6 +4,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "Mesh.h"
+#include "CubeMapTexture.h"
 #include <unordered_map>
 #include "Animation3D.h"
 #include "AnimationPlayer3D.h"
@@ -59,7 +60,8 @@ public:
 	~Model();
 
 	void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
-	void Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light);
+	void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject& light);
+	void UpdateCameraView(VulkanEngine& engine, std::shared_ptr<Camera> camera);
 	void UpdateImGUI();
 	void Destroy(VulkanEngine& engine);
 

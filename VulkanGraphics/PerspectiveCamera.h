@@ -4,6 +4,8 @@
 class PerspectiveCamera : public Camera
 {
 private:
+public:
+
     float YAW = -90.0f;
     float PITCH = 0.0f;
 
@@ -17,8 +19,6 @@ private:
 
     float MovementSpeed;
     float MouseSensitivity;
-
-public:
 
     PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position);
     PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw);

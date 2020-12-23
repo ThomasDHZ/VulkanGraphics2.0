@@ -1,6 +1,5 @@
 #pragma once
 #include "Mesh.h"
-#include "Camera.h"
 #include "CubeMapTexture.h"
 
 const std::vector<Vertex> SkyBoxVertices =
