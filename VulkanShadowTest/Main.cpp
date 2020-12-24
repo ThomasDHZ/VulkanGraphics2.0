@@ -26,6 +26,7 @@
 #include "PerspectiveCamera.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "InterfaceRenderPass.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -168,6 +169,7 @@ private:
     VkDeviceMemory textureImageMemory;
     VkImageView textureImageView;
     VkSampler textureSampler;
+    VkDescriptorSet ImGuiDescriptorSet;
 
     struct Mesh
     {
@@ -206,7 +208,7 @@ private:
     Mesh CubeMesh3;
 
     std::vector<VkCommandBuffer> commandBuffers;
-
+    InterfaceRenderPass interfaceRenderPass;
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
     std::vector<VkFence> inFlightFences;
@@ -248,6 +250,7 @@ private:
         createDescriptorSetLayout();
         createGraphicsPipeline();
 
+        interfaceRenderPass = InterfaceRenderPass(device, instance, physicalDevice, graphicsQueue, window, swapChainImageViews, swapChainExtent);
         camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(800 / (float)600), glm::vec3(0.0f, 0.0f, 3.0f)));
 
         createCommandPool();
@@ -256,6 +259,7 @@ private:
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
+        ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, textureSampler, textureImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         //Plane
         {
@@ -387,6 +391,16 @@ private:
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
+
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            {
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::Image(ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+            }
+            ImGui::Render();
+
             drawFrame();
             mouse.Update(window, camera);
             keyboard.Update(window, camera);
@@ -1507,6 +1521,7 @@ private:
         }
 
         updateUniformBuffer(imageIndex);
+        interfaceRenderPass.Draw(device, imageIndex, swapChainExtent);
 
         if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
             vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -1516,14 +1531,20 @@ private:
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
+
+
+        std::array<VkCommandBuffer, 2> submitCommandBuffers =
+        { commandBuffers[imageIndex],  interfaceRenderPass.ImGuiCommandBuffers[imageIndex] };
+
         VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
 
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+        submitInfo.commandBufferCount = static_cast<uint32_t>(submitCommandBuffers.size());
+        submitInfo.pCommandBuffers = submitCommandBuffers.data();
+
 
         VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
         submitInfo.signalSemaphoreCount = 1;
