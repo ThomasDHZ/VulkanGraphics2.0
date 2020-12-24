@@ -121,6 +121,7 @@ struct UniformBufferObject {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
+    alignas(16) glm::mat4 lightSpaceMatrix;
 };
 
 class HelloTriangleApplication {
@@ -964,7 +965,7 @@ private:
 
     void createTextureImage() {
         int texWidth, texHeight, texChannels;
-        stbi_uc* pixels = stbi_load("C:/Users/dotha/source/repos/VulkanGraphics/texture/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
         if (!pixels) {
@@ -1420,11 +1421,24 @@ private:
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+        camera->Update();
+        keyboard.Update(window, camera);
+        mouse.Update(window, camera);
+          
+        glm::mat4 lightProjection, lightView;
+        glm::mat4 lightSpaceMatrix;
+        float near_plane = 1.0f, far_plane = 7.5f;
+        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        lightProjection[1][1] *= -1;
+        lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        lightSpaceMatrix = lightProjection * lightView;
+
         UniformBufferObject ubo{};
         ubo.model = glm::mat4(1.0f);
-        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+        ubo.view = camera->GetViewMatrix();
+        ubo.proj = camera->GetProjectionMatrix();
         ubo.proj[1][1] *= -1;
+        ubo.lightSpaceMatrix = lightSpaceMatrix;
 
         void* data;
         vkMapMemory(device, planeMesh.uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
@@ -1435,9 +1449,11 @@ private:
         ubo2.model = glm::mat4(1.0f);
         ubo2.model = glm::translate(ubo2.model, glm::vec3(0.0f, 1.5f, 0.0));
         ubo2.model = glm::scale(ubo2.model, glm::vec3(0.5f));
-        ubo2.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo2.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+        ubo2.view = camera->GetViewMatrix();
+        ubo2.proj = camera->GetProjectionMatrix();
         ubo2.proj[1][1] *= -1;
+        ubo2.lightSpaceMatrix = lightSpaceMatrix;
+
 
         void* data2;
         vkMapMemory(device, CubeMesh.uniformBuffersMemory[currentImage], 0, sizeof(ubo2), 0, &data2);
@@ -1448,9 +1464,11 @@ private:
         ubo3.model = glm::mat4(1.0f);
         ubo3.model = glm::translate(ubo3.model, glm::vec3(2.0f, 0.0f, 1.0));
         ubo3.model = glm::scale(ubo3.model, glm::vec3(0.5f));
-        ubo3.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo3.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+        ubo3.view = camera->GetViewMatrix();
+        ubo3.proj = camera->GetProjectionMatrix();
         ubo3.proj[1][1] *= -1;
+        ubo3.lightSpaceMatrix = lightSpaceMatrix;
+
 
         void* data3;
         vkMapMemory(device, CubeMesh2.uniformBuffersMemory[currentImage], 0, sizeof(ubo3), 0, &data3);
@@ -1462,9 +1480,11 @@ private:
         ubo4.model = glm::translate(ubo4.model, glm::vec3(-1.0f, 0.0f, 2.0));
         ubo4.model = glm::rotate(ubo4.model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
         ubo4.model = glm::scale(ubo4.model, glm::vec3(0.25));
-        ubo4.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo4.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+        ubo4.view = camera->GetViewMatrix();
+        ubo4.proj = camera->GetProjectionMatrix();
         ubo4.proj[1][1] *= -1;
+        ubo4.lightSpaceMatrix = lightSpaceMatrix;
+
 
         void* data4;
         vkMapMemory(device, CubeMesh3.uniformBuffersMemory[currentImage], 0, sizeof(ubo4), 0, &data4);
