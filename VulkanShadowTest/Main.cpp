@@ -27,11 +27,13 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "InterfaceRenderPass.h"
+#include "ShadowRenderPass.h"
+#include "Vertex.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
-
+glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 const std::vector<const char*> validationLayers = {
@@ -82,47 +84,19 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-struct ShadowVertex {
-    glm::vec3 pos;
-    glm::vec3 color;
-    glm::vec2 texCoord;
 
-    static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(ShadowVertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(ShadowVertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(ShadowVertex, color);
-
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(ShadowVertex, texCoord);
-
-        return attributeDescriptions;
-    }
-};
 
 struct UniformBufferObject {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
     alignas(16) glm::mat4 lightSpaceMatrix;
+};
+
+struct LightUniformBufferObject
+{
+    alignas(16) glm::vec3 lightPos;
+    alignas(16) glm::vec3 viewPos;
 };
 
 class HelloTriangleApplication {
@@ -171,6 +145,8 @@ private:
     VkSampler textureSampler;
     VkDescriptorSet ImGuiDescriptorSet;
 
+    ShadowRenderPass shadowRenderPass;
+
     struct Mesh
     {
         std::vector<ShadowVertex> vertices;
@@ -187,6 +163,8 @@ private:
 
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
+        std::vector<VkBuffer> lightuniformBuffers;
+        std::vector<VkDeviceMemory> lightuniformBuffersMemory;
 
         void Draw(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, VkPipelineLayout pipelineLayout, int index)
         {
@@ -250,7 +228,10 @@ private:
         createDescriptorSetLayout();
         createGraphicsPipeline();
 
+
+
         interfaceRenderPass = InterfaceRenderPass(device, instance, physicalDevice, graphicsQueue, window, swapChainImageViews, swapChainExtent);
+        shadowRenderPass = ShadowRenderPass(device, physicalDevice, commandPool, graphicsQueue, swapChainExtent);
         camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(800 / (float)600), glm::vec3(0.0f, 0.0f, 3.0f)));
 
         createCommandPool();
@@ -283,30 +264,51 @@ private:
         }
         //Cube1
         {
-            CubeMesh.vertices = { { {-1.0, -1.0, -1.0}, { 0,-1,0 }, { 0,1 } },
-            { {1.0,-1.0,-1.0}, {0,-1,0}, {1,1} },
-            { {1.0,-1.0,1.0}, {0,-1,0}, {1,0} },
-            { {-1.0,-1.0,1.0}, {0,-1,0}, {0,0} },
-            { {-1.0,1.0,-1.0}, {0,0,-1}, {0,0} },
-            { {1.0,1.0,-1.0}, {0,0,-1}, {1,0} },
-            { {1.0,-1.0,-1.0}, {0,0,-1}, {1,1} },
-            { {-1.0,-1.0,-1.0}, {0,0,-1}, {0,1} },
-            { {1.0,1.0,-1.0}, {1,0,0}, {0,0} },
-            { {1.0,1.0,1.0}, {1,0,0}, {1,0} },
-            { {1.0,-1.0,1.0}, {1,0,0}, {1,1} },
-            { {1.0,-1.0,-1.0}, {1,0,0}, {0,1} },
-            { {1.0,1.0,1.0}, {0,0,1}, {1,0} },
-            { {-1.0,1.0,1.0}, {0,0,1}, {0,0} },
-            { {-1.0,-1.0,1.0}, {0,0,1}, {0,1} },
-            { {1.0,-1.0,1.0}, {0,0,1}, {1,1} },
-            { {-1.0,1.0,1.0}, {-1,0,0}, {1,0} },
-            { {-1.0,1.0,-1.0}, {-1,0,0}, {0,0} },
-            { {-1.0,-1.0,-1.0}, {-1,0,0}, {0,1} },
-            { {-1.0,-1.0,1.0}, {-1,0,0}, {1,1} },
-            { {-1.0,1.0,-1.0}, {0,1,0}, {0,1} },
-            { {-1.0,1.0,1.0}, {0,1,0}, {0,0} },
-            { {1.0,1.0,1.0}, {0,1,0}, {1,0} },
-            { {1.0,1.0,-1.0}, {0,1,0}, {1,1} } };
+            CubeMesh.vertices = { 
+
+            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
+             { {1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 0.0f} } , // bottom-right         
+            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
+            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            { {-1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 1.0f} } , // top-left
+            // front face
+           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
+           { {  1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 0.0f} } , // bottom-right
+           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
+           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
+           { { -1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 1.0f} } , // top-left
+           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            // left face
+           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
+           { { -1.0f,  1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
+            { {-1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
+           { { -1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
+           { { -1.0f, -1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
+           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
+            // right face
+            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
+            { { 1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
+           { {  1.0f,  1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right         
+           { {  1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
+            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
+          { {   1.0f, -1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-left     
+            // bottom face
+           { { -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
+          { {   1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
+         { {    1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
+          { {   1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
+          { {  -1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
+          { {  -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
+            // top face
+         { {   -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
+         { {    1.0f,  1.0f , 1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
+          { {   1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right     
+          { {   1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
+          { {  -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
+          { {  -1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f } }  // bottom-left  
+            
+            };
                 CubeMesh.indices = {
 
             };
@@ -317,30 +319,49 @@ private:
         }
         //Cube2
         {
-            CubeMesh2.vertices = { { {-1.0, -1.0, -1.0}, { 0,-1,0 }, { 0,1 } },
-{ {1.0,-1.0,-1.0}, {0,-1,0}, {1,1} },
-{ {1.0,-1.0,1.0}, {0,-1,0}, {1,0} },
-{ {-1.0,-1.0,1.0}, {0,-1,0}, {0,0} },
-{ {-1.0,1.0,-1.0}, {0,0,-1}, {0,0} },
-{ {1.0,1.0,-1.0}, {0,0,-1}, {1,0} },
-{ {1.0,-1.0,-1.0}, {0,0,-1}, {1,1} },
-{ {-1.0,-1.0,-1.0}, {0,0,-1}, {0,1} },
-{ {1.0,1.0,-1.0}, {1,0,0}, {0,0} },
-{ {1.0,1.0,1.0}, {1,0,0}, {1,0} },
-{ {1.0,-1.0,1.0}, {1,0,0}, {1,1} },
-{ {1.0,-1.0,-1.0}, {1,0,0}, {0,1} },
-{ {1.0,1.0,1.0}, {0,0,1}, {1,0} },
-{ {-1.0,1.0,1.0}, {0,0,1}, {0,0} },
-{ {-1.0,-1.0,1.0}, {0,0,1}, {0,1} },
-{ {1.0,-1.0,1.0}, {0,0,1}, {1,1} },
-{ {-1.0,1.0,1.0}, {-1,0,0}, {1,0} },
-{ {-1.0,1.0,-1.0}, {-1,0,0}, {0,0} },
-{ {-1.0,-1.0,-1.0}, {-1,0,0}, {0,1} },
-{ {-1.0,-1.0,1.0}, {-1,0,0}, {1,1} },
-{ {-1.0,1.0,-1.0}, {0,1,0}, {0,1} },
-{ {-1.0,1.0,1.0}, {0,1,0}, {0,0} },
-{ {1.0,1.0,1.0}, {0,1,0}, {1,0} },
-{ {1.0,1.0,-1.0}, {0,1,0}, {1,1} } };
+            CubeMesh2.vertices = {
+            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
+             { {1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 0.0f} } , // bottom-right         
+            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
+            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            { {-1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 1.0f} } , // top-left
+            // front face
+           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
+           { {  1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 0.0f} } , // bottom-right
+           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
+           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
+           { { -1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 1.0f} } , // top-left
+           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            // left face
+           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
+           { { -1.0f,  1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
+            { {-1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
+           { { -1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
+           { { -1.0f, -1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
+           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
+            // right face
+            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
+            { { 1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
+           { {  1.0f,  1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right         
+           { {  1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
+            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
+          { {   1.0f, -1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-left     
+            // bottom face
+           { { -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
+          { {   1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
+         { {    1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
+          { {   1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
+          { {  -1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
+          { {  -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
+            // top face
+         { {   -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
+         { {    1.0f,  1.0f , 1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
+          { {   1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right     
+          { {   1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
+          { {  -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
+          { {  -1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f } }  // bottom-left  
+            };
             CubeMesh2.indices = {
 
             };
@@ -352,30 +373,49 @@ private:
 
         //Cube3
         {
-            CubeMesh3.vertices = { { {-1.0, -1.0, -1.0}, { 0,-1,0 }, { 0,1 } },
-{ {1.0,-1.0,-1.0}, {0,-1,0}, {1,1} },
-{ {1.0,-1.0,1.0}, {0,-1,0}, {1,0} },
-{ {-1.0,-1.0,1.0}, {0,-1,0}, {0,0} },
-{ {-1.0,1.0,-1.0}, {0,0,-1}, {0,0} },
-{ {1.0,1.0,-1.0}, {0,0,-1}, {1,0} },
-{ {1.0,-1.0,-1.0}, {0,0,-1}, {1,1} },
-{ {-1.0,-1.0,-1.0}, {0,0,-1}, {0,1} },
-{ {1.0,1.0,-1.0}, {1,0,0}, {0,0} },
-{ {1.0,1.0,1.0}, {1,0,0}, {1,0} },
-{ {1.0,-1.0,1.0}, {1,0,0}, {1,1} },
-{ {1.0,-1.0,-1.0}, {1,0,0}, {0,1} },
-{ {1.0,1.0,1.0}, {0,0,1}, {1,0} },
-{ {-1.0,1.0,1.0}, {0,0,1}, {0,0} },
-{ {-1.0,-1.0,1.0}, {0,0,1}, {0,1} },
-{ {1.0,-1.0,1.0}, {0,0,1}, {1,1} },
-{ {-1.0,1.0,1.0}, {-1,0,0}, {1,0} },
-{ {-1.0,1.0,-1.0}, {-1,0,0}, {0,0} },
-{ {-1.0,-1.0,-1.0}, {-1,0,0}, {0,1} },
-{ {-1.0,-1.0,1.0}, {-1,0,0}, {1,1} },
-{ {-1.0,1.0,-1.0}, {0,1,0}, {0,1} },
-{ {-1.0,1.0,1.0}, {0,1,0}, {0,0} },
-{ {1.0,1.0,1.0}, {0,1,0}, {1,0} },
-{ {1.0,1.0,-1.0}, {0,1,0}, {1,1} } };
+            CubeMesh3.vertices = {
+            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
+             { {1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 0.0f} } , // bottom-right         
+            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
+            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            { {-1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 1.0f} } , // top-left
+            // front face
+           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
+           { {  1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 0.0f} } , // bottom-right
+           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
+           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
+           { { -1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 1.0f} } , // top-left
+           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
+            // left face
+           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
+           { { -1.0f,  1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
+            { {-1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
+           { { -1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
+           { { -1.0f, -1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
+           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
+            // right face
+            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
+            { { 1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
+           { {  1.0f,  1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right         
+           { {  1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
+            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
+          { {   1.0f, -1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-left     
+            // bottom face
+           { { -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
+          { {   1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
+         { {    1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
+          { {   1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
+          { {  -1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
+          { {  -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
+            // top face
+         { {   -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
+         { {    1.0f,  1.0f , 1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
+          { {   1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right     
+          { {   1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
+          { {  -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
+          { {  -1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f } }  // bottom-left  
+            };
             CubeMesh3.indices = {
 
             };
@@ -397,7 +437,7 @@ private:
             ImGui::NewFrame();
             {
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-                ImGui::Image(ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+                ImGui::Image(shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
             }
             ImGui::Render();
 
@@ -768,7 +808,21 @@ private:
         samplerLayoutBinding.pImmutableSamplers = nullptr;
         samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
+        VkDescriptorSetLayoutBinding samplerLayoutBinding2{};
+        samplerLayoutBinding2.binding = 2;
+        samplerLayoutBinding2.descriptorCount = 1;
+        samplerLayoutBinding2.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerLayoutBinding2.pImmutableSamplers = nullptr;
+        samplerLayoutBinding2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        VkDescriptorSetLayoutBinding samplerLayoutBinding3{};
+        samplerLayoutBinding3.binding = 3;
+        samplerLayoutBinding3.descriptorCount = 1;
+        samplerLayoutBinding3.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        samplerLayoutBinding3.pImmutableSamplers = nullptr;
+        samplerLayoutBinding3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 4> bindings = { uboLayoutBinding, samplerLayoutBinding, samplerLayoutBinding2, samplerLayoutBinding3 };
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -780,8 +834,8 @@ private:
     }
 
     void createGraphicsPipeline() {
-        auto vertShaderCode = readFile("shaders/vert.spv");
-        auto fragShaderCode = readFile("shaders/frag.spv");
+        auto vertShaderCode = readFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanShadowTest/Shaders/vert.spv");
+        auto fragShaderCode = readFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanShadowTest/Shaders/frag.spv");
 
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -1202,23 +1256,41 @@ private:
         vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
-    void createUniformBuffers(Mesh& meshi) {
-        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    void createUniformBuffers(Mesh& meshi) 
+    {
+        {
+            VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
-        meshi.uniformBuffers.resize(swapChainImages.size());
-        meshi.uniformBuffersMemory.resize(swapChainImages.size());
+            meshi.uniformBuffers.resize(swapChainImages.size());
+            meshi.uniformBuffersMemory.resize(swapChainImages.size());
 
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
-            createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, meshi.uniformBuffers[i], meshi.uniformBuffersMemory[i]);
+            for (size_t i = 0; i < swapChainImages.size(); i++) {
+                createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, meshi.uniformBuffers[i], meshi.uniformBuffersMemory[i]);
+            }
+        }
+
+        {
+            VkDeviceSize lightbufferSize = sizeof(LightUniformBufferObject);
+
+            meshi.lightuniformBuffers.resize(swapChainImages.size());
+            meshi.lightuniformBuffersMemory.resize(swapChainImages.size());
+
+            for (size_t i = 0; i < swapChainImages.size(); i++) {
+                createBuffer(lightbufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, meshi.lightuniformBuffers[i], meshi.lightuniformBuffersMemory[i]);
+            }
         }
     }
 
     void createDescriptorPool(Mesh& meshi) {
-        std::array<VkDescriptorPoolSize, 2> poolSizes{};
+        std::array<VkDescriptorPoolSize, 4> poolSizes{};
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
         poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+        poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[2].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+        poolSizes[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSizes[3].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1250,12 +1322,23 @@ private:
             bufferInfo.offset = 0;
             bufferInfo.range = sizeof(UniformBufferObject);
 
+            VkDescriptorBufferInfo lightbufferInfo{};
+            lightbufferInfo.buffer = meshi.uniformBuffers[i];
+            lightbufferInfo.offset = 0;
+            lightbufferInfo.range = sizeof(LightUniformBufferObject);
+
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             imageInfo.imageView = textureImageView;
             imageInfo.sampler = textureSampler;
 
-            std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+            VkDescriptorImageInfo imageInfo2{};
+            imageInfo2.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            imageInfo2.imageView = shadowRenderPass.DepthTexture->View;
+            imageInfo2.sampler = shadowRenderPass.DepthTexture->GetTextureSampler();
+
+
+            std::array<VkWriteDescriptorSet, 4> descriptorWrites{};
 
             descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[0].dstSet = meshi.descriptorSets[i];
@@ -1272,6 +1355,22 @@ private:
             descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             descriptorWrites[1].descriptorCount = 1;
             descriptorWrites[1].pImageInfo = &imageInfo;
+
+            descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[2].dstSet = meshi.descriptorSets[i];
+            descriptorWrites[2].dstBinding = 2;
+            descriptorWrites[2].dstArrayElement = 0;
+            descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[2].descriptorCount = 1;
+            descriptorWrites[2].pImageInfo = &imageInfo2;
+
+            descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[3].dstSet = meshi.descriptorSets[i];
+            descriptorWrites[3].dstBinding = 3;
+            descriptorWrites[3].dstArrayElement = 0;
+            descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[3].descriptorCount = 1;
+            descriptorWrites[3].pBufferInfo = &lightbufferInfo;
 
             vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
@@ -1359,52 +1458,77 @@ private:
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    void createCommandBuffers() {
-        commandBuffers.resize(swapChainFramebuffers.size());
+    void createCommandBuffers() 
+    {
+        {
+            commandBuffers.resize(swapChainFramebuffers.size());
 
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = commandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+            VkCommandBufferAllocateInfo allocInfo{};
+            allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            allocInfo.commandPool = commandPool;
+            allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
-        if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-
-        for (size_t i = 0; i < commandBuffers.size(); i++) {
-            VkCommandBufferBeginInfo beginInfo{};
-            beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-            if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
-                throw std::runtime_error("failed to begin recording command buffer!");
+            if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+                throw std::runtime_error("failed to allocate command buffers!");
             }
 
-            VkRenderPassBeginInfo renderPassInfo{};
-            renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderPassInfo.renderPass = renderPass;
-            renderPassInfo.framebuffer = swapChainFramebuffers[i];
-            renderPassInfo.renderArea.offset = { 0, 0 };
-            renderPassInfo.renderArea.extent = swapChainExtent;
+            for (size_t i = 0; i < commandBuffers.size(); i++) {
+                VkCommandBufferBeginInfo beginInfo{};
+                beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-            std::array<VkClearValue, 2> clearValues{};
-            clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-            clearValues[1].depthStencil = { 1.0f, 0 };
+                if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
+                    throw std::runtime_error("failed to begin recording command buffer!");
+                }
 
-            renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-            renderPassInfo.pClearValues = clearValues.data();
+                VkRenderPassBeginInfo renderPassInfo{};
+                renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+                renderPassInfo.renderPass = renderPass;
+                renderPassInfo.framebuffer = swapChainFramebuffers[i];
+                renderPassInfo.renderArea.offset = { 0, 0 };
+                renderPassInfo.renderArea.extent = swapChainExtent;
 
-            vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            planeMesh.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-            CubeMesh.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-            CubeMesh2.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-            CubeMesh3.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-            vkCmdEndRenderPass(commandBuffers[i]);
+                std::array<VkClearValue, 2> clearValues{};
+                clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+                clearValues[1].depthStencil = { 1.0f, 0 };
 
-            if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-                throw std::runtime_error("failed to record command buffer!");
+                renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+                renderPassInfo.pClearValues = clearValues.data();
+
+                vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+                planeMesh.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
+                CubeMesh.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
+                CubeMesh2.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
+                CubeMesh3.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
+                vkCmdEndRenderPass(commandBuffers[i]);
+
+
+                std::array<VkClearValue, 2> clearValues2{};
+                clearValues2[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+                clearValues2[1].depthStencil = { 1.0f, 0 };
+
+                VkRenderPassBeginInfo renderPassInfo2{};
+                renderPassInfo2.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+                renderPassInfo2.renderPass = shadowRenderPass.GetRenderPass();
+                renderPassInfo2.framebuffer = shadowRenderPass.SwapChainFramebuffers[i];
+                renderPassInfo2.renderArea.offset = { 0, 0 };
+                renderPassInfo2.renderArea.extent = swapChainExtent;
+                renderPassInfo2.clearValueCount = static_cast<uint32_t>(clearValues2.size());
+                renderPassInfo2.pClearValues = clearValues2.data();
+
+                vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
+                planeMesh.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
+                CubeMesh.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
+                CubeMesh2.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
+                CubeMesh3.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
+                vkCmdEndRenderPass(commandBuffers[i]);
+
+                if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
+                    throw std::runtime_error("failed to record command buffer!");
+                }
             }
         }
+ 
     }
 
     void createSyncObjects() {
@@ -1439,12 +1563,16 @@ private:
         keyboard.Update(window, camera);
         mouse.Update(window, camera);
           
+        lightPos.x = sin(glfwGetTime()) * 3.0f;
+        lightPos.z = cos(glfwGetTime()) * 2.0f;
+        lightPos.y = 5.0 + cos(glfwGetTime()) * 1.0f;
+
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
         float near_plane = 1.0f, far_plane = 7.5f;
         lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         lightProjection[1][1] *= -1;
-        lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+        lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
         lightSpaceMatrix = lightProjection * lightView;
 
         UniformBufferObject ubo{};
@@ -1458,6 +1586,15 @@ private:
         vkMapMemory(device, planeMesh.uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));
         vkUnmapMemory(device, planeMesh.uniformBuffersMemory[currentImage]);
+
+        LightUniformBufferObject lubo{};
+        lubo.lightPos = lightPos;
+        lubo.viewPos = camera->Position;
+
+        void* data5;
+        vkMapMemory(device, planeMesh.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data5);
+        memcpy(data5, &lubo, sizeof(lubo));
+        vkUnmapMemory(device, planeMesh.lightuniformBuffersMemory[currentImage]);
 
         UniformBufferObject ubo2{};
         ubo2.model = glm::mat4(1.0f);
@@ -1474,6 +1611,11 @@ private:
         memcpy(data2, &ubo2, sizeof(ubo2));
         vkUnmapMemory(device, CubeMesh.uniformBuffersMemory[currentImage]);
 
+        void* data6;
+        vkMapMemory(device, CubeMesh.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data6);
+        memcpy(data6, &lubo, sizeof(lubo));
+        vkUnmapMemory(device, CubeMesh.lightuniformBuffersMemory[currentImage]);
+
         UniformBufferObject ubo3{};
         ubo3.model = glm::mat4(1.0f);
         ubo3.model = glm::translate(ubo3.model, glm::vec3(2.0f, 0.0f, 1.0));
@@ -1488,6 +1630,11 @@ private:
         vkMapMemory(device, CubeMesh2.uniformBuffersMemory[currentImage], 0, sizeof(ubo3), 0, &data3);
         memcpy(data3, &ubo3, sizeof(ubo3));
         vkUnmapMemory(device, CubeMesh2.uniformBuffersMemory[currentImage]);
+
+        void* data7;
+        vkMapMemory(device, CubeMesh2.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data7);
+        memcpy(data7, &lubo, sizeof(lubo));
+        vkUnmapMemory(device, CubeMesh2.lightuniformBuffersMemory[currentImage]);
 
         UniformBufferObject ubo4{};
         ubo4.model = glm::mat4(1.0f);
@@ -1504,6 +1651,11 @@ private:
         vkMapMemory(device, CubeMesh3.uniformBuffersMemory[currentImage], 0, sizeof(ubo4), 0, &data4);
         memcpy(data4, &ubo4, sizeof(ubo4));
         vkUnmapMemory(device, CubeMesh3.uniformBuffersMemory[currentImage]);
+
+        void* data8;
+        vkMapMemory(device, CubeMesh3.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data8);
+        memcpy(data8, &lubo, sizeof(lubo));
+        vkUnmapMemory(device, CubeMesh3.lightuniformBuffersMemory[currentImage]);
     }
 
     void drawFrame() {

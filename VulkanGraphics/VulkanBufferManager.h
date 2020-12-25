@@ -33,6 +33,33 @@ public:
 		vkBindBufferMemory(renderer.Device, buffer, bufferMemory, 0);
 	}
 
+	static void CreateBuffer(VkDevice device, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory, VkPhysicalDevice physcialDevice)
+	{
+		VkBufferCreateInfo bufferInfo = {};
+		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		bufferInfo.size = size;
+		bufferInfo.usage = usage;
+		bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+		if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create buffer!");
+		}
+
+		VkMemoryRequirements memRequirements;
+		vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+
+		VkMemoryAllocateInfo allocInfo = {};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = memRequirements.size;
+		allocInfo.memoryTypeIndex = VulkanBufferManager::FindMemoryType(physcialDevice, memRequirements.memoryTypeBits, properties);
+
+		if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate buffer memory!");
+		}
+
+		vkBindBufferMemory(device, buffer, bufferMemory, 0);
+	}
+
 	static	VkCommandBuffer beginSingleTimeCommands(VulkanEngine& renderer)
 	{
 		VkCommandBufferAllocateInfo allocInfo = {};
@@ -118,6 +145,21 @@ public:
 	{
 		VkPhysicalDeviceMemoryProperties memProperties;
 		vkGetPhysicalDeviceMemoryProperties(renderer.PhysicalDevice, &memProperties);
+
+		for (uint32_t x = 0; x < memProperties.memoryTypeCount; x++)
+		{
+			if ((typeFilter & (1 << x)) && (memProperties.memoryTypes[x].propertyFlags & properties) == properties) {
+				return x;
+			}
+		}
+
+		throw std::runtime_error("Failed to find suitable memory type.");
+	}
+
+	static uint32_t FindMemoryType(VkPhysicalDevice PhysicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+	{
+		VkPhysicalDeviceMemoryProperties memProperties;
+		vkGetPhysicalDeviceMemoryProperties(PhysicalDevice, &memProperties);
 
 		for (uint32_t x = 0; x < memProperties.memoryTypeCount; x++)
 		{
