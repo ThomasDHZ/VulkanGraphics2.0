@@ -114,9 +114,9 @@ void Sprite::SetUpSprite(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	SetPosition2D(StartPos);
 }
 
-void Sprite::Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject light)
+void Sprite::Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, LightBufferObject light)
 {
-	Object2D::Update(engine, dt, camera, CameraList, light);
+	Object2D::Update(engine, dt, camera, light);
 }
 
 void Sprite::Destory(VulkanEngine& engine)

@@ -6,9 +6,7 @@ layout(binding = 0) uniform UniformBufferObject
     mat4 model;
     mat4 view;
     mat4 projection;
-        mat4 Lightmodel;
-    mat4 Lightview;
-    mat4 Lightproj;
+    mat4 lightSpaceMatrix;
 } ubo;
 
 layout (location = 0) in vec3 aPos;

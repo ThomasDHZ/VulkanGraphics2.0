@@ -66,6 +66,6 @@ public:
 	DebugLightMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, VkDescriptorSetLayout& layout, int renderBit);
 	~DebugLightMesh();
 
-	void Update(VulkanEngine& engine, std::shared_ptr<Camera>& camera, MeshColor meshColorBuffer);
+	void Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, MeshColor meshColorBuffer);
 	virtual void Destory(VulkanEngine& engine) override;
 };

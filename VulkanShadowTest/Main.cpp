@@ -1563,6 +1563,7 @@ private:
         keyboard.Update(window, camera);
         mouse.Update(window, camera);
           
+    
         lightPos.x = sin(glfwGetTime()) * 3.0f;
         lightPos.z = cos(glfwGetTime()) * 2.0f;
         lightPos.y = 5.0 + cos(glfwGetTime()) * 1.0f;

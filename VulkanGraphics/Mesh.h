@@ -3,14 +3,12 @@
 #include "PerspectiveCamera.h"
 #include "RenderedDepthTexture.h"
 
-struct DirectionalLightStruct 
-{
-    alignas(16) glm::vec3 position = glm::vec3(0.5f, 1.0f, 0.3f);
+struct DirectionalLightStruct {
     alignas(16) glm::vec3 direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+
     alignas(16) glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
     alignas(16) glm::vec3 diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
     alignas(16) glm::vec3 specular = glm::vec3(0.5f, 0.5f, 0.5f);
-    alignas(4)  int InUseFlag = 1;
 };
 
 struct PointLightStruct {
@@ -66,9 +64,7 @@ struct VertexMatrixObject {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
-    alignas(16) glm::mat4 Lightmodel;
-    alignas(16) glm::mat4 Lightview;
-    alignas(16) glm::mat4 Lightproj;
+    alignas(16) glm::mat4 lightSpaceMatrix;
     glm::mat4 BoneTransform[300];
 };
 
@@ -127,8 +123,8 @@ public:
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);
 
     virtual void Update(VulkanEngine& engine) override;
-    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer, glm::mat4 ModelMatrix = glm::mat4(1.0f), void* CustomBufferinfo = nullptr);
-    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, glm::mat4 ModelMatrix = glm::mat4(1.0f), void* CustomBufferinfo = nullptr);
+    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, glm::mat4 ModelMatrix = glm::mat4(1.0f), void* CustomBufferinfo = nullptr);
+    virtual void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, glm::mat4 ModelMatrix = glm::mat4(1.0f), void* CustomBufferinfo = nullptr);
     virtual void ScreenResizeUpdate(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     virtual void Destory(VulkanEngine& engine) override;
 

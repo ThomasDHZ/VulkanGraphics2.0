@@ -102,69 +102,34 @@ vec3 SpotLight(SpotLightStruct spotLight, vec3 FragPosition, vec3 viewDir, vec2 
 vec3 Reflect(vec3 N, vec3 TangentViewPos);
 float ShadowCalculation(vec4 fragPosLightSpace);
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
-float DistributionGGX(vec3 N, vec3 H, float roughness);
-float SchlickGGX(float NdotV, float roughness);
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
-vec3  FresnelSchlick(float cosTheta, vec3 F0);
 
 void main()
 {
-    vec3 TangentViewPos  = TBN * light.viewPos;
-    vec3 TangentFragPos  = TBN * FragPos;
+    vec3 color = texture(DiffuseMap, TexCoords).rgb;
+    vec3 normal = normalize(Normal);
+    vec3 lightColor = vec3(0.3);
+    // ambient
+    vec3 ambient = 0.3 * color;
+    // diffuse
+    vec3 lightDir = normalize(light.dLight.direction - FragPos);
+    float diff = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = diff * lightColor;
+    // specular
+    vec3 viewDir = normalize(light.viewPos - FragPos);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = 0.0;
+    vec3 halfwayDir = normalize(lightDir + viewDir);  
+    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
+    vec3 specular = spec * lightColor;    
+    // calculate shadow
+    float shadow = ShadowCalculation(LightSpaceMatrix);                      
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
     
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-    vec2 texCoords = TexCoords;
-
-    RemoveAlphaPixels(texCoords);
-    
-    if(meshProperties.UseDepthMapBit == 1)
-    {
-        texCoords = ParallaxMapping(TexCoords,  viewDir);       
-        if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-            discard;
-    }
-
-    vec3 normal = texture(normalMap, texCoords).rgb;
-    if(meshProperties.UseNormalMapBit == 1)
-    {
-        normal = normalize(normal * 2.0 - 1.0);   
-    }
-   
-    vec3 result = vec3(0.0f);
-    if(light.dLight.InUseFlag == 1)
-    {
-       result = DirectionalLight(light.dLight, TangentFragPos, viewDir, texCoords, normal);
-    }
-    for(int x = 0; x < MAXPOINTLIGHTS; x++)
-    {
-       if(light.pLight[x].InUseFlag == 1)
-       {
-            result += PointLight(light.pLight[x], TangentFragPos, viewDir, texCoords, normal);
-       }
-    }
-//    if(light.sLight.InUseFlag == 1)
-//    {
-//        result += SpotLight(light.sLight, TangentFragPos, viewDir, texCoords, normal);
-//    }
-
-    vec3 I = normalize(TangentFragPos - TangentViewPos);
-    vec3 R = reflect(I, normalize(normal));
-    vec3 Reflected = texture(SkyBox, R).rgb;
-    if(meshProperties.UseReflectionMapBit == 1)
-    {
-        result = mix(result, Reflected, texture(ReflectionMap, texCoords).rgb);
-    }
-    else
-    {
-        result = mix(result, Reflected, meshProperties.material.reflectivness);
-    }
-   
-
-    FragColor = vec4(texture(ShadowMap, texCoords).rrr, 1.0);
+    FragColor = vec4(lighting, 1.0);
 
    if(meshProperties.UseEmissionMapBit == 1)
    {
-      BloomColor = vec4(texture(EmissionMap, texCoords).rgb, 1.0f);
+      BloomColor = vec4(texture(EmissionMap, TexCoords).rgb, 1.0f);
    }
    else
    {
@@ -372,44 +337,4 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
     vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
 
     return finalTexCoords;
-}
-
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-    float a = roughness * roughness;
-    float a2 = a*a;
-    float NdotH = max(dot(N, H), 0.0f);
-    float NdotH2 = NdotH * NdotH;
-
-    float nominator = a2;
-    float denominator = (NdotH2 * (a2 - 1.0) + 1.0f);
-    denominator = PI * denominator * denominator;
-
-    return nominator/denominator;
-}
-
-float SchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness + 1.0f);
-    float k = (r*r) / 8.0f;
-
-    float nominator = NdotV;
-    float denominator = NdotV * (1.0f - k) + k;
-    
-    return nominator/denominator;
-}
-
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0f);
-    float NdotL = max(dot(N, L), 0.0f);
-    float ggx1 = SchlickGGX(NdotL, roughness);
-    float ggx2 = SchlickGGX(NdotV, roughness);
-
-    return ggx1 * ggx2;
-}
-
-vec3  FresnelSchlick(float cosTheta, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }

@@ -48,7 +48,7 @@ void DebugLightMesh::CreateDescriptorSets(VulkanEngine& engine, VkDescriptorSetL
     }
 }
 
-void DebugLightMesh::Update(VulkanEngine& engine, std::shared_ptr<Camera>& camera, MeshColor MeshColorBuffer)
+void DebugLightMesh::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, MeshColor MeshColorBuffer)
 {
     VertexMatrixObject ubo{};
     ubo.model = glm::mat4(1.0f);

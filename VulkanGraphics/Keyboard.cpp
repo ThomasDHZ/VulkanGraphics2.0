@@ -6,22 +6,23 @@ void Keyboard::Update(GLFWwindow* window, std::shared_ptr<Camera> camera)
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 
-
+	if (auto PCamera = dynamic_cast<PerspectiveCamera*>(camera.get()))
+	{
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{
-			camera->ProcessKeyboard(FORWARD, deltaTime);
+			PCamera->ProcessKeyboard(FORWARD, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		{
-			camera->ProcessKeyboard(BACKWARD, deltaTime);
+			PCamera->ProcessKeyboard(BACKWARD, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		{
-			camera->ProcessKeyboard(LEFT, deltaTime);
+			PCamera->ProcessKeyboard(LEFT, deltaTime);
 		}
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		{
-			camera->ProcessKeyboard(RIGHT, deltaTime);
+			PCamera->ProcessKeyboard(RIGHT, deltaTime);
 		}
-	
+	}
 }

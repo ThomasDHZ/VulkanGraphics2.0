@@ -19,14 +19,12 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 projection;
-    mat4 Lightmodel;
-    mat4 Lightview;
-    mat4 Lightproj;
+    mat4 lightSpaceMatrix;
 } ubo;
 
 void main()
 {
-    LightSpaceMatrix = ubo.Lightproj * ubo.Lightview * ubo.Lightmodel * vec4(aPos, 1.0);
+    LightSpaceMatrix = ubo.lightSpaceMatrix * ubo.model * vec4(aPos, 1.0);
     FragPos = vec3(ubo.model * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;

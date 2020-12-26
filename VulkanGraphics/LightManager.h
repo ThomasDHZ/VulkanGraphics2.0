@@ -1,9 +1,4 @@
 #pragma once
-#include "Camera.h"
-#include "PerspectiveCamera.h"
-#include "OrthographicCamera.h"
-#include <GLFW\glfw3.h>
-#include <memory>
 #include "PointLight.h"
 
 class LightManager
@@ -19,6 +14,6 @@ public:
 	~LightManager();
 
 	void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
-	void Update(VulkanEngine& engine, std::shared_ptr<Camera> camera);
+	void Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera);
 	void Destory(VulkanEngine& engine);
 };

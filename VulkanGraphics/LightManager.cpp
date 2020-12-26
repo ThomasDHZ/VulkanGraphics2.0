@@ -1,4 +1,5 @@
 #include "LightManager.h"
+#include "OrthographicCamera.h"
 
 LightManager::LightManager()
 {
@@ -13,7 +14,7 @@ LightManager::LightManager(VulkanEngine& engine, std::shared_ptr<TextureManager>
 	//PointLightList.emplace_back(std::make_shared<PointLight>(PointLight(engine, textureManager, layout, renderBit, Pos)));
 	//PointLightList.emplace_back(std::make_shared<PointLight>(PointLight(engine, textureManager, layout, renderBit, Pos)));
 
-	light.dLight.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+	light.dLight.direction = glm::vec3(-2.0f, 4.0f, -1.0f);
 	light.dLight.ambient = glm::vec3(0.45f, 0.45f, 0.45f);
 	light.dLight.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
 	light.dLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -72,11 +73,11 @@ void LightManager::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<Gr
 	}
 }
 
-void LightManager::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera)
+void LightManager::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera)
 {
 	light.viewPos = static_cast<PerspectiveCamera*>(camera.get())->GetPosition();
     light.sLight.position = camera->GetPosition();
-    //light.sLight.direction = camera->GetFront();
+    light.sLight.direction = camera->GetFront();
 	for (int x = 0; x < PointLightList.size(); x++)
 	{
 		PointLightList[x]->Update(engine, camera);
@@ -90,7 +91,6 @@ void LightManager::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera)
         light.lightColors[i] = glm::vec3(150.0f, 150.0f, 150.0f);
     }
 }
-
 
 void LightManager::Destory(VulkanEngine& engine)
 {

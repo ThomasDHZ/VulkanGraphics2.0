@@ -60,11 +60,6 @@ void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const 
         vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3D_AnimatedBloomShaderVert.spv");
         fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/Shader3D_BloomOutputFrag.spv");
     }
-    else if (PipelineBitFlags & RenderDrawFlags::RenderPBR)
-    {
-        vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/PBRBloomVert.spv");
-        fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/PBRBloomFrag.spv");
-    }
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);
@@ -123,7 +118,7 @@ void SceneRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const 
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     if (PipelineBitFlags & RenderDrawFlags::RenderWireFrame ||

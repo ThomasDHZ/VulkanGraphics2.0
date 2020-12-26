@@ -89,7 +89,7 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> came
             throw std::runtime_error("failed to begin recording command buffer!");
         }
      //   MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList);
-      //  ShadowRenderCMDBuffer(engine, ModelList, i);
+        ShadowRenderCMDBuffer(engine, ModelList, i);
         SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList, MeshList);
       //  GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
        // SSAORenderCMDBuffer(engine, camera, i);
@@ -97,34 +97,6 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> came
         bloomRenderPass.Draw(engine, commandBuffers, i);
         FrameBufferRenderCMDBuffer(engine, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
-    }
-}
-
-void RenderManager::ShadowCMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList, std::vector<Mesh>& MeshList)
-{
-    shadowCommandBuffers.resize(mainRenderPass.SwapChainFramebuffers.size());
-
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.GetRenderCommandPool();
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = (uint32_t)shadowCommandBuffers.size();
-
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, shadowCommandBuffers.data()) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
-    }
-
-    for (size_t i = 0; i < shadowCommandBuffers.size(); i++) {
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        if (vkBeginCommandBuffer(shadowCommandBuffers[i], &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
-        ShadowRenderCMDBuffer(engine, camera, ModelList, i);
-        if (vkEndCommandBuffer(shadowCommandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
     }
@@ -168,7 +140,7 @@ void RenderManager::UpdateCommandBuffer(VulkanEngine& engine, std::shared_ptr<Ca
     CMDBuffer(engine, camera, ModelList, skybox, lightmanager, SpriteList, MeshList);
 }
 
-void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList, std::vector<Mesh>& MeshList)
+void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<PerspectiveCamera> camera, std::vector<Model>& ModelList, SkyBoxMesh& skybox, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList, std::vector<Mesh>& MeshList)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -189,8 +161,8 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
 
     interfaceRenderPass.Draw(engine);
 
-    std::array<VkCommandBuffer, 3> submitCommandBuffers =
-    { commandBuffers[engine.DrawFrame], shadowCommandBuffers[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
+    std::array<VkCommandBuffer, 2> submitCommandBuffers =
+    { commandBuffers[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -404,7 +376,7 @@ void RenderManager::TextureRenderCMDBuffer(VulkanEngine& engine, int SwapBufferI
     textureRenderPass.Draw(engine, commandBuffers, SwapBufferImageIndex, SpriteList);
 }
 
-void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> camera, std::vector<Model>& ModelList, int SwapBufferImageIndex)
+void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, int SwapBufferImageIndex)
 {
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -419,17 +391,17 @@ void RenderManager::ShadowRenderCMDBuffer(VulkanEngine& engine, std::shared_ptr<
     renderPassInfo2.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo2.pClearValues = clearValues.data();
 
-    vkCmdBeginRenderPass(shadowCommandBuffers[SwapBufferImageIndex], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBeginRenderPass(commandBuffers[SwapBufferImageIndex], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
     for (auto model : ModelList)
     {
         if (model.GetRenderFlags() & RenderDrawFlags::RenderShadow)
         {
-            model.Draw(shadowCommandBuffers[SwapBufferImageIndex], shadowRenderPass.shadowRendereringPipeline, SwapBufferImageIndex);
+            model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.shadowRendereringPipeline, SwapBufferImageIndex);
         }
         else if (model.GetRenderFlags() & RenderDrawFlags::RenderShadowAnimated)
         {
-           model.Draw(shadowCommandBuffers[SwapBufferImageIndex], shadowRenderPass.AnimatedShadowRendereringPipeline, SwapBufferImageIndex);
+           model.Draw(commandBuffers[SwapBufferImageIndex], shadowRenderPass.AnimatedShadowRendereringPipeline, SwapBufferImageIndex);
         }
     }
-    vkCmdEndRenderPass(shadowCommandBuffers[SwapBufferImageIndex]);
+    vkCmdEndRenderPass(commandBuffers[SwapBufferImageIndex]);
 }

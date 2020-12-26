@@ -10,7 +10,7 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, vertexdata, indicesdata, textures, layout, renderFlags)));
 }
 
-Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags, std::shared_ptr<Texture> shadow)
+Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags, std::shared_ptr<Texture> shadowTexture)
 {
 	RenderFlags = renderFlags;
 	Assimp::Importer ModelImporter;
@@ -26,7 +26,7 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene, shadow);
+	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene, shadowTexture);
 
 	for (auto mesh : SubMeshList)
 	{
@@ -46,7 +46,7 @@ Model::~Model()
 
 }
 
-void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, std::shared_ptr<Texture> shadow)
+void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, std::shared_ptr<Texture> shadowTexture)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
@@ -57,7 +57,7 @@ void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& te
 		NewMesh.NodeName = node->mName.C_Str();
 		NewMesh.VertexList = LoadVertices(mesh);
 		NewMesh.IndexList = LoadIndices(mesh);
-		LoadTextures(renderer, textureManager, NewMesh, FilePath, mesh, scene, shadow);
+		LoadTextures(renderer, textureManager, NewMesh, FilePath, mesh, scene, shadowTexture);
 		NewMesh.TransformMatrix = AssimpToGLMMatrixConverter(node->mTransformation);
 		LoadBones(scene->mRootNode, mesh, NewMesh.VertexList);
 		for (auto nodeMap : NodeMapList)
@@ -73,7 +73,7 @@ void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& te
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(renderer, textureManager, FilePath, node->mChildren[i], scene, shadow);
+		LoadMesh(renderer, textureManager, FilePath, node->mChildren[i], scene, shadowTexture);
 	}
 }
 
@@ -279,7 +279,7 @@ void Model::LoadAnimations(const aiScene* scene)
 	}
 }
 
-void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshData& Properties, const std::string& FilePath, aiMesh* mesh, const aiScene* scene, std::shared_ptr<Texture> shadow)
+void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshData& Properties, const std::string& FilePath, aiMesh* mesh, const aiScene* scene, std::shared_ptr<Texture> shadowTexture)
 {
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
@@ -291,8 +291,8 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 	meshTextures.AlphaMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/ao.png";
 	meshTextures.DepthMap = DefaultTexture;
 	meshTextures.EmissionMap = DefaultTexture;
+	meshTextures.RendererShadowMap = shadowTexture;
 	meshTextures.ReflectionMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/metallic.png";
-	meshTextures.RendererShadowMap = shadow;
 	meshTextures.CubeMap[0] = DefaultTexture;
 	meshTextures.CubeMap[1] = DefaultTexture;
 	meshTextures.CubeMap[2] = DefaultTexture;
@@ -459,7 +459,7 @@ void Model::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsP
 	}
 }
 
-void Model::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject& light)
+void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light)
 {
 	glm::mat4 modelMatrix = ModelTransformMatrix;
 	modelMatrix = glm::translate(modelMatrix, ModelPosition);
@@ -480,16 +480,8 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, std::ve
 	{
 		//mesh->properites.material.specular = glm::vec3(0.02f);
 		//mesh->properites.EmissionStrength = abs(sin(glfwGetTime()));
-		mesh->Update(engine, camera, CameraList, light, BoneList, modelMatrix);
+		mesh->Update(engine, camera, light, BoneList, modelMatrix);
 	}
-}
-
-void Model::UpdateCameraView(VulkanEngine& engine, std::shared_ptr<Camera> camera)
-{
-	//for (auto mesh : MeshList)
-	//{
-	//	mesh->UpdateCameraView(engine, camera);
-	//}
 }
 
 void Model::UpdateImGUI()

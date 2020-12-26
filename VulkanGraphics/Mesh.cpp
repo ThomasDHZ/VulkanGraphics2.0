@@ -221,7 +221,7 @@ void Mesh::Update(VulkanEngine& engine)
     BaseMesh::Update(engine);
 }
 
-void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer, glm::mat4 ModelMatrix, void* CustomBufferinfo)
+void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, glm::mat4 ModelMatrix, void* CustomBufferinfo)
 {
     ubo.model = TransformMatrix;
     ubo.model = glm::translate(ubo.model, MeshPosition);
@@ -229,8 +229,8 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, st
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.model = glm::scale(ubo.model, MeshScale);
-    ubo.view = ActiveCamera->GetViewMatrix();
-    ubo.proj = ActiveCamera->GetProjectionMatrix();
+    ubo.view = camera->GetViewMatrix();
+    ubo.proj = camera->GetProjectionMatrix();
     ubo.proj[1][1] *= -1;
 
     ubo.model = ubo.model * ModelMatrix;
@@ -238,7 +238,7 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, st
     UpdateUniformBuffer(engine, ubo, Lightbuffer, CustomBufferinfo);
 }
 
-void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, glm::mat4 ModelMatrix, void* CustomBufferinfo)
+void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer, const std::vector<std::shared_ptr<Bone>>& BoneList, glm::mat4 ModelMatrix, void* CustomBufferinfo)
 {
     ubo.model = TransformMatrix;
     ubo.model = glm::translate(ubo.model, MeshPosition);
@@ -246,16 +246,21 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> ActiveCamera, st
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.y), glm::vec3(0.0f, 1.0f, 0.0f));
     ubo.model = glm::rotate(ubo.model, glm::radians(MeshRotate.z), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.model = glm::scale(ubo.model, MeshScale);
-    ubo.view = ActiveCamera->GetViewMatrix();
-    ubo.proj = ActiveCamera->GetProjectionMatrix();
+    ubo.view = camera->GetViewMatrix();
+    ubo.proj = camera->GetProjectionMatrix();
     ubo.proj[1][1] *= -1;
 
-    ubo.Lightmodel = ubo.model * ModelMatrix;
-    ubo.Lightview = CameraList[0]->GetViewMatrix();
-    ubo.Lightproj = CameraList[0]->GetProjectionMatrix();
-    ubo.Lightproj[1][1] *= -1;
-
     ubo.model = ubo.model * ModelMatrix;
+
+
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    float near_plane = 1.0f, far_plane = 7.5f;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightProjection[1][1] *= -1;
+    lightView = glm::lookAt(Lightbuffer.dLight.direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    ubo.lightSpaceMatrix = lightProjection * lightView;
+
     for (auto bone : BoneList)
     {
         ubo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;

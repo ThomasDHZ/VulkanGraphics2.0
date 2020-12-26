@@ -9,7 +9,6 @@ struct Material {
     float reflectivness;
 }; 
 struct DirectionalLightStruct {
-    vec3 position;
     vec3 direction;
 	
     vec3 ambient;

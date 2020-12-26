@@ -17,10 +17,6 @@ enum Camera_Movement {
 class Camera
 {
 protected:
-
-
-public:
-
     float Width;
     float Height;
     float Aspect;
@@ -34,6 +30,7 @@ public:
     float Zoom;
     float MovementSpeed = 5.0f;
 
+public:
     Camera();
     ~Camera();
 

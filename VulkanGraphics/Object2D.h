@@ -38,7 +38,7 @@ public:
 
 	virtual void AnimationHandler();
 	virtual void Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int FrameNumber);
-	virtual void Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, std::vector<std::shared_ptr<Camera>> CameraList, LightBufferObject Lightbuffer);
+	virtual void Update(VulkanEngine& engine, float dt, std::shared_ptr<Camera> camera, LightBufferObject Lightbuffer);
 	virtual void Collision(VulkanEngine& engine, std::vector<std::shared_ptr<Object2D>>& ObjectList);
 	virtual void Destory(VulkanEngine& engine);
 

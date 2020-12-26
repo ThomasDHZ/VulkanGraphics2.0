@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game3D", "Game3D\Game3D.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game2DTest_MegaMan", "Game2DTest_MegaMan\Game2DTest_MegaMan.vcxproj", "{4D473594-F1FC-4A23-A7A0-6321397617D3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanShadowTest", "VulkanShadowTest\VulkanShadowTest.vcxproj", "{57BCEA70-F675-4A27-98B9-978AABCBB8AC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{4D473594-F1FC-4A23-A7A0-6321397617D3}.Release|x64.Build.0 = Release|x64
 		{4D473594-F1FC-4A23-A7A0-6321397617D3}.Release|x86.ActiveCfg = Release|Win32
 		{4D473594-F1FC-4A23-A7A0-6321397617D3}.Release|x86.Build.0 = Release|Win32
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Debug|x64.ActiveCfg = Debug|x64
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Debug|x64.Build.0 = Debug|x64
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Debug|x86.ActiveCfg = Debug|Win32
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Debug|x86.Build.0 = Debug|Win32
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Release|x64.ActiveCfg = Release|x64
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Release|x64.Build.0 = Release|x64
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Release|x86.ActiveCfg = Release|Win32
+		{57BCEA70-F675-4A27-98B9-978AABCBB8AC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
