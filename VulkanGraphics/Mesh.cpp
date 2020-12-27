@@ -252,11 +252,10 @@ void Mesh::Update(VulkanEngine& engine, std::shared_ptr<Camera> camera, LightBuf
 
     ubo.model = ubo.model * ModelMatrix;
 
-
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    float near_plane = 1.0f, far_plane = 7.5f;
-    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    float near_plane = 1.0f, far_plane = 50.5f;
+    lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
     lightProjection[1][1] *= -1;
     lightView = glm::lookAt(Lightbuffer.dLight.direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     ubo.lightSpaceMatrix = lightProjection * lightView;

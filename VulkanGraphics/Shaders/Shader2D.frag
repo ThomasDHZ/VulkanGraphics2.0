@@ -1,59 +1,7 @@
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
 
-struct MapBits
-{
-     int UseDiffuseMapBit;
-     int UseSpecularMapBit;
-     int UseNormalMapBit;
-     int UseDepthMapBit;
-     int UseAlphaMapBit;
-     int UseEmissionMapBit;
-     int UseSkyBoxBit;
-};
-
-struct Material {
-    vec3 ambient;
-    vec3 Diffuse;
-    vec3 specular;    
-    float shininess;
-    float reflectivness;
-}; 
-
-struct DirectionalLightStruct {
-    vec3 direction;
-	
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-struct PointLightStruct {
-    vec3 position;
-    
-    float constant;
-    float linear;
-    float quadratic;
-	
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-struct SpotLightStruct {
-    vec3 position;
-    vec3 direction;
-    float cutOff;
-    float outerCutOff;
-  
-    float constant;
-    float linear;
-    float quadratic;
-  
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;       
-};
+#include "Structs.glsl"
 
 layout(binding = 1) uniform sampler2D DiffuseMap;
 layout(binding = 2) uniform sampler2D SpecularMap;

@@ -419,6 +419,15 @@
     <None Include="Shaders\PBR_BloomOutput.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\Structs.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\VertexStructs.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\PBR.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
