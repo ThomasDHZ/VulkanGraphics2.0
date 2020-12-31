@@ -8,6 +8,8 @@ RenderManager::RenderManager()
 
 RenderManager::RenderManager(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, GLFWwindow* window)
 {
+    rayTracer = RayTraceRenderer(engine);
+
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     mainRenderPass = MainRenderPass(engine);
     sceneRenderPass = SceneRenderPass(engine);

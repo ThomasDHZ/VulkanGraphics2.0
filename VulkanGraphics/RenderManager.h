@@ -15,6 +15,7 @@
 #include "Object2D.h"
 #include "SceneToTextureRendererPass.h"
 #include "BloomRenderPass.h"
+#include "RayTraceRenderer.h"
 
 class RenderManager
 {
@@ -28,6 +29,8 @@ private:
 	}
 
 	std::vector<BaseMesh> MeshDrawList;
+
+	RayTraceRenderer rayTracer;
 
 	FrameBufferMesh frameBuffer;
 	DeferredFrameBufferMesh SSAOFrameBuffer;

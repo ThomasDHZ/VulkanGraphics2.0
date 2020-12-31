@@ -105,6 +105,10 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	deviceFeatures.fillModeNonSolid = VK_TRUE;
 	deviceFeatures.wideLines = VK_TRUE;
 
+	std::vector<const char*> deviceExtensions;
+	deviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+	deviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+
 	VkDeviceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
@@ -134,6 +138,23 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 
 	InitializeCommandPool();
 	InitializeSyncObjects();
+
+	VkPhysicalDeviceRayTracingPipelinePropertiesKHR  RayTracingPipelineProperties{};
+	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
+	AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+
+	VkPhysicalDeviceProperties2 deviceProperties2{};
+	deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+	deviceProperties2.pNext = &RayTracingPipelineProperties;
+
+	VkPhysicalDeviceFeatures2 deviceFeatures2{};
+	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	deviceFeatures2.pNext = &AccelerationStructureFeatures;
+
+	vkGetPhysicalDeviceProperties2(PhysicalDevice, &deviceProperties2);
+	vkGetPhysicalDeviceFeatures2(PhysicalDevice, &deviceFeatures2);
 }
 
 VulkanEngine::~VulkanEngine()
@@ -317,4 +338,20 @@ void VulkanEngine::InitializeSyncObjects()
 			throw std::runtime_error("failed to create synchronization objects for a frame!");
 		}
 	}
+
+	//VkImageViewCreateInfo VulkanEngine::CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo)
+	//{
+	//	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+	//		throw std::runtime_error("Failed to create Image View.");
+	//	}
+	//}
+
+	//VkSamplerCreateInfo VulkanEngine::CreateTextureSampler(VkSamplerCreateInfo TextureImageSamplerInfo)
+	//{
+	//	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	//	{
+	//		throw std::runtime_error("Failed to create Sampler.");
+	//	}
+	//}
 }
+

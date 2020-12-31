@@ -193,6 +193,7 @@
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
     <ClCompile Include="RenderedGammaTexture.cpp" />
@@ -327,6 +328,7 @@
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
     <ClInclude Include="RenderedGammaTexture.h" />
