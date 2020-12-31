@@ -11,14 +11,14 @@ class ColliderObject
 {
 private:
 	std::vector<Vertex> VertexList;
-	std::vector<uint16_t> Indicesdata;
+	std::vector<uint32_t> Indicesdata;
 	Mesh2D ColliderMesh;
 	glm::vec3 Position = glm::vec3(0.0f);
 	BoxCollider Collider;
 	CollidorType Type;
 public:
 	ColliderObject();
-	ColliderObject(const std::vector<Vertex>& vertexList, const std::vector<uint16_t>& indicesdata, glm::vec3 position, CollidorType type);
+	ColliderObject(const std::vector<Vertex>& vertexList, const std::vector<uint32_t>& indicesdata, glm::vec3 position, CollidorType type);
 	~ColliderObject();
 
 	void Update(glm::vec2 position);

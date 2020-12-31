@@ -106,7 +106,7 @@ Game::Game()
           { {  -1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f}, {  0.0f,  0.0f,  0.0f}, {  0.0f,  0.0f,  0.0f} }  // bottom-left  
     };
 
-    const std::vector<uint16_t> indices =
+    const std::vector<uint32_t> indices =
     {
     };
 

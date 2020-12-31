@@ -32,7 +32,7 @@ private:
 
 	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, std::shared_ptr<Texture> shadowTexture);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
-	std::vector<uint16_t> LoadIndices(aiMesh* mesh);
+	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
 	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
@@ -54,7 +54,7 @@ public:
 	glm::vec3 ModelScale = glm::vec3(1.0f);
 
 	Model();
-	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
+	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
 	Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags, std::shared_ptr<Texture> shadowTexture);
 	~Model();
 

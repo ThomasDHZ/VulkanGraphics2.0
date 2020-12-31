@@ -83,7 +83,7 @@ struct MeshData
     unsigned int NodeID;
     std::string NodeName;
     std::vector<Vertex> VertexList;
-    std::vector<uint16_t> IndexList;
+    std::vector<uint32_t> IndexList;
     MeshTextures TextureList;
     glm::mat4 TransformMatrix;
     MeshProperties properties;
@@ -131,7 +131,7 @@ public:
 
     BaseMesh();
     BaseMesh(VulkanEngine& engine, const MeshData& meshData, int renderFlags);
-    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata, int renderFlags);
+    BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint32_t>& Indicesdata, int renderFlags);
     BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, int renderFlags);
     ~BaseMesh();
 

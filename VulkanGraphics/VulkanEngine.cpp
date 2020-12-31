@@ -338,20 +338,25 @@ void VulkanEngine::InitializeSyncObjects()
 			throw std::runtime_error("failed to create synchronization objects for a frame!");
 		}
 	}
-
-	//VkImageViewCreateInfo VulkanEngine::CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo)
-	//{
-	//	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
-	//		throw std::runtime_error("Failed to create Image View.");
-	//	}
-	//}
-
-	//VkSamplerCreateInfo VulkanEngine::CreateTextureSampler(VkSamplerCreateInfo TextureImageSamplerInfo)
-	//{
-	//	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
-	//	{
-	//		throw std::runtime_error("Failed to create Sampler.");
-	//	}
-	//}
 }
 
+VkImageView VulkanEngine::CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo)
+{
+	VkImageView TextureView;
+	if (vkCreateImageView(Device, &TextureImageViewInfo, nullptr, &TextureView)) {
+		throw std::runtime_error("Failed to create Image View.");
+	}
+
+	return TextureView;
+}
+
+VkSampler VulkanEngine::CreateTextureSampler(VkSamplerCreateInfo TextureImageSamplerInfo)
+{
+	VkSampler TextureSampler;
+	if (vkCreateSampler(Device, &TextureImageSamplerInfo, nullptr, &TextureSampler))
+	{
+		throw std::runtime_error("Failed to create Sampler.");
+	}
+
+	return TextureSampler;
+}

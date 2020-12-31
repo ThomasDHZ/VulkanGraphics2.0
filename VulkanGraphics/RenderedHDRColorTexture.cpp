@@ -4,11 +4,11 @@ RenderedHDRColorTexture::RenderedHDRColorTexture() : Texture()
 {
 }
 
-RenderedHDRColorTexture::RenderedHDRColorTexture(VulkanEngine& renderer) : Texture(renderer, TextureType::vkRenderedTexture)
+RenderedHDRColorTexture::RenderedHDRColorTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
 {
-    CreateTextureImage(renderer);
-    CreateTextureView(renderer);
-    CreateTextureSampler(renderer);
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
 }
 
 RenderedHDRColorTexture::~RenderedHDRColorTexture()
@@ -16,14 +16,14 @@ RenderedHDRColorTexture::~RenderedHDRColorTexture()
 }
 
 
-void RenderedHDRColorTexture::CreateTextureImage(VulkanEngine& renderer)
+void RenderedHDRColorTexture::CreateTextureImage(VulkanEngine& engine)
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
     TextureInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-    TextureInfo.extent.width = renderer.SwapChain.GetSwapChainResolution().width;
-    TextureInfo.extent.height = renderer.SwapChain.GetSwapChainResolution().height;
+    TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
+    TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
@@ -31,10 +31,10 @@ void RenderedHDRColorTexture::CreateTextureImage(VulkanEngine& renderer)
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-    Texture::CreateTextureImage(renderer, TextureInfo);
+    Texture::CreateTextureImage(engine, TextureInfo);
 }
 
-void RenderedHDRColorTexture::CreateTextureView(VulkanEngine& renderer)
+void RenderedHDRColorTexture::CreateTextureView(VulkanEngine& engine)
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -48,10 +48,10 @@ void RenderedHDRColorTexture::CreateTextureView(VulkanEngine& renderer)
     TextureImageViewInfo.subresourceRange.layerCount = 1;
     TextureImageViewInfo.image = Image;
 
-    Texture::CreateTextureView(renderer, TextureImageViewInfo);
+    View = engine.CreateTextureView(TextureImageViewInfo);
 }
 
-void RenderedHDRColorTexture::CreateTextureSampler(VulkanEngine& renderer)
+void RenderedHDRColorTexture::CreateTextureSampler(VulkanEngine& engine)
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -67,13 +67,13 @@ void RenderedHDRColorTexture::CreateTextureSampler(VulkanEngine& renderer)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    Texture::CreateTextureSampler(renderer, TextureImageSamplerInfo);
+    Sampler = engine.CreateTextureSampler(TextureImageSamplerInfo);
 }
 
-void RenderedHDRColorTexture::RecreateRendererTexture(VulkanEngine& renderer)
+void RenderedHDRColorTexture::RecreateRendererTexture(VulkanEngine& engine)
 {
-    Texture::Delete(renderer);
-    CreateTextureImage(renderer);
-    CreateTextureView(renderer);
-    CreateTextureSampler(renderer);
+    Texture::Delete(engine);
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
 }

@@ -13,7 +13,7 @@ Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, int rend
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     for (int x = 0; x < 300; x++)
     {
@@ -21,7 +21,7 @@ Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const st
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     for (int x = 0; x < 300; x++)
     {
@@ -29,7 +29,7 @@ Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const st
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout& layout, CustomBuffer customBuffer, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, VkDescriptorSetLayout& layout, CustomBuffer customBuffer, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     for (int x = 0; x < 300; x++)
     {
@@ -60,7 +60,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     CustomBuffer EmptyBuffer;
     EmptyBuffer.ByteSize = sizeof(Empty);
@@ -79,7 +79,7 @@ Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager
     }
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
+Mesh::Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags) : BaseMesh(engine, vertexdata, indicesdata, renderFlags)
 {
     ExtendedMeshProperitesBuffer = customBuffer;
 

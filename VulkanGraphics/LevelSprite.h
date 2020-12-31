@@ -11,7 +11,7 @@ private:
 	std::vector<int> MapLocs;
 
 	std::vector<Vertex> VertexList;
-	std::vector<uint16_t> IndexList;
+	std::vector<uint32_t> IndexList;
 
 	void LoadTiles(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshTextures textures);
 public:

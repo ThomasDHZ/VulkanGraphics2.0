@@ -4,25 +4,25 @@ RendereredTexture::RendereredTexture() : Texture()
 {
 }
 
-RendereredTexture::RendereredTexture(VulkanEngine& renderer, unsigned int textureID) : Texture(renderer, textureID, TextureType::vkTexture2D)
+RendereredTexture::RendereredTexture(VulkanEngine& engine, unsigned int textureID) : Texture(engine, textureID, TextureType::vkTexture2D)
 {
-    CreateTextureImage(renderer);
-    CreateTextureView(renderer);
-    CreateTextureSampler(renderer);
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
 }
 
 RendereredTexture::~RendereredTexture()
 {
 }
 
-void RendereredTexture::CreateTextureImage(VulkanEngine& renderer)
+void RendereredTexture::CreateTextureImage(VulkanEngine& engine)
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
     TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-    TextureInfo.extent.width = renderer.SwapChain.GetSwapChainResolution().width;
-    TextureInfo.extent.height = renderer.SwapChain.GetSwapChainResolution().height;
+    TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
+    TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
@@ -30,10 +30,10 @@ void RendereredTexture::CreateTextureImage(VulkanEngine& renderer)
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-    Texture::CreateTextureImage(renderer, TextureInfo);
+    Texture::CreateTextureImage(engine, TextureInfo);
 }
 
-void RendereredTexture::CreateTextureView(VulkanEngine& renderer)
+void RendereredTexture::CreateTextureView(VulkanEngine& engine)
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -46,10 +46,10 @@ void RendereredTexture::CreateTextureView(VulkanEngine& renderer)
     TextureImageViewInfo.subresourceRange.layerCount = 1;
     TextureImageViewInfo.image = Image;
 
-    Texture::CreateTextureView(renderer, TextureImageViewInfo);
+    View = engine.CreateTextureView(TextureImageViewInfo);
 }
 
-void RendereredTexture::CreateTextureSampler(VulkanEngine& renderer)
+void RendereredTexture::CreateTextureSampler(VulkanEngine& engine)
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -65,5 +65,5 @@ void RendereredTexture::CreateTextureSampler(VulkanEngine& renderer)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
 
-    Texture::CreateTextureSampler(renderer, TextureImageSamplerInfo);
+    Sampler = engine.CreateTextureSampler(TextureImageSamplerInfo);
 }

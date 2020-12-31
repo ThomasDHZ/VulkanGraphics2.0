@@ -31,8 +31,6 @@ protected:
     virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
-    virtual void CreateTextureView(VulkanEngine& engine, VkImageViewCreateInfo TextureImageViewInfo);
-    virtual void CreateTextureSampler(VulkanEngine& engine, VkSamplerCreateInfo TextureImageSamplerInfo);
 
 public:
     VkImageView View = VK_NULL_HANDLE;

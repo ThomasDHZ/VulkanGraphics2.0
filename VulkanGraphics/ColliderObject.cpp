@@ -4,7 +4,7 @@ ColliderObject::ColliderObject()
 {
 }
 
-ColliderObject::ColliderObject(const std::vector<Vertex>& vertexList, const std::vector<uint16_t>& indicesdata, glm::vec3 position, CollidorType type)
+ColliderObject::ColliderObject(const std::vector<Vertex>& vertexList, const std::vector<uint32_t>& indicesdata, glm::vec3 position, CollidorType type)
 {
 	VertexList = vertexList;
 	Indicesdata = indicesdata;

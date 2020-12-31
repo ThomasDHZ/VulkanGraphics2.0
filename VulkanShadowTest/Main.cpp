@@ -150,7 +150,7 @@ private:
     struct Mesh
     {
         std::vector<ShadowVertex> vertices;
-        std::vector<uint16_t> indices;
+        std::vector<uint32_t> indices;
 
         VkBuffer vertexBuffer;
         VkDeviceMemory vertexBufferMemory;

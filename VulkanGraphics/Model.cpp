@@ -5,7 +5,7 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags)
+Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags)
 {
 	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, vertexdata, indicesdata, textures, layout, renderFlags)));
 }
@@ -146,9 +146,9 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 	return VertexList;
 }
 
-std::vector<uint16_t> Model::LoadIndices(aiMesh* mesh)
+std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 {
-	std::vector<uint16_t> IndexList;
+	std::vector<uint32_t> IndexList;
 
 	for (int x = 0; x < mesh->mNumFaces; x++)
 	{

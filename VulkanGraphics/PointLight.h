@@ -8,7 +8,7 @@ const std::vector<Vertex> LightVertices = {
 	{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}
 };
 
-const std::vector<uint16_t> LightIndices = {
+const std::vector<uint32_t> LightIndices = {
 	0, 1, 2, 2, 3, 0
 };
 

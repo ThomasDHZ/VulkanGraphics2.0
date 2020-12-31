@@ -37,7 +37,7 @@ void RenderedDepthTexture::CreateTextureImage(VulkanEngine& renderer)
     Texture::CreateTextureImage(renderer, TextureInfo);
 }
 
-void RenderedDepthTexture::CreateTextureView(VulkanEngine& renderer)
+void RenderedDepthTexture::CreateTextureView(VulkanEngine& engine)
 {
     VkImageViewCreateInfo TextureImageViewInfo{};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -50,10 +50,10 @@ void RenderedDepthTexture::CreateTextureView(VulkanEngine& renderer)
     TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
     TextureImageViewInfo.subresourceRange.layerCount = 1;
 
-    Texture::CreateTextureView(renderer, TextureImageViewInfo);
+    View = engine.CreateTextureView(TextureImageViewInfo);
 }
 
-void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& renderer)
+void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& engine)
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -69,14 +69,14 @@ void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& renderer)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    Texture::CreateTextureSampler(renderer, TextureImageSamplerInfo);
+    Sampler = engine.CreateTextureSampler(TextureImageSamplerInfo);
 }
 
-void RenderedDepthTexture::RecreateRendererTexture(VulkanEngine& renderer)
+void RenderedDepthTexture::RecreateRendererTexture(VulkanEngine& engine)
 {
-    Texture::Delete(renderer);
-    CreateTextureImage(renderer);
-    CreateTextureView(renderer);
-    CreateTextureSampler(renderer);
+    Texture::Delete(engine);
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

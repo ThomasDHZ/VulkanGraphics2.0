@@ -334,21 +334,6 @@ void Texture::CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo Texture
 	vkBindImageMemory(engine.Device, Image, Memory, 0);
 }
 
-void Texture::CreateTextureView(VulkanEngine& engine, VkImageViewCreateInfo TextureImageViewInfo)
-{
-	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
-		throw std::runtime_error("Failed to create Image View.");
-	}
-}
-
-void Texture::CreateTextureSampler(VulkanEngine& engine, VkSamplerCreateInfo TextureImageSamplerInfo)
-{
-	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
-	{
-		throw std::runtime_error("Failed to create Sampler.");
-	}
-}
-
 void Texture::Delete(VulkanEngine& engine)
 {
 	vkDestroyImageView(engine.Device, View, nullptr);

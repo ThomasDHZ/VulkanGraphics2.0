@@ -4,15 +4,15 @@
 class RenderedDepthTexture : public Texture
 {
 private:
-    void CreateTextureImage(VulkanEngine& renderer);
-    void CreateTextureView(VulkanEngine& renderer);
-    void CreateTextureSampler(VulkanEngine& renderer);
+    void CreateTextureImage(VulkanEngine& engine);
+    void CreateTextureView(VulkanEngine& engine);
+    void CreateTextureSampler(VulkanEngine& engine);
 public:
     RenderedDepthTexture();
-    RenderedDepthTexture(VulkanEngine& renderer);
+    RenderedDepthTexture(VulkanEngine& engine);
     ~RenderedDepthTexture();
 
-    void RecreateRendererTexture(VulkanEngine& renderer);
+    void RecreateRendererTexture(VulkanEngine& engine);
 };
 
 

@@ -80,6 +80,8 @@ public:
 	~VulkanEngine();
 
 	uint32_t DrawFrame = 0;
+	VkImageView CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo);
+	VkSampler CreateTextureSampler(VkSamplerCreateInfo TextureImageSamplerInfo);
 	void Destory();
 
 	VkInstance GetVulkanInstance() { return Instance; }

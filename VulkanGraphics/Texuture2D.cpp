@@ -36,7 +36,7 @@ void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	Texture::CreateTextureView(engine, TextureImageViewInfo);
+	View = engine.CreateTextureView(TextureImageViewInfo);
 }
 
 void Texture2D::CreateTextureSampler(VulkanEngine& engine)
@@ -56,5 +56,5 @@ void Texture2D::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-	Texture::CreateTextureSampler(engine, TextureImageSamplerInfo);
+	Sampler = engine.CreateTextureSampler(TextureImageSamplerInfo);
 }

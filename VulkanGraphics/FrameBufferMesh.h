@@ -10,7 +10,7 @@ const std::vector<Vertex> FrameBufferVertices =
     {{-1.0f, 1.0f, 0.0f},  {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}},
 };
 
-const std::vector<uint16_t> FrameBufferIndices = {
+const std::vector<uint32_t> FrameBufferIndices = {
     0, 1, 3, 1, 2, 3
 };
 

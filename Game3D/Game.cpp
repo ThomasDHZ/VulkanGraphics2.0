@@ -84,7 +84,7 @@ Game::Game()
         {{0.5,0.5,-0.5}, {0,1,0}, {1,1}},
     };
 
-    const std::vector<uint16_t> CubeIndices = {
+    const std::vector<uint32_t> CubeIndices = {
         0,1,2, 0,2,3,
         4,5,6, 4,6,7,
         8,9,10, 8,10,11,
@@ -248,7 +248,7 @@ void Game::renderSphere()
     std::vector<glm::vec3> positions;
     std::vector<glm::vec2> uv;
     std::vector<glm::vec3> normals;
-    std::vector<uint16_t> indices;
+    std::vector<uint32_t> indices;
 
     const unsigned int X_SEGMENTS = 64;
     const unsigned int Y_SEGMENTS = 64;
