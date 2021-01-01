@@ -105,13 +105,40 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	deviceFeatures.fillModeNonSolid = VK_TRUE;
 	deviceFeatures.wideLines = VK_TRUE;
 
+	VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
+	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+	BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
+
+	VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
+	RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+	RayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
+	RayTracingPipelineFeatures.pNext = &BufferDeviceAddresFeatures;
+
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
+	AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+	AccelerationStructureFeatures.accelerationStructure = VK_TRUE;
+	AccelerationStructureFeatures.pNext = &RayTracingPipelineFeatures;
+
+	VkPhysicalDeviceRayTracingPipelinePropertiesKHR  RayTracingPipelineProperties{};
+	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+
+	VkPhysicalDeviceProperties2 deviceProperties2{};
+	deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+	deviceProperties2.pNext = &RayTracingPipelineProperties;
+
+	VkPhysicalDeviceFeatures2 deviceFeatures2{};
+	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	deviceFeatures2.features = deviceFeatures;
+	deviceFeatures2.pNext = &AccelerationStructureFeatures;
+
 	VkDeviceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
-	createInfo.pEnabledFeatures = &deviceFeatures;
+	createInfo.pEnabledFeatures = nullptr;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+	createInfo.pNext = &deviceFeatures2;
 
 	if (DebuggerAvalible)
 	{
@@ -138,22 +165,9 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	InitializeSyncObjects();
 
 
-	VkPhysicalDeviceRayTracingPipelinePropertiesKHR  RayTracingPipelineProperties{};
-	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
 
-	VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
-	AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-
-	VkPhysicalDeviceProperties2 deviceProperties2{};
-	deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-	deviceProperties2.pNext = &RayTracingPipelineProperties;
-
-	VkPhysicalDeviceFeatures2 deviceFeatures2{};
-	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-	deviceFeatures2.pNext = &AccelerationStructureFeatures;
-
-	vkGetPhysicalDeviceProperties2(PhysicalDevice, &deviceProperties2);
-	vkGetPhysicalDeviceFeatures2(PhysicalDevice, &deviceFeatures2);
+	//vkGetPhysicalDeviceProperties2(PhysicalDevice, &deviceProperties2);
+	//vkGetPhysicalDeviceFeatures2(PhysicalDevice, &deviceFeatures2);
 
 	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));
 	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(Device, "vkCmdBuildAccelerationStructuresKHR"));
@@ -348,6 +362,18 @@ void VulkanEngine::InitializeSyncObjects()
 			throw std::runtime_error("failed to create synchronization objects for a frame!");
 		}
 	}
+}
+
+VkDeviceOrHostAddressConstKHR VulkanEngine::BufferToDeviceAddress(VkBuffer buffer)
+{
+	VkBufferDeviceAddressInfoKHR BufferDevice = {};
+	BufferDevice.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+	BufferDevice.buffer = buffer;
+
+	VkDeviceOrHostAddressConstKHR DeviceAddressConst = {};
+	DeviceAddressConst.deviceAddress = vkGetBufferDeviceAddressKHR(Device, &BufferDevice);
+
+	return DeviceAddressConst;
 }
 
 VkImageView VulkanEngine::CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo)

@@ -20,7 +20,7 @@ const std::vector<const char*> deviceExtensions = {
 	VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
 	VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
 	VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-	VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME,
+	VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME
 };
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -95,6 +95,7 @@ public:
 	~VulkanEngine();
 
 	uint32_t DrawFrame = 0;
+	VkDeviceOrHostAddressConstKHR BufferToDeviceAddress(VkBuffer buffer);
 	VkImageView CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo);
 	VkSampler CreateTextureSampler(VkSamplerCreateInfo TextureImageSamplerInfo);
 	void Destory();

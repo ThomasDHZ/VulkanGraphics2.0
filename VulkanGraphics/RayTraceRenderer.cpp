@@ -41,26 +41,29 @@ void RayTraceRenderer::InitializeBottomLevelAccelerationStructure(VulkanEngine& 
 		0.0f, 0.0f, 1.0f, 0.0f
 	};
 
-	//VkBuffer vertexBuffer = VertexBuffer(engine, vertices).GetVertexBuffer();
-	//VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress = engine.BufferToHostAddress(vertexBuffer);
+	VkBuffer vertexBuffer = VertexBuffer(engine, vertices).GetVertexBuffer();
+	VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer);
 
-	//VkBuffer indicesBuffer = IndicesBuffer(engine, indices).GetIndiceBuffer();
-	//VkDeviceOrHostAddressConstKHR IndicesBufferDeviceAddress = engine.BufferToHostAddress(indicesBuffer);
+	VkBuffer indicesBuffer = IndicesBuffer(engine, indices).GetIndiceBuffer();
+	VkDeviceOrHostAddressConstKHR IndicesBufferDeviceAddress = engine.BufferToDeviceAddress(indicesBuffer);
 
-	//VkBuffer transformBuffer = TransformBuffer(engine, transformMatrix).GetTransformBuffer();
-	//VkDeviceOrHostAddressConstKHR TransformBufferDeviceAddress = engine.BufferToHostAddress(indicesBuffer);
+	VkBuffer transformBuffer = TransformBuffer(engine, transformMatrix).GetTransformBuffer();
+	VkDeviceOrHostAddressConstKHR TransformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer);
 
-	//VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
-	//GeometryAccelerationStructure.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
-	//GeometryAccelerationStructure.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-	//GeometryAccelerationStructure.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-	//GeometryAccelerationStructure.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-	//GeometryAccelerationStructure.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
- //   GeometryAccelerationStructure.geometry.triangles.vertexData = VertexBufferDeviceAddress;
-	//GeometryAccelerationStructure.geometry.triangles.maxVertex = vertices.size();
-	//GeometryAccelerationStructure.geometry.triangles.vertexStride = sizeof(Vertex);
-	//GeometryAccelerationStructure.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-	//GeometryAccelerationStructure.geometry.triangles.indexData = IndicesBufferDeviceAddress;
+	VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
+	GeometryAccelerationStructure.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+	GeometryAccelerationStructure.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+	GeometryAccelerationStructure.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+	GeometryAccelerationStructure.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+	GeometryAccelerationStructure.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+    GeometryAccelerationStructure.geometry.triangles.vertexData = VertexBufferDeviceAddress;
+	GeometryAccelerationStructure.geometry.triangles.maxVertex = vertices.size();
+	GeometryAccelerationStructure.geometry.triangles.vertexStride = sizeof(Vertex);
+	GeometryAccelerationStructure.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+	GeometryAccelerationStructure.geometry.triangles.indexData = IndicesBufferDeviceAddress;
+	GeometryAccelerationStructure.geometry.triangles.transformData.deviceAddress = 0;
+	GeometryAccelerationStructure.geometry.triangles.transformData.hostAddress = nullptr;
+	GeometryAccelerationStructure.geometry.triangles.transformData = TransformBufferDeviceAddress;
 }
 
 void RayTraceRenderer::InitializeTopLevelAccelerationStructure(VulkanEngine& engine)
