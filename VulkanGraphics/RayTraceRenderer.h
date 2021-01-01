@@ -1,17 +1,18 @@
 #pragma once
 #include "VulkanEngine.h"
+#include <vulkan/vulkan_core.h>
 
 class RayTraceRenderer
 {
 private:
-	void InitializeBottomLevelAccelerationStructure(VulkanEngine& Engine);
-	void InitializeTopLevelAccelerationStructure(VulkanEngine& Engine);
-	void InitializeRayTracingDescriptorSet(VulkanEngine& Engine);
-	void InitializeRayTracingPipeline(VulkanEngine& Engine);
-	void InitializeRayTracingShaderBindingTable(VulkanEngine& Engine);
+	void InitializeBottomLevelAccelerationStructure(VulkanEngine& engine);
+	void InitializeTopLevelAccelerationStructure(VulkanEngine& engine);
+	void InitializeRayTracingDescriptorSet(VulkanEngine& engine);
+	void InitializeRayTracingPipeline(VulkanEngine& engine);
+	void InitializeRayTracingShaderBindingTable(VulkanEngine& engine);
 public:
 	RayTraceRenderer();
-	RayTraceRenderer(VulkanEngine& Engine);
+	RayTraceRenderer(VulkanEngine& engine);
 	~RayTraceRenderer();
 
 	void Draw();
