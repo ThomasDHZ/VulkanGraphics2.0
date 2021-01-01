@@ -222,6 +222,7 @@
     <ClCompile Include="Texuture2D.cpp" />
     <ClCompile Include="TransformBuffer.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
+    <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
     <ClCompile Include="VulkanSwapChain.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="TransformBuffer.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanBufferManager.h" />
     <ClInclude Include="VulkanDebugger.h" />
     <ClInclude Include="VulkanEngine.h" />

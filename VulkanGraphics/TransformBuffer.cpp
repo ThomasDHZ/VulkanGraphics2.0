@@ -18,7 +18,7 @@ TransformBuffer::TransformBuffer(VulkanEngine& engine, const VkTransformMatrixKH
     memcpy(data, &TransformData,(size_t)bufferSize);
     vkUnmapMemory(engine.Device, stagingBufferMemory);
 
-    VulkanBufferManager::CreateBuffer(engine, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, transformBuffer, TransformBufferMemory);
+    VulkanBufferManager::CreateBuffer(engine, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, transformBuffer, TransformBufferMemory);
     VulkanBufferManager::CopyBuffer(engine, stagingBuffer, transformBuffer, bufferSize);
 
     vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);

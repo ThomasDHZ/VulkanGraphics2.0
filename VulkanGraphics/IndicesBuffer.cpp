@@ -26,6 +26,18 @@ IndicesBuffer::IndicesBuffer(VulkanEngine& renderer, const std::vector<uint32_t>
 
     vkDestroyBuffer(renderer.Device, stagingBuffer, nullptr);
     vkFreeMemory(renderer.Device, stagingBufferMemory, nullptr);
+
+
+    //IndiceCount = indicesdata.size();
+    //VkDeviceSize bufferSize = sizeof(indicesdata[0]) * IndiceCount;
+
+    //auto b = indicesdata[0];
+    //auto a = static_cast<void*>(&b);
+    //CreateStagingBuffer(engine, bufferSize);
+    //MapMemory(engine, a, bufferSize);
+    //CreateBuffer(engine, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    //CopyBuffer(engine, StagingBuffer, Buffer, bufferSize);
+    //DestoryStagingBuffer(engine);
 }
 
 IndicesBuffer::~IndicesBuffer()
