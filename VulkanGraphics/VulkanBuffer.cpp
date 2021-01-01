@@ -23,41 +23,6 @@ VulkanBuffer::VulkanBuffer(VulkanEngine& engine)
 {
 }
 
-VkCommandBuffer VulkanBuffer::BeginSingleTimeCommand(VulkanEngine& engine)
-{
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = engine.RenderCommandPool;
-	allocInfo.commandBufferCount = 1;
-
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(engine.Device, &allocInfo, &commandBuffer);
-
-	VkCommandBufferBeginInfo beginInfo = {};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-	return commandBuffer;
-}
-
-void VulkanBuffer::EndSingleTimeCommand(VulkanEngine& engine, VkCommandBuffer commandBuffer)
-{
-	vkEndCommandBuffer(commandBuffer);
-
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-
-	vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(engine.GraphicsQueue);
-
-	vkFreeCommandBuffers(engine.Device, engine.RenderCommandPool, 1, &commandBuffer);
-}
-
 VkResult VulkanBuffer::CreateStagingBuffer(VulkanEngine& engine, VkDeviceSize BufferSize)
 {
 	VkBufferCreateInfo buffer = {};
@@ -110,15 +75,15 @@ VkResult VulkanBuffer::CreateBuffer(VulkanEngine& engine, VkDeviceSize BufferSiz
 	return vkBindBufferMemory(engine.Device, Buffer, BufferMemory, 0);
 }
 
-void VulkanBuffer::CopyBuffer(VulkanEngine& renderer, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+void VulkanBuffer::CopyBuffer(VulkanEngine& engine, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
-	VkCommandBuffer commandBuffer = BeginSingleTimeCommand(renderer);
+	VkCommandBuffer commandBuffer = engine.BeginSingleTimeCommand();
 
 	VkBufferCopy copyRegion = {};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	EndSingleTimeCommand(renderer, commandBuffer);
+	engine.EndSingleTimeCommand(commandBuffer);
 }
 
 void VulkanBuffer::MapMemory(VulkanEngine& engine, void* DataToCopy, VkDeviceSize BufferSize)

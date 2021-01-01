@@ -17,11 +17,9 @@ class VulkanBuffer
 	public:
 		VulkanBuffer();
 		VulkanBuffer(VulkanEngine& engine);
-		VkCommandBuffer BeginSingleTimeCommand(VulkanEngine& engine);
-		void EndSingleTimeCommand(VulkanEngine& engine, VkCommandBuffer commandBuffer);
 		VkResult CreateStagingBuffer(VulkanEngine& engine, VkDeviceSize BufferSize);
 		VkResult CreateBuffer(VulkanEngine& engine, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties);
-		void CopyBuffer(VulkanEngine& renderer, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+		void CopyBuffer(VulkanEngine& engine, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 		void MapMemory(VulkanEngine& engine, void* DataToCopy, VkDeviceSize BufferSize);
 		void DestoryStagingBuffer(VulkanEngine& engine);
 		void DestoryBuffer(VulkanEngine& engine);

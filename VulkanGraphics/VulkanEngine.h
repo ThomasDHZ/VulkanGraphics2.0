@@ -98,6 +98,9 @@ public:
 	VkDeviceOrHostAddressConstKHR BufferToDeviceAddress(VkBuffer buffer);
 	VkImageView CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo);
 	VkSampler CreateTextureSampler(VkSamplerCreateInfo TextureImageSamplerInfo);
+
+	VkCommandBuffer BeginSingleTimeCommand();
+	void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
 	void Destory();
 
 	VkInstance GetVulkanInstance() { return Instance; }
