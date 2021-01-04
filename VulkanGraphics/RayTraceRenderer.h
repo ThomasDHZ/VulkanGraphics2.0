@@ -22,8 +22,11 @@ private:
 	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
 	VulkanBuffer BottomLevelAccelerationBuffer;
+	VulkanBuffer TopLevelAccelerationBuffer;
 	VkAccelerationStructureKHR BottomLevelAccelerationStructure;
+	VkAccelerationStructureKHR TopLevelAccelerationStructure;
 	uint64_t BottomLevelAccelerationDeviceAddress;
+	uint64_t TopLevelAccelerationDeviceAddress;
 	VkCommandBuffer RayTraceCommandBuffer;
 
 	void InitializeBottomLevelAccelerationStructure(VulkanEngine& engine);
