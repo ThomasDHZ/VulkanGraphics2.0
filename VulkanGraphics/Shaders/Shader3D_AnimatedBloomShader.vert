@@ -7,6 +7,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
+    mat4 lightSpaceMatrix;
     mat4 BoneTransform[100];
 } ubo;
 
@@ -19,9 +20,10 @@ layout (location = 5) in ivec4 BoneID;
 layout (location = 6) in vec4 BoneWeights;
 
 layout(location = 0) out vec3 FragPos;
-layout(location = 1) out vec2 TexCoords;
-layout(location = 2) out vec3 Normal;
-layout(location = 3) out mat3 TBN;
+layout(location = 1) out vec4 LightSpaceMatrix;
+layout(location = 2) out vec2 TexCoords;
+layout(location = 3) out vec3 Normal;
+layout(location = 4) out mat3 TBN;
 
 void main() 
 {
@@ -32,6 +34,7 @@ void main()
    BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
     vec4 BonePosition = BoneTransform * vec4(inPosition, 1.0);
 
+    LightSpaceMatrix = ubo.lightSpaceMatrix * ubo.model * vec4(inPosition, 1.0);
     FragPos = vec3(ubo.model * BonePosition);    
     TexCoords = inTexCoord;
     Normal = normalize(transpose(inverse(mat3(ubo.view * ubo.model * BoneTransform))) * aNormal);

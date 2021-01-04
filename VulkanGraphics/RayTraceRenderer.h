@@ -21,7 +21,7 @@ private:
 	PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
 	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
-	//VulkanBuffer BottomLevelAccelerationBuffer;
+	VulkanBuffer BottomLevelAccelerationBuffer;
 	VkAccelerationStructureKHR BottomLevelAccelerationStructure;
 	uint64_t BottomLevelAccelerationDeviceAddress;
 	VkCommandBuffer RayTraceCommandBuffer;
