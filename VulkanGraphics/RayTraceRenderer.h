@@ -29,6 +29,9 @@ private:
 	uint64_t TopLevelAccelerationDeviceAddress;
 	VkCommandBuffer RayTraceCommandBuffer;
 
+	VkPhysicalDeviceProperties2 RTDeviceProperties;
+	VkPhysicalDeviceFeatures2 RTPhysicalDeviceProperties;
+
 	VkDescriptorSetLayout RayTraceDescriptorSetLayout;
 	VkPipelineLayout RayTracePipelineLayout;
 	VkPipeline RayTracePipeline;

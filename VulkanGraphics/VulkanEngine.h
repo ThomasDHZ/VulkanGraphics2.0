@@ -89,6 +89,8 @@ public:
 	VkQueue PresentQueue = VK_NULL_HANDLE;
 	VkCommandPool RenderCommandPool = VK_NULL_HANDLE;
 	VulkanSwapChain SwapChain;
+	VkPhysicalDeviceRayTracingPipelinePropertiesKHR  RayTracingPipelineProperties;
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR RayTracinDeviceProperties{};
 
 	VulkanEngine();
 	VulkanEngine(GLFWwindow* window);
@@ -102,6 +104,11 @@ public:
 	VkCommandBuffer BeginSingleTimeCommand();
 	void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
 	void Destory();
+
+	VkPhysicalDeviceFeatures GetCurrentPhysicalDeviceFeatures();
+	VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice);
+	VkPhysicalDeviceRayTracingPipelinePropertiesKHR GetRayTracingPipelineProperties();
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR GetRayTracingAccelerationStructureFeatures();
 
 	VkInstance GetVulkanInstance() { return Instance; }
 	VkDevice GetVulkanDevice() { return Device; }

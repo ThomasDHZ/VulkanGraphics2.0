@@ -320,6 +320,10 @@ void RayTraceRenderer::InitializeRayTracingPipeline(VulkanEngine& engine)
 
 void RayTraceRenderer::InitializeRayTracingShaderBindingTable(VulkanEngine& engine)
 {
+
+	auto b = engine.GetRayTracingPipelineProperties();
+	auto c = engine.GetRayTracingAccelerationStructureFeatures();
+	int a = 34;
 }
 
 void RayTraceRenderer::InitializeRayTracingDescriptorSet(VulkanEngine& engine)

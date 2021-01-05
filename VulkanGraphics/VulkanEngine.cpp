@@ -119,12 +119,12 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	AccelerationStructureFeatures.accelerationStructure = VK_TRUE;
 	AccelerationStructureFeatures.pNext = &RayTracingPipelineFeatures;
 
-	VkPhysicalDeviceRayTracingPipelinePropertiesKHR  RayTracingPipelineProperties{};
+	RayTracingPipelineProperties = {};
 	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
 
-	VkPhysicalDeviceProperties2 deviceProperties2{};
-	deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-	deviceProperties2.pNext = &RayTracingPipelineProperties;
+	RayTracinDeviceProperties = {};
+	RayTracinDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+	RayTracinDeviceProperties.pNext = &RayTracingPipelineProperties;
 
 	VkPhysicalDeviceFeatures2 deviceFeatures2{};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
@@ -163,11 +163,6 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 
 	InitializeCommandPool();
 	InitializeSyncObjects();
-
-
-
-	//vkGetPhysicalDeviceProperties2(PhysicalDevice, &deviceProperties2);
-	//vkGetPhysicalDeviceFeatures2(PhysicalDevice, &deviceFeatures2);
 
 	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));
 	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(Device, "vkCmdBuildAccelerationStructuresKHR"));
@@ -227,8 +222,7 @@ bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
 	bool extensionsSupported = checkDeviceExtensionSupport(GPUDevice);
 
 
-	VkPhysicalDeviceFeatures supportedFeatures;
-	vkGetPhysicalDeviceFeatures(GPUDevice, &supportedFeatures);
+	VkPhysicalDeviceFeatures supportedFeatures = GetPhysicalDeviceFeatures(GPUDevice);
 
 	uint32_t GPUSurfaceFormatCount;
 	uint32_t GPUPresentModeCount;
@@ -328,6 +322,46 @@ void VulkanEngine::Destory()
 
 	vkDestroySurfaceKHR(Instance, Surface, nullptr);
 	vkDestroyInstance(Instance, nullptr);
+}
+
+VkPhysicalDeviceFeatures VulkanEngine::GetCurrentPhysicalDeviceFeatures()
+{
+	VkPhysicalDeviceFeatures PhysicalDeviceFeatures;
+	vkGetPhysicalDeviceFeatures(PhysicalDevice, &PhysicalDeviceFeatures);
+	return PhysicalDeviceFeatures;
+}
+
+VkPhysicalDeviceFeatures VulkanEngine::GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice)
+{
+	VkPhysicalDeviceFeatures PhysicalDeviceFeatures;
+	vkGetPhysicalDeviceFeatures(GPUDevice, &PhysicalDeviceFeatures);
+	return PhysicalDeviceFeatures;
+}
+
+VkPhysicalDeviceRayTracingPipelinePropertiesKHR VulkanEngine::GetRayTracingPipelineProperties()
+{
+	VkPhysicalDeviceRayTracingPipelinePropertiesKHR RayTracingPipelineProperties = {};
+	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+
+	VkPhysicalDeviceProperties2 GetRayTraceDeviceProperties{};
+	GetRayTraceDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+	GetRayTraceDeviceProperties.pNext = &RayTracingPipelineProperties;
+	vkGetPhysicalDeviceProperties2(PhysicalDevice, &GetRayTraceDeviceProperties);
+
+	return RayTracingPipelineProperties;
+}
+
+VkPhysicalDeviceAccelerationStructureFeaturesKHR VulkanEngine::GetRayTracingAccelerationStructureFeatures()
+{
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR RayTracingAccelerationStructureFeatures = {};
+	RayTracingAccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+	
+	VkPhysicalDeviceFeatures2 GetRayTraceDeviceFeatures{};
+	GetRayTraceDeviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	GetRayTraceDeviceFeatures.pNext = &RayTracingAccelerationStructureFeatures;
+	vkGetPhysicalDeviceFeatures2(PhysicalDevice, &GetRayTraceDeviceFeatures);
+
+	return RayTracingAccelerationStructureFeatures;
 }
 
 void VulkanEngine::InitializeCommandPool()
