@@ -29,11 +29,21 @@ private:
 	uint64_t TopLevelAccelerationDeviceAddress;
 	VkCommandBuffer RayTraceCommandBuffer;
 
+	VkDescriptorSetLayout RayTraceDescriptorSetLayout;
+	VkPipelineLayout RayTracePipelineLayout;
+	VkPipeline RayTracePipeline;
+
+	std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
+
+	std::vector<char> ReadShaderFile(const std::string& filename);
+	VkShaderModule CreateShaderModule(VulkanEngine& engine, const std::vector<char>& code);
+	VkPipelineShaderStageCreateInfo LoadShader(VulkanEngine& engine, const std::string& filename, VkShaderStageFlagBits StageFlag);
+
 	void InitializeBottomLevelAccelerationStructure(VulkanEngine& engine);
 	void InitializeTopLevelAccelerationStructure(VulkanEngine& engine);
-	void InitializeRayTracingDescriptorSet(VulkanEngine& engine);
 	void InitializeRayTracingPipeline(VulkanEngine& engine);
 	void InitializeRayTracingShaderBindingTable(VulkanEngine& engine);
+	void InitializeRayTracingDescriptorSet(VulkanEngine& engine);
 
 public:
 	RayTraceRenderer();

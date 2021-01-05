@@ -443,6 +443,15 @@
     <None Include="Shaders\PBR.glsl">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shaders\closesthit.rchit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\miss.rmiss">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shaders\raygen.rgen">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

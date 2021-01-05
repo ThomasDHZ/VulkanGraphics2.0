@@ -1,6 +1,7 @@
 #include "RayTraceRenderer.h"
 #include "RayTraceVertexBuffer.h"
 #include "RayTraceIndicesBuffer.h"
+#include <fstream>
 
 RayTraceRenderer::RayTraceRenderer()
 {
@@ -257,7 +258,7 @@ void RayTraceRenderer::InitializeRayTracingPipeline(VulkanEngine& engine)
 
 	VkDescriptorSetLayoutBinding UniformBufferStructureBinding = {};
 	UniformBufferStructureBinding.binding = 2;
-	UniformBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+	UniformBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	UniformBufferStructureBinding.descriptorCount = 1;
 	UniformBufferStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
 	RTDescriptorSetBindings.emplace_back(UniformBufferStructureBinding);
@@ -268,7 +269,53 @@ void RayTraceRenderer::InitializeRayTracingPipeline(VulkanEngine& engine)
 	RTDescriptorSetLayout.pBindings = RTDescriptorSetBindings.data();
 	vkCreateDescriptorSetLayout(engine.Device, &RTDescriptorSetLayout, nullptr, &RayTraceDescriptorSetLayout);
 
-	VkPipelineLayoutCreateInfo
+	VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
+	PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	PipelineLayoutCreateInfo.setLayoutCount = 1;
+	PipelineLayoutCreateInfo.pSetLayouts = &RayTraceDescriptorSetLayout;
+	vkCreatePipelineLayout(engine.Device, &PipelineLayoutCreateInfo, nullptr, &RayTracePipelineLayout);
+
+	std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
+
+	ShaderList.emplace_back(LoadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
+	VkRayTracingShaderGroupCreateInfoKHR RayGeneratorShaderInfo = {};
+	RayGeneratorShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+	RayGeneratorShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+	RayGeneratorShaderInfo.generalShader = static_cast<uint32_t>(ShaderList.size()) - 1;
+	RayGeneratorShaderInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
+	RayGeneratorShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
+	RayGeneratorShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+	RayTraceShaders.emplace_back(RayGeneratorShaderInfo);
+	
+	ShaderList.emplace_back(LoadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/miss.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
+	VkRayTracingShaderGroupCreateInfoKHR MissShaderInfo = {};
+	MissShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+	MissShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+	MissShaderInfo.generalShader = static_cast<uint32_t>(ShaderList.size()) - 1;
+	MissShaderInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
+	MissShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
+	MissShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+	RayTraceShaders.emplace_back(MissShaderInfo);
+
+	ShaderList.emplace_back(LoadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
+	VkRayTracingShaderGroupCreateInfoKHR ClosestHitShaderInfo = {};
+	ClosestHitShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+	ClosestHitShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
+	ClosestHitShaderInfo.generalShader = VK_SHADER_UNUSED_KHR;
+	ClosestHitShaderInfo.closestHitShader = static_cast<uint32_t>(ShaderList.size()) - 1;
+	ClosestHitShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
+	ClosestHitShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+	RayTraceShaders.emplace_back(ClosestHitShaderInfo);
+
+	VkRayTracingPipelineCreateInfoKHR RayTracingPipeline = {};
+	RayTracingPipeline.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
+	RayTracingPipeline.stageCount = static_cast<uint32_t>(ShaderList.size());
+	RayTracingPipeline.pStages = ShaderList.data();
+	RayTracingPipeline.groupCount = static_cast<uint32_t>(RayTraceShaders.size());
+	RayTracingPipeline.pGroups = RayTraceShaders.data();
+	RayTracingPipeline.maxPipelineRayRecursionDepth = 1;
+	RayTracingPipeline.layout = RayTracePipelineLayout;
+	VkResult result = vkCreateRayTracingPipelinesKHR(engine.Device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &RayTracePipeline);
 }
 
 void RayTraceRenderer::InitializeRayTracingShaderBindingTable(VulkanEngine& engine)
@@ -282,3 +329,52 @@ void RayTraceRenderer::InitializeRayTracingDescriptorSet(VulkanEngine& engine)
 void RayTraceRenderer::Draw()
 {
 }
+std::vector<char> RayTraceRenderer::ReadShaderFile(const std::string& filename)
+{
+	std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open()) {
+		throw std::runtime_error("failed to open file!");
+	}
+
+	size_t fileSize = (size_t)file.tellg();
+	std::vector<char> buffer(fileSize);
+
+	file.seekg(0);
+	file.read(buffer.data(), fileSize);
+
+	file.close();
+
+	return buffer;
+}
+
+VkShaderModule RayTraceRenderer::CreateShaderModule(VulkanEngine& engine, const std::vector<char>& code)
+{
+	VkShaderModuleCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.codeSize = code.size();
+	createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+	VkShaderModule shaderModule;
+	if (vkCreateShaderModule(engine.Device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create shader module!");
+	}
+
+	return shaderModule;
+}
+
+VkPipelineShaderStageCreateInfo RayTraceRenderer::LoadShader(VulkanEngine& engine, const std::string& filename, VkShaderStageFlagBits StageFlag)
+{
+	auto ShaderCode = ReadShaderFile(filename);
+
+	VkShaderModule ShaderModule = CreateShaderModule(engine, ShaderCode);
+
+	VkPipelineShaderStageCreateInfo ShaderInfo{};
+	ShaderInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	ShaderInfo.stage = StageFlag;
+	ShaderInfo.module = ShaderModule;
+	ShaderInfo.pName = "main";
+
+	return ShaderInfo;
+}
+

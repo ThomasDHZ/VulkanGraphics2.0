@@ -243,6 +243,7 @@
     <None Include="Shaders\BloomShader2ndPass.frag" />
     <None Include="Shaders\BloomShader2ndPass.vert" />
     <None Include="Shaders\BloomSkyBoxShader.frag" />
+    <None Include="Shaders\closesthit.rchit" />
     <None Include="Shaders\DepthDebugShader.frag" />
     <None Include="Shaders\DepthDebugShader.vert" />
     <None Include="Shaders\FlatShader.frag" />
@@ -251,9 +252,11 @@
     <None Include="Shaders\FrameBufferShader.vert" />
     <None Include="Shaders\GBufferShader.frag" />
     <None Include="Shaders\GBufferShader.vert" />
+    <None Include="Shaders\miss.rmiss" />
     <None Include="Shaders\PBR.glsl" />
     <None Include="Shaders\PBR_BloomOutput.frag" />
     <None Include="Shaders\PBR_BloomOutput.vert" />
+    <None Include="Shaders\raygen.rgen" />
     <None Include="Shaders\Shader2D.frag" />
     <None Include="Shaders\Shader2D.vert" />
     <None Include="Shaders\Shader2D_BloomOutput.frag" />
