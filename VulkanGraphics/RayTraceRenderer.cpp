@@ -240,27 +240,35 @@ void RayTraceRenderer::InitializeTopLevelAccelerationStructure(VulkanEngine& eng
 
 void RayTraceRenderer::InitializeRayTracingPipeline(VulkanEngine& engine)
 {
-	std::vector<VkDescriptorSetLayoutBinding> DescriptorSetBindings;
+	std::vector<VkDescriptorSetLayoutBinding> RTDescriptorSetBindings;
 	VkDescriptorSetLayoutBinding AccelerationStructureBinding = {};
 	AccelerationStructureBinding.binding = 0;
 	AccelerationStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
 	AccelerationStructureBinding.descriptorCount = 1;
 	AccelerationStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-	DescriptorSetBindings.emplace_back(AccelerationStructureBinding);
+	RTDescriptorSetBindings.emplace_back(AccelerationStructureBinding);
 
 	VkDescriptorSetLayoutBinding ReturnImageStructureBinding = {};
 	ReturnImageStructureBinding.binding = 1;
 	ReturnImageStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
 	ReturnImageStructureBinding.descriptorCount = 1;
 	ReturnImageStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-	DescriptorSetBindings.emplace_back(ReturnImageStructureBinding);
+	RTDescriptorSetBindings.emplace_back(ReturnImageStructureBinding);
 
 	VkDescriptorSetLayoutBinding UniformBufferStructureBinding = {};
 	UniformBufferStructureBinding.binding = 2;
 	UniformBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
 	UniformBufferStructureBinding.descriptorCount = 1;
 	UniformBufferStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
-	DescriptorSetBindings.emplace_back(UniformBufferStructureBinding);
+	RTDescriptorSetBindings.emplace_back(UniformBufferStructureBinding);
+
+	VkDescriptorSetLayoutCreateInfo RTDescriptorSetLayout = {};
+	RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	RTDescriptorSetLayout.bindingCount = static_cast<uint32_t>(RTDescriptorSetBindings.size());
+	RTDescriptorSetLayout.pBindings = RTDescriptorSetBindings.data();
+	vkCreateDescriptorSetLayout(engine.Device, &RTDescriptorSetLayout, nullptr, &RayTraceDescriptorSetLayout);
+
+	VkPipelineLayoutCreateInfo
 }
 
 void RayTraceRenderer::InitializeRayTracingShaderBindingTable(VulkanEngine& engine)
