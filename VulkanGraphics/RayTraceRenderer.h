@@ -6,6 +6,13 @@
 #include "TransformBuffer.h"
 #include "VulkanBuffer.h"
 #include "VulkanBufferManager.h"
+#include "RayTraceTexture.h"
+#include "VulkanUniformBuffer.h"
+
+struct RTUniformData {
+	glm::mat4 viewInverse;
+	glm::mat4 projInverse;
+};
 
 class RayTraceRenderer
 {
@@ -35,6 +42,17 @@ private:
 	VkDescriptorSetLayout RayTraceDescriptorSetLayout;
 	VkPipelineLayout RayTracePipelineLayout;
 	VkPipeline RayTracePipeline;
+
+	VulkanBuffer raygenShaderBindingTable;
+	VulkanBuffer missShaderBindingTable;
+	VulkanBuffer hitShaderBindingTable;
+
+	VkDescriptorPool RTDescriptorPool;
+	VkDescriptorSet RTDescriptorSet;
+
+	RayTraceTexture RTTexture;
+
+	VulkanUniformBuffer uniformBuffer;
 
 	std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
 

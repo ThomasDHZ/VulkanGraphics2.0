@@ -97,7 +97,15 @@ void VulkanBuffer::CopyBuffer(VulkanEngine& engine, VkBuffer srcBuffer, VkBuffer
 	engine.EndSingleTimeCommand(commandBuffer);
 }
 
-void VulkanBuffer::MapMemory(VulkanEngine& engine, void* DataToCopy, VkDeviceSize BufferSize)
+void VulkanBuffer::CopyToBufferMemory(VulkanEngine& engine, void* DataToCopy, VkDeviceSize BufferSize)
+{
+	void* data;
+	vkMapMemory(engine.Device, BufferMemory, 0, BufferSize, 0, &data);
+	memcpy(data, DataToCopy, (size_t)BufferSize);
+	vkUnmapMemory(engine.Device, BufferMemory);
+}
+
+void VulkanBuffer::CopyToStagingBufferMemory(VulkanEngine& engine, void* DataToCopy, VkDeviceSize BufferSize)
 {
 	void* data;
     vkMapMemory(engine.Device, StagingBufferMemory, 0, BufferSize, 0, &data);

@@ -306,6 +306,9 @@
     <ClCompile Include="RayTraceIndicesBuffer.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="RayTraceTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\WireFrameShader.frag">
@@ -737,6 +740,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RayTraceIndicesBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTraceTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

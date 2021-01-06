@@ -195,6 +195,7 @@
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RayTraceIndicesBuffer.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
+    <ClCompile Include="RayTraceTexture.cpp" />
     <ClCompile Include="RayTraceVertexBuffer.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
@@ -337,6 +338,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="RayTraceIndicesBuffer.h" />
     <ClInclude Include="RayTraceRenderer.h" />
+    <ClInclude Include="RayTraceTexture.h" />
     <ClInclude Include="RayTraceVertexBuffer.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />

@@ -23,6 +23,13 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
 
 	BottomLevelAccelerationBuffer = VulkanBuffer(engine);
 	TopLevelAccelerationBuffer = VulkanBuffer(engine);
+	 raygenShaderBindingTable = VulkanBuffer(engine);
+	 missShaderBindingTable = VulkanBuffer(engine);
+	 hitShaderBindingTable = VulkanBuffer(engine);
+
+	 RTTexture = RayTraceTexture(engine);
+
+	 uniformBuffer = VulkanUniformBuffer(engine, sizeof(RTUniformData));
 
 	InitializeBottomLevelAccelerationStructure(engine);
 	InitializeTopLevelAccelerationStructure(engine);
@@ -320,19 +327,98 @@ void RayTraceRenderer::InitializeRayTracingPipeline(VulkanEngine& engine)
 
 void RayTraceRenderer::InitializeRayTracingShaderBindingTable(VulkanEngine& engine)
 {
+	const VkPhysicalDeviceRayTracingPipelinePropertiesKHR PhysicalDeviceRayTracingPipelineProperties = engine.GetRayTracingPipelineProperties(engine.PhysicalDevice);
+	const uint32_t HandleSize = PhysicalDeviceRayTracingPipelineProperties.shaderGroupHandleSize;
+	const uint32_t AlignedHandleSize = engine.GetShaderGroupAlignment(engine.PhysicalDevice);
+	const uint32_t GroupCount = static_cast<uint32_t>(RayTraceShaders.size());
+	const uint32_t Sizing = GroupCount * AlignedHandleSize;
+	std::vector<uint8_t> shaderHandleStorage(Sizing);
 
-	auto b = engine.GetRayTracingPipelineProperties();
-	auto c = engine.GetRayTracingAccelerationStructureFeatures();
-	int a = 34;
+	VkResult result = vkGetRayTracingShaderGroupHandlesKHR(engine.Device, RayTracePipeline, 0, GroupCount, Sizing, shaderHandleStorage.data());
+	
+	raygenShaderBindingTable.CreateBuffer(engine, HandleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	raygenShaderBindingTable.CopyToBufferMemory(engine, shaderHandleStorage.data(), HandleSize);
+	
+	missShaderBindingTable.CreateBuffer(engine, HandleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	missShaderBindingTable.CopyToBufferMemory(engine, shaderHandleStorage.data() + AlignedHandleSize, HandleSize);
+
+	hitShaderBindingTable.CreateBuffer(engine, HandleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	hitShaderBindingTable.CopyToBufferMemory(engine, shaderHandleStorage.data() + (AlignedHandleSize * 2), HandleSize);
 }
 
 void RayTraceRenderer::InitializeRayTracingDescriptorSet(VulkanEngine& engine)
 {
+	std::vector<VkDescriptorPoolSize> poolSizes = {
+	{ VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1 },
+	{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1 },
+	{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }
+	};
+
+	VkDescriptorPoolCreateInfo RayTraceDescriptorPoolInfo = {};
+	RayTraceDescriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	RayTraceDescriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	RayTraceDescriptorPoolInfo.pPoolSizes = poolSizes.data();
+	RayTraceDescriptorPoolInfo.maxSets = 1;
+	vkCreateDescriptorPool(engine.Device, &RayTraceDescriptorPoolInfo, nullptr, &RTDescriptorPool);
+
+	VkDescriptorSetAllocateInfo RayTraceDescriptorSetAllocateInfo = {};
+	RayTraceDescriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	RayTraceDescriptorSetAllocateInfo.descriptorPool = RTDescriptorPool;
+	RayTraceDescriptorSetAllocateInfo.pSetLayouts = &RayTraceDescriptorSetLayout;
+	RayTraceDescriptorSetAllocateInfo.descriptorSetCount = 1;
+	vkAllocateDescriptorSets(engine.Device, &RayTraceDescriptorSetAllocateInfo, &RTDescriptorSet);
+
+	VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
+	AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+	AccelerationDescriptorStructure.accelerationStructureCount = 1;
+	AccelerationDescriptorStructure.pAccelerationStructures = &TopLevelAccelerationStructure;
+
+	VkWriteDescriptorSet AccelerationDesciptorSet = {};
+	AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	AccelerationDesciptorSet.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+	AccelerationDesciptorSet.dstSet = RTDescriptorSet;
+	AccelerationDesciptorSet.dstBinding = 0;
+	AccelerationDesciptorSet.descriptorCount = 1;
+	AccelerationDesciptorSet.pNext = &AccelerationDescriptorStructure;
+
+	VkDescriptorImageInfo RayTraceImageDescriptor{};
+	RayTraceImageDescriptor.imageView = RTTexture.View;
+	RayTraceImageDescriptor.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+
+	VkWriteDescriptorSet ImageDescriptorSet{};
+	ImageDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	ImageDescriptorSet.dstSet = RTDescriptorSet;
+	ImageDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+	ImageDescriptorSet.dstBinding = 1;
+	ImageDescriptorSet.pImageInfo = &RayTraceImageDescriptor;
+	ImageDescriptorSet.descriptorCount = 1;
+
+	VkDescriptorBufferInfo RTBufferInfo = {};
+	RTBufferInfo.buffer = uniformBuffer.GetUniformBuffer(0);
+	RTBufferInfo.offset = 0;
+	RTBufferInfo.range = uniformBuffer.GetBufferSize();
+
+	VkWriteDescriptorSet UniformDescriptorSet{};
+	UniformDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	UniformDescriptorSet.dstSet = RTDescriptorSet;
+	UniformDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	UniformDescriptorSet.dstBinding = 2;
+	UniformDescriptorSet.pBufferInfo = &RTBufferInfo;
+	UniformDescriptorSet.descriptorCount = 1;
+
+	std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
+		AccelerationDesciptorSet,
+		ImageDescriptorSet,
+		UniformDescriptorSet
+	};
+	vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }
 
 void RayTraceRenderer::Draw()
 {
+
 }
+
 std::vector<char> RayTraceRenderer::ReadShaderFile(const std::string& filename)
 {
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);

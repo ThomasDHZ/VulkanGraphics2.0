@@ -165,15 +165,6 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	InitializeSyncObjects();
 
 	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));
-	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(Device, "vkCmdBuildAccelerationStructuresKHR"));
-	vkBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(Device, "vkBuildAccelerationStructuresKHR"));
-	vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(vkGetDeviceProcAddr(Device, "vkCreateAccelerationStructureKHR"));
-	vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(vkGetDeviceProcAddr(Device, "vkDestroyAccelerationStructureKHR"));
-	vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(vkGetDeviceProcAddr(Device, "vkGetAccelerationStructureBuildSizesKHR"));
-	vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetAccelerationStructureDeviceAddressKHR"));
-	vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(Device, "vkCmdTraceRaysKHR"));
-	vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(Device, "vkGetRayTracingShaderGroupHandlesKHR"));
-	vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(Device, "vkCreateRayTracingPipelinesKHR"));
 }
 
 VulkanEngine::~VulkanEngine()
@@ -218,37 +209,16 @@ std::vector<const char*> VulkanEngine::getRequiredExtensions() {
 bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
 {
 	FindQueueFamilies(GPUDevice, Surface);
-
 	bool extensionsSupported = checkDeviceExtensionSupport(GPUDevice);
-
-
 	VkPhysicalDeviceFeatures supportedFeatures = GetPhysicalDeviceFeatures(GPUDevice);
-
-	uint32_t GPUSurfaceFormatCount;
-	uint32_t GPUPresentModeCount;
-	std::vector<VkSurfaceFormatKHR> GPUSwapChainFormatCapabilities;
-	std::vector<VkPresentModeKHR> GPUPresentModesList;
-
-	vkGetPhysicalDeviceSurfaceFormatsKHR(GPUDevice, Surface, &GPUSurfaceFormatCount, nullptr);
-	if (GPUSurfaceFormatCount != 0)
-	{
-		GPUSwapChainFormatCapabilities.resize(GPUSurfaceFormatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(GPUDevice, Surface, &GPUSurfaceFormatCount, GPUSwapChainFormatCapabilities.data());
-	}
-
-	vkGetPhysicalDeviceSurfacePresentModesKHR(GPUDevice, Surface, &GPUPresentModeCount, nullptr);
-	if (GPUPresentModeCount != 0)
-	{
-		GPUPresentModesList.resize(GPUPresentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(GPUDevice, Surface, &GPUPresentModeCount, GPUPresentModesList.data());
-	}
-
+	std::vector<VkSurfaceFormatKHR> SurfaceFormatList = GetSurfaceFormatList(GPUDevice);
+	std::vector<VkPresentModeKHR> PresentModeList = GetPresentModeList(GPUDevice, Surface);
 
 	return GraphicsFamily != -1 &&
 		PresentFamily != -1 &&
 		extensionsSupported &&
-		GPUSwapChainFormatCapabilities.size() != 0 &&
-		GPUPresentModesList.size() != 0 &&
+		SurfaceFormatList.size() != 0 &&
+		PresentModeList.size() != 0 &&
 		supportedFeatures.samplerAnisotropy;
 }
 
@@ -324,12 +294,37 @@ void VulkanEngine::Destory()
 	vkDestroyInstance(Instance, nullptr);
 }
 
-VkPhysicalDeviceFeatures VulkanEngine::GetCurrentPhysicalDeviceFeatures()
+
+std::vector<VkSurfaceFormatKHR> VulkanEngine::GetSurfaceFormatList(VkPhysicalDevice GPUDevice)
 {
-	VkPhysicalDeviceFeatures PhysicalDeviceFeatures;
-	vkGetPhysicalDeviceFeatures(PhysicalDevice, &PhysicalDeviceFeatures);
-	return PhysicalDeviceFeatures;
+	uint32_t GPUSurfaceFormatCount;
+	std::vector<VkSurfaceFormatKHR> GPUSwapChainFormatCapabilities;
+
+	vkGetPhysicalDeviceSurfaceFormatsKHR(GPUDevice, Surface, &GPUSurfaceFormatCount, nullptr);
+	if (GPUSurfaceFormatCount != 0)
+	{
+		GPUSwapChainFormatCapabilities.resize(GPUSurfaceFormatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(GPUDevice, Surface, &GPUSurfaceFormatCount, GPUSwapChainFormatCapabilities.data());
+	}
+
+	return GPUSwapChainFormatCapabilities;
 }
+
+std::vector<VkPresentModeKHR> VulkanEngine::GetPresentModeList(VkPhysicalDevice GPUDevice, VkSurfaceKHR Surface)
+{
+	uint32_t GPUPresentModeCount;
+	std::vector<VkPresentModeKHR> GPUPresentModesList;
+
+	vkGetPhysicalDeviceSurfacePresentModesKHR(GPUDevice, Surface, &GPUPresentModeCount, nullptr);
+	if (GPUPresentModeCount != 0)
+	{
+		GPUPresentModesList.resize(GPUPresentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(GPUDevice, Surface, &GPUPresentModeCount, GPUPresentModesList.data());
+	}
+
+	return GPUPresentModesList;
+}
+
 
 VkPhysicalDeviceFeatures VulkanEngine::GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice)
 {
@@ -338,7 +333,7 @@ VkPhysicalDeviceFeatures VulkanEngine::GetPhysicalDeviceFeatures(VkPhysicalDevic
 	return PhysicalDeviceFeatures;
 }
 
-VkPhysicalDeviceRayTracingPipelinePropertiesKHR VulkanEngine::GetRayTracingPipelineProperties()
+VkPhysicalDeviceRayTracingPipelinePropertiesKHR VulkanEngine::GetRayTracingPipelineProperties(VkPhysicalDevice GPUDevice)
 {
 	VkPhysicalDeviceRayTracingPipelinePropertiesKHR RayTracingPipelineProperties = {};
 	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
@@ -346,12 +341,12 @@ VkPhysicalDeviceRayTracingPipelinePropertiesKHR VulkanEngine::GetRayTracingPipel
 	VkPhysicalDeviceProperties2 GetRayTraceDeviceProperties{};
 	GetRayTraceDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 	GetRayTraceDeviceProperties.pNext = &RayTracingPipelineProperties;
-	vkGetPhysicalDeviceProperties2(PhysicalDevice, &GetRayTraceDeviceProperties);
+	vkGetPhysicalDeviceProperties2(GPUDevice, &GetRayTraceDeviceProperties);
 
 	return RayTracingPipelineProperties;
 }
 
-VkPhysicalDeviceAccelerationStructureFeaturesKHR VulkanEngine::GetRayTracingAccelerationStructureFeatures()
+VkPhysicalDeviceAccelerationStructureFeaturesKHR VulkanEngine::GetRayTracingAccelerationStructureFeatures(VkPhysicalDevice GPUDevice)
 {
 	VkPhysicalDeviceAccelerationStructureFeaturesKHR RayTracingAccelerationStructureFeatures = {};
 	RayTracingAccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
@@ -359,9 +354,17 @@ VkPhysicalDeviceAccelerationStructureFeaturesKHR VulkanEngine::GetRayTracingAcce
 	VkPhysicalDeviceFeatures2 GetRayTraceDeviceFeatures{};
 	GetRayTraceDeviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	GetRayTraceDeviceFeatures.pNext = &RayTracingAccelerationStructureFeatures;
-	vkGetPhysicalDeviceFeatures2(PhysicalDevice, &GetRayTraceDeviceFeatures);
+	vkGetPhysicalDeviceFeatures2(GPUDevice, &GetRayTraceDeviceFeatures);
 
 	return RayTracingAccelerationStructureFeatures;
+}
+
+uint32_t VulkanEngine::GetShaderGroupAlignment(VkPhysicalDevice GPUDevice)
+{
+	const VkPhysicalDeviceRayTracingPipelinePropertiesKHR PhysicalDeviceRayTracingPipelineProperties = GetRayTracingPipelineProperties(PhysicalDevice);
+	const uint32_t HandleSize = PhysicalDeviceRayTracingPipelineProperties.shaderGroupHandleSize;
+	const uint32_t AlignedHandleSize = (HandleSize + PhysicalDeviceRayTracingPipelineProperties.shaderGroupHandleAlignment - 1) & ~(PhysicalDeviceRayTracingPipelineProperties.shaderGroupHandleAlignment - 1);
+	return AlignedHandleSize;
 }
 
 void VulkanEngine::InitializeCommandPool()

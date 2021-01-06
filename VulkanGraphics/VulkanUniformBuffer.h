@@ -18,5 +18,7 @@ public:
 
 	void UpdateUniformBuffer(VulkanEngine& renderer, void* UniformObjectData);
 	void Destroy(VulkanEngine& renderer);
+
+	VkDeviceSize GetBufferSize() { return BufferSize; }
 	VkBuffer GetUniformBuffer(int currentImage) { return UniformBuffers[currentImage]; };
 };
