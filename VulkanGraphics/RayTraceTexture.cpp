@@ -28,7 +28,7 @@ void RayTraceTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.arrayLayers = 1;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    TextureInfo.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    TextureInfo.usage = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
     Texture::CreateTextureImage(engine, TextureInfo);
 }

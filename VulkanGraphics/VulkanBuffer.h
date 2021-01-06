@@ -5,17 +5,20 @@
 class VulkanBuffer
 {
 	private:
-		VkDeviceSize BufferSize = VK_NULL_HANDLE;
+		
 		VkBuffer StagingBuffer = VK_NULL_HANDLE;
 		VkDeviceMemory StagingBufferMemory = VK_NULL_HANDLE;
 
 		uint32_t GetMemoryType(VulkanEngine& engine, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	protected:
-		VkBuffer Buffer = VK_NULL_HANDLE;
-		VkDeviceMemory BufferMemory = VK_NULL_HANDLE;
+	
+	
 
 	public:
+		VkBuffer Buffer = VK_NULL_HANDLE;
+		VkDeviceMemory BufferMemory = VK_NULL_HANDLE;
+		VkDeviceSize BufferSize = VK_NULL_HANDLE;
 
 		VulkanBuffer();
 		VulkanBuffer(VulkanEngine& engine);

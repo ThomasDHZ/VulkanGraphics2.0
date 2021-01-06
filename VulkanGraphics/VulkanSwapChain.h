@@ -28,7 +28,7 @@ private:
 
 	std::vector<VkImageView> SwapChainImageViews;
 	VkExtent2D SwapChainResolution;
-	std::vector<VkImage> SwapChainImages;
+	
 
 	VkSurfaceFormatKHR FindSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR FindSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
@@ -45,6 +45,8 @@ public:
 	void Destroy(VkDevice device);
 
 	void UpdateSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
+
+	std::vector<VkImage> SwapChainImages;
 
 	VkSwapchainKHR GetSwapChain() { return Swapchain; }
 	std::vector<VkImage> GetSwapChainImages() { return SwapChainImages; }

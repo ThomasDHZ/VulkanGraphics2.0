@@ -10,6 +10,11 @@ RayTraceRenderer::RayTraceRenderer()
 
 RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
 {
+	camera.type = Camera2::CameraType::lookat;
+	camera.setPerspective(60.0f, (float)engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 512.0f);
+	camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+	camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.5f));
+
 	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(engine.Device, "vkCmdBuildAccelerationStructuresKHR"));
 	vkBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(engine.Device, "vkBuildAccelerationStructuresKHR"));
@@ -36,6 +41,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
 	InitializeRayTracingPipeline(engine);
 	InitializeRayTracingShaderBindingTable(engine);
 	InitializeRayTracingDescriptorSet(engine);
+	InitializeRayTracingCommandBuffer(engine);
 }
 
 RayTraceRenderer::~RayTraceRenderer()
@@ -126,31 +132,34 @@ void RayTraceRenderer::InitializeBottomLevelAccelerationStructure(VulkanEngine& 
 	AcclerationBuildRange.transformOffset = 0;
 	AcclerationBuildRangeList.emplace_back(&AcclerationBuildRange);
 
+	VkCommandBuffer TempCMDBuffer;
+
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = engine.GetRenderCommandPool();
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = 1;
 
-	if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &RayTraceCommandBuffer) != VK_SUCCESS) {
+	if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &TempCMDBuffer) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate command buffers!");
 	}
-
 
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-	if (vkBeginCommandBuffer(RayTraceCommandBuffer, &beginInfo) != VK_SUCCESS) {
+	if (vkBeginCommandBuffer(TempCMDBuffer, &beginInfo) != VK_SUCCESS) {
 		throw std::runtime_error("failed to begin recording command buffer!");
 	}
+	vkCmdBuildAccelerationStructuresKHR(TempCMDBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
+	if (vkEndCommandBuffer(TempCMDBuffer) != VK_SUCCESS) {
+		throw std::runtime_error("failed to record command buffer!");
+	}
 
-	vkCmdBuildAccelerationStructuresKHR(RayTraceCommandBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
 
 	VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
 	AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
 	AccelerationDeviceAddressInfo.accelerationStructure = BottomLevelAccelerationStructure;
 	BottomLevelAccelerationDeviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &AccelerationDeviceAddressInfo);
-
 
 	ScratchBuffer.DestoryBuffer(engine);
 
@@ -236,8 +245,29 @@ void RayTraceRenderer::InitializeTopLevelAccelerationStructure(VulkanEngine& eng
 	AcclerationBuildRange.transformOffset = 0;
 	AcclerationBuildRangeList.emplace_back(&AcclerationBuildRange);
 
-	vkCmdBuildAccelerationStructuresKHR(RayTraceCommandBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
+	VkCommandBuffer TempCMDBuffer;
 
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = engine.GetRenderCommandPool();
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = 1;
+
+	if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &TempCMDBuffer) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate command buffers!");
+	}
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+	if (vkBeginCommandBuffer(TempCMDBuffer, &beginInfo) != VK_SUCCESS) {
+		throw std::runtime_error("failed to begin recording command buffer!");
+	}
+	vkCmdBuildAccelerationStructuresKHR(TempCMDBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
+	if (vkEndCommandBuffer(TempCMDBuffer) != VK_SUCCESS) {
+		throw std::runtime_error("failed to record command buffer!");
+	}
+	
 	VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
 	AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
 	AccelerationDeviceAddressInfo.accelerationStructure = TopLevelAccelerationStructure;
@@ -414,9 +444,117 @@ void RayTraceRenderer::InitializeRayTracingDescriptorSet(VulkanEngine& engine)
 	vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }
 
-void RayTraceRenderer::Draw()
+void RayTraceRenderer::InitializeRayTracingCommandBuffer(VulkanEngine& engine)
 {
+	RayTraceCommandBuffer.resize(engine.SwapChain.GetSwapChainImageCount());
 
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = engine.GetRenderCommandPool();
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = (uint32_t)RayTraceCommandBuffer.size();
+
+	if (vkAllocateCommandBuffers(engine.Device, &allocInfo, RayTraceCommandBuffer.data()) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate command buffers!");
+	}
+
+	const uint32_t AlignedHandleSize = engine.GetShaderGroupAlignment(engine.PhysicalDevice);
+
+	VkStridedDeviceAddressRegionKHR RaygenShader{};
+	RaygenShader.deviceAddress = engine.BufferToDeviceAddress(raygenShaderBindingTable.GetBuffer()).deviceAddress;
+	RaygenShader.stride = AlignedHandleSize;
+	RaygenShader.size = AlignedHandleSize;
+
+	VkStridedDeviceAddressRegionKHR MissShaderEntry{};
+	MissShaderEntry.deviceAddress = engine.BufferToDeviceAddress(missShaderBindingTable.GetBuffer()).deviceAddress;
+	MissShaderEntry.stride = AlignedHandleSize;
+	MissShaderEntry.size = AlignedHandleSize;
+
+	VkStridedDeviceAddressRegionKHR HitShaderEntry{};
+	HitShaderEntry.deviceAddress = engine.BufferToDeviceAddress(hitShaderBindingTable.GetBuffer()).deviceAddress;
+	HitShaderEntry.stride = AlignedHandleSize;
+	HitShaderEntry.size = AlignedHandleSize;
+
+	VkStridedDeviceAddressRegionKHR ShaderIndex{};
+	VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+
+	for (size_t x = 0; x < RayTraceCommandBuffer.size(); x++) {
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+		if (vkBeginCommandBuffer(RayTraceCommandBuffer[x], &beginInfo) != VK_SUCCESS) {
+			throw std::runtime_error("failed to begin recording command buffer!");
+		}
+		vkCmdBindPipeline(RayTraceCommandBuffer[x], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline);
+		vkCmdBindDescriptorSets(RayTraceCommandBuffer[x], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &RTDescriptorSet, 0, 0);
+		vkCmdTraceRaysKHR(RayTraceCommandBuffer[x], &RaygenShader, &MissShaderEntry, &HitShaderEntry, &ShaderIndex, engine.SwapChain.GetSwapChainResolution().width, engine.SwapChain.GetSwapChainResolution().height, 1);
+
+
+			VkImageMemoryBarrier barrier = {};
+			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			barrier.image = engine.SwapChain.GetSwapChainImages()[x];
+			barrier.subresourceRange = subresourceRange;
+			barrier.srcAccessMask = 0;
+			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+			vkCmdPipelineBarrier(RayTraceCommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+			VkImageMemoryBarrier barrier2 = {};
+			barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier2.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+			barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+			barrier2.image = RTTexture.Image;
+			barrier2.subresourceRange = subresourceRange;
+			barrier2.srcAccessMask = 0;
+			barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+			vkCmdPipelineBarrier(RayTraceCommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
+
+			VkImageCopy copyRegion{};
+			copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+			copyRegion.srcOffset = { 0, 0, 0 };
+			copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+			copyRegion.dstOffset = { 0, 0, 0 };
+			copyRegion.extent = { engine.GetSwapChainResolution().width, engine.GetSwapChainResolution().height, 1 };
+			vkCmdCopyImage(RayTraceCommandBuffer[x], RTTexture.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, engine.SwapChain.SwapChainImages[x], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+
+			VkImageMemoryBarrier barrier3 = {};
+			barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			barrier3.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			barrier3.image = engine.SwapChain.GetSwapChainImages()[x];
+			barrier3.subresourceRange = subresourceRange;
+			barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			barrier3.dstAccessMask = 0;
+
+			vkCmdPipelineBarrier(RayTraceCommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
+
+			VkImageMemoryBarrier barrier4 = {};
+			barrier4.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier4.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+			barrier4.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+			barrier4.image = RTTexture.Image;
+			barrier4.subresourceRange = subresourceRange;
+			barrier4.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+			barrier4.dstAccessMask = 0;
+
+			vkCmdPipelineBarrier(RayTraceCommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier4);
+
+
+		if (vkEndCommandBuffer(RayTraceCommandBuffer[x]) != VK_SUCCESS) {
+			throw std::runtime_error("failed to record command buffer!");
+		}
+	}
+}
+
+void RayTraceRenderer::Update(VulkanEngine& engine)
+{
+	ubo.projInverse = glm::inverse(camera.matrices.perspective);
+	ubo.viewInverse = glm::inverse(camera.matrices.view);
+	uniformBuffer.UpdateUniformBuffer(engine, static_cast<void*>(&ubo));
 }
 
 std::vector<char> RayTraceRenderer::ReadShaderFile(const std::string& filename)

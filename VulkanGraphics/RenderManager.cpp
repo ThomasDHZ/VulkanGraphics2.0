@@ -161,10 +161,11 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
     }
     engine.imagesInFlight[engine.DrawFrame] = engine.inFlightFences[currentFrame];
 
+    rayTracer.Update(engine);
     interfaceRenderPass.Draw(engine);
 
     std::array<VkCommandBuffer, 2> submitCommandBuffers =
-    { commandBuffers[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
+    { rayTracer.RayTraceCommandBuffer[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

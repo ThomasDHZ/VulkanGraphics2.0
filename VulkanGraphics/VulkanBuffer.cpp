@@ -53,8 +53,10 @@ VkResult VulkanBuffer::CreateStagingBuffer(VulkanEngine& engine, VkDeviceSize Bu
 	return vkBindBufferMemory(engine.Device, StagingBuffer, StagingBufferMemory, 0);
 }
 
-VkResult VulkanBuffer::CreateBuffer(VulkanEngine& engine, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
+VkResult VulkanBuffer::CreateBuffer(VulkanEngine& engine, VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
 {
+	BufferSize = bufferSize;
+
 	VkBufferCreateInfo buffer = {};
 	buffer.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	buffer.size = BufferSize;

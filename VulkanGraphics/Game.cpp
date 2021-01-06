@@ -13,7 +13,7 @@ Game::Game()
     //std::ifstream file2("C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/texture/skybox/front.dds", std::ios::binary);
     //file2.read(reinterpret_cast<char*>(&header), sizeof(header));
 
-    window = VulkanWindow(1920, 1080, "Vulkan Engine");
+    window = VulkanWindow(1280, 720, "Vulkan Engine");
     vulkanEngine = VulkanEngine(window.GetWindowPtr());
     textureManager = std::make_shared<TextureManager>(vulkanEngine);
     renderManager = RenderManager(vulkanEngine, textureManager, window.GetWindowPtr());
