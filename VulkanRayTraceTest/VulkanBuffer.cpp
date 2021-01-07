@@ -24,7 +24,7 @@ VulkanBuffer::~VulkanBuffer()
 {
 }
 
-VkResult VulkanBuffer::CreateBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties)
+VkResult VulkanBuffer::CreateBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
 {
 	BufferSize = bufferSize;
 
@@ -54,6 +54,11 @@ VkResult VulkanBuffer::CreateBuffer(VkDevice& device, VkPhysicalDevice& physical
 	}
 	if (vkAllocateMemory(device, &allocInfo, nullptr, &BufferMemory) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to allocate buffer memory!");
+	}
+
+	if (BufferData != nullptr)
+	{
+		CopyBufferToMemory(device, BufferData, bufferSize);
 	}
 
 	return vkBindBufferMemory(device, Buffer, BufferMemory, 0);

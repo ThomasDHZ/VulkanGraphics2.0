@@ -24,6 +24,7 @@
 #include <optional>
 #include <set>
 #include "Buffer.h"
+#include "VulkanBuffer.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -419,14 +420,14 @@ private:
     AccelerationStructure bottomLevelAS{};
     AccelerationStructure topLevelAS{};
 
-    Buffer vertexBuffer;
-    Buffer indexBuffer;
+    VulkanBuffer vertexBuffer;
+    VulkanBuffer indexBuffer;
     uint32_t indexCount;
-    Buffer transformBuffer;
+    VulkanBuffer transformBuffer;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
-    Buffer raygenShaderBindingTable;
-    Buffer missShaderBindingTable;
-    Buffer hitShaderBindingTable;
+    VulkanBuffer raygenShaderBindingTable;
+    VulkanBuffer missShaderBindingTable;
+    VulkanBuffer hitShaderBindingTable;
 
     struct StorageImage {
         VkDeviceMemory memory;
@@ -439,7 +440,7 @@ private:
         glm::mat4 viewInverse;
         glm::mat4 projInverse;
     } uniformData;
-    Buffer ubo;
+    VulkanBuffer ubo;
 
     VkPipeline            RayTracePipeline;
     VkPipelineLayout      RayTracePipelineLayout;
@@ -578,7 +579,7 @@ private:
         createCommandPool();
         createDepthResources();
         createFramebuffers();
-        createTextureImage();
+ /*       createTextureImage();
         createTextureImageView();
         createTextureSampler();
         createVertexBuffer();
@@ -586,7 +587,7 @@ private:
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
-        createCommandBuffers();
+        createCommandBuffers();*/
         createSyncObjects();
         createBottomLevelAccelerationStructure();
         createTopLevelAccelerationStructure();
@@ -628,17 +629,17 @@ private:
             const uint32_t handleSizeAligned = alignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
 
             VkStridedDeviceAddressRegionKHR raygenShaderSbtEntry{};
-            raygenShaderSbtEntry.deviceAddress = getBufferDeviceAddress(raygenShaderBindingTable.buffer);
+            raygenShaderSbtEntry.deviceAddress = getBufferDeviceAddress(raygenShaderBindingTable.Buffer);
             raygenShaderSbtEntry.stride = handleSizeAligned;
             raygenShaderSbtEntry.size = handleSizeAligned;
 
             VkStridedDeviceAddressRegionKHR missShaderSbtEntry{};
-            missShaderSbtEntry.deviceAddress = getBufferDeviceAddress(missShaderBindingTable.buffer);
+            missShaderSbtEntry.deviceAddress = getBufferDeviceAddress(missShaderBindingTable.Buffer);
             missShaderSbtEntry.stride = handleSizeAligned;
             missShaderSbtEntry.size = handleSizeAligned;
 
             VkStridedDeviceAddressRegionKHR hitShaderSbtEntry{};
-            hitShaderSbtEntry.deviceAddress = getBufferDeviceAddress(hitShaderBindingTable.buffer);
+            hitShaderSbtEntry.deviceAddress = getBufferDeviceAddress(hitShaderBindingTable.Buffer);
             hitShaderSbtEntry.stride = handleSizeAligned;
             hitShaderSbtEntry.size = handleSizeAligned;
 
@@ -755,9 +756,9 @@ private:
         ImageDescriptorSet.descriptorCount = 1;
 
         VkDescriptorBufferInfo RTBufferInfo = {};
-        RTBufferInfo.buffer = ubo.buffer;
+        RTBufferInfo.buffer = ubo.Buffer;
         RTBufferInfo.offset = 0;
-        RTBufferInfo.range = ubo.size;
+        RTBufferInfo.range = ubo.BufferSize;
 
         VkWriteDescriptorSet UniformDescriptorSet{};
         UniformDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -772,6 +773,8 @@ private:
             ImageDescriptorSet,
             UniformDescriptorSet };
         vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
+
+      
     }
 
     void createShaderBindingTable() {
@@ -783,19 +786,9 @@ private:
         std::vector<uint8_t> shaderHandleStorage(sbtSize);
         vkGetRayTracingShaderGroupHandlesKHR(device, RayTracePipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
 
-        const VkBufferUsageFlags bufferUsageFlags = VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-        const VkMemoryPropertyFlags memoryUsageFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-        createBuffer(bufferUsageFlags, memoryUsageFlags, &raygenShaderBindingTable, handleSize);
-        createBuffer(bufferUsageFlags, memoryUsageFlags, &missShaderBindingTable, handleSize);
-        createBuffer(bufferUsageFlags, memoryUsageFlags, &hitShaderBindingTable, handleSize);
-
-        // Copy handles
-        raygenShaderBindingTable.map();
-        missShaderBindingTable.map();
-        hitShaderBindingTable.map();
-        memcpy(raygenShaderBindingTable.mapped, shaderHandleStorage.data(), handleSize);
-        memcpy(missShaderBindingTable.mapped, shaderHandleStorage.data() + handleSizeAligned, handleSize);
-        memcpy(hitShaderBindingTable.mapped, shaderHandleStorage.data() + handleSizeAligned * 2, handleSize);
+        raygenShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
+        missShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
+        hitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 2);
     }
 
     uint32_t alignedSize(uint32_t value, uint32_t alignment)
@@ -829,34 +822,17 @@ private:
         // Create buffers
         // For the sake of simplicity we won't stage the vertex data to the GPU memory
         // Vertex buffer
-        createBuffer(
-            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            &vertexBuffer,
-            vertices.size() * sizeof(Vertex),
-            vertices.data());
-        // Index buffer
-        createBuffer(
-            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            &indexBuffer,
-            indices.size() * sizeof(uint32_t),
-            indices.data());
-        // Transform buffer
-       createBuffer(
-            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            &transformBuffer,
-            sizeof(VkTransformMatrixKHR),
-            &transformMatrix);
+        vertexBuffer.CreateBuffer(device, physicalDevice, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
+        indexBuffer.CreateBuffer(device, physicalDevice, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
+        transformBuffer.CreateBuffer(device, physicalDevice, sizeof(VkTransformMatrixKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
 
         VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress{};
         VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress{};
         VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress{};
 
-        vertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(vertexBuffer.buffer);
-        indexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(indexBuffer.buffer);
-        transformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(transformBuffer.buffer);
+        vertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(vertexBuffer.Buffer);
+        indexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(indexBuffer.Buffer);
+        transformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(transformBuffer.Buffer);
 
         // Build
         VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
@@ -1062,10 +1038,11 @@ private:
     }
     void createStorageImage()
     {
-        VkImageCreateInfo image{};
+
+        VkImageCreateInfo image = {};
         image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         image.imageType = VK_IMAGE_TYPE_2D;
-        image.format = VK_FORMAT_B8G8R8A8_SRGB;
+        image.format = VK_FORMAT_B8G8R8A8_UNORM;
         image.extent.width = WIDTH;
         image.extent.height = HEIGHT;
         image.extent.depth = 1;
@@ -1086,10 +1063,12 @@ private:
         vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &storageImage.memory);
         vkBindImageMemory(device, storageImage.image, storageImage.memory, 0);
 
+        //VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT
+
         VkImageViewCreateInfo colorImageView{};
         colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        colorImageView.format = swapChainImageFormat;
+        colorImageView.format = VK_FORMAT_B8G8R8A8_UNORM;
         colorImageView.subresourceRange = {};
         colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         colorImageView.subresourceRange.baseMipLevel = 0;
@@ -1108,21 +1087,14 @@ private:
     }
     void createUniformBuffer()
     {
-        createBuffer(
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            &ubo,
-            sizeof(uniformData),
-            &uniformData);
-       ubo.map();
-
+        ubo.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformData);
         updateUniformBuffers();
     }
     void updateUniformBuffers()
     {
         uniformData.projInverse = glm::inverse(camera.matrices.perspective);
         uniformData.viewInverse = glm::inverse(camera.matrices.view);
-        memcpy(ubo.mapped, &uniformData, sizeof(uniformData));
+        ubo.CopyBufferToMemory(device, &uniformData, sizeof(UniformData));
     }
     void createRayTracingPipeline()
     {
@@ -1201,6 +1173,11 @@ private:
         RayTracingPipeline.maxPipelineRayRecursionDepth = 1;
         RayTracingPipeline.layout = RayTracePipelineLayout;
         VkResult result = vkCreateRayTracingPipelinesKHR(device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &RayTracePipeline);
+
+        for (auto shader : ShaderList)
+        {
+            vkDestroyShaderModule(device, shader.module, nullptr);
+        }
     }
 
 
@@ -1410,10 +1387,10 @@ private:
 
         vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
+      /*  for (size_t i = 0; i < swapChainImages.size(); i++) {
             vkDestroyBuffer(device, uniformBuffers[i], nullptr);
             vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-        }
+        }*/
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
     }
@@ -1442,6 +1419,26 @@ private:
         }
 
         vkDestroyCommandPool(device, commandPool, nullptr);
+
+        vkDestroyPipeline(device, RayTracePipeline, nullptr);
+        vkDestroyPipelineLayout(device, RayTracePipelineLayout, nullptr);
+        vkDestroyDescriptorSetLayout(device, RayTraceDescriptorSetLayout, nullptr);
+        vkDestroyImageView(device, storageImage.view, nullptr);
+        vkDestroyImage(device, storageImage.image, nullptr);
+        vkFreeMemory(device, storageImage.memory, nullptr);
+        vkFreeMemory(device, bottomLevelAS.memory, nullptr);
+        vkDestroyBuffer(device, bottomLevelAS.buffer, nullptr);
+        vkDestroyAccelerationStructureKHR(device, bottomLevelAS.handle, nullptr);
+        vkFreeMemory(device, topLevelAS.memory, nullptr);
+        vkDestroyBuffer(device, topLevelAS.buffer, nullptr);
+        vkDestroyAccelerationStructureKHR(device, topLevelAS.handle, nullptr);
+        vertexBuffer.DestoryBuffer(device);
+        indexBuffer.DestoryBuffer(device);
+        transformBuffer.DestoryBuffer(device);
+        raygenShaderBindingTable.DestoryBuffer(device);
+        missShaderBindingTable.DestoryBuffer(device);
+        hitShaderBindingTable.DestoryBuffer(device);
+        ubo.DestoryBuffer(device);
 
         vkDestroyDevice(device, nullptr);
 
@@ -1590,6 +1587,7 @@ private:
         deviceFeatures.fillModeNonSolid = VK_TRUE;
         deviceFeatures.wideLines = VK_TRUE;
 
+
         VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
         BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
         BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
@@ -1655,7 +1653,7 @@ private:
         createInfo.imageColorSpace = surfaceFormat.colorSpace;
         createInfo.imageExtent = extent;
         createInfo.imageArrayLayers = 1;
-        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        createInfo.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
         QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
         uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
@@ -2444,7 +2442,7 @@ private:
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
         camera.rotate(glm::vec3(time * camera.rotationSpeed, -time * camera.rotationSpeed, 0.0f));
 
-        UniformBufferObject ubo{};
+     /*   UniformBufferObject ubo{};
         ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
@@ -2453,7 +2451,7 @@ private:
         void* data;
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));
-        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);*/
     }
 
     void drawFrame() {
@@ -2940,57 +2938,7 @@ private:
             0, nullptr,
             1, &imageMemoryBarrier);
     }
-    VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, VkDeviceSize size, VkBuffer* buffer, VkDeviceMemory* memory, void* data = nullptr)
-    {
-        // Create the buffer handle
-        VkBufferCreateInfo bufCreateInfo{};
-        bufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufCreateInfo.usage = usageFlags;
-        bufCreateInfo.size = size;
-        bufCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        vkCreateBuffer(device, &bufCreateInfo, nullptr, buffer);
 
-        // Create the memory backing up the buffer handle
-        VkMemoryRequirements memReqs;
-        VkMemoryAllocateInfo memAllocInfo{};
-        memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        vkGetBufferMemoryRequirements(device, *buffer, &memReqs);
-        memAllocInfo.allocationSize = memReqs.size;
-        // Find a memory type index that fits the properties of the buffer
-        memAllocInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);
-        // If the buffer has VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT set we also need to enable the appropriate flag during allocation
-        VkMemoryAllocateFlagsInfoKHR allocFlagsInfo{};
-        if (usageFlags & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
-            allocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
-            allocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-            memAllocInfo.pNext = &allocFlagsInfo;
-        }
-        vkAllocateMemory(device, &memAllocInfo, nullptr, memory);
-
-        // If a pointer to the buffer data has been passed, map the buffer and copy over the data
-        if (data != nullptr)
-        {
-            void* mapped;
-            vkMapMemory(device, *memory, 0, size, 0, &mapped);
-            memcpy(mapped, data, size);
-            // If host coherency hasn't been requested, do a manual flush to make writes visible
-            if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0)
-            {
-                VkMappedMemoryRange mappedRange{};
-                mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-                mappedRange.memory = *memory;
-                mappedRange.offset = 0;
-                mappedRange.size = size;
-                vkFlushMappedMemoryRanges(device, 1, &mappedRange);
-            }
-            vkUnmapMemory(device, *memory);
-        }
-
-        // Attach the memory to the buffer object
-        vkBindBufferMemory(device, *buffer, *memory, 0);
-
-        return VK_SUCCESS;
-    }
 };
 
 int main() {
