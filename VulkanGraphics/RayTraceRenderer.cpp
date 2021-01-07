@@ -66,12 +66,11 @@ void RayTraceRenderer::InitializeBottomLevelAccelerationStructure(VulkanEngine& 
 	};
 
 	VkBuffer vertexBuffer = RayTraceVertexBuffer(engine, vertices).GetVertexBuffer();
-	VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer);
-	
 	VkBuffer indicesBuffer = RayTraceIndicesBuffer(engine, indices).GetIndiceBuffer();
-	VkDeviceOrHostAddressConstKHR IndicesBufferDeviceAddress = engine.BufferToDeviceAddress(indicesBuffer);
-
 	VkBuffer transformBuffer = TransformBuffer(engine, transformMatrix).GetTransformBuffer();
+
+	VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer);
+	VkDeviceOrHostAddressConstKHR IndicesBufferDeviceAddress = engine.BufferToDeviceAddress(indicesBuffer);
 	VkDeviceOrHostAddressConstKHR TransformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer);
 	
 	VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
@@ -151,10 +150,24 @@ void RayTraceRenderer::InitializeBottomLevelAccelerationStructure(VulkanEngine& 
 		throw std::runtime_error("failed to begin recording command buffer!");
 	}
 	vkCmdBuildAccelerationStructuresKHR(TempCMDBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
-	if (vkEndCommandBuffer(TempCMDBuffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to record command buffer!");
-	}
+	vkEndCommandBuffer(TempCMDBuffer);
 
+	VkSubmitInfo submitInfo {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &TempCMDBuffer;
+	// Create fence to ensure that the command buffer has finished executing
+	VkFenceCreateInfo fenceCreateInfo{};
+	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCreateInfo.flags = 0;
+
+	VkFence fence;
+	vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+	vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+	vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
+	vkDestroyFence(engine.Device, fence, nullptr);
+	vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &TempCMDBuffer);
+	
 
 	VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
 	AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
@@ -264,9 +277,23 @@ void RayTraceRenderer::InitializeTopLevelAccelerationStructure(VulkanEngine& eng
 		throw std::runtime_error("failed to begin recording command buffer!");
 	}
 	vkCmdBuildAccelerationStructuresKHR(TempCMDBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
-	if (vkEndCommandBuffer(TempCMDBuffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to record command buffer!");
-	}
+	vkEndCommandBuffer(TempCMDBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &TempCMDBuffer;
+	// Create fence to ensure that the command buffer has finished executing
+	VkFenceCreateInfo fenceCreateInfo{};
+	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCreateInfo.flags = 0;
+
+	VkFence fence;
+	vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+	vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+	vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
+	vkDestroyFence(engine.Device, fence, nullptr);
+	vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &TempCMDBuffer);
 	
 	VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
 	AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
