@@ -20,6 +20,9 @@
 class RenderManager
 {
 private:
+	VkCommandPool commandPool;
+	VkDescriptorPool descriptorPool;
+
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
 

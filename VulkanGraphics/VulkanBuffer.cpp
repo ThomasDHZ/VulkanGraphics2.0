@@ -1,10 +1,10 @@
 #include "VulkanBuffer.h"
 #include <stdexcept>
 
-uint32_t VulkanBuffer::GetMemoryType(VulkanEngine& engine, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+uint32_t VulkanBuffer::GetMemoryType(VkPhysicalDevice& physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
-	vkGetPhysicalDeviceMemoryProperties(engine.PhysicalDevice, &memProperties);
+	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
 	for (uint32_t x = 0; x < memProperties.memoryTypeCount; x++)
 	{
@@ -24,7 +24,7 @@ VulkanBuffer::~VulkanBuffer()
 {
 }
 
-VkResult VulkanBuffer::CreateBuffer(VulkanEngine& engine, VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
+VkResult VulkanBuffer::CreateBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
 {
 	BufferSize = bufferSize;
 
@@ -33,18 +33,18 @@ VkResult VulkanBuffer::CreateBuffer(VulkanEngine& engine, VkDeviceSize bufferSiz
 	buffer.size = BufferSize;
 	buffer.usage = usage;
 	buffer.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	if (vkCreateBuffer(engine.Device, &buffer, nullptr, &Buffer) != VK_SUCCESS)
+	if (vkCreateBuffer(device, &buffer, nullptr, &Buffer) != VK_SUCCESS)
 	{
 		throw std::runtime_error("Failed to create buffer!");
 	}
 
 	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(engine.Device, Buffer, &memRequirements);
+	vkGetBufferMemoryRequirements(device, Buffer, &memRequirements);
 
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = GetMemoryType(engine, memRequirements.memoryTypeBits, properties);
+	allocInfo.memoryTypeIndex = GetMemoryType(physicalDevice, memRequirements.memoryTypeBits, properties);
 	if (usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT)
 	{
 		VkMemoryAllocateFlagsInfoKHR ExtendedAllocFlagsInfo{};
@@ -52,57 +52,57 @@ VkResult VulkanBuffer::CreateBuffer(VulkanEngine& engine, VkDeviceSize bufferSiz
 		ExtendedAllocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
 		allocInfo.pNext = &ExtendedAllocFlagsInfo;
 	}
-	if (vkAllocateMemory(engine.Device, &allocInfo, nullptr, &BufferMemory) != VK_SUCCESS) {
+	if (vkAllocateMemory(device, &allocInfo, nullptr, &BufferMemory) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to allocate buffer memory!");
 	}
 
 	if (BufferData != nullptr)
 	{
-		CopyBufferToMemory(engine, BufferData, bufferSize);
+		CopyBufferToMemory(device, BufferData, bufferSize);
 	}
 
-	return vkBindBufferMemory(engine.Device, Buffer, BufferMemory, 0);
+	return vkBindBufferMemory(device, Buffer, BufferMemory, 0);
 }
 
-void VulkanBuffer::CopyBuffer(VulkanEngine& engine, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+void VulkanBuffer::CopyBuffer(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
-	VkCommandBuffer commandBuffer = BeginSingleTimeCommand(engine);
+	VkCommandBuffer commandBuffer = BeginSingleTimeCommand(device, renderCommandPool);
 
 	VkBufferCopy copyRegion = {};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	EndSingleTimeCommand(engine, commandBuffer);
+	EndSingleTimeCommand(device, GraphicsQueue, renderCommandPool, commandBuffer);
 }
 
-void VulkanBuffer::CopyBufferToMemory(VulkanEngine& engine, void* DataToCopy, VkDeviceSize BufferSize)
+void VulkanBuffer::CopyBufferToMemory(VkDevice& device, void* DataToCopy, VkDeviceSize BufferSize)
 {
 	void* data;
-	vkMapMemory(engine.Device, BufferMemory, 0, BufferSize, 0, &data);
+	vkMapMemory(device, BufferMemory, 0, BufferSize, 0, &data);
 	memcpy(data, DataToCopy, (size_t)BufferSize);
-	vkUnmapMemory(engine.Device, BufferMemory);
+	vkUnmapMemory(device, BufferMemory);
 }
 
-void VulkanBuffer::DestoryBuffer(VulkanEngine& engine)
+void VulkanBuffer::DestoryBuffer(VkDevice& device)
 {
-	vkDestroyBuffer(engine.Device, Buffer, nullptr);
-	vkFreeMemory(engine.Device, BufferMemory, nullptr);
+	vkDestroyBuffer(device, Buffer, nullptr);
+	vkFreeMemory(device, BufferMemory, nullptr);
 
 	Buffer = VK_NULL_HANDLE;
 	BufferMemory = VK_NULL_HANDLE;
 }
 
 
-VkCommandBuffer VulkanBuffer::BeginSingleTimeCommand(VulkanEngine& engine)
+VkCommandBuffer VulkanBuffer::BeginSingleTimeCommand(VkDevice& device, VkCommandPool& renderCommandPool)
 {
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = engine.RenderCommandPool;
+	allocInfo.commandPool = renderCommandPool;
 	allocInfo.commandBufferCount = 1;
 
 	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(engine.Device, &allocInfo, &commandBuffer);
+	vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
 
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -113,7 +113,7 @@ VkCommandBuffer VulkanBuffer::BeginSingleTimeCommand(VulkanEngine& engine)
 	return commandBuffer;
 }
 
-void VulkanBuffer::EndSingleTimeCommand(VulkanEngine& engine, VkCommandBuffer commandBuffer)
+void VulkanBuffer::EndSingleTimeCommand(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkCommandBuffer commandBuffer)
 {
 	vkEndCommandBuffer(commandBuffer);
 
@@ -122,8 +122,8 @@ void VulkanBuffer::EndSingleTimeCommand(VulkanEngine& engine, VkCommandBuffer co
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
-	vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(engine.GraphicsQueue);
+	vkQueueSubmit(GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(GraphicsQueue);
 
-	vkFreeCommandBuffers(engine.Device, engine.RenderCommandPool, 1, &commandBuffer);
+	vkFreeCommandBuffers(device, renderCommandPool, 1, &commandBuffer);
 }

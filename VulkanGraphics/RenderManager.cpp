@@ -8,7 +8,34 @@ RenderManager::RenderManager()
 
 RenderManager::RenderManager(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, GLFWwindow* window)
 {
-    rayTracer = RayTraceRenderer(engine);
+    std::array<VkDescriptorPoolSize, 2> poolSizes{};
+    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSizes[0].descriptorCount = static_cast<uint32_t>(3);
+    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    poolSizes[1].descriptorCount = static_cast<uint32_t>(3);
+
+    VkDescriptorPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+    poolInfo.pPoolSizes = poolSizes.data();
+    poolInfo.maxSets = 3;
+
+    if (vkCreateDescriptorPool(engine.Device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create descriptor pool!");
+    }
+   
+
+    VkCommandPoolCreateInfo poolInfo2{};
+    poolInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo2.queueFamilyIndex = engine.GraphicsFamily;
+
+    if (vkCreateCommandPool(engine.Device, &poolInfo2, nullptr, &commandPool) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create graphics command pool!");
+    }
+
+    uint32_t width = engine.SwapChain.GetSwapChainResolution().width;
+    uint32_t height = engine.SwapChain.GetSwapChainResolution().height;
+    rayTracer = RayTraceRenderer(engine.Device, engine.PhysicalDevice, commandPool, engine.GraphicsQueue, descriptorPool, width, height, 3, engine.SwapChain.SwapChainImages);
 
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     mainRenderPass = MainRenderPass(engine);
@@ -161,11 +188,11 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
     }
     engine.imagesInFlight[engine.DrawFrame] = engine.inFlightFences[currentFrame];
 
-    rayTracer.Update(engine);
+    rayTracer.updateUniformBuffers();
     interfaceRenderPass.Draw(engine);
 
     std::array<VkCommandBuffer, 2> submitCommandBuffers =
-    { rayTracer.RayTraceCommandBuffer[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
+    { rayTracer.drawCmdBuffers[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
