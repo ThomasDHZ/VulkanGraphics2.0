@@ -24,7 +24,7 @@
 #include <optional>
 #include <set>
 #include "Buffer.h"
-#include "VulkanBuffer.h"
+#include "RayTraceRenderer.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -147,246 +147,6 @@ const std::vector<uint16_t> indices = {
     4, 5, 6, 6, 7, 4
 };
 
-struct RayTracingScratchBuffer
-{
-    uint64_t deviceAddress = 0;
-    VkBuffer handle = VK_NULL_HANDLE;
-    VkDeviceMemory memory = VK_NULL_HANDLE;
-};
-
-// Ray tracing acceleration structure
-struct AccelerationStructure {
-    VkAccelerationStructureKHR handle;
-    uint64_t deviceAddress = 0;
-    VkDeviceMemory memory;
-    VkBuffer buffer;
-};
-
-class Camera
-{
-private:
-    float fov;
-    float znear, zfar;
-
-    void updateViewMatrix()
-    {
-        glm::mat4 rotM = glm::mat4(1.0f);
-        glm::mat4 transM;
-
-        rotM = glm::rotate(rotM, glm::radians(rotation.x * (flipY ? -1.0f : 1.0f)), glm::vec3(1.0f, 0.0f, 0.0f));
-        rotM = glm::rotate(rotM, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        rotM = glm::rotate(rotM, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        glm::vec3 translation = position;
-        if (flipY) {
-            translation.y *= -1.0f;
-        }
-        transM = glm::translate(glm::mat4(1.0f), translation);
-
-        if (type == CameraType::firstperson)
-        {
-            matrices.view = rotM * transM;
-        }
-        else
-        {
-            matrices.view = transM * rotM;
-        }
-
-        viewPos = glm::vec4(position, 0.0f) * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
-
-        updated = true;
-    };
-public:
-    enum CameraType { lookat, firstperson };
-    CameraType type = CameraType::lookat;
-
-    glm::vec3 rotation = glm::vec3();
-    glm::vec3 position = glm::vec3();
-    glm::vec4 viewPos = glm::vec4();
-
-    float rotationSpeed = 1.0f;
-    float movementSpeed = 1.0f;
-
-    bool updated = false;
-    bool flipY = false;
-
-    struct
-    {
-        glm::mat4 perspective;
-        glm::mat4 view;
-    } matrices;
-
-    struct
-    {
-        bool left = false;
-        bool right = false;
-        bool up = false;
-        bool down = false;
-    } keys;
-
-    bool moving()
-    {
-        return keys.left || keys.right || keys.up || keys.down;
-    }
-
-    float getNearClip() {
-        return znear;
-    }
-
-    float getFarClip() {
-        return zfar;
-    }
-
-    void setPerspective(float fov, float aspect, float znear, float zfar)
-    {
-        this->fov = fov;
-        this->znear = znear;
-        this->zfar = zfar;
-        matrices.perspective = glm::perspective(glm::radians(fov), aspect, znear, zfar);
-        if (flipY) {
-            matrices.perspective[1][1] *= -1.0f;
-        }
-    };
-
-    void updateAspectRatio(float aspect)
-    {
-        matrices.perspective = glm::perspective(glm::radians(fov), aspect, znear, zfar);
-        if (flipY) {
-            matrices.perspective[1][1] *= -1.0f;
-        }
-    }
-
-    void setPosition(glm::vec3 position)
-    {
-        this->position = position;
-        updateViewMatrix();
-    }
-
-    void setRotation(glm::vec3 rotation)
-    {
-        this->rotation = rotation;
-        updateViewMatrix();
-    }
-
-    void rotate(glm::vec3 delta)
-    {
-        this->rotation += delta;
-        updateViewMatrix();
-    }
-
-    void setTranslation(glm::vec3 translation)
-    {
-        this->position = translation;
-        updateViewMatrix();
-    };
-
-    void translate(glm::vec3 delta)
-    {
-        this->position += delta;
-        updateViewMatrix();
-    }
-
-    void setRotationSpeed(float rotationSpeed)
-    {
-        this->rotationSpeed = rotationSpeed;
-    }
-
-    void setMovementSpeed(float movementSpeed)
-    {
-        this->movementSpeed = movementSpeed;
-    }
-
-    void update(float deltaTime)
-    {
-       
-                glm::vec3 camFront;
-                camFront.x = -cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y));
-                camFront.y = sin(glm::radians(rotation.x));
-                camFront.z = cos(glm::radians(rotation.x)) * cos(glm::radians(rotation.y));
-                camFront = glm::normalize(camFront);
-
-                float moveSpeed = deltaTime * movementSpeed;
-
-                if (keys.up)
-                    position += camFront * moveSpeed;
-                if (keys.down)
-                    position -= camFront * moveSpeed;
-                if (keys.left)
-                    position -= glm::normalize(glm::cross(camFront, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
-                if (keys.right)
-                    position += glm::normalize(glm::cross(camFront, glm::vec3(0.0f, 1.0f, 0.0f))) * moveSpeed;
-
-                updateViewMatrix();
-            
-        
-    };
-
-    // Update camera passing separate axis data (gamepad)
-    // Returns true if view or position has been changed
-    bool updatePad(glm::vec2 axisLeft, glm::vec2 axisRight, float deltaTime)
-    {
-        bool retVal = false;
-
-        if (type == CameraType::firstperson)
-        {
-            // Use the common console thumbstick layout		
-            // Left = view, right = move
-
-            const float deadZone = 0.0015f;
-            const float range = 1.0f - deadZone;
-
-            glm::vec3 camFront;
-            camFront.x = -cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y));
-            camFront.y = sin(glm::radians(rotation.x));
-            camFront.z = cos(glm::radians(rotation.x)) * cos(glm::radians(rotation.y));
-            camFront = glm::normalize(camFront);
-
-            float moveSpeed = deltaTime * movementSpeed * 2.0f;
-            float rotSpeed = deltaTime * rotationSpeed * 50.0f;
-
-            // Move
-            if (fabsf(axisLeft.y) > deadZone)
-            {
-                float pos = (fabsf(axisLeft.y) - deadZone) / range;
-                position -= camFront * pos * ((axisLeft.y < 0.0f) ? -1.0f : 1.0f) * moveSpeed;
-                retVal = true;
-            }
-            if (fabsf(axisLeft.x) > deadZone)
-            {
-                float pos = (fabsf(axisLeft.x) - deadZone) / range;
-                position += glm::normalize(glm::cross(camFront, glm::vec3(0.0f, 1.0f, 0.0f))) * pos * ((axisLeft.x < 0.0f) ? -1.0f : 1.0f) * moveSpeed;
-                retVal = true;
-            }
-
-            // Rotate
-            if (fabsf(axisRight.x) > deadZone)
-            {
-                float pos = (fabsf(axisRight.x) - deadZone) / range;
-                rotation.y += pos * ((axisRight.x < 0.0f) ? -1.0f : 1.0f) * rotSpeed;
-                retVal = true;
-            }
-            if (fabsf(axisRight.y) > deadZone)
-            {
-                float pos = (fabsf(axisRight.y) - deadZone) / range;
-                rotation.x -= pos * ((axisRight.y < 0.0f) ? -1.0f : 1.0f) * rotSpeed;
-                retVal = true;
-            }
-        }
-        else
-        {
-            // todo: move code from example base class for look-at
-        }
-
-        if (retVal)
-        {
-            updateViewMatrix();
-        }
-
-        return retVal;
-    }
-
-};
-
 class HelloTriangleApplication {
 public:
     void run() {
@@ -397,19 +157,6 @@ public:
     }
 
 private:
-    Camera camera;
-
-    PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
-    PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
-    PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR;
-    PFN_vkGetAccelerationStructureBuildSizesKHR vkGetAccelerationStructureBuildSizesKHR;
-    PFN_vkGetAccelerationStructureDeviceAddressKHR vkGetAccelerationStructureDeviceAddressKHR;
-    PFN_vkCmdBuildAccelerationStructuresKHR vkCmdBuildAccelerationStructuresKHR;
-    PFN_vkBuildAccelerationStructuresKHR vkBuildAccelerationStructuresKHR;
-    PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR;
-    PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
-    PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
-
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
@@ -417,51 +164,7 @@ private:
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{};
 
-    AccelerationStructure bottomLevelAS{};
-    AccelerationStructure topLevelAS{};
-
-    VulkanBuffer vertexBuffer;
-    VulkanBuffer indexBuffer;
-    uint32_t indexCount;
-    VulkanBuffer transformBuffer;
-    std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
-    VulkanBuffer raygenShaderBindingTable;
-    VulkanBuffer missShaderBindingTable;
-    VulkanBuffer hitShaderBindingTable;
-
-    struct StorageImage {
-        VkDeviceMemory memory;
-        VkImage image;
-        VkImageView view;
-        VkFormat format;
-    } storageImage;
-
-    struct UniformData {
-        glm::mat4 viewInverse;
-        glm::mat4 projInverse;
-    } uniformData;
-    VulkanBuffer ubo;
-
-    VkPipeline            RayTracePipeline;
-    VkPipelineLayout      RayTracePipelineLayout;
-    VkDescriptorSet       RTDescriptorSet;
-    VkDescriptorSetLayout RayTraceDescriptorSetLayout;
-    std::vector<VkShaderModule> shaderModules;
-    std::vector<VkCommandBuffer> drawCmdBuffers;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    RayTraceRenderer RayRenderer;
     GLFWwindow* window;
 
     VkInstance instance;
@@ -541,11 +244,6 @@ private:
         createLogicalDevice();
         createSwapChain();
 
-        camera.type = Camera::CameraType::lookat;
-        camera.setPerspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 512.0f);
-        camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-        camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.5f));
-
         // Get ray tracing pipeline properties, which will be used later on in the sample
         rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
         VkPhysicalDeviceProperties2 deviceProperties2{};
@@ -559,18 +257,6 @@ private:
         deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
         deviceFeatures2.pNext = &accelerationStructureFeatures;
         vkGetPhysicalDeviceFeatures2(physicalDevice, &deviceFeatures2);
-
-        // Get the ray tracing and accelertion structure related function pointers required by this sample
-        vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(device, "vkGetBufferDeviceAddressKHR"));
-        vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(device, "vkCmdBuildAccelerationStructuresKHR"));
-        vkBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(device, "vkBuildAccelerationStructuresKHR"));
-        vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(vkGetDeviceProcAddr(device, "vkCreateAccelerationStructureKHR"));
-        vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(vkGetDeviceProcAddr(device, "vkDestroyAccelerationStructureKHR"));
-        vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(vkGetDeviceProcAddr(device, "vkGetAccelerationStructureBuildSizesKHR"));
-        vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(device, "vkGetAccelerationStructureDeviceAddressKHR"));
-        vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(device, "vkCmdTraceRaysKHR"));
-        vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(device, "vkGetRayTracingShaderGroupHandlesKHR"));
-        vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(device, "vkCreateRayTracingPipelinesKHR"));
 
         createImageViews();
         createRenderPass();
@@ -589,27 +275,28 @@ private:
         createDescriptorSets();
         createCommandBuffers();*/
         createSyncObjects();
-        createBottomLevelAccelerationStructure();
-        createTopLevelAccelerationStructure();
-        createStorageImage();
-        createUniformBuffer();
-        createRayTracingPipeline();
-        createShaderBindingTable();
-        createDescriptorSets2();
+
+        RayRenderer = RayTraceRenderer(device, physicalDevice, commandPool, graphicsQueue, descriptorPool, WIDTH, HEIGHT, swapChainImages.size(), swapChainImages);
+        RayRenderer.camera.type = Camera::CameraType::lookat;
+        RayRenderer.camera.setPerspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 512.0f);
+        RayRenderer.camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+        RayRenderer.camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.5f));
+
+  
         buildCommandBuffers();
     }
 
     void buildCommandBuffers()
     {
-        drawCmdBuffers.resize(swapChainFramebuffers.size());
+        RayRenderer.drawCmdBuffers.resize(swapChainFramebuffers.size());
 
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = commandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = (uint32_t)drawCmdBuffers.size();
+        allocInfo.commandBufferCount = (uint32_t)RayRenderer.drawCmdBuffers.size();
 
-        if (vkAllocateCommandBuffers(device, &allocInfo, drawCmdBuffers.data()) != VK_SUCCESS) {
+        if (vkAllocateCommandBuffers(device, &allocInfo, RayRenderer.drawCmdBuffers.data()) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate command buffers!");
         }
 
@@ -618,9 +305,9 @@ private:
 
         VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 
-        for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+        for (int32_t i = 0; i < RayRenderer.drawCmdBuffers.size(); ++i)
         {
-            vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo);
+            vkBeginCommandBuffer(RayRenderer.drawCmdBuffers[i], &cmdBufInfo);
 
             /*
                 Setup the buffer regions pointing to the shaders in our shader binding table
@@ -629,17 +316,17 @@ private:
             const uint32_t handleSizeAligned = alignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
 
             VkStridedDeviceAddressRegionKHR raygenShaderSbtEntry{};
-            raygenShaderSbtEntry.deviceAddress = getBufferDeviceAddress(raygenShaderBindingTable.Buffer);
+            raygenShaderSbtEntry.deviceAddress = getBufferDeviceAddress(RayRenderer.raygenShaderBindingTable.Buffer);
             raygenShaderSbtEntry.stride = handleSizeAligned;
             raygenShaderSbtEntry.size = handleSizeAligned;
 
             VkStridedDeviceAddressRegionKHR missShaderSbtEntry{};
-            missShaderSbtEntry.deviceAddress = getBufferDeviceAddress(missShaderBindingTable.Buffer);
+            missShaderSbtEntry.deviceAddress = getBufferDeviceAddress(RayRenderer.missShaderBindingTable.Buffer);
             missShaderSbtEntry.stride = handleSizeAligned;
             missShaderSbtEntry.size = handleSizeAligned;
 
             VkStridedDeviceAddressRegionKHR hitShaderSbtEntry{};
-            hitShaderSbtEntry.deviceAddress = getBufferDeviceAddress(hitShaderBindingTable.Buffer);
+            hitShaderSbtEntry.deviceAddress = getBufferDeviceAddress(RayRenderer.hitShaderBindingTable.Buffer);
             hitShaderSbtEntry.stride = handleSizeAligned;
             hitShaderSbtEntry.size = handleSizeAligned;
 
@@ -648,11 +335,11 @@ private:
             /*
                 Dispatch the ray tracing commands
             */
-            vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline);
-            vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &RTDescriptorSet, 0, 0);
+            vkCmdBindPipeline(RayRenderer.drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayRenderer.RayTracePipeline);
+            vkCmdBindDescriptorSets(RayRenderer.drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayRenderer.RayTracePipelineLayout, 0, 1, &RayRenderer.RTDescriptorSet, 0, 0);
 
-            vkCmdTraceRaysKHR(
-                drawCmdBuffers[i],
+            RayRenderer.vkCmdTraceRaysKHR(
+                RayRenderer.drawCmdBuffers[i],
                 &raygenShaderSbtEntry,
                 &missShaderSbtEntry,
                 &hitShaderSbtEntry,
@@ -667,7 +354,7 @@ private:
 
             // Prepare current swap chain image as transfer destination
             setImageLayout(
-                drawCmdBuffers[i],
+                RayRenderer.drawCmdBuffers[i],
                 swapChainImages[i],
                 VK_IMAGE_LAYOUT_UNDEFINED,
                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -675,8 +362,8 @@ private:
 
             // Prepare ray tracing output image as transfer source
             setImageLayout(
-                drawCmdBuffers[i],
-                storageImage.image,
+                RayRenderer.drawCmdBuffers[i],
+                RayRenderer.storageImage.image,
                 VK_IMAGE_LAYOUT_GENERAL,
                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 subresourceRange);
@@ -687,11 +374,11 @@ private:
             copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
             copyRegion.dstOffset = { 0, 0, 0 };
             copyRegion.extent = { WIDTH, HEIGHT, 1 };
-            vkCmdCopyImage(drawCmdBuffers[i], storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+            vkCmdCopyImage(RayRenderer.drawCmdBuffers[i], RayRenderer.storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
             // Transition swap chain image back for presentation
             setImageLayout(
-                drawCmdBuffers[i],
+                RayRenderer.drawCmdBuffers[i],
                 swapChainImages[i],
                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                 VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
@@ -699,13 +386,13 @@ private:
 
             // Transition ray tracing output image back to general layout
            setImageLayout(
-                drawCmdBuffers[i],
-                storageImage.image,
+               RayRenderer.drawCmdBuffers[i],
+               RayRenderer.storageImage.image,
                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 VK_IMAGE_LAYOUT_GENERAL,
                 subresourceRange);
 
-            vkEndCommandBuffer(drawCmdBuffers[i]);
+            vkEndCommandBuffer(RayRenderer.drawCmdBuffers[i]);
         }
     }
 
@@ -726,43 +413,43 @@ private:
         VkDescriptorSetAllocateInfo RayTraceDescriptorSetAllocateInfo = {};
         RayTraceDescriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         RayTraceDescriptorSetAllocateInfo.descriptorPool = descriptorPool;
-        RayTraceDescriptorSetAllocateInfo.pSetLayouts = &RayTraceDescriptorSetLayout;
+        RayTraceDescriptorSetAllocateInfo.pSetLayouts = &RayRenderer.RayTraceDescriptorSetLayout;
         RayTraceDescriptorSetAllocateInfo.descriptorSetCount = 1;
-        vkAllocateDescriptorSets(device, &RayTraceDescriptorSetAllocateInfo, &RTDescriptorSet);
+        vkAllocateDescriptorSets(device, &RayTraceDescriptorSetAllocateInfo, &RayRenderer.RTDescriptorSet);
 
         VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
         AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
         AccelerationDescriptorStructure.accelerationStructureCount = 1;
-        AccelerationDescriptorStructure.pAccelerationStructures = &topLevelAS.handle;
+        AccelerationDescriptorStructure.pAccelerationStructures = &RayRenderer.topLevelAS.handle;
 
         VkWriteDescriptorSet AccelerationDesciptorSet = {};
         AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         AccelerationDesciptorSet.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-        AccelerationDesciptorSet.dstSet = RTDescriptorSet;
+        AccelerationDesciptorSet.dstSet = RayRenderer.RTDescriptorSet;
         AccelerationDesciptorSet.dstBinding = 0;
         AccelerationDesciptorSet.descriptorCount = 1;
         AccelerationDesciptorSet.pNext = &AccelerationDescriptorStructure;
 
         VkDescriptorImageInfo RayTraceImageDescriptor{};
-        RayTraceImageDescriptor.imageView = storageImage.view;
+        RayTraceImageDescriptor.imageView = RayRenderer.storageImage.view;
         RayTraceImageDescriptor.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
         VkWriteDescriptorSet ImageDescriptorSet{};
         ImageDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        ImageDescriptorSet.dstSet = RTDescriptorSet;
+        ImageDescriptorSet.dstSet = RayRenderer.RTDescriptorSet;
         ImageDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
         ImageDescriptorSet.dstBinding = 1;
         ImageDescriptorSet.pImageInfo = &RayTraceImageDescriptor;
         ImageDescriptorSet.descriptorCount = 1;
 
         VkDescriptorBufferInfo RTBufferInfo = {};
-        RTBufferInfo.buffer = ubo.Buffer;
+        RTBufferInfo.buffer = RayRenderer.ubo.Buffer;
         RTBufferInfo.offset = 0;
-        RTBufferInfo.range = ubo.BufferSize;
+        RTBufferInfo.range = RayRenderer.ubo.BufferSize;
 
         VkWriteDescriptorSet UniformDescriptorSet{};
         UniformDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        UniformDescriptorSet.dstSet = RTDescriptorSet;
+        UniformDescriptorSet.dstSet = RayRenderer.RTDescriptorSet;
         UniformDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         UniformDescriptorSet.dstBinding = 2;
         UniformDescriptorSet.pBufferInfo = &RTBufferInfo;
@@ -780,15 +467,15 @@ private:
     void createShaderBindingTable() {
         const uint32_t handleSize = rayTracingPipelineProperties.shaderGroupHandleSize;
         const uint32_t handleSizeAligned = alignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
-        const uint32_t groupCount = static_cast<uint32_t>(RayTraceShaders.size());
+        const uint32_t groupCount = static_cast<uint32_t>(RayRenderer.RayTraceShaders.size());
         const uint32_t sbtSize = groupCount * handleSizeAligned;
 
         std::vector<uint8_t> shaderHandleStorage(sbtSize);
-        vkGetRayTracingShaderGroupHandlesKHR(device, RayTracePipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
+        RayRenderer.vkGetRayTracingShaderGroupHandlesKHR(device, RayRenderer.RayTracePipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
 
-        raygenShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
-        missShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
-        hitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 2);
+        RayRenderer.raygenShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
+        RayRenderer.missShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
+        RayRenderer.hitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 2);
     }
 
     uint32_t alignedSize(uint32_t value, uint32_t alignment)
@@ -810,7 +497,7 @@ private:
 
         // Setup indices
         std::vector<uint32_t> indices = { 0, 1, 2 };
-        indexCount = static_cast<uint32_t>(indices.size());
+        RayRenderer.indexCount = static_cast<uint32_t>(indices.size());
 
         // Setup identity transform matrix
         VkTransformMatrixKHR transformMatrix = {
@@ -822,17 +509,17 @@ private:
         // Create buffers
         // For the sake of simplicity we won't stage the vertex data to the GPU memory
         // Vertex buffer
-        vertexBuffer.CreateBuffer(device, physicalDevice, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-        indexBuffer.CreateBuffer(device, physicalDevice, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
-        transformBuffer.CreateBuffer(device, physicalDevice, sizeof(VkTransformMatrixKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
+        RayRenderer.vertexBuffer.CreateBuffer(device, physicalDevice, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
+        RayRenderer.indexBuffer.CreateBuffer(device, physicalDevice, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
+        RayRenderer.transformBuffer.CreateBuffer(device, physicalDevice, sizeof(VkTransformMatrixKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
 
         VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress{};
         VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress{};
         VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress{};
 
-        vertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(vertexBuffer.Buffer);
-        indexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(indexBuffer.Buffer);
-        transformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(transformBuffer.Buffer);
+        vertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(RayRenderer.vertexBuffer.Buffer);
+        indexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(RayRenderer.indexBuffer.Buffer);
+        transformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(RayRenderer.transformBuffer.Buffer);
 
         // Build
         VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
@@ -861,17 +548,17 @@ private:
         uint32_t                                 geoCount = 1;
         VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
         AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-        vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, &geoCount, &AccelerationBuildInfo);
+        RayRenderer.vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, &geoCount, &AccelerationBuildInfo);
 
 
-        createAccelerationStructureBuffer(bottomLevelAS, AccelerationBuildInfo);
+        createAccelerationStructureBuffer(RayRenderer.bottomLevelAS, AccelerationBuildInfo);
 
         VkAccelerationStructureCreateInfoKHR AccelerationStructureInfo = {};
         AccelerationStructureInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-        AccelerationStructureInfo.buffer = bottomLevelAS.buffer;
+        AccelerationStructureInfo.buffer = RayRenderer.bottomLevelAS.buffer;
         AccelerationStructureInfo.size = AccelerationBuildInfo.accelerationStructureSize;
         AccelerationStructureInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-        VkResult result = vkCreateAccelerationStructureKHR(device, &AccelerationStructureInfo, nullptr, &bottomLevelAS.handle);
+        VkResult result = RayRenderer.vkCreateAccelerationStructureKHR(device, &AccelerationStructureInfo, nullptr, &RayRenderer.bottomLevelAS.handle);
 
 
         // Create a small scratch buffer used during build of the bottom level acceleration structure
@@ -882,7 +569,7 @@ private:
         AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
         AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
         AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-        AccelerationBuildGeometryInfo.dstAccelerationStructure = bottomLevelAS.handle;
+        AccelerationBuildGeometryInfo.dstAccelerationStructure = RayRenderer.bottomLevelAS.handle;
         AccelerationBuildGeometryInfo.geometryCount = 1;
         AccelerationBuildGeometryInfo.pGeometries = &GeometryAccelerationStructure;
         AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.deviceAddress;
@@ -898,7 +585,7 @@ private:
         if (accelerationStructureFeatures.accelerationStructureHostCommands)
         {
             // Implementation supports building acceleration structure building on host
-            vkBuildAccelerationStructuresKHR(
+            RayRenderer.vkBuildAccelerationStructuresKHR(
                 device,
                 VK_NULL_HANDLE,
                 1,
@@ -909,7 +596,7 @@ private:
         {
             // Acceleration structure needs to be build on the device
             VkCommandBuffer commandBuffer = createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-            vkCmdBuildAccelerationStructuresKHR(
+            RayRenderer.vkCmdBuildAccelerationStructuresKHR(
                 commandBuffer,
                 1,
                 &AccelerationBuildGeometryInfo,
@@ -919,8 +606,8 @@ private:
 
         VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
         AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-        AccelerationDeviceAddressInfo.accelerationStructure = bottomLevelAS.handle;
-        bottomLevelAS.deviceAddress = vkGetAccelerationStructureDeviceAddressKHR(device, &AccelerationDeviceAddressInfo);
+        AccelerationDeviceAddressInfo.accelerationStructure = RayRenderer.bottomLevelAS.handle;
+        RayRenderer.bottomLevelAS.deviceAddress = RayRenderer.vkGetAccelerationStructureDeviceAddressKHR(device, &AccelerationDeviceAddressInfo);
 
         deleteScratchBuffer(scratchBuffer);
     }
@@ -937,7 +624,7 @@ private:
         instance.mask = 0xFF;
         instance.instanceShaderBindingTableRecordOffset = 0;
         instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-        instance.accelerationStructureReference = bottomLevelAS.deviceAddress;
+        instance.accelerationStructureReference = RayRenderer.bottomLevelAS.deviceAddress;
 
         // Buffer for instance data
         Buffer instancesBuffer;
@@ -973,17 +660,17 @@ private:
         uint32_t                                 geoCount = 1;
         VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
         AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-        vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &geoCount, &AccelerationBuildInfo);
+        RayRenderer.vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &geoCount, &AccelerationBuildInfo);
 
 
-        createAccelerationStructureBuffer(topLevelAS, AccelerationBuildInfo);
+        createAccelerationStructureBuffer(RayRenderer.topLevelAS, AccelerationBuildInfo);
 
         VkAccelerationStructureCreateInfoKHR accelerationStructureCreateInfo{};
         accelerationStructureCreateInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-        accelerationStructureCreateInfo.buffer = topLevelAS.buffer;
+        accelerationStructureCreateInfo.buffer = RayRenderer.topLevelAS.buffer;
         accelerationStructureCreateInfo.size = AccelerationBuildInfo.accelerationStructureSize;
         accelerationStructureCreateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
-        vkCreateAccelerationStructureKHR(device, &accelerationStructureCreateInfo, nullptr, &topLevelAS.handle);
+        RayRenderer.vkCreateAccelerationStructureKHR(device, &accelerationStructureCreateInfo, nullptr, &RayRenderer.topLevelAS.handle);
 
         // Create a small scratch buffer used during build of the top level acceleration structure
         RayTracingScratchBuffer scratchBuffer = createScratchBuffer(AccelerationBuildInfo.buildScratchSize);
@@ -993,7 +680,7 @@ private:
         AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
         AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
         AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-        AccelerationBuildGeometryInfo.dstAccelerationStructure = topLevelAS.handle;
+        AccelerationBuildGeometryInfo.dstAccelerationStructure = RayRenderer.topLevelAS.handle;
         AccelerationBuildGeometryInfo.geometryCount = 1;
         AccelerationBuildGeometryInfo.pGeometries = &AccelerationGeometry;
         AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.deviceAddress;
@@ -1009,7 +696,7 @@ private:
         if (accelerationStructureFeatures.accelerationStructureHostCommands)
         {
             // Implementation supports building acceleration structure building on host
-            vkBuildAccelerationStructuresKHR(
+            RayRenderer.vkBuildAccelerationStructuresKHR(
                 device,
                 VK_NULL_HANDLE,
                 1,
@@ -1020,7 +707,7 @@ private:
         {
             // Acceleration structure needs to be build on the device
             VkCommandBuffer commandBuffer = createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-            vkCmdBuildAccelerationStructuresKHR(
+            RayRenderer.vkCmdBuildAccelerationStructuresKHR(
                 commandBuffer,
                 1,
                 &AccelerationBuildGeometryInfo,
@@ -1030,8 +717,8 @@ private:
 
         VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
         AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-        AccelerationDeviceAddressInfo.accelerationStructure = topLevelAS.handle;
-        topLevelAS.deviceAddress = vkGetAccelerationStructureDeviceAddressKHR(device, &AccelerationDeviceAddressInfo);
+        AccelerationDeviceAddressInfo.accelerationStructure = RayRenderer.topLevelAS.handle;
+        RayRenderer.topLevelAS.deviceAddress = RayRenderer.vkGetAccelerationStructureDeviceAddressKHR(device, &AccelerationDeviceAddressInfo);
 
         deleteScratchBuffer(scratchBuffer);
         instancesBuffer.destroy();
@@ -1052,18 +739,16 @@ private:
         image.tiling = VK_IMAGE_TILING_OPTIMAL;
         image.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
         image.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        vkCreateImage(device, &image, nullptr, &storageImage.image);
+        vkCreateImage(device, &image, nullptr, &RayRenderer.storageImage.image);
 
         VkMemoryRequirements memReqs;
-        vkGetImageMemoryRequirements(device, storageImage.image, &memReqs);
+        vkGetImageMemoryRequirements(device, RayRenderer.storageImage.image, &memReqs);
         VkMemoryAllocateInfo memoryAllocateInfo{};
         memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memoryAllocateInfo.allocationSize = memReqs.size;
         memoryAllocateInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-        vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &storageImage.memory);
-        vkBindImageMemory(device, storageImage.image, storageImage.memory, 0);
-
-        //VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT
+        vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &RayRenderer.storageImage.memory);
+        vkBindImageMemory(device, RayRenderer.storageImage.image, RayRenderer.storageImage.memory, 0);
 
         VkImageViewCreateInfo colorImageView{};
         colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1075,27 +760,17 @@ private:
         colorImageView.subresourceRange.levelCount = 1;
         colorImageView.subresourceRange.baseArrayLayer = 0;
         colorImageView.subresourceRange.layerCount = 1;
-        colorImageView.image = storageImage.image;
-        vkCreateImageView(device, &colorImageView, nullptr, &storageImage.view);
+        colorImageView.image = RayRenderer.storageImage.image;
+        vkCreateImageView(device, &colorImageView, nullptr, &RayRenderer.storageImage.view);
 
         VkCommandBuffer cmdBuffer = createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-        setImageLayout(cmdBuffer, storageImage.image,
+        setImageLayout(cmdBuffer, RayRenderer.storageImage.image,
             VK_IMAGE_LAYOUT_UNDEFINED,
             VK_IMAGE_LAYOUT_GENERAL,
             { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 });
         flushCommandBuffer(cmdBuffer, graphicsQueue);
     }
-    void createUniformBuffer()
-    {
-        ubo.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformData);
-        updateUniformBuffers();
-    }
-    void updateUniformBuffers()
-    {
-        uniformData.projInverse = glm::inverse(camera.matrices.perspective);
-        uniformData.viewInverse = glm::inverse(camera.matrices.view);
-        ubo.CopyBufferToMemory(device, &uniformData, sizeof(UniformData));
-    }
+
     void createRayTracingPipeline()
     {
         std::vector<VkDescriptorSetLayoutBinding> RTDescriptorSetBindings;
@@ -1124,13 +799,13 @@ private:
         RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         RTDescriptorSetLayout.bindingCount = static_cast<uint32_t>(RTDescriptorSetBindings.size());
         RTDescriptorSetLayout.pBindings = RTDescriptorSetBindings.data();
-        vkCreateDescriptorSetLayout(device, &RTDescriptorSetLayout, nullptr, &RayTraceDescriptorSetLayout);
+        vkCreateDescriptorSetLayout(device, &RTDescriptorSetLayout, nullptr, &RayRenderer.RayTraceDescriptorSetLayout);
 
         VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
         PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         PipelineLayoutCreateInfo.setLayoutCount = 1;
-        PipelineLayoutCreateInfo.pSetLayouts = &RayTraceDescriptorSetLayout;
-        vkCreatePipelineLayout(device, &PipelineLayoutCreateInfo, nullptr, &RayTracePipelineLayout);
+        PipelineLayoutCreateInfo.pSetLayouts = &RayRenderer.RayTraceDescriptorSetLayout;
+        vkCreatePipelineLayout(device, &PipelineLayoutCreateInfo, nullptr, &RayRenderer.RayTracePipelineLayout);
 
         std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
 
@@ -1142,7 +817,7 @@ private:
         RayGeneratorShaderInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
         RayGeneratorShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
         RayGeneratorShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
-        RayTraceShaders.emplace_back(RayGeneratorShaderInfo);
+        RayRenderer.RayTraceShaders.emplace_back(RayGeneratorShaderInfo);
 
         ShaderList.emplace_back(loadShader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/miss.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
         VkRayTracingShaderGroupCreateInfoKHR MissShaderInfo = {};
@@ -1152,7 +827,7 @@ private:
         MissShaderInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
         MissShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
         MissShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
-        RayTraceShaders.emplace_back(MissShaderInfo);
+        RayRenderer.RayTraceShaders.emplace_back(MissShaderInfo);
 
         ShaderList.emplace_back(loadShader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
         VkRayTracingShaderGroupCreateInfoKHR ClosestHitShaderInfo = {};
@@ -1162,17 +837,17 @@ private:
         ClosestHitShaderInfo.closestHitShader = static_cast<uint32_t>(ShaderList.size()) - 1;
         ClosestHitShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
         ClosestHitShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
-        RayTraceShaders.emplace_back(ClosestHitShaderInfo);
+        RayRenderer.RayTraceShaders.emplace_back(ClosestHitShaderInfo);
 
         VkRayTracingPipelineCreateInfoKHR RayTracingPipeline = {};
         RayTracingPipeline.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
         RayTracingPipeline.stageCount = static_cast<uint32_t>(ShaderList.size());
         RayTracingPipeline.pStages = ShaderList.data();
-        RayTracingPipeline.groupCount = static_cast<uint32_t>(RayTraceShaders.size());
-        RayTracingPipeline.pGroups = RayTraceShaders.data();
+        RayTracingPipeline.groupCount = static_cast<uint32_t>(RayRenderer.RayTraceShaders.size());
+        RayTracingPipeline.pGroups = RayRenderer.RayTraceShaders.data();
         RayTracingPipeline.maxPipelineRayRecursionDepth = 1;
-        RayTracingPipeline.layout = RayTracePipelineLayout;
-        VkResult result = vkCreateRayTracingPipelinesKHR(device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &RayTracePipeline);
+        RayTracingPipeline.layout = RayRenderer.RayTracePipelineLayout;
+        VkResult result = RayRenderer.vkCreateRayTracingPipelinesKHR(device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &RayRenderer.RayTracePipeline);
 
         for (auto shader : ShaderList)
         {
@@ -1190,7 +865,7 @@ private:
         shaderStage.module = loadShader(fileName.c_str(), device);
         shaderStage.pName = "main";
         assert(shaderStage.module != VK_NULL_HANDLE);
-        shaderModules.push_back(shaderStage.module);
+        RayRenderer.shaderModules.push_back(shaderStage.module);
         return shaderStage;
     }
 
@@ -1323,7 +998,7 @@ private:
         VkBufferDeviceAddressInfoKHR bufferDeviceAddressInfo{};
         bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         bufferDeviceAddressInfo.buffer = scratchBuffer.handle;
-        scratchBuffer.deviceAddress = vkGetBufferDeviceAddressKHR(device, &bufferDeviceAddressInfo);
+        scratchBuffer.deviceAddress = RayRenderer.vkGetBufferDeviceAddressKHR(device, &bufferDeviceAddressInfo);
 
         return scratchBuffer;
     }
@@ -1354,7 +1029,7 @@ private:
         VkBufferDeviceAddressInfoKHR bufferDeviceAI{};
         bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
         bufferDeviceAI.buffer = buffer;
-        return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
+        return RayRenderer.vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
     }
 
     void mainLoop() {
@@ -1420,25 +1095,25 @@ private:
 
         vkDestroyCommandPool(device, commandPool, nullptr);
 
-        vkDestroyPipeline(device, RayTracePipeline, nullptr);
-        vkDestroyPipelineLayout(device, RayTracePipelineLayout, nullptr);
-        vkDestroyDescriptorSetLayout(device, RayTraceDescriptorSetLayout, nullptr);
-        vkDestroyImageView(device, storageImage.view, nullptr);
-        vkDestroyImage(device, storageImage.image, nullptr);
-        vkFreeMemory(device, storageImage.memory, nullptr);
-        vkFreeMemory(device, bottomLevelAS.memory, nullptr);
-        vkDestroyBuffer(device, bottomLevelAS.buffer, nullptr);
-        vkDestroyAccelerationStructureKHR(device, bottomLevelAS.handle, nullptr);
-        vkFreeMemory(device, topLevelAS.memory, nullptr);
-        vkDestroyBuffer(device, topLevelAS.buffer, nullptr);
-        vkDestroyAccelerationStructureKHR(device, topLevelAS.handle, nullptr);
-        vertexBuffer.DestoryBuffer(device);
-        indexBuffer.DestoryBuffer(device);
-        transformBuffer.DestoryBuffer(device);
-        raygenShaderBindingTable.DestoryBuffer(device);
-        missShaderBindingTable.DestoryBuffer(device);
-        hitShaderBindingTable.DestoryBuffer(device);
-        ubo.DestoryBuffer(device);
+        vkDestroyPipeline(device, RayRenderer.RayTracePipeline, nullptr);
+        vkDestroyPipelineLayout(device, RayRenderer.RayTracePipelineLayout, nullptr);
+        vkDestroyDescriptorSetLayout(device, RayRenderer.RayTraceDescriptorSetLayout, nullptr);
+        vkDestroyImageView(device, RayRenderer.storageImage.view, nullptr);
+        vkDestroyImage(device, RayRenderer.storageImage.image, nullptr);
+        vkFreeMemory(device, RayRenderer.storageImage.memory, nullptr);
+        vkFreeMemory(device, RayRenderer.bottomLevelAS.memory, nullptr);
+        vkDestroyBuffer(device, RayRenderer.bottomLevelAS.buffer, nullptr);
+        RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.bottomLevelAS.handle, nullptr);
+        vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
+        vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
+        RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);
+        RayRenderer.vertexBuffer.DestoryBuffer(device);
+        RayRenderer.indexBuffer.DestoryBuffer(device);
+        RayRenderer.transformBuffer.DestoryBuffer(device);
+        RayRenderer.raygenShaderBindingTable.DestoryBuffer(device);
+        RayRenderer.missShaderBindingTable.DestoryBuffer(device);
+        RayRenderer.hitShaderBindingTable.DestoryBuffer(device);
+        RayRenderer.ubo.DestoryBuffer(device);
 
         vkDestroyDevice(device, nullptr);
 
@@ -2440,9 +2115,9 @@ private:
 
         auto  currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-        camera.rotate(glm::vec3(time * camera.rotationSpeed, -time * camera.rotationSpeed, 0.0f));
 
-     /*   UniformBufferObject ubo{};
+
+        UniformBufferObject ubo{};
         ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
@@ -2451,7 +2126,7 @@ private:
         void* data;
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));
-        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);*/
+        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
     }
 
     void drawFrame() {
@@ -2469,8 +2144,8 @@ private:
         }
 
         
-        updateUniformBuffers();
-        updateUniformBuffer(imageIndex);
+        RayRenderer.updateUniformBuffers();
+        //updateUniformBuffer(imageIndex);
 
         if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
             vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -2487,7 +2162,7 @@ private:
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &drawCmdBuffers[imageIndex];
+        submitInfo.pCommandBuffers = &RayRenderer.drawCmdBuffers[imageIndex];
 
         VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
         submitInfo.signalSemaphoreCount = 1;
