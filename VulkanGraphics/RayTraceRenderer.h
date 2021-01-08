@@ -11,6 +11,32 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
+struct RayTracingScratchBuffer
+{
+	uint64_t deviceAddress = 0;
+	VkBuffer handle = VK_NULL_HANDLE;
+	VkDeviceMemory memory = VK_NULL_HANDLE;
+};
+
+struct AccelerationStructure {
+	VkAccelerationStructureKHR handle;
+	uint64_t deviceAddress = 0;
+	VkDeviceMemory memory;
+	VkBuffer buffer;
+};
+
+struct StorageImage {
+	VkDeviceMemory memory;
+	VkImage image;
+	VkImageView view;
+	VkFormat format;
+};
+
+struct UniformData {
+	glm::mat4 viewInverse;
+	glm::mat4 projInverse;
+};
+
 struct RTUniformData {
 	glm::mat4 viewInverse;
 	glm::mat4 projInverse;
@@ -261,8 +287,8 @@ private:
 	PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
 	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
-	VulkanBuffer BottomLevelAccelerationBuffer;
-	VulkanBuffer TopLevelAccelerationBuffer;
+	AccelerationStructure BottomLevelAccelerationBuffer;
+	AccelerationStructure TopLevelAccelerationBuffer;
 	VkAccelerationStructureKHR BottomLevelAccelerationStructure;
 	VkAccelerationStructureKHR TopLevelAccelerationStructure;
 	uint64_t BottomLevelAccelerationDeviceAddress;
@@ -308,5 +334,9 @@ public:
 	std::vector<VkCommandBuffer> RayTraceCommandBuffer;
 
 	void Update(VulkanEngine& engine);
+	void createAccelerationStructureBuffer(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
+	RayTracingScratchBuffer createScratchBuffer(VulkanEngine& engine, VkDeviceSize size);
+	uint32_t getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties);
 };
+
 

@@ -39,6 +39,11 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(device, "vkCreateRayTracingPipelinesKHR"));
 
+    camera.type = Camera::CameraType::lookat;
+    camera.setPerspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 512.0f);
+    camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+    camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.5f));
+
     createBottomLevelAccelerationStructure();
     createTopLevelAccelerationStructure();
     createStorageImage();
@@ -46,7 +51,7 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     createRayTracingPipeline();
     createShaderBindingTable();
     createDescriptorSets();
-   // buildCommandBuffers(swapChainFramebuffersSize, swapChainImages);
+    buildCommandBuffers(swapChainFramebuffersSize, swapChainImages);
 }
 RayTraceRenderer::~RayTraceRenderer()
 {
@@ -119,7 +124,6 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure()
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, &geoCount, &AccelerationBuildInfo);
-
 
     createAccelerationStructureBuffer(bottomLevelAS, AccelerationBuildInfo);
 
@@ -614,25 +618,27 @@ void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::v
             HEIGHT,
             1);
 
-        /*
-            Copy ray tracing output to swap chain image
-        */
+        VkImageMemoryBarrier barrier = {};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier.image = swapChainImages[i];
+        barrier.subresourceRange = subresourceRange;
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
-        // Prepare current swap chain image as transfer destination
-        setImageLayout(
-            drawCmdBuffers[i],
-            swapChainImages[i],
-            VK_IMAGE_LAYOUT_UNDEFINED,
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            subresourceRange);
+        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-        // Prepare ray tracing output image as transfer source
-        setImageLayout(
-            drawCmdBuffers[i],
-            storageImage.image,
-            VK_IMAGE_LAYOUT_GENERAL,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            subresourceRange);
+        VkImageMemoryBarrier barrier2 = {};
+        barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier2.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+        barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        barrier2.image = storageImage.image;
+        barrier2.subresourceRange = subresourceRange;
+        barrier2.srcAccessMask = 0;
+        barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
 
         VkImageCopy copyRegion{};
         copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
@@ -642,24 +648,55 @@ void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::v
         copyRegion.extent = { WIDTH, HEIGHT, 1 };
         vkCmdCopyImage(drawCmdBuffers[i], storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
-        // Transition swap chain image back for presentation
-        setImageLayout(
-            drawCmdBuffers[i],
-            swapChainImages[i],
-            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-            subresourceRange);
 
-        // Transition ray tracing output image back to general layout
-        setImageLayout(
-            drawCmdBuffers[i],
-            storageImage.image,
-            VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            VK_IMAGE_LAYOUT_GENERAL,
-            subresourceRange);
+        VkImageMemoryBarrier barrier3 = {};
+        barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier3.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        barrier3.image = swapChainImages[i];
+        barrier3.subresourceRange = subresourceRange;
+        barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier3.dstAccessMask = 0;
 
+        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
+
+        VkImageMemoryBarrier barrier4 = {};
+        barrier4.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier4.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        barrier4.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+        barrier4.image = storageImage.image;
+        barrier4.subresourceRange = subresourceRange;
+        barrier4.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        barrier4.dstAccessMask = 0;
+
+        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier4);
         vkEndCommandBuffer(drawCmdBuffers[i]);
     }
+}
+void RayTraceRenderer::Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height)
+{
+    WIDTH = width;
+    HEIGHT = height;
+
+    // Delete allocated resources
+    vkDestroyImageView(device, storageImage.view, nullptr);
+    vkDestroyImage(device, storageImage.image, nullptr);
+    vkFreeMemory(device, storageImage.memory, nullptr);
+    // Recreate image
+    createStorageImage();
+    // Update descriptor
+    VkDescriptorImageInfo storageImageDescriptor{ VK_NULL_HANDLE, storageImage.view, VK_IMAGE_LAYOUT_GENERAL };
+
+    VkWriteDescriptorSet writeDescriptorSet{};
+    writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writeDescriptorSet.dstSet = RTDescriptorSet;
+    writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+    writeDescriptorSet.dstBinding = 1;
+    writeDescriptorSet.pImageInfo = &storageImageDescriptor;
+    writeDescriptorSet.descriptorCount = 1;
+    vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, VK_NULL_HANDLE);
+
+    buildCommandBuffers(swapChainFramebuffersSize, swapChainImages);
 }
 
 void RayTraceRenderer::deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffer)

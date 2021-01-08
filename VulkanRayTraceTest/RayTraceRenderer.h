@@ -24,7 +24,6 @@ struct RayTracingScratchBuffer
     VkDeviceMemory memory = VK_NULL_HANDLE;
 };
 
-// Ray tracing acceleration structure
 struct AccelerationStructure {
     VkAccelerationStructureKHR handle;
     uint64_t deviceAddress = 0;
@@ -281,6 +280,7 @@ private:
 
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
+
 public:
 
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
@@ -339,6 +339,7 @@ public:
     void createShaderBindingTable();
     void createDescriptorSets();
     void buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
+    void Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
 
     void updateUniformBuffers();
     void deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffer);
