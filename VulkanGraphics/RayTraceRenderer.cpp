@@ -67,41 +67,6 @@ RayTraceRenderer::~RayTraceRenderer()
 
 }
 
-VulkanBuffer RayTraceRenderer::BuildScratchBuffer(VkDeviceSize size)
-{
-    VulkanBuffer scratchBuffer = VulkanBuffer();
-  
-
-   /* scratchBuffer.CreateBuffer(device, physicalDevice, size, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    VkBufferCreateInfo bufferCreateInfo{};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = size;
-    bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-    vkCreateBuffer(device, &bufferCreateInfo, nullptr, &scratchBuffer.handle);
-
-    VkMemoryRequirements memoryRequirements{};
-    vkGetBufferMemoryRequirements(device, scratchBuffer.handle, &memoryRequirements);
-
-    VkMemoryAllocateFlagsInfo memoryAllocateFlagsInfo{};
-    memoryAllocateFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-    memoryAllocateFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-
-    VkMemoryAllocateInfo memoryAllocateInfo = {};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAllocateInfo.pNext = &memoryAllocateFlagsInfo;
-    memoryAllocateInfo.allocationSize = memoryRequirements.size;
-    memoryAllocateInfo.memoryTypeIndex = getMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &scratchBuffer.memory);
-    vkBindBufferMemory(device, scratchBuffer.handle, scratchBuffer.memory, 0);
-
-    VkBufferDeviceAddressInfoKHR bufferDeviceAddressInfo{};
-    bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-    bufferDeviceAddressInfo.buffer = scratchBuffer.handle;
-    scratchBuffer.deviceAddress = vkGetBufferDeviceAddressKHR(device, &bufferDeviceAddressInfo);*/
-
-    return scratchBuffer;
-}
-
 void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine)
 {
     struct Vertex {
@@ -125,13 +90,9 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     indexBuffer.CreateBuffer(engine, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
     transformBuffer.CreateBuffer(engine, sizeof(VkTransformMatrixKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
 
-    VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress{};
-    VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress{};
-    VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress{};
-
-    vertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine, vertexBuffer.Buffer);
-    indexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine, indexBuffer.Buffer);
-    transformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine, transformBuffer.Buffer);
+    VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
+    VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
+    VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
 
     VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
     GeometryAccelerationStructure.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -160,14 +121,14 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, &geoCount, &AccelerationBuildInfo);
 
-    createAccelerationStructureBuffer(engine, bottomLevelAS, AccelerationBuildInfo);
+    bottomLevelAS.CreateBuffer(engine, AccelerationBuildInfo.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     VkAccelerationStructureCreateInfoKHR AccelerationStructureInfo = {};
     AccelerationStructureInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-    AccelerationStructureInfo.buffer = bottomLevelAS.buffer;
+    AccelerationStructureInfo.buffer = bottomLevelAS.Buffer;
     AccelerationStructureInfo.size = AccelerationBuildInfo.accelerationStructureSize;
     AccelerationStructureInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-    VkResult result = vkCreateAccelerationStructureKHR(engine.Device, &AccelerationStructureInfo, nullptr, &bottomLevelAS.handle);
+    VkResult result = vkCreateAccelerationStructureKHR(engine.Device, &AccelerationStructureInfo, nullptr, &bottomLevelAS.BufferHandle);
 
     VulkanBuffer ScratchBuffer = VulkanBuffer();
     ScratchBuffer.CreateBuffer(engine, AccelerationBuildInfo.buildScratchSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -178,7 +139,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
     AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-    AccelerationBuildGeometryInfo.dstAccelerationStructure = bottomLevelAS.handle;
+    AccelerationBuildGeometryInfo.dstAccelerationStructure = bottomLevelAS.BufferHandle;
     AccelerationBuildGeometryInfo.geometryCount = 1;
     AccelerationBuildGeometryInfo.pGeometries = &GeometryAccelerationStructure;
     AccelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBufferDeviceAddress.deviceAddress;
@@ -191,32 +152,42 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AcclerationBuildRange.transformOffset = 0;
     AcclerationBuildRangeList.emplace_back(&AcclerationBuildRange);
 
-    if (accelerationStructureFeatures.accelerationStructureHostCommands)
-    {
-        // Implementation supports building acceleration structure building on host
-        vkBuildAccelerationStructuresKHR(
-            engine.Device,
-            VK_NULL_HANDLE,
-            1,
-            &AccelerationBuildGeometryInfo,
-            AcclerationBuildRangeList.data());
-    }
-    else
-    {
-        // Acceleration structure needs to be build on the device
-        VkCommandBuffer commandBuffer = createCommandBuffer(engine, VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-        vkCmdBuildAccelerationStructuresKHR(
-            commandBuffer,
-            1,
-            &AccelerationBuildGeometryInfo,
-            AcclerationBuildRangeList.data());
-        flushCommandBuffer(engine, commandBuffer);
-    };
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool = engine.GetRenderCommandPool();
+    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    commandBufferAllocateInfo.commandBufferCount = 1;
+
+    VkCommandBuffer cmdBuffer;
+    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
+
+    VkCommandBufferBeginInfo cmdBufferBeginInfo{};
+    cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
+    vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
+    vkEndCommandBuffer(cmdBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &cmdBuffer;
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+
+    VkFence fence;
+    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
+    vkDestroyFence(engine.Device, fence, nullptr);
+    vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &cmdBuffer);
+
 
     VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
     AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-    AccelerationDeviceAddressInfo.accelerationStructure = bottomLevelAS.handle;
-    bottomLevelAS.deviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &AccelerationDeviceAddressInfo);
+    AccelerationDeviceAddressInfo.accelerationStructure = bottomLevelAS.BufferHandle;
+    bottomLevelAS.BufferDeviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &AccelerationDeviceAddressInfo);
 
     ScratchBuffer.DestoryBuffer(engine);
 }
@@ -234,18 +205,13 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationInstance.mask = 0xFF;
     AccelerationInstance.instanceShaderBindingTableRecordOffset = 0;
     AccelerationInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    AccelerationInstance.accelerationStructureReference = bottomLevelAS.deviceAddress;
+    AccelerationInstance.accelerationStructureReference = bottomLevelAS.BufferDeviceAddress;
 
-    Buffer instancesBuffer;
-    createBuffer(engine,
-        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        &instancesBuffer,
-        sizeof(VkAccelerationStructureInstanceKHR),
-        &AccelerationInstance);
+    VulkanBuffer instancesBuffer;
+    instancesBuffer.CreateBuffer(engine, sizeof(VkAccelerationStructureInstanceKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &AccelerationInstance);
 
     VkDeviceOrHostAddressConstKHR TopLevelAccelerationInstanceBufferDeviceAddress{};
-    TopLevelAccelerationInstanceBufferDeviceAddress.deviceAddress = engine.BufferToDeviceAddress(instancesBuffer.buffer).deviceAddress;
+    TopLevelAccelerationInstanceBufferDeviceAddress.deviceAddress = engine.BufferToDeviceAddress(instancesBuffer.Buffer).deviceAddress;
 
     VkAccelerationStructureGeometryKHR AccelerationGeometry = {};
     AccelerationGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -267,14 +233,14 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &geoCount, &AccelerationBuildInfo);
 
-    createAccelerationStructureBuffer(engine, topLevelAS, AccelerationBuildInfo);
+    topLevelAS.CreateBuffer(engine, AccelerationBuildInfo.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     VkAccelerationStructureCreateInfoKHR AccelerationStructureInfo = {};
     AccelerationStructureInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-    AccelerationStructureInfo.buffer = topLevelAS.buffer;
+    AccelerationStructureInfo.buffer = topLevelAS.Buffer;
     AccelerationStructureInfo.size = AccelerationBuildInfo.accelerationStructureSize;
     AccelerationStructureInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
-    VkResult result = vkCreateAccelerationStructureKHR(engine.Device, &AccelerationStructureInfo, nullptr, &topLevelAS.handle);
+    VkResult result = vkCreateAccelerationStructureKHR(engine.Device, &AccelerationStructureInfo, nullptr, &topLevelAS.BufferHandle);
 
     VulkanBuffer ScratchBuffer = VulkanBuffer();
     ScratchBuffer.CreateBuffer(engine, AccelerationBuildInfo.buildScratchSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -285,7 +251,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
     AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
     AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-    AccelerationBuildGeometryInfo.dstAccelerationStructure = topLevelAS.handle;
+    AccelerationBuildGeometryInfo.dstAccelerationStructure = topLevelAS.BufferHandle;
     AccelerationBuildGeometryInfo.geometryCount = 1;
     AccelerationBuildGeometryInfo.pGeometries = &AccelerationGeometry;
     AccelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBufferDeviceAddress.deviceAddress;
@@ -298,32 +264,42 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AcclerationBuildRange.transformOffset = 0;
     AcclerationBuildRangeList.emplace_back(&AcclerationBuildRange);
 
-    if (accelerationStructureFeatures.accelerationStructureHostCommands)
-    {
-        // Implementation supports building acceleration structure building on host
-        vkBuildAccelerationStructuresKHR(
-            engine.Device,
-            VK_NULL_HANDLE,
-            1,
-            &AccelerationBuildGeometryInfo,
-            AcclerationBuildRangeList.data());
-    }
-    else
-    {
-        // Acceleration structure needs to be build on the device
-        VkCommandBuffer commandBuffer = createCommandBuffer(engine, VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-        vkCmdBuildAccelerationStructuresKHR(
-            commandBuffer,
-            1,
-            &AccelerationBuildGeometryInfo,
-            AcclerationBuildRangeList.data());
-        flushCommandBuffer(engine, commandBuffer);
-    }
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool = engine.GetRenderCommandPool();
+    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    commandBufferAllocateInfo.commandBufferCount = 1;
+
+    VkCommandBuffer cmdBuffer;
+    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
+
+    VkCommandBufferBeginInfo cmdBufferBeginInfo{};
+    cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
+    vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
+    vkEndCommandBuffer(cmdBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &cmdBuffer;
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+
+    VkFence fence;
+    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
+    vkDestroyFence(engine.Device, fence, nullptr);
+    vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &cmdBuffer);
+
 
     VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
     AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-    AccelerationDeviceAddressInfo.accelerationStructure = topLevelAS.handle;
-    topLevelAS.deviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &AccelerationDeviceAddressInfo);
+    AccelerationDeviceAddressInfo.accelerationStructure = topLevelAS.BufferHandle;
+    topLevelAS.BufferDeviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &AccelerationDeviceAddressInfo);
 
     ScratchBuffer.DestoryBuffer(engine);
 }
@@ -384,12 +360,12 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
    // vkDestroyImageView(engine.Device, storageImage.view, nullptr);
   //  vkDestroyImage(engine.Device, storageImage.image, nullptr);
   //  vkFreeMemory(engine.Device, storageImage.memory, nullptr);
-    vkFreeMemory(engine.Device, bottomLevelAS.memory, nullptr);
-    vkDestroyBuffer(engine.Device, bottomLevelAS.buffer, nullptr);
-    vkDestroyAccelerationStructureKHR(engine.Device, bottomLevelAS.handle, nullptr);
-    vkFreeMemory(engine.Device, topLevelAS.memory, nullptr);
-    vkDestroyBuffer(engine.Device, topLevelAS.buffer, nullptr);
-    vkDestroyAccelerationStructureKHR(engine.Device, topLevelAS.handle, nullptr);
+   // vkFreeMemory(engine.Device, bottomLevelAS.memory, nullptr);
+ //   vkDestroyBuffer(engine.Device, bottomLevelAS.buffer, nullptr);
+//    vkDestroyAccelerationStructureKHR(engine.Device, bottomLevelAS.handle, nullptr);
+    //vkFreeMemory(engine.Device, topLevelAS.memory, nullptr);
+    //vkDestroyBuffer(engine.Device, topLevelAS.buffer, nullptr);
+    //vkDestroyAccelerationStructureKHR(engine.Device, topLevelAS.handle, nullptr);
     vertexBuffer.DestoryBuffer(engine);
     indexBuffer.DestoryBuffer(engine);
     transformBuffer.DestoryBuffer(engine);
@@ -401,38 +377,6 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
 }
 
-RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VulkanEngine& engine, VkDeviceSize size)
-{
-    RayTracingScratchBuffer scratchBuffer{};
-
-    VkBufferCreateInfo bufferCreateInfo{};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = size;
-    bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-    vkCreateBuffer(engine.Device, &bufferCreateInfo, nullptr, &scratchBuffer.handle);
-
-    VkMemoryRequirements memoryRequirements{};
-    vkGetBufferMemoryRequirements(engine.Device, scratchBuffer.handle, &memoryRequirements);
-
-    VkMemoryAllocateFlagsInfo memoryAllocateFlagsInfo{};
-    memoryAllocateFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-    memoryAllocateFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-
-    VkMemoryAllocateInfo memoryAllocateInfo = {};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAllocateInfo.pNext = &memoryAllocateFlagsInfo;
-    memoryAllocateInfo.allocationSize = memoryRequirements.size;
-    memoryAllocateInfo.memoryTypeIndex = getMemoryType(engine, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &scratchBuffer.memory);
-    vkBindBufferMemory(engine.Device, scratchBuffer.handle, scratchBuffer.memory, 0);
-
-    VkBufferDeviceAddressInfoKHR bufferDeviceAddressInfo{};
-    bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-    bufferDeviceAddressInfo.buffer = scratchBuffer.handle;
-    scratchBuffer.deviceAddress = vkGetBufferDeviceAddressKHR(engine.Device, &bufferDeviceAddressInfo);
-
-    return scratchBuffer;
-}
 void RayTraceRenderer::createUniformBuffer(VulkanEngine& engine)
 {
     ubo.CreateBuffer(engine, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformData);
@@ -566,7 +510,7 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
     AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
     AccelerationDescriptorStructure.accelerationStructureCount = 1;
-    AccelerationDescriptorStructure.pAccelerationStructures = &topLevelAS.handle;
+    AccelerationDescriptorStructure.pAccelerationStructures = &topLevelAS.BufferHandle;
 
     VkWriteDescriptorSet AccelerationDesciptorSet = {};
     AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -732,72 +676,6 @@ void RayTraceRenderer::Resize(VulkanEngine& engine)
     buildCommandBuffers(engine);
 }
 
-void RayTraceRenderer::deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffer)
-{
-   /* if (scratchBuffer.memory != VK_NULL_HANDLE) {
-        vkFreeMemory(engine.Device, scratchBuffer.memory, nullptr);
-    }
-    if (scratchBuffer.handle != VK_NULL_HANDLE) {
-        vkDestroyBuffer(engine.Device, scratchBuffer.handle, nullptr);
-    }*/
-}
-
-void RayTraceRenderer::flushCommandBuffer(VulkanEngine& engine, VkCommandBuffer commandBuffer)
-{
-    if (commandBuffer == VK_NULL_HANDLE)
-    {
-        return;
-    }
-
-    vkEndCommandBuffer(commandBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-    // Create fence to ensure that the command buffer has finished executing
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-    // Submit to the queue
-    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-    // Wait for the fence to signal that command buffer has finished executing
-    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
-    vkDestroyFence(engine.Device, fence, nullptr);
-
-    vkFreeCommandBuffers(engine.Device, engine.RenderCommandPool, 1, &commandBuffer);
-}
-
-uint64_t RayTraceRenderer::getBufferDeviceAddress(VulkanEngine& engine, VkBuffer buffer)
-{
-    VkBufferDeviceAddressInfoKHR bufferDeviceAI{};
-    bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-    bufferDeviceAI.buffer = buffer;
-    return vkGetBufferDeviceAddressKHR(engine.Device, &bufferDeviceAI);
-}
-void RayTraceRenderer::createAccelerationStructureBuffer(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo)
-{
-    VkBufferCreateInfo bufferCreateInfo{};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = buildSizeInfo.accelerationStructureSize;
-    bufferCreateInfo.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-    vkCreateBuffer(engine.Device, &bufferCreateInfo, nullptr, &accelerationStructure.buffer);
-    VkMemoryRequirements memoryRequirements{};
-    vkGetBufferMemoryRequirements(engine.Device, accelerationStructure.buffer, &memoryRequirements);
-    VkMemoryAllocateFlagsInfo memoryAllocateFlagsInfo{};
-    memoryAllocateFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-    memoryAllocateFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-    VkMemoryAllocateInfo memoryAllocateInfo{};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAllocateInfo.pNext = &memoryAllocateFlagsInfo;
-    memoryAllocateInfo.allocationSize = memoryRequirements.size;
-    memoryAllocateInfo.memoryTypeIndex = getMemoryType(engine, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &accelerationStructure.memory);
-    vkBindBufferMemory(engine.Device, accelerationStructure.buffer, accelerationStructure.memory, 0);
-}
-
 uint32_t RayTraceRenderer::getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties)
 {
     VkBool32* memTypeFound = nullptr;
@@ -831,105 +709,6 @@ uint32_t RayTraceRenderer::getMemoryType(VulkanEngine& engine, uint32_t typeBits
     }
 }
 
-VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin)
-{
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = pool;
-    commandBufferAllocateInfo.level = level;
-    commandBufferAllocateInfo.commandBufferCount = 1;
-    VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
-    // If requested, also start recording for the new command buffer
-    if (begin)
-    {
-        VkCommandBufferBeginInfo cmdBufferBeginInfo{};
-        cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    }
-    return cmdBuffer;
-}
-
-VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin)
-{
-    return createCommandBuffer(engine, level, engine.RenderCommandPool, begin);
-}
-
-void RayTraceRenderer::createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
-    VkBufferCreateInfo bufferInfo{};
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = size;
-    bufferInfo.usage = usage;
-    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    if (vkCreateBuffer(engine.Device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create buffer!");
-    }
-
-    VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(engine.Device, buffer, &memRequirements);
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = getMemoryType(engine, memRequirements.memoryTypeBits, properties);
-
-    if (vkAllocateMemory(engine.Device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate buffer memory!");
-    }
-
-    vkBindBufferMemory(engine.Device, buffer, bufferMemory, 0);
-}
-VkResult RayTraceRenderer::createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data)
-{
-    buffer->device = engine.Device;
-
-    // Create the buffer handle
-    VkBufferCreateInfo bufCreateInfo{};
-    bufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufCreateInfo.usage = usageFlags;
-    bufCreateInfo.size = size;
-    vkCreateBuffer(engine.Device, &bufCreateInfo, nullptr, &buffer->buffer);
-
-    // Create the memory backing up the buffer handle
-    VkMemoryRequirements memReqs;
-    VkMemoryAllocateInfo memAllocInfo{};
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    vkGetBufferMemoryRequirements(engine.Device, buffer->buffer, &memReqs);
-    memAllocInfo.allocationSize = memReqs.size;
-    // Find a memory type index that fits the properties of the buffer
-    memAllocInfo.memoryTypeIndex = getMemoryType(engine, memReqs.memoryTypeBits, memoryPropertyFlags);
-    // If the buffer has VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT set we also need to enable the appropriate flag during allocation
-    VkMemoryAllocateFlagsInfoKHR allocFlagsInfo{};
-    if (usageFlags & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
-        allocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
-        allocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-        memAllocInfo.pNext = &allocFlagsInfo;
-    }
-    vkAllocateMemory(engine.Device, &memAllocInfo, nullptr, &buffer->memory);
-
-    buffer->alignment = memReqs.alignment;
-    buffer->size = size;
-    buffer->usageFlags = usageFlags;
-    buffer->memoryPropertyFlags = memoryPropertyFlags;
-
-    // If a pointer to the buffer data has been passed, map the buffer and copy over the data
-    if (data != nullptr)
-    {
-        buffer->map();
-        memcpy(buffer->mapped, data, size);
-        if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0)
-            buffer->flush();
-
-        buffer->unmap();
-    }
-
-    // Initialize a default descriptor that covers the whole buffer size
-    buffer->setupDescriptor();
-
-    // Attach the memory to the buffer object
-    return buffer->bind();
-}
 //
 //void RayTraceRenderer::setImageLayout(VulkanEngine& engine,
 //    VkCommandBuffer cmdbuffer,
@@ -1099,131 +878,5 @@ VkShaderModule RayTraceRenderer::loadShader(const char* fileName, VkDevice devic
     {
         std::cerr << "Error: Could not open shader file \"" << fileName << "\"" << "\n";
         return VK_NULL_HANDLE;
-    }
-}
-
-uint32_t RayTraceRenderer::alignedSize(uint32_t value, uint32_t alignment)
-{
-    return (value + alignment - 1) & ~(alignment - 1);
-}
-
-/**
-    * Map a memory range of this buffer. If successful, mapped points to the specified buffer range.
-    *
-    * @param size (Optional) Size of the memory range to map. Pass VK_WHOLE_SIZE to map the complete buffer range.
-    * @param offset (Optional) Byte offset from beginning
-    *
-    * @return VkResult of the buffer mapping call
-    */
-VkResult Buffer::map(VkDeviceSize size, VkDeviceSize offset)
-{
-    return vkMapMemory(device, memory, offset, size, 0, &mapped);
-}
-
-/**
-* Unmap a mapped memory range
-*
-* @note Does not return a result as vkUnmapMemory can't fail
-*/
-void Buffer::unmap()
-{
-    if (mapped)
-    {
-        vkUnmapMemory(device, memory);
-        mapped = nullptr;
-    }
-}
-
-/**
-* Attach the allocated memory block to the buffer
-*
-* @param offset (Optional) Byte offset (from the beginning) for the memory region to bind
-*
-* @return VkResult of the bindBufferMemory call
-*/
-VkResult Buffer::bind(VkDeviceSize offset)
-{
-    return vkBindBufferMemory(device, buffer, memory, offset);
-}
-
-/**
-* Setup the default descriptor for this buffer
-*
-* @param size (Optional) Size of the memory range of the descriptor
-* @param offset (Optional) Byte offset from beginning
-*
-*/
-void Buffer::setupDescriptor(VkDeviceSize size, VkDeviceSize offset)
-{
-    descriptor.offset = offset;
-    descriptor.buffer = buffer;
-    descriptor.range = size;
-}
-
-/**
-* Copies the specified data to the mapped buffer
-*
-* @param data Pointer to the data to copy
-* @param size Size of the data to copy in machine units
-*
-*/
-void Buffer::copyTo(void* data, VkDeviceSize size)
-{
-    assert(mapped);
-    memcpy(mapped, data, size);
-}
-
-/**
-* Flush a memory range of the buffer to make it visible to the device
-*
-* @note Only required for non-coherent memory
-*
-* @param size (Optional) Size of the memory range to flush. Pass VK_WHOLE_SIZE to flush the complete buffer range.
-* @param offset (Optional) Byte offset from beginning
-*
-* @return VkResult of the flush call
-*/
-VkResult Buffer::flush(VkDeviceSize size, VkDeviceSize offset)
-{
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    return vkFlushMappedMemoryRanges(device, 1, &mappedRange);
-}
-
-/**
-* Invalidate a memory range of the buffer to make it visible to the host
-*
-* @note Only required for non-coherent memory
-*
-* @param size (Optional) Size of the memory range to invalidate. Pass VK_WHOLE_SIZE to invalidate the complete buffer range.
-* @param offset (Optional) Byte offset from beginning
-*
-* @return VkResult of the invalidate call
-*/
-VkResult Buffer::invalidate(VkDeviceSize size, VkDeviceSize offset)
-{
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    return vkInvalidateMappedMemoryRanges(device, 1, &mappedRange);
-}
-
-/**
-* Release all Vulkan resources held by this buffer
-*/
-void Buffer::destroy()
-{
-    if (buffer)
-    {
-        vkDestroyBuffer(device, buffer, nullptr);
-    }
-    if (memory)
-    {
-        vkFreeMemory(device, memory, nullptr);
     }
 }
