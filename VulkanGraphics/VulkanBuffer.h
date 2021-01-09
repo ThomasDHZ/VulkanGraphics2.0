@@ -1,5 +1,5 @@
 #pragma once
-#include <vulkan/vulkan.h>
+#include "VulkanEngine.h"
 
 class VulkanBuffer
 {
@@ -17,15 +17,16 @@ public:
 	VkBuffer Buffer = VK_NULL_HANDLE;
 	VkDeviceMemory BufferMemory = VK_NULL_HANDLE;
 	VkDeviceSize BufferSize = VK_NULL_HANDLE;
+	uint64_t deviceAddress = VK_NULL_HANDLE;
 
 	VulkanBuffer();
 	~VulkanBuffer();
-	VkResult CreateBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
-	void CopyBuffer(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-	void CopyBufferToMemory(VkDevice& device, void* DataToCopy, VkDeviceSize BufferSize);
-	void DestoryBuffer(VkDevice& device);
-	VkCommandBuffer BeginSingleTimeCommand(VkDevice& device, VkCommandPool& renderCommandPool);
-	void EndSingleTimeCommand(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkCommandBuffer commandBuffer);
+	VkResult CreateBuffer(VulkanEngine& engine, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
+	void CopyBuffer(VulkanEngine& engine, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void CopyBufferToMemory(VulkanEngine& engine, void* DataToCopy, VkDeviceSize BufferSize);
+	void DestoryBuffer(VulkanEngine& engine);
+	VkCommandBuffer BeginSingleTimeCommand(VulkanEngine& engine);
+	void EndSingleTimeCommand(VulkanEngine& engine, VkCommandBuffer commandBuffer);
 
 	VkBuffer GetBuffer() { return Buffer; }
 	VkDeviceMemory GetBufferMemory() { return BufferMemory; }

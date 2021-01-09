@@ -8,32 +8,7 @@ RenderManager::RenderManager()
 
 RenderManager::RenderManager(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, GLFWwindow* window)
 {
-    std::array<VkDescriptorPoolSize, 1> poolSizes{};
-    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(3);
-
-    VkDescriptorPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-    poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = 3;
-
-    if (vkCreateDescriptorPool(engine.Device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create descriptor pool!");
-    }
-   
-
-    VkCommandPoolCreateInfo poolInfo2{};
-    poolInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo2.queueFamilyIndex = engine.GraphicsFamily;
-
-    if (vkCreateCommandPool(engine.Device, &poolInfo2, nullptr, &commandPool) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create graphics command pool!");
-    }
-
-    uint32_t width = engine.SwapChain.GetSwapChainResolution().width;
-    uint32_t height = engine.SwapChain.GetSwapChainResolution().height;
-    rayTracer = RayTraceRenderer(engine.Device, engine.PhysicalDevice, commandPool, engine.GraphicsQueue, descriptorPool, width, height, 3, engine.SwapChain.SwapChainImages);
+    rayTracer = RayTraceRenderer(engine);
 
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     mainRenderPass = MainRenderPass(engine);
@@ -73,12 +48,14 @@ void RenderManager::ResizeWindowUpdate(VulkanEngine& engine, GLFWwindow* window,
     engine.SwapChain.UpdateSwapChain(window, engine.Device, engine.PhysicalDevice, engine.Surface);
 
     /// mainRenderPass.UpdateSwapChain(engine);
-    shadowRenderPass.UpdateSwapChain(engine);
-     sceneRenderPass.UpdateSwapChain(engine);
+  //  shadowRenderPass.UpdateSwapChain(engine);
+  //   sceneRenderPass.UpdateSwapChain(engine);
   //  gBufferRenderPass.UpdateSwapChain(engine);
   //  frameBufferRenderPass.UpdateSwapChain(engine);
-    bloomRenderPass.UpdateSwapChain(engine, textureManager, sceneRenderPass.BloomTexture);
-    interfaceRenderPass.UpdateSwapChain(engine);
+ //   bloomRenderPass.UpdateSwapChain(engine, textureManager, sceneRenderPass.BloomTexture);
+  //  interfaceRenderPass.UpdateSwapChain(engine);
+
+    rayTracer.Resize(engine);
 
     //SSAOFrameBuffer.UpdateSwapChain(engine, gBufferRenderPass.GPositionTexture, gBufferRenderPass.GNormalTexture, gBufferRenderPass.ssaoPipeline->ShaderPipelineDescriptorLayout);
    // SSAOBlurframeBuffer = FrameBufferMesh(engine, gBufferRenderPass.SSAOTexture, frameBufferRenderPass.frameBufferPipeline->ShaderPipelineDescriptorLayout);
@@ -116,13 +93,13 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> came
             throw std::runtime_error("failed to begin recording command buffer!");
         }
      //   MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList);
-        ShadowRenderCMDBuffer(engine, ModelList, i);
-        SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList, MeshList);
+       // ShadowRenderCMDBuffer(engine, ModelList, i);
+       // SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList, MeshList);
       //  GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
        // SSAORenderCMDBuffer(engine, camera, i);
-        TextureRenderCMDBuffer(engine, i, SpriteList);
-        bloomRenderPass.Draw(engine, commandBuffers, i);
-        FrameBufferRenderCMDBuffer(engine, i);
+      //  TextureRenderCMDBuffer(engine, i, SpriteList);
+     //   bloomRenderPass.Draw(engine, commandBuffers, i);
+     //   FrameBufferRenderCMDBuffer(engine, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -186,11 +163,11 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
     }
     engine.imagesInFlight[engine.DrawFrame] = engine.inFlightFences[currentFrame];
 
-    rayTracer.updateUniformBuffers();
-    interfaceRenderPass.Draw(engine);
+    rayTracer.updateUniformBuffers(engine);
+    //interfaceRenderPass.Draw(engine);
 
-    std::array<VkCommandBuffer, 2> submitCommandBuffers =
-    { rayTracer.drawCmdBuffers[engine.DrawFrame], interfaceRenderPass.ImGuiCommandBuffers[engine.DrawFrame] };
+    std::array<VkCommandBuffer, 1> submitCommandBuffers =
+    { rayTracer.drawCmdBuffers[engine.DrawFrame] };
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -252,6 +229,7 @@ void RenderManager::Destroy(VulkanEngine& engine)
     textureRenderPass.Destroy(engine);
     bloomRenderPass.Destory(engine);
     shadowRenderPass.Destroy(engine);
+    rayTracer.Destory(engine);
 }
 
 void RenderManager::MainRenderCMDBuffer(VulkanEngine& engine, std::vector<Model>& ModelList, SkyBoxMesh& skybox, int SwapBufferImageIndex, LightManager& lightmanager, std::vector<std::shared_ptr<Object2D>>& SpriteList)
