@@ -163,7 +163,7 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
     }
     engine.imagesInFlight[engine.DrawFrame] = engine.inFlightFences[currentFrame];
 
-    rayTracer.updateUniformBuffers(engine);
+    rayTracer.updateUniformBuffers(engine, window);
     //interfaceRenderPass.Draw(engine);
 
     std::array<VkCommandBuffer, 1> submitCommandBuffers =

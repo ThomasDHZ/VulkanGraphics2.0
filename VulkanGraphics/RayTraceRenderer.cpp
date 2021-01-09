@@ -46,10 +46,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(engine.Device, "vkCreateRayTracingPipelinesKHR"));
 
-    camera.type = Camera2::CameraType::lookat;
-    camera.setPerspective(60.0f, (float)engine.GetSwapChainResolution().width / (float)engine.GetSwapChainResolution().height, 0.1f, 512.0f);
-    camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-    camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.5f));
+    camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.GetSwapChainResolution().width, (float)engine.GetSwapChainResolution().height), glm::vec3(0.0f, 0.0f, 5.0f));
 
     createBottomLevelAccelerationStructure(engine);
     createTopLevelAccelerationStructure(engine);
@@ -374,18 +371,20 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     hitShaderBindingTable.DestoryBuffer(engine);
     ubo.DestoryBuffer(engine);
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-    vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
 }
 
 void RayTraceRenderer::createUniformBuffer(VulkanEngine& engine)
 {
     ubo.CreateBuffer(engine, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformData);
-    updateUniformBuffers(engine);
 }
-void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine)
+void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window)
 {
-    uniformData.projInverse = glm::inverse(camera.matrices.perspective);
-    uniformData.viewInverse = glm::inverse(camera.matrices.view);
+    keyboard.Update(window, camera);
+    mouse.Update(window, camera);
+    camera->Update(engine);
+
+    uniformData.projInverse = glm::inverse(camera->GetProjectionMatrix());
+    uniformData.viewInverse = glm::inverse(camera->GetViewMatrix());
     ubo.CopyBufferToMemory(engine, &uniformData, sizeof(UniformData));
 }
 void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
@@ -659,9 +658,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine)
 }
 void RayTraceRenderer::Resize(VulkanEngine& engine)
 {
-    // Delete allocated resources
     rayTexture.RecreateRendererTexture(engine);
-    // Update descriptor
     VkDescriptorImageInfo storageImageDescriptor{ VK_NULL_HANDLE, rayTexture.View, VK_IMAGE_LAYOUT_GENERAL };
 
     VkWriteDescriptorSet writeDescriptorSet{};
