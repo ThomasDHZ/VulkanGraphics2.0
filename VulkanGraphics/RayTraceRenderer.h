@@ -322,6 +322,13 @@ public:
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{};
 
+    VulkanBuffer BottomLevelAccelerationBuffer;
+    VulkanBuffer TopLevelAccelerationBuffer;
+    VkAccelerationStructureKHR BottomLevelAccelerationStructure;
+    VkAccelerationStructureKHR TopLevelAccelerationStructure;
+    uint64_t BottomLevelAccelerationDeviceAddress;
+    uint64_t TopLevelAccelerationDeviceAddress;
+
     AccelerationStructure bottomLevelAS{};
     AccelerationStructure topLevelAS{};
 
