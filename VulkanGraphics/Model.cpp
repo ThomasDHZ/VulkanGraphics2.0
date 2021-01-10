@@ -25,20 +25,20 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 
 	LoadNodeTree(Scene->mRootNode);
-	LoadAnimations(Scene);
+//	LoadAnimations(Scene);
 	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene, shadowTexture);
-
-	for (auto mesh : SubMeshList)
-	{
-		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, mesh, layout, renderFlags)));
-	}
-
-	LoadMeshTransform(0, ModelTransformMatrix);
-
-	if (AnimationList.size() > 0)
-	{
-		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
-	}
+//
+//	for (auto mesh : SubMeshList)
+//	{
+//		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, mesh, layout, renderFlags)));
+//	}
+//
+//	LoadMeshTransform(0, ModelTransformMatrix);
+//
+//	if (AnimationList.size() > 0)
+//	{
+//		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
+//	}
 }
 
 Model::~Model()

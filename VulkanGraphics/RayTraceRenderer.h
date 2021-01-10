@@ -20,6 +20,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "VulkanWindow.h"
+#include "Model.h"
 
 struct RayTracingScratchBuffer
 {
@@ -45,11 +46,14 @@ struct StorageImage {
 struct UniformData {
     glm::mat4 viewInverse;
     glm::mat4 projInverse;
+    glm::vec4 lightPos;
+    int32_t vertexSize;
 };
 
 class RayTraceRenderer
 {
 private:
+    Model model;
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 

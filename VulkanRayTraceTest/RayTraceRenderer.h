@@ -41,6 +41,8 @@ struct StorageImage {
 struct UniformData {
     glm::mat4 viewInverse;
     glm::mat4 projInverse;
+    glm::vec4 lightPos;
+    int32_t vertexSize;
 };
 
 class Camera

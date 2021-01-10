@@ -66,16 +66,11 @@ RayTraceRenderer::~RayTraceRenderer()
 
 void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine)
 {
-    struct Vertex {
-        float pos[3];
-    };
-    std::vector<Vertex> vertices = {
-      { {  1.0f,  1.0f, 0.0f } },
-      { { -1.0f,  1.0f, 0.0f } },
-      { {  0.0f, -1.0f, 0.0f } }
-    };
-
-    std::vector<uint32_t> indices = { 0, 1, 2 };
+ 
+    std::shared_ptr<TextureManager> manager = std::make_shared<TextureManager>(engine);
+    std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/suzanne.obj", RayTraceDescriptorSetLayout, 1, texture);
+    uint32_t numTriangles = static_cast<uint32_t>(model.SubMeshList[0].IndexList.size()) / 3;
 
     VkTransformMatrixKHR transformMatrix = {
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -83,8 +78,8 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         0.0f, 0.0f, 1.0f, 0.0f
     };
 
-    vertexBuffer.CreateBuffer(engine, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-    indexBuffer.CreateBuffer(engine, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
+    vertexBuffer.CreateBuffer(engine, model.SubMeshList[0].VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].VertexList.data());
+    indexBuffer.CreateBuffer(engine, model.SubMeshList[0].IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].IndexList.data());
     transformBuffer.CreateBuffer(engine, sizeof(VkTransformMatrixKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
 
     VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
@@ -98,7 +93,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     GeometryAccelerationStructure.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
     GeometryAccelerationStructure.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
     GeometryAccelerationStructure.geometry.triangles.vertexData = vertexBufferDeviceAddress;
-    GeometryAccelerationStructure.geometry.triangles.maxVertex = vertices.size();
+    GeometryAccelerationStructure.geometry.triangles.maxVertex = model.SubMeshList[0].VertexList.size() * sizeof(Vertex);
     GeometryAccelerationStructure.geometry.triangles.vertexStride = sizeof(Vertex);
     GeometryAccelerationStructure.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
     GeometryAccelerationStructure.geometry.triangles.indexData = indexBufferDeviceAddress;
@@ -113,7 +108,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AccelerationBuildGeometry.geometryCount = 1;
     AccelerationBuildGeometry.pGeometries = &GeometryAccelerationStructure;
 
-    uint32_t geoCount = 1;
+    uint32_t geoCount = numTriangles;
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, &geoCount, &AccelerationBuildInfo);
@@ -225,7 +220,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationStructureBuildGeometry.geometryCount = 1;
     AccelerationStructureBuildGeometry.pGeometries = &AccelerationGeometry;
 
-    uint32_t geoCount = 1;
+    uint32_t geoCount =9;
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &geoCount, &AccelerationBuildInfo);
@@ -383,8 +378,16 @@ void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* wi
     mouse.Update(window, camera);
     camera->Update(engine);
 
+
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    auto  currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
     uniformData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     uniformData.viewInverse = glm::inverse(camera->GetViewMatrix());
+    uniformData.lightPos = glm::vec4(cos(glm::radians(time * 360.0f)) * 40.0f, -50.0f + sin(glm::radians(time * 360.0f)) * 20.0f, 25.0f + sin(glm::radians(time * 360.0f)) * 5.0f, 0.0f);
+    uniformData.vertexSize = sizeof(Vertex);
     ubo.CopyBufferToMemory(engine, &uniformData, sizeof(UniformData));
 }
 void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
@@ -394,7 +397,7 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     AccelerationStructureBinding.binding = 0;
     AccelerationStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
     AccelerationStructureBinding.descriptorCount = 1;
-    AccelerationStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
+    AccelerationStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(AccelerationStructureBinding);
 
     VkDescriptorSetLayoutBinding ReturnImageStructureBinding = {};
@@ -408,8 +411,22 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     UniformBufferStructureBinding.binding = 2;
     UniformBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     UniformBufferStructureBinding.descriptorCount = 1;
-    UniformBufferStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
+    UniformBufferStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(UniformBufferStructureBinding);
+
+    VkDescriptorSetLayoutBinding VertexBufferStructureBinding = {};
+    VertexBufferStructureBinding.binding = 3;
+    VertexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    VertexBufferStructureBinding.descriptorCount = 1;
+    VertexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(VertexBufferStructureBinding);
+
+    VkDescriptorSetLayoutBinding IndexBufferStructureBinding = {};
+    IndexBufferStructureBinding.binding = 4;
+    IndexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    IndexBufferStructureBinding.descriptorCount = 1;
+    IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
     VkDescriptorSetLayoutCreateInfo RTDescriptorSetLayout = {};
     RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -544,10 +561,39 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     UniformDescriptorSet.pBufferInfo = &RTBufferInfo;
     UniformDescriptorSet.descriptorCount = 1;
 
+
+    VkDescriptorBufferInfo VertexBufferInfo = {};
+    VertexBufferInfo.buffer = vertexBuffer.Buffer;
+    VertexBufferInfo.offset = 0;
+    VertexBufferInfo.range = vertexBuffer.BufferSize;
+
+    VkWriteDescriptorSet VertexDescriptorSet{};
+    VertexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    VertexDescriptorSet.dstSet = RTDescriptorSet;
+    VertexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    VertexDescriptorSet.dstBinding = 3;
+    VertexDescriptorSet.pBufferInfo = &VertexBufferInfo;
+    VertexDescriptorSet.descriptorCount = 1;
+
+    VkDescriptorBufferInfo IndexBufferInfo = {};
+    IndexBufferInfo.buffer = indexBuffer.Buffer;
+    IndexBufferInfo.offset = 0;
+    IndexBufferInfo.range = indexBuffer.BufferSize;
+
+    VkWriteDescriptorSet IndexDescriptorSet{};
+    IndexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    IndexDescriptorSet.dstSet = RTDescriptorSet;
+    IndexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    IndexDescriptorSet.dstBinding = 4;
+    IndexDescriptorSet.pBufferInfo = &IndexBufferInfo;
+    IndexDescriptorSet.descriptorCount = 1;
+
     std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
         AccelerationDesciptorSet,
         ImageDescriptorSet,
-        UniformDescriptorSet
+        UniformDescriptorSet,
+        VertexDescriptorSet,
+        IndexDescriptorSet
     };
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }
