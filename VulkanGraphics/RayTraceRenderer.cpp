@@ -69,8 +69,25 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
  
     std::shared_ptr<TextureManager> manager = std::make_shared<TextureManager>(engine);
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/suzanne.obj", RayTraceDescriptorSetLayout, 1, texture);
-    uint32_t numTriangles = static_cast<uint32_t>(model.SubMeshList[0].IndexList.size()) / 3;
+    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj", RayTraceDescriptorSetLayout, 1, texture);
+
+
+
+    std::vector<Vertex> Vertices =
+    {
+        {{0.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+        {{1.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f},  {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+        {{1.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f},  {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
+        {{0.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}
+    };
+
+    std::vector<uint32_t> Indices =
+    {
+          0, 1, 2, 2, 3, 0
+    };
+
+    uint32_t numTriangles = static_cast<uint32_t>(Indices.size()) / 3;
+    texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", 1);
 
     VkTransformMatrixKHR transformMatrix = {
         1.0f, 0.0f, 0.0f, 0.0f,
@@ -78,8 +95,8 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         0.0f, 0.0f, 1.0f, 0.0f
     };
 
-    vertexBuffer.CreateBuffer(engine, model.SubMeshList[0].VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].VertexList.data());
-    indexBuffer.CreateBuffer(engine, model.SubMeshList[0].IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].IndexList.data());
+    vertexBuffer.CreateBuffer(engine, Vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Vertices.data());
+    indexBuffer.CreateBuffer(engine, Indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Indices.data());
     transformBuffer.CreateBuffer(engine, sizeof(VkTransformMatrixKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
 
     VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
@@ -428,6 +445,13 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
+    VkDescriptorSetLayoutBinding DiffuseBinding = {};
+    DiffuseBinding.binding = 5;
+    DiffuseBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    DiffuseBinding.descriptorCount = 1;
+    DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(DiffuseBinding);
+
     VkDescriptorSetLayoutCreateInfo RTDescriptorSetLayout = {};
     RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     RTDescriptorSetLayout.bindingCount = static_cast<uint32_t>(RTDescriptorSetBindings.size());
@@ -506,7 +530,8 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     std::vector<VkDescriptorPoolSize> poolSizes = {
     { VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1 },
     { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1 },
-    { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 }
+    { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 },
+     { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }
     };
 
     VkDescriptorPoolCreateInfo RayTraceDescriptorPoolInfo = {};
@@ -588,12 +613,27 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     IndexDescriptorSet.pBufferInfo = &IndexBufferInfo;
     IndexDescriptorSet.descriptorCount = 1;
 
+    VkDescriptorImageInfo DescriptorImage = {};
+    DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    DescriptorImage.imageView = texture2D.GetTextureView();
+    DescriptorImage.sampler = texture2D.GetTextureSampler();
+
+    VkWriteDescriptorSet TextureDescriptor = {};
+    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    TextureDescriptor.dstSet = RTDescriptorSet;
+    TextureDescriptor.dstBinding = 5;
+    TextureDescriptor.dstArrayElement = 0;
+    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    TextureDescriptor.descriptorCount = 1;
+    TextureDescriptor.pImageInfo = &DescriptorImage;
+
     std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
         AccelerationDesciptorSet,
         ImageDescriptorSet,
         UniformDescriptorSet,
         VertexDescriptorSet,
-        IndexDescriptorSet
+        IndexDescriptorSet,
+        TextureDescriptor
     };
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }

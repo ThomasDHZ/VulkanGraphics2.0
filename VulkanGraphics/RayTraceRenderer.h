@@ -60,6 +60,7 @@ private:
 public:
 
     RayTraceTexture rayTexture;
+    Texture2D texture2D;
 
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
