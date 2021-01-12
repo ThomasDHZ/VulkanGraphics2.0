@@ -89,13 +89,13 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 
 		if (mesh->mTangents)
 		{
-			vertex.Tangant = glm::vec3{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z };
-			vertex.BiTangant = glm::vec3{ mesh->mBitangents[x].x, mesh->mBitangents[x].y, mesh->mBitangents[x].z };
+			vertex.Tangant = glm::vec4{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z, 0.0f };
+			vertex.BiTangant = glm::vec4{ mesh->mBitangents[x].x, mesh->mBitangents[x].y, mesh->mBitangents[x].z, 0.0f };
 		}
 		else
 		{
-			vertex.Tangant = glm::vec3{ 0.0f, 0.0f, 0.0f };
-			vertex.BiTangant = glm::vec3{ 0.0f, 0.0f, 0.0f };
+			vertex.Tangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
+			vertex.BiTangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
 		}
 
 		if (mesh->mTextureCoords[0])
