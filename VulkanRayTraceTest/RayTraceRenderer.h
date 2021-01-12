@@ -310,6 +310,7 @@ public:
     VulkanBuffer indexBuffer;
     uint32_t indexCount;
     VulkanBuffer transformBuffer;
+    VulkanBuffer transformBuffer2;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;

@@ -43,4 +43,5 @@ C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe PBR_BloomOutput.frag -o PBRBloomFrag.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 raygen.rgen -o raygen.rgen.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 miss.rmiss -o miss.rmiss.spv
+C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 shadow.rmiss -o shadow.rmiss.spv
 pause

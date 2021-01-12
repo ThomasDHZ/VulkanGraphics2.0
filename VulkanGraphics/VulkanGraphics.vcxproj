@@ -281,6 +281,7 @@
     <None Include="Shaders\WireFrameBloomShader.vert" />
     <None Include="Shaders\WireFrameShader.frag" />
     <None Include="Shaders\WireFrameShader.vert" />
+    <None Include="shadow.rmiss" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation2D.h" />

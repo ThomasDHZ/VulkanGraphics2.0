@@ -46,7 +46,9 @@ struct StorageImage {
 struct UniformData {
     glm::mat4 viewInverse;
     glm::mat4 projInverse;
+    glm::mat4 modelInverse;
     glm::vec4 lightPos;
+    glm::vec4 viewPos;
     int32_t vertexSize;
 };
 
@@ -54,6 +56,7 @@ class RayTraceRenderer
 {
 private:
     Model model;
+    Model model2;
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
@@ -61,6 +64,7 @@ public:
 
     RayTraceTexture rayTexture;
     Texture2D texture2D;
+    Texture2D NormalMap;
 
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
@@ -90,12 +94,16 @@ public:
     uint64_t TopLevelAccelerationDeviceAddress;
 
     VulkanBuffer bottomLevelAS;
+    VulkanBuffer bottomLevelAS2;
     VulkanBuffer topLevelAS;
 
     VulkanBuffer vertexBuffer;
     VulkanBuffer indexBuffer;
+    VulkanBuffer vertexBuffer2;
+    VulkanBuffer indexBuffer2;
     uint32_t indexCount;
     VulkanBuffer transformBuffer;
+    VulkanBuffer transformBuffer2;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;
@@ -142,5 +150,17 @@ public:
     //    VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
     VkPipelineShaderStageCreateInfo loadShader(VulkanEngine& engine, std::string fileName, VkShaderStageFlagBits stage);
     VkShaderModule loadShader(const char* fileName, VkDevice device);
+
+    struct Vertex2 {
+        glm::vec3 pos = glm::vec3(0.0f);
+        glm::vec3 normal = glm::vec3(0.0f);
+        glm::vec2 uv = glm::vec2(0.0f);
+        glm::vec3 tangent = glm::vec3(0.0f);
+        glm::vec4 color = glm::vec4(0.0f);
+        glm::vec4 joint0 = glm::vec4(0.0f);
+        glm::vec4 weight0 = glm::vec4(0.0f);
+        glm::vec4 Padding = glm::vec4(0.0f);
+    };
+    std::vector<Vertex> CalcVertex();
 };
 

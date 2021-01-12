@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <iostream>
-#include "Vertex.h"
+
 RayTraceRenderer::RayTraceRenderer()
 {
 
@@ -69,36 +69,35 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
  
     std::shared_ptr<TextureManager> manager = std::make_shared<TextureManager>(engine);
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
-    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj", RayTraceDescriptorSetLayout, 1, texture);
 
+    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj", RayTraceDescriptorSetLayout, 1, texture);
+    auto a = sizeof(Vertex);
+    auto b = sizeof(Vertex2);
 
+    //std::vector<Vertex> Vertices =
+    //{
+    //    {{0.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+    //    {{1.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+    //    {{1.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+    //    {{0.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, -1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}
+    //};
 
-    std::vector<Vertex> Vertices =
-    {
-        {{0.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-        {{1.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f},  {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-        {{1.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f},  {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}},
-        {{0.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, -1.0f}, {-1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}
-    };
+    //std::vector<uint32_t> Indices =
+    //{
+    //      0, 1, 2, 2, 3, 0
+    //};
 
-    std::vector<uint32_t> Indices =
-    {
-          0, 1, 2, 2, 3, 0
-    };
+    uint32_t numTriangles = static_cast<uint32_t>(model.SubMeshList[0].IndexList.size()) / 3;
+    texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
+    NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
 
-    uint32_t numTriangles = static_cast<uint32_t>(Indices.size()) / 3;
-    texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", 1);
+    glm::mat4 transformMatrix = glm::mat4(1.0f);
+    transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    VkTransformMatrixKHR transformMatrix = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f
-    };
-
-    vertexBuffer.CreateBuffer(engine, Vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Vertices.data());
-    indexBuffer.CreateBuffer(engine, Indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, Indices.data());
-    transformBuffer.CreateBuffer(engine, sizeof(VkTransformMatrixKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
-
+    vertexBuffer.CreateBuffer(engine, model.SubMeshList[0].VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].VertexList.data());
+    indexBuffer.CreateBuffer(engine, model.SubMeshList[0].IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].IndexList.data());
+    transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
+  
     VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
     VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
     VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
@@ -401,9 +400,13 @@ void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* wi
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+    glm::mat4 transformMatrix(1.0f);
+
     uniformData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     uniformData.viewInverse = glm::inverse(camera->GetViewMatrix());
+    uniformData.modelInverse = glm::inverse(transformMatrix);
     uniformData.lightPos = glm::vec4(cos(glm::radians(time * 360.0f)) * 40.0f, -50.0f + sin(glm::radians(time * 360.0f)) * 20.0f, 25.0f + sin(glm::radians(time * 360.0f)) * 5.0f, 0.0f);
+    uniformData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     uniformData.vertexSize = sizeof(Vertex);
     ubo.CopyBufferToMemory(engine, &uniformData, sizeof(UniformData));
 }
@@ -452,6 +455,13 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(DiffuseBinding);
 
+    VkDescriptorSetLayoutBinding NormalBinding = {};
+    NormalBinding.binding = 6;
+    NormalBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    NormalBinding.descriptorCount = 1;
+    NormalBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(NormalBinding);
+
     VkDescriptorSetLayoutCreateInfo RTDescriptorSetLayout = {};
     RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     RTDescriptorSetLayout.bindingCount = static_cast<uint32_t>(RTDescriptorSetBindings.size());
@@ -486,6 +496,16 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     MissShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(MissShaderInfo);
 
+    ShaderList.emplace_back(loadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/shadow.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
+    VkRayTracingShaderGroupCreateInfoKHR ShadowMissShaderInfo = {};
+    ShadowMissShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+    ShadowMissShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+    ShadowMissShaderInfo.generalShader = static_cast<uint32_t>(ShaderList.size()) - 1;
+    ShadowMissShaderInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
+    ShadowMissShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
+    ShadowMissShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+    RayTraceShaders.emplace_back(ShadowMissShaderInfo);
+
     ShaderList.emplace_back(loadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/shaders/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ClosestHitShaderInfo = {};
     ClosestHitShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
@@ -502,7 +522,7 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     RayTracingPipeline.pStages = ShaderList.data();
     RayTracingPipeline.groupCount = static_cast<uint32_t>(RayTraceShaders.size());
     RayTracingPipeline.pGroups = RayTraceShaders.data();
-    RayTracingPipeline.maxPipelineRayRecursionDepth = 1;
+    RayTracingPipeline.maxPipelineRayRecursionDepth = 2;
     RayTracingPipeline.layout = RayTracePipelineLayout;
     VkResult result = vkCreateRayTracingPipelinesKHR(engine.Device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &RayTracePipeline);
 
@@ -522,8 +542,8 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     VkResult result = vkGetRayTracingShaderGroupHandlesKHR(engine.Device, RayTracePipeline, 0, GroupCount, Sizing, shaderHandleStorage.data());
 
     raygenShaderBindingTable.CreateBuffer(engine, HandleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
-    missShaderBindingTable.CreateBuffer(engine, HandleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + AlignedHandleSize);
-    hitShaderBindingTable.CreateBuffer(engine, HandleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + AlignedHandleSize * 2);
+    missShaderBindingTable.CreateBuffer(engine, HandleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + AlignedHandleSize);
+    hitShaderBindingTable.CreateBuffer(engine, HandleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + AlignedHandleSize * 3);
 }
 void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
 {
@@ -531,7 +551,8 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     { VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1 },
     { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1 },
     { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1 },
-     { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }
+     { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
+      { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }
     };
 
     VkDescriptorPoolCreateInfo RayTraceDescriptorPoolInfo = {};
@@ -627,13 +648,29 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     TextureDescriptor.descriptorCount = 1;
     TextureDescriptor.pImageInfo = &DescriptorImage;
 
+
+    VkDescriptorImageInfo NormalMapImage = {};
+    NormalMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    NormalMapImage.imageView = NormalMap.GetTextureView();
+    NormalMapImage.sampler = NormalMap.GetTextureSampler();
+
+    VkWriteDescriptorSet NormalMapTextureDescriptor = {};
+    NormalMapTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    NormalMapTextureDescriptor.dstSet = RTDescriptorSet;
+    NormalMapTextureDescriptor.dstBinding = 6;
+    NormalMapTextureDescriptor.dstArrayElement = 0;
+    NormalMapTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    NormalMapTextureDescriptor.descriptorCount = 1;
+    NormalMapTextureDescriptor.pImageInfo = &NormalMapImage;
+
     std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
         AccelerationDesciptorSet,
         ImageDescriptorSet,
         UniformDescriptorSet,
         VertexDescriptorSet,
         IndexDescriptorSet,
-        TextureDescriptor
+        TextureDescriptor,
+        NormalMapTextureDescriptor
     };
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }
@@ -962,4 +999,72 @@ VkShaderModule RayTraceRenderer::loadShader(const char* fileName, VkDevice devic
         std::cerr << "Error: Could not open shader file \"" << fileName << "\"" << "\n";
         return VK_NULL_HANDLE;
     }
+}
+
+std::vector<Vertex> RayTraceRenderer::CalcVertex()
+{
+    glm::vec3 pos1(-1.0f, 1.0f, 0.0f);
+    glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
+    glm::vec3 pos3(1.0f, -1.0f, 0.0f);
+    glm::vec3 pos4(1.0f, 1.0f, 0.0f);
+    // texture coordinates
+    glm::vec2 uv1(0.0f, 1.0f);
+    glm::vec2 uv2(0.0f, 0.0f);
+    glm::vec2 uv3(1.0f, 0.0f);
+    glm::vec2 uv4(1.0f, 1.0f);
+    // normal vector
+    glm::vec3 nm(0.0f, 0.0f, 1.0f);
+
+    // calculate tangent/bitangent vectors of both triangles
+    glm::vec3 tangent1, bitangent1;
+    glm::vec3 tangent2, bitangent2;
+    // triangle 1
+    // ----------
+    glm::vec3 edge1 = pos2 - pos1;
+    glm::vec3 edge2 = pos3 - pos1;
+    glm::vec2 deltaUV1 = uv2 - uv1;
+    glm::vec2 deltaUV2 = uv3 - uv1;
+
+    float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent1 = glm::normalize(tangent1);
+
+    bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent1 = glm::normalize(bitangent1);
+
+    // triangle 2
+    // ----------
+    edge1 = pos3 - pos1;
+    edge2 = pos4 - pos1;
+    deltaUV1 = uv3 - uv1;
+    deltaUV2 = uv4 - uv1;
+
+    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent2 = glm::normalize(tangent2);
+
+
+    bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent2 = glm::normalize(bitangent2);
+
+    return {
+    //    // positions            // normal         // texcoords  // tangent                          // bitangent
+    //    {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent1.x, tangent1.y, tangent1.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
+    //    {{pos2.x, pos2.y, pos2.z}, {nm.x, nm.y, nm.z}, {uv2.x, uv2.y}, {tangent1.x, tangent1.y, tangent1.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
+    //    {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y, {tangent1.x, tangent1.y, tangent1.z}}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
+
+    //    {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}},
+    //    {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}},
+    //    {{pos4.x, pos4.y, pos4.z}, {nm.x, nm.y, nm.z}, {uv4.x, uv4.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}}
+    };
 }
