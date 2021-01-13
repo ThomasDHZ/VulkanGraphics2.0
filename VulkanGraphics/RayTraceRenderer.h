@@ -93,9 +93,8 @@ public:
     uint64_t BottomLevelAccelerationDeviceAddress;
     uint64_t TopLevelAccelerationDeviceAddress;
 
-    VulkanBuffer bottomLevelAS;
-    VulkanBuffer bottomLevelAS2;
-    VulkanBuffer topLevelAS;
+    AccelerationStructure bottomLevelAS;
+    AccelerationStructure topLevelAS;
 
     VulkanBuffer vertexBuffer;
     VulkanBuffer indexBuffer;
@@ -140,7 +139,8 @@ public:
     void buildCommandBuffers(VulkanEngine& engine);
     void Resize(VulkanEngine& engine);
     void Destory(VulkanEngine& engine);
-
+    void createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
+    void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& accelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
     void updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window);
     uint32_t getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties);
     //void setImageLayout(VulkanEngine& engine,

@@ -76,32 +76,16 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
     model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj", RayTraceDescriptorSetLayout, 1, texture);
-    auto a = sizeof(Vertex);
-    auto b = sizeof(Vertex2);
-
-    //std::vector<Vertex> Vertices =
-    //{
-    //    {{0.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-    //    {{1.0f, 0.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-    //    {{1.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {0.0f, -1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-    //    {{0.0f, 1.0f, -0.1f}, {0.0f, 0.0f, 1.0f}, {1.0f, -1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}}
-    //};
-
-    //std::vector<uint32_t> Indices =
-    //{
-    //      0, 1, 2, 2, 3, 0
-    //};
-
     texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
     NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
-
-    std::vector<VkAccelerationStructureGeometryKHR> GeometryAccelerationStructureList;
-    std::vector<VkAccelerationStructureBuildRangeInfoKHR> AcclerationBuildRangeList;
 
     for (auto mesh : model.SubMeshList)
     {
         glm::mat4 transformMatrix = glm::mat4(1.0f);
         transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        uint32_t numTriangles = static_cast<uint32_t>(mesh.IndexList.size()) / 3;
+        uint32_t maxVertex = mesh.VertexList.size();
 
         vertexBuffer.CreateBuffer(engine, mesh.VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.VertexList.data());
         indexBuffer.CreateBuffer(engine, mesh.IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.IndexList.data());
@@ -111,36 +95,36 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
         VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
 
-        VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
-        GeometryAccelerationStructure.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
-        GeometryAccelerationStructure.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-        GeometryAccelerationStructure.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-        GeometryAccelerationStructure.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-        GeometryAccelerationStructure.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-        GeometryAccelerationStructure.geometry.triangles.vertexData = vertexBufferDeviceAddress;
-        GeometryAccelerationStructure.geometry.triangles.maxVertex = mesh.VertexList.size() * sizeof(Vertex);
-        GeometryAccelerationStructure.geometry.triangles.vertexStride = sizeof(Vertex);
-        GeometryAccelerationStructure.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-        GeometryAccelerationStructure.geometry.triangles.indexData = indexBufferDeviceAddress;
-        GeometryAccelerationStructure.geometry.triangles.transformData.deviceAddress = 0;
-        GeometryAccelerationStructure.geometry.triangles.transformData.hostAddress = nullptr;
-        GeometryAccelerationStructure.geometry.triangles.transformData = transformBufferDeviceAddress;
-        GeometryAccelerationStructureList.emplace_back(GeometryAccelerationStructure);
+        VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
+        accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
+        accelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+        accelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        accelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        accelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        accelerationStructureGeometry.geometry.triangles.vertexData = vertexBufferDeviceAddress;
+        accelerationStructureGeometry.geometry.triangles.maxVertex = maxVertex;
+        accelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
+        accelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+        accelerationStructureGeometry.geometry.triangles.indexData = indexBufferDeviceAddress;
+        accelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = transformBufferDeviceAddress.deviceAddress;
+        accelerationStructureGeometry.geometry.triangles.transformData.hostAddress = transformBufferDeviceAddress.hostAddress;
+        GeometryAccelerationStructureList.emplace_back(accelerationStructureGeometry);
 
-        VkAccelerationStructureBuildRangeInfoKHR AcclerationBuildRange = {};
-        AcclerationBuildRange.primitiveCount = static_cast<uint32_t>(mesh.IndexList.size()) / 3;
-        AcclerationBuildRange.primitiveOffset = 0;
-        AcclerationBuildRange.firstVertex = 0;
-        AcclerationBuildRange.transformOffset = 0;
-        AcclerationBuildRangeList.emplace_back(AcclerationBuildRange);
+        VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
+        accelerationStructureBuildRangeInfo.primitiveCount = numTriangles;
+        accelerationStructureBuildRangeInfo.primitiveOffset = 0;
+        accelerationStructureBuildRangeInfo.firstVertex = 0;
+        accelerationStructureBuildRangeInfo.transformOffset = 0;
+        AcclerationBuildRangeList.emplace_back(accelerationStructureBuildRangeInfo);
     }
 
-    VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometry = {};
-    AccelerationBuildGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
-    AccelerationBuildGeometry.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-    AccelerationBuildGeometry.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-    AccelerationBuildGeometry.geometryCount = static_cast<uint32_t>(GeometryAccelerationStructureList.size());
-    AccelerationBuildGeometry.pGeometries = GeometryAccelerationStructureList.data();
+    VkAccelerationStructureBuildGeometryInfoKHR accelerationStructureBuildGeometryInfo{};
+    accelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+    accelerationStructureBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    accelerationStructureBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    accelerationStructureBuildGeometryInfo.geometryCount = static_cast<uint32_t>(GeometryAccelerationStructureList.size());
+    accelerationStructureBuildGeometryInfo.pGeometries = GeometryAccelerationStructureList.data();
+
 
 
     maxPrimCount.resize(AcclerationBuildRangeList.size());
@@ -149,71 +133,31 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         maxPrimCount[x] = AcclerationBuildRangeList[x].primitiveCount;
     }
 
-    VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
-    AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-    vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, maxPrimCount.data(), &AccelerationBuildInfo);
-
-    bottomLevelAS.CreateBuffer(engine, AccelerationBuildInfo.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    VkAccelerationStructureCreateInfoKHR AccelerationStructureInfo = {};
-    AccelerationStructureInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-    AccelerationStructureInfo.buffer = bottomLevelAS.Buffer;
-    AccelerationStructureInfo.size = AccelerationBuildInfo.accelerationStructureSize;
-    AccelerationStructureInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-    VkResult result = vkCreateAccelerationStructureKHR(engine.Device, &AccelerationStructureInfo, nullptr, &bottomLevelAS.BufferHandle);
+    VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
+    accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
+    vkGetAccelerationStructureBuildSizesKHR(
+        engine.Device,
+        VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+        &accelerationStructureBuildGeometryInfo,
+        maxPrimCount.data(),
+        &accelerationStructureBuildSizesInfo);
+    createAccelerationStructure(engine, bottomLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, accelerationStructureBuildSizesInfo);
 
     VulkanBuffer ScratchBuffer = VulkanBuffer();
-    ScratchBuffer.CreateBuffer(engine, AccelerationBuildInfo.buildScratchSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    VkDeviceOrHostAddressConstKHR ScratchBufferDeviceAddress = engine.BufferToDeviceAddress(ScratchBuffer.GetBuffer());
+    ScratchBuffer.CreateBuffer(engine, accelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    ScratchBuffer.BufferDeviceAddress = engine.BufferToDeviceAddress(ScratchBuffer.GetBuffer()).deviceAddress;
 
-    VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
-    AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
-    AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-    AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-    AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-    AccelerationBuildGeometryInfo.dstAccelerationStructure = bottomLevelAS.BufferHandle;
-    AccelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(GeometryAccelerationStructureList.size());
-    AccelerationBuildGeometryInfo.pGeometries = GeometryAccelerationStructureList.data();
-    AccelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBufferDeviceAddress.deviceAddress;
+    VkAccelerationStructureBuildGeometryInfoKHR accelerationBuildGeometryInfo{};
+    accelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+    accelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    accelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    accelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
+    accelerationBuildGeometryInfo.dstAccelerationStructure = bottomLevelAS.handle;
+    accelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(GeometryAccelerationStructureList.size());
+    accelerationBuildGeometryInfo.pGeometries = GeometryAccelerationStructureList.data();
+    accelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBuffer.BufferDeviceAddress;
 
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = engine.GetRenderCommandPool();
-    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateInfo.commandBufferCount = 1;
-
-    VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
-
-    VkCommandBufferBeginInfo cmdBufferBeginInfo{};
-    cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    auto asdf = AcclerationBuildRangeList.data();
-    vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &AccelerationBuildGeometryInfo, &asdf);
-    vkEndCommandBuffer(cmdBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &cmdBuffer;
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-
-    VkFence fence;
-    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
-    vkDestroyFence(engine.Device, fence, nullptr);
-    vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &cmdBuffer);
-
-
-    VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
-    AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-    AccelerationDeviceAddressInfo.accelerationStructure = bottomLevelAS.BufferHandle;
-    bottomLevelAS.BufferDeviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &AccelerationDeviceAddressInfo);
-
+    AcclerationCommandBuffer(engine, accelerationBuildGeometryInfo, AcclerationBuildRangeList);
     ScratchBuffer.DestoryBuffer(engine);
 }
 void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
@@ -230,7 +174,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationInstance.mask = 0xFF;
     AccelerationInstance.instanceShaderBindingTableRecordOffset = 0;
     AccelerationInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    AccelerationInstance.accelerationStructureReference = bottomLevelAS.BufferDeviceAddress;
+    AccelerationInstance.accelerationStructureReference = bottomLevelAS.deviceAddress;
 
     VulkanBuffer instancesBuffer;
     instancesBuffer.CreateBuffer(engine, sizeof(VkAccelerationStructureInstanceKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &AccelerationInstance);
@@ -253,79 +197,36 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationStructureBuildGeometry.geometryCount = 1;
     AccelerationStructureBuildGeometry.pGeometries = &AccelerationGeometry;
 
-    uint32_t geoCount =1;
+    uint32_t primitive_count =1;
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-    vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &geoCount, &AccelerationBuildInfo);
+    vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &primitive_count, &AccelerationBuildInfo);
 
-    topLevelAS.CreateBuffer(engine, AccelerationBuildInfo.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    VkAccelerationStructureCreateInfoKHR AccelerationStructureInfo = {};
-    AccelerationStructureInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-    AccelerationStructureInfo.buffer = topLevelAS.Buffer;
-    AccelerationStructureInfo.size = AccelerationBuildInfo.accelerationStructureSize;
-    AccelerationStructureInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
-    VkResult result = vkCreateAccelerationStructureKHR(engine.Device, &AccelerationStructureInfo, nullptr, &topLevelAS.BufferHandle);
+    createAccelerationStructure(engine, topLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationBuildInfo);
 
     VulkanBuffer ScratchBuffer = VulkanBuffer();
     ScratchBuffer.CreateBuffer(engine, AccelerationBuildInfo.buildScratchSize, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    VkDeviceOrHostAddressConstKHR ScratchBufferDeviceAddress = engine.BufferToDeviceAddress(ScratchBuffer.GetBuffer());
+    ScratchBuffer.BufferDeviceAddress = engine.BufferToDeviceAddress(ScratchBuffer.GetBuffer()).deviceAddress;
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
     AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
     AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR;
     AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
     AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-    AccelerationBuildGeometryInfo.dstAccelerationStructure = topLevelAS.BufferHandle;
+    AccelerationBuildGeometryInfo.dstAccelerationStructure = topLevelAS.handle;
     AccelerationBuildGeometryInfo.geometryCount = 1;
     AccelerationBuildGeometryInfo.pGeometries = &AccelerationGeometry;
-    AccelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBufferDeviceAddress.deviceAddress;
+    AccelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBuffer.BufferDeviceAddress;
+   
+    VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
+    accelerationStructureBuildRangeInfo.primitiveCount = 1;
+    accelerationStructureBuildRangeInfo.primitiveOffset = 0;
+    accelerationStructureBuildRangeInfo.firstVertex = 0;
+    accelerationStructureBuildRangeInfo.transformOffset = 0;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> accelerationBuildStructureRangeInfos = { accelerationStructureBuildRangeInfo };
 
-    std::vector<VkAccelerationStructureBuildRangeInfoKHR*> AcclerationBuildRangeList;
-    VkAccelerationStructureBuildRangeInfoKHR AcclerationBuildRange = {};
-    AcclerationBuildRange.primitiveCount = geoCount;
-    AcclerationBuildRange.primitiveOffset = 0;
-    AcclerationBuildRange.firstVertex = 0;
-    AcclerationBuildRange.transformOffset = 0;
-    AcclerationBuildRangeList.emplace_back(&AcclerationBuildRange);
-
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = engine.GetRenderCommandPool();
-    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateInfo.commandBufferCount = 1;
-
-    VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
-
-    VkCommandBufferBeginInfo cmdBufferBeginInfo{};
-    cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
-    vkEndCommandBuffer(cmdBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &cmdBuffer;
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-
-    VkFence fence;
-    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
-    vkDestroyFence(engine.Device, fence, nullptr);
-    vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &cmdBuffer);
-
-
-    VkAccelerationStructureDeviceAddressInfoKHR AccelerationDeviceAddressInfo{};
-    AccelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-    AccelerationDeviceAddressInfo.accelerationStructure = topLevelAS.BufferHandle;
-    topLevelAS.BufferDeviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &AccelerationDeviceAddressInfo);
-
+    AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, accelerationBuildStructureRangeInfos);
     ScratchBuffer.DestoryBuffer(engine);
 }
 void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
@@ -589,7 +490,7 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
     AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
     AccelerationDescriptorStructure.accelerationStructureCount = 1;
-    AccelerationDescriptorStructure.pAccelerationStructures = &topLevelAS.BufferHandle;
+    AccelerationDescriptorStructure.pAccelerationStructures = &topLevelAS.handle;
 
     VkWriteDescriptorSet AccelerationDesciptorSet = {};
     AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1084,4 +985,74 @@ std::vector<Vertex> RayTraceRenderer::CalcVertex()
     //    {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}},
     //    {{pos4.x, pos4.y, pos4.z}, {nm.x, nm.y, nm.z}, {uv4.x, uv4.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}}
     };
+}
+
+void RayTraceRenderer::createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo)
+{
+    // Buffer and memory
+    VkBufferCreateInfo bufferCreateInfo{};
+    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCreateInfo.size = buildSizeInfo.accelerationStructureSize;
+    bufferCreateInfo.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+    vkCreateBuffer(engine.Device, &bufferCreateInfo, nullptr, &accelerationStructure.buffer);
+    VkMemoryRequirements memoryRequirements{};
+    vkGetBufferMemoryRequirements(engine.Device, accelerationStructure.buffer, &memoryRequirements);
+    VkMemoryAllocateFlagsInfo memoryAllocateFlagsInfo{};
+    memoryAllocateFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
+    memoryAllocateFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
+    VkMemoryAllocateInfo memoryAllocateInfo{};
+    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryAllocateInfo.pNext = &memoryAllocateFlagsInfo;
+    memoryAllocateInfo.allocationSize = memoryRequirements.size;
+    memoryAllocateInfo.memoryTypeIndex = getMemoryType(engine, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &accelerationStructure.memory);
+    vkBindBufferMemory(engine.Device, accelerationStructure.buffer, accelerationStructure.memory, 0);
+    // Acceleration structure
+    VkAccelerationStructureCreateInfoKHR accelerationStructureCreate_info{};
+    accelerationStructureCreate_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
+    accelerationStructureCreate_info.buffer = accelerationStructure.buffer;
+    accelerationStructureCreate_info.size = buildSizeInfo.accelerationStructureSize;
+    accelerationStructureCreate_info.type = type;
+    vkCreateAccelerationStructureKHR(engine.Device, &accelerationStructureCreate_info, nullptr, &accelerationStructure.handle);
+    // AS device address
+    VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
+    accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
+    accelerationDeviceAddressInfo.accelerationStructure = accelerationStructure.handle;
+    accelerationStructure.deviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &accelerationDeviceAddressInfo);
+}
+
+void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR)
+{
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool = engine.GetRenderCommandPool();
+    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    commandBufferAllocateInfo.commandBufferCount = 1;
+
+    VkCommandBuffer cmdBuffer;
+    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
+
+    VkCommandBufferBeginInfo cmdBufferBeginInfo{};
+    cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    auto asdf = accelerationStructureBuildRangeInfoKHR.data();
+    vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
+    vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &VkAccelerationStructureBuildGeometryInfoKHR, &asdf);
+    vkEndCommandBuffer(cmdBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &cmdBuffer;
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+
+    VkFence fence;
+    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, 100000000000);
+    vkDestroyFence(engine.Device, fence, nullptr);
+    vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &cmdBuffer);
+
 }
