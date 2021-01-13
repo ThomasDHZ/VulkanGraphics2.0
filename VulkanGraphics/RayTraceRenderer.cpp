@@ -64,6 +64,11 @@ RayTraceRenderer::~RayTraceRenderer()
 
 }
 
+void RayTraceRenderer::AddMesh(VulkanEngine& engine)
+{
+}
+
+
 void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine)
 {
  
@@ -87,47 +92,66 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     //      0, 1, 2, 2, 3, 0
     //};
 
-    uint32_t numTriangles = static_cast<uint32_t>(model.SubMeshList[0].IndexList.size()) / 3;
     texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
     NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
 
-    glm::mat4 transformMatrix = glm::mat4(1.0f);
-    transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    std::vector<VkAccelerationStructureGeometryKHR> GeometryAccelerationStructureList;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> AcclerationBuildRangeList;
 
-    vertexBuffer.CreateBuffer(engine, model.SubMeshList[0].VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].VertexList.data());
-    indexBuffer.CreateBuffer(engine, model.SubMeshList[0].IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.SubMeshList[0].IndexList.data());
-    transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
-  
-    VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
-    VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
-    VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
+    for (auto mesh : model.SubMeshList)
+    {
+        glm::mat4 transformMatrix = glm::mat4(1.0f);
+        transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
-    GeometryAccelerationStructure.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
-    GeometryAccelerationStructure.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-    GeometryAccelerationStructure.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-    GeometryAccelerationStructure.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-    GeometryAccelerationStructure.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-    GeometryAccelerationStructure.geometry.triangles.vertexData = vertexBufferDeviceAddress;
-    GeometryAccelerationStructure.geometry.triangles.maxVertex = model.SubMeshList[0].VertexList.size() * sizeof(Vertex);
-    GeometryAccelerationStructure.geometry.triangles.vertexStride = sizeof(Vertex);
-    GeometryAccelerationStructure.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-    GeometryAccelerationStructure.geometry.triangles.indexData = indexBufferDeviceAddress;
-    GeometryAccelerationStructure.geometry.triangles.transformData.deviceAddress = 0;
-    GeometryAccelerationStructure.geometry.triangles.transformData.hostAddress = nullptr;
-    GeometryAccelerationStructure.geometry.triangles.transformData = transformBufferDeviceAddress;
+        vertexBuffer.CreateBuffer(engine, mesh.VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.VertexList.data());
+        indexBuffer.CreateBuffer(engine, mesh.IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.IndexList.data());
+        transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
+
+        VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
+        VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
+        VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
+
+        VkAccelerationStructureGeometryKHR GeometryAccelerationStructure = {};
+        GeometryAccelerationStructure.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
+        GeometryAccelerationStructure.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+        GeometryAccelerationStructure.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        GeometryAccelerationStructure.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        GeometryAccelerationStructure.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        GeometryAccelerationStructure.geometry.triangles.vertexData = vertexBufferDeviceAddress;
+        GeometryAccelerationStructure.geometry.triangles.maxVertex = mesh.VertexList.size() * sizeof(Vertex);
+        GeometryAccelerationStructure.geometry.triangles.vertexStride = sizeof(Vertex);
+        GeometryAccelerationStructure.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+        GeometryAccelerationStructure.geometry.triangles.indexData = indexBufferDeviceAddress;
+        GeometryAccelerationStructure.geometry.triangles.transformData.deviceAddress = 0;
+        GeometryAccelerationStructure.geometry.triangles.transformData.hostAddress = nullptr;
+        GeometryAccelerationStructure.geometry.triangles.transformData = transformBufferDeviceAddress;
+        GeometryAccelerationStructureList.emplace_back(GeometryAccelerationStructure);
+
+        VkAccelerationStructureBuildRangeInfoKHR AcclerationBuildRange = {};
+        AcclerationBuildRange.primitiveCount = static_cast<uint32_t>(mesh.IndexList.size()) / 3;
+        AcclerationBuildRange.primitiveOffset = 0;
+        AcclerationBuildRange.firstVertex = 0;
+        AcclerationBuildRange.transformOffset = 0;
+        AcclerationBuildRangeList.emplace_back(AcclerationBuildRange);
+    }
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometry = {};
     AccelerationBuildGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
     AccelerationBuildGeometry.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
     AccelerationBuildGeometry.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-    AccelerationBuildGeometry.geometryCount = 1;
-    AccelerationBuildGeometry.pGeometries = &GeometryAccelerationStructure;
+    AccelerationBuildGeometry.geometryCount = static_cast<uint32_t>(GeometryAccelerationStructureList.size());
+    AccelerationBuildGeometry.pGeometries = GeometryAccelerationStructureList.data();
 
-    uint32_t geoCount = numTriangles;
+
+    maxPrimCount.resize(AcclerationBuildRangeList.size());
+    for (auto x = 0; x < AcclerationBuildRangeList.size(); x++)
+    {
+        maxPrimCount[x] = AcclerationBuildRangeList[x].primitiveCount;
+    }
+
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-    vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, &geoCount, &AccelerationBuildInfo);
+    vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationBuildGeometry, maxPrimCount.data(), &AccelerationBuildInfo);
 
     bottomLevelAS.CreateBuffer(engine, AccelerationBuildInfo.accelerationStructureSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
@@ -148,17 +172,9 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
     AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
     AccelerationBuildGeometryInfo.dstAccelerationStructure = bottomLevelAS.BufferHandle;
-    AccelerationBuildGeometryInfo.geometryCount = 1;
-    AccelerationBuildGeometryInfo.pGeometries = &GeometryAccelerationStructure;
+    AccelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(GeometryAccelerationStructureList.size());
+    AccelerationBuildGeometryInfo.pGeometries = GeometryAccelerationStructureList.data();
     AccelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBufferDeviceAddress.deviceAddress;
-
-    std::vector<VkAccelerationStructureBuildRangeInfoKHR*> AcclerationBuildRangeList;
-    VkAccelerationStructureBuildRangeInfoKHR AcclerationBuildRange = {};
-    AcclerationBuildRange.primitiveCount = geoCount;
-    AcclerationBuildRange.primitiveOffset = 0;
-    AcclerationBuildRange.firstVertex = 0;
-    AcclerationBuildRange.transformOffset = 0;
-    AcclerationBuildRangeList.emplace_back(&AcclerationBuildRange);
 
     VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -172,8 +188,9 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     VkCommandBufferBeginInfo cmdBufferBeginInfo{};
     cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
+    auto asdf = AcclerationBuildRangeList.data();
     vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &AccelerationBuildGeometryInfo, AcclerationBuildRangeList.data());
+    vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &AccelerationBuildGeometryInfo, &asdf);
     vkEndCommandBuffer(cmdBuffer);
 
     VkSubmitInfo submitInfo{};
@@ -236,7 +253,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationStructureBuildGeometry.geometryCount = 1;
     AccelerationStructureBuildGeometry.pGeometries = &AccelerationGeometry;
 
-    uint32_t geoCount =9;
+    uint32_t geoCount =1;
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &geoCount, &AccelerationBuildInfo);

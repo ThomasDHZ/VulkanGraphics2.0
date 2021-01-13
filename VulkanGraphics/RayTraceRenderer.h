@@ -110,7 +110,9 @@ public:
     VulkanBuffer hitShaderBindingTable;
 
    // StorageImage storageImage;
-
+    std::vector<uint32_t> maxPrimCount;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> AcclerationBuildRangeList;
+    std::vector<VkAccelerationStructureGeometryKHR> GeometryAccelerationStructureList;
     UniformData uniformData;
     VulkanBuffer ubo;
 
@@ -127,6 +129,7 @@ public:
     RayTraceRenderer(VulkanEngine& engine);
     ~RayTraceRenderer();
 
+    void AddMesh(VulkanEngine& engine);
     void createBottomLevelAccelerationStructure(VulkanEngine& engine);
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
     void createStorageImage(VulkanEngine& engine);

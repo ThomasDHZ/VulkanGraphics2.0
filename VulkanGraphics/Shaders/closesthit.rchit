@@ -91,16 +91,9 @@ void main()
     float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = diff * color;
 
-	vec3 viewDir = normalize(TangentLightPos - TangentFragPos);
-    vec3 reflectDir = reflect(-lightDir, normal);
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-
-    vec3 specular = vec3(0.2) * spec;
-
 	//vec3 lightVector = normalize(ubo.lightPos.xyz);
 	//float dot_product = max(dot(lightVector, normal), 0.2);
-	hitValue = ambient + diffuse + specular;
+	hitValue = ambient + diffuse;
 
 	// Shadow casting
 	float tmin = 0.001;
@@ -111,5 +104,16 @@ void main()
 	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
 	if (shadowed) {
 		hitValue *= 0.3;
+	}
+	else
+	{
+		vec3 viewDir = normalize(TangentLightPos - TangentFragPos);
+		vec3 reflectDir = reflect(-lightDir, normal);
+		vec3 halfwayDir = normalize(lightDir + viewDir);  
+		float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+
+		vec3 specular = vec3(0.2) * spec;
+
+		hitValue += specular;
 	}
 }
