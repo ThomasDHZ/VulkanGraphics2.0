@@ -333,9 +333,9 @@ private:
         vkDestroyImageView(device, RayRenderer.storageImage.view, nullptr);
         vkDestroyImage(device, RayRenderer.storageImage.image, nullptr);
         vkFreeMemory(device, RayRenderer.storageImage.memory, nullptr);
-        vkFreeMemory(device, RayRenderer.bottomLevelAS.memory, nullptr);
-        vkDestroyBuffer(device, RayRenderer.bottomLevelAS.buffer, nullptr);
-        RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.bottomLevelAS.handle, nullptr);
+       // vkFreeMemory(device, RayRenderer.bottomLevelAS.memory, nullptr);
+       // vkDestroyBuffer(device, RayRenderer.bottomLevelAS.buffer, nullptr);
+      //  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.bottomLevelAS.handle, nullptr);
         vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
         vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
         RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);

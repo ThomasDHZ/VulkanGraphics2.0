@@ -16,6 +16,9 @@
 #include "VulkanBuffer.h"
 #include <vector>
 #include "Buffer.h"
+#include "RayTraceMesh.h"
+
+
 
 struct RayTracingScratchBuffer
 {
@@ -24,12 +27,7 @@ struct RayTracingScratchBuffer
     VkDeviceMemory memory = VK_NULL_HANDLE;
 };
 
-struct AccelerationStructure {
-    VkAccelerationStructureKHR handle;
-    uint64_t deviceAddress = 0;
-    VkDeviceMemory memory;
-    VkBuffer buffer;
-};
+
 
 struct StorageImage {
     VkDeviceMemory memory;
@@ -306,14 +304,9 @@ public:
     AccelerationStructure bottomLevelAS{};
     AccelerationStructure topLevelAS{};
 
-    struct RTMesh
-    {
-        Buffer vertexBuffer;
-        Buffer indexBuffer;
-        Buffer transformBuffer;
-    };
 
-    std::vector<RTMesh> MeshList;
+
+    std::vector<RayTraceMesh> MeshList;
     uint32_t indexCount;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
@@ -336,10 +329,9 @@ public:
 
     Buffer transformBuffer;
     Buffer transformBuffer2;
-
-    std::vector<VkAccelerationStructureGeometryKHR> accelerationStructureGeometryList;
-    std::vector<VkAccelerationStructureBuildRangeInfoKHR> accelerationBuildStructureRangeInfos;
-    std::vector<uint32_t>                                 maxPrimCount;
+    Buffer transformBuffer3;
+    Buffer transformBuffer4;
+  
 
     RayTraceRenderer();
     RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
@@ -378,5 +370,15 @@ public:
     VkPipelineShaderStageCreateInfo loadShader(std::string fileName, VkShaderStageFlagBits stage);
     VkShaderModule loadShader(const char* fileName, VkDevice device);
     uint32_t alignedSize(uint32_t value, uint32_t alignment);
+
+    VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
+    {
+        return VkTransformMatrixKHR
+        {
+            matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+            matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+            matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+        };
+    }
 };
 
