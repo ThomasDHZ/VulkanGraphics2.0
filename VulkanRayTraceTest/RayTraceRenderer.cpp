@@ -60,7 +60,7 @@ RayTraceRenderer::~RayTraceRenderer()
 
 void RayTraceRenderer::createBottomLevelAccelerationStructure()
 {
-
+    AccelerationStructure bottomLevelAS{};
     std::vector<RTVertex> vertices = {
     { {  1.0f,  1.0f, 0.0f } },
     { { -1.0f,  1.0f, 0.0f } },
@@ -259,6 +259,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure()
     }
 
     deleteScratchBuffer(scratchBuffer);
+    BLASList.emplace_back(bottomLevelAS);
 }
 void RayTraceRenderer::createTopLevelAccelerationStructure()
 {
@@ -273,7 +274,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
     instance.mask = 0xFF;
     instance.instanceShaderBindingTableRecordOffset = 0;
     instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    instance.accelerationStructureReference = bottomLevelAS.deviceAddress;
+    instance.accelerationStructureReference = BLASList[0].deviceAddress;
 
     // Buffer for instance data
     createBuffer(

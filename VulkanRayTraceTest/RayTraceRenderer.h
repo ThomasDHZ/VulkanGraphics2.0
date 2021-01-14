@@ -301,7 +301,7 @@ public:
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{};
 
-    AccelerationStructure bottomLevelAS{};
+    std::vector<AccelerationStructure> BLASList;
     AccelerationStructure topLevelAS{};
 
 

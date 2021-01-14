@@ -144,7 +144,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="RayTraceMesh.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
@@ -158,6 +162,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Mouse.h" />
+    <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="RayTraceMesh.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="VulkanBuffer.h" />
