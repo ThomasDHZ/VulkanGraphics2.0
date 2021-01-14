@@ -339,9 +339,9 @@ private:
         vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
         vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
         RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);
-        RayRenderer.vertexBuffer.DestoryBuffer(device);
+       /* RayRenderer.vertexBuffer.DestoryBuffer(device);
         RayRenderer.indexBuffer.DestoryBuffer(device);
-        RayRenderer.transformBuffer.DestoryBuffer(device);
+        RayRenderer.transformBuffer.DestoryBuffer(device);*/
         RayRenderer.raygenShaderBindingTable.DestoryBuffer(device);
         RayRenderer.missShaderBindingTable.DestoryBuffer(device);
         RayRenderer.hitShaderBindingTable.DestoryBuffer(device);

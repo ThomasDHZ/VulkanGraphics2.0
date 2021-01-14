@@ -306,11 +306,15 @@ public:
     AccelerationStructure bottomLevelAS{};
     AccelerationStructure topLevelAS{};
 
-    VulkanBuffer vertexBuffer;
-    VulkanBuffer indexBuffer;
+    struct RTMesh
+    {
+        Buffer vertexBuffer;
+        Buffer indexBuffer;
+        Buffer transformBuffer;
+    };
+
+    std::vector<RTMesh> MeshList;
     uint32_t indexCount;
-    VulkanBuffer transformBuffer;
-    VulkanBuffer transformBuffer2;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;
@@ -330,6 +334,13 @@ public:
     std::vector<VkShaderModule> shaderModules;
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
+    Buffer transformBuffer;
+    Buffer transformBuffer2;
+
+    std::vector<VkAccelerationStructureGeometryKHR> accelerationStructureGeometryList;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> accelerationBuildStructureRangeInfos;
+    std::vector<uint32_t>                                 maxPrimCount;
+
     RayTraceRenderer();
     RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     ~RayTraceRenderer();
@@ -348,7 +359,7 @@ public:
     void deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffer);
     void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);
     void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue, VkCommandPool pool);
-    void createAccelerationStructureBuffer(AccelerationStructure& accelerationStructure, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
+    void createAccelerationStructure(AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
     RayTracingScratchBuffer createScratchBuffer(VkDeviceSize size);
     uint64_t getBufferDeviceAddress(VkBuffer buffer);
     uint32_t getMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties);
