@@ -16,8 +16,7 @@
 #include "VulkanBuffer.h"
 #include <vector>
 #include "Buffer.h"
-#include "RayTraceMesh.h"
-
+#include "RayTraceModel.h"
 
 
 struct RayTracingScratchBuffer

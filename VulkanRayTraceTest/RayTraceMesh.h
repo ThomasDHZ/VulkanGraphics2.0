@@ -6,11 +6,19 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-struct RTVertex {
-    float pos[3];
+struct RTVertex 
+{
+    glm::vec3 Position = glm::vec3(0.0f);
+    glm::vec3 Normal = glm::vec3(0.0f);
+    glm::vec2 TexureCoord = glm::vec2(0.0f);
+    glm::vec4 Tangant = glm::vec4(0.0f);
+    glm::vec4 BiTangant = glm::vec4(0.0f);
+    glm::vec4 Color = glm::vec4(0.0f);
+    glm::ivec4 BoneID = glm::ivec4(0);
+    glm::vec4 BoneWeights = glm::vec4(0.0f);
 };
 
-struct MeshContainer
+struct MeshDetails
 {
     std::vector<RTVertex> vertices;
     std::vector<uint32_t> indices;
@@ -27,12 +35,14 @@ class RayTraceMesh
 {
 private:
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
-    PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
 
 public:
     VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress{};
     VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress{};
     VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress{};
+
+     uint32_t TriangleCount;
+     uint32_t VertexCount;
 
     AccelerationStructure bottomLevelAS{};
     uint32_t TLASID = -1;
@@ -50,7 +60,7 @@ public:
     glm::vec3 MeshScale = glm::vec3(1.0f);
 
     RayTraceMesh();
-    RayTraceMesh(VkDevice& device, VkPhysicalDevice& VkPhysicalDevice, MeshContainer meshContainer, glm::mat4 TransformMatrix);
+    RayTraceMesh(VkDevice& device, VkPhysicalDevice& VkPhysicalDevice, MeshDetails meshContainer, glm::mat4 TransformMatrix);
     ~RayTraceMesh();
 
     void Update();

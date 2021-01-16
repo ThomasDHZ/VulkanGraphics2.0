@@ -42,7 +42,7 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     camera.type = Camera::CameraType::lookat;
     camera.setPerspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 512.0f);
     camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-    camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.5f));
+    camera.setTranslation(glm::vec3(0.0f, 0.0f, -10.0f));
 
     createBottomLevelAccelerationStructure();
     createTopLevelAccelerationStructure();
@@ -69,32 +69,23 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure()
 
     std::vector<uint32_t> indices = { 0, 1, 2 };
 
-    MeshContainer meshContainer = {};
+    MeshDetails meshContainer = {};
     meshContainer.vertices = vertices;
     meshContainer.indices = indices;
 
-
+    RayTraceModel model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj");
+   
     glm::mat4 transformMatrix = glm::mat4(1.0f);
-
-    MeshList.emplace_back(RayTraceMesh(device, physicalDevice, meshContainer, transformMatrix));
-
-    transformMatrix = glm::rotate(transformMatrix, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    MeshList.emplace_back(RayTraceMesh(device, physicalDevice, meshContainer, transformMatrix));
-
-    transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    MeshList.emplace_back(RayTraceMesh(device, physicalDevice, meshContainer, transformMatrix));
-
-    transformMatrix = glm::rotate(transformMatrix, glm::radians(270.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    MeshList.emplace_back(RayTraceMesh(device, physicalDevice, meshContainer, transformMatrix));
-
+    transformMatrix = glm::rotate(transformMatrix, float(180), glm::vec3(0.0f, 0.0f, 1.0f));
 
     std::vector<uint32_t> PrimitiveCount;
     std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationBuildStructureRangeInfos;
-    for (int x = 0; x < MeshList.size(); x++)
+    for (int x = 0; x < model.MeshList.size(); x++)
     {
-        const uint32_t TriangleCount = static_cast<uint32_t>(indices.size()) / 3;
-        const uint32_t VertexCount = vertices.size();
+        MeshList.emplace_back(RayTraceMesh(device, physicalDevice, model.MeshInfoList[x], transformMatrix));
+        const uint32_t TriangleCount = model.MeshList[x].TriangleCount;
+        const uint32_t VertexCount = model.MeshList[x].VertexCount;
 
         VkAccelerationStructureGeometryKHR AccelerationStructureGeometry = {};
         AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -177,11 +168,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
     }
 
     VulkanBuffer instancesBuffer;
-    instancesBuffer.CreateBuffer(device, physicalDevice,
-        sizeof(VkAccelerationStructureInstanceKHR) * AccelerationStructureInstanceList.size(), 
-        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        AccelerationStructureInstanceList.data());
+    instancesBuffer.CreateBuffer(device, physicalDevice, sizeof(VkAccelerationStructureInstanceKHR) * AccelerationStructureInstanceList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, AccelerationStructureInstanceList.data());
 
     VkDeviceOrHostAddressConstKHR DeviceOrHostAddressConst = {};
     DeviceOrHostAddressConst.deviceAddress = getBufferDeviceAddress(instancesBuffer.Buffer);
@@ -203,12 +190,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
 
     VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
     accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-    vkGetAccelerationStructureBuildSizesKHR(
-        device,
-        VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
-        &AccelerationStructureBuildGeometryInfo,
-        &PrimitiveCount,
-        &accelerationStructureBuildSizesInfo);
+    vkGetAccelerationStructureBuildSizesKHR( device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, &PrimitiveCount, &accelerationStructureBuildSizesInfo);
 
     if (MeshList[0].TLAS == VK_NULL_HANDLE)
     {
@@ -380,7 +362,6 @@ void RayTraceRenderer::updateUniformBuffers()
     uniformData.viewInverse = glm::inverse(camera.matrices.view);
     ubo.CopyBufferToMemory(device, &uniformData, sizeof(UniformData));
 
-    transformMatrix2 = glm::rotate(transformMatrix2, float(-time), glm::vec3(0.0f, 1.0f, 0.0f));
     createTopLevelAccelerationStructure();
 }
 
