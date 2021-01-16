@@ -307,7 +307,6 @@ public:
 
 
     std::vector<RayTraceMesh> MeshList;
-    uint32_t indexCount;
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;
@@ -326,12 +325,7 @@ public:
 
     std::vector<VkShaderModule> shaderModules;
     std::vector<VkCommandBuffer> drawCmdBuffers;
-
-    Buffer transformBuffer;
-    Buffer transformBuffer2;
-    Buffer transformBuffer3;
-    Buffer transformBuffer4;
-  
+    glm::mat4 transformMatrix2 = glm::mat4(1.0f);
 
     RayTraceRenderer();
     RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
@@ -344,10 +338,13 @@ public:
     void createRayTracingPipeline();
     void createShaderBindingTable();
     void createDescriptorSets();
+    void UpdateAccelerationStructure(RayTraceMesh& mesh);
     void buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     void Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
 
+    void AcclerationCommandBuffer(VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
     void updateUniformBuffers();
+
     void deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffer);
     void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);
     void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue, VkCommandPool pool);
