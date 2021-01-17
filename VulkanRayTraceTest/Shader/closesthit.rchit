@@ -16,10 +16,8 @@ layout(binding = 2, set = 0) uniform UBO
 	vec4 viewPos;
 	int vertexSize;
 } ubo;
-layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices;
-layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices;
-layout(binding = 5, set = 0) uniform sampler2D DiffuseMap;
-layout(binding = 6, set = 0) uniform sampler2D NormalMap;
+layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices[];
+layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices[];
 
 struct Vertex
 {
@@ -39,9 +37,9 @@ Vertex unpack(uint index)
 	// The multiplier is the size of the vertex divided by four float components (=16 bytes)
 	const int m = ubo.vertexSize / 16;
 
-	vec4 d0 = vertices.v[m * index + 0];
-	vec4 d1 = vertices.v[m * index + 1];
-	vec4 d2 = vertices.v[m * index + 2];
+	vec4 d0 = vertices[gl_InstanceID].v[m * index + 0];
+	vec4 d1 = vertices[gl_InstanceID].v[m * index + 1];
+	vec4 d2 = vertices[gl_InstanceID].v[m * index + 2];
 
 	Vertex v;
 	v.pos = d0.xyz;
@@ -55,7 +53,9 @@ Vertex unpack(uint index)
 
 void main()
 {
-	ivec3 index = ivec3(indices.i[3 * gl_PrimitiveID], indices.i[3 * gl_PrimitiveID + 1], indices.i[3 * gl_PrimitiveID + 2]);
+	ivec3 index = ivec3(indices[gl_InstanceID].i[3 * gl_PrimitiveID], 
+						indices[gl_InstanceID].i[3 * gl_PrimitiveID + 1], 
+						indices[gl_InstanceID].i[3 * gl_PrimitiveID + 2]);
 
 	Vertex v0 = unpack(index.x);
 	Vertex v1 = unpack(index.y);
@@ -67,5 +67,5 @@ void main()
 	vec2 texCoord = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
 
-	hitValue = vec3(0.5f, 0.5f, 0.5f);
+	hitValue = normal2;
 }

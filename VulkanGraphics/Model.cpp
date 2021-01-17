@@ -111,6 +111,8 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.BoneWeights = glm::vec4(0.0f);
 
 		VertexList.emplace_back(vertex);
+		VertexList2.emplace_back(vertex);
+		VertexCount++;
 	}
 
 	for (int x = 0; x < mesh->mNumBones; x++)
@@ -156,9 +158,11 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 		for (int y = 0; y < Faces.mNumIndices; y++)
 		{
 			IndexList.emplace_back(Faces.mIndices[y]);
+			IndexList2.emplace_back(Faces.mIndices[y]);
+			IndexCount++;
 		}
 	}
-
+	
 	return IndexList;
 }
 

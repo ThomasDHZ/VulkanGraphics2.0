@@ -45,14 +45,11 @@ public:
      uint32_t VertexCount;
 
     AccelerationStructure bottomLevelAS{};
-    uint32_t TLASID = -1;
-    uint64_t DeviceAddress = VK_NULL_HANDLE;
-    VkAccelerationStructureKHR TLAS = VK_NULL_HANDLE;
+    AccelerationStructure topLevelAS{};
 
     VulkanBuffer vertexBuffer;
     VulkanBuffer indexBuffer;
     VulkanBuffer transformBuffer;
-    uint64_t BLASAddress;
 
     glm::mat4 MeshTransformMatrix = glm::mat4(1.0f);
     glm::vec3 MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);

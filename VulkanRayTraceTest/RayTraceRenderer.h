@@ -38,8 +38,10 @@ struct StorageImage {
 struct UniformData {
     glm::mat4 viewInverse;
     glm::mat4 projInverse;
+    glm::mat4 modelInverse;
     glm::vec4 lightPos;
-    int32_t vertexSize;
+    glm::vec4 viewPos;
+    int vertexSize;
 };
 
 class Camera
@@ -300,8 +302,6 @@ public:
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{};
 
-    std::vector<AccelerationStructure> BLASList;
-    AccelerationStructure topLevelAS{};
 
 
 
@@ -330,13 +330,15 @@ public:
     RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     ~RayTraceRenderer();
 
-    void createBottomLevelAccelerationStructure();
-    void createTopLevelAccelerationStructure();
+
+    RayTraceModel model;
+    void createBottomLevelAccelerationStructure(RayTraceMesh& mesh);
+    void createTopLevelAccelerationStructure(RayTraceMesh& mesh, int x);
     void createStorageImage();
     void createUniformBuffer();
     void createRayTracingPipeline();
     void createShaderBindingTable();
-    void createDescriptorSets();
+    void createDescriptorSets(RayTraceMesh& mesh);
     void UpdateAccelerationStructure(RayTraceMesh& mesh);
     void buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     void Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);

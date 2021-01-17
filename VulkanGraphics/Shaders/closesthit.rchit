@@ -17,9 +17,9 @@ layout(binding = 2, set = 0) uniform UBO
 	vec4 lightPos;
 	vec4 viewPos;
 	int vertexSize;
-} ubo;
-layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices;
-layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices;
+} ubo[];
+layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices[];
+layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices[];
 layout(binding = 5, set = 0) uniform sampler2D DiffuseMap;
 layout(binding = 6, set = 0) uniform sampler2D NormalMap;
 
@@ -39,11 +39,11 @@ Vertex unpack(uint index)
 {
 	// Unpack the vertices from the SSBO using the glTF vertex structure
 	// The multiplier is the size of the vertex divided by four float components (=16 bytes)
-	const int m = ubo.vertexSize / 16;
+	const int m = ubo[gl_InstanceID].vertexSize / 16;
 
-	vec4 d0 = vertices.v[m * index + 0];
-	vec4 d1 = vertices.v[m * index + 1];
-	vec4 d2 = vertices.v[m * index + 2];
+	vec4 d0 = vertices[gl_InstanceID].v[m * index + 0];
+	vec4 d1 = vertices[gl_InstanceID].v[m * index + 1];
+	vec4 d2 = vertices[gl_InstanceID].v[m * index + 2];
 
 	Vertex v;
 	v.pos = d0.xyz;
@@ -57,7 +57,9 @@ Vertex unpack(uint index)
 
 void main()
 {
-	ivec3 index = ivec3(indices.i[3 * gl_PrimitiveID], indices.i[3 * gl_PrimitiveID + 1], indices.i[3 * gl_PrimitiveID + 2]);
+	ivec3 index = ivec3(indices[gl_InstanceID].i[3 * gl_PrimitiveID], 
+						indices[gl_InstanceID].i[3 * gl_PrimitiveID + 1], 
+						indices[gl_InstanceID].i[3 * gl_PrimitiveID + 2]);
 
 	Vertex v0 = unpack(index.x);
 	Vertex v1 = unpack(index.y);
@@ -69,15 +71,15 @@ void main()
 	vec2 texCoord = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
 
-	mat3 normalMatrix = transpose(inverse(mat3(ubo.modelInverse)));
+	mat3 normalMatrix = transpose(inverse(mat3(ubo[gl_InstanceID].modelInverse)));
     vec3 T = normalize(normalMatrix * tangent);
     vec3 N = normalize(normalMatrix * normal2);
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
     
     mat3 TBN = transpose(mat3(T, B, N));    
-    vec3 TangentLightPos = TBN * ubo.lightPos.xyz;
-    vec3 TangentViewPos  = TBN * ubo.viewPos.xyz;
+    vec3 TangentLightPos = TBN * ubo[gl_InstanceID].lightPos.xyz;
+    vec3 TangentViewPos  = TBN * ubo[gl_InstanceID].viewPos.xyz;
     vec3 TangentFragPos  = TBN * worldPos;
 
 	vec3 normal = texture(NormalMap, texCoord).rgb;
@@ -116,4 +118,6 @@ void main()
 
 		hitValue += specular;
 	}
+
+	hitValue = normal2;
 }

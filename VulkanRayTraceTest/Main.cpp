@@ -336,9 +336,9 @@ private:
        // vkFreeMemory(device, RayRenderer.bottomLevelAS.memory, nullptr);
        // vkDestroyBuffer(device, RayRenderer.bottomLevelAS.buffer, nullptr);
       //  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.bottomLevelAS.handle, nullptr);
-        vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
-        vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
-        RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);
+       // vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
+       // vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
+      //  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);
        /* RayRenderer.vertexBuffer.DestoryBuffer(device);
         RayRenderer.indexBuffer.DestoryBuffer(device);
         RayRenderer.transformBuffer.DestoryBuffer(device);*/

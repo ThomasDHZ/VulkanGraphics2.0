@@ -46,9 +46,14 @@ private:
 public:
 
 	std::vector<MeshData> SubMeshList;
+	std::vector<Vertex> VertexList2;
+	std::vector<uint32_t> IndexList2;
 	std::vector<std::shared_ptr<Mesh>> MeshList;
 	std::vector<std::shared_ptr<Bone>> BoneList;
 
+
+	int VertexCount = 0;
+	int IndexCount = 0;
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
 	glm::vec3 ModelRotation = glm::vec3(0.0f);
 	glm::vec3 ModelScale = glm::vec3(1.0f);

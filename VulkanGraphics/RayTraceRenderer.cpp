@@ -71,11 +71,18 @@ void RayTraceRenderer::AddMesh(VulkanEngine& engine)
 
 void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine)
 {
+    std::vector<Vertex> vertices = {
+ { {  1.0f,  1.0f, 0.0f }, {1.0f, 0.0f, 0.0f} },
+ { { -1.0f,  1.0f, 0.0f }, {0.0f, 1.0f, 0.0f} },
+ { {  0.0f, -1.0f, 0.0f }, {0.0f, 0.0f, 1.0f} }
+    };
+
+    std::vector<uint32_t> indices = { 0, 1, 2 };
  
     std::shared_ptr<TextureManager> manager = std::make_shared<TextureManager>(engine);
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
-    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj", RayTraceDescriptorSetLayout, 1, texture);
+    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/shapes.obj", RayTraceDescriptorSetLayout, 1, texture);
     texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
     NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
 
@@ -84,16 +91,33 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         glm::mat4 transformMatrix = glm::mat4(1.0f);
         transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        uint32_t numTriangles = static_cast<uint32_t>(mesh.IndexList.size()) / 3;
-        uint32_t maxVertex = mesh.VertexList.size();
+        uint32_t numTriangles = static_cast<uint32_t>(indices.size()) / 3;
+        uint32_t maxVertex = vertices.size();
 
-        vertexBuffer.CreateBuffer(engine, mesh.VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.VertexList.data());
-        indexBuffer.CreateBuffer(engine, mesh.IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.IndexList.data());
+        vertexBuffer.CreateBuffer(engine, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
+        indexBuffer.CreateBuffer(engine, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
         transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
 
         VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
         VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
         VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
+
+
+    //for (int x = 0; x < 2; x++)
+    //{
+    //    glm::mat4 transformMatrix = glm::mat4(1.0f);
+    //    transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    //    uint32_t numTriangles = static_cast<uint32_t>(model.IndexList2.size()) / 3;
+    //    uint32_t maxVertex = model.VertexList2.size();
+
+    //    vertexBuffer.CreateBuffer(engine, model.VertexList2.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.VertexList2.data());
+    //    indexBuffer.CreateBuffer(engine, model.IndexList2.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.IndexList2.data());
+    //    transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
+
+    //    VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
+    //    VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
+    //    VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
 
         VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
         accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
