@@ -50,7 +50,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
 
     createBottomLevelAccelerationStructure(engine);
     createTopLevelAccelerationStructure(engine);
-   
+
     rayTexture = RayTraceTexture(engine);
     //createStorageImage(engine);
     createUniformBuffer(engine);
@@ -71,18 +71,11 @@ void RayTraceRenderer::AddMesh(VulkanEngine& engine)
 
 void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine)
 {
-    std::vector<Vertex> vertices = {
- { {  1.0f,  1.0f, 0.0f }, {1.0f, 0.0f, 0.0f} },
- { { -1.0f,  1.0f, 0.0f }, {0.0f, 1.0f, 0.0f} },
- { {  0.0f, -1.0f, 0.0f }, {0.0f, 0.0f, 1.0f} }
-    };
 
-    std::vector<uint32_t> indices = { 0, 1, 2 };
- 
     std::shared_ptr<TextureManager> manager = std::make_shared<TextureManager>(engine);
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
-    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/shapes.obj", RayTraceDescriptorSetLayout, 1, texture);
+    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj", RayTraceDescriptorSetLayout, 1, texture);
     texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
     NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
 
@@ -91,33 +84,16 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         glm::mat4 transformMatrix = glm::mat4(1.0f);
         transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-        uint32_t numTriangles = static_cast<uint32_t>(indices.size()) / 3;
-        uint32_t maxVertex = vertices.size();
+        uint32_t numTriangles = static_cast<uint32_t>(mesh.IndexList.size()) / 3;
+        uint32_t maxVertex = mesh.VertexList.size();
 
-        vertexBuffer.CreateBuffer(engine, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-        indexBuffer.CreateBuffer(engine, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
+        vertexBuffer.CreateBuffer(engine, mesh.VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.VertexList.data());
+        indexBuffer.CreateBuffer(engine, mesh.IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.IndexList.data());
         transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
 
         VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
         VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
         VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
-
-
-    //for (int x = 0; x < 2; x++)
-    //{
-    //    glm::mat4 transformMatrix = glm::mat4(1.0f);
-    //    transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-    //    uint32_t numTriangles = static_cast<uint32_t>(model.IndexList2.size()) / 3;
-    //    uint32_t maxVertex = model.VertexList2.size();
-
-    //    vertexBuffer.CreateBuffer(engine, model.VertexList2.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.VertexList2.data());
-    //    indexBuffer.CreateBuffer(engine, model.IndexList2.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.IndexList2.data());
-    //    transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
-
-    //    VkDeviceOrHostAddressConstKHR vertexBufferDeviceAddress = engine.BufferToDeviceAddress(vertexBuffer.Buffer);
-    //    VkDeviceOrHostAddressConstKHR indexBufferDeviceAddress = engine.BufferToDeviceAddress(indexBuffer.Buffer);
-    //    VkDeviceOrHostAddressConstKHR transformBufferDeviceAddress = engine.BufferToDeviceAddress(transformBuffer.Buffer);
 
         VkAccelerationStructureGeometryKHR accelerationStructureGeometry{};
         accelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -148,8 +124,6 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     accelerationStructureBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
     accelerationStructureBuildGeometryInfo.geometryCount = static_cast<uint32_t>(GeometryAccelerationStructureList.size());
     accelerationStructureBuildGeometryInfo.pGeometries = GeometryAccelerationStructureList.data();
-
-
 
     maxPrimCount.resize(AcclerationBuildRangeList.size());
     for (auto x = 0; x < AcclerationBuildRangeList.size(); x++)
@@ -186,22 +160,30 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
 }
 void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
 {
-    VkTransformMatrixKHR transformMatrix = {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f
-    };
+    std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
+    for (auto x = 0; x < 1; x++)
+    {
+        glm::mat4 Transform = glm::mat4(1.0f);
+        Transform = glm::translate(Transform, glm::vec3(20.0f * x, 0.0f, 0.0f));
+        Transform = glm::transpose(Transform);
+        VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(Transform);
 
-    VkAccelerationStructureInstanceKHR AccelerationInstance = {};
-    AccelerationInstance.transform = transformMatrix;
-    AccelerationInstance.instanceCustomIndex = 0;
-    AccelerationInstance.mask = 0xFF;
-    AccelerationInstance.instanceShaderBindingTableRecordOffset = 0;
-    AccelerationInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    AccelerationInstance.accelerationStructureReference = bottomLevelAS.deviceAddress;
+        VkAccelerationStructureInstanceKHR AccelerationInstance = {};
+        AccelerationInstance.transform = transformMatrix;
+        AccelerationInstance.instanceCustomIndex = 0;
+        AccelerationInstance.mask = 0xFF;
+        AccelerationInstance.instanceShaderBindingTableRecordOffset = 0;
+        AccelerationInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        AccelerationInstance.accelerationStructureReference = bottomLevelAS.deviceAddress;
+        AccelerationStructureInstanceList.emplace_back(AccelerationInstance);
+    }
 
     VulkanBuffer instancesBuffer;
-    instancesBuffer.CreateBuffer(engine, sizeof(VkAccelerationStructureInstanceKHR), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &AccelerationInstance);
+    instancesBuffer.CreateBuffer(engine, 
+        sizeof(VkAccelerationStructureInstanceKHR) * AccelerationStructureInstanceList.size(),
+        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, 
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+        AccelerationStructureInstanceList.data());
 
     VkDeviceOrHostAddressConstKHR TopLevelAccelerationInstanceBufferDeviceAddress{};
     TopLevelAccelerationInstanceBufferDeviceAddress.deviceAddress = engine.BufferToDeviceAddress(instancesBuffer.Buffer).deviceAddress;
@@ -221,7 +203,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationStructureBuildGeometry.geometryCount = 1;
     AccelerationStructureBuildGeometry.pGeometries = &AccelerationGeometry;
 
-    uint32_t primitive_count =1;
+    uint32_t primitive_count = 1;
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &primitive_count, &AccelerationBuildInfo);
@@ -242,7 +224,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     AccelerationBuildGeometryInfo.geometryCount = 1;
     AccelerationBuildGeometryInfo.pGeometries = &AccelerationGeometry;
     AccelerationBuildGeometryInfo.scratchData.deviceAddress = ScratchBuffer.BufferDeviceAddress;
-   
+
     VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
     accelerationStructureBuildRangeInfo.primitiveCount = 1;
     accelerationStructureBuildRangeInfo.primitiveOffset = 0;
@@ -307,15 +289,15 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     vkDestroyPipelineLayout(engine.Device, RayTracePipelineLayout, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, RayTraceDescriptorSetLayout, nullptr);
     rayTexture.Delete(engine);
-   // vkDestroyImageView(engine.Device, storageImage.view, nullptr);
-  //  vkDestroyImage(engine.Device, storageImage.image, nullptr);
-  //  vkFreeMemory(engine.Device, storageImage.memory, nullptr);
-   // vkFreeMemory(engine.Device, bottomLevelAS.memory, nullptr);
- //   vkDestroyBuffer(engine.Device, bottomLevelAS.buffer, nullptr);
-//    vkDestroyAccelerationStructureKHR(engine.Device, bottomLevelAS.handle, nullptr);
-    //vkFreeMemory(engine.Device, topLevelAS.memory, nullptr);
-    //vkDestroyBuffer(engine.Device, topLevelAS.buffer, nullptr);
-    //vkDestroyAccelerationStructureKHR(engine.Device, topLevelAS.handle, nullptr);
+    // vkDestroyImageView(engine.Device, storageImage.view, nullptr);
+   //  vkDestroyImage(engine.Device, storageImage.image, nullptr);
+   //  vkFreeMemory(engine.Device, storageImage.memory, nullptr);
+    // vkFreeMemory(engine.Device, bottomLevelAS.memory, nullptr);
+  //   vkDestroyBuffer(engine.Device, bottomLevelAS.buffer, nullptr);
+ //    vkDestroyAccelerationStructureKHR(engine.Device, bottomLevelAS.handle, nullptr);
+     //vkFreeMemory(engine.Device, topLevelAS.memory, nullptr);
+     //vkDestroyBuffer(engine.Device, topLevelAS.buffer, nullptr);
+     //vkDestroyAccelerationStructureKHR(engine.Device, topLevelAS.handle, nullptr);
     vertexBuffer.DestoryBuffer(engine);
     indexBuffer.DestoryBuffer(engine);
     transformBuffer.DestoryBuffer(engine);
@@ -1000,14 +982,14 @@ std::vector<Vertex> RayTraceRenderer::CalcVertex()
     bitangent2 = glm::normalize(bitangent2);
 
     return {
-    //    // positions            // normal         // texcoords  // tangent                          // bitangent
-    //    {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent1.x, tangent1.y, tangent1.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
-    //    {{pos2.x, pos2.y, pos2.z}, {nm.x, nm.y, nm.z}, {uv2.x, uv2.y}, {tangent1.x, tangent1.y, tangent1.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
-    //    {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y, {tangent1.x, tangent1.y, tangent1.z}}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
+        //    // positions            // normal         // texcoords  // tangent                          // bitangent
+        //    {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent1.x, tangent1.y, tangent1.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
+        //    {{pos2.x, pos2.y, pos2.z}, {nm.x, nm.y, nm.z}, {uv2.x, uv2.y}, {tangent1.x, tangent1.y, tangent1.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
+        //    {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y, {tangent1.x, tangent1.y, tangent1.z}}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent1.x, tangent1.y, tangent1.z, 0.0f}},
 
-    //    {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}},
-    //    {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}},
-    //    {{pos4.x, pos4.y, pos4.z}, {nm.x, nm.y, nm.z}, {uv4.x, uv4.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}}
+        //    {{pos1.x, pos1.y, pos1.z}, {nm.x, nm.y, nm.z}, {uv1.x, uv1.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}},
+        //    {{pos3.x, pos3.y, pos3.z}, {nm.x, nm.y, nm.z}, {uv3.x, uv3.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}},
+        //    {{pos4.x, pos4.y, pos4.z}, {nm.x, nm.y, nm.z}, {uv4.x, uv4.y}, {tangent2.x, tangent2.y, tangent2.z}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)}, {tangent2.x, tangent2.y, tangent2.z, 0.0f}}
     };
 }
 
@@ -1079,4 +1061,14 @@ void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelera
     vkDestroyFence(engine.Device, fence, nullptr);
     vkFreeCommandBuffers(engine.Device, engine.GetRenderCommandPool(), 1, &cmdBuffer);
 
+}
+
+VkTransformMatrixKHR RayTraceRenderer::GLMToVkTransformMatrix(glm::mat4 matrix)
+{
+    return VkTransformMatrixKHR
+    {
+        matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+        matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+        matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+    };
 }

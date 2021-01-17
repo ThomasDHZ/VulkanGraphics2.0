@@ -108,7 +108,7 @@ public:
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
 
-   // StorageImage storageImage;
+    // StorageImage storageImage;
     std::vector<uint32_t> maxPrimCount;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> AcclerationBuildRangeList;
     std::vector<VkAccelerationStructureGeometryKHR> GeometryAccelerationStructureList;
@@ -153,6 +153,7 @@ public:
     //    VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
     VkPipelineShaderStageCreateInfo loadShader(VulkanEngine& engine, std::string fileName, VkShaderStageFlagBits stage);
     VkShaderModule loadShader(const char* fileName, VkDevice device);
+    VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix);
 
     struct Vertex2 {
         glm::vec3 pos = glm::vec3(0.0f);
