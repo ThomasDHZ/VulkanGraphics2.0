@@ -93,13 +93,12 @@ public:
     uint64_t BottomLevelAccelerationDeviceAddress;
     uint64_t TopLevelAccelerationDeviceAddress;
 
-    AccelerationStructure bottomLevelAS;
+    std::vector<AccelerationStructure> bottomLevelASList;
     AccelerationStructure topLevelAS;
 
-    VulkanBuffer vertexBuffer;
-    VulkanBuffer indexBuffer;
-    VulkanBuffer vertexBuffer2;
-    VulkanBuffer indexBuffer2;
+    std::vector<VulkanBuffer> vertexBufferList;
+    std::vector<VulkanBuffer> indexBufferList;
+
     uint32_t indexCount;
     VulkanBuffer transformBuffer;
     VulkanBuffer transformBuffer2;
@@ -129,7 +128,9 @@ public:
     ~RayTraceRenderer();
 
     void AddMesh(VulkanEngine& engine);
-    void createBottomLevelAccelerationStructure(VulkanEngine& engine);
+    
+        void createBottomLevelAccelerationStructure(VulkanEngine & engine, MeshData& mesh);
+ 
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
     void createStorageImage(VulkanEngine& engine);
     void createUniformBuffer(VulkanEngine& engine);

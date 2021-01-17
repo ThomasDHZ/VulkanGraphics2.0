@@ -48,7 +48,16 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.GetSwapChainResolution().width, (float)engine.GetSwapChainResolution().height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-    createBottomLevelAccelerationStructure(engine);
+    std::shared_ptr<TextureManager> manager = std::make_shared<TextureManager>(engine);
+    std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+
+    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj", RayTraceDescriptorSetLayout, 1, texture);
+    texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
+    NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
+    for (auto mesh : model.SubMeshList)
+    {
+        createBottomLevelAccelerationStructure(engine, mesh);
+    }
     createTopLevelAccelerationStructure(engine);
 
     rayTexture = RayTraceTexture(engine);
@@ -69,24 +78,20 @@ void RayTraceRenderer::AddMesh(VulkanEngine& engine)
 }
 
 
-void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine)
+void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, MeshData& mesh)
 {
+    AccelerationStructure bottomLevelAS = {};
+   
 
-    std::shared_ptr<TextureManager> manager = std::make_shared<TextureManager>(engine);
-    std::shared_ptr<Texture> texture = std::make_shared<Texture>();
+    glm::mat4 transformMatrix = glm::mat4(1.0f);
+    transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj", RayTraceDescriptorSetLayout, 1, texture);
-    texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
-    NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
-
-    for (auto mesh : model.SubMeshList)
-    {
-        glm::mat4 transformMatrix = glm::mat4(1.0f);
-        transformMatrix = glm::rotate(transformMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
         uint32_t numTriangles = static_cast<uint32_t>(mesh.IndexList.size()) / 3;
         uint32_t maxVertex = mesh.VertexList.size();
 
+        VulkanBuffer vertexBuffer;
+        VulkanBuffer indexBuffer;
         vertexBuffer.CreateBuffer(engine, mesh.VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.VertexList.data());
         indexBuffer.CreateBuffer(engine, mesh.IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mesh.IndexList.data());
         transformBuffer.CreateBuffer(engine, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &transformMatrix);
@@ -116,7 +121,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         accelerationStructureBuildRangeInfo.firstVertex = 0;
         accelerationStructureBuildRangeInfo.transformOffset = 0;
         AcclerationBuildRangeList.emplace_back(accelerationStructureBuildRangeInfo);
-    }
+    
 
     VkAccelerationStructureBuildGeometryInfoKHR accelerationStructureBuildGeometryInfo{};
     accelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -157,24 +162,27 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
 
     AcclerationCommandBuffer(engine, accelerationBuildGeometryInfo, AcclerationBuildRangeList);
     ScratchBuffer.DestoryBuffer(engine);
+    vertexBufferList.emplace_back(vertexBuffer);
+    indexBufferList.emplace_back(indexBuffer);
+    bottomLevelASList.emplace_back(bottomLevelAS);
 }
 void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
 {
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
-    for (auto x = 0; x < 1; x++)
+    for (auto x = 0; x < bottomLevelASList.size(); x++)
     {
         glm::mat4 Transform = glm::mat4(1.0f);
-        Transform = glm::translate(Transform, glm::vec3(20.0f * x, 0.0f, 0.0f));
+        Transform = glm::translate(Transform, glm::vec3(0.0f));
         Transform = glm::transpose(Transform);
         VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(Transform);
 
         VkAccelerationStructureInstanceKHR AccelerationInstance = {};
         AccelerationInstance.transform = transformMatrix;
-        AccelerationInstance.instanceCustomIndex = 0;
+        AccelerationInstance.instanceCustomIndex = x;
         AccelerationInstance.mask = 0xFF;
         AccelerationInstance.instanceShaderBindingTableRecordOffset = 0;
         AccelerationInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-        AccelerationInstance.accelerationStructureReference = bottomLevelAS.deviceAddress;
+        AccelerationInstance.accelerationStructureReference = bottomLevelASList[10].deviceAddress;
         AccelerationStructureInstanceList.emplace_back(AccelerationInstance);
     }
 
@@ -207,7 +215,6 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     VkAccelerationStructureBuildSizesInfoKHR AccelerationBuildInfo = {};
     AccelerationBuildInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometry, &primitive_count, &AccelerationBuildInfo);
-
 
     createAccelerationStructure(engine, topLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationBuildInfo);
 
@@ -298,8 +305,8 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
      //vkFreeMemory(engine.Device, topLevelAS.memory, nullptr);
      //vkDestroyBuffer(engine.Device, topLevelAS.buffer, nullptr);
      //vkDestroyAccelerationStructureKHR(engine.Device, topLevelAS.handle, nullptr);
-    vertexBuffer.DestoryBuffer(engine);
-    indexBuffer.DestoryBuffer(engine);
+    //vertexBuffer.DestoryBuffer(engine);
+   // indexBuffer.DestoryBuffer(engine);
     transformBuffer.DestoryBuffer(engine);
     raygenShaderBindingTable.DestoryBuffer(engine);
     missShaderBindingTable.DestoryBuffer(engine);
@@ -361,14 +368,14 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     VkDescriptorSetLayoutBinding VertexBufferStructureBinding = {};
     VertexBufferStructureBinding.binding = 3;
     VertexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    VertexBufferStructureBinding.descriptorCount = 1;
+    VertexBufferStructureBinding.descriptorCount = 3;
     VertexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(VertexBufferStructureBinding);
 
     VkDescriptorSetLayoutBinding IndexBufferStructureBinding = {};
     IndexBufferStructureBinding.binding = 4;
     IndexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    IndexBufferStructureBinding.descriptorCount = 1;
+    IndexBufferStructureBinding.descriptorCount = 3;
     IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
@@ -532,31 +539,38 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     UniformDescriptorSet.descriptorCount = 1;
 
 
-    VkDescriptorBufferInfo VertexBufferInfo = {};
-    VertexBufferInfo.buffer = vertexBuffer.Buffer;
-    VertexBufferInfo.offset = 0;
-    VertexBufferInfo.range = vertexBuffer.BufferSize;
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
+    for (int x = 0; x < 3; x++)
+    {
+        VkDescriptorBufferInfo VertexBufferInfo = {};
+        VertexBufferInfo.buffer = vertexBufferList[x].Buffer;
+        VertexBufferInfo.offset = 0;
+        VertexBufferInfo.range = vertexBufferList[x].BufferSize;
+        VertexBufferInfoList.emplace_back(VertexBufferInfo);
+
+        VkDescriptorBufferInfo IndexBufferInfo = {};
+        IndexBufferInfo.buffer = indexBufferList[x].Buffer;
+        IndexBufferInfo.offset = 0;
+        IndexBufferInfo.range = indexBufferList[x].BufferSize;
+        IndexBufferInfoList.emplace_back(IndexBufferInfo);
+    }
 
     VkWriteDescriptorSet VertexDescriptorSet{};
     VertexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     VertexDescriptorSet.dstSet = RTDescriptorSet;
     VertexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     VertexDescriptorSet.dstBinding = 3;
-    VertexDescriptorSet.pBufferInfo = &VertexBufferInfo;
-    VertexDescriptorSet.descriptorCount = 1;
-
-    VkDescriptorBufferInfo IndexBufferInfo = {};
-    IndexBufferInfo.buffer = indexBuffer.Buffer;
-    IndexBufferInfo.offset = 0;
-    IndexBufferInfo.range = indexBuffer.BufferSize;
+    VertexDescriptorSet.pBufferInfo = VertexBufferInfoList.data();
+    VertexDescriptorSet.descriptorCount = 3;
 
     VkWriteDescriptorSet IndexDescriptorSet{};
     IndexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     IndexDescriptorSet.dstSet = RTDescriptorSet;
     IndexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     IndexDescriptorSet.dstBinding = 4;
-    IndexDescriptorSet.pBufferInfo = &IndexBufferInfo;
-    IndexDescriptorSet.descriptorCount = 1;
+    IndexDescriptorSet.pBufferInfo = IndexBufferInfoList.data();
+    IndexDescriptorSet.descriptorCount = 3;
 
     VkDescriptorImageInfo DescriptorImage = {};
     DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
