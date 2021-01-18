@@ -67,5 +67,5 @@ void main()
 	vec2 texCoord = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
 
-	hitValue = normal2;
+	hitValue = vec3(texCoord, 0.0f);
 }

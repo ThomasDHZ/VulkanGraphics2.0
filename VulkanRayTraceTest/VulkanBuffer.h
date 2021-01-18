@@ -17,6 +17,8 @@ public:
 	VkBuffer Buffer = VK_NULL_HANDLE;
 	VkDeviceMemory BufferMemory = VK_NULL_HANDLE;
 	VkDeviceSize BufferSize = VK_NULL_HANDLE;
+	uint64_t BufferDeviceAddress = VK_NULL_HANDLE;
+	VkAccelerationStructureKHR BufferHandle = VK_NULL_HANDLE;
 
 	VulkanBuffer();
 	~VulkanBuffer();

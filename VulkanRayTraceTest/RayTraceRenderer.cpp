@@ -39,10 +39,8 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(device, "vkCreateRayTracingPipelinesKHR"));
 
-    camera.type = Camera::CameraType::lookat;
-    camera.setPerspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 512.0f);
-    camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-    camera.setTranslation(glm::vec3(0.0f, 0.0f, -10.0f));
+    camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
+
         model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj");
 
         
@@ -306,7 +304,7 @@ RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VkDeviceSize size)
 void RayTraceRenderer::createUniformBuffer()
 {
     ubo.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformData);
-    updateUniformBuffers();
+   // updateUniformBuffers();
 }
 
 void RayTraceRenderer::AcclerationCommandBuffer(VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo)
@@ -344,18 +342,22 @@ void RayTraceRenderer::AcclerationCommandBuffer(VkAccelerationStructureBuildGeom
     vkFreeCommandBuffers(device, commandPool, 1, &cmdBuffer);
 }
 
-void RayTraceRenderer::updateUniformBuffers()
+void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
 {
+    keyboard.Update(window, camera);
+    mouse.Update(window, camera);
+    camera->Update(WIDTH, HEIGHT);
+
     static auto startTime = std::chrono::high_resolution_clock::now();
 
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
   
-    uniformData.projInverse = glm::inverse(camera.matrices.perspective);
-    uniformData.viewInverse = glm::inverse(camera.matrices.view);
+    uniformData.projInverse = glm::inverse(camera->GetProjectionMatrix());
+    uniformData.viewInverse = glm::inverse(camera->GetViewMatrix());
     uniformData.modelInverse = glm::inverse(glm::mat4(1.0f));
     uniformData.lightPos = glm::vec4(cos(glm::radians(time * 360.0f)) * 40.0f, -50.0f + sin(glm::radians(time * 360.0f)) * 20.0f, 25.0f + sin(glm::radians(time * 360.0f)) * 5.0f, 0.0f);
-    uniformData.viewPos = glm::vec4(camera.position, 0.0f);
+    uniformData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     uniformData.vertexSize = sizeof(RTVertex);
     ubo.CopyBufferToMemory(device, &uniformData, sizeof(UniformData));
 

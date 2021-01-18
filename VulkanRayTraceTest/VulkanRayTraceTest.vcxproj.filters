@@ -30,9 +30,6 @@
     <ClCompile Include="RayTraceRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RayTraceMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PerspectiveCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,6 +40,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTraceMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RayTraceModel.cpp">
@@ -76,9 +76,6 @@
     <ClInclude Include="RayTraceRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RayTraceMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -91,8 +88,11 @@
     <ClInclude Include="PerspectiveCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RayTraceMesh.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="RayTraceModel.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
