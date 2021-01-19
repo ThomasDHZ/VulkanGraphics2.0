@@ -18,6 +18,7 @@ layout(binding = 2, set = 0) uniform UBO
 } ubo;
 layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices[];
+layout(binding = 5, set = 0) uniform sampler2D DiffuseMap;
 
 struct Vertex
 {
@@ -67,5 +68,5 @@ void main()
 	vec2 texCoord = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
 
-	hitValue = vec3(texCoord, 0.0f);
+	hitValue = texture(DiffuseMap, texCoord).rgb;
 }
