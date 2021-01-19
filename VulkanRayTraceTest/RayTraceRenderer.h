@@ -106,6 +106,8 @@ public:
     VulkanBuffer ubo;
     Texture DiffuseMap;
 
+    std::vector<AccelerationStructure> bottomLevelASList{};
+    AccelerationStructure topLevelAS{};
 
     std::vector<VkShaderModule> shaderModules;
     std::vector<VkCommandBuffer> drawCmdBuffers;
@@ -117,14 +119,13 @@ public:
 
 
     RayTraceModel model;
-    void createBottomLevelAccelerationStructure(RayTraceMesh& mesh);
-    void createTopLevelAccelerationStructure(RayTraceMesh& mesh, int x);
+    void createBottomLevelAccelerationStructure(RayTraceModel& model);
+    void createTopLevelAccelerationStructure(RayTraceModel& model);
     void createStorageImage();
     void createUniformBuffer();
     void createRayTracingPipeline();
     void createShaderBindingTable();
-    void createDescriptorSets(RayTraceMesh& mesh);
-    void UpdateAccelerationStructure(RayTraceMesh& mesh);
+    void createDescriptorSets(RayTraceModel& model);
     void buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     void Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
 
@@ -168,7 +169,7 @@ public:
     VkCommandBuffer beginSingleTimeCommands();
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-
+    uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
     //Texture
     void createTextureImage(Texture& texture, const std::string Filepath);
     void createTextureImageView(Texture& texture);
