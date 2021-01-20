@@ -42,19 +42,20 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
 
-    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
+    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj");
+    //model2 = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
 
     createTextureImage(DiffuseMap, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png");
     createTextureImageView(DiffuseMap);
     createTextureSampler(DiffuseMap);
 
     createBottomLevelAccelerationStructure(model);
-    createTopLevelAccelerationStructure(model);
+   // createBottomLevelAccelerationStructure(model2);
+    createTopLevelAccelerationStructure();
     createStorageImage();
-    createUniformBuffer();
     createRayTracingPipeline();
     createShaderBindingTable();
-    createDescriptorSets(model);
+    createDescriptorSets();
 
 
 
@@ -69,11 +70,14 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
 {
     AccelerationStructure bottomLevelAS{};
 
-    std::vector<uint32_t> PrimitiveCount;
+    std::vector<uint32_t> PrimitiveCountList;
+    uint32_t PrimitiveOffset = 0;
     std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationBuildStructureRangeInfos;
     for (auto x = 0; x < model.MeshList.size(); x++)
     {
+        PrimitiveCountList.emplace_back(model.MeshList[x].TriangleCount);
+
         VkAccelerationStructureGeometryKHR AccelerationStructureGeometry = {};
         AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
         AccelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
@@ -90,12 +94,20 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
         AccelerationStructureGeometryList.emplace_back(AccelerationStructureGeometry);
 
         VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
-        AccelerationStructureBuildRangeInfo.primitiveCount = model.MeshList[x].TriangleCount;
+        AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList[x];
         AccelerationStructureBuildRangeInfo.primitiveOffset = 0;
         AccelerationStructureBuildRangeInfo.firstVertex = 0;
         AccelerationStructureBuildRangeInfo.transformOffset = 0;
         AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
+
+        MeshOffsets offset;
+        offset.VertexOffset = 1;
+        offset.IndiceOffset = 1;
+        model.MeshOffsetList.emplace_back(offset);
+
+        PrimitiveOffset += PrimitiveCountList[x];
     }
+    model.MeshOffsetBuffer.CreateBuffer(device, physicalDevice, sizeof(MeshOffsets) * model.MeshOffsetList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.MeshOffsetList.data());
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationStructureBuildGeometryInfo = {};
     AccelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -104,15 +116,15 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     AccelerationStructureBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
     AccelerationStructureBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
 
-    PrimitiveCount.resize(AccelerationBuildStructureRangeInfos.size());
+    PrimitiveCountList.resize(AccelerationBuildStructureRangeInfos.size());
     for (auto x = 0; x < AccelerationBuildStructureRangeInfos.size(); x++)
     {
-        PrimitiveCount[x] = AccelerationBuildStructureRangeInfos[x].primitiveCount;
+        PrimitiveCountList[x] = AccelerationBuildStructureRangeInfos[x].primitiveCount;
     }
 
     VkAccelerationStructureBuildSizesInfoKHR AccelerationStructureBuildSizesInfo = {};
     AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-    vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCount.data(), &AccelerationStructureBuildSizesInfo);
+    vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
 
     createAccelerationStructure(bottomLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
 
@@ -134,24 +146,25 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     deleteScratchBuffer(scratchBuffer);
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
-void RayTraceRenderer::createTopLevelAccelerationStructure(RayTraceModel& model)
+void RayTraceRenderer::createTopLevelAccelerationStructure()
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
+    for (auto x = 0; x < bottomLevelASList.size(); x++)
+    {
+        glm::mat4 transformMatrix2 = glm::mat4(1.0f);
+        auto transtransformMatrix2 = glm::transpose(transformMatrix2);
+        VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transtransformMatrix2);
 
-
-    auto transtransformMatrix2 = glm::transpose(transformMatrix2);
-    VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transtransformMatrix2);
-
-    VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
-    AccelerationStructureInstance.transform = transformMatrix;
-    AccelerationStructureInstance.instanceCustomIndex = 0;
-    AccelerationStructureInstance.mask = 0xFF;
-    AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
-    AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    AccelerationStructureInstance.accelerationStructureReference = bottomLevelASList[0].deviceAddress;
-    AccelerationStructureInstanceList.emplace_back(AccelerationStructureInstance);
-
+        VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
+        AccelerationStructureInstance.transform = transformMatrix;
+        AccelerationStructureInstance.instanceCustomIndex = x;
+        AccelerationStructureInstance.mask = 0xFF;
+        AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
+        AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        AccelerationStructureInstance.accelerationStructureReference = bottomLevelASList[x].deviceAddress;
+        AccelerationStructureInstanceList.emplace_back(AccelerationStructureInstance);
+    }
 
     VulkanBuffer instancesBuffer;
     instancesBuffer.CreateBuffer(device, physicalDevice, sizeof(VkAccelerationStructureInstanceKHR) * AccelerationStructureInstanceList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, AccelerationStructureInstanceList.data());
@@ -178,9 +191,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(RayTraceModel& model)
     accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, &PrimitiveCount, &accelerationStructureBuildSizesInfo);
 
-
     createAccelerationStructure(topLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR, accelerationStructureBuildSizesInfo);
-
 
     RayTracingScratchBuffer ScratchBuffer = createScratchBuffer(accelerationStructureBuildSizesInfo.buildScratchSize);
 
@@ -210,7 +221,6 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(RayTraceModel& model)
 
 void RayTraceRenderer::createStorageImage()
 {
-
     VkImageCreateInfo image = {};
     image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     image.imageType = VK_IMAGE_TYPE_2D;
@@ -253,8 +263,28 @@ void RayTraceRenderer::createStorageImage()
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_GENERAL,
         { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 });
-    flushCommandBuffer(cmdBuffer, graphicsQueue);
+
+    vkEndCommandBuffer(cmdBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &cmdBuffer;
+
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(device, &fenceCreateInfo, nullptr, &fence);
+
+    vkQueueSubmit(graphicsQueue, 1, &submitInfo, fence);
+
+    vkWaitForFences(device, 1, &fence, VK_TRUE, INT64_MAX);
+    vkDestroyFence(device, fence, nullptr);
+
+    vkFreeCommandBuffers(device, commandPool, 1, &cmdBuffer);
 }
+
 RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VkDeviceSize size)
 {
     RayTracingScratchBuffer scratchBuffer{};
@@ -287,11 +317,7 @@ RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VkDeviceSize size)
 
     return scratchBuffer;
 }
-void RayTraceRenderer::createUniformBuffer()
-{
-    ubo.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformData);
-   // updateUniformBuffers();
-}
+
 
 void RayTraceRenderer::AcclerationCommandBuffer(VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo)
 {
@@ -334,20 +360,8 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     mouse.Update(window, camera);
     camera->Update(WIDTH, HEIGHT);
 
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto  currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-  
-    uniformData.projInverse = glm::inverse(camera->GetProjectionMatrix());
-    uniformData.viewInverse = glm::inverse(camera->GetViewMatrix());
-    uniformData.modelInverse = glm::inverse(glm::mat4(1.0f));
-    uniformData.lightPos = glm::vec4(cos(glm::radians(time * 360.0f)) * 40.0f, -50.0f + sin(glm::radians(time * 360.0f)) * 20.0f, 25.0f + sin(glm::radians(time * 360.0f)) * 5.0f, 0.0f);
-    uniformData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    uniformData.vertexSize = sizeof(RTVertex);
-    ubo.CopyBufferToMemory(device, &uniformData, sizeof(UniformData));
-
-    //createTopLevelAccelerationStructure();
+    model.Update(device, camera);
+    model2.Update(device, camera);
 }
 
 void RayTraceRenderer::createRayTracingPipeline()
@@ -377,19 +391,26 @@ void RayTraceRenderer::createRayTracingPipeline()
     VkDescriptorSetLayoutBinding VertexBufferStructureBinding = {};
     VertexBufferStructureBinding.binding = 3;
     VertexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    VertexBufferStructureBinding.descriptorCount = 1;
+    VertexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(bottomLevelASList.size());
     VertexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(VertexBufferStructureBinding);
 
     VkDescriptorSetLayoutBinding IndexBufferStructureBinding = {};
     IndexBufferStructureBinding.binding = 4;
     IndexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    IndexBufferStructureBinding.descriptorCount = 1;
+    IndexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(bottomLevelASList.size());
     IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
+    VkDescriptorSetLayoutBinding OffsetBufferStructureBinding = {};
+    OffsetBufferStructureBinding.binding = 5;
+    OffsetBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    OffsetBufferStructureBinding.descriptorCount = static_cast<uint32_t>(bottomLevelASList.size());
+    OffsetBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(OffsetBufferStructureBinding);
+
     VkDescriptorSetLayoutBinding DiffuseBinding = {};
-    DiffuseBinding.binding = 5;
+    DiffuseBinding.binding = 6;
     DiffuseBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     DiffuseBinding.descriptorCount = 1;
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
@@ -467,12 +488,12 @@ void RayTraceRenderer::createShaderBindingTable() {
     missShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
     hitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 2);
 }
-void RayTraceRenderer::createDescriptorSets(RayTraceModel& model)
+void RayTraceRenderer::createDescriptorSets()
 {
     std::vector<VkDescriptorPoolSize> poolSizes = {
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
       { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }};
 
     VkDescriptorPoolCreateInfo RayTraceDescriptorPoolInfo = {};
@@ -514,44 +535,66 @@ void RayTraceRenderer::createDescriptorSets(RayTraceModel& model)
     ImageDescriptorSet.pImageInfo = &RayTraceImageDescriptor;
     ImageDescriptorSet.descriptorCount = 1;
 
-    VkDescriptorBufferInfo RTBufferInfo = {};
-    RTBufferInfo.buffer = ubo.Buffer;
-    RTBufferInfo.offset = 0;
-    RTBufferInfo.range = ubo.BufferSize;
+    VkDescriptorBufferInfo UniformBuffer = {};
+    UniformBuffer.buffer = model.MeshList[0].UniformBuffer.Buffer;
+    UniformBuffer.offset = 0;
+    UniformBuffer.range = model.MeshList[0].UniformBuffer.BufferSize;
 
     VkWriteDescriptorSet UniformDescriptorSet{};
     UniformDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     UniformDescriptorSet.dstSet = RTDescriptorSet;
     UniformDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     UniformDescriptorSet.dstBinding = 2;
-    UniformDescriptorSet.pBufferInfo = &RTBufferInfo;
+    UniformDescriptorSet.pBufferInfo = &UniformBuffer;
     UniformDescriptorSet.descriptorCount = 1;
 
-    VkDescriptorBufferInfo VertexBufferInfo = {};
-    VertexBufferInfo.buffer = model.MeshList[0].VertexBuffer.Buffer;
-    VertexBufferInfo.offset = 0;
-    VertexBufferInfo.range = model.MeshList[0].VertexBuffer.BufferSize;
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
+    std::vector<VkDescriptorBufferInfo> OffsetBufferInfoList;
+    for (int x = 0; x < bottomLevelASList.size(); x++)
+    {
+        VkDescriptorBufferInfo VertexBufferInfo = {};
+        VertexBufferInfo.buffer = model.MeshList[x].VertexBuffer.Buffer;
+        VertexBufferInfo.offset = 0;
+        VertexBufferInfo.range = VK_WHOLE_SIZE;
+        VertexBufferInfoList.emplace_back(VertexBufferInfo);
+
+        VkDescriptorBufferInfo IndexBufferInfo = {};
+        IndexBufferInfo.buffer = model.MeshList[x].IndexBuffer.Buffer;
+        IndexBufferInfo.offset = 0;
+        IndexBufferInfo.range = VK_WHOLE_SIZE;
+        IndexBufferInfoList.emplace_back(IndexBufferInfo);
+
+        VkDescriptorBufferInfo OffsetBufferInfo = {};
+        OffsetBufferInfo.buffer = model.MeshOffsetBuffer.Buffer;
+        OffsetBufferInfo.offset = 0;
+        OffsetBufferInfo.range = VK_WHOLE_SIZE;
+        OffsetBufferInfoList.emplace_back(OffsetBufferInfo);
+    }
 
     VkWriteDescriptorSet VertexDescriptorSet{};
     VertexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     VertexDescriptorSet.dstSet = RTDescriptorSet;
     VertexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     VertexDescriptorSet.dstBinding = 3;
-    VertexDescriptorSet.pBufferInfo = &VertexBufferInfo;
-    VertexDescriptorSet.descriptorCount = 1;
-
-    VkDescriptorBufferInfo IndexBufferInfo = {};
-    IndexBufferInfo.buffer = model.MeshList[0].IndexBuffer.Buffer;
-    IndexBufferInfo.offset = 0;
-    IndexBufferInfo.range = model.MeshList[0].IndexBuffer.BufferSize;
+    VertexDescriptorSet.pBufferInfo = VertexBufferInfoList.data();
+    VertexDescriptorSet.descriptorCount = static_cast<uint32_t>(VertexBufferInfoList.size());
 
     VkWriteDescriptorSet IndexDescriptorSet{};
     IndexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     IndexDescriptorSet.dstSet = RTDescriptorSet;
     IndexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     IndexDescriptorSet.dstBinding = 4;
-    IndexDescriptorSet.pBufferInfo = &IndexBufferInfo;
-    IndexDescriptorSet.descriptorCount = 1;
+    IndexDescriptorSet.pBufferInfo = IndexBufferInfoList.data();
+    IndexDescriptorSet.descriptorCount = static_cast<uint32_t>(IndexBufferInfoList.size());
+
+    VkWriteDescriptorSet OffsetDescriptorSet{};
+    OffsetDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    OffsetDescriptorSet.dstSet = RTDescriptorSet;
+    OffsetDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    OffsetDescriptorSet.dstBinding = 5;
+    OffsetDescriptorSet.pBufferInfo = OffsetBufferInfoList.data();
+    OffsetDescriptorSet.descriptorCount = static_cast<uint32_t>(OffsetBufferInfoList.size());
 
     VkDescriptorImageInfo DiffuseMapImage = {};
     DiffuseMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -561,7 +604,7 @@ void RayTraceRenderer::createDescriptorSets(RayTraceModel& model)
     VkWriteDescriptorSet DiffuseMapDescriptor = {};
     DiffuseMapDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     DiffuseMapDescriptor.dstSet = RTDescriptorSet;
-    DiffuseMapDescriptor.dstBinding = 5;
+    DiffuseMapDescriptor.dstBinding = 6;
     DiffuseMapDescriptor.dstArrayElement = 0;
     DiffuseMapDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     DiffuseMapDescriptor.descriptorCount = 1;
@@ -573,6 +616,7 @@ void RayTraceRenderer::createDescriptorSets(RayTraceModel& model)
         UniformDescriptorSet,
         VertexDescriptorSet,
         IndexDescriptorSet,
+        OffsetDescriptorSet,
         DiffuseMapDescriptor
     };
     vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
@@ -602,10 +646,6 @@ void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::v
     {
         vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo);
 
-        /*
-            Setup the buffer regions pointing to the shaders in our shader binding table
-        */
-
         const uint32_t handleSizeAligned = alignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
 
         VkStridedDeviceAddressRegionKHR raygenShaderSbtEntry{};
@@ -625,9 +665,6 @@ void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::v
 
         VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 
-        /*
-            Dispatch the ray tracing commands
-        */
         vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline);
         vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &RTDescriptorSet, 0, 0);
 
@@ -701,13 +738,12 @@ void RayTraceRenderer::Resize(int swapChainFramebuffersSize, std::vector<VkImage
     WIDTH = width;
     HEIGHT = height;
 
-    // Delete allocated resources
     vkDestroyImageView(device, storageImage.view, nullptr);
     vkDestroyImage(device, storageImage.image, nullptr);
     vkFreeMemory(device, storageImage.memory, nullptr);
-    // Recreate image
+
     createStorageImage();
-    // Update descriptor
+
     VkDescriptorImageInfo storageImageDescriptor{ VK_NULL_HANDLE, storageImage.view, VK_IMAGE_LAYOUT_GENERAL };
 
     VkWriteDescriptorSet writeDescriptorSet{};
@@ -732,50 +768,8 @@ void RayTraceRenderer::deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffe
     }
 }
 
-void RayTraceRenderer::flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue, VkCommandPool pool)
-{
-    if (commandBuffer == VK_NULL_HANDLE)
-    {
-        return;
-    }
-
-    vkEndCommandBuffer(commandBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-    // Create fence to ensure that the command buffer has finished executing
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(device, &fenceCreateInfo, nullptr, &fence);
-    // Submit to the queue
-    vkQueueSubmit(queue, 1, &submitInfo, fence);
-    // Wait for the fence to signal that command buffer has finished executing
-    vkWaitForFences(device, 1, &fence, VK_TRUE, 100000000000);
-    vkDestroyFence(device, fence, nullptr);
-
-    vkFreeCommandBuffers(device, pool, 1, &commandBuffer);
-
-}
-
-void RayTraceRenderer::flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue)
-{
-    return flushCommandBuffer(commandBuffer, queue, commandPool);
-}
-
-uint64_t RayTraceRenderer::getBufferDeviceAddress(VkBuffer buffer)
-{
-    VkBufferDeviceAddressInfoKHR bufferDeviceAI{};
-    bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-    bufferDeviceAI.buffer = buffer;
-    return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
-}
 void RayTraceRenderer::createAccelerationStructure(AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo)
 {
-    // Buffer and memory
     VkBufferCreateInfo bufferCreateInfo{};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCreateInfo.size = buildSizeInfo.accelerationStructureSize;
@@ -793,14 +787,14 @@ void RayTraceRenderer::createAccelerationStructure(AccelerationStructure& accele
     memoryAllocateInfo.memoryTypeIndex = getMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     vkAllocateMemory(device, &memoryAllocateInfo, nullptr, &accelerationStructure.memory);
     vkBindBufferMemory(device, accelerationStructure.buffer, accelerationStructure.memory, 0);
-    // Acceleration structure
+
     VkAccelerationStructureCreateInfoKHR accelerationStructureCreate_info{};
     accelerationStructureCreate_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
     accelerationStructureCreate_info.buffer = accelerationStructure.buffer;
     accelerationStructureCreate_info.size = buildSizeInfo.accelerationStructureSize;
     accelerationStructureCreate_info.type = type;
     vkCreateAccelerationStructureKHR(device, &accelerationStructureCreate_info, nullptr, &accelerationStructure.handle);
-    // AS device address
+   
     VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
     accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
     accelerationDeviceAddressInfo.accelerationStructure = accelerationStructure.handle;
@@ -864,82 +858,6 @@ VkCommandBuffer RayTraceRenderer::createCommandBuffer(VkCommandBufferLevel level
     return createCommandBuffer(level, commandPool, begin);
 }
 
-void RayTraceRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
-    VkBufferCreateInfo bufferInfo{};
-    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferInfo.size = size;
-    bufferInfo.usage = usage;
-    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create buffer!");
-    }
-
-    VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
-
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = getMemoryType(memRequirements.memoryTypeBits, properties);
-
-    if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate buffer memory!");
-    }
-
-    vkBindBufferMemory(device, buffer, bufferMemory, 0);
-}
-VkResult RayTraceRenderer::createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data)
-{
-    buffer->device = device;
-
-    // Create the buffer handle
-    VkBufferCreateInfo bufCreateInfo{};
-    bufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufCreateInfo.usage = usageFlags;
-    bufCreateInfo.size = size;
-    vkCreateBuffer(device, &bufCreateInfo, nullptr, &buffer->buffer);
-
-    // Create the memory backing up the buffer handle
-    VkMemoryRequirements memReqs;
-    VkMemoryAllocateInfo memAllocInfo{};
-    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    vkGetBufferMemoryRequirements(device, buffer->buffer, &memReqs);
-    memAllocInfo.allocationSize = memReqs.size;
-    // Find a memory type index that fits the properties of the buffer
-    memAllocInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);
-    // If the buffer has VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT set we also need to enable the appropriate flag during allocation
-    VkMemoryAllocateFlagsInfoKHR allocFlagsInfo{};
-    if (usageFlags & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
-        allocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
-        allocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-        memAllocInfo.pNext = &allocFlagsInfo;
-    }
-    vkAllocateMemory(device, &memAllocInfo, nullptr, &buffer->memory);
-
-    buffer->alignment = memReqs.alignment;
-    buffer->size = size;
-    buffer->usageFlags = usageFlags;
-    buffer->memoryPropertyFlags = memoryPropertyFlags;
-
-    // If a pointer to the buffer data has been passed, map the buffer and copy over the data
-    if (data != nullptr)
-    {
-        buffer->map();
-        memcpy(buffer->mapped, data, size);
-        if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0)
-            buffer->flush();
-
-        buffer->unmap();
-    }
-
-    // Initialize a default descriptor that covers the whole buffer size
-    buffer->setupDescriptor();
-
-    // Attach the memory to the buffer object
-    return buffer->bind();
-}
-
 void RayTraceRenderer::setImageLayout(
     VkCommandBuffer cmdbuffer,
     VkImage image,
@@ -949,7 +867,6 @@ void RayTraceRenderer::setImageLayout(
     VkPipelineStageFlags srcStageMask,
     VkPipelineStageFlags dstStageMask)
 {
-    // Create an image barrier object
     VkImageMemoryBarrier imageMemoryBarrier{};
     imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -958,103 +875,8 @@ void RayTraceRenderer::setImageLayout(
     imageMemoryBarrier.newLayout = newImageLayout;
     imageMemoryBarrier.image = image;
     imageMemoryBarrier.subresourceRange = subresourceRange;
+    imageMemoryBarrier.srcAccessMask = 0;
 
-    // Source layouts (old)
-    // Source access mask controls actions that have to be finished on the old layout
-    // before it will be transitioned to the new layout
-    switch (oldImageLayout)
-    {
-    case VK_IMAGE_LAYOUT_UNDEFINED:
-        // Image layout is undefined (or does not matter)
-        // Only valid as initial layout
-        // No flags required, listed only for completeness
-        imageMemoryBarrier.srcAccessMask = 0;
-        break;
-
-    case VK_IMAGE_LAYOUT_PREINITIALIZED:
-        // Image is preinitialized
-        // Only valid as initial layout for linear images, preserves memory contents
-        // Make sure host writes have been finished
-        imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
-        // Image is a color attachment
-        // Make sure any writes to the color buffer have been finished
-        imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
-        // Image is a depth/stencil attachment
-        // Make sure any writes to the depth/stencil buffer have been finished
-        imageMemoryBarrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
-        // Image is a transfer source
-        // Make sure any reads from the image have been finished
-        imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-        // Image is a transfer destination
-        // Make sure any writes to the image have been finished
-        imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-        // Image is read by a shader
-        // Make sure any shader reads from the image have been finished
-        imageMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        break;
-    default:
-        // Other source layouts aren't handled (yet)
-        break;
-    }
-
-    // Target layouts (new)
-    // Destination access mask controls the dependency for the new image layout
-    switch (newImageLayout)
-    {
-    case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-        // Image will be used as a transfer destination
-        // Make sure any writes to the image have been finished
-        imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
-        // Image will be used as a transfer source
-        // Make sure any reads from the image have been finished
-        imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
-        // Image will be used as a color attachment
-        // Make sure any writes to the color buffer have been finished
-        imageMemoryBarrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
-        // Image layout will be used as a depth/stencil attachment
-        // Make sure any writes to depth/stencil buffer have been finished
-        imageMemoryBarrier.dstAccessMask = imageMemoryBarrier.dstAccessMask | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-        break;
-
-    case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-        // Image will be read in a shader (sampler, input attachment)
-        // Make sure any writes to the image have been finished
-        if (imageMemoryBarrier.srcAccessMask == 0)
-        {
-            imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-        }
-        imageMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        break;
-    default:
-        // Other source layouts aren't handled (yet)
-        break;
-    }
-
-    // Put barrier inside setup command buffer
     vkCmdPipelineBarrier(
         cmdbuffer,
         srcStageMask,
@@ -1063,6 +885,14 @@ void RayTraceRenderer::setImageLayout(
         0, nullptr,
         0, nullptr,
         1, &imageMemoryBarrier);
+}
+
+uint64_t RayTraceRenderer::getBufferDeviceAddress(VkBuffer buffer)
+{
+    VkBufferDeviceAddressInfoKHR bufferDeviceAI{};
+    bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+    bufferDeviceAI.buffer = buffer;
+    return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
 }
 
 VkPipelineShaderStageCreateInfo RayTraceRenderer::loadShader(std::string fileName, VkShaderStageFlagBits stage)
@@ -1353,4 +1183,80 @@ uint64_t RayTraceRenderer::getBufferDeviceAddress(VkDevice& device, VkBuffer buf
     bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
     bufferDeviceAI.buffer = buffer;
     return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
+}
+
+void RayTraceRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    if (vkCreateBuffer(device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create buffer!");
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(device, buffer, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = getMemoryType(memRequirements.memoryTypeBits, properties);
+
+    if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate buffer memory!");
+    }
+
+    vkBindBufferMemory(device, buffer, bufferMemory, 0);
+}
+VkResult RayTraceRenderer::createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data)
+{
+    buffer->device = device;
+
+    // Create the buffer handle
+    VkBufferCreateInfo bufCreateInfo{};
+    bufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufCreateInfo.usage = usageFlags;
+    bufCreateInfo.size = size;
+    vkCreateBuffer(device, &bufCreateInfo, nullptr, &buffer->buffer);
+
+    // Create the memory backing up the buffer handle
+    VkMemoryRequirements memReqs;
+    VkMemoryAllocateInfo memAllocInfo{};
+    memAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    vkGetBufferMemoryRequirements(device, buffer->buffer, &memReqs);
+    memAllocInfo.allocationSize = memReqs.size;
+    // Find a memory type index that fits the properties of the buffer
+    memAllocInfo.memoryTypeIndex = getMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);
+    // If the buffer has VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT set we also need to enable the appropriate flag during allocation
+    VkMemoryAllocateFlagsInfoKHR allocFlagsInfo{};
+    if (usageFlags & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT) {
+        allocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
+        allocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
+        memAllocInfo.pNext = &allocFlagsInfo;
+    }
+    vkAllocateMemory(device, &memAllocInfo, nullptr, &buffer->memory);
+
+    buffer->alignment = memReqs.alignment;
+    buffer->size = size;
+    buffer->usageFlags = usageFlags;
+    buffer->memoryPropertyFlags = memoryPropertyFlags;
+
+    // If a pointer to the buffer data has been passed, map the buffer and copy over the data
+    if (data != nullptr)
+    {
+        buffer->map();
+        memcpy(buffer->mapped, data, size);
+        if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0)
+            buffer->flush();
+
+        buffer->unmap();
+    }
+
+    // Initialize a default descriptor that covers the whole buffer size
+    buffer->setupDescriptor();
+
+    // Attach the memory to the buffer object
+    return buffer->bind();
 }

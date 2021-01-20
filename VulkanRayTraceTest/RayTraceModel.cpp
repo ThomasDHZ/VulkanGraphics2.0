@@ -1,4 +1,5 @@
 #include "RayTraceModel.h"
+#include <chrono>
 
 RayTraceModel::RayTraceModel()
 {
@@ -46,6 +47,7 @@ void RayTraceModel::LoadMesh(VkDevice& device, VkPhysicalDevice& physicalDevice,
 		ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.IndexBuffer.Buffer);
 		ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.TransformBuffer.Buffer);
 
+		ModelMesh.UniformBuffer.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.ubo);
 		MeshList.emplace_back(ModelMesh);
 	}
 
@@ -116,4 +118,23 @@ uint64_t RayTraceModel::getBufferDeviceAddress(VkDevice& device, VkBuffer buffer
 	bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
 	bufferDeviceAI.buffer = buffer;
 	return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
+}
+
+void RayTraceModel::Update(VkDevice& device, std::shared_ptr<PerspectiveCamera> camera)
+{
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto  currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+	for (auto& mesh : MeshList)
+	{
+		mesh.ubo.projInverse = glm::inverse(camera->GetProjectionMatrix());
+		mesh.ubo.viewInverse = glm::inverse(camera->GetViewMatrix());
+		mesh.ubo.modelInverse = glm::inverse(glm::mat4(1.0f));
+		mesh.ubo.lightPos = glm::vec4(cos(glm::radians(time * 360.0f)) * 40.0f, -50.0f + sin(glm::radians(time * 360.0f)) * 20.0f, 25.0f + sin(glm::radians(time * 360.0f)) * 5.0f, 0.0f);
+		mesh.ubo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+		mesh.ubo.vertexSize = sizeof(RTVertex);
+		mesh.UniformBuffer.CopyBufferToMemory(device, &mesh.ubo, sizeof(UniformData));
+	}
 }

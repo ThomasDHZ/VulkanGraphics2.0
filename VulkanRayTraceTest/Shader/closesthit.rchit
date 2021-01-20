@@ -4,7 +4,8 @@
 
 layout(location = 0) rayPayloadInEXT vec3 hitValue;
 layout(location = 2) rayPayloadEXT bool shadowed;
-hitAttributeEXT vec3 attribs;
+hitAttributeEXT vec2 attribs;
+
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2, set = 0) uniform UBO 
@@ -18,7 +19,12 @@ layout(binding = 2, set = 0) uniform UBO
 } ubo;
 layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices[];
-layout(binding = 5, set = 0) uniform sampler2D DiffuseMap;
+layout(binding = 5, set = 0) buffer MeshInfo 
+{ 
+  uint VertexOffset;
+  uint IndiceOffset;
+} offset;
+layout(binding = 6, set = 0) uniform sampler2D DiffuseMap;
 
 struct Vertex
 {
@@ -52,6 +58,8 @@ Vertex unpack(uint index)
 	return v;
 }
 
+
+
 void main()
 {
 	ivec3 index = ivec3(indices[gl_InstanceID].i[3 * gl_PrimitiveID], 
@@ -68,5 +76,31 @@ void main()
 	vec2 texCoord = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
 
-	hitValue = texture(DiffuseMap, texCoord).rgb;
+	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
+	
+	vec3 lightVector = normalize(ubo.lightPos.xyz);
+	float dot_product = max(dot(lightVector, normal), 0.2);
+
+	vec3 a;
+ switch(gl_InstanceCustomIndexEXT)
+ {
+	case 0: a = vec3(1.0f, 0.0f, 0.0f); break;
+	case 1: a = vec3(0.0f, 1.0f, 0.0f); break;
+	case 2: a = vec3(0.0f, 0.0f, 1.0f); break;
+	case 3: a = vec3(1.0f, 1.0f, 0.0f); break;
+	case 4: a = vec3(1.0f, 0.0f, 1.0f); break;
+	case 5: a = vec3(0.0f, 1.0f, 1.0f); break;
+	case 6: a = vec3(1.0f, 1.0f, 1.0f); break;
+ }
+ hitValue = vec3(a);
+	// Shadow casting
+//	float tmin = 0.001;
+//	float tmax = 10000.0;
+//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+//	shadowed = true;  
+//
+//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
+//	if (shadowed) {
+//		hitValue *= 0.3;
+//	}
 }

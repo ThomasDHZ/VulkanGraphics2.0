@@ -42,9 +42,6 @@
     <ClCompile Include="camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RayTraceMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RayTraceModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,11 +85,8 @@
     <ClInclude Include="PerspectiveCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RayTraceMesh.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="RayTraceModel.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

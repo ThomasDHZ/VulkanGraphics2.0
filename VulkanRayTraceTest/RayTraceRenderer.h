@@ -36,13 +36,11 @@ struct StorageImage {
     VkFormat format;
 };
 
-struct UniformData {
-    glm::mat4 viewInverse;
-    glm::mat4 projInverse;
-    glm::mat4 modelInverse;
-    glm::vec4 lightPos;
-    glm::vec4 viewPos;
-    int vertexSize;
+struct AccelerationStructure {
+    VkAccelerationStructureKHR handle;
+    uint64_t deviceAddress = 0;
+    VkDeviceMemory memory;
+    VkBuffer buffer;
 };
 
 struct Texture
@@ -100,10 +98,6 @@ public:
     Keyboard keyboard;
     Mouse mouse;
 
-    std::vector<RayTraceMesh> MeshList;
-
-    UniformData uniformData;
-    VulkanBuffer ubo;
     Texture DiffuseMap;
 
     std::vector<AccelerationStructure> bottomLevelASList{};
@@ -111,7 +105,6 @@ public:
 
     std::vector<VkShaderModule> shaderModules;
     std::vector<VkCommandBuffer> drawCmdBuffers;
-    glm::mat4 transformMatrix2 = glm::mat4(1.0f);
 
     RayTraceRenderer();
     RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
@@ -119,30 +112,28 @@ public:
 
 
     RayTraceModel model;
+    RayTraceModel model2;
     void createBottomLevelAccelerationStructure(RayTraceModel& model);
-    void createTopLevelAccelerationStructure(RayTraceModel& model);
+    void createTopLevelAccelerationStructure();
     void createStorageImage();
-    void createUniformBuffer();
     void createRayTracingPipeline();
     void createShaderBindingTable();
-    void createDescriptorSets(RayTraceModel& model);
+    void createDescriptorSets();
     void buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     void Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
 
     void AcclerationCommandBuffer(VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
     void updateUniformBuffers(GLFWwindow* window);
 
+    VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffer);
-    void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue);
-    void flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueue queue, VkCommandPool pool);
     void createAccelerationStructure(AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
     RayTracingScratchBuffer createScratchBuffer(VkDeviceSize size);
     uint64_t getBufferDeviceAddress(VkBuffer buffer);
     uint32_t getMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties);
     VkCommandBuffer createCommandBuffer(VkCommandBufferLevel level, VkCommandPool pool, bool begin);
     VkCommandBuffer createCommandBuffer(VkCommandBufferLevel level, bool begin);
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-    VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data = nullptr);
     void setImageLayout(
         VkCommandBuffer cmdbuffer,
         VkImage image,
