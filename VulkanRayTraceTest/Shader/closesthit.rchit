@@ -44,27 +44,26 @@ Vertex unpack(uint index)
 	// The multiplier is the size of the vertex divided by four float components (=16 bytes)
 	const int m = ubo.vertexSize / 16;
 
-	vec4 d0 = vertices[gl_InstanceID].v[m * index + 0];
-	vec4 d1 = vertices[gl_InstanceID].v[m * index + 1];
-	vec4 d2 = vertices[gl_InstanceID].v[m * index + 2];
+	vec4 d0 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 0];
+	vec4 d1 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 1];
+	vec4 d2 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 2];
 
 	Vertex v;
 	v.pos = d0.xyz;
 	v.normal = vec3(d0.w, d1.x, d1.y);
 	v.Color = vec4(d2.x, d2.y, d2.z, 1.0);
-	v.uv = vec2(d0.x, d0.y);
+	v.uv = vec2(vertices[gl_InstanceCustomIndexEXT].v[2 * index + 0].x, vertices[gl_InstanceCustomIndexEXT].v[2 * index + 1].y);
 	v.tangent = vec4(d0.w, d1.y, d1.y, 0.0f);
 
 	return v;
 }
 
-
-
 void main()
 {
-	ivec3 index = ivec3(indices[gl_InstanceID].i[3 * gl_PrimitiveID], 
-						indices[gl_InstanceID].i[3 * gl_PrimitiveID + 1], 
-						indices[gl_InstanceID].i[3 * gl_PrimitiveID + 2]);
+
+	ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
+						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
+						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
 
 	Vertex v0 = unpack(index.x);
 	Vertex v1 = unpack(index.y);
@@ -81,18 +80,21 @@ void main()
 	vec3 lightVector = normalize(ubo.lightPos.xyz);
 	float dot_product = max(dot(lightVector, normal), 0.2);
 
-	vec3 a;
- switch(gl_InstanceCustomIndexEXT)
- {
-	case 0: a = vec3(1.0f, 0.0f, 0.0f); break;
-	case 1: a = vec3(0.0f, 1.0f, 0.0f); break;
-	case 2: a = vec3(0.0f, 0.0f, 1.0f); break;
-	case 3: a = vec3(1.0f, 1.0f, 0.0f); break;
-	case 4: a = vec3(1.0f, 0.0f, 1.0f); break;
-	case 5: a = vec3(0.0f, 1.0f, 1.0f); break;
-	case 6: a = vec3(1.0f, 1.0f, 1.0f); break;
- }
- hitValue = vec3(a);
+ hitValue = vec3(0.6f) * dot_product;
+// vec3 a;
+// switch(gl_InstanceCustomIndexEXT)
+// {
+//    case 0: a = vec3(1.0f, 0.0f, 0.0f); break;
+//    case 1: a = vec3(0.0f, 1.0f, 0.0f); break;
+//    case 2: a = vec3(0.0f, 0.0f, 1.0f); break;
+//    case 3: a = vec3(1.0f, 1.0f, 0.0f); break;
+//    case 4: a = vec3(1.0f, 0.0f, 1.0f); break;
+//    case 5: a = vec3(0.0f, 1.0f, 1.0f); break;
+//    case 6: a = vec3(1.0f, 1.0f, 1.0f); break;
+// }
+// hitValue = vec3(a);
+
+	//	hitValue = texture(DiffuseMap, texCoord).rgb;
 	// Shadow casting
 //	float tmin = 0.001;
 //	float tmax = 10000.0;

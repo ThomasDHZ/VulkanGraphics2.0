@@ -113,6 +113,11 @@ public:
 
     RayTraceModel model;
     RayTraceModel model2;
+
+    std::vector<VulkanBuffer> VertexBufferList;
+    std::vector<VulkanBuffer> IndexBufferList;
+
+    void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);
     void createBottomLevelAccelerationStructure(RayTraceModel& model);
     void createTopLevelAccelerationStructure();
     void createStorageImage();

@@ -18,6 +18,23 @@ RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice,
 	}
 
 	LoadMesh(device, physicalDevice, FilePath, Scene->mRootNode, Scene);
+
+	ModelTransform = glm::mat4(1.0f);
+	ModelTransform = glm::rotate(ModelTransform, float(180), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	ModelVertexCount = ModelVertices.size();
+	ModelIndexCount = ModelIndices.size();
+	ModelTriangleCount = static_cast<uint32_t>(ModelIndices.size()) / 3;
+
+	ModelVertexBuffer.CreateBuffer(device, physicalDevice, ModelVertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelVertices.data());
+	ModelIndexBuffer.CreateBuffer(device, physicalDevice, ModelIndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelIndices.data());
+	ModelTransformBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelTransform);
+
+	ModelVertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelVertexBuffer.Buffer);
+	ModelIndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelIndexBuffer.Buffer);
+	ModelTransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelTransformBuffer.Buffer);
+
+	int x = 34;
 }
 
 RayTraceModel::~RayTraceModel()
@@ -91,6 +108,7 @@ std::vector<RTVertex> RayTraceModel::LoadVertices(aiMesh* mesh)
 		vertex.BoneWeights = glm::vec4(0.0f);
 
 		VertexList.emplace_back(vertex);
+		ModelVertices.emplace_back(vertex);
 	}
 
 	return VertexList;
@@ -106,6 +124,7 @@ std::vector<uint32_t> RayTraceModel::LoadIndices(aiMesh* mesh)
 		for (int y = 0; y < Faces.mNumIndices; y++)
 		{
 			IndexList.emplace_back(Faces.mIndices[y]);
+			ModelIndices.emplace_back(Faces.mIndices[y]);
 		}
 	}
 

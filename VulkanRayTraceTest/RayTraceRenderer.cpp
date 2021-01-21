@@ -40,16 +40,30 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(device, "vkCreateRayTracingPipelinesKHR"));
 
-    camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
+  camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
 
-    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj");
-    //model2 = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
+    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.gltf");
+   // model2 = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
+
+    //const uint32_t glTFLoadingFlags = vkglTF::FileLoadingFlags::PreTransformVertices | vkglTF::FileLoadingFlags::PreMultiplyVertexColors | vkglTF::FileLoadingFlags::FlipY;
+    //scene.loadFromFile("C:/Users/dotha/Desktop/Vulkan-master/data/models/vulkanscene_shadow.gltf", glTFLoadingFlags);
+
+    //vulkanDevice = new VulkanDevice(physicalDevice);
+    //vulkanDevice->commandPool = commandPool;
+    //vulkanDevice->logicalDevice = device;
+    //const uint32_t glTFLoadingFlags = vkglTF::FileLoadingFlags::PreTransformVertices | vkglTF::FileLoadingFlags::PreMultiplyVertexColors | vkglTF::FileLoadingFlags::FlipY;
+    //scene.loadFromFile( "C:/Users/dotha/Desktop/Vulkan-master/data/models/vulkanscene_shadow.gltf", vulkanDevice, graphicsQueue, glTFLoadingFlags);
+
+
+  
 
     createTextureImage(DiffuseMap, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png");
     createTextureImageView(DiffuseMap);
     createTextureSampler(DiffuseMap);
 
-    createBottomLevelAccelerationStructure(model);
+
+        createBottomLevelAccelerationStructure(model);
+    
    // createBottomLevelAccelerationStructure(model2);
     createTopLevelAccelerationStructure();
     createStorageImage();
@@ -66,17 +80,18 @@ RayTraceRenderer::~RayTraceRenderer()
 
 }
 
-void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& model)
+void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh)
 {
     AccelerationStructure bottomLevelAS{};
 
     std::vector<uint32_t> PrimitiveCountList;
+    uint32_t FirstVertex = 0;
     uint32_t PrimitiveOffset = 0;
     std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationBuildStructureRangeInfos;
-    for (auto x = 0; x < model.MeshList.size(); x++)
+    for (auto x = 0; x < 1; x++)
     {
-        PrimitiveCountList.emplace_back(model.MeshList[x].TriangleCount);
+        PrimitiveCountList.emplace_back(mesh.TriangleCount);
 
         VkAccelerationStructureGeometryKHR AccelerationStructureGeometry = {};
         AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
@@ -84,30 +99,39 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
         AccelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
         AccelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
         AccelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-        AccelerationStructureGeometry.geometry.triangles.vertexData = model.MeshList[x].VertexBufferDeviceAddress;
-        AccelerationStructureGeometry.geometry.triangles.maxVertex = model.MeshList[x].VertexCount;
+        AccelerationStructureGeometry.geometry.triangles.vertexData = mesh.VertexBufferDeviceAddress;
+        AccelerationStructureGeometry.geometry.triangles.maxVertex = mesh.VertexCount;
         AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(RTVertex);
         AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-        AccelerationStructureGeometry.geometry.triangles.indexData = model.MeshList[x].IndexBufferDeviceAddress;
-        AccelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = model.MeshList[x].TransformBufferDeviceAddress.deviceAddress;
-        AccelerationStructureGeometry.geometry.triangles.transformData.hostAddress = model.MeshList[x].TransformBufferDeviceAddress.hostAddress;
+        AccelerationStructureGeometry.geometry.triangles.indexData = mesh.IndexBufferDeviceAddress;
+        AccelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = mesh.TransformBufferDeviceAddress.deviceAddress;
+        AccelerationStructureGeometry.geometry.triangles.transformData.hostAddress = mesh.TransformBufferDeviceAddress.hostAddress;
         AccelerationStructureGeometryList.emplace_back(AccelerationStructureGeometry);
 
-        VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
-        AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList[x];
-        AccelerationStructureBuildRangeInfo.primitiveOffset = 0;
-        AccelerationStructureBuildRangeInfo.firstVertex = 0;
-        AccelerationStructureBuildRangeInfo.transformOffset = 0;
-        AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
+
+            VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
+            AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList[x];
+            AccelerationStructureBuildRangeInfo.primitiveOffset = 0;
+            AccelerationStructureBuildRangeInfo.firstVertex = 0;
+            AccelerationStructureBuildRangeInfo.transformOffset = 0;
+            AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
 
         MeshOffsets offset;
-        offset.VertexOffset = 1;
-        offset.IndiceOffset = 1;
+        offset.VertexOffset = PrimitiveOffset;
+        offset.IndiceOffset = FirstVertex;
         model.MeshOffsetList.emplace_back(offset);
+ 
+        VulkanBuffer MeshOffsetBuffer;
+        MeshOffsetBuffer.CreateBuffer(device, physicalDevice, sizeof(MeshOffsets), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &model.MeshOffsetList[x]);
+        model.MeshOffsetBufferList.emplace_back(MeshOffsetBuffer);
 
-        PrimitiveOffset += PrimitiveCountList[x];
+        PrimitiveOffset += model.MeshList[x].IndexCount;
+        FirstVertex += model.MeshList[x].VertexCount;
+
+        VertexBufferList.emplace_back(mesh.VertexBuffer);
+        IndexBufferList.emplace_back(mesh.IndexBuffer);
     }
-    model.MeshOffsetBuffer.CreateBuffer(device, physicalDevice, sizeof(MeshOffsets) * model.MeshOffsetList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, model.MeshOffsetList.data());
+  
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationStructureBuildGeometryInfo = {};
     AccelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -146,6 +170,95 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     deleteScratchBuffer(scratchBuffer);
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
+
+void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& model)
+{
+    AccelerationStructure bottomLevelAS{};
+
+    std::vector<uint32_t> PrimitiveCountList;
+    uint32_t FirstVertex = 0;
+    uint32_t PrimitiveOffset = 0;
+    std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationBuildStructureRangeInfos;
+    for (auto x = 0; x < model.MeshList.size(); x++)
+    {
+        PrimitiveCountList.emplace_back(model.MeshList[x].TriangleCount);
+
+        VkAccelerationStructureGeometryKHR AccelerationStructureGeometry = {};
+        AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
+        AccelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+        AccelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        AccelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        AccelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        AccelerationStructureGeometry.geometry.triangles.vertexData = model.ModelVertexBufferDeviceAddress;
+        AccelerationStructureGeometry.geometry.triangles.maxVertex = model.ModelVertexCount;
+        AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(RTVertex);
+        AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+        AccelerationStructureGeometry.geometry.triangles.indexData = model.ModelIndexBufferDeviceAddress;
+        AccelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = model.ModelTransformBufferDeviceAddress.deviceAddress;
+        AccelerationStructureGeometry.geometry.triangles.transformData.hostAddress = model.ModelTransformBufferDeviceAddress.hostAddress;
+        AccelerationStructureGeometryList.emplace_back(AccelerationStructureGeometry);
+
+        VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
+        AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList[x];
+        AccelerationStructureBuildRangeInfo.primitiveOffset = 0;
+        AccelerationStructureBuildRangeInfo.firstVertex = 0;
+        AccelerationStructureBuildRangeInfo.transformOffset = 0;
+        AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
+
+        MeshOffsets offset;
+        offset.VertexOffset = PrimitiveOffset;
+        offset.IndiceOffset = FirstVertex;
+        model.MeshOffsetList.emplace_back(offset);
+
+        VulkanBuffer MeshOffsetBuffer;
+        MeshOffsetBuffer.CreateBuffer(device, physicalDevice, sizeof(MeshOffsets), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &model.MeshOffsetList[0]);
+        model.MeshOffsetBufferList.emplace_back(MeshOffsetBuffer);
+
+        PrimitiveOffset += model.MeshList[x].IndexCount;
+        FirstVertex += model.MeshList[x].VertexCount;
+    }
+    VertexBufferList.emplace_back(model.ModelVertexBuffer);
+    IndexBufferList.emplace_back(model.ModelIndexBuffer);
+
+    VkAccelerationStructureBuildGeometryInfoKHR AccelerationStructureBuildGeometryInfo = {};
+    AccelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+    AccelerationStructureBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    AccelerationStructureBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    AccelerationStructureBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
+    AccelerationStructureBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
+
+    PrimitiveCountList.resize(AccelerationBuildStructureRangeInfos.size());
+    for (auto x = 0; x < AccelerationBuildStructureRangeInfos.size(); x++)
+    {
+        PrimitiveCountList[x] = AccelerationBuildStructureRangeInfos[x].primitiveCount;
+    }
+
+    VkAccelerationStructureBuildSizesInfoKHR AccelerationStructureBuildSizesInfo = {};
+    AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
+    vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
+
+    createAccelerationStructure(bottomLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
+
+    RayTracingScratchBuffer scratchBuffer = createScratchBuffer(AccelerationStructureBuildSizesInfo.buildScratchSize);
+
+    VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
+    AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+    AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+    AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+    AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
+    AccelerationBuildGeometryInfo.dstAccelerationStructure = bottomLevelAS.handle;
+    AccelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
+    AccelerationBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
+    AccelerationBuildGeometryInfo.srcAccelerationStructure = nullptr;
+    AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.deviceAddress;
+
+    AcclerationCommandBuffer(AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
+
+    deleteScratchBuffer(scratchBuffer);
+    bottomLevelASList.emplace_back(bottomLevelAS);
+}
+
 void RayTraceRenderer::createTopLevelAccelerationStructure()
 {
     uint32_t PrimitiveCount = 1;
@@ -391,21 +504,21 @@ void RayTraceRenderer::createRayTracingPipeline()
     VkDescriptorSetLayoutBinding VertexBufferStructureBinding = {};
     VertexBufferStructureBinding.binding = 3;
     VertexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    VertexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(bottomLevelASList.size());
+    VertexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(VertexBufferList.size());
     VertexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(VertexBufferStructureBinding);
 
     VkDescriptorSetLayoutBinding IndexBufferStructureBinding = {};
     IndexBufferStructureBinding.binding = 4;
     IndexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    IndexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(bottomLevelASList.size());
+    IndexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(IndexBufferList.size());
     IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
     VkDescriptorSetLayoutBinding OffsetBufferStructureBinding = {};
     OffsetBufferStructureBinding.binding = 5;
     OffsetBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    OffsetBufferStructureBinding.descriptorCount = static_cast<uint32_t>(bottomLevelASList.size());
+    OffsetBufferStructureBinding.descriptorCount = static_cast<uint32_t>(model.MeshOffsetBufferList.size());
     OffsetBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(OffsetBufferStructureBinding);
 
@@ -551,22 +664,27 @@ void RayTraceRenderer::createDescriptorSets()
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
     std::vector<VkDescriptorBufferInfo> OffsetBufferInfoList;
-    for (int x = 0; x < bottomLevelASList.size(); x++)
+    for (int x = 0; x < VertexBufferList.size(); x++)
     {
         VkDescriptorBufferInfo VertexBufferInfo = {};
-        VertexBufferInfo.buffer = model.MeshList[x].VertexBuffer.Buffer;
+        VertexBufferInfo.buffer = VertexBufferList[x].Buffer;
         VertexBufferInfo.offset = 0;
         VertexBufferInfo.range = VK_WHOLE_SIZE;
         VertexBufferInfoList.emplace_back(VertexBufferInfo);
-
+    }
+        for (int x = 0; x < IndexBufferList.size(); x++)
+        {
         VkDescriptorBufferInfo IndexBufferInfo = {};
-        IndexBufferInfo.buffer = model.MeshList[x].IndexBuffer.Buffer;
+        IndexBufferInfo.buffer = IndexBufferList[x].Buffer;
         IndexBufferInfo.offset = 0;
         IndexBufferInfo.range = VK_WHOLE_SIZE;
         IndexBufferInfoList.emplace_back(IndexBufferInfo);
+    }
 
+    for (int x = 0; x < model.MeshOffsetBufferList.size(); x++)
+    {
         VkDescriptorBufferInfo OffsetBufferInfo = {};
-        OffsetBufferInfo.buffer = model.MeshOffsetBuffer.Buffer;
+        OffsetBufferInfo.buffer = model.MeshOffsetBufferList[x].Buffer;
         OffsetBufferInfo.offset = 0;
         OffsetBufferInfo.range = VK_WHOLE_SIZE;
         OffsetBufferInfoList.emplace_back(OffsetBufferInfo);

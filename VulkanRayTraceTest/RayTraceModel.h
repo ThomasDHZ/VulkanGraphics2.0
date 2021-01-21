@@ -44,8 +44,8 @@ struct Mesh
 {
 	std::vector<RTVertex> vertices;
 	std::vector<uint32_t> indices;
-
 	glm::mat4 Transform;
+
 	UniformData ubo;
 
 	VulkanBuffer IndexBuffer;
@@ -75,7 +75,24 @@ private:
 public:
 	std::vector<Mesh> MeshList;
 	std::vector<MeshOffsets> MeshOffsetList;
-	VulkanBuffer MeshOffsetBuffer;
+	std::vector<VulkanBuffer> MeshOffsetBufferList;
+
+	std::vector<RTVertex> ModelVertices;
+	std::vector<uint32_t> ModelIndices;
+	glm::mat4 ModelTransform;
+
+	VulkanBuffer ModelIndexBuffer;
+	VulkanBuffer ModelVertexBuffer;
+	VulkanBuffer ModelTransformBuffer;
+	VulkanBuffer ModelUniformBuffer;
+
+	uint32_t ModelTriangleCount;
+	uint32_t ModelVertexCount;
+	uint32_t ModelIndexCount;
+
+	VkDeviceOrHostAddressConstKHR ModelVertexBufferDeviceAddress{};
+	VkDeviceOrHostAddressConstKHR ModelIndexBufferDeviceAddress{};
+	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
 
 	RayTraceModel();
 	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, const std::string& FilePath);
