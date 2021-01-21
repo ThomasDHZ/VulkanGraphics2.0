@@ -159,6 +159,7 @@
     <None Include="Shader\closesthit.rchit" />
     <None Include="Shader\miss.rmiss" />
     <None Include="Shader\raygen.rgen" />
+    <None Include="Shader\shadow.rmiss.spv" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />

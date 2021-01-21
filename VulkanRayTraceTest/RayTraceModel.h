@@ -95,6 +95,7 @@ public:
 	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
 
 	RayTraceModel();
+	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, MeshDetails& meshDetails);
 	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, const std::string& FilePath);
 	~RayTraceModel();
 

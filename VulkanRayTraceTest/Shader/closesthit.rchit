@@ -25,6 +25,7 @@ layout(binding = 5, set = 0) buffer MeshInfo
   uint IndiceOffset;
 } offset;
 layout(binding = 6, set = 0) uniform sampler2D DiffuseMap;
+layout(set = 0, binding = 7) readonly buffer _TexCoordBuf {float texcoord0[];};
 
 struct Vertex
 {
@@ -58,6 +59,14 @@ Vertex unpack(uint index)
 	return v;
 }
 
+vec2 getTexCoord(uint index)
+{
+  vec2 vp;
+  vp.x = texcoord0[2 * index + 0];
+  vp.y = texcoord0[2 * index + 1];
+  return vp;
+}
+
 void main()
 {
 
@@ -69,10 +78,14 @@ void main()
 	Vertex v1 = unpack(index.y);
 	Vertex v2 = unpack(index.z);
 
+	vec2 uv0 = getTexCoord(index.x);
+		vec2 uv1 = getTexCoord(index.y);
+			vec2 uv2 = getTexCoord(index.z);
+
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
 	vec3 normal2 = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	vec2 texCoord = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
+	vec2 texCoord = uv0 * barycentricCoords.x + uv1 * barycentricCoords.y + uv2 * barycentricCoords.z;
 	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
@@ -80,7 +93,7 @@ void main()
 	vec3 lightVector = normalize(ubo.lightPos.xyz);
 	float dot_product = max(dot(lightVector, normal), 0.2);
 
- hitValue = vec3(0.6f) * dot_product;
+ hitValue = texture(DiffuseMap, texCoord).rgb;
 // vec3 a;
 // switch(gl_InstanceCustomIndexEXT)
 // {
@@ -96,13 +109,13 @@ void main()
 
 	//	hitValue = texture(DiffuseMap, texCoord).rgb;
 	// Shadow casting
-//	float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//
-//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
-//	if (shadowed) {
-//		hitValue *= 0.3;
-//	}
+	float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
+	if (shadowed) {
+		hitValue *= 0.3;
+	}
 }

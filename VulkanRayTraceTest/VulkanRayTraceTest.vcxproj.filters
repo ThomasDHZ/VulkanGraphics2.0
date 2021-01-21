@@ -62,6 +62,9 @@
     <None Include="Shader\raygen.rgen">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\shadow.rmiss.spv">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">

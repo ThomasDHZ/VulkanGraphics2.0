@@ -42,8 +42,24 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
 
   camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
 
-    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.gltf");
-   // model2 = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
+
+  const std::vector<RTVertex> vertices = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
+  };
+
+  const std::vector<uint32_t> indices = {
+      0, 1, 2, 2, 3, 0
+  };
+  MeshDetails details{};
+  details.vertices = vertices;
+  details.indices = indices;
+
+  //model = RayTraceModel(device, physicalDevice, details);
+   // model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj");
+    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
 
     //const uint32_t glTFLoadingFlags = vkglTF::FileLoadingFlags::PreTransformVertices | vkglTF::FileLoadingFlags::PreMultiplyVertexColors | vkglTF::FileLoadingFlags::FlipY;
     //scene.loadFromFile("C:/Users/dotha/Desktop/Vulkan-master/data/models/vulkanscene_shadow.gltf", glTFLoadingFlags);
@@ -61,8 +77,10 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     createTextureImageView(DiffuseMap);
     createTextureSampler(DiffuseMap);
 
-
-        createBottomLevelAccelerationStructure(model);
+    for (int x = 0; x < model.MeshList.size(); x++)
+    {
+        createBottomLevelAccelerationStructure(model, model.MeshList[x]);
+    }
     
    // createBottomLevelAccelerationStructure(model2);
     createTopLevelAccelerationStructure();
@@ -484,7 +502,7 @@ void RayTraceRenderer::createRayTracingPipeline()
     AccelerationStructureBinding.binding = 0;
     AccelerationStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
     AccelerationStructureBinding.descriptorCount = 1;
-    AccelerationStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
+    AccelerationStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(AccelerationStructureBinding);
 
     VkDescriptorSetLayoutBinding ReturnImageStructureBinding = {};
@@ -529,6 +547,13 @@ void RayTraceRenderer::createRayTracingPipeline()
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(DiffuseBinding);
 
+    VkDescriptorSetLayoutBinding UVStructureBinding = {};
+    UVStructureBinding.binding = 7;
+    UVStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    UVStructureBinding.descriptorCount = 1;
+    UVStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(UVStructureBinding);
+
     VkDescriptorSetLayoutCreateInfo RTDescriptorSetLayout = {};
     RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     RTDescriptorSetLayout.bindingCount = static_cast<uint32_t>(RTDescriptorSetBindings.size());
@@ -562,6 +587,16 @@ void RayTraceRenderer::createRayTracingPipeline()
     MissShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
     MissShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(MissShaderInfo);
+
+    ShaderList.emplace_back(loadShader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/shadow.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
+    VkRayTracingShaderGroupCreateInfoKHR ShadowShaderInfo = {};
+    ShadowShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+    ShadowShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
+    ShadowShaderInfo.generalShader = static_cast<uint32_t>(ShaderList.size()) - 1;
+    ShadowShaderInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
+    ShadowShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
+    ShadowShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+    RayTraceShaders.emplace_back(ShadowShaderInfo);
 
     ShaderList.emplace_back(loadShader("C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ClosestHitShaderInfo = {};
@@ -598,15 +633,15 @@ void RayTraceRenderer::createShaderBindingTable() {
     vkGetRayTracingShaderGroupHandlesKHR(device, RayTracePipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
 
     raygenShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
-    missShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
-    hitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 2);
+    missShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
+    hitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }
 void RayTraceRenderer::createDescriptorSets()
 {
     std::vector<VkDescriptorPoolSize> poolSizes = {
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4},
       { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }};
 
     VkDescriptorPoolCreateInfo RayTraceDescriptorPoolInfo = {};
@@ -728,6 +763,32 @@ void RayTraceRenderer::createDescriptorSets()
     DiffuseMapDescriptor.descriptorCount = 1;
     DiffuseMapDescriptor.pImageInfo = &DiffuseMapImage;
 
+    std::vector<glm::vec2> uvList;
+    for (auto mesh : model.MeshList[0].vertices)
+    {
+        uvList.emplace_back(mesh.TexureCoord);
+    }
+
+    UVBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec2) * uvList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uvList.data());
+
+
+    std::vector<VkDescriptorBufferInfo> UVBufferInfoList;
+
+        VkDescriptorBufferInfo UVBufferInfo = {};
+        UVBufferInfo.buffer = UVBuffer.Buffer;
+        UVBufferInfo.offset = 0;
+        UVBufferInfo.range = VK_WHOLE_SIZE;
+        UVBufferInfoList.emplace_back(UVBufferInfo);
+    
+
+    VkWriteDescriptorSet UVDescriptorSet{};
+    UVDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    UVDescriptorSet.dstSet = RTDescriptorSet;
+    UVDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    UVDescriptorSet.dstBinding = 7;
+    UVDescriptorSet.pBufferInfo = UVBufferInfoList.data();
+    UVDescriptorSet.descriptorCount = 1;
+
     std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
         AccelerationDesciptorSet,
         ImageDescriptorSet,
@@ -735,7 +796,8 @@ void RayTraceRenderer::createDescriptorSets()
         VertexDescriptorSet,
         IndexDescriptorSet,
         OffsetDescriptorSet,
-        DiffuseMapDescriptor
+        DiffuseMapDescriptor,
+        UVDescriptorSet
     };
     vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 

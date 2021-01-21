@@ -116,6 +116,8 @@ public:
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
+    VulkanBuffer UVBuffer;
+    VulkanBuffer NormalBuffer;
 
     void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);
     void createBottomLevelAccelerationStructure(RayTraceModel& model);

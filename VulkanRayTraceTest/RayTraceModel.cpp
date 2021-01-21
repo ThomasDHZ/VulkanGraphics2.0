@@ -5,6 +5,34 @@ RayTraceModel::RayTraceModel()
 {
 }
 
+RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, MeshDetails& meshDetails)
+{
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(device, "vkGetBufferDeviceAddressKHR"));
+
+	Mesh ModelMesh{};
+	ModelMesh.vertices = meshDetails.vertices;
+	ModelMesh.indices = meshDetails.indices;
+
+	ModelMesh.Transform = glm::mat4(1.0f);
+
+	ModelMesh.Transform = glm::transpose(ModelMesh.Transform);
+
+	ModelMesh.VertexCount = ModelMesh.vertices.size();
+	ModelMesh.IndexCount = ModelMesh.indices.size();
+	ModelMesh.TriangleCount = static_cast<uint32_t>(ModelMesh.indices.size()) / 3;
+
+	ModelMesh.VertexBuffer.CreateBuffer(device, physicalDevice, ModelMesh.VertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
+	ModelMesh.IndexBuffer.CreateBuffer(device, physicalDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
+	ModelMesh.TransformBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.Transform);
+
+	ModelMesh.VertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.VertexBuffer.Buffer);
+	ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.IndexBuffer.Buffer);
+	ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.TransformBuffer.Buffer);
+
+	ModelMesh.UniformBuffer.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.ubo);
+	MeshList.emplace_back(ModelMesh);
+}
+
 RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, const std::string& FilePath)
 {
 	Assimp::Importer ModelImporter;
@@ -50,7 +78,13 @@ void RayTraceModel::LoadMesh(VkDevice& device, VkPhysicalDevice& physicalDevice,
 		Mesh ModelMesh{};
 		ModelMesh.vertices = LoadVertices(mesh);
 		ModelMesh.indices = LoadIndices(mesh);
+
 		ModelMesh.Transform = glm::mat4(1.0f);
+		ModelMesh.Transform = glm::translate(ModelMesh.Transform, glm::vec3(0.0f, 10.0f, 0.0f));
+		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ModelMesh.Transform = glm::transpose(ModelMesh.Transform);
 
 		ModelMesh.VertexCount = ModelMesh.vertices.size();
 		ModelMesh.IndexCount = ModelMesh.indices.size();
