@@ -59,7 +59,7 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
 
   //model = RayTraceModel(device, physicalDevice, details);
    // model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj");
-    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
+    model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj");
 
     //const uint32_t glTFLoadingFlags = vkglTF::FileLoadingFlags::PreTransformVertices | vkglTF::FileLoadingFlags::PreMultiplyVertexColors | vkglTF::FileLoadingFlags::FlipY;
     //scene.loadFromFile("C:/Users/dotha/Desktop/Vulkan-master/data/models/vulkanscene_shadow.gltf", glTFLoadingFlags);
@@ -76,6 +76,16 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     createTextureImage(DiffuseMap, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png");
     createTextureImageView(DiffuseMap);
     createTextureSampler(DiffuseMap);
+    stbi_set_flip_vertically_on_load(true);
+    std::string CubeMapFiles[6];
+    CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
+    CubeMapFiles[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
+    CubeMapFiles[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
+    CubeMapFiles[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
+    CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
+    CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
+    CubeMapTexture(CubeMapFiles, CubeMap);
+
 
     for (int x = 0; x < model.MeshList.size(); x++)
     {
@@ -129,8 +139,8 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
 
             VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
             AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList[x];
-            AccelerationStructureBuildRangeInfo.primitiveOffset = 0;
-            AccelerationStructureBuildRangeInfo.firstVertex = 0;
+            AccelerationStructureBuildRangeInfo.primitiveOffset = PrimitiveOffset;
+            AccelerationStructureBuildRangeInfo.firstVertex = FirstVertex;
             AccelerationStructureBuildRangeInfo.transformOffset = 0;
             AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
 
@@ -491,8 +501,14 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     mouse.Update(window, camera);
     camera->Update(WIDTH, HEIGHT);
 
-    model.Update(device, camera);
-    model2.Update(device, camera);
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    auto  currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+
+    model.Update(device, camera, time);
+    model2.Update(device, camera, time);
 }
 
 void RayTraceRenderer::createRayTracingPipeline()
@@ -547,12 +563,33 @@ void RayTraceRenderer::createRayTracingPipeline()
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(DiffuseBinding);
 
+    VkDescriptorSetLayoutBinding POSStructureBinding = {};
+    POSStructureBinding.binding = 7;
+    POSStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    POSStructureBinding.descriptorCount = 1;
+    POSStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(POSStructureBinding);
+
     VkDescriptorSetLayoutBinding UVStructureBinding = {};
-    UVStructureBinding.binding = 7;
+    UVStructureBinding.binding = 8;
     UVStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     UVStructureBinding.descriptorCount = 1;
     UVStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(UVStructureBinding);
+
+    VkDescriptorSetLayoutBinding NormalStructureBinding = {};
+    NormalStructureBinding.binding = 9;
+    NormalStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    NormalStructureBinding.descriptorCount = 1;
+    NormalStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(NormalStructureBinding);
+
+    VkDescriptorSetLayoutBinding CubeMapStructureBinding = {};
+    CubeMapStructureBinding.binding = 10;
+    CubeMapStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    CubeMapStructureBinding.descriptorCount = 1;
+    CubeMapStructureBinding.stageFlags = VK_SHADER_STAGE_MISS_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(CubeMapStructureBinding);
 
     VkDescriptorSetLayoutCreateInfo RTDescriptorSetLayout = {};
     RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -641,8 +678,8 @@ void RayTraceRenderer::createDescriptorSets()
     std::vector<VkDescriptorPoolSize> poolSizes = {
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4},
-      { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }};
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 5},
+      { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2 }};
 
     VkDescriptorPoolCreateInfo RayTraceDescriptorPoolInfo = {};
     RayTraceDescriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -763,10 +800,72 @@ void RayTraceRenderer::createDescriptorSets()
     DiffuseMapDescriptor.descriptorCount = 1;
     DiffuseMapDescriptor.pImageInfo = &DiffuseMapImage;
 
-    std::vector<glm::vec2> uvList;
-    for (auto mesh : model.MeshList[0].vertices)
+
+
+
+
+
+
+
+
+
+
+    std::vector<glm::vec3> posList;
+    for (auto model : model.MeshList)
     {
-        uvList.emplace_back(mesh.TexureCoord);
+        for (auto mesh : model.vertices)
+        {
+            posList.emplace_back(mesh.Position);
+        }
+    }
+
+    POSBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec3) * posList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, posList.data());
+
+
+    std::vector<VkDescriptorBufferInfo> posBufferInfoList;
+
+    VkDescriptorBufferInfo POSBufferInfo = {};
+    POSBufferInfo.buffer = POSBuffer.Buffer;
+    POSBufferInfo.offset = 0;
+    POSBufferInfo.range = VK_WHOLE_SIZE;
+    posBufferInfoList.emplace_back(POSBufferInfo);
+
+
+    VkWriteDescriptorSet POSDescriptorSet{};
+    POSDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    POSDescriptorSet.dstSet = RTDescriptorSet;
+    POSDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    POSDescriptorSet.dstBinding = 7;
+    POSDescriptorSet.pBufferInfo = posBufferInfoList.data();
+    POSDescriptorSet.descriptorCount = 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    std::vector<glm::vec2> uvList;
+    for (auto model : model.MeshList)
+    {
+        for (auto mesh : model.vertices)
+        {
+            uvList.emplace_back(mesh.TexureCoord);
+        }
     }
 
     UVBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec2) * uvList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uvList.data());
@@ -785,9 +884,53 @@ void RayTraceRenderer::createDescriptorSets()
     UVDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     UVDescriptorSet.dstSet = RTDescriptorSet;
     UVDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    UVDescriptorSet.dstBinding = 7;
+    UVDescriptorSet.dstBinding = 8;
     UVDescriptorSet.pBufferInfo = UVBufferInfoList.data();
     UVDescriptorSet.descriptorCount = 1;
+
+
+    std::vector<glm::vec3> normalList;
+    for (auto model : model.MeshList)
+    {
+        for (auto mesh : model.vertices)
+        {
+            normalList.emplace_back(mesh.Normal);
+        }
+    }
+
+   NormalBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec3) * normalList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, normalList.data());
+
+
+    std::vector<VkDescriptorBufferInfo> NormalBufferInfoList;
+
+    VkDescriptorBufferInfo NormalBufferInfo = {};
+    NormalBufferInfo.buffer = NormalBuffer.Buffer;
+    NormalBufferInfo.offset = 0;
+    NormalBufferInfo.range = VK_WHOLE_SIZE;
+    NormalBufferInfoList.emplace_back(NormalBufferInfo);
+
+
+    VkWriteDescriptorSet NormalDescriptorSet{};
+    NormalDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    NormalDescriptorSet.dstSet = RTDescriptorSet;
+    NormalDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    NormalDescriptorSet.dstBinding = 9;
+    NormalDescriptorSet.pBufferInfo = NormalBufferInfoList.data();
+    NormalDescriptorSet.descriptorCount = 1;
+
+    VkDescriptorImageInfo CubeMapImage = {};
+    CubeMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    CubeMapImage.imageView = CubeMap.textureImageView;
+    CubeMapImage.sampler = CubeMap.textureSampler;
+
+    VkWriteDescriptorSet CubeMapDescriptor = {};
+    CubeMapDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    CubeMapDescriptor.dstSet = RTDescriptorSet;
+    CubeMapDescriptor.dstBinding = 10;
+    CubeMapDescriptor.dstArrayElement = 0;
+    CubeMapDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    CubeMapDescriptor.descriptorCount = 1;
+    CubeMapDescriptor.pImageInfo = &CubeMapImage;
 
     std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
         AccelerationDesciptorSet,
@@ -797,7 +940,10 @@ void RayTraceRenderer::createDescriptorSets()
         IndexDescriptorSet,
         OffsetDescriptorSet,
         DiffuseMapDescriptor,
-        UVDescriptorSet
+        POSDescriptorSet,
+        UVDescriptorSet,
+        NormalDescriptorSet,
+        CubeMapDescriptor
     };
     vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 
@@ -1149,9 +1295,9 @@ void RayTraceRenderer::createTextureImage(Texture& texture, const std::string Fi
 
     createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texture.textureImage, texture.textureImageMemory);
 
-    transitionImageLayout(texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    copyBufferToImage(stagingBuffer, texture.textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-    transitionImageLayout(texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    transitionImageLayout(texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1);
+    copyBufferToImage(stagingBuffer, texture.textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight), 1);
+    transitionImageLayout(texture.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1);
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
@@ -1240,7 +1386,7 @@ void RayTraceRenderer::createImage(uint32_t width, uint32_t height, VkFormat for
     vkBindImageMemory(device, image, imageMemory, 0);
 }
 
-void RayTraceRenderer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+void RayTraceRenderer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, int levelCount) {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkImageMemoryBarrier barrier{};
@@ -1254,7 +1400,7 @@ void RayTraceRenderer::transitionImageLayout(VkImage image, VkFormat format, VkI
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = 1;
     barrier.subresourceRange.baseArrayLayer = 0;
-    barrier.subresourceRange.layerCount = 1;
+    barrier.subresourceRange.layerCount = levelCount;
 
     VkPipelineStageFlags sourceStage;
     VkPipelineStageFlags destinationStage;
@@ -1289,7 +1435,7 @@ void RayTraceRenderer::transitionImageLayout(VkImage image, VkFormat format, VkI
     endSingleTimeCommands(commandBuffer);
 }
 
-void RayTraceRenderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+void RayTraceRenderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, int layerCount) {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkBufferImageCopy region{};
@@ -1299,7 +1445,7 @@ void RayTraceRenderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     region.imageSubresource.mipLevel = 0;
     region.imageSubresource.baseArrayLayer = 0;
-    region.imageSubresource.layerCount = 1;
+    region.imageSubresource.layerCount = layerCount;
     region.imageOffset = { 0, 0, 0 };
     region.imageExtent = {
         width,
@@ -1311,6 +1457,7 @@ void RayTraceRenderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_
 
     endSingleTimeCommands(commandBuffer);
 }
+
 
 VkCommandBuffer  RayTraceRenderer::beginSingleTimeCommands() {
     VkCommandBufferAllocateInfo allocInfo{};
@@ -1363,6 +1510,143 @@ uint64_t RayTraceRenderer::getBufferDeviceAddress(VkDevice& device, VkBuffer buf
     bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
     bufferDeviceAI.buffer = buffer;
     return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
+}
+
+void RayTraceRenderer::CubeMapTexture(std::string CubeMapFiles[6], Texture& CubeMap)
+{
+    CubeMapLayout cubeMapfiles;
+    cubeMapfiles.Left = CubeMapFiles[0];
+    cubeMapfiles.Right = CubeMapFiles[1];
+    cubeMapfiles.Top = CubeMapFiles[2];
+    cubeMapfiles.Bottom = CubeMapFiles[3];
+    cubeMapfiles.Front = CubeMapFiles[4];
+    cubeMapfiles.Back = CubeMapFiles[5];
+
+    LoadTexture(cubeMapfiles, CubeMap);
+    CreateTextureView(CubeMap);
+    CreateTextureSampler(CubeMap);
+}
+
+void RayTraceRenderer::LoadTexture(CubeMapLayout CubeMapFiles, Texture& CubeMap)
+{
+    std::vector<unsigned char*> textureData;
+    int texChannels;
+     int Width;
+     int Height;
+    textureData.emplace_back(stbi_load(CubeMapFiles.Left.c_str(), &Width, &Height, &texChannels, STBI_rgb_alpha));
+    textureData.emplace_back(stbi_load(CubeMapFiles.Right.c_str(), &Width, &Height, &texChannels, STBI_rgb_alpha));
+    textureData.emplace_back(stbi_load(CubeMapFiles.Top.c_str(), &Width, &Height, &texChannels, STBI_rgb_alpha));
+    textureData.emplace_back(stbi_load(CubeMapFiles.Bottom.c_str(), &Width, &Height, &texChannels, STBI_rgb_alpha));
+    textureData.emplace_back(stbi_load(CubeMapFiles.Back.c_str(), &Width, &Height, &texChannels, STBI_rgb_alpha));
+    textureData.emplace_back(stbi_load(CubeMapFiles.Front.c_str(), &Width, &Height, &texChannels, STBI_rgb_alpha));
+
+    const VkDeviceSize imageSize = Width * Height * 4 * 6;
+    const VkDeviceSize layerSize = imageSize / 6;
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    VkImageCreateInfo TextureInfo = {};
+    TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    TextureInfo.imageType = VK_IMAGE_TYPE_2D;
+    TextureInfo.extent.width = Width;
+    TextureInfo.extent.height = Height;
+    TextureInfo.extent.depth = 1;
+    TextureInfo.mipLevels = 1;
+    TextureInfo.arrayLayers = 6;
+    TextureInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+    TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+    TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    void* data;
+    vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
+    for (int x = 0; x < 6; ++x)
+    {
+        memcpy(static_cast<char*>(data) + (x * layerSize), textureData[x], static_cast<size_t>(layerSize));
+    }
+    vkUnmapMemory(device, stagingBufferMemory);
+
+   CreateTextureImage(TextureInfo, CubeMap);
+
+   transitionImageLayout(CubeMap.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 6);
+   copyBufferToImage(stagingBuffer, CubeMap.textureImage, static_cast<uint32_t>(Width), static_cast<uint32_t>(Height), 6);
+   transitionImageLayout(CubeMap.textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 6);
+
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
+    stbi_image_free(textureData[0]);
+    stbi_image_free(textureData[1]);
+    stbi_image_free(textureData[2]);
+    stbi_image_free(textureData[3]);
+    stbi_image_free(textureData[4]);
+    stbi_image_free(textureData[5]);
+}
+
+void RayTraceRenderer::CreateTextureImage(VkImageCreateInfo TextureInfo, Texture& CubeMap)
+{
+    if (vkCreateImage(device, &TextureInfo, nullptr, &CubeMap.textureImage)) {
+        throw std::runtime_error("Failed to create Image.");
+    }
+
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(device, CubeMap.textureImage, &memRequirements);
+
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = getMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    if (vkAllocateMemory(device, &allocInfo, nullptr, &CubeMap.textureImageMemory) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to allocate image Memory.");
+    }
+
+    vkBindImageMemory(device, CubeMap.textureImage, CubeMap.textureImageMemory, 0);
+}
+
+void RayTraceRenderer::CreateTextureView(Texture& CubeMap)
+{
+    VkImageViewCreateInfo TextureImageViewInfo = {};
+    TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    TextureImageViewInfo.image = CubeMap.textureImage;
+    TextureImageViewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+    TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
+    TextureImageViewInfo.subresourceRange.levelCount = 1;
+    TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
+    TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+    TextureImageViewInfo.subresourceRange.layerCount = 6;
+
+    if (vkCreateImageView(device, &TextureImageViewInfo, nullptr, &CubeMap.textureImageView) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create texture image view!");
+    }
+}
+
+void RayTraceRenderer::CreateTextureSampler(Texture& CubeMap)
+{
+    VkSamplerCreateInfo TextureImageSamplerInfo = {};
+    TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    TextureImageSamplerInfo.magFilter = VK_FILTER_LINEAR;
+    TextureImageSamplerInfo.minFilter = VK_FILTER_LINEAR;
+    TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    TextureImageSamplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    TextureImageSamplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    TextureImageSamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    TextureImageSamplerInfo.mipLodBias = 0.0f;
+    TextureImageSamplerInfo.maxAnisotropy = 16.0f;
+    TextureImageSamplerInfo.minLod = 0.0f;
+    TextureImageSamplerInfo.maxLod = 1.0f;
+    TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
+    TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+    TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
+
+    if (vkCreateSampler(device, &TextureImageSamplerInfo, nullptr, &CubeMap.textureSampler) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create texture sampler!");
+    }
 }
 
 void RayTraceRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {

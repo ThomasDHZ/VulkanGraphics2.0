@@ -7,6 +7,13 @@ layout(location = 2) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
 
+struct PrimMeshInfo
+{
+  uint VertexOffset;
+  uint IndiceOffset;
+};
+
+
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2, set = 0) uniform UBO 
 {
@@ -19,13 +26,11 @@ layout(binding = 2, set = 0) uniform UBO
 } ubo;
 layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices[];
-layout(binding = 5, set = 0) buffer MeshInfo 
-{ 
-  uint VertexOffset;
-  uint IndiceOffset;
-} offset;
+layout(set = 0, binding = 5) readonly buffer _InstanceInfo {PrimMeshInfo primInfo[];};
 layout(binding = 6, set = 0) uniform sampler2D DiffuseMap;
-layout(set = 0, binding = 7) readonly buffer _TexCoordBuf {float texcoord0[];};
+layout(binding = 7, set = 0) readonly buffer _PosBuf {float pos[];};
+layout(binding = 8, set = 0) readonly buffer _TexCoordBuf {float texcoord0[];};
+layout(binding = 9, set = 0) readonly buffer _NormalBuf {float normals[];};
 
 struct Vertex
 {
@@ -38,6 +43,33 @@ struct Vertex
   vec4 BoneID;
   vec4 BoneWeights;
  };
+
+
+vec3 getVertex(uint index)
+{
+  vec3 vp;
+  vp.x = pos[3 * index + 0];
+  vp.y = pos[3 * index + 1];
+  vp.z = pos[3 * index + 2];
+  return vp;
+}
+
+vec2 getTexCoord(uint index)
+{
+  vec2 vp;
+  vp.x = texcoord0[2 * index + 0];
+  vp.y = texcoord0[2 * index + 1];
+  return vp;
+}
+
+vec3 getNormal(uint index)
+{
+  vec3 vp;
+  vp.x = normals[3 * index + 0];
+  vp.y = normals[3 * index + 1];
+  vp.z = normals[3 * index + 2];
+  return vp;
+}
 
 Vertex unpack(uint index)
 {
@@ -58,18 +90,8 @@ Vertex unpack(uint index)
 
 	return v;
 }
-
-vec2 getTexCoord(uint index)
-{
-  vec2 vp;
-  vp.x = texcoord0[2 * index + 0];
-  vp.y = texcoord0[2 * index + 1];
-  return vp;
-}
-
 void main()
 {
-
 	ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
 						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
 						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
@@ -92,30 +114,63 @@ void main()
 	
 	vec3 lightVector = normalize(ubo.lightPos.xyz);
 	float dot_product = max(dot(lightVector, normal), 0.2);
-
- hitValue = texture(DiffuseMap, texCoord).rgb;
-// vec3 a;
-// switch(gl_InstanceCustomIndexEXT)
-// {
-//    case 0: a = vec3(1.0f, 0.0f, 0.0f); break;
-//    case 1: a = vec3(0.0f, 1.0f, 0.0f); break;
-//    case 2: a = vec3(0.0f, 0.0f, 1.0f); break;
-//    case 3: a = vec3(1.0f, 1.0f, 0.0f); break;
-//    case 4: a = vec3(1.0f, 0.0f, 1.0f); break;
-//    case 5: a = vec3(0.0f, 1.0f, 1.0f); break;
-//    case 6: a = vec3(1.0f, 1.0f, 1.0f); break;
-// }
-// hitValue = vec3(a);
-
-	//	hitValue = texture(DiffuseMap, texCoord).rgb;
-	// Shadow casting
-	float tmin = 0.001;
-	float tmax = 10000.0;
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	shadowed = true;  
-
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
-	if (shadowed) {
-		hitValue *= 0.3;
-	}
+	hitValue = vec3(.6f) * dot_product;
+//PrimMeshInfo pinfo = primInfo[gl_InstanceCustomIndexEXT];
+//
+////  // Getting the 'first index' for this mesh (offset of the mesh + offset of the triangle)
+//  uint indexOffset  = pinfo.IndiceOffset + (3 * gl_PrimitiveID);
+//  uint vertexOffset = pinfo.VertexOffset;    
+////
+//	ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[indexOffset], 
+//						indices[gl_InstanceCustomIndexEXT].i[indexOffset + 1], 
+//						indices[gl_InstanceCustomIndexEXT].i[indexOffset + 2]);
+//   index += ivec3(vertexOffset);
+//
+//   vec3 pos0 = getVertex(index.x);
+//   vec3 pos1 = getVertex(index.y);
+//   vec3 pos2 = getVertex(index.z);
+//
+//   vec2 uv0 = getTexCoord(index.x);
+//   vec2 uv1 = getTexCoord(index.y);
+//   vec2 uv2 = getTexCoord(index.z);
+//
+//   vec3 nrm0 = getNormal(index.x);
+//   vec3 nrm1 = getNormal(index.y);
+//   vec3 nrm2 = getNormal(index.z);
+//
+//
+//	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
+//	vec3 position = pos0 * barycentricCoords.x + pos1 * barycentricCoords.y + pos2 * barycentricCoords.z;
+//	vec2 texCoord = uv0 * barycentricCoords.x + uv1 * barycentricCoords.y + uv2 * barycentricCoords.z;
+//	vec3 normal = normalize(nrm0 * barycentricCoords.x + nrm1 * barycentricCoords.y + nrm2 * barycentricCoords.z);
+//	
+//	vec3 lightVector = normalize(ubo.lightPos.xyz);
+//	float dot_product = max(dot(lightVector, normal), 0.2);
+//
+//	hitValue = vec3(.6f) * dot_product;
+// //hitValue = texture(DiffuseMap, texCoord).rgb;
+//// vec3 a;
+//// switch(gl_InstanceCustomIndexEXT)
+//// {
+////    case 0: a = vec3(1.0f, 0.0f, 0.0f); break;
+////    case 1: a = vec3(0.0f, 1.0f, 0.0f); break;
+////    case 2: a = vec3(0.0f, 0.0f, 1.0f); break;
+////    case 3: a = vec3(1.0f, 1.0f, 0.0f); break;
+////    case 4: a = vec3(1.0f, 0.0f, 1.0f); break;
+////    case 5: a = vec3(0.0f, 1.0f, 1.0f); break;
+////    case 6: a = vec3(1.0f, 1.0f, 1.0f); break;
+//// }
+//// hitValue = vec3(a);
+//
+//	//	hitValue = texture(DiffuseMap, texCoord).rgb;
+//	// Shadow casting
+//	float tmin = 0.001;
+//	float tmax = 10000.0;
+//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+//	shadowed = true;  
+//
+//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
+//	if (shadowed) {
+//		hitValue *= 0.3;
+//	}
 }

@@ -99,6 +99,6 @@ public:
 	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, const std::string& FilePath);
 	~RayTraceModel();
 
-	void Update(VkDevice& device, std::shared_ptr<PerspectiveCamera> camera);
+	void Update(VkDevice& device, std::shared_ptr<PerspectiveCamera> camera, float time);
 };
 

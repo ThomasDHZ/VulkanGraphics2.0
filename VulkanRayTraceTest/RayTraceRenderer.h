@@ -21,6 +21,15 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
+struct CubeMapLayout
+{
+    std::string Front;
+    std::string Back;
+    std::string Top;
+    std::string Bottom;
+    std::string Right;
+    std::string Left;
+};
 
 struct RayTracingScratchBuffer
 {
@@ -99,6 +108,7 @@ public:
     Mouse mouse;
 
     Texture DiffuseMap;
+    Texture CubeMap;
 
     std::vector<AccelerationStructure> bottomLevelASList{};
     AccelerationStructure topLevelAS{};
@@ -116,6 +126,7 @@ public:
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
+    VulkanBuffer POSBuffer;
     VulkanBuffer UVBuffer;
     VulkanBuffer NormalBuffer;
 
@@ -172,9 +183,15 @@ public:
     void createTextureImage(Texture& texture, const std::string Filepath);
     void createTextureImageView(Texture& texture);
     void createTextureSampler(Texture& texture);
+    //CubeMap Texture
+    void CubeMapTexture(std::string CubeMapFiles[6], Texture& CubeMap);
+    void LoadTexture(CubeMapLayout CubeMapFiles, Texture& CubeMap);
+    void CreateTextureImage(VkImageCreateInfo TextureInfo, Texture& CubeMap);
+    void CreateTextureView(Texture& CubeMap);
+    void CreateTextureSampler(Texture& CubeMap);
 
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, int levelCount);
+    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, int layerCount);
 };

@@ -1,5 +1,3 @@
-
-
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -23,7 +21,6 @@
 #include <array>
 #include <optional>
 #include <set>
-#include "Buffer.h"
 #include "RayTraceRenderer.h"
 
 const uint32_t WIDTH = 800;
@@ -327,25 +324,25 @@ private:
 
         vkDestroyCommandPool(device, commandPool, nullptr);
 
-        vkDestroyPipeline(device, RayRenderer.RayTracePipeline, nullptr);
-        vkDestroyPipelineLayout(device, RayRenderer.RayTracePipelineLayout, nullptr);
-        vkDestroyDescriptorSetLayout(device, RayRenderer.RayTraceDescriptorSetLayout, nullptr);
-        vkDestroyImageView(device, RayRenderer.storageImage.view, nullptr);
-        vkDestroyImage(device, RayRenderer.storageImage.image, nullptr);
-        vkFreeMemory(device, RayRenderer.storageImage.memory, nullptr);
-       // vkFreeMemory(device, RayRenderer.bottomLevelAS.memory, nullptr);
-       // vkDestroyBuffer(device, RayRenderer.bottomLevelAS.buffer, nullptr);
-      //  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.bottomLevelAS.handle, nullptr);
-       // vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
-       // vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
-      //  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);
-       /* RayRenderer.vertexBuffer.DestoryBuffer(device);
-        RayRenderer.indexBuffer.DestoryBuffer(device);
-        RayRenderer.transformBuffer.DestoryBuffer(device);*/
-        RayRenderer.raygenShaderBindingTable.DestoryBuffer(device);
-        RayRenderer.missShaderBindingTable.DestoryBuffer(device);
-        RayRenderer.hitShaderBindingTable.DestoryBuffer(device);
-        RayRenderer.ubo.DestoryBuffer(device);
+      //  vkDestroyPipeline(device, RayRenderer.RayTracePipeline, nullptr);
+      //  vkDestroyPipelineLayout(device, RayRenderer.RayTracePipelineLayout, nullptr);
+      //  vkDestroyDescriptorSetLayout(device, RayRenderer.RayTraceDescriptorSetLayout, nullptr);
+      //  vkDestroyImageView(device, RayRenderer.storageImage.view, nullptr);
+      //  vkDestroyImage(device, RayRenderer.storageImage.image, nullptr);
+      //  vkFreeMemory(device, RayRenderer.storageImage.memory, nullptr);
+      // // vkFreeMemory(device, RayRenderer.bottomLevelAS.memory, nullptr);
+      // // vkDestroyBuffer(device, RayRenderer.bottomLevelAS.buffer, nullptr);
+      ////  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.bottomLevelAS.handle, nullptr);
+      // // vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
+      // // vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
+      ////  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);
+      // /* RayRenderer.vertexBuffer.DestoryBuffer(device);
+      //  RayRenderer.indexBuffer.DestoryBuffer(device);
+      //  RayRenderer.transformBuffer.DestoryBuffer(device);*/
+      //  RayRenderer.raygenShaderBindingTable.DestoryBuffer(device);
+      //  RayRenderer.missShaderBindingTable.DestoryBuffer(device);
+      //  RayRenderer.hitShaderBindingTable.DestoryBuffer(device);
+      //  RayRenderer.ubo.DestoryBuffer(device);
 
         vkDestroyDevice(device, nullptr);
 
@@ -502,6 +499,9 @@ private:
         BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
         BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
 
+        VkPhysicalDeviceDescriptorIndexingFeatures IndexFeatures{};
+        IndexFeatures.runtimeDescriptorArray = VK_TRUE;
+
         VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
         RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
         RayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
@@ -512,6 +512,10 @@ private:
         AccelerationStructureFeatures.accelerationStructure = VK_TRUE;
         AccelerationStructureFeatures.pNext = &RayTracingPipelineFeatures;
 
+        VkPhysicalDeviceDescriptorIndexingFeatures PhysicalDeviceDescriptorIndexingFeatures{};
+        PhysicalDeviceDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+        PhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+        PhysicalDeviceDescriptorIndexingFeatures.pNext = &AccelerationStructureFeatures;
 
         VkPhysicalDeviceRayTracingPipelinePropertiesKHR RayTracingPipelineProperties = {};
         RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
@@ -523,7 +527,7 @@ private:
         VkPhysicalDeviceFeatures2 deviceFeatures2{};
         deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
         deviceFeatures2.features = deviceFeatures;
-        deviceFeatures2.pNext = &AccelerationStructureFeatures;
+        deviceFeatures2.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
 
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -1379,7 +1383,7 @@ private:
         }
 
         
-        RayRenderer.updateUniformBuffers();
+        RayRenderer.updateUniformBuffers(window);
         //updateUniformBuffer(imageIndex);
 
         if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
@@ -1481,9 +1485,7 @@ private:
                 static_cast<uint32_t>(height)
             };
 
-            actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
-            actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
-
+            
             return actualExtent;
         }
     }
