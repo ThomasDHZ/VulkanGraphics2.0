@@ -7,13 +7,29 @@
 #include "PerspectiveCamera.h"
 #include "VulkanBuffer.h"
 
+struct Material
+{
+	glm::vec3 Ambient = glm::vec3(0.2f);
+	glm::vec3 Diffuse = glm::vec3(0.6f);
+	glm::vec3 Specular = glm::vec3(1.0f);
+	float Shininess = 32;
+	float Reflectivness = 0;
+
+	uint32_t DiffuseMapID = 0;
+	uint32_t SpecularMapID = 0;
+	uint32_t NormalMapID = 0;
+	uint32_t DepthMapID = 0;
+	uint32_t AlphaMapID = 0;
+	uint32_t EmissionMapID = 0;
+};
+
 struct UniformData {
-	glm::mat4 viewInverse;
-	glm::mat4 projInverse;
-	glm::mat4 modelInverse;
-	glm::vec4 lightPos;
-	glm::vec4 viewPos;
-	int vertexSize;
+	alignas(16) glm::mat4 viewInverse;
+	alignas(16) glm::mat4 projInverse;
+	alignas(16) glm::mat4 modelInverse;
+	alignas(16) glm::vec3 lightPos = glm::vec3(0.0f);
+	alignas(16) glm::vec3 viewPos;
+	alignas(4) int vertexSize;
 };
 
 struct RTVertex
@@ -45,13 +61,12 @@ struct Mesh
 	std::vector<RTVertex> vertices;
 	std::vector<uint32_t> indices;
 	glm::mat4 Transform;
-
-	UniformData ubo;
+	Material material;
 
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
 	VulkanBuffer TransformBuffer;
-	VulkanBuffer UniformBuffer;
+	VulkanBuffer MaterialBuffer;
 
 	uint32_t TriangleCount;
 	uint32_t VertexCount;
@@ -99,6 +114,6 @@ public:
 	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, const std::string& FilePath);
 	~RayTraceModel();
 
-	void Update(VkDevice& device, std::shared_ptr<PerspectiveCamera> camera, float time);
+	void Destory(VkDevice& device);
 };
 

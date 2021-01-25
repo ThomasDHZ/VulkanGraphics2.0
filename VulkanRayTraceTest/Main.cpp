@@ -21,10 +21,11 @@
 #include <array>
 #include <optional>
 #include <set>
+#include "InterfaceRenderPass.h"
 #include "RayTraceRenderer.h"
 
-const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
+const uint32_t WIDTH = 1920;
+const uint32_t HEIGHT = 1080;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -216,6 +217,8 @@ private:
     std::vector<VkFence> imagesInFlight;
     size_t currentFrame = 0;
 
+    InterfaceRenderPass interfaceRenderPass;
+
     bool framebufferResized = false;
 
     void initWindow() {
@@ -247,7 +250,10 @@ private:
         createCommandPool();
         createDepthResources();
         createFramebuffers();
- /*       createTextureImage();
+
+        interfaceRenderPass = InterfaceRenderPass(device, instance, physicalDevice, graphicsQueue, window, swapChainImageViews, swapChainExtent);
+
+        createTextureImage();
         createTextureImageView();
         createTextureSampler();
         createVertexBuffer();
@@ -255,7 +261,7 @@ private:
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
-        createCommandBuffers();*/
+        createCommandBuffers();
         createSyncObjects();
 
         RayRenderer = RayTraceRenderer(device, physicalDevice, commandPool, graphicsQueue, descriptorPool, WIDTH, HEIGHT, swapChainImages.size(), swapChainImages);
@@ -264,6 +270,15 @@ private:
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
+
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            {
+              RayRenderer.UpdateGUI();
+            }
+            ImGui::Render();
+
             drawFrame();
         }
 
@@ -291,10 +306,10 @@ private:
 
         vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-      /*  for (size_t i = 0; i < swapChainImages.size(); i++) {
+        for (size_t i = 0; i < swapChainImages.size(); i++) {
             vkDestroyBuffer(device, uniformBuffers[i], nullptr);
             vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-        }*/
+        }
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
     }
@@ -322,27 +337,10 @@ private:
             vkDestroyFence(device, inFlightFences[i], nullptr);
         }
 
-        vkDestroyCommandPool(device, commandPool, nullptr);
+        RayRenderer.Destory();
+        interfaceRenderPass.Destroy(device);
 
-      //  vkDestroyPipeline(device, RayRenderer.RayTracePipeline, nullptr);
-      //  vkDestroyPipelineLayout(device, RayRenderer.RayTracePipelineLayout, nullptr);
-      //  vkDestroyDescriptorSetLayout(device, RayRenderer.RayTraceDescriptorSetLayout, nullptr);
-      //  vkDestroyImageView(device, RayRenderer.storageImage.view, nullptr);
-      //  vkDestroyImage(device, RayRenderer.storageImage.image, nullptr);
-      //  vkFreeMemory(device, RayRenderer.storageImage.memory, nullptr);
-      // // vkFreeMemory(device, RayRenderer.bottomLevelAS.memory, nullptr);
-      // // vkDestroyBuffer(device, RayRenderer.bottomLevelAS.buffer, nullptr);
-      ////  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.bottomLevelAS.handle, nullptr);
-      // // vkFreeMemory(device, RayRenderer.topLevelAS.memory, nullptr);
-      // // vkDestroyBuffer(device, RayRenderer.topLevelAS.buffer, nullptr);
-      ////  RayRenderer.vkDestroyAccelerationStructureKHR(device, RayRenderer.topLevelAS.handle, nullptr);
-      // /* RayRenderer.vertexBuffer.DestoryBuffer(device);
-      //  RayRenderer.indexBuffer.DestoryBuffer(device);
-      //  RayRenderer.transformBuffer.DestoryBuffer(device);*/
-      //  RayRenderer.raygenShaderBindingTable.DestoryBuffer(device);
-      //  RayRenderer.missShaderBindingTable.DestoryBuffer(device);
-      //  RayRenderer.hitShaderBindingTable.DestoryBuffer(device);
-      //  RayRenderer.ubo.DestoryBuffer(device);
+        vkDestroyCommandPool(device, commandPool, nullptr);
 
         vkDestroyDevice(device, nullptr);
 
@@ -381,7 +379,7 @@ private:
         //createDescriptorPool();
         //createDescriptorSets();
         //createCommandBuffers();
-
+        interfaceRenderPass.UpdateSwapChain(device, swapChainImageViews, swapChainExtent);
         RayRenderer.Resize(3, swapChainImages, width, height);
     }
 
@@ -1363,8 +1361,8 @@ private:
         ubo.proj[1][1] *= -1;
 
         void* data;
-        vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
-        memcpy(data, &ubo, sizeof(ubo));
+        vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(UniformBufferObject), 0, &data);
+        memcpy(data, &ubo, sizeof(UniformBufferObject));
         vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
     }
 
@@ -1382,30 +1380,35 @@ private:
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-        
+        interfaceRenderPass.Draw(device, imageIndex, swapChainExtent);
         RayRenderer.updateUniformBuffers(window);
-        //updateUniformBuffer(imageIndex);
+       // updateUniformBuffer(imageIndex);
 
         if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
             vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
         }
         imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
         VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+        std::vector<VkCommandBuffer> CommandBufferSubmitList;
+        //CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
-
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &RayRenderer.drawCmdBuffers[imageIndex];
+        submitInfo.commandBufferCount = static_cast<uint32_t>(CommandBufferSubmitList.size());
+        submitInfo.pCommandBuffers = CommandBufferSubmitList.data();
 
         VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
+
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
 

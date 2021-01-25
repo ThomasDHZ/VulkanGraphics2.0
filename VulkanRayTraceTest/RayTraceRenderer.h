@@ -20,6 +20,7 @@
 #include "PerspectiveCamera.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "InterfaceRenderPass.h"
 
 struct CubeMapLayout
 {
@@ -39,25 +40,37 @@ struct RayTracingScratchBuffer
 };
 
 struct StorageImage {
-    VkDeviceMemory memory;
-    VkImage image;
-    VkImageView view;
+    VkDeviceMemory memory = VK_NULL_HANDLE;
+    VkImage image = VK_NULL_HANDLE;
+    VkImageView view = VK_NULL_HANDLE;
     VkFormat format;
 };
 
 struct AccelerationStructure {
-    VkAccelerationStructureKHR handle;
+    VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
     uint64_t deviceAddress = 0;
-    VkDeviceMemory memory;
-    VkBuffer buffer;
+    VkDeviceMemory memory = VK_NULL_HANDLE;
+    VkBuffer buffer = VK_NULL_HANDLE;
+
+    //void Destory(VkDevice& device)
+    //{
+    //    vkFreeMemory(device, memory, nullptr);
+    //    vkDestroyBuffer(device, buffer, nullptr);
+    //    vkDestroyAccelerationStructureKHR(device, handle, nullptr);
+
+    //    memory = VK_NULL_HANDLE;
+    //    buffer = VK_NULL_HANDLE;
+    //    handle = VK_NULL_HANDLE;
+    //    deviceAddress = 0;
+    //}
 };
 
 struct Texture
 {
-    VkImage textureImage;
-    VkDeviceMemory textureImageMemory;
-    VkImageView textureImageView;
-    VkSampler textureSampler;
+    VkImage textureImage = VK_NULL_HANDLE;
+    VkDeviceMemory textureImageMemory = VK_NULL_HANDLE;
+    VkImageView textureImageView = VK_NULL_HANDLE;
+    VkSampler textureSampler = VK_NULL_HANDLE;
 };
 
 class RayTraceRenderer
@@ -90,16 +103,19 @@ private:
 
     StorageImage storageImage;
 
-    VkPipeline            RayTracePipeline;
-    VkPipelineLayout      RayTracePipelineLayout;
-    VkDescriptorSet       RTDescriptorSet;
-    VkDescriptorSetLayout RayTraceDescriptorSetLayout;
-    VkDescriptorPool      descriptorPool;
+    VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
+    VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
+    VkDescriptorSet       RTDescriptorSet = VK_NULL_HANDLE;
+    VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
+    VkDescriptorPool      descriptorPool = VK_NULL_HANDLE;
 
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
+
+    UniformData SceneData;
+    VulkanBuffer SceneDataBuffer;
 
 public:
 
@@ -120,6 +136,7 @@ public:
     RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     ~RayTraceRenderer();
 
+    void Destory();
 
     RayTraceModel model;
     RayTraceModel model2;
@@ -131,16 +148,18 @@ public:
     VulkanBuffer NormalBuffer;
 
     void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);
-    void createBottomLevelAccelerationStructure(RayTraceModel& model);
     void createTopLevelAccelerationStructure();
     void createStorageImage();
     void createRayTracingPipeline();
     void createShaderBindingTable();
+    void createSceneDataBuffer();
     void createDescriptorSets();
     void buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     void Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
 
     void AcclerationCommandBuffer(VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
+
+    void UpdateGUI();
     void updateUniformBuffers(GLFWwindow* window);
 
     VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);

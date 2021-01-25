@@ -29,7 +29,6 @@ RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice,
 	ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.IndexBuffer.Buffer);
 	ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.TransformBuffer.Buffer);
 
-	ModelMesh.UniformBuffer.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.ubo);
 	MeshList.emplace_back(ModelMesh);
 }
 
@@ -61,8 +60,6 @@ RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice,
 	ModelVertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelVertexBuffer.Buffer);
 	ModelIndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelIndexBuffer.Buffer);
 	ModelTransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelTransformBuffer.Buffer);
-
-	int x = 34;
 }
 
 RayTraceModel::~RayTraceModel()
@@ -98,7 +95,6 @@ void RayTraceModel::LoadMesh(VkDevice& device, VkPhysicalDevice& physicalDevice,
 		ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.IndexBuffer.Buffer);
 		ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.TransformBuffer.Buffer);
 
-		ModelMesh.UniformBuffer.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.ubo);
 		MeshList.emplace_back(ModelMesh);
 	}
 
@@ -173,16 +169,21 @@ uint64_t RayTraceModel::getBufferDeviceAddress(VkDevice& device, VkBuffer buffer
 	return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
 }
 
-void RayTraceModel::Update(VkDevice& device, std::shared_ptr<PerspectiveCamera> camera, float time)
+void RayTraceModel::Destory(VkDevice& device)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh.ubo.projInverse = glm::inverse(camera->GetProjectionMatrix());
-		mesh.ubo.viewInverse = glm::inverse(camera->GetViewMatrix());
-		mesh.ubo.modelInverse = glm::inverse(glm::mat4(1.0f));
-		mesh.ubo.lightPos = glm::vec4(cos(glm::radians(time * 360.0f)) * 40.0f, -50.0f + sin(glm::radians(time * 360.0f)) * 20.0f, 25.0f + sin(glm::radians(time * 360.0f)) * 5.0f, 0.0f);
-		mesh.ubo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-		mesh.ubo.vertexSize = sizeof(RTVertex);
-		mesh.UniformBuffer.CopyBufferToMemory(device, &mesh.ubo, sizeof(UniformData));
+		mesh.VertexBuffer.DestoryBuffer(device);
+		mesh.IndexBuffer.DestoryBuffer(device);
+		mesh.TransformBuffer.DestoryBuffer(device);
+		mesh.MaterialBuffer.DestoryBuffer(device);
 	}
+	for (auto& buffer : MeshOffsetBufferList)
+	{
+		buffer.DestoryBuffer(device);
+	}
+	 ModelIndexBuffer.DestoryBuffer(device);
+	 ModelVertexBuffer.DestoryBuffer(device);
+	 ModelTransformBuffer.DestoryBuffer(device);
+	 ModelUniformBuffer.DestoryBuffer(device);
 }

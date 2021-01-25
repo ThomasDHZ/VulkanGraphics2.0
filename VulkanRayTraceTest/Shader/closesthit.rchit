@@ -13,24 +13,39 @@ struct PrimMeshInfo
   uint IndiceOffset;
 };
 
+struct Material
+{
+	vec3 Ambient;
+    vec3 Diffuse;
+    vec3 Specular;    
+    float Shininess;
+    float Reflectivness;
 
-layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 2, set = 0) uniform UBO 
+	uint DiffuseMapID;
+	uint SpecularMapID;
+	uint NormalMapID;
+	uint DepthMapID;
+	uint AlphaMapID;
+	uint EmissionMapID;
+};
+
+layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 2) uniform UBO 
 {
 	mat4 viewInverse;
 	mat4 projInverse;
 	mat4 modelInverse;
-	vec4 lightPos;
-	vec4 viewPos;
+	vec3 lightPos;
+	vec3 viewPos;
 	int vertexSize;
 } ubo;
-layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices[];
-layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices[];
-layout(set = 0, binding = 5) readonly buffer _InstanceInfo {PrimMeshInfo primInfo[];};
-layout(binding = 6, set = 0) uniform sampler2D DiffuseMap;
-layout(binding = 7, set = 0) readonly buffer _PosBuf {float pos[];};
-layout(binding = 8, set = 0) readonly buffer _TexCoordBuf {float texcoord0[];};
-layout(binding = 9, set = 0) readonly buffer _NormalBuf {float normals[];};
+layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
+layout(binding = 4) buffer Indices { uint i[]; } indices[];
+layout(binding = 6) uniform sampler2D DiffuseMap[];
+layout(binding = 7) readonly buffer _PosBuf {float pos[];};
+layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
+layout(binding = 9) readonly buffer _NormalBuf {float normals[];};
+//layout(binding = 11) readonly buffer MaterialLi {Material material; } MaterialList;
 
 struct Vertex
 {
@@ -73,8 +88,6 @@ vec3 getNormal(uint index)
 
 Vertex unpack(uint index)
 {
-	// Unpack the vertices from the SSBO using the glTF vertex structure
-	// The multiplier is the size of the vertex divided by four float components (=16 bytes)
 	const int m = ubo.vertexSize / 16;
 
 	vec4 d0 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 0];
@@ -85,7 +98,8 @@ Vertex unpack(uint index)
 	v.pos = d0.xyz;
 	v.normal = vec3(d0.w, d1.x, d1.y);
 	v.Color = vec4(d2.x, d2.y, d2.z, 1.0);
-	v.uv = vec2(vertices[gl_InstanceCustomIndexEXT].v[2 * index + 0].x, vertices[gl_InstanceCustomIndexEXT].v[2 * index + 1].y);
+	v.uv = vec2(d0.x, 
+				d1.y);
 	v.tangent = vec4(d0.w, d1.y, d1.y, 0.0f);
 
 	return v;
@@ -114,42 +128,8 @@ void main()
 	
 	vec3 lightVector = normalize(ubo.lightPos.xyz);
 	float dot_product = max(dot(lightVector, normal), 0.2);
-	hitValue = vec3(.6f) * dot_product;
-//PrimMeshInfo pinfo = primInfo[gl_InstanceCustomIndexEXT];
-//
-////  // Getting the 'first index' for this mesh (offset of the mesh + offset of the triangle)
-//  uint indexOffset  = pinfo.IndiceOffset + (3 * gl_PrimitiveID);
-//  uint vertexOffset = pinfo.VertexOffset;    
-////
-//	ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[indexOffset], 
-//						indices[gl_InstanceCustomIndexEXT].i[indexOffset + 1], 
-//						indices[gl_InstanceCustomIndexEXT].i[indexOffset + 2]);
-//   index += ivec3(vertexOffset);
-//
-//   vec3 pos0 = getVertex(index.x);
-//   vec3 pos1 = getVertex(index.y);
-//   vec3 pos2 = getVertex(index.z);
-//
-//   vec2 uv0 = getTexCoord(index.x);
-//   vec2 uv1 = getTexCoord(index.y);
-//   vec2 uv2 = getTexCoord(index.z);
-//
-//   vec3 nrm0 = getNormal(index.x);
-//   vec3 nrm1 = getNormal(index.y);
-//   vec3 nrm2 = getNormal(index.z);
-//
-//
-//	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
-//	vec3 position = pos0 * barycentricCoords.x + pos1 * barycentricCoords.y + pos2 * barycentricCoords.z;
-//	vec2 texCoord = uv0 * barycentricCoords.x + uv1 * barycentricCoords.y + uv2 * barycentricCoords.z;
-//	vec3 normal = normalize(nrm0 * barycentricCoords.x + nrm1 * barycentricCoords.y + nrm2 * barycentricCoords.z);
-//	
-//	vec3 lightVector = normalize(ubo.lightPos.xyz);
-//	float dot_product = max(dot(lightVector, normal), 0.2);
-//
-//	hitValue = vec3(.6f) * dot_product;
-// //hitValue = texture(DiffuseMap, texCoord).rgb;
-//// vec3 a;
+	hitValue = vec3(0.6f) * dot_product;
+
 //// switch(gl_InstanceCustomIndexEXT)
 //// {
 ////    case 0: a = vec3(1.0f, 0.0f, 0.0f); break;
@@ -160,10 +140,8 @@ void main()
 ////    case 5: a = vec3(0.0f, 1.0f, 1.0f); break;
 ////    case 6: a = vec3(1.0f, 1.0f, 1.0f); break;
 //// }
-//// hitValue = vec3(a);
-//
-//	//	hitValue = texture(DiffuseMap, texCoord).rgb;
-//	// Shadow casting
+
+	// Shadow casting
 //	float tmin = 0.001;
 //	float tmax = 10000.0;
 //	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
