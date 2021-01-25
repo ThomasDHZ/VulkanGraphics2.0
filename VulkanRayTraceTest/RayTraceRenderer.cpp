@@ -249,9 +249,8 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
     for (auto x = 0; x < bottomLevelASList.size(); x++)
     {
-        glm::mat4 transformMatrix2 = glm::mat4(1.0f);
-        auto transtransformMatrix2 = glm::transpose(transformMatrix2);
-        VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transtransformMatrix2);
+        glm::mat4 transformMatrix2 = model.ModelTransform;
+        VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
         VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
         AccelerationStructureInstance.transform = transformMatrix;
@@ -288,7 +287,10 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
     accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, &PrimitiveCount, &accelerationStructureBuildSizesInfo);
 
-    createAccelerationStructure(topLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR, accelerationStructureBuildSizesInfo);
+    if (topLevelAS.handle == VK_NULL_HANDLE)
+    {
+        createAccelerationStructure(topLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR, accelerationStructureBuildSizesInfo);
+    }
 
     RayTracingScratchBuffer ScratchBuffer = createScratchBuffer(accelerationStructureBuildSizesInfo.buildScratchSize);
 
@@ -301,7 +303,15 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
     AccelerationStructureBuildGeometryInfo2.pGeometries = &AccelerationStructureGeometry;
     AccelerationStructureBuildGeometryInfo2.scratchData.deviceAddress = ScratchBuffer.deviceAddress;
 
-    AccelerationStructureBuildGeometryInfo2.dstAccelerationStructure = topLevelAS.handle;
+    if (topLevelAS.handle == VK_NULL_HANDLE)
+    {
+        AccelerationStructureBuildGeometryInfo2.dstAccelerationStructure = topLevelAS.handle;
+    }
+    else
+    {
+        AccelerationStructureBuildGeometryInfo2.srcAccelerationStructure = topLevelAS.handle;
+        AccelerationStructureBuildGeometryInfo2.dstAccelerationStructure = topLevelAS.handle;
+    }
 
     VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo = {};
     AccelerationStructureBuildRangeInfo.primitiveCount = static_cast<uint32_t>(AccelerationStructureInstanceList.size());
@@ -454,7 +464,11 @@ void RayTraceRenderer::AcclerationCommandBuffer(VkAccelerationStructureBuildGeom
 void RayTraceRenderer::UpdateGUI()
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::SliderFloat3("dLight", &SceneData.lightPos.x, -1000.0f, 1000.0f);
+    ImGui::SliderFloat3("Pos", &SceneData.lightPos.x, -1000.0f, 1000.0f);
+    ImGui::SliderFloat3("Ambient", &SceneData.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse", &SceneData.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Specular", &SceneData.specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("shininess", &SceneData.shininess, 0.0f, 255.0f);
 }
 
 void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
@@ -474,6 +488,10 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData.vertexSize = sizeof(RTVertex);
     SceneDataBuffer.CopyBufferToMemory(device, &SceneData, sizeof(SceneData));
+
+    model.ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
+    model.Update();
+    createTopLevelAccelerationStructure();
 }
 
 void RayTraceRenderer::createRayTracingPipeline()

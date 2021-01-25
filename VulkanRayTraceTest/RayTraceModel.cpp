@@ -14,7 +14,6 @@ RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice,
 	ModelMesh.indices = meshDetails.indices;
 
 	ModelMesh.Transform = glm::mat4(1.0f);
-
 	ModelMesh.Transform = glm::transpose(ModelMesh.Transform);
 
 	ModelMesh.VertexCount = ModelMesh.vertices.size();
@@ -47,7 +46,12 @@ RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice,
 	LoadMesh(device, physicalDevice, FilePath, Scene->mRootNode, Scene);
 
 	ModelTransform = glm::mat4(1.0f);
-	ModelTransform = glm::rotate(ModelTransform, float(180), glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelTransform = glm::translate(ModelTransform, ModelPosition);
+	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelTransform = glm::scale(ModelTransform, ModelScale);
+	ModelTransform = glm::transpose(ModelTransform);
 
 	ModelVertexCount = ModelVertices.size();
 	ModelIndexCount = ModelIndices.size();
@@ -77,7 +81,7 @@ void RayTraceModel::LoadMesh(VkDevice& device, VkPhysicalDevice& physicalDevice,
 		ModelMesh.indices = LoadIndices(mesh);
 
 		ModelMesh.Transform = glm::mat4(1.0f);
-		ModelMesh.Transform = glm::translate(ModelMesh.Transform, glm::vec3(0.0f, 0.0f, 10.0f));
+		ModelMesh.Transform = glm::translate(ModelMesh.Transform, glm::vec3(0.0f, 0.0f, 0.0f));
 		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -175,6 +179,17 @@ uint64_t RayTraceModel::getBufferDeviceAddress(VkDevice& device, VkBuffer buffer
 	bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
 	bufferDeviceAI.buffer = buffer;
 	return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
+}
+
+void RayTraceModel::Update()
+{
+	ModelTransform = glm::mat4(1.0f);
+	ModelTransform = glm::translate(ModelTransform, ModelPosition);
+	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	ModelTransform = glm::scale(ModelTransform, ModelScale);
+	ModelTransform = glm::transpose(ModelTransform);
 }
 
 void RayTraceModel::Destory(VkDevice& device)

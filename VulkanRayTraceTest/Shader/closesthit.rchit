@@ -152,23 +152,15 @@ void main()
 {
 	const VertexData vertexData = GetVertexData();
 
-	vec3 lightVector = normalize(ubo.lightPos.xyz);
-	float dot_product = max(dot(lightVector, vertexData.Normal), 0.2);
-	hitValue = vec3(0.7f) * dot_product;
+	vec3 color = texture(DiffuseMap[0], vertexData.UV).rgb;
+	vec3 ambient = ubo.ambient * color;
 
-//	vec3 ambient = ubo.ambient * vec3(0.7f);
-//	vec3 norm = normalize(normal);
-//    vec3 lightDir = normalize(ubo.lightPos - worldPos);
-//    float diff = max(dot(norm, lightDir), 0.0);
-//    vec3 diffuse = ubo.diffuse * diff;  
-//    
-//    // specular
-//    vec3 viewDir = normalize(ubo.viewPos - worldPos);
-//    vec3 reflectDir = reflect(-lightDir, norm);  
-//    float spec = pow(max(dot(viewDir, reflectDir), 0.0), ubo.shininess);
-//    vec3 specular = ubo.specular * spec;  
-//        
-//	hitValue = ambient + ubo.diffuse + ubo.specular;
+	vec3 lightDir = normalize(ubo.lightPos.xyz - vertexData.Position);
+	float diff =  max(dot(lightDir, vertexData.Normal), 0.0);
+	vec3 diffuse = ubo.diffuse * diff * color;
+
+	hitValue = ambient + diffuse;
+
 //// switch(gl_InstanceCustomIndexEXT)
 //// {
 ////    case 0: a = vec3(1.0f, 0.0f, 0.0f); break;
@@ -181,13 +173,20 @@ void main()
 //// }
 
 	// Shadow casting
-//	float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//
-//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
-//	if (shadowed) {
-//		hitValue *= 0.3;
-//	}
+	float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+
+	if(dot(vertexData.Normal, lightDir) > 0)
+	{
+		
+			vec3 viewDir = normalize(ubo.viewPos.xyz - vertexData.Position);
+			vec3 reflectDir = reflect(-lightDir, vertexData.Normal);  
+			float spec = pow(max(dot(viewDir, reflectDir), 0.0), ubo.shininess);
+			vec3 specular = ubo.specular * spec;
+
+			hitValue += specular;
+		
+	}
 }
