@@ -6,6 +6,14 @@ layout(location = 0) rayPayloadInEXT vec3 hitValue;
 layout(location = 2) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
+struct VertexData
+{
+	vec3 Position;
+	vec3 Normal;
+	vec2 UV;
+	vec3 Tangent;
+	vec3 BiTangent;
+};
 
 struct PrimMeshInfo
 {
@@ -36,7 +44,11 @@ layout(binding = 2) uniform UBO
 	mat4 projInverse;
 	mat4 modelInverse;
 	vec3 lightPos;
+	vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 	vec3 viewPos;
+	float shininess;
 	int vertexSize;
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
@@ -104,32 +116,59 @@ Vertex unpack(uint index)
 
 	return v;
 }
-void main()
+
+VertexData GetVertexData()
 {
-	ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
+	VertexData data;
+
+	const ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
 						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
 						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
 
-	Vertex v0 = unpack(index.x);
-	Vertex v1 = unpack(index.y);
-	Vertex v2 = unpack(index.z);
+	const Vertex v0 = unpack(index.x);
+	const Vertex v1 = unpack(index.y);
+	const Vertex v2 = unpack(index.z);
 
-	vec2 uv0 = getTexCoord(index.x);
-		vec2 uv1 = getTexCoord(index.y);
-			vec2 uv2 = getTexCoord(index.z);
+	const vec2 uv0 = getTexCoord(index.x);
+	const vec2 uv1 = getTexCoord(index.y);
+	const vec2 uv2 = getTexCoord(index.z);
 
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
-	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
-	vec3 normal2 = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	vec2 texCoord = uv0 * barycentricCoords.x + uv1 * barycentricCoords.y + uv2 * barycentricCoords.z;
-	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
+	const vec3 position = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
+	data.Position = vec3(gl_ObjectToWorldEXT * vec4(position, 1.0));
 
-	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	
+	const vec3 normal = v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z;
+	data.Normal = normalize(vec3(normal * gl_WorldToObjectEXT));
+
+	data.UV = uv0 * barycentricCoords.x + uv1 * barycentricCoords.y + uv2 * barycentricCoords.z;
+
+	const vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
+	data.Tangent = normalize(vec3(tangent * gl_WorldToObjectEXT));
+
+	return data;
+}
+
+void main()
+{
+	const VertexData vertexData = GetVertexData();
+
 	vec3 lightVector = normalize(ubo.lightPos.xyz);
-	float dot_product = max(dot(lightVector, normal), 0.2);
-	hitValue = vec3(0.6f) * dot_product;
+	float dot_product = max(dot(lightVector, vertexData.Normal), 0.2);
+	hitValue = vec3(0.7f) * dot_product;
 
+//	vec3 ambient = ubo.ambient * vec3(0.7f);
+//	vec3 norm = normalize(normal);
+//    vec3 lightDir = normalize(ubo.lightPos - worldPos);
+//    float diff = max(dot(norm, lightDir), 0.0);
+//    vec3 diffuse = ubo.diffuse * diff;  
+//    
+//    // specular
+//    vec3 viewDir = normalize(ubo.viewPos - worldPos);
+//    vec3 reflectDir = reflect(-lightDir, norm);  
+//    float spec = pow(max(dot(viewDir, reflectDir), 0.0), ubo.shininess);
+//    vec3 specular = ubo.specular * spec;  
+//        
+//	hitValue = ambient + ubo.diffuse + ubo.specular;
 //// switch(gl_InstanceCustomIndexEXT)
 //// {
 ////    case 0: a = vec3(1.0f, 0.0f, 0.0f); break;

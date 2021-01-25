@@ -32,6 +32,19 @@ struct CubeMapLayout
     std::string Left;
 };
 
+struct SceneData {
+    alignas(16) glm::mat4 viewInverse;
+    alignas(16) glm::mat4 projInverse;
+    alignas(16) glm::mat4 modelInverse;
+    alignas(16) glm::vec3 lightPos = glm::vec3(0.0f);
+    alignas(16) glm::vec3 ambient;
+    alignas(16) glm::vec3 diffuse;
+    alignas(16) glm::vec3 specular;
+    alignas(16) glm::vec3 viewPos;
+    alignas(4)  float shininess;
+    alignas(4) int vertexSize;
+};
+
 struct RayTracingScratchBuffer
 {
     uint64_t deviceAddress = 0;
@@ -114,7 +127,7 @@ private:
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
 
-    UniformData SceneData;
+    SceneData SceneData;
     VulkanBuffer SceneDataBuffer;
 
 public:

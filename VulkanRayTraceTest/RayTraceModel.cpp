@@ -114,6 +114,14 @@ std::vector<RTVertex> RayTraceModel::LoadVertices(aiMesh* mesh)
 		vertex.Position = glm::vec3{ mesh->mVertices[x].x, mesh->mVertices[x].y, mesh->mVertices[x].z };
 		vertex.Normal = glm::vec3{ mesh->mNormals[x].x, mesh->mNormals[x].y, mesh->mNormals[x].z };
 
+		if(mesh->mColors[0])
+		{
+			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
+		}
+		else
+		{
+			vertex.Color = glm::vec4{ 0.6f, 0.6f, 0.6f, 1.0f };
+		}
 		if (mesh->mTangents)
 		{
 			vertex.Tangant = glm::vec4{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z, 0.0f };

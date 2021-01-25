@@ -23,15 +23,6 @@ struct Material
 	uint32_t EmissionMapID = 0;
 };
 
-struct UniformData {
-	alignas(16) glm::mat4 viewInverse;
-	alignas(16) glm::mat4 projInverse;
-	alignas(16) glm::mat4 modelInverse;
-	alignas(16) glm::vec3 lightPos = glm::vec3(0.0f);
-	alignas(16) glm::vec3 viewPos;
-	alignas(4) int vertexSize;
-};
-
 struct RTVertex
 {
 	glm::vec3 Position = glm::vec3(0.0f);

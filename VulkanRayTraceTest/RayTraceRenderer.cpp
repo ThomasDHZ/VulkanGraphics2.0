@@ -63,6 +63,10 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
 
 
     SceneData.lightPos = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
+    SceneData.ambient = glm::vec4(0.2f);
+    SceneData.diffuse = glm::vec4(0.5f);
+    SceneData.specular = glm::vec4(1.0f);
+    SceneData.shininess = 64.0f;
 
    for (int x = 0; x < model.MeshList.size(); x++)
    {
@@ -469,7 +473,7 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     SceneData.modelInverse = glm::inverse(glm::mat4(1.0f));
     SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData.vertexSize = sizeof(RTVertex);
-    SceneDataBuffer.CopyBufferToMemory(device, &SceneData, sizeof(UniformData));
+    SceneDataBuffer.CopyBufferToMemory(device, &SceneData, sizeof(SceneData));
 }
 
 void RayTraceRenderer::createRayTracingPipeline()
@@ -636,7 +640,7 @@ void RayTraceRenderer::createShaderBindingTable() {
 }
 void RayTraceRenderer::createSceneDataBuffer()
 {
-    SceneDataBuffer.CreateBuffer(device, physicalDevice, sizeof(UniformData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &SceneData);
+    SceneDataBuffer.CreateBuffer(device, physicalDevice, sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &SceneData);
 }
 void RayTraceRenderer::createDescriptorSets()
 {
