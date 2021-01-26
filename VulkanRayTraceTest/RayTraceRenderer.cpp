@@ -546,27 +546,6 @@ void RayTraceRenderer::createRayTracingPipeline()
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(DiffuseBinding);
 
-    VkDescriptorSetLayoutBinding POSStructureBinding = {};
-    POSStructureBinding.binding = 7;
-    POSStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    POSStructureBinding.descriptorCount = 1;
-    POSStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-    RTDescriptorSetBindings.emplace_back(POSStructureBinding);
-
-    VkDescriptorSetLayoutBinding UVStructureBinding = {};
-    UVStructureBinding.binding = 8;
-    UVStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    UVStructureBinding.descriptorCount = 1;
-    UVStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-    RTDescriptorSetBindings.emplace_back(UVStructureBinding);
-
-    VkDescriptorSetLayoutBinding NormalStructureBinding = {};
-    NormalStructureBinding.binding = 9;
-    NormalStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    NormalStructureBinding.descriptorCount = 1;
-    NormalStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-    RTDescriptorSetBindings.emplace_back(NormalStructureBinding);
-
     VkDescriptorSetLayoutBinding CubeMapStructureBinding = {};
     CubeMapStructureBinding.binding = 10;
     CubeMapStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -780,123 +759,6 @@ void RayTraceRenderer::createDescriptorSets()
     DiffuseMapDescriptor.pImageInfo = &DiffuseMapImage;
 
 
-
-
-
-
-
-
-
-
-
-    std::vector<glm::vec3> posList;
-    for (auto model : model.MeshList)
-    {
-        for (auto mesh : model.vertices)
-        {
-            posList.emplace_back(mesh.Position);
-        }
-    }
-
-    POSBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec3) * posList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, posList.data());
-
-
-    std::vector<VkDescriptorBufferInfo> posBufferInfoList;
-
-    VkDescriptorBufferInfo POSBufferInfo = {};
-    POSBufferInfo.buffer = POSBuffer.Buffer;
-    POSBufferInfo.offset = 0;
-    POSBufferInfo.range = VK_WHOLE_SIZE;
-    posBufferInfoList.emplace_back(POSBufferInfo);
-
-
-    VkWriteDescriptorSet POSDescriptorSet{};
-    POSDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    POSDescriptorSet.dstSet = RTDescriptorSet;
-    POSDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    POSDescriptorSet.dstBinding = 7;
-    POSDescriptorSet.pBufferInfo = posBufferInfoList.data();
-    POSDescriptorSet.descriptorCount = 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    std::vector<glm::vec2> uvList;
-    for (auto model : model.MeshList)
-    {
-        for (auto mesh : model.vertices)
-        {
-            uvList.emplace_back(mesh.TexureCoord);
-        }
-    }
-
-    UVBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec2) * uvList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uvList.data());
-
-
-    std::vector<VkDescriptorBufferInfo> UVBufferInfoList;
-
-        VkDescriptorBufferInfo UVBufferInfo = {};
-        UVBufferInfo.buffer = UVBuffer.Buffer;
-        UVBufferInfo.offset = 0;
-        UVBufferInfo.range = VK_WHOLE_SIZE;
-        UVBufferInfoList.emplace_back(UVBufferInfo);
-    
-
-    VkWriteDescriptorSet UVDescriptorSet{};
-    UVDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    UVDescriptorSet.dstSet = RTDescriptorSet;
-    UVDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    UVDescriptorSet.dstBinding = 8;
-    UVDescriptorSet.pBufferInfo = UVBufferInfoList.data();
-    UVDescriptorSet.descriptorCount = 1;
-
-
-    std::vector<glm::vec3> normalList;
-    for (auto model : model.MeshList)
-    {
-        for (auto mesh : model.vertices)
-        {
-            normalList.emplace_back(mesh.Normal);
-        }
-    }
-
-   NormalBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec3) * normalList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, normalList.data());
-
-
-    std::vector<VkDescriptorBufferInfo> NormalBufferInfoList;
-
-    VkDescriptorBufferInfo NormalBufferInfo = {};
-    NormalBufferInfo.buffer = NormalBuffer.Buffer;
-    NormalBufferInfo.offset = 0;
-    NormalBufferInfo.range = VK_WHOLE_SIZE;
-    NormalBufferInfoList.emplace_back(NormalBufferInfo);
-
-
-    VkWriteDescriptorSet NormalDescriptorSet{};
-    NormalDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    NormalDescriptorSet.dstSet = RTDescriptorSet;
-    NormalDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    NormalDescriptorSet.dstBinding = 9;
-    NormalDescriptorSet.pBufferInfo = NormalBufferInfoList.data();
-    NormalDescriptorSet.descriptorCount = 1;
-
     VkDescriptorImageInfo CubeMapImage = {};
     CubeMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     CubeMapImage.imageView = CubeMap.textureImageView;
@@ -918,9 +780,6 @@ void RayTraceRenderer::createDescriptorSets()
         VertexDescriptorSet,
         IndexDescriptorSet,
         DiffuseMapDescriptor,
-        POSDescriptorSet,
-        UVDescriptorSet,
-        NormalDescriptorSet,
         CubeMapDescriptor
     };
     vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
