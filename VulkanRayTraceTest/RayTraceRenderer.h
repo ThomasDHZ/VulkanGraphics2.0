@@ -136,7 +136,7 @@ public:
     Keyboard keyboard;
     Mouse mouse;
 
-    Texture DiffuseMap;
+    std::vector<Texture> DiffuseMapList;
     Texture CubeMap;
 
     std::vector<AccelerationStructure> bottomLevelASList{};
@@ -159,6 +159,7 @@ public:
     VulkanBuffer POSBuffer;
     VulkanBuffer UVBuffer;
     VulkanBuffer NormalBuffer;
+    VulkanBuffer MaterialBuffer;
 
     void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);
     void createTopLevelAccelerationStructure();

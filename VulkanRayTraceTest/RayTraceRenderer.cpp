@@ -43,13 +43,36 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
 
   camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
 
-//  model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj");
-  model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj");
+ model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj");
+//  model = RayTraceModel(device, physicalDevice, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
   
 
-    createTextureImage(DiffuseMap, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png");
-    createTextureImageView(DiffuseMap);
-    createTextureSampler(DiffuseMap);
+  Texture texture;
+    createTextureImage(texture, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png");
+    createTextureImageView(texture);
+    createTextureSampler(texture);
+    DiffuseMapList.emplace_back(texture);
+
+    Texture texture2;
+    createTextureImage(texture2, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp");
+    createTextureImageView(texture2);
+    createTextureSampler(texture2);
+    DiffuseMapList.emplace_back(texture2);
+
+    Texture texture3;
+    createTextureImage(texture3, "C:/Users/dotha/source/repos/VulkanGraphics/texture/container2.png");
+    createTextureImageView(texture3);
+    createTextureSampler(texture3);
+    DiffuseMapList.emplace_back(texture3);
+    DiffuseMapList.emplace_back(texture);
+    DiffuseMapList.emplace_back(texture2);
+    DiffuseMapList.emplace_back(texture3);
+    DiffuseMapList.emplace_back(texture);
+    DiffuseMapList.emplace_back(texture2);
+    DiffuseMapList.emplace_back(texture3);
+    DiffuseMapList.emplace_back(texture);
+    DiffuseMapList.emplace_back(texture2);
+    DiffuseMapList.emplace_back(texture3);
 
     stbi_set_flip_vertically_on_load(true);
     std::string CubeMapFiles[6];
@@ -143,15 +166,15 @@ void RayTraceRenderer::Destory()
 
     model.Destory(device);
     {
-        vkDestroySampler(device, DiffuseMap.textureSampler, nullptr);
-        vkDestroyImageView(device, DiffuseMap.textureImageView, nullptr);
-        vkDestroyImage(device, DiffuseMap.textureImage, nullptr);
-        vkFreeMemory(device, DiffuseMap.textureImageMemory, nullptr);
+       // vkDestroySampler(device, DiffuseMap.textureSampler, nullptr);
+       // vkDestroyImageView(device, DiffuseMap.textureImageView, nullptr);
+       // vkDestroyImage(device, DiffuseMap.textureImage, nullptr);
+       // vkFreeMemory(device, DiffuseMap.textureImageMemory, nullptr);
 
-        DiffuseMap.textureSampler = VK_NULL_HANDLE;
-        DiffuseMap.textureImageView = VK_NULL_HANDLE;
-        DiffuseMap.textureImage = VK_NULL_HANDLE;
-        DiffuseMap.textureImageMemory = VK_NULL_HANDLE;
+      //  DiffuseMap.textureSampler = VK_NULL_HANDLE;
+      //  DiffuseMap.textureImageView = VK_NULL_HANDLE;
+      //  DiffuseMap.textureImage = VK_NULL_HANDLE;
+      //  DiffuseMap.textureImageMemory = VK_NULL_HANDLE;
     }
     {
         vkDestroySampler(device, CubeMap.textureSampler, nullptr);
@@ -489,9 +512,9 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     SceneData.vertexSize = sizeof(RTVertex);
     SceneDataBuffer.CopyBufferToMemory(device, &SceneData, sizeof(SceneData));
 
-    model.ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
-    model.Update();
-    createTopLevelAccelerationStructure();
+   // model.ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
+   // model.Update();
+   // createTopLevelAccelerationStructure();
 }
 
 void RayTraceRenderer::createRayTracingPipeline()
@@ -532,19 +555,26 @@ void RayTraceRenderer::createRayTracingPipeline()
     IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
-    //VkDescriptorSetLayoutBinding OffsetBufferStructureBinding = {};
-    //OffsetBufferStructureBinding.binding = 5;
-    //OffsetBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    //OffsetBufferStructureBinding.descriptorCount = static_cast<uint32_t>(model.MeshOffsetBufferList.size());
-    //OffsetBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-    //RTDescriptorSetBindings.emplace_back(OffsetBufferStructureBinding);
+    VkDescriptorSetLayoutBinding MaterialBufferStructureBinding = {};
+    MaterialBufferStructureBinding.binding = 5;
+    MaterialBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    MaterialBufferStructureBinding.descriptorCount = 1;
+    MaterialBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(MaterialBufferStructureBinding);
 
     VkDescriptorSetLayoutBinding DiffuseBinding = {};
     DiffuseBinding.binding = 6;
     DiffuseBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    DiffuseBinding.descriptorCount = 1;
+    DiffuseBinding.descriptorCount = 12;
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(DiffuseBinding);
+
+    VkDescriptorSetLayoutBinding UVStructureBinding = {};
+    UVStructureBinding.binding = 8;
+    UVStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    UVStructureBinding.descriptorCount = 1;
+    UVStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(UVStructureBinding);
 
     VkDescriptorSetLayoutBinding CubeMapStructureBinding = {};
     CubeMapStructureBinding.binding = 10;
@@ -744,20 +774,79 @@ void RayTraceRenderer::createDescriptorSets()
     IndexDescriptorSet.pBufferInfo = IndexBufferInfoList.data();
     IndexDescriptorSet.descriptorCount = static_cast<uint32_t>(IndexBufferInfoList.size());
 
-    VkDescriptorImageInfo DiffuseMapImage = {};
-    DiffuseMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    DiffuseMapImage.imageView = DiffuseMap.textureImageView;
-    DiffuseMapImage.sampler = DiffuseMap.textureSampler;
+    std::vector<Material> MaterialList;
+    for (int  x= 0; x < model.MeshList.size(); x++)
+    {
+        Material mat;
+        mat.DiffuseMapID = x;
+        mat.NormalMapID = x + 4;
+        mat.SpecularMapID = x + 4;
+        mat.EmissionMapID = x + 5;
+        mat.Shininess= x + 5;
+        auto a = &mat.DiffuseMapID;
+        MaterialList.emplace_back(mat);
+    }
+    auto b = &MaterialList[0];
+    MaterialBuffer.CreateBuffer(device, physicalDevice, sizeof(Material) * MaterialList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, MaterialList.data());
 
+    VkDescriptorBufferInfo MaterialBufferInfo = {};
+    MaterialBufferInfo.buffer = MaterialBuffer.Buffer;
+    MaterialBufferInfo.offset = 0;
+    MaterialBufferInfo.range = VK_WHOLE_SIZE;
+
+    VkWriteDescriptorSet MaterialDescriptorSet{};
+    MaterialDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    MaterialDescriptorSet.dstSet = RTDescriptorSet;
+    MaterialDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    MaterialDescriptorSet.dstBinding = 5;
+    MaterialDescriptorSet.pBufferInfo = &MaterialBufferInfo;
+    MaterialDescriptorSet.descriptorCount = 1;
+
+    std::vector<VkDescriptorImageInfo> DiffuseMapInfoList;
+    for (auto diffusemap : DiffuseMapList)
+    {
+        VkDescriptorImageInfo DiffuseMapImage = {};
+        DiffuseMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        DiffuseMapImage.imageView = diffusemap.textureImageView;
+        DiffuseMapImage.sampler = diffusemap.textureSampler;
+        DiffuseMapInfoList.emplace_back(DiffuseMapImage);
+    }
     VkWriteDescriptorSet DiffuseMapDescriptor = {};
     DiffuseMapDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     DiffuseMapDescriptor.dstSet = RTDescriptorSet;
     DiffuseMapDescriptor.dstBinding = 6;
     DiffuseMapDescriptor.dstArrayElement = 0;
     DiffuseMapDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    DiffuseMapDescriptor.descriptorCount = 1;
-    DiffuseMapDescriptor.pImageInfo = &DiffuseMapImage;
+    DiffuseMapDescriptor.descriptorCount = 12;
+    DiffuseMapDescriptor.pImageInfo = DiffuseMapInfoList.data();
 
+    std::vector<glm::vec2> uvList;
+    for (auto model : model.MeshList)
+    {
+        for (auto mesh : model.vertices)
+        {
+            uvList.emplace_back(mesh.TexureCoord);
+        }
+    }
+
+    UVBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::vec2) * uvList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uvList.data());
+
+
+    std::vector<VkDescriptorBufferInfo> UVBufferInfoList;
+
+    VkDescriptorBufferInfo UVBufferInfo = {};
+    UVBufferInfo.buffer = UVBuffer.Buffer;
+    UVBufferInfo.offset = 0;
+    UVBufferInfo.range = VK_WHOLE_SIZE;
+    UVBufferInfoList.emplace_back(UVBufferInfo);
+
+    VkWriteDescriptorSet UVDescriptorSet{};
+    UVDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    UVDescriptorSet.dstSet = RTDescriptorSet;
+    UVDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    UVDescriptorSet.dstBinding = 8;
+    UVDescriptorSet.pBufferInfo = UVBufferInfoList.data();
+    UVDescriptorSet.descriptorCount = 1;
 
     VkDescriptorImageInfo CubeMapImage = {};
     CubeMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -779,7 +868,9 @@ void RayTraceRenderer::createDescriptorSets()
         UniformDescriptorSet,
         VertexDescriptorSet,
         IndexDescriptorSet,
+        MaterialDescriptorSet,
         DiffuseMapDescriptor,
+        UVDescriptorSet,
         CubeMapDescriptor
     };
     vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
