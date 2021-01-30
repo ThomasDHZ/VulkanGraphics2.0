@@ -6,6 +6,7 @@
 #include <string>
 #include "PerspectiveCamera.h"
 #include "VulkanBuffer.h"
+#include "TextureManager.h"
 
 struct Material
 {
@@ -73,9 +74,10 @@ class RayTraceModel
 private:
 	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
 
-	void LoadMesh(VkDevice& device, VkPhysicalDevice& physicalDevice, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadMesh(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<RTVertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
+	Material LoadMaterial(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
 	uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
 
 public:
@@ -106,7 +108,7 @@ public:
 
 	RayTraceModel();
 	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, MeshDetails& meshDetails);
-	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, const std::string& FilePath);
+	RayTraceModel(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath);
 	~RayTraceModel();
 
 	void Update();

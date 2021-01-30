@@ -15,10 +15,13 @@ struct VertexData
 	vec3 BiTangent;
 };
 
-struct PrimMeshInfo
+
+struct DirectionalLight
 {
-  uint VertexOffset;
-  uint IndiceOffset;
+	vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 };
 
 struct Material
@@ -115,21 +118,34 @@ ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID],
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
 	vec2 UV = uv0 * barycentricCoords.x + uv1 * barycentricCoords.y + uv2 * barycentricCoords.z;
 
-	// Basic lighting
-	vec3 lightVector = normalize(ubo.lightPos.xyz);
-	float dot_product = max(dot(lightVector, normal), 0.2);
+	vec3 lightDir = normalize(-ubo.lightPos);
+	float diff = max(dot(normal, lightDir), 0.0);
 
- // hitValue = texture(DiffuseMap[MaterialList.material[gl_InstanceCustomIndexEXT].DiffuseMapID], UV).rgb * dot_product; 
-	hitValue = vec3(0.7f) * dot_product;
+	vec3 ambient = ubo.ambient * vec3(texture(DiffuseMap[MaterialList.material[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
+    vec3 diffuse = ubo.diffuse * diff * vec3(texture(DiffuseMap[MaterialList.material[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
  
+	 hitValue = ambient + diffuse;
+
+	float spec = 0.0f;
+ // if(dot(normal, L) > 0)
+ // {
 	// Shadow casting
 	float tmin = 0.001;
 	float tmax = 10000.0;
 	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 	shadowed = true;  
 	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
-//	if (shadowed) {
-//		hitValue = vec3(1.0f, 0.0f, 0.0f);
-//	}
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+	if (shadowed) {
+		hitValue *= 0.3f;
+	}
+	else
+	{
+		vec3 halfwayDir = normalize(ubo.lightPos + ubo.viewPos);  
+         spec = pow(max(dot(normal, halfwayDir), 0.0), MaterialList.material[gl_InstanceCustomIndexEXT].Shininess);
+		vec3 specular = ubo.specular * spec * vec3(texture(DiffuseMap[MaterialList.material[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
+		hitValue += specular;
+	}
+  // }
+
 }

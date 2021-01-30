@@ -21,16 +21,10 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "InterfaceRenderPass.h"
+#include "Texuture2D.h"
+#include "CubeMapTexture.h"
+#include "TextureManager.h"
 
-struct CubeMapLayout
-{
-    std::string Front;
-    std::string Back;
-    std::string Top;
-    std::string Bottom;
-    std::string Right;
-    std::string Left;
-};
 
 struct SceneData {
     alignas(16) glm::mat4 viewInverse;
@@ -78,14 +72,6 @@ struct AccelerationStructure {
     //}
 };
 
-struct Texture
-{
-    VkImage textureImage = VK_NULL_HANDLE;
-    VkDeviceMemory textureImageMemory = VK_NULL_HANDLE;
-    VkImageView textureImageView = VK_NULL_HANDLE;
-    VkSampler textureSampler = VK_NULL_HANDLE;
-};
-
 class RayTraceRenderer
 {
 private:
@@ -95,6 +81,8 @@ private:
     VkQueue graphicsQueue;
     uint32_t WIDTH;
     uint32_t HEIGHT;
+
+    TextureManager textureManager;
 
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
@@ -135,9 +123,6 @@ public:
     std::shared_ptr<PerspectiveCamera> camera;
     Keyboard keyboard;
     Mouse mouse;
-
-    std::vector<Texture> DiffuseMapList;
-    Texture CubeMap;
 
     std::vector<AccelerationStructure> bottomLevelASList{};
     AccelerationStructure topLevelAS{};
@@ -212,16 +197,7 @@ public:
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
-    //Texture
-    void createTextureImage(Texture& texture, const std::string Filepath);
-    void createTextureImageView(Texture& texture);
-    void createTextureSampler(Texture& texture);
-    //CubeMap Texture
-    void CubeMapTexture(std::string CubeMapFiles[6], Texture& CubeMap);
-    void LoadTexture(CubeMapLayout CubeMapFiles, Texture& CubeMap);
-    void CreateTextureImage(VkImageCreateInfo TextureInfo, Texture& CubeMap);
-    void CreateTextureView(Texture& CubeMap);
-    void CreateTextureSampler(Texture& CubeMap);
+
 
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
