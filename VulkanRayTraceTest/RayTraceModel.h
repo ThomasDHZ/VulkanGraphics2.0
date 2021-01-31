@@ -16,7 +16,7 @@ struct Material
 	alignas(4) float Shininess = 32;
 	alignas(4) float Reflectivness = 0;
 
-	alignas(4) uint32_t DiffuseMapID = 1;
+	alignas(4) uint32_t DiffuseMapID = 0;
 	alignas(4) uint32_t SpecularMapID = 0;
 	alignas(4) uint32_t NormalMapID = 0;
 	alignas(4) uint32_t DepthMapID = 0;

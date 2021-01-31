@@ -24,7 +24,18 @@ struct DirectionalLight
     vec3 specular;
 };
 
-struct Material
+struct PointLight 
+{
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+	float constant;
+    float linear;
+    float quadratic;
+};
+
+struct MaterialInfo
 {
 	vec3 Ambient;
     vec3 Diffuse;
@@ -40,24 +51,37 @@ struct Material
 	uint EmissionMapID;
 };
 
+struct Material
+{
+	vec3 Ambient;
+    vec3 Diffuse;
+    vec3 Specular;    
+    float Shininess;
+    float Reflectivness;
+
+	vec3 DiffuseMap;
+	vec3 SpecularMap;
+	vec3 NormalMap;
+	vec3 DepthMap;
+	vec3 AlphaMap;
+	vec3 EmissionMap;
+};
+
 layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
 	mat4 viewInverse;
 	mat4 projInverse;
 	mat4 modelInverse;
-	vec3 lightPos;
-	vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
+	DirectionalLight dlight;
 	vec3 viewPos;
-	float shininess;
+	PointLight plight;
 	int vertexSize;
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
-layout(binding = 5) buffer Materials { Material material[]; } MaterialList;
-layout(binding = 6) uniform sampler2D DiffuseMap[];
+layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
+layout(binding = 6) uniform sampler2D TextureMap[];
 layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
 
 struct Vertex
@@ -72,6 +96,7 @@ struct Vertex
   vec4 BoneWeights;
  };
 
+
 Vertex unpack(uint index)
 {
 	const int m = ubo.vertexSize / 16;
@@ -79,15 +104,16 @@ Vertex unpack(uint index)
 	vec4 d0 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 0];
 	vec4 d1 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 1];
 	vec4 d2 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 2];
+	vec4 d3 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 3];
+	vec4 d4 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 4];
 
 	Vertex v;
 	v.pos = d0.xyz;
 	v.normal = vec3(d0.w, d1.x, d1.y);
-	v.Color = vec4(d2.x, d2.y, d2.z, 1.0);
-	v.uv = vec2(d0.x, 
-				d1.y);
-	v.tangent = vec4(d0.w, d1.y, d1.y, 0.0f);
-
+	v.uv = vec2(d1.zw);
+	v.tangent = vec4(d2.x, d2.y, d2.z, d2.w);
+    v.BiTangant = vec4(d3.x, d3.y, d3.z, d3.w);
+	v.Color = vec4(d4.x, d4.y, d4.z, d4.z);
 	return v;
 }
 
@@ -99,15 +125,31 @@ vec2 getTexCoord(uint index)
   return vp;
 }
 
+Material BuildMaterial(vec2 UV)
+{
+	Material material;
+	material.Ambient = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Ambient;
+	material.Diffuse = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Diffuse;
+	material.Specular = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Specular;
+	material.Shininess = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Shininess;
+	material.Reflectivness = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Reflectivness;
+	material.DiffuseMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].NormalMapID], UV));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].AlphaMapID], UV));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].EmissionMapID], UV));
+	return material;
+};
+
 void main()
 {
-ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
-						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
-						indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
+    const ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
+						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
+						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
 
-	Vertex v0 = unpack(index.x);
-	Vertex v1 = unpack(index.y);
-	Vertex v2 = unpack(index.z);
+	const Vertex v0 = unpack(index.x);
+	const Vertex v1 = unpack(index.y);
+	const Vertex v2 = unpack(index.z);
 
 	const vec2 uv0 = getTexCoord(index.x);
 	const vec2 uv1 = getTexCoord(index.y);
@@ -115,37 +157,82 @@ ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID],
 
 	// Interpolate normal
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
+	vec3 color = normalize(v0.Color * barycentricCoords.x + v1.Color * barycentricCoords.y + v2.Color * barycentricCoords.z);
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	vec2 UV = uv0 * barycentricCoords.x + uv1 * barycentricCoords.y + uv2 * barycentricCoords.z;
+	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
+	 vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
 
-	vec3 lightDir = normalize(-ubo.lightPos);
-	float diff = max(dot(normal, lightDir), 0.0);
+	 	const Material material = BuildMaterial(UV);
 
-	vec3 ambient = ubo.ambient * vec3(texture(DiffuseMap[MaterialList.material[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
-    vec3 diffuse = ubo.diffuse * diff * vec3(texture(DiffuseMap[MaterialList.material[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
+	vec3 lightDir = normalize(-ubo.dlight.direction);
+	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
+
+	vec3 ambient = ubo.dlight.ambient *  color;
+    vec3 diffuse = ubo.dlight.diffuse * diff *  color;
  
 	 hitValue = ambient + diffuse;
 
-	float spec = 0.0f;
- // if(dot(normal, L) > 0)
- // {
-	// Shadow casting
-	float tmin = 0.001;
-	float tmax = 10000.0;
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	shadowed = true;  
-	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
-	if (shadowed) {
-		hitValue *= 0.3f;
-	}
-	else
-	{
-		vec3 halfwayDir = normalize(ubo.lightPos + ubo.viewPos);  
-         spec = pow(max(dot(normal, halfwayDir), 0.0), MaterialList.material[gl_InstanceCustomIndexEXT].Shininess);
-		vec3 specular = ubo.specular * spec * vec3(texture(DiffuseMap[MaterialList.material[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
-		hitValue += specular;
-	}
-  // }
+
+		vec3 lightDir2 = normalize(ubo.plight.position - worldPos);
+	float diff2 = max(dot(ubo.plight.position, lightDir2), 0.0);
+	 float distance = length(ubo.plight.position - worldPos);
+    float attenuation = 1.0 / (ubo.plight.constant + ubo.plight.linear * distance + ubo.plight.quadratic * (distance * distance));    
+    
+	vec3 ambient2 = ubo.plight.ambient * color;
+    vec3 diffuse2 = ubo.plight.diffuse * diff * color;
+//	ambient2 *= attenuation;
+  //  diffuse2 *= attenuation;
+
+	 hitValue += ambient2 + diffuse2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//	float spec = 0.0f;
+////  if(dot(normal, L) > 0)
+////  {
+//	// Shadow casting
+//	float tmin = 0.001;
+//	float tmax = 10000.0;
+//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+//	shadowed = true;  
+//	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+//	if (shadowed) {
+//		hitValue *= 0.3f;
+//	}
+//	else
+//	{
+//		vec3 halfwayDir = normalize(ubo.dlight.direction + ubo.viewPos);  
+//         spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
+//		vec3 specular = ubo.dlight.specular * spec * material.Specular;
+//		hitValue += specular;
+//	}
+//
+//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir2, tmax, 2);
+//	if (shadowed) {
+//		hitValue *= 0.3f;
+//	}
+//	else
+//	{
+//		vec3 halfwayDir2 = normalize(ubo.plight.position + ubo.viewPos);  
+//        spec = pow(max(dot(normal, halfwayDir2), 0.0), material.Shininess);
+//		vec3 specular2 = ubo.plight.specular * spec * material.Specular;
+//		//specular2 *= attenuation;
+//		hitValue += specular2;
+//	}
+		
+ //  }
 
 }
