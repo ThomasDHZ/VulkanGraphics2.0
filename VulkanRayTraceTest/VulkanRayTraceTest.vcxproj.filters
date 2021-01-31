@@ -92,9 +92,6 @@
     <None Include="shader.frag">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\closesthit.rchit">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\miss.rmiss">
       <Filter>Shader</Filter>
     </None>
@@ -102,6 +99,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\shadow.rmiss.spv">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\closesthit.rchit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="alpha.rahit">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

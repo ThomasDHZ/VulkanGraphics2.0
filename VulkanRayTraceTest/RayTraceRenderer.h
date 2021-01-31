@@ -154,7 +154,6 @@ public:
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
-    VulkanBuffer UVBuffer;
     VulkanBuffer MaterialBuffer;
 
     void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);

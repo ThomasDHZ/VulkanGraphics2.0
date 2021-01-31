@@ -45,10 +45,12 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
 
   camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
 
-  ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+  //ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 //  ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
  // ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj"));
- // textureManager.LoadTexture(device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
+    ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
+
+  textureManager.LoadTexture(device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
 
     stbi_set_flip_vertically_on_load(true);
     std::string CubeMapFiles[6];
@@ -137,9 +139,6 @@ void RayTraceRenderer::Destory()
         raygenShaderBindingTable.DestoryBuffer(device);
         missShaderBindingTable.DestoryBuffer(device);
         hitShaderBindingTable.DestoryBuffer(device);
-    }
-    {
-        //UVBuffer.DestoryBuffer(device);
         SceneDataBuffer.DestoryBuffer(device);
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
@@ -494,16 +493,18 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+
+    ModelList[0].ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
+    ModelList[0].Update();
+
     SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
-    SceneData.modelInverse = glm::inverse(glm::mat4(1.0f));
+    SceneData.modelInverse = ModelList[0].ModelTransform;
     SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData.vertexSize = sizeof(RTVertex);
     SceneDataBuffer.CopyBufferToMemory(device, &SceneData, sizeof(SceneData));
 
-   // model.ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
-   // model.Update();
-   // createTopLevelAccelerationStructure();
+    createTopLevelAccelerationStructure();
 }
 
 void RayTraceRenderer::createRayTracingPipeline()
@@ -557,13 +558,6 @@ void RayTraceRenderer::createRayTracingPipeline()
     DiffuseBinding.descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(DiffuseBinding);
-
-    VkDescriptorSetLayoutBinding UVStructureBinding = {};
-    UVStructureBinding.binding = 8;
-    UVStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    UVStructureBinding.descriptorCount = 1;
-    UVStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
-    RTDescriptorSetBindings.emplace_back(UVStructureBinding);
 
     VkDescriptorSetLayoutBinding CubeMapStructureBinding = {};
     CubeMapStructureBinding.binding = 10;
@@ -807,22 +801,6 @@ void RayTraceRenderer::createDescriptorSets()
     DiffuseMapDescriptor.descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
     DiffuseMapDescriptor.pImageInfo = DiffuseMapInfoList.data();
 
-    std::vector<VkDescriptorBufferInfo> UVBufferInfoList;
-
-    VkDescriptorBufferInfo UVBufferInfo = {};
-    UVBufferInfo.buffer = UVBuffer.Buffer;
-    UVBufferInfo.offset = 0;
-    UVBufferInfo.range = VK_WHOLE_SIZE;
-    UVBufferInfoList.emplace_back(UVBufferInfo);
-
-    VkWriteDescriptorSet UVDescriptorSet{};
-    UVDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    UVDescriptorSet.dstSet = RTDescriptorSet;
-    UVDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    UVDescriptorSet.dstBinding = 8;
-    UVDescriptorSet.pBufferInfo = UVBufferInfoList.data();
-    UVDescriptorSet.descriptorCount = 1;
-
     VkDescriptorImageInfo CubeMapImage = {};
     CubeMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     CubeMapImage.imageView = textureManager.GetCubeMapTexture().GetTextureView();
@@ -845,7 +823,6 @@ void RayTraceRenderer::createDescriptorSets()
         IndexDescriptorSet,
         MaterialDescriptorSet,
         DiffuseMapDescriptor,
-        UVDescriptorSet,
         CubeMapDescriptor
     };
     vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);

@@ -166,6 +166,7 @@
     <ClCompile Include="VulkanEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="alpha.rahit" />
     <None Include="shader.frag" />
     <None Include="shader.vert" />
     <None Include="Shader\closesthit.rchit" />
