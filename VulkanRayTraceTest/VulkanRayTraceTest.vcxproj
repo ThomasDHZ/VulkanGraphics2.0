@@ -164,15 +164,18 @@
     <ClCompile Include="Texuture2D.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
+    <ClCompile Include="VulkanWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="alpha.rahit" />
-    <None Include="shader.frag" />
-    <None Include="shader.vert" />
+    <None Include="Shader\alpha.rahit" />
     <None Include="Shader\closesthit.rchit" />
     <None Include="Shader\miss.rmiss" />
+    <None Include="Shader\Random.glsl" />
     <None Include="Shader\raygen.rgen" />
-    <None Include="Shader\shadow.rmiss.spv" />
+    <None Include="Shader\shader.frag" />
+    <None Include="Shader\shader.vert" />
+    <None Include="Shader\shadow.rmiss" />
+    <None Include="Shader\Structs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
@@ -197,6 +200,7 @@
     <ClInclude Include="Texuture2D.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanEngine.h" />
+    <ClInclude Include="VulkanWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

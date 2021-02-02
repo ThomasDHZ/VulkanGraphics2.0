@@ -51,6 +51,7 @@ struct SceneData {
     alignas(16) glm::vec3 viewPos;
     PointLight plight;
     alignas(4) int vertexSize;
+    alignas(4) int frame;
 };
 
 struct RayTracingScratchBuffer
@@ -72,18 +73,6 @@ struct AccelerationStructure {
     uint64_t deviceAddress = 0;
     VkDeviceMemory memory = VK_NULL_HANDLE;
     VkBuffer buffer = VK_NULL_HANDLE;
-
-    //void Destory(VkDevice& device)
-    //{
-    //    vkFreeMemory(device, memory, nullptr);
-    //    vkDestroyBuffer(device, buffer, nullptr);
-    //    vkDestroyAccelerationStructureKHR(device, handle, nullptr);
-
-    //    memory = VK_NULL_HANDLE;
-    //    buffer = VK_NULL_HANDLE;
-    //    handle = VK_NULL_HANDLE;
-    //    deviceAddress = 0;
-    //}
 };
 
 class RayTraceRenderer
@@ -97,6 +86,8 @@ private:
     uint32_t HEIGHT;
 
     TextureManager textureManager;
+
+    int frame = -1;
 
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
@@ -128,6 +119,7 @@ private:
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
+    VulkanBuffer AnyHitShaderBindingTable;
 
     SceneData SceneData;
     VulkanBuffer SceneDataBuffer;
@@ -156,6 +148,7 @@ public:
     std::vector<VulkanBuffer> IndexBufferList;
     VulkanBuffer MaterialBuffer;
 
+    void createBottomLevelAccelerationStructure(RayTraceModel& model);
     void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);
     void createTopLevelAccelerationStructure();
     void createStorageImage();

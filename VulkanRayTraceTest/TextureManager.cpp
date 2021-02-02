@@ -24,3 +24,22 @@ void TextureManager::LoadCubeMap(VkDevice& device, VkPhysicalDevice& physcialDev
 {
 	CubeMap = CubeMapTexture(device, physcialDevice, commandPool, graphicsQueue, CubeMapFiles, 0);
 }
+
+void TextureManager::UnloadAllTextures(VkDevice& device)
+{
+	for (auto& texture : TextureList)
+	{
+		texture->Delete(device);
+	}
+}
+
+void TextureManager::UnloadCubeMap(VkDevice& device)
+{
+	CubeMap.Delete(device);
+}
+
+void TextureManager::Destory(VkDevice& device)
+{
+	UnloadAllTextures(device);
+	UnloadCubeMap(device);
+}

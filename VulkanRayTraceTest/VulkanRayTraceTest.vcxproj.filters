@@ -84,27 +84,36 @@
     <ClCompile Include="TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.vert">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="shader.frag">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\miss.rmiss">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\raygen.rgen">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\shadow.rmiss.spv">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\closesthit.rchit">
       <Filter>Shader</Filter>
     </None>
-    <None Include="alpha.rahit">
+    <None Include="Shader\Random.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Structs.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\alpha.rahit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\shadow.rmiss">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\shader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\shader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -173,6 +182,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,4 +2,7 @@ C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 raygen.rgen -o raygen.rgen.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 miss.rmiss -o miss.rmiss.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 shadow.rmiss -o shadow.rmiss.spv
+
+C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe shader.vert -o shader.spv
+C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe shader.frag -o shader.spv
 pause

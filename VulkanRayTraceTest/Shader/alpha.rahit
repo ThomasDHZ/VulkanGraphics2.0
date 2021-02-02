@@ -1,0 +1,66 @@
+#version 460
+#extension GL_EXT_ray_tracing : require
+#extension GL_EXT_nonuniform_qualifier : enable
+#include "Random.glsl"
+#include "Structs.glsl"
+
+layout(location = 0) rayPayloadInEXT hitPayload hit;
+
+layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 2) uniform UBO 
+{
+	mat4 viewInverse;
+	mat4 projInverse;
+	mat4 modelInverse;
+	DirectionalLight dlight;
+	vec3 viewPos;
+	PointLight plight;
+	int vertexSize;
+} ubo;
+layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
+layout(binding = 4) buffer Indices { uint i[]; } indices[];
+layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
+layout(binding = 6) uniform sampler2D TextureMap[];
+layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
+
+
+Vertex unpack(uint index)
+{
+	const int m = ubo.vertexSize / 16;
+
+	vec4 d0 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 0];
+	vec4 d1 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 1];
+	vec4 d2 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 2];
+	vec4 d3 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 3];
+	vec4 d4 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 4];
+
+	Vertex v;
+	v.pos = d0.xyz;
+	v.normal = vec3(d0.w, d1.x, d1.y);
+	v.uv = vec2(d1.zw);
+	v.tangent = vec4(d2.x, d2.y, d2.z, d2.w);
+    v.BiTangant = vec4(d3.x, d3.y, d3.z, d3.w);
+	v.Color = vec4(d4.x, d4.y, d4.z, d4.z);
+	return v;
+}
+
+Material BuildMaterial(vec2 UV)
+{
+	Material material;
+	material.Ambient = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Ambient;
+	material.Diffuse = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Diffuse;
+	material.Specular = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Specular;
+	material.Shininess = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Shininess;
+	material.Reflectivness = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Reflectivness;
+	material.DiffuseMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].NormalMapID], UV));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].AlphaMapID], UV));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].EmissionMapID], UV));
+	return material;
+};
+
+void main()
+{
+    ignoreIntersectionEXT;
+}

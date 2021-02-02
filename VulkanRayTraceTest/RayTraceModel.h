@@ -15,6 +15,7 @@ struct Material
 	alignas(16) glm::vec3 Specular = glm::vec3(1.0f);
 	alignas(4) float Shininess = 32;
 	alignas(4) float Reflectivness = 0;
+	alignas(4) float Dissolveness = 0.5f;
 
 	alignas(4) uint32_t DiffuseMapID = 0;
 	alignas(4) uint32_t SpecularMapID = 0;
@@ -60,9 +61,11 @@ struct Mesh
 	VulkanBuffer TransformBuffer;
 	VulkanBuffer MaterialBuffer;
 
-	uint32_t TriangleCount;
-	uint32_t VertexCount;
-	uint32_t IndexCount;
+	uint32_t MeshID = 0;
+	uint32_t VertexCount = 0;
+	uint32_t IndexCount = 0;
+	uint32_t VertexOffset = 0;
+	uint32_t FirstIndex = 0;
 
 	VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress{};
 	VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress{};

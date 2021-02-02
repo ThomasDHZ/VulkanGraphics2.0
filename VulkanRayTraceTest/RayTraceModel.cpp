@@ -19,7 +19,6 @@ RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice,
 
 	ModelMesh.VertexCount = ModelMesh.vertices.size();
 	ModelMesh.IndexCount = ModelMesh.indices.size();
-	ModelMesh.TriangleCount = static_cast<uint32_t>(ModelMesh.indices.size()) / 3;
 
 	ModelMesh.VertexBuffer.CreateBuffer(device, physicalDevice, ModelMesh.VertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
 	ModelMesh.IndexBuffer.CreateBuffer(device, physicalDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
@@ -73,6 +72,9 @@ RayTraceModel::~RayTraceModel()
 
 void RayTraceModel::LoadMesh(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
+	unsigned int TotalVertex = 0;
+	unsigned int TotalIndex = 0;
+
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -89,9 +91,11 @@ void RayTraceModel::LoadMesh(TextureManager& textureManager, VkDevice& device, V
 		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ModelMesh.Transform = glm::transpose(ModelMesh.Transform);
 
+		ModelMesh.MeshID++;
 		ModelMesh.VertexCount = ModelMesh.vertices.size();
 		ModelMesh.IndexCount = ModelMesh.indices.size();
-		ModelMesh.TriangleCount = static_cast<uint32_t>(ModelMesh.indices.size()) / 3;
+		ModelMesh.VertexOffset += TotalVertex;
+		ModelMesh.FirstIndex += TotalIndex;
 
 		ModelMesh.VertexBuffer.CreateBuffer(device, physcialDevice, ModelMesh.VertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
 		ModelMesh.IndexBuffer.CreateBuffer(device, physcialDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
@@ -101,6 +105,8 @@ void RayTraceModel::LoadMesh(TextureManager& textureManager, VkDevice& device, V
 		ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.IndexBuffer.Buffer);
 		ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.TransformBuffer.Buffer);
 
+		TotalVertex += ModelMesh.VertexCount;
+		TotalIndex += ModelMesh.IndexCount;
 		MeshList.emplace_back(ModelMesh);
 	}
 

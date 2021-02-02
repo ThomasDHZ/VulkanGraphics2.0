@@ -1,6 +1,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "VulkanWindow.h"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -8,6 +10,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+
 
 #include <iostream>
 #include <fstream>
@@ -24,8 +28,6 @@
 #include "InterfaceRenderPass.h"
 #include "RayTraceRenderer.h"
 
-const uint32_t WIDTH = 1920;
-const uint32_t HEIGHT = 1080;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -148,13 +150,14 @@ const std::vector<uint16_t> indices = {
 class HelloTriangleApplication {
 public:
     void run() {
-        initWindow();
         initVulkan();
         mainLoop();
         cleanup();
     }
 
 private:
+    VulkanWindow vulkanWindow;
+
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
@@ -163,7 +166,6 @@ private:
     VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{};
 
     RayTraceRenderer RayRenderer;
-    GLFWwindow* window;
 
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
@@ -221,22 +223,15 @@ private:
 
     bool framebufferResized = false;
 
-    void initWindow() {
-        glfwInit();
-
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-        glfwSetWindowUserPointer(window, this);
-        glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
-    }
-
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
         auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
         app->framebufferResized = true;
     }
 
-    void initVulkan() {
+    void initVulkan() 
+    {
+        vulkanWindow = VulkanWindow(1280, 720, "VulkanEngine");
+
         createInstance();
         setupDebugMessenger();
         createSurface();
@@ -251,7 +246,7 @@ private:
         createDepthResources();
         createFramebuffers();
 
-        interfaceRenderPass = InterfaceRenderPass(device, instance, physicalDevice, graphicsQueue, window, swapChainImageViews, swapChainExtent);
+        interfaceRenderPass = InterfaceRenderPass(device, instance, physicalDevice, graphicsQueue, vulkanWindow.GetWindowPtr(), swapChainImageViews, swapChainExtent);
 
         createTextureImage();
         createTextureImageView();
@@ -264,11 +259,11 @@ private:
         createCommandBuffers();
         createSyncObjects();
 
-        RayRenderer = RayTraceRenderer(device, physicalDevice, commandPool, graphicsQueue, descriptorPool, WIDTH, HEIGHT, swapChainImages.size(), swapChainImages);
+        RayRenderer = RayTraceRenderer(device, physicalDevice, commandPool, graphicsQueue, descriptorPool, vulkanWindow.GetWindowWidth(), vulkanWindow.GetWindowHeight(), swapChainImages.size(), swapChainImages);
     }
 
     void mainLoop() {
-        while (!glfwWindowShouldClose(window)) {
+        while (!glfwWindowShouldClose(vulkanWindow.GetWindowPtr())) {
             glfwPollEvents();
 
             ImGui_ImplVulkan_NewFrame();
@@ -300,13 +295,15 @@ private:
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
         vkDestroyRenderPass(device, renderPass, nullptr);
 
-        for (auto imageView : swapChainImageViews) {
+        for (auto imageView : swapChainImageViews) 
+        {
             vkDestroyImageView(device, imageView, nullptr);
         }
 
         vkDestroySwapchainKHR(device, swapChain, nullptr);
 
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
+        for (size_t i = 0; i < swapChainImages.size(); i++) 
+        {
             vkDestroyBuffer(device, uniformBuffers[i], nullptr);
             vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
         }
@@ -351,16 +348,14 @@ private:
         vkDestroySurfaceKHR(instance, surface, nullptr);
         vkDestroyInstance(instance, nullptr);
 
-        glfwDestroyWindow(window);
-
-        glfwTerminate();
+        vulkanWindow.CleanUp();
     }
 
     void recreateSwapChain() {
         int width = 0, height = 0;
-        glfwGetFramebufferSize(window, &width, &height);
+        glfwGetFramebufferSize(vulkanWindow.GetWindowPtr(), &width, &height);
         while (width == 0 || height == 0) {
-            glfwGetFramebufferSize(window, &width, &height);
+            glfwGetFramebufferSize(vulkanWindow.GetWindowPtr(), &width, &height);
             glfwWaitEvents();
         }
 
@@ -374,11 +369,11 @@ private:
         createGraphicsPipeline();
         createDepthResources();
         createFramebuffers();
+        createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
+        createCommandBuffers();
 
-        //createUniformBuffers();
-        //createDescriptorPool();
-        //createDescriptorSets();
-        //createCommandBuffers();
         interfaceRenderPass.UpdateSwapChain(device, swapChainImageViews, swapChainExtent);
         RayRenderer.Resize(3, swapChainImages, width, height);
     }
@@ -443,7 +438,7 @@ private:
     }
 
     void createSurface() {
-        if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+        if (glfwCreateWindowSurface(instance, vulkanWindow.GetWindowPtr(), nullptr, &surface) != VK_SUCCESS) {
             throw std::runtime_error("failed to create window surface!");
         }
     }
@@ -1381,8 +1376,8 @@ private:
         }
 
         interfaceRenderPass.Draw(device, imageIndex, swapChainExtent);
-        RayRenderer.updateUniformBuffers(window);
-       // updateUniformBuffer(imageIndex);
+        RayRenderer.updateUniformBuffers(vulkanWindow.GetWindowPtr());
+        updateUniformBuffer(imageIndex);
 
         if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
             vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -1393,9 +1388,9 @@ private:
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
         std::vector<VkCommandBuffer> CommandBufferSubmitList;
-        //CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
-        CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
-        CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
+       // CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
+      //  CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1481,7 +1476,7 @@ private:
         }
         else {
             int width, height;
-            glfwGetFramebufferSize(window, &width, &height);
+            glfwGetFramebufferSize(vulkanWindow.GetWindowPtr(), &width, &height);
 
             VkExtent2D actualExtent = {
                 static_cast<uint32_t>(width),
