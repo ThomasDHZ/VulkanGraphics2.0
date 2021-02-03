@@ -15,6 +15,7 @@
 #include <optional>
 #include "VulkanBuffer.h"
 #include <vector>
+#include "VulkanEngine.h"
 #include "Buffer.h"
 #include "RayTraceModel.h"
 #include "PerspectiveCamera.h"
@@ -137,7 +138,7 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
+    RayTraceRenderer(VulkanEngine& engine, VkDescriptorPool& DescriptorPool);
     ~RayTraceRenderer();
 
     void Destory();
@@ -148,27 +149,27 @@ public:
     std::vector<VulkanBuffer> IndexBufferList;
     VulkanBuffer MaterialBuffer;
 
-    void createBottomLevelAccelerationStructure(RayTraceModel& model);
-    void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);
-    void createTopLevelAccelerationStructure();
-    void createStorageImage();
-    void createRayTracingPipeline();
-    void createShaderBindingTable();
-    void createSceneDataBuffer();
-    void createDescriptorSets();
-    void buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
-    void Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
+    void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model);
+    void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
+    void createTopLevelAccelerationStructure(VulkanEngine& engine);
+    void createStorageImage(VulkanEngine& engine);
+    void createRayTracingPipeline(VulkanEngine& engine);
+    void createShaderBindingTable(VulkanEngine& engine);
+    void createSceneDataBuffer(VulkanEngine& engine);
+    void createDescriptorSets(VulkanEngine& engine);
+    void buildCommandBuffers(VulkanEngine& engine);
+    void Resize(VulkanEngine& engine, uint32_t width, uint32_t height);
 
-    void AcclerationCommandBuffer(VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
+    void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
 
-    void UpdateGUI();
-    void updateUniformBuffers(GLFWwindow* window);
+    void UpdateGUI(VulkanEngine& engine);
+    void updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window);
 
     VkResult createBuffer(VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffer);
-    void createAccelerationStructure(AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
-    RayTracingScratchBuffer createScratchBuffer(VkDeviceSize size);
+    void createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
+    RayTracingScratchBuffer createScratchBuffer(VulkanEngine& engine, VkDeviceSize size);
     uint64_t getBufferDeviceAddress(VkBuffer buffer);
     uint32_t getMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties);
     VkCommandBuffer createCommandBuffer(VkCommandBufferLevel level, VkCommandPool pool, bool begin);

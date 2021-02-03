@@ -8,15 +8,15 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDevice, VkCommandPool CommandPool, VkQueue GraphicsQueue, VkDescriptorPool DescriptorPool, uint32_t wIDTH, uint32_t hEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, VkDescriptorPool& DescriptorPool)
 {
-    device = Device;
-    physicalDevice = PhysicalDevice;
-    commandPool = CommandPool;
-    graphicsQueue = GraphicsQueue;
+    device = engine.Device;
+    physicalDevice = engine.PhysicalDevice;
+    commandPool = engine.RenderCommandPool;
+    graphicsQueue = engine.GraphicsQueue;
     descriptorPool = DescriptorPool;
-    WIDTH = wIDTH;
-    HEIGHT = hEIGHT;
+    WIDTH = engine.GetSwapChainResolution().width;
+    HEIGHT = engine.GetSwapChainResolution().height;
 
     textureManager = TextureManager();
 
@@ -78,16 +78,16 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     {
         for (int y = 0; y < ModelList[x].MeshList.size(); y++)
         {
-            createBottomLevelAccelerationStructure(ModelList[x], ModelList[x].MeshList[y]);
+            createBottomLevelAccelerationStructure(engine, ModelList[x], ModelList[x].MeshList[y]);
         }
     }
-   createTopLevelAccelerationStructure();
-   createStorageImage();
-   createRayTracingPipeline();
-   createShaderBindingTable();
-   createSceneDataBuffer();
-   createDescriptorSets();
-   buildCommandBuffers(swapChainFramebuffersSize, swapChainImages);
+   createTopLevelAccelerationStructure(engine);
+   createStorageImage(engine);
+   createRayTracingPipeline(engine);
+   createShaderBindingTable(engine);
+   createSceneDataBuffer(engine);
+   createDescriptorSets(engine);
+   buildCommandBuffers(engine);
 }
 RayTraceRenderer::~RayTraceRenderer()
 {
@@ -153,7 +153,7 @@ void RayTraceRenderer::Destory()
     MaterialBuffer.DestoryBuffer(device);
 }
 
-void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh)
+void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh)
 {
     AccelerationStructure bottomLevelAS{};
 
@@ -193,9 +193,9 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
 
-    createAccelerationStructure(bottomLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
+    createAccelerationStructure(engine, bottomLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
 
-    RayTracingScratchBuffer scratchBuffer = createScratchBuffer(AccelerationStructureBuildSizesInfo.buildScratchSize);
+    RayTracingScratchBuffer scratchBuffer = createScratchBuffer(engine, AccelerationStructureBuildSizesInfo.buildScratchSize);
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
     AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -208,7 +208,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     AccelerationBuildGeometryInfo.srcAccelerationStructure = nullptr;
     AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.deviceAddress;
 
-    AcclerationCommandBuffer(AccelerationBuildGeometryInfo, AccelerationStructureBuildRangeInfoList);
+    AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationStructureBuildRangeInfoList);
 
     deleteScratchBuffer(scratchBuffer);
 
@@ -217,7 +217,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
 
-void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& model)
+void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model)
 {
     AccelerationStructure bottomLevelAS{};
 
@@ -270,9 +270,9 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
     vkGetAccelerationStructureBuildSizesKHR(device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
 
-    createAccelerationStructure(bottomLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
+    createAccelerationStructure(engine, bottomLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
 
-    RayTracingScratchBuffer scratchBuffer = createScratchBuffer(AccelerationStructureBuildSizesInfo.buildScratchSize);
+    RayTracingScratchBuffer scratchBuffer = createScratchBuffer(engine, AccelerationStructureBuildSizesInfo.buildScratchSize);
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
     AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -285,13 +285,13 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(RayTraceModel& mod
     AccelerationBuildGeometryInfo.srcAccelerationStructure = nullptr;
     AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.deviceAddress;
 
-    AcclerationCommandBuffer(AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
+    AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
 
     deleteScratchBuffer(scratchBuffer);
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
 
-void RayTraceRenderer::createTopLevelAccelerationStructure()
+void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
@@ -337,10 +337,10 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
 
     if (topLevelAS.handle == VK_NULL_HANDLE)
     {
-        createAccelerationStructure(topLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR, accelerationStructureBuildSizesInfo);
+        createAccelerationStructure(engine, topLevelAS, VK_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL_KHR, accelerationStructureBuildSizesInfo);
     }
 
-    RayTracingScratchBuffer ScratchBuffer = createScratchBuffer(accelerationStructureBuildSizesInfo.buildScratchSize);
+    RayTracingScratchBuffer ScratchBuffer = createScratchBuffer(engine, accelerationStructureBuildSizesInfo.buildScratchSize);
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationStructureBuildGeometryInfo2 = {};
     AccelerationStructureBuildGeometryInfo2.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -368,13 +368,13 @@ void RayTraceRenderer::createTopLevelAccelerationStructure()
     AccelerationStructureBuildRangeInfo.transformOffset = 0;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationStructureBuildRangeInfoList = { AccelerationStructureBuildRangeInfo };
 
-    AcclerationCommandBuffer(AccelerationStructureBuildGeometryInfo2, AccelerationStructureBuildRangeInfoList);
+    AcclerationCommandBuffer(engine, AccelerationStructureBuildGeometryInfo2, AccelerationStructureBuildRangeInfoList);
 
     deleteScratchBuffer(ScratchBuffer);
     instancesBuffer.DestoryBuffer(device);
 }
 
-void RayTraceRenderer::createStorageImage()
+void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
 {
     VkImageCreateInfo image = {};
     image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -440,7 +440,7 @@ void RayTraceRenderer::createStorageImage()
     vkFreeCommandBuffers(device, commandPool, 1, &cmdBuffer);
 }
 
-RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VkDeviceSize size)
+RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VulkanEngine& engine, VkDeviceSize size)
 {
     RayTracingScratchBuffer scratchBuffer{};
 
@@ -474,7 +474,7 @@ RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VkDeviceSize size)
 }
 
 
-void RayTraceRenderer::AcclerationCommandBuffer(VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo)
+void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo)
 {
     VkCommandBufferAllocateInfo CommandBufferAllocateInfo{};
     CommandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -509,7 +509,7 @@ void RayTraceRenderer::AcclerationCommandBuffer(VkAccelerationStructureBuildGeom
     vkFreeCommandBuffers(device, commandPool, 1, &cmdBuffer);
 }
 
-void RayTraceRenderer::UpdateGUI()
+void RayTraceRenderer::UpdateGUI(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderFloat3("Pos", &SceneData.dlight.direction.x, -1000.0f, 1000.0f);
@@ -526,7 +526,7 @@ void RayTraceRenderer::UpdateGUI()
     ImGui::SliderFloat("quadratic", &SceneData.plight.quadratic, 0.0f, 100.0f);
 }
 
-void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
+void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window)
 {
     keyboard.Update(window, camera);
     mouse.Update(window, camera);
@@ -549,11 +549,11 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     SceneData.frame = frame;
     SceneDataBuffer.CopyBufferToMemory(device, &SceneData, sizeof(SceneData));
 
-    createTopLevelAccelerationStructure();
+    createTopLevelAccelerationStructure(engine);
     frame++;
 }
 
-void RayTraceRenderer::createRayTracingPipeline()
+void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
 {
     std::vector<VkDescriptorSetLayoutBinding> RTDescriptorSetBindings;
     VkDescriptorSetLayoutBinding              AccelerationStructureBinding = {};
@@ -681,7 +681,7 @@ void RayTraceRenderer::createRayTracingPipeline()
         vkDestroyShaderModule(device, shader.module, nullptr);
     }
 }
-void RayTraceRenderer::createShaderBindingTable() {
+void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     const uint32_t handleSize = rayTracingPipelineProperties.shaderGroupHandleSize;
     const uint32_t handleSizeAligned = alignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
     const uint32_t groupCount = static_cast<uint32_t>(RayTraceShaders.size());
@@ -695,11 +695,11 @@ void RayTraceRenderer::createShaderBindingTable() {
     hitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
     //AnyHitShaderBindingTable.CreateBuffer(device, physicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 4);
 }
-void RayTraceRenderer::createSceneDataBuffer()
+void RayTraceRenderer::createSceneDataBuffer(VulkanEngine& engine)
 {
     SceneDataBuffer.CreateBuffer(device, physicalDevice, sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &SceneData);
 }
-void RayTraceRenderer::createDescriptorSets()
+void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
 {
     std::vector<VkDescriptorPoolSize> poolSizes = {
         {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1},
@@ -876,9 +876,9 @@ void RayTraceRenderer::createDescriptorSets()
 
 
 }
-void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages)
+void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine)
 {
-    drawCmdBuffers.resize(swapChainFramebuffersSize);
+    drawCmdBuffers.resize(engine.GetSwapChainImageCount());
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -935,7 +935,7 @@ void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::v
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier.image = swapChainImages[i];
+        barrier.image = engine.GetSwapChainImages()[i];
         barrier.subresourceRange = subresourceRange;
         barrier.srcAccessMask = 0;
         barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -959,14 +959,14 @@ void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::v
         copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
         copyRegion.dstOffset = { 0, 0, 0 };
         copyRegion.extent = { WIDTH, HEIGHT, 1 };
-        vkCmdCopyImage(drawCmdBuffers[i], storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+        vkCmdCopyImage(drawCmdBuffers[i], storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, engine.GetSwapChainImages()[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 
         VkImageMemoryBarrier barrier3 = {};
         barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         barrier3.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-        barrier3.image = swapChainImages[i];
+        barrier3.image = engine.GetSwapChainImages()[i];
         barrier3.subresourceRange = subresourceRange;
         barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         barrier3.dstAccessMask = 0;
@@ -987,7 +987,7 @@ void RayTraceRenderer::buildCommandBuffers(int swapChainFramebuffersSize, std::v
     }
 }
 
-void RayTraceRenderer::Resize(int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height)
+void RayTraceRenderer::Resize(VulkanEngine& engine, uint32_t width, uint32_t height)
 {
     WIDTH = width;
     HEIGHT = height;
@@ -996,7 +996,7 @@ void RayTraceRenderer::Resize(int swapChainFramebuffersSize, std::vector<VkImage
     vkDestroyImage(device, storageImage.image, nullptr);
     vkFreeMemory(device, storageImage.memory, nullptr);
 
-    createStorageImage();
+    createStorageImage(engine);
 
     VkDescriptorImageInfo storageImageDescriptor{ VK_NULL_HANDLE, storageImage.view, VK_IMAGE_LAYOUT_GENERAL };
 
@@ -1009,7 +1009,7 @@ void RayTraceRenderer::Resize(int swapChainFramebuffersSize, std::vector<VkImage
     writeDescriptorSet.descriptorCount = 1;
     vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, VK_NULL_HANDLE);
 
-    buildCommandBuffers(swapChainFramebuffersSize, swapChainImages);
+    buildCommandBuffers(engine);
 
     frame = 0;
 }
@@ -1024,7 +1024,7 @@ void RayTraceRenderer::deleteScratchBuffer(RayTracingScratchBuffer& scratchBuffe
     }
 }
 
-void RayTraceRenderer::createAccelerationStructure(AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo)
+void RayTraceRenderer::createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo)
 {
     VkBufferCreateInfo bufferCreateInfo{};
     bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

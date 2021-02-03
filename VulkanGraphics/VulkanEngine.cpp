@@ -150,8 +150,6 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 		createInfo.enabledLayerCount = 0;
 	}
 
-
-
 	if (vkCreateDevice(PhysicalDevice, &createInfo, nullptr, &Device) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create logical device!");
 	}
