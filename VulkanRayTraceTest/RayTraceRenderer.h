@@ -141,7 +141,7 @@ public:
     RayTraceRenderer(VulkanEngine& engine, VkDescriptorPool& DescriptorPool);
     ~RayTraceRenderer();
 
-    void Destory();
+    void Destory(VulkanEngine& engine);
 
     std::vector<RayTraceModel> ModelList;
 
@@ -196,9 +196,5 @@ public:
         };
     }
 
-
-    VkCommandBuffer beginSingleTimeCommands();
-    void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
 };

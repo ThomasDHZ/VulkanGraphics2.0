@@ -1,5 +1,4 @@
 #include "CubeMapTexture.h"
-#include "../VulkanGraphics/VulkanBufferManager.h"
 #include <stb_image.h>
 #include "VulkanBuffer.h"
 
@@ -7,14 +6,14 @@ CubeMapTexture::CubeMapTexture() : Texture()
 {
 }
 
-CubeMapTexture::CubeMapTexture(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, CubeMapLayout CubeMapFiles, unsigned int TextureID) : Texture(device, physcialDevice, commandPool, graphicsQueue, TextureType::vkTextureCube, TextureID)
+CubeMapTexture::CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
 {
-	LoadTexture(device, physcialDevice, commandPool, graphicsQueue, CubeMapFiles);
-	CreateTextureView(device);
-	CreateTextureSampler(device);
+	LoadTexture(engine, CubeMapFiles);
+	CreateTextureView(engine);
+	CreateTextureSampler(engine);
 }
 
-CubeMapTexture::CubeMapTexture(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, std::string CubeMapFiles[6], unsigned int TextureID) : Texture(device, physcialDevice, commandPool, graphicsQueue, TextureType::vkTextureCube, TextureID)
+CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
 {
 	CubeMapLayout cubeMapfiles;
 	cubeMapfiles.Left = CubeMapFiles[0];
@@ -24,16 +23,16 @@ CubeMapTexture::CubeMapTexture(VkDevice& device, VkPhysicalDevice& physcialDevic
 	cubeMapfiles.Front = CubeMapFiles[4];
 	cubeMapfiles.Back = CubeMapFiles[5];
 
-	LoadTexture(device, physcialDevice, commandPool, graphicsQueue, cubeMapfiles);
-	CreateTextureView(device);
-	CreateTextureSampler(device);
+	LoadTexture(engine, cubeMapfiles);
+	CreateTextureView(engine);
+	CreateTextureSampler(engine);
 }
 
 CubeMapTexture::~CubeMapTexture()
 {
 }
 
-void CubeMapTexture::LoadTexture(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, CubeMapLayout CubeMapFiles)
+void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles)
 {
 	std::vector<unsigned char*> textureData;
 	int texChannels;
@@ -49,15 +48,15 @@ void CubeMapTexture::LoadTexture(VkDevice& device, VkPhysicalDevice& physcialDev
 	const VkDeviceSize layerSize = imageSize / 6;
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(device, physcialDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* data;
-	vkMapMemory(device, StagingBuffer.BufferMemory, 0, imageSize, 0, &data);
+	vkMapMemory(engine.Device, StagingBuffer.BufferMemory, 0, imageSize, 0, &data);
 	for (int x = 0; x < 6; ++x)
 	{
 		memcpy(static_cast<char*>(data) + (x * layerSize), textureData[x], static_cast<size_t>(layerSize));
 	}
-	vkUnmapMemory(device, StagingBuffer.BufferMemory);
+	vkUnmapMemory(engine.Device, StagingBuffer.BufferMemory);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -75,20 +74,20 @@ void CubeMapTexture::LoadTexture(VkDevice& device, VkPhysicalDevice& physcialDev
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	CreateTextureImage(device, physcialDevice, TextureInfo);
+	CreateTextureImage(engine, TextureInfo);
 
-	TransitionImageLayout(device, commandPool, graphicsQueue, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	CopyBufferToImage(device, commandPool, graphicsQueue, StagingBuffer.Buffer);
-	TransitionImageLayout(device, commandPool, graphicsQueue, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(engine, StagingBuffer.Buffer);
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer(device);
+	StagingBuffer.DestoryBuffer(engine.Device);
 	for (auto texturedata : textureData)
 	{
 		stbi_image_free(texturedata);
 	}
 }
 
-void CubeMapTexture::CreateTextureView(VkDevice& device)
+void CubeMapTexture::CreateTextureView(VulkanEngine& engine)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -101,12 +100,12 @@ void CubeMapTexture::CreateTextureView(VkDevice& device)
 	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 	TextureImageViewInfo.subresourceRange.layerCount = 6;
 
-	if (vkCreateImageView(device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void CubeMapTexture::CreateTextureSampler(VkDevice& device)
+void CubeMapTexture::CreateTextureSampler(VulkanEngine& engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -124,7 +123,7 @@ void CubeMapTexture::CreateTextureSampler(VkDevice& device)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
 
-	if (vkCreateSampler(device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

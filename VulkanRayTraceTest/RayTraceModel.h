@@ -77,10 +77,10 @@ class RayTraceModel
 private:
 	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
 
-	void LoadMesh(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<RTVertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
-	Material LoadMaterial(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	Material LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
 	uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
 
 public:
@@ -110,11 +110,11 @@ public:
 	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
 
 	RayTraceModel();
-	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, MeshDetails& meshDetails);
-	RayTraceModel(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath);
+	RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, MeshDetails& meshDetails);
+	RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
 	~RayTraceModel();
 
 	void Update();
-	void Destory(VkDevice& device);
+	void Destory(VulkanEngine& engine);
 };
 

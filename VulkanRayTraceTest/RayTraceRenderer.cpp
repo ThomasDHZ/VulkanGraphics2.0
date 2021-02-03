@@ -48,9 +48,9 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, VkDescriptorPool& Descr
   //ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 //  ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
  // ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj"));
-    ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
+    ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
 
-  textureManager.LoadTexture(device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
+  textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
 
     stbi_set_flip_vertically_on_load(true);
     std::string CubeMapFiles[6];
@@ -61,7 +61,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, VkDescriptorPool& Descr
     CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
     CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
-    textureManager.LoadCubeMap(device, physicalDevice, commandPool, graphicsQueue, CubeMapFiles);
+    textureManager.LoadCubeMap(engine, CubeMapFiles);
 
 
     SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
@@ -94,7 +94,7 @@ RayTraceRenderer::~RayTraceRenderer()
    
 }
 
-void RayTraceRenderer::Destory()
+void RayTraceRenderer::Destory(VulkanEngine& engine)
 {
     for (auto& Blas : bottomLevelASList)
     {
@@ -147,9 +147,9 @@ void RayTraceRenderer::Destory()
 
     for (auto& model : ModelList)
     {
-        model.Destory(device);
+        model.Destory(engine);
     }
-    textureManager.Destory(device);
+    textureManager.Destory(engine);
     MaterialBuffer.DestoryBuffer(device);
 }
 
@@ -1200,52 +1200,6 @@ VkShaderModule RayTraceRenderer::loadShader(const char* fileName, VkDevice devic
 uint32_t RayTraceRenderer::alignedSize(uint32_t value, uint32_t alignment)
 {
     return (value + alignment - 1) & ~(alignment - 1);
-}
-
-
-VkCommandBuffer  RayTraceRenderer::beginSingleTimeCommands() {
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = commandPool;
-    allocInfo.commandBufferCount = 1;
-
-    VkCommandBuffer commandBuffer;
-    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
-
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-    return commandBuffer;
-}
-
-void  RayTraceRenderer::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
-    vkEndCommandBuffer(commandBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
-
-    vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(graphicsQueue);
-
-    vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
-}
-uint32_t RayTraceRenderer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
-    VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
-
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-            return i;
-        }
-    }
-
-    throw std::runtime_error("failed to find suitable memory type!");
 }
 
 uint64_t RayTraceRenderer::getBufferDeviceAddress(VkDevice& device, VkBuffer buffer)

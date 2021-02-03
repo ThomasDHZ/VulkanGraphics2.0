@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanGraphics", "VulkanGraphics\VulkanGraphics.vcxproj", "{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game3D", "Game3D\Game3D.vcxproj", "{30A46C82-B4B9-437C-B215-DE353404B76D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game2DTest_MegaMan", "Game2DTest_MegaMan\Game2DTest_MegaMan.vcxproj", "{4D473594-F1FC-4A23-A7A0-6321397617D3}"
@@ -12,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanShadowTest", "VulkanShadowTest\VulkanShadowTest.vcxproj", "{57BCEA70-F675-4A27-98B9-978AABCBB8AC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanRayTraceTest", "VulkanRayTraceTest\VulkanRayTraceTest.vcxproj", "{8B0BD21B-371F-47C1-A5C6-DFA5D647DF03}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VulkanGraphics", "VulkanGraphics\VulkanGraphics.vcxproj", "{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,14 +21,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x64.ActiveCfg = Debug|x64
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x64.Build.0 = Debug|x64
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x86.ActiveCfg = Debug|Win32
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x86.Build.0 = Debug|Win32
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x64.ActiveCfg = Release|x64
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x64.Build.0 = Release|x64
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x86.ActiveCfg = Release|Win32
-		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x86.Build.0 = Release|Win32
 		{30A46C82-B4B9-437C-B215-DE353404B76D}.Debug|x64.ActiveCfg = Debug|x64
 		{30A46C82-B4B9-437C-B215-DE353404B76D}.Debug|x64.Build.0 = Debug|x64
 		{30A46C82-B4B9-437C-B215-DE353404B76D}.Debug|x86.ActiveCfg = Debug|Win32
@@ -61,6 +53,14 @@ Global
 		{8B0BD21B-371F-47C1-A5C6-DFA5D647DF03}.Release|x64.Build.0 = Release|x64
 		{8B0BD21B-371F-47C1-A5C6-DFA5D647DF03}.Release|x86.ActiveCfg = Release|Win32
 		{8B0BD21B-371F-47C1-A5C6-DFA5D647DF03}.Release|x86.Build.0 = Release|Win32
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x64.ActiveCfg = Debug|x64
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x64.Build.0 = Debug|x64
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x86.ActiveCfg = Debug|Win32
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Debug|x86.Build.0 = Debug|Win32
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x64.ActiveCfg = Release|x64
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x64.Build.0 = Release|x64
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x86.ActiveCfg = Release|Win32
+		{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

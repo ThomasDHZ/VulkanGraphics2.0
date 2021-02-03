@@ -1,4 +1,7 @@
+#ifndef VulkanEngine_H
+#define VulkanEngine_H
 #pragma once
+
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <array>
@@ -65,6 +68,7 @@ public:
 
 	int GraphicsFamily = -1;
 	int PresentFamily = -1;
+	uint32_t DrawFrame = 0;
 
 	std::vector<VkLayerProperties> VulkanLayers;
 
@@ -78,6 +82,7 @@ public:
 
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	VkInstance GetVulkanInstance() { return Instance; }
 	VkDevice GetVulkanDevice() { return Device; }
@@ -94,4 +99,4 @@ public:
 	uint32_t GetSwapChainMinImageCount() { return SwapChain.GetSwapChainMinImageCount(); }
 	uint32_t GetSwapChainImageCount() { return SwapChain.GetSwapChainImageCount(); }
 };
-
+#endif

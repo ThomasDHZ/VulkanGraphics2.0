@@ -1,6 +1,5 @@
 #include "InterfaceRenderPass.h"
 #include <stdexcept>
-#include "../VulkanGraphics/VulkanBufferManager.h"
 
 InterfaceRenderPass::InterfaceRenderPass()
 {

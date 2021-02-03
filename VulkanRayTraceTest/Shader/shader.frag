@@ -9,5 +9,9 @@ layout(location = 1) in vec2 fragTexCoord;
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    outColor = texture(texSampler, fragTexCoord);
+
+   vec3 hdrColor = texture(texSampler, fragTexCoord).rgb;
+   vec3 result = vec3(1.0) - exp(-hdrColor * 1.0f);
+   result = pow(result, vec3(1.0f / 2.2f));
+   outColor = vec4(result, 1.0f);
 }

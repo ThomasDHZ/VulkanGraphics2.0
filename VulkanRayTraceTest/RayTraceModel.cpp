@@ -6,9 +6,9 @@ RayTraceModel::RayTraceModel()
 {
 }
 
-RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, MeshDetails& meshDetails)
+RayTraceModel::RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, MeshDetails& meshDetails)
 {
-	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(device, "vkGetBufferDeviceAddressKHR"));
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 
 	Mesh ModelMesh{};
 	ModelMesh.vertices = meshDetails.vertices;
@@ -20,21 +20,21 @@ RayTraceModel::RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice,
 	ModelMesh.VertexCount = ModelMesh.vertices.size();
 	ModelMesh.IndexCount = ModelMesh.indices.size();
 
-	ModelMesh.VertexBuffer.CreateBuffer(device, physicalDevice, ModelMesh.VertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
-	ModelMesh.IndexBuffer.CreateBuffer(device, physicalDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
-	ModelMesh.TransformBuffer.CreateBuffer(device, physicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.Transform);
+	ModelMesh.VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelMesh.VertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
+	ModelMesh.IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
+	ModelMesh.TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.Transform);
 
-	ModelMesh.VertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.VertexBuffer.Buffer);
-	ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.IndexBuffer.Buffer);
-	ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.TransformBuffer.Buffer);
+	ModelMesh.VertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelMesh.VertexBuffer.Buffer);
+	ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelMesh.IndexBuffer.Buffer);
+	ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelMesh.TransformBuffer.Buffer);
 
 	MeshList.emplace_back(ModelMesh);
 }
 
-RayTraceModel::RayTraceModel(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath)
+RayTraceModel::RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
 {
 	Assimp::Importer ModelImporter;
-	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(device, "vkGetBufferDeviceAddressKHR"));
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 
 	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
@@ -43,7 +43,7 @@ RayTraceModel::RayTraceModel(TextureManager& textureManager, VkDevice& device, V
 		return;
 	}
 
-	LoadMesh(textureManager, device, physcialDevice, commandPool, graphicsQueue, FilePath, Scene->mRootNode, Scene);
+	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
 
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -57,20 +57,20 @@ RayTraceModel::RayTraceModel(TextureManager& textureManager, VkDevice& device, V
 	ModelIndexCount = ModelIndices.size();
 	ModelTriangleCount = static_cast<uint32_t>(ModelIndices.size()) / 3;
 
-	ModelVertexBuffer.CreateBuffer(device, physcialDevice, ModelVertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelVertices.data());
-	ModelIndexBuffer.CreateBuffer(device, physcialDevice, ModelIndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelIndices.data());
-	ModelTransformBuffer.CreateBuffer(device, physcialDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelTransform);
+	ModelVertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelVertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelVertices.data());
+	ModelIndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelIndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelIndices.data());
+	ModelTransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelTransform);
 
-	ModelVertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelVertexBuffer.Buffer);
-	ModelIndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelIndexBuffer.Buffer);
-	ModelTransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelTransformBuffer.Buffer);
+	ModelVertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelVertexBuffer.Buffer);
+	ModelIndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelIndexBuffer.Buffer);
+	ModelTransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelTransformBuffer.Buffer);
 }
 
 RayTraceModel::~RayTraceModel()
 {
 }
 
-void RayTraceModel::LoadMesh(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void RayTraceModel::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	unsigned int TotalVertex = 0;
 	unsigned int TotalIndex = 0;
@@ -82,7 +82,7 @@ void RayTraceModel::LoadMesh(TextureManager& textureManager, VkDevice& device, V
 		Mesh ModelMesh{};
 		ModelMesh.vertices = LoadVertices(mesh);
 		ModelMesh.indices = LoadIndices(mesh);
-		ModelMesh.material = LoadMaterial(textureManager, device, physcialDevice, commandPool, graphicsQueue, FilePath, mesh, scene);
+		ModelMesh.material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
 
 		ModelMesh.Transform = glm::mat4(1.0f);
 		ModelMesh.Transform = glm::translate(ModelMesh.Transform, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -97,13 +97,13 @@ void RayTraceModel::LoadMesh(TextureManager& textureManager, VkDevice& device, V
 		ModelMesh.VertexOffset += TotalVertex;
 		ModelMesh.FirstIndex += TotalIndex;
 
-		ModelMesh.VertexBuffer.CreateBuffer(device, physcialDevice, ModelMesh.VertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
-		ModelMesh.IndexBuffer.CreateBuffer(device, physcialDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
-		ModelMesh.TransformBuffer.CreateBuffer(device, physcialDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.Transform);
+		ModelMesh.VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelMesh.VertexCount * sizeof(RTVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
+		ModelMesh.IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
+		ModelMesh.TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.Transform);
 
-		ModelMesh.VertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.VertexBuffer.Buffer);
-		ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.IndexBuffer.Buffer);
-		ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(device, ModelMesh.TransformBuffer.Buffer);
+		ModelMesh.VertexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelMesh.VertexBuffer.Buffer);
+		ModelMesh.IndexBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelMesh.IndexBuffer.Buffer);
+		ModelMesh.TransformBufferDeviceAddress.deviceAddress = getBufferDeviceAddress(engine.Device, ModelMesh.TransformBuffer.Buffer);
 
 		TotalVertex += ModelMesh.VertexCount;
 		TotalIndex += ModelMesh.IndexCount;
@@ -112,7 +112,7 @@ void RayTraceModel::LoadMesh(TextureManager& textureManager, VkDevice& device, V
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(textureManager, device, physcialDevice, commandPool, graphicsQueue, FilePath, node->mChildren[i], scene);
+		LoadMesh(engine, textureManager, FilePath, node->mChildren[i], scene);
 	}
 }
 
@@ -181,7 +181,7 @@ std::vector<uint32_t> RayTraceModel::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-Material RayTraceModel::LoadMaterial(TextureManager& textureManager, VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+Material RayTraceModel::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	Material ModelMaterial;
 
@@ -219,37 +219,37 @@ Material RayTraceModel::LoadMaterial(TextureManager& textureManager, VkDevice& d
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
 	{
 		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-		ModelMaterial.DiffuseMapID = textureManager.LoadTexture(device, physcialDevice, commandPool, graphicsQueue, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial.DiffuseMapID = textureManager.LoadTexture(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
 	{
 		material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
-		ModelMaterial.SpecularMapID = textureManager.LoadTexture(device, physcialDevice, commandPool, graphicsQueue, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial.SpecularMapID = textureManager.LoadTexture(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
 	{
 		material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
-		ModelMaterial.NormalMapID = textureManager.LoadTexture(device, physcialDevice, commandPool, graphicsQueue, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial.NormalMapID = textureManager.LoadTexture(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
 	{
 		material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
-		ModelMaterial.DepthMapID = textureManager.LoadTexture(device, physcialDevice, commandPool, graphicsQueue, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial.DepthMapID = textureManager.LoadTexture(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
 	{
 		material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
-		ModelMaterial.AlphaMapID = textureManager.LoadTexture(device, physcialDevice, commandPool, graphicsQueue, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial.AlphaMapID = textureManager.LoadTexture(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
 	{
 		material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
-		ModelMaterial.EmissionMapID = textureManager.LoadTexture(device, physcialDevice, commandPool, graphicsQueue, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial.EmissionMapID = textureManager.LoadTexture(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	return ModelMaterial;
@@ -274,21 +274,21 @@ void RayTraceModel::Update()
 	ModelTransform = glm::transpose(ModelTransform);
 }
 
-void RayTraceModel::Destory(VkDevice& device)
+void RayTraceModel::Destory(VulkanEngine& engine)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh.VertexBuffer.DestoryBuffer(device);
-		mesh.IndexBuffer.DestoryBuffer(device);
-		mesh.TransformBuffer.DestoryBuffer(device);
-		mesh.MaterialBuffer.DestoryBuffer(device);
+		mesh.VertexBuffer.DestoryBuffer(engine.Device);
+		mesh.IndexBuffer.DestoryBuffer(engine.Device);
+		mesh.TransformBuffer.DestoryBuffer(engine.Device);
+		mesh.MaterialBuffer.DestoryBuffer(engine.Device);
 	}
 	for (auto& buffer : MeshOffsetBufferList)
 	{
-		buffer.DestoryBuffer(device);
+		buffer.DestoryBuffer(engine.Device);
 	}
-	 ModelIndexBuffer.DestoryBuffer(device);
-	 ModelVertexBuffer.DestoryBuffer(device);
-	 ModelTransformBuffer.DestoryBuffer(device);
-	 ModelUniformBuffer.DestoryBuffer(device);
+	 ModelIndexBuffer.DestoryBuffer(engine.Device);
+	 ModelVertexBuffer.DestoryBuffer(engine.Device);
+	 ModelTransformBuffer.DestoryBuffer(engine.Device);
+	 ModelUniformBuffer.DestoryBuffer(engine.Device);
 }
