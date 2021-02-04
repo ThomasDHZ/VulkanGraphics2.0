@@ -1,9 +1,9 @@
+#include "..\VulkanRayTraceTest\Mesh.h"
+#include "..\VulkanRayTraceTest\Mesh.h"
+#include "..\VulkanRayTraceTest\Mesh.h"
+#include "..\VulkanRayTraceTest\Mesh.h"
 #include "Mesh.h"
 
-
-Mesh::Mesh() : BaseMesh()
-{
-}
 
 Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, int renderFlags) : BaseMesh(engine, vertexdata, renderFlags)
 {

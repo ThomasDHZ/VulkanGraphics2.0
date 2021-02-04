@@ -168,7 +168,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AccelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
     AccelerationStructureGeometry.geometry.triangles.vertexData = mesh.VertexBufferDeviceAddress;
     AccelerationStructureGeometry.geometry.triangles.maxVertex = mesh.VertexCount;
-    AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(RTVertex);
+    AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
     AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
     AccelerationStructureGeometry.geometry.triangles.indexData = mesh.IndexBufferDeviceAddress;
     AccelerationStructureGeometry.geometry.triangles.transformData.deviceAddress = mesh.TransformBufferDeviceAddress.deviceAddress;
@@ -237,7 +237,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         AccelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
         AccelerationStructureGeometry.geometry.triangles.vertexData = model.ModelVertexBufferDeviceAddress;
         AccelerationStructureGeometry.geometry.triangles.maxVertex = mesh.VertexCount;
-        AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(RTVertex);
+        AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
         AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
         AccelerationStructureGeometry.geometry.triangles.indexData = model.ModelIndexBufferDeviceAddress;
         AccelerationStructureGeometryList.emplace_back(AccelerationStructureGeometry);
@@ -545,7 +545,7 @@ void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* wi
     SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData.modelInverse = ModelList[0].ModelTransform;
     SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SceneData.vertexSize = sizeof(RTVertex);
+    SceneData.vertexSize = sizeof(Vertex);
     SceneData.frame = frame;
     SceneDataBuffer.CopyBufferToMemory(device, &SceneData, sizeof(SceneData));
 

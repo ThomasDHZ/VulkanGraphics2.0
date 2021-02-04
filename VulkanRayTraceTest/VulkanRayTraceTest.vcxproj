@@ -164,6 +164,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRenderPass.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="RayTraceModel.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="InterfaceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="MainRenderPass.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="RayTraceModel.h" />
@@ -215,6 +217,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texuture2D.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebugger.h" />
     <ClInclude Include="VulkanEngine.h" />
