@@ -36,16 +36,19 @@ struct MeshOffsets
 	uint32_t IndiceOffset;
 };
 
+struct UniformBufferObject {
+	alignas(16) glm::mat4 model;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
+};
+
 class Mesh
 {
 private:
-	VkDescriptorPool DescriptorPool;
-	std::vector<VkDescriptorSet> DescriptorSets;
 
+	void SetUpMesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList);
 	void SetUpDescriptorPool(VulkanEngine& engine);
-	void SetUpDescriptorSets(VulkanEngine& engine, GraphicsPipeline& pipeline, std::shared_ptr<Texture> texture);
-
-
+	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture);
 
 public:
 	std::vector<Vertex> vertices;
@@ -55,7 +58,7 @@ public:
 
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
-	VulkanBuffer UniformBufferList;
+	VulkanBuffer UniformBuffer;
 	VulkanBuffer TransformBuffer;
 	VulkanBuffer MaterialBuffer;
 
@@ -64,21 +67,29 @@ public:
 	uint32_t IndexCount = 0;
 	uint32_t VertexOffset = 0;
 	uint32_t FirstIndex = 0;
+	uint32_t PrimitiveCountList = 0;
 
 	VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress{};
 	VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress{};
 	VkDeviceOrHostAddressConstKHR TransformBufferDeviceAddress{};
 
+	VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
+	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
+
+	VkDescriptorPool DescriptorPool;
+	std::vector<VkDescriptorSet> DescriptorSets;
+
 	Mesh();
-	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList);
-	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList);
-	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, Material MeshMaterial);
-	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList, Material MeshMaterial);
+	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture);
+	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList, Material MeshMaterial, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture);
 	~Mesh();
 
 	VkDescriptorPoolSize AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType);
 	VkDescriptorImageInfo AddImageDescriptorInfo(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture);
 	VkDescriptorBufferInfo AddBufferDescriptorInfo(VulkanEngine& engine, VulkanBuffer buffer);
 	VkWriteDescriptorSet AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
-	VkWriteDescriptorSet AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
+	VkWriteDescriptorSet AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo> TextureImageList);
+
+	void Draw(std::vector<VkCommandBuffer> commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int index);
+	void Destory(VulkanEngine& engine);
 };

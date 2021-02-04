@@ -348,6 +348,29 @@ void VulkanEngine::InitializeSyncObjects()
 	}
 }
 
+void VulkanEngine::Destory()
+{
+	SwapChain.Destroy(Device);
+
+	vkDestroyCommandPool(Device, RenderCommandPool, nullptr);
+	RenderCommandPool = VK_NULL_HANDLE;
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		vulkanSemaphores[i].Destory(Device);
+		vkDestroyFence(Device, inFlightFences[i], nullptr);
+
+		inFlightFences[i] = VK_NULL_HANDLE;
+	}
+
+	vkDestroyDevice(Device, nullptr);
+	Device = VK_NULL_HANDLE;
+
+	VulkanDebug.CleanUp(Instance);
+
+	vkDestroySurfaceKHR(Instance, Surface, nullptr);
+	vkDestroyInstance(Instance, nullptr);
+}
 
 VkCommandBuffer  VulkanEngine::beginSingleTimeCommands() {
 	VkCommandBufferAllocateInfo allocInfo{};

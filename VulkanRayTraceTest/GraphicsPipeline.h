@@ -14,6 +14,7 @@ struct DescriptorSetLayoutBindingInfo
 	uint32_t Binding;
 	VkDescriptorType DescriptorType;
 	VkShaderStageFlags StageFlags;
+	uint32_t BindingCount;
 };
 
 class GraphicsPipeline

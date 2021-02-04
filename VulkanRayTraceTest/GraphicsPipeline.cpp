@@ -58,7 +58,7 @@ void GraphicsPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer, std::ve
 	{
 		VkDescriptorSetLayoutBinding LayoutBinding = {};
 		LayoutBinding.binding = Binding.Binding;
-		LayoutBinding.descriptorCount = 1;
+		LayoutBinding.descriptorCount = Binding.BindingCount;
 		LayoutBinding.descriptorType = Binding.DescriptorType;
 		LayoutBinding.pImmutableSamplers = nullptr;
 		LayoutBinding.stageFlags = Binding.StageFlags;
