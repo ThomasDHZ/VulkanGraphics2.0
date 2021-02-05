@@ -88,6 +88,8 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 
 	InitializeCommandPool();
 	InitializeSyncObjects();
+
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));
 }
 
 VulkanEngine::~VulkanEngine()
@@ -416,4 +418,12 @@ uint32_t VulkanEngine::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags
 	}
 
 	throw std::runtime_error("failed to find suitable memory type!");
+}
+
+uint64_t VulkanEngine::GetBufferDeviceAddress(VkDevice& device, VkBuffer buffer)
+{
+	VkBufferDeviceAddressInfoKHR bufferDeviceAI{};
+	bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+	bufferDeviceAI.buffer = buffer;
+	return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
 }

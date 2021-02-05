@@ -50,6 +50,8 @@ private:
 	void InitializeCommandPool();
 	void InitializeSyncObjects();
 
+	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
+
 public:
 	VulkanWindow vulkanWindow;
 	VkInstance Instance = VK_NULL_HANDLE;
@@ -85,6 +87,7 @@ public:
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+	uint64_t GetBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
 
 	VkInstance GetVulkanInstance() { return Instance; }
 	VkDevice GetVulkanDevice() { return Device; }

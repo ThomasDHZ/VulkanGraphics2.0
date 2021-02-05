@@ -130,13 +130,8 @@ private:
        interfaceRenderPass = InterfaceRenderPass(vulkanEngine, vulkanWindow.GetWindowPtr());
        texture = std::make_shared<Texture2D>(Texture2D(vulkanEngine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB, 0));
        texture2 = std::make_shared<Texture2D>(Texture2D(vulkanEngine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB, 0));
-       mesh.VertexBuffer.CreateBuffer(vulkanEngine.Device, vulkanEngine.PhysicalDevice, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-       mesh.IndexBuffer.CreateBuffer(vulkanEngine.Device, vulkanEngine.PhysicalDevice, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
-       mesh.UniformBuffer.CreateBuffer(vulkanEngine.Device, vulkanEngine.PhysicalDevice, sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-       mesh2.VertexBuffer.CreateBuffer(vulkanEngine.Device, vulkanEngine.PhysicalDevice, vertices.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-       mesh2.IndexBuffer.CreateBuffer(vulkanEngine.Device, vulkanEngine.PhysicalDevice, indices.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
-       mesh2.UniformBuffer.CreateBuffer(vulkanEngine.Device, vulkanEngine.PhysicalDevice, sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+       mesh = Mesh(vulkanEngine, vertices, indices);
+       mesh2 = Mesh(vulkanEngine, vertices, indices);
 
         createDescriptorPool();
         createDescriptorSets();
@@ -329,49 +324,11 @@ private:
             renderPassInfo.pClearValues = clearValues.data();
 
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-            {
-            struct MeshInfo
-            {
-                int MeshID = 0;
-                int MaterialID = 0;
-            } Mesh;
-            Mesh.MeshID = 0;
-            Mesh.MaterialID = 0;
-
-            VkBuffer vertexBuffers[] = { mesh.VertexBuffer.Buffer };
-            VkDeviceSize offsets[] = { 0 };
-
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer.pipeline->ShaderPipeline);
-            vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-            vkCmdBindIndexBuffer(commandBuffers[i], mesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
             vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer.pipeline->ShaderPipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
-            vkCmdPushConstants(commandBuffers[i], renderer.pipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(MeshInfo), &Mesh);
-            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
-        }
-            {
-                struct MeshInfo
-                {
-                    int MeshID = 0;
-                    int MaterialID = 0;
-                } Mesh2;
-                Mesh2.MeshID = 1;
-                Mesh2.MaterialID = 1;
 
-                VkBuffer vertexBuffers[] = { mesh2.VertexBuffer.Buffer };
-                VkDeviceSize offsets[] = { 0 };
-
-                vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer.pipeline->ShaderPipeline);
-                vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-                vkCmdBindIndexBuffer(commandBuffers[i], mesh2.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-                vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer.pipeline->ShaderPipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
-                vkCmdPushConstants(commandBuffers[i], renderer.pipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(MeshInfo), &Mesh2);
-                vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
-            }
-
-
-
-
+            mesh.Draw(commandBuffers[i], renderer.pipeline, 0);
+            mesh.Draw(commandBuffers[i], renderer.pipeline, 1);
 
             vkCmdEndRenderPass(commandBuffers[i]);
 

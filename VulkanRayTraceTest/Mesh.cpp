@@ -5,25 +5,29 @@ Mesh::Mesh()
 }
 
 
-Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
-	UniformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(UniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 
-	SetUpDescriptorPool(engine);
-	SetUpDescriptorSets(engine, pipeline, texture);
+	VertexCount = VertexList.size();
+	IndexCount = IndexList.size();
+
+	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
+	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+	UniformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(UniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
-Mesh::Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList, Material MeshMaterial, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial)
 {
-	material = MeshMaterial;
-	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
-	UniformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(UniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 
-	SetUpDescriptorPool(engine);
-	SetUpDescriptorSets(engine, pipeline, texture);
+	material = MeshMaterial;
+	VertexCount = VertexList.size();
+	IndexCount = IndexList.size();
+
+	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
+	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+	UniformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(UniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
 Mesh::~Mesh()
@@ -31,9 +35,19 @@ Mesh::~Mesh()
 
 }
 
-void Mesh::SetUpMesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList)
+void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	VkAccelerationStructureGeometryKHR AccelerationStructureGeometry = {};
+	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
+	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+	TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Transform);
+	MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);
+
+	VertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(engine.Device, VertexBuffer.Buffer);
+	IndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(engine.Device, IndexBuffer.Buffer);
+	TransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(engine.Device, TransformBuffer.Buffer);
+
+	PrimitiveCountList = IndexCount / 3;
+
 	AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
 	AccelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
 	AccelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
@@ -44,68 +58,12 @@ void Mesh::SetUpMesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList
 	AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
 	AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
 	AccelerationStructureGeometry.geometry.triangles.indexData = IndexBufferDeviceAddress;
+	AccelerationStructureGeometry.geometry.triangles.transformData = TransformBufferDeviceAddress;
 
-	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
 	AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList;
-	AccelerationStructureBuildRangeInfo.primitiveOffset = FirstIndex * sizeof(uint32_t);
-	AccelerationStructureBuildRangeInfo.firstVertex = VertexOffset;
+	AccelerationStructureBuildRangeInfo.primitiveOffset = 0;
+	AccelerationStructureBuildRangeInfo.firstVertex = 0;
 	AccelerationStructureBuildRangeInfo.transformOffset = 0;
-
-	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertices.data());
-	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indices.data());
-	UniformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(UniformBufferObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-	//VulkanBuffer IndexBuffer;
-	//VulkanBuffer VertexBuffer;
-	//VulkanBuffer UniformBuffer;
-	//VulkanBuffer TransformBuffer;
-	//VulkanBuffer MaterialBuffer;
-}
-
-void Mesh::SetUpDescriptorPool(VulkanEngine& engine)
-{
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(engine, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-
-    VkDescriptorPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = static_cast<uint32_t>(DescriptorPoolList.size());
-    poolInfo.pPoolSizes = DescriptorPoolList.data();
-    poolInfo.maxSets = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
-
-    if (vkCreateDescriptorPool(engine.Device, &poolInfo, nullptr, &DescriptorPool) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create descriptor pool!");
-    }
-}
-
-void Mesh::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture)
-{
-    //std::vector<VkDescriptorSetLayout> layouts(engine.SwapChain.GetSwapChainImageCount(), pipeline->ShaderPipelineDescriptorLayout);
-
-    //VkDescriptorSetAllocateInfo allocInfo{};
-    //allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    //allocInfo.descriptorPool = DescriptorPool;
-    //allocInfo.descriptorSetCount = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
-    //allocInfo.pSetLayouts = layouts.data();
-
-    //DescriptorSets.resize(engine.SwapChain.GetSwapChainImageCount());
-    //if (vkAllocateDescriptorSets(engine.Device, &allocInfo, DescriptorSets.data()) != VK_SUCCESS) {
-    //    throw std::runtime_error("failed to allocate descriptor sets!");
-    //}
-
-    //VkDescriptorBufferInfo PositionInfo = AddBufferDescriptorInfo(engine, UniformBuffer);
-    //VkDescriptorImageInfo DiffuseMap = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, texture);
-
-    //for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
-    //{
-    //    std::vector<VkWriteDescriptorSet> DescriptorList;
-    //    DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 0, DescriptorSets[i], PositionInfo));
-    //    DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 1, DescriptorSets[i], DiffuseMap));
-
-    //    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
-    //}
 }
 
 VkDescriptorPoolSize Mesh::AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType)
@@ -162,16 +120,23 @@ VkWriteDescriptorSet Mesh::AddDescriptorSetTextureInfo(VulkanEngine& engine, uns
 	return TextureDescriptor;
 }
 
-void Mesh::Draw(std::vector<VkCommandBuffer> commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int index)
+void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int index)
 {
+	struct MeshInfo
+	{
+		int MeshID = 0;
+		int MaterialID = 0;
+	} meshInfo;
+	meshInfo.MeshID = index;
+	meshInfo.MaterialID = index;
+
 	VkBuffer vertexBuffers[] = { VertexBuffer.Buffer };
 	VkDeviceSize offsets[] = { 0 };
 
-	vkCmdBindPipeline(commandBuffer[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->ShaderPipeline);
-	vkCmdBindVertexBuffers(commandBuffer[index], 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer[index], IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-	vkCmdBindDescriptorSets(commandBuffer[index], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->ShaderPipelineLayout, 0, 1, &DescriptorSets[index], 0, nullptr);
-	vkCmdDrawIndexed(commandBuffer[index], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+	vkCmdPushConstants(commandBuffer, pipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(MeshInfo), &meshInfo);
+	vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
 }
 
 void Mesh::Destory(VulkanEngine& engine)
@@ -181,4 +146,12 @@ void Mesh::Destory(VulkanEngine& engine)
 	TransformBuffer.DestoryBuffer(engine.Device);
 	UniformBuffer.DestoryBuffer(engine.Device);
 	MaterialBuffer.DestoryBuffer(engine.Device);
+}
+
+uint64_t Mesh::getBufferDeviceAddress(VkDevice& device, VkBuffer buffer)
+{
+	VkBufferDeviceAddressInfoKHR bufferDeviceAI{};
+	bufferDeviceAI.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+	bufferDeviceAI.buffer = buffer;
+	return vkGetBufferDeviceAddressKHR(device, &bufferDeviceAI);
 }

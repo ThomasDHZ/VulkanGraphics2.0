@@ -45,10 +45,7 @@ struct UniformBufferObject {
 class Mesh
 {
 private:
-
-	void SetUpMesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList);
-	void SetUpDescriptorPool(VulkanEngine& engine);
-	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture);
+	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
 
 public:
 	std::vector<Vertex> vertices;
@@ -80,9 +77,11 @@ public:
 	std::vector<VkDescriptorSet> DescriptorSets;
 
 	Mesh();
-	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture);
-	Mesh(VulkanEngine& engine, const std::vector<Vertex>& VertexList, const std::vector<uint32_t>& IndexList, Material MeshMaterial, std::shared_ptr<GraphicsPipeline> pipeline, std::shared_ptr<Texture> texture);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial);
 	~Mesh();
+
+	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
 	VkDescriptorPoolSize AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType);
 	VkDescriptorImageInfo AddImageDescriptorInfo(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture);
@@ -90,6 +89,8 @@ public:
 	VkWriteDescriptorSet AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
 	VkWriteDescriptorSet AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo> TextureImageList);
 
-	void Draw(std::vector<VkCommandBuffer> commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int index);
+	uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
+
+	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int index);
 	void Destory(VulkanEngine& engine);
 };

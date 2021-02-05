@@ -167,7 +167,7 @@ void main()
 
 	 vec3 lightVector = normalize(ubo.dlight.direction);
 	float dot_product = max(dot(lightVector, normal), 0.2);
-	hitValue = vec3(0.7f) * dot_product;
+	hitValue = material.Diffuse;
 
 
 
