@@ -65,7 +65,6 @@ public:
     RayTraceTexture rayTexture;
     Texture2D texture2D;
     Texture2D NormalMap;
-    CubeMapTexture CubeMap;
 
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;

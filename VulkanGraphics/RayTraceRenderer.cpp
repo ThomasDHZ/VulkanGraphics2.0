@@ -54,16 +54,6 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
     model = Model(engine, manager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj", RayTraceDescriptorSetLayout, 1, texture);
     texture2D = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", 1);
     NormalMap = Texture2D(engine, VK_FORMAT_R8G8B8A8_UNORM, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_normal.bmp", 1);
-
-    CubeMapLayout CubeMapFiles;
-    CubeMapFiles.Left = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
-    CubeMapFiles.Right = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
-    CubeMapFiles.Top = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
-    CubeMapFiles.Bottom = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
-    CubeMapFiles.Back = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
-    CubeMapFiles.Front = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
-    CubeMap = CubeMapTexture(engine, CubeMapFiles);
-
     for (auto mesh : model.SubMeshList)
     {
         createBottomLevelAccelerationStructure(engine, mesh);
@@ -403,13 +393,6 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     NormalBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(NormalBinding);
 
-    VkDescriptorSetLayoutBinding CubeMapBinding = {};
-    CubeMapBinding.binding = 7;
-    CubeMapBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    CubeMapBinding.descriptorCount = 1;
-    CubeMapBinding.stageFlags = VK_SHADER_STAGE_MISS_BIT_KHR;
-    RTDescriptorSetBindings.emplace_back(CubeMapBinding);
-
     VkDescriptorSetLayoutCreateInfo RTDescriptorSetLayout = {};
     RTDescriptorSetLayout.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     RTDescriptorSetLayout.bindingCount = static_cast<uint32_t>(RTDescriptorSetBindings.size());
@@ -618,20 +601,6 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     NormalMapTextureDescriptor.descriptorCount = 1;
     NormalMapTextureDescriptor.pImageInfo = &NormalMapImage;
 
-    VkDescriptorImageInfo CubeMapImage = {};
-    CubeMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    CubeMapImage.imageView = NormalMap.GetTextureView();
-    CubeMapImage.sampler = NormalMap.GetTextureSampler();
-
-    VkWriteDescriptorSet CubeMapTextureDescriptor = {};
-    CubeMapTextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    CubeMapTextureDescriptor.dstSet = RTDescriptorSet;
-    CubeMapTextureDescriptor.dstBinding = 7;
-    CubeMapTextureDescriptor.dstArrayElement = 0;
-    CubeMapTextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    CubeMapTextureDescriptor.descriptorCount = 1;
-    CubeMapTextureDescriptor.pImageInfo = &CubeMapImage;
-
     std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
         AccelerationDesciptorSet,
         ImageDescriptorSet,
@@ -639,8 +608,7 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
         VertexDescriptorSet,
         IndexDescriptorSet,
         TextureDescriptor,
-        NormalMapTextureDescriptor,
-        CubeMapTextureDescriptor
+        NormalMapTextureDescriptor
     };
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }

@@ -12,12 +12,9 @@ public:
 	TextureManager();
 	~TextureManager();
 
-	unsigned int LoadTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
-	void LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles);
-	void LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6]);
-	void UnloadAllTextures(VulkanEngine& engine);
-	void UnloadCubeMap(VulkanEngine& engine);
-	void Destory(VulkanEngine& engine);
+	unsigned int LoadTexture(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string TextureLocation, VkFormat format);
+	void LoadCubeMap(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, CubeMapLayout CubeMapFiles);
+	void LoadCubeMap(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, std::string CubeMapFiles[6]);
 
 	std::shared_ptr<Texture2D> GetTexture(unsigned int TextureID) { return TextureList[TextureID]; };
 	std::vector<std::shared_ptr<Texture2D>> GetTextureList() { return TextureList; }

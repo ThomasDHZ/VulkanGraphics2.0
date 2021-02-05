@@ -1,27 +1,28 @@
 #include "InterfaceRenderPass.h"
 #include <stdexcept>
+#include "../VulkanGraphics/VulkanBufferManager.h"
 
 InterfaceRenderPass::InterfaceRenderPass()
 {
 }
 
-InterfaceRenderPass::InterfaceRenderPass(VulkanEngine& engine, GLFWwindow* window)
+InterfaceRenderPass::InterfaceRenderPass(VkDevice device, VkInstance Instance, VkPhysicalDevice PhysicalDevice, VkQueue GraphicsQueue, GLFWwindow* window, std::vector<VkImageView> view, VkExtent2D rect)
 {
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
+    CreateRenderPass(device);
+    CreateRendererFramebuffers(device, view, rect);
 
-    ImGuiCommandBuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+    ImGuiCommandBuffers.resize(3);
 
     ImGui_ImplVulkan_InitInfo init_info = {};
-    init_info.Instance = engine.Instance;
-    init_info.PhysicalDevice = engine.PhysicalDevice;
-    init_info.Device = engine.Device;
+    init_info.Instance = Instance;
+    init_info.PhysicalDevice = PhysicalDevice;
+    init_info.Device = device;
     init_info.QueueFamily = 0;
-    init_info.Queue = engine.GraphicsQueue;
+    init_info.Queue = GraphicsQueue;
     init_info.PipelineCache = VK_NULL_HANDLE;
     init_info.Allocator = nullptr;
-    init_info.MinImageCount = engine.SwapChain.GetSwapChainMinImageCount();
-    init_info.ImageCount = engine.SwapChain.GetSwapChainImageCount();
+    init_info.MinImageCount = 3;
+    init_info.ImageCount = 3;
 
 
     VkCommandPoolCreateInfo poolInfo{};
@@ -81,19 +82,19 @@ InterfaceRenderPass::InterfaceRenderPass(VulkanEngine& engine, GLFWwindow* windo
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info, RenderPass);
 
-    VkCommandBuffer command_buffer = engine.beginSingleTimeCommands();
+    VkCommandBuffer command_buffer = VulkanBufferManager::beginSingleTimeCommands(device, ImGuiCommandPool);
     ImGui_ImplVulkan_CreateFontsTexture(command_buffer);
-    engine.endSingleTimeCommands(command_buffer);
+    VulkanBufferManager::endSingleTimeCommands(device, command_buffer, GraphicsQueue, ImGuiCommandPool);
 }
 
 InterfaceRenderPass::~InterfaceRenderPass()
 {
 }
 
-void InterfaceRenderPass::CreateRenderPass(VulkanEngine& engine)
+void InterfaceRenderPass::CreateRenderPass(VkDevice device)
 {
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
+    colorAttachment.format = VK_FORMAT_B8G8R8A8_SRGB;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -128,18 +129,18 @@ void InterfaceRenderPass::CreateRenderPass(VulkanEngine& engine)
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(engine.Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
 }
 
-void InterfaceRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void InterfaceRenderPass::CreateRendererFramebuffers(VkDevice device, std::vector<VkImageView> view, VkExtent2D rect)
 {
-    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(3);
 
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++) {
+    for (size_t i = 0; i < 3; i++) {
         std::array<VkImageView, 1> attachments = {
-            engine.SwapChain.GetSwapChainImageViews()[i]
+            view[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
@@ -147,18 +148,18 @@ void InterfaceRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
         framebufferInfo.renderPass = RenderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = engine.SwapChain.GetSwapChainResolution().width;
-        framebufferInfo.height = engine.SwapChain.GetSwapChainResolution().height;
+        framebufferInfo.width = rect.width;
+        framebufferInfo.height = rect.height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine.Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
 }
 
 
-void InterfaceRenderPass::Draw(VulkanEngine& engine, int frame)
+void InterfaceRenderPass::Draw(VkDevice device, int frame, VkExtent2D rect)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -172,7 +173,7 @@ void InterfaceRenderPass::Draw(VulkanEngine& engine, int frame)
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[frame];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.GetSwapChainResolution();
+    renderPassInfo.renderArea.extent = rect;
 
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -180,6 +181,7 @@ void InterfaceRenderPass::Draw(VulkanEngine& engine, int frame)
 
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
+
 
     vkCmdBeginRenderPass(ImGuiCommandBuffers[frame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[frame]);
@@ -190,35 +192,35 @@ void InterfaceRenderPass::Draw(VulkanEngine& engine, int frame)
     }
 }
 
-void InterfaceRenderPass::UpdateSwapChain(VulkanEngine& engine)
+void InterfaceRenderPass::UpdateSwapChain(VkDevice& device, std::vector<VkImageView>& view, VkExtent2D& rect)
 {
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
+    CreateRenderPass(device);
+    CreateRendererFramebuffers(device, view, rect);
 }
 
-void InterfaceRenderPass::Destroy(VulkanEngine& engine)
+void InterfaceRenderPass::Destroy(VkDevice device)
 {
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    vkDestroyDescriptorPool(engine.Device, ImGuiDescriptorPool, nullptr);
-    vkFreeCommandBuffers(engine.Device, ImGuiCommandPool, static_cast<uint32_t>(ImGuiCommandBuffers.size()), ImGuiCommandBuffers.data());
-    vkDestroyCommandPool(engine.Device, ImGuiCommandPool, nullptr);
+    vkDestroyDescriptorPool(device, ImGuiDescriptorPool, nullptr);
+    vkFreeCommandBuffers(device, ImGuiCommandPool, static_cast<uint32_t>(ImGuiCommandBuffers.size()), ImGuiCommandBuffers.data());
+    vkDestroyCommandPool(device, ImGuiCommandPool, nullptr);
 
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();

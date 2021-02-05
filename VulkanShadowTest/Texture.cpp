@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <stb_image.h>
+#include "../VulkanGraphics/VulkanBufferManager.h"
 
 Texture::Texture()
 {

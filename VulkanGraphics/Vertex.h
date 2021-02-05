@@ -84,8 +84,4 @@ struct Vertex
 
 		return AttributeDescriptions;
 	}
-
-	bool operator==(const Vertex& other) const {
-		return Position == other.Position && Color == other.Color && TexureCoord == other.TexureCoord;
-	}
 };

@@ -6,17 +6,17 @@ Texture2D::Texture2D() : Texture()
 {
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(engine, TextureLocation, textureID, format, TextureType::vkTexture2D)
+Texture2D::Texture2D(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(device, physcialDevice, commandPool, graphicsQueue, TextureLocation, TextureType::vkTexture2D, format, textureID)
 {
-	CreateTextureView(engine, format);
-	CreateTextureSampler(engine);
+	CreateTextureView(device, format);
+	CreateTextureSampler(device);
 }
 
 Texture2D::~Texture2D()
 {
 }
 
-void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
+void Texture2D::CreateTextureView(VkDevice& device, VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -29,12 +29,12 @@ void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(device, &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void Texture2D::CreateTextureSampler(VulkanEngine& engine)
+void Texture2D::CreateTextureSampler(VkDevice& device)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -51,7 +51,7 @@ void Texture2D::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

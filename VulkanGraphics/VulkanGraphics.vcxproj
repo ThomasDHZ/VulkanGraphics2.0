@@ -78,11 +78,11 @@
     <LibraryPath>C:\VulkanSDK\1.1.130.0\Lib;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\tinyobjloader-master;$(SolutionDir)\ProgramInclude;$(SolutionDir)TextureLoader;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\VulkanSDK\1.2.162.0\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)TextureLoader;$(SolutionDir)\ProgramInclude;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\include;C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.162.0\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\dotha\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.162.0\Lib;C:\Users\dotha\Documents\Visual Studio 2019\glfw-3.3.2.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\dotha\Documents\Visual Studio 2019\glm;C:\Users\dotha\Documents\Visual Studio 2019\stb-master;C:\Users\dotha\Documents\Visual Studio 2019\Assimp\include;C:\Users\dotha\Documents\Visual Studio 2019\tinyobjloader-master;$(SolutionDir)\ProgramInclude;$(SolutionDir)TextureLoader;C:\Users\ZZT\Documents\Visual Studio 2019\Assimp\include;C:\Users\ZZT\Documents\Visual Studio 2019\tinyobjloader-master;C:\Users\ZZT\Documents\Visual Studio 2019\stb-master;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\include;C:\Users\ZZT\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.131.2\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\ZZT\Documents\Visual Studio 2019\Assimp\include;C:\Users\ZZT\Documents\Visual Studio 2019\tinyobjloader-master;C:\Users\ZZT\Documents\Visual Studio 2019\stb-master;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\include;C:\Users\ZZT\Documents\Visual Studio 2019\glm;C:\VulkanSDK\1.2.131.2\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\ZZT\Documents\Visual Studio 2019\Assimp\lib;C:\VulkanSDK\1.2.131.2\Lib;C:\Users\ZZT\Documents\Visual Studio 2019\glfw-3.3.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -190,7 +190,6 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Object2D.cpp" />
-    <ClCompile Include="ObjLoader.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="PointLight.cpp" />
@@ -334,7 +333,6 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Object2D.h" />
-    <ClInclude Include="ObjLoader.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Pixel.h" />
