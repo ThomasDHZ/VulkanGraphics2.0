@@ -216,7 +216,7 @@ private:
         createDepthResources();
         createFramebuffers();
 
-        interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, vulkanWindow.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
+        interfaceRenderPass = InterfaceRenderPass(engine, vulkanWindow.GetWindowPtr());
 
         createTextureImage();
         createTextureImageView();
@@ -228,7 +228,7 @@ private:
         createDescriptorSets();
         createCommandBuffers();
 
-        RayRenderer = RayTraceRenderer(engine.Device, engine.PhysicalDevice, engine.RenderCommandPool, engine.GraphicsQueue, descriptorPool, WIDTH, HEIGHT, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
+        RayRenderer = RayTraceRenderer(engine);
     }
 
     void mainLoop() {
@@ -304,18 +304,18 @@ private:
         //RayRenderer.Destory();
         //interfaceRenderPass.Destroy(engine.Device);
 
-        //vkDestroyCommandPool(engine.Device, commandPool, nullptr);
+       // vkDestroyCommandPool(engine.Device, commandPool, nullptr);
 
-        //vkDestroyDevice(engine.Device, nullptr);
+        vkDestroyDevice(engine.Device, nullptr);
 
     
 
-        //vkDestroySurfaceKHR(engine.Instance, engine.Surface, nullptr);
-        //vkDestroyInstance(engine.Instance, nullptr);
+        vkDestroySurfaceKHR(engine.Instance, engine.Surface, nullptr);
+        vkDestroyInstance(engine.Instance, nullptr);
 
-        //glfwDestroyWindow(vulkanWindow.GetWindowPtr());
+        glfwDestroyWindow(vulkanWindow.GetWindowPtr());
 
-        //glfwTerminate();
+        glfwTerminate();
     }
 
     void recreateSwapChain() {
@@ -1250,7 +1250,7 @@ private:
         else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("failed to acquire swap chain image!");
         }
-        interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
+        interfaceRenderPass.Draw(engine, imageIndex);
         RayRenderer.updateUniformBuffers(vulkanWindow.GetWindowPtr());
          updateUniformBuffer(imageIndex);
 

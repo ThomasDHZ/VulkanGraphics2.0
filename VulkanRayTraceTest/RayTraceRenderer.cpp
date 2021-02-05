@@ -8,15 +8,16 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDevice, VkCommandPool CommandPool, VkQueue GraphicsQueue, VkDescriptorPool DescriptorPool, uint32_t wIDTH, uint32_t hEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
 {
-    device = Device;
-    physicalDevice = PhysicalDevice;
-    commandPool = CommandPool;
-    graphicsQueue = GraphicsQueue;
-    descriptorPool = DescriptorPool;
-    WIDTH = wIDTH;
-    HEIGHT = hEIGHT;
+    //engine.Device, engine.PhysicalDevice, engine.RenderCommandPool, engine.GraphicsQueue, descriptorPool, WIDTH, HEIGHT, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages
+    device = engine.Device;
+    physicalDevice = engine.PhysicalDevice;
+    commandPool = engine.RenderCommandPool;
+    graphicsQueue = engine.GraphicsQueue;
+    descriptorPool = engine.DescriptorPool;
+    WIDTH = engine.SwapChain.SwapChainResolution.width;
+    HEIGHT = engine.SwapChain.SwapChainResolution.height;
 
     textureManager = TextureManager();
 
@@ -45,7 +46,7 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
 
   camera = std::make_shared<PerspectiveCamera>(glm::vec2(WIDTH, HEIGHT), glm::vec3(0.0f, 0.0f, 5.0f));
 
- model = RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj");
+ model = RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj");
   //model = RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj");
  // textureManager.LoadTexture(device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
 
@@ -58,7 +59,7 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
     CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
     CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
-    textureManager.LoadCubeMap(device, physicalDevice, commandPool, graphicsQueue, CubeMapFiles);
+    textureManager.LoadCubeMap(engine, CubeMapFiles);
 
 
     SceneData.lightPos = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
@@ -77,7 +78,7 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
    createShaderBindingTable();
    createSceneDataBuffer();
    createDescriptorSets();
-   buildCommandBuffers(swapChainFramebuffersSize, swapChainImages);
+   buildCommandBuffers(engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
 }
 RayTraceRenderer::~RayTraceRenderer()
 {

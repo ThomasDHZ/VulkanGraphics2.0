@@ -14,12 +14,12 @@ struct CubeMapLayout
 class CubeMapTexture : public Texture
 {
 private:
-	void LoadTexture(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, CubeMapLayout CubeMapFiles);
-	void CreateTextureView(VkDevice& device);
-	void CreateTextureSampler(VkDevice& device);
+	void LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles);
+	void CreateTextureView(VulkanEngine& engine);
+	void CreateTextureSampler(VulkanEngine& engine);
 public:
 	CubeMapTexture();
-	CubeMapTexture(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, CubeMapLayout CubeMapFiles, unsigned int TextureID);
-	CubeMapTexture(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, std::string CubeMapFiles[6], unsigned int TextureID);
+	CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, unsigned int TextureID);
+	CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], unsigned int TextureID);
 	~CubeMapTexture();
 };
