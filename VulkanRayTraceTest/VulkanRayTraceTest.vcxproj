@@ -163,7 +163,10 @@
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Texuture2D.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
+    <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
+    <ClCompile Include="VulkanSwapChain.cpp" />
+    <ClCompile Include="VulkanWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.rahit" />
@@ -196,7 +199,10 @@
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texuture2D.h" />
     <ClInclude Include="VulkanBuffer.h" />
+    <ClInclude Include="VulkanDebugger.h" />
     <ClInclude Include="VulkanEngine.h" />
+    <ClInclude Include="VulkanSwapChain.h" />
+    <ClInclude Include="VulkanWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
