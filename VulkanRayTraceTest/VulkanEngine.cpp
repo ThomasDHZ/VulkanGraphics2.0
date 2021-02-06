@@ -56,7 +56,7 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 
 	VulkanDebug.SetUpDebugger(Instance);
 
-	/*if (glfwCreateWindowSurface(Instance, window, nullptr, &Surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(Instance, window, nullptr, &Surface) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create window surface!");
 	}
 
@@ -83,7 +83,7 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 		throw std::runtime_error("failed to find a suitable GPU!");
 	}
 
-	SetUPDeviceFeatures(window);
+	/*SetUPDeviceFeatures(window);
 	SwapChain = VulkanSwapChain(window, Device, PhysicalDevice, Surface);
 
 	InitializeCommandPool();
