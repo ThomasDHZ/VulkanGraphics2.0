@@ -37,7 +37,7 @@ private:
 
 	VulkanDebugger VulkanDebug;
 
-	void SetUPDeviceFeatures(GLFWwindow* window);
+	void SetUpDeviceFeatures(GLFWwindow* window);
 
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
 	bool checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
@@ -53,7 +53,6 @@ private:
 	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
 
 public:
-	VulkanWindow vulkanWindow;
 	VkInstance Instance = VK_NULL_HANDLE;
 	VkDevice Device = VK_NULL_HANDLE;
 	VkPhysicalDevice PhysicalDevice = VK_NULL_HANDLE;

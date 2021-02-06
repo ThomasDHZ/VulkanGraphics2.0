@@ -83,8 +83,8 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 		throw std::runtime_error("failed to find a suitable GPU!");
 	}
 
-	/*SetUPDeviceFeatures(window);
-	SwapChain = VulkanSwapChain(window, Device, PhysicalDevice, Surface);
+	SetUpDeviceFeatures(window);
+	/*SwapChain = VulkanSwapChain(window, Device, PhysicalDevice, Surface);
 
 	InitializeCommandPool();
 	InitializeSyncObjects();
@@ -157,7 +157,7 @@ void VulkanEngine::FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceK
 	}
 }
 
-void VulkanEngine::SetUPDeviceFeatures(GLFWwindow* window)
+void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 {
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = { static_cast<uint32_t>(GraphicsFamily), static_cast<uint32_t>(PresentFamily) };
