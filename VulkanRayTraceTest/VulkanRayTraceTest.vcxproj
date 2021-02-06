@@ -146,9 +146,6 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
-    <ClCompile Include="DepthTexture.cpp" />
-    <ClCompile Include="ForwardRenderingPipeline.cpp" />
-    <ClCompile Include="GraphicsPipeline.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
@@ -158,38 +155,29 @@
     <ClCompile Include="InterfaceRenderPass.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MainRenderPass.cpp" />
-    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="RayTraceModel.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
-    <ClCompile Include="RenderedDepthTexture.cpp" />
-    <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Texuture2D.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
-    <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
-    <ClCompile Include="VulkanSwapChain.cpp" />
-    <ClCompile Include="VulkanWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.frag" />
-    <None Include="shader.vert" />
+    <None Include="alpha.rahit" />
     <None Include="Shader\closesthit.rchit" />
     <None Include="Shader\miss.rmiss" />
     <None Include="Shader\raygen.rgen" />
+    <None Include="Shader\shader.frag" />
+    <None Include="Shader\shader.vert" />
     <None Include="Shader\shadow.rmiss.spv" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapTexture.h" />
-    <ClInclude Include="DepthTexture.h" />
-    <ClInclude Include="ForwardRenderingPipeline.h" />
-    <ClInclude Include="GraphicsPipeline.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_glfw.h" />
@@ -200,23 +188,15 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="InterfaceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="MainRenderPass.h" />
-    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="RayTraceModel.h" />
     <ClInclude Include="RayTraceRenderer.h" />
-    <ClInclude Include="RenderedDepthTexture.h" />
-    <ClInclude Include="RenderManager.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texuture2D.h" />
-    <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanBuffer.h" />
-    <ClInclude Include="VulkanDebugger.h" />
     <ClInclude Include="VulkanEngine.h" />
-    <ClInclude Include="VulkanSwapChain.h" />
-    <ClInclude Include="VulkanWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

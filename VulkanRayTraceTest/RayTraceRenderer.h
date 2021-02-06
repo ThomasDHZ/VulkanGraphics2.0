@@ -25,17 +25,31 @@
 #include "CubeMapTexture.h"
 #include "TextureManager.h"
 
+struct DirectionalLight {
+    alignas(16) glm::vec3 direction;
+
+    alignas(16) glm::vec3 ambient;
+    alignas(16) glm::vec3 diffuse;
+    alignas(16) glm::vec3 specular;
+};
+
+struct PointLight {
+    alignas(16) glm::vec3 position;
+    alignas(16) glm::vec3 ambient;
+    alignas(16) glm::vec3 diffuse;
+    alignas(16) glm::vec3 specular;
+    alignas(4) float constant = 1.0f;
+    alignas(4) float linear = 0.09f;
+    alignas(4) float quadratic = 0.032f;
+};
 
 struct SceneData {
     alignas(16) glm::mat4 viewInverse;
     alignas(16) glm::mat4 projInverse;
     alignas(16) glm::mat4 modelInverse;
-    alignas(16) glm::vec3 lightPos = glm::vec3(0.0f);
-    alignas(16) glm::vec3 ambient;
-    alignas(16) glm::vec3 diffuse;
-    alignas(16) glm::vec3 specular;
+    DirectionalLight dlight;
     alignas(16) glm::vec3 viewPos;
-    alignas(4)  float shininess;
+    PointLight plight;
     alignas(4) int vertexSize;
 };
 
@@ -131,19 +145,15 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine);
+    RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     ~RayTraceRenderer();
 
     void Destory();
 
-    RayTraceModel model;
-    RayTraceModel model2;
+    std::vector<RayTraceModel> ModelList;
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
-    VulkanBuffer POSBuffer;
-    VulkanBuffer UVBuffer;
-    VulkanBuffer NormalBuffer;
     VulkanBuffer MaterialBuffer;
 
     void createBottomLevelAccelerationStructure(RayTraceModel& model, Mesh& mesh);
@@ -197,10 +207,4 @@ public:
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
-
-
-    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-    void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout, int levelCount);
-    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, int layerCount);
 };

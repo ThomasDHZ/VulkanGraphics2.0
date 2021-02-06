@@ -5,10 +5,10 @@
 class Texture2D : public Texture
 {
 private:
-    void CreateTextureView(VulkanEngine& engine, VkFormat format);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextureView(VkDevice& device, VkFormat format);
+    void CreateTextureSampler(VkDevice& device);
 public:
     Texture2D();
-    Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID);
+    Texture2D(VkDevice& device, VkPhysicalDevice& physcialDevice, VkCommandPool& commandPool, VkQueue& graphicsQueue, const std::string TextureLocation, VkFormat format, unsigned int textureID);
     ~Texture2D();
 };

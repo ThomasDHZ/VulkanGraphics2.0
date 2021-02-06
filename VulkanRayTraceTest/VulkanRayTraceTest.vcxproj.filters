@@ -84,47 +84,8 @@
     <ClCompile Include="TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DepthTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ForwardRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MainRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedDepthTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanDebugger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanSwapChain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.vert">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="shader.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\closesthit.rchit">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\miss.rmiss">
       <Filter>Shader</Filter>
     </None>
@@ -132,6 +93,18 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\shadow.rmiss.spv">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\closesthit.rchit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="alpha.rahit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\shader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\shader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -200,39 +173,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ForwardRenderingPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedDepthTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanDebugger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanSwapChain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
