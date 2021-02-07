@@ -37,13 +37,33 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
    
   camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-  ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+
+  std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+  };
+
+  std::vector<uint32_t> indices = {
+      0, 1, 2, 2, 3, 0,
+      4, 5, 6, 6, 7, 4
+  };
+
+  ModelList.emplace_back(RayTraceModel(engine, vertices, indices));
+
+ // ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
  //ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
  // ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj"));
   //  ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
 
-  //textureManager.LoadTexture(device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
-
+ // textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
+ textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB);
     stbi_set_flip_vertically_on_load(true);
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
@@ -486,12 +506,14 @@ void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* wi
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 
-   // ModelList[0].ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
-    ModelList[0].Update();
+    ModelList[0].ModelTransform = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+   // ModelList[0].Update();
 
-    SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
-    SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
+
     SceneData.modelInverse = ModelList[0].ModelTransform;
+    SceneData.viewInverse = glm::inverse(glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    SceneData.projInverse = glm::inverse(glm::perspective(glm::radians(45.0f), engine.SwapChain.SwapChainResolution.width / (float)engine.SwapChain.SwapChainResolution.height, 0.1f, 10.0f));
+    SceneData.projInverse[1][1] *= -1;
     SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData.vertexSize = sizeof(Vertex);
     SceneDataBuffer.CopyBufferToMemory(engine.Device, &SceneData, sizeof(SceneData));
@@ -526,14 +548,14 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     VkDescriptorSetLayoutBinding VertexBufferStructureBinding = {};
     VertexBufferStructureBinding.binding = 3;
     VertexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    VertexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(VertexBufferList.size());
+    VertexBufferStructureBinding.descriptorCount = 1;
     VertexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(VertexBufferStructureBinding);
 
     VkDescriptorSetLayoutBinding IndexBufferStructureBinding = {};
     IndexBufferStructureBinding.binding = 4;
     IndexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    IndexBufferStructureBinding.descriptorCount = static_cast<uint32_t>(IndexBufferList.size());
+    IndexBufferStructureBinding.descriptorCount = 1;
     IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
@@ -704,53 +726,42 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     UniformDescriptorSet.pBufferInfo = &UniformBuffer;
     UniformDescriptorSet.descriptorCount = 1;
 
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
-    std::vector<VkDescriptorBufferInfo> OffsetBufferInfoList;
-    for (int x = 0; x < VertexBufferList.size(); x++)
-    {
+    //std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
+    //std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
+    //std::vector<VkDescriptorBufferInfo> OffsetBufferInfoList;
+    //for (int x = 0; x < VertexBufferList.size(); x++)
+    //{
         VkDescriptorBufferInfo VertexBufferInfo = {};
-        VertexBufferInfo.buffer = VertexBufferList[x].Buffer;
+        VertexBufferInfo.buffer = ModelList[0].MeshList[0].VertexBuffer.Buffer;
         VertexBufferInfo.offset = 0;
         VertexBufferInfo.range = VK_WHOLE_SIZE;
-        VertexBufferInfoList.emplace_back(VertexBufferInfo);
-    }
-        for (int x = 0; x < IndexBufferList.size(); x++)
-        {
+    //    VertexBufferInfoList.emplace_back(VertexBufferInfo);
+    //}
+    //    for (int x = 0; x < IndexBufferList.size(); x++)
+    //    {
         VkDescriptorBufferInfo IndexBufferInfo = {};
-        IndexBufferInfo.buffer = IndexBufferList[x].Buffer;
+        IndexBufferInfo.buffer = ModelList[0].MeshList[0].IndexBuffer.Buffer;
         IndexBufferInfo.offset = 0;
         IndexBufferInfo.range = VK_WHOLE_SIZE;
-        IndexBufferInfoList.emplace_back(IndexBufferInfo);
-    }
+    //    IndexBufferInfoList.emplace_back(IndexBufferInfo);
+    //}
 
-        for (int x = 0; x < ModelList.size(); x++)
-        {
-            for (int y = 0; y < ModelList[x].MeshOffsetBufferList.size(); y++)
-            {
-                VkDescriptorBufferInfo OffsetBufferInfo = {};
-                OffsetBufferInfo.buffer = ModelList[x].MeshOffsetBufferList[y].Buffer;
-                OffsetBufferInfo.offset = 0;
-                OffsetBufferInfo.range = VK_WHOLE_SIZE;
-                OffsetBufferInfoList.emplace_back(OffsetBufferInfo);
-            }
-        }
 
     VkWriteDescriptorSet VertexDescriptorSet{};
     VertexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     VertexDescriptorSet.dstSet = RTDescriptorSet;
     VertexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     VertexDescriptorSet.dstBinding = 3;
-    VertexDescriptorSet.pBufferInfo = VertexBufferInfoList.data();
-    VertexDescriptorSet.descriptorCount = static_cast<uint32_t>(VertexBufferInfoList.size());
+    VertexDescriptorSet.descriptorCount = 1;
+    VertexDescriptorSet.pBufferInfo = &VertexBufferInfo;
 
     VkWriteDescriptorSet IndexDescriptorSet{};
     IndexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     IndexDescriptorSet.dstSet = RTDescriptorSet;
     IndexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     IndexDescriptorSet.dstBinding = 4;
-    IndexDescriptorSet.pBufferInfo = IndexBufferInfoList.data();
-    IndexDescriptorSet.descriptorCount = static_cast<uint32_t>(IndexBufferInfoList.size());
+    IndexDescriptorSet.descriptorCount = 1;
+    IndexDescriptorSet.pBufferInfo = &IndexBufferInfo;
 
     std::vector<Material> MaterialList;
     for (int x = 0; x < ModelList.size(); x++)

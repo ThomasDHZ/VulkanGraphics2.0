@@ -48,7 +48,7 @@ public:
 	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
 
 	RayTraceModel();
-	RayTraceModel(VkDevice& device, VkPhysicalDevice& physicalDevice, MeshDetails& meshDetails);
+	RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
 	~RayTraceModel();
 
