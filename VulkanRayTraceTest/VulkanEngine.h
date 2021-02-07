@@ -86,7 +86,7 @@ public:
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-	uint64_t GetBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
+	uint64_t GetBufferDeviceAddress(VkBuffer buffer);
 
 	VkInstance GetVulkanInstance() { return Instance; }
 	VkDevice GetVulkanDevice() { return Device; }

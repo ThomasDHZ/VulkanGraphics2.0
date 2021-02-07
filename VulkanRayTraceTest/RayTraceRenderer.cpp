@@ -37,7 +37,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
    
   camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-  ModelList.emplace_back(RayTraceModel(textureManager, engine.Device, engine.PhysicalDevice, engine.CommandPool, engine.GraphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+  ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
  //ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
  // ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj"));
   //  ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
@@ -53,7 +53,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
     CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
     CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
-    textureManager.LoadCubeMap(engine.Device, engine.PhysicalDevice, engine.CommandPool, engine.GraphicsQueue, CubeMapFiles);
+    textureManager.LoadCubeMap(engine, CubeMapFiles);
 
 
     SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
