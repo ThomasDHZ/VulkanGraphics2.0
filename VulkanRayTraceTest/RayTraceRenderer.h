@@ -24,6 +24,7 @@
 #include "Texuture2D.h"
 #include "CubeMapTexture.h"
 #include "TextureManager.h"
+#include "VulkanEngine.h"
 
 struct DirectionalLight {
     alignas(16) glm::vec3 direction;
@@ -145,7 +146,7 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool, VkQueue graphicsQueue, VkDescriptorPool descriptorPool, uint32_t WIDTH, uint32_t HEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
+    RayTraceRenderer(VulkanEngine& engine);
     ~RayTraceRenderer();
 
     void Destory();

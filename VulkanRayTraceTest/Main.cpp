@@ -233,7 +233,7 @@ private:
         createDescriptorSets();
         createCommandBuffers();
 
-        RayRenderer = RayTraceRenderer(engine.Device, engine.PhysicalDevice, engine.CommandPool, engine.GraphicsQueue, descriptorPool, WIDTH, HEIGHT, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
+        RayRenderer = RayTraceRenderer(engine);
     }
 
     void mainLoop() {

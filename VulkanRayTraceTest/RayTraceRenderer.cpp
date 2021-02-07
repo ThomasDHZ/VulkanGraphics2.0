@@ -8,15 +8,15 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDevice, VkCommandPool CommandPool, VkQueue GraphicsQueue, VkDescriptorPool DescriptorPool, uint32_t wIDTH, uint32_t hEIGHT, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
 {
-    device = Device;
-    physicalDevice = PhysicalDevice;
-    commandPool = CommandPool;
-    graphicsQueue = GraphicsQueue;
-    descriptorPool = DescriptorPool;
-    WIDTH = wIDTH;
-    HEIGHT = hEIGHT;
+    device = engine.Device;
+    physicalDevice = engine.PhysicalDevice;
+    commandPool = engine.CommandPool;
+    graphicsQueue = engine.GraphicsQueue;
+    descriptorPool = engine.DescriptorPool;
+    WIDTH = engine.GetSwapChainResolution().width;
+    HEIGHT = engine.GetSwapChainResolution().height;
 
     textureManager = TextureManager();
 
@@ -87,7 +87,7 @@ RayTraceRenderer::RayTraceRenderer(VkDevice Device, VkPhysicalDevice PhysicalDev
    createShaderBindingTable();
    createSceneDataBuffer();
    createDescriptorSets();
-   buildCommandBuffers(swapChainFramebuffersSize, swapChainImages);
+   buildCommandBuffers(engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
 }
 RayTraceRenderer::~RayTraceRenderer()
 {
@@ -494,7 +494,7 @@ void RayTraceRenderer::updateUniformBuffers(GLFWwindow* window)
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 
-    ModelList[0].ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
+   // ModelList[0].ModelRotation = glm::vec3(0.0f, time * 5, 0.0f);
     ModelList[0].Update();
 
     SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
