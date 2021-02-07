@@ -307,7 +307,7 @@ private:
             vkDestroyFence(engine.Device, inFlightFences[i], nullptr);
         }*/
 
-        RayRenderer.Destory();
+        RayRenderer.Destory(engine);
         interfaceRenderPass.Destroy(engine.Device);
 
         vkDestroyCommandPool(engine.Device, engine.CommandPool, nullptr);
@@ -348,7 +348,7 @@ private:
         //createDescriptorSets();
         //createCommandBuffers();
         interfaceRenderPass.UpdateSwapChain(engine.Device, engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
-        RayRenderer.Resize(3, engine.SwapChain.SwapChainImages, width, height);
+        RayRenderer.Resize(engine, 3, engine.SwapChain.SwapChainImages, width, height);
     }
 
     void createLogicalDevice() {
@@ -1168,7 +1168,7 @@ private:
         }
 
         interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
-        RayRenderer.updateUniformBuffers(window.GetWindowPtr());
+        RayRenderer.updateUniformBuffers(engine, window.GetWindowPtr());
         updateUniformBuffer(imageIndex);
 
         if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
