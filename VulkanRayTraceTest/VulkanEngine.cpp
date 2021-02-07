@@ -84,12 +84,12 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	}
 
 	SetUpDeviceFeatures(window);
-	/*SwapChain = VulkanSwapChain(window, Device, PhysicalDevice, Surface);
+	SwapChain = VulkanSwapChain(window, Device, PhysicalDevice, Surface);
 
 	InitializeCommandPool();
 	InitializeSyncObjects();
 
-	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));*/
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));
 }
 
 VulkanEngine::~VulkanEngine()
@@ -323,7 +323,7 @@ void VulkanEngine::InitializeCommandPool()
 	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	poolInfo.queueFamilyIndex = GraphicsFamily;
 
-	if (vkCreateCommandPool(Device, &poolInfo, nullptr, &RenderCommandPool) != VK_SUCCESS) {
+	if (vkCreateCommandPool(Device, &poolInfo, nullptr, &CommandPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics command pool!");
 	}
 }
@@ -354,8 +354,8 @@ void VulkanEngine::Destory()
 {
 	SwapChain.Destroy(Device);
 
-	vkDestroyCommandPool(Device, RenderCommandPool, nullptr);
-	RenderCommandPool = VK_NULL_HANDLE;
+	vkDestroyCommandPool(Device, CommandPool, nullptr);
+	CommandPool = VK_NULL_HANDLE;
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
@@ -378,7 +378,7 @@ VkCommandBuffer  VulkanEngine::beginSingleTimeCommands() {
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = RenderCommandPool;
+	allocInfo.commandPool = CommandPool;
 	allocInfo.commandBufferCount = 1;
 
 	VkCommandBuffer commandBuffer;
@@ -404,7 +404,7 @@ void  VulkanEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 	vkQueueSubmit(GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
 	vkQueueWaitIdle(GraphicsQueue);
 
-	vkFreeCommandBuffers(Device, RenderCommandPool, 1, &commandBuffer);
+	vkFreeCommandBuffers(Device, CommandPool, 1, &commandBuffer);
 }
 
 uint32_t VulkanEngine::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {

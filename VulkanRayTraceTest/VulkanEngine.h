@@ -60,7 +60,7 @@ public:
 	VkQueue GraphicsQueue = VK_NULL_HANDLE;
 	VkQueue PresentQueue = VK_NULL_HANDLE;
 	VkDescriptorPool      DescriptorPool = VK_NULL_HANDLE;
-	VkCommandPool RenderCommandPool = VK_NULL_HANDLE;
+	VkCommandPool CommandPool = VK_NULL_HANDLE;
 	VulkanSwapChain SwapChain;
 
 	std::vector<VulkanSemaphores> vulkanSemaphores;
@@ -94,7 +94,7 @@ public:
 	VkSurfaceKHR GetVulkanSurface() { return Surface; }
 	VkQueue GetVulkanGraphicsQueue() { return GraphicsQueue; }
 	VkQueue GetVulkanPresentQueue() { return PresentQueue; }
-	VkCommandPool GetRenderCommandPool() { return RenderCommandPool; }
+	VkCommandPool GetRenderCommandPool() { return CommandPool; }
 	VkSwapchainKHR GetSwapChain() { return SwapChain.GetSwapChain(); }
 	std::vector<VkImage> GetSwapChainImages() { return SwapChain.GetSwapChainImages(); }
 	std::vector<VkImageView> GetSwapChainImageViews() { return SwapChain.GetSwapChainImageViews(); }

@@ -11,8 +11,7 @@ private:
 	uint32_t PresentModeCount;
 	uint32_t SwapChainImageCount;
 
-	int GraphicsFamily = -1;
-	int PresentFamily = -1;
+	
 
 	VkSurfaceFormatKHR SwapChainImageFormat;
 	VkPresentModeKHR SwapChainPresentMode;
@@ -34,6 +33,9 @@ private:
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
 
 public:
+
+	int GraphicsFamily = -1;
+	int PresentFamily = -1;
 
 	VulkanSwapChain();
 	VulkanSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
