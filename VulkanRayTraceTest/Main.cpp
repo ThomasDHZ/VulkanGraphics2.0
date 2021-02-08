@@ -550,17 +550,24 @@ private:
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
         std::vector<VkCommandBuffer> CommandBufferSubmitList;
-
-        std::array<VkCommandBuffer, 2> submitCommandBuffers =
-        { commandBuffers[imageIndex], interfaceRenderPass.ImGuiCommandBuffers[imageIndex] };
+        if (!RayTraceSwitch)
+        {
+            CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
+            CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+        }
+        else
+        {
+            CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
+            //CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+        }
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
-        submitInfo.commandBufferCount = static_cast<uint32_t>(submitCommandBuffers.size());
-        submitInfo.pCommandBuffers = submitCommandBuffers.data();
+        submitInfo.commandBufferCount = static_cast<uint32_t>(CommandBufferSubmitList.size());
+        submitInfo.pCommandBuffers = CommandBufferSubmitList.data();
 
         VkSemaphore signalSemaphores[] = { engine.vulkanSemaphores[currentFrame].RenderCompleteSemaphore };
         submitInfo.signalSemaphoreCount = 1;

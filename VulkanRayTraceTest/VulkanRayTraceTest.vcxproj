@@ -163,7 +163,10 @@
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="RayTraceModel.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
+    <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
+    <ClCompile Include="SceneRenderingPipeline.cpp" />
+    <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Texuture2D.cpp" />
@@ -204,7 +207,10 @@
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="RayTraceModel.h" />
     <ClInclude Include="RayTraceRenderer.h" />
+    <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
+    <ClInclude Include="SceneRenderingPipeline.h" />
+    <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texuture2D.h" />
