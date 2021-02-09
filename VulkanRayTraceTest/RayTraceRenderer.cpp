@@ -921,7 +921,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
         VkImageMemoryBarrier barrier3 = {};
         barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier3.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
         barrier3.image = swapChainImages[i];
         barrier3.subresourceRange = subresourceRange;
         barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;

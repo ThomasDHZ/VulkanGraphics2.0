@@ -558,7 +558,7 @@ private:
         else
         {
             CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
-            //CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+            CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
         }
 
         VkSubmitInfo submitInfo{};
