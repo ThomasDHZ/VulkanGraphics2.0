@@ -41,7 +41,7 @@ void VulkanWindow::Update()
 	}
 }
 
-void VulkanWindow::CleanUp()
+void VulkanWindow::Destroy()
 {
 	glfwDestroyWindow(GLFWindow);
 	glfwTerminate();

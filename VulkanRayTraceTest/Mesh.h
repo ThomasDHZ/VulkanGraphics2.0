@@ -23,6 +23,36 @@ struct Material
 	alignas(4) uint32_t EmissionMapID = 0;
 };
 
+struct DirectionalLight {
+	alignas(16) glm::vec3 direction;
+
+	alignas(16) glm::vec3 ambient;
+	alignas(16) glm::vec3 diffuse;
+	alignas(16) glm::vec3 specular;
+};
+
+struct PointLight {
+	alignas(16) glm::vec3 position;
+	alignas(16) glm::vec3 ambient;
+	alignas(16) glm::vec3 diffuse;
+	alignas(16) glm::vec3 specular;
+	alignas(4) float constant = 1.0f;
+	alignas(4) float linear = 0.09f;
+	alignas(4) float quadratic = 0.032f;
+};
+
+struct SceneDataBufferData {
+	alignas(16) glm::mat4 viewInverse;
+	alignas(16) glm::mat4 projInverse;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
+	alignas(16) glm::mat4 model;
+	DirectionalLight dlight;
+	alignas(16) glm::vec3 viewPos;
+	PointLight plight;
+	alignas(4) int vertexSize;
+};
+
 struct MeshDetails
 {
 	std::vector<Vertex> vertices;
@@ -33,12 +63,6 @@ struct MeshOffsets
 {
 	uint32_t VertexOffset;
 	uint32_t IndiceOffset;
-};
-
-struct UniformBufferObject {
-	alignas(16) glm::mat4 model;
-	alignas(16) glm::mat4 view;
-	alignas(16) glm::mat4 proj;
 };
 
 class Mesh
@@ -78,8 +102,6 @@ public:
 	//VkDescriptorBufferInfo AddBufferDescriptorInfo(VulkanEngine& engine, VulkanBuffer buffer);
 	//VkWriteDescriptorSet AddDescriptorSetBufferInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
 	//VkWriteDescriptorSet AddDescriptorSetTextureInfo(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo> TextureImageList);
-
-	//uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
 
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline, int index);
 	void Destory(VulkanEngine& engine);

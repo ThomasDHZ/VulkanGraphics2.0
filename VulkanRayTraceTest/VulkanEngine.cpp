@@ -234,6 +234,8 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 
 	vkGetDeviceQueue(Device, GraphicsFamily, 0, &GraphicsQueue);
 	vkGetDeviceQueue(Device, PresentFamily, 0, &PresentQueue);
+
+	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));
 }
 
 bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
@@ -350,7 +352,7 @@ void VulkanEngine::InitializeSyncObjects()
 	}
 }
 
-void VulkanEngine::Destory()
+void VulkanEngine::Destroy()
 {
 	SwapChain.Destroy(Device);
 
@@ -418,4 +420,12 @@ uint32_t VulkanEngine::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags
 	}
 
 	throw std::runtime_error("failed to find suitable memory type!");
+}
+
+uint64_t VulkanEngine::GetBufferDeviceAddress(VkBuffer buffer)
+{
+	VkBufferDeviceAddressInfoKHR BufferDevice{};
+	BufferDevice.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
+	BufferDevice.buffer = buffer;
+	return vkGetBufferDeviceAddressKHR(Device, &BufferDevice);
 }

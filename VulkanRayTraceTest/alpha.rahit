@@ -72,7 +72,9 @@ layout(binding = 2) uniform UBO
 {
 	mat4 viewInverse;
 	mat4 projInverse;
-	mat4 modelInverse;
+	mat4 view;
+	mat4 proj;
+	mat4 model;
 	DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;

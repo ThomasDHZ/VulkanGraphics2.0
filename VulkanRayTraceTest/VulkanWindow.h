@@ -15,7 +15,7 @@ public:
 	~VulkanWindow();
 
 	void Update();
-	void CleanUp();
+	void Destroy();
 	static void frameBufferResizeCallBack(GLFWwindow* Window, int width, int height);
 
 	void SetFrameBufferResizedFlag(bool flag) { FramebufferResized = flag; }

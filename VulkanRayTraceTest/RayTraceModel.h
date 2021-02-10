@@ -19,7 +19,6 @@ private:
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
 	Material LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
-	uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
 
 public:
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
@@ -49,6 +48,7 @@ public:
 
 	RayTraceModel();
 	RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
 	RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
 	~RayTraceModel();
 

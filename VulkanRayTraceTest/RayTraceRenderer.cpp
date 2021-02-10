@@ -8,9 +8,10 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList)
 {
-    textureManager = TextureManager();
+    textureManager = textureManagerz;
+    ModelList = modelList;
 
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 deviceProperties2{};
@@ -37,26 +38,6 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
    
   camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-
-  std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-  };
-
-  std::vector<uint32_t> indices = {
-      0, 1, 2, 2, 3, 0,
-      4, 5, 6, 6, 7, 4
-  };
-
-  ModelList.emplace_back(RayTraceModel(engine, vertices, indices));
-
  // ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
  //ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
  // ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj"));
@@ -74,17 +55,6 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine)
     CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
     textureManager.LoadCubeMap(engine, CubeMapFiles);
-
-
-    SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
-    SceneData.dlight.ambient = glm::vec4(0.2f);
-    SceneData.dlight.diffuse = glm::vec4(0.5f);
-    SceneData.dlight.specular = glm::vec4(1.0f);
-
-    SceneData.plight.position = glm::vec4(0.0f);
-    SceneData.plight.ambient = glm::vec4(0.2f);
-    SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    SceneData.plight.specular = glm::vec4(1.0f);
 
     for (int x = 0; x < ModelList.size(); x++)
     {
@@ -477,24 +447,7 @@ void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelera
     vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
 }
 
-void RayTraceRenderer::UpdateGUI()
-{
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::SliderFloat3("Pos", &SceneData.dlight.direction.x, -1000.0f, 1000.0f);
-    ImGui::SliderFloat3("Ambient", &SceneData.dlight.ambient.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse", &SceneData.dlight.diffuse.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Speculare", &SceneData.dlight.specular.x, 0.0f, 1.0f);
-
-    ImGui::SliderFloat3("Pos2", &SceneData.plight.position.x, -10.0f, 10.0f);
-    ImGui::SliderFloat3("Ambient2", &SceneData.plight.ambient.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse2", &SceneData.plight.diffuse.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Speculare2", &SceneData.plight.specular.x, 0.0f, 1.0f);
-    ImGui::SliderFloat("constant", &SceneData.plight.constant, 0.0f, 100.0f);
-    ImGui::SliderFloat("linear", &SceneData.plight.linear, 0.0f, 100.0f);
-    ImGui::SliderFloat("quadratic", &SceneData.plight.quadratic, 0.0f, 100.0f);
-}
-
-void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window)
+void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData)
 {
     keyboard.Update(window, camera);
     mouse.Update(window, camera);
@@ -510,13 +463,16 @@ void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* wi
    // ModelList[0].Update();
 
 
-    SceneData.modelInverse = ModelList[0].ModelTransform;
-    SceneData.viewInverse = glm::inverse(glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-    SceneData.projInverse = glm::inverse(glm::perspective(glm::radians(45.0f), engine.SwapChain.SwapChainResolution.width / (float)engine.SwapChain.SwapChainResolution.height, 0.1f, 10.0f));
-    SceneData.projInverse[1][1] *= -1;
-    SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SceneData.vertexSize = sizeof(Vertex);
-    SceneDataBuffer.CopyBufferToMemory(engine.Device, &SceneData, sizeof(SceneData));
+    sceneData.model = ModelList[0].ModelTransform;
+    sceneData.viewInverse = glm::inverse(glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    sceneData.projInverse = glm::inverse(glm::perspective(glm::radians(45.0f), engine.SwapChain.SwapChainResolution.width / (float)engine.SwapChain.SwapChainResolution.height, 0.1f, 10.0f));
+    sceneData.projInverse[1][1] *= -1;
+    sceneData.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    sceneData.proj = glm::perspective(glm::radians(45.0f), engine.SwapChain.SwapChainResolution.width / (float)engine.SwapChain.SwapChainResolution.height, 0.1f, 10.0f);
+    sceneData.proj[1][1] *= -1;
+    sceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+    sceneData.vertexSize = sizeof(Vertex);
+    SceneDataBuffer.CopyBufferToMemory(engine.Device, &sceneData, sizeof(sceneData));
 
     createTopLevelAccelerationStructure(engine);
 }
@@ -664,7 +620,8 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
 }
 void RayTraceRenderer::createSceneDataBuffer(VulkanEngine& engine)
 {
-    SceneDataBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &SceneData);
+
+    SceneDataBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(SceneDataBufferData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
 {

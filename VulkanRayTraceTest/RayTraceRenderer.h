@@ -26,34 +26,6 @@
 #include "TextureManager.h"
 #include "VulkanEngine.h"
 
-struct DirectionalLight {
-    alignas(16) glm::vec3 direction;
-
-    alignas(16) glm::vec3 ambient;
-    alignas(16) glm::vec3 diffuse;
-    alignas(16) glm::vec3 specular;
-};
-
-struct PointLight {
-    alignas(16) glm::vec3 position;
-    alignas(16) glm::vec3 ambient;
-    alignas(16) glm::vec3 diffuse;
-    alignas(16) glm::vec3 specular;
-    alignas(4) float constant = 1.0f;
-    alignas(4) float linear = 0.09f;
-    alignas(4) float quadratic = 0.032f;
-};
-
-struct SceneData {
-    alignas(16) glm::mat4 viewInverse;
-    alignas(16) glm::mat4 projInverse;
-    alignas(16) glm::mat4 modelInverse;
-    DirectionalLight dlight;
-    alignas(16) glm::vec3 viewPos;
-    PointLight plight;
-    alignas(4) int vertexSize;
-};
-
 struct RayTracingScratchBuffer
 {
     uint64_t deviceAddress = 0;
@@ -123,7 +95,6 @@ private:
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
 
-    SceneData SceneData;
     VulkanBuffer SceneDataBuffer;
 
 public:
@@ -139,7 +110,7 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine);
+    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);
@@ -162,8 +133,7 @@ public:
 
     void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
 
-    void UpdateGUI();
-    void updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window);
+    void updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData);
 
     VkResult createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
