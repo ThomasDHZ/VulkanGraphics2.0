@@ -53,6 +53,7 @@ public:
 	~RayTraceModel();
 
 	void Update();
+	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VkDevice& device);
 };
 

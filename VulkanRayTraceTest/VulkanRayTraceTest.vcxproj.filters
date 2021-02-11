@@ -140,6 +140,9 @@
     <None Include="Shader\shader.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\Lighting.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">
@@ -242,6 +245,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SceneRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

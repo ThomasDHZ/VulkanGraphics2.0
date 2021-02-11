@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include <stb_image.h>
+#include "SceneData.h"
 
 RayTraceRenderer::RayTraceRenderer()
 {
@@ -36,21 +37,21 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(engine.Device, "vkCreateRayTracingPipelinesKHR"));
    
-  camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
  // ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+
  //ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
  // ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Medieval_building.obj"));
   //  ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
 
  // textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
  textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    stbi_set_flip_vertically_on_load(true);
+   // stbi_set_flip_vertically_on_load(true);
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
     CubeMapFiles[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
-    CubeMapFiles[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
-    CubeMapFiles[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
+    CubeMapFiles[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
+    CubeMapFiles[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
     CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
     CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
@@ -64,7 +65,8 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
         }
     }
    createTopLevelAccelerationStructure(engine);
-   createStorageImage(engine);
+   createStorageImage(engine, storageImage);
+   createStorageImage(engine, shadowStorageImage);
    createRayTracingPipeline(engine);
    createShaderBindingTable(engine);
    createSceneDataBuffer(engine);
@@ -312,7 +314,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
     instancesBuffer.DestoryBuffer(engine.Device);
 }
 
-void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
+void RayTraceRenderer::createStorageImage(VulkanEngine& engine, StorageImage& StoreImage)
 {
     VkImageCreateInfo image = {};
     image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -327,16 +329,16 @@ void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
     image.tiling = VK_IMAGE_TILING_OPTIMAL;
     image.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
     image.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    vkCreateImage(engine.Device, &image, nullptr, &storageImage.image);
+    vkCreateImage(engine.Device, &image, nullptr, &StoreImage.image);
 
     VkMemoryRequirements memReqs;
-    vkGetImageMemoryRequirements(engine.Device, storageImage.image, &memReqs);
+    vkGetImageMemoryRequirements(engine.Device, StoreImage.image, &memReqs);
     VkMemoryAllocateInfo memoryAllocateInfo{};
     memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memoryAllocateInfo.allocationSize = memReqs.size;
     memoryAllocateInfo.memoryTypeIndex = getMemoryType(engine, memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &storageImage.memory);
-    vkBindImageMemory(engine.Device, storageImage.image, storageImage.memory, 0);
+    vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &StoreImage.memory);
+    vkBindImageMemory(engine.Device, StoreImage.image, StoreImage.memory, 0);
 
     VkImageViewCreateInfo colorImageView{};
     colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -348,11 +350,11 @@ void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
     colorImageView.subresourceRange.levelCount = 1;
     colorImageView.subresourceRange.baseArrayLayer = 0;
     colorImageView.subresourceRange.layerCount = 1;
-    colorImageView.image = storageImage.image;
-    vkCreateImageView(engine.Device, &colorImageView, nullptr, &storageImage.view);
+    colorImageView.image = StoreImage.image;
+    vkCreateImageView(engine.Device, &colorImageView, nullptr, &StoreImage.view);
 
     VkCommandBuffer cmdBuffer = createCommandBuffer(engine, VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-    setImageLayout(cmdBuffer, storageImage.image,
+    setImageLayout(cmdBuffer, StoreImage.image,
         VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_GENERAL,
         { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 });
@@ -447,11 +449,8 @@ void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelera
     vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
 }
 
-void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData)
+void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData, std::shared_ptr<PerspectiveCamera> camera)
 {
-    keyboard.Update(window, camera);
-    mouse.Update(window, camera);
-    camera->Update(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height);
 
     static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -459,16 +458,16 @@ void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* wi
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 
-    ModelList[0].ModelTransform = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    ModelList[0].ModelTransform = glm::mat4(1.0f);
    // ModelList[0].Update();
 
 
     sceneData.model = ModelList[0].ModelTransform;
-    sceneData.viewInverse = glm::inverse(glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-    sceneData.projInverse = glm::inverse(glm::perspective(glm::radians(45.0f), engine.SwapChain.SwapChainResolution.width / (float)engine.SwapChain.SwapChainResolution.height, 0.1f, 10.0f));
+    sceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
+    sceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     sceneData.projInverse[1][1] *= -1;
-    sceneData.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    sceneData.proj = glm::perspective(glm::radians(45.0f), engine.SwapChain.SwapChainResolution.width / (float)engine.SwapChain.SwapChainResolution.height, 0.1f, 10.0f);
+    sceneData.view = camera->GetViewMatrix();
+    sceneData.proj = camera->GetProjectionMatrix();
     sceneData.proj[1][1] *= -1;
     sceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     sceneData.vertexSize = sizeof(Vertex);
@@ -504,14 +503,14 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     VkDescriptorSetLayoutBinding VertexBufferStructureBinding = {};
     VertexBufferStructureBinding.binding = 3;
     VertexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    VertexBufferStructureBinding.descriptorCount = 1;
+    VertexBufferStructureBinding.descriptorCount = VertexBufferList.size();
     VertexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(VertexBufferStructureBinding);
 
     VkDescriptorSetLayoutBinding IndexBufferStructureBinding = {};
     IndexBufferStructureBinding.binding = 4;
     IndexBufferStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    IndexBufferStructureBinding.descriptorCount = 1;
+    IndexBufferStructureBinding.descriptorCount = IndexBufferList.size();
     IndexBufferStructureBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(IndexBufferStructureBinding);
 
@@ -528,6 +527,13 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     DiffuseBinding.descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
     DiffuseBinding.stageFlags = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
     RTDescriptorSetBindings.emplace_back(DiffuseBinding);
+
+    VkDescriptorSetLayoutBinding ReturnShadowImageStructureBinding = {};
+    ReturnShadowImageStructureBinding.binding = 7;
+    ReturnShadowImageStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+    ReturnShadowImageStructureBinding.descriptorCount = 1;
+    ReturnShadowImageStructureBinding.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
+    RTDescriptorSetBindings.emplace_back(ReturnShadowImageStructureBinding);
 
     VkDescriptorSetLayoutBinding CubeMapStructureBinding = {};
     CubeMapStructureBinding.binding = 10;
@@ -683,25 +689,25 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     UniformDescriptorSet.pBufferInfo = &UniformBuffer;
     UniformDescriptorSet.descriptorCount = 1;
 
-    //std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
-    //std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
-    //std::vector<VkDescriptorBufferInfo> OffsetBufferInfoList;
-    //for (int x = 0; x < VertexBufferList.size(); x++)
-    //{
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
+    std::vector<VkDescriptorBufferInfo> OffsetBufferInfoList;
+    for (int x = 0; x < VertexBufferList.size(); x++)
+    {
         VkDescriptorBufferInfo VertexBufferInfo = {};
-        VertexBufferInfo.buffer = ModelList[0].MeshList[0].VertexBuffer.Buffer;
+        VertexBufferInfo.buffer = ModelList[0].MeshList[x].VertexBuffer.Buffer;
         VertexBufferInfo.offset = 0;
         VertexBufferInfo.range = VK_WHOLE_SIZE;
-    //    VertexBufferInfoList.emplace_back(VertexBufferInfo);
-    //}
-    //    for (int x = 0; x < IndexBufferList.size(); x++)
-    //    {
+        VertexBufferInfoList.emplace_back(VertexBufferInfo);
+    }
+        for (int x = 0; x < IndexBufferList.size(); x++)
+        {
         VkDescriptorBufferInfo IndexBufferInfo = {};
-        IndexBufferInfo.buffer = ModelList[0].MeshList[0].IndexBuffer.Buffer;
+        IndexBufferInfo.buffer = ModelList[0].MeshList[x].IndexBuffer.Buffer;
         IndexBufferInfo.offset = 0;
         IndexBufferInfo.range = VK_WHOLE_SIZE;
-    //    IndexBufferInfoList.emplace_back(IndexBufferInfo);
-    //}
+        IndexBufferInfoList.emplace_back(IndexBufferInfo);
+    }
 
 
     VkWriteDescriptorSet VertexDescriptorSet{};
@@ -709,16 +715,16 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     VertexDescriptorSet.dstSet = RTDescriptorSet;
     VertexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     VertexDescriptorSet.dstBinding = 3;
-    VertexDescriptorSet.descriptorCount = 1;
-    VertexDescriptorSet.pBufferInfo = &VertexBufferInfo;
+    VertexDescriptorSet.descriptorCount = static_cast<uint32_t>(VertexBufferInfoList.size());
+    VertexDescriptorSet.pBufferInfo = VertexBufferInfoList.data();
 
     VkWriteDescriptorSet IndexDescriptorSet{};
     IndexDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     IndexDescriptorSet.dstSet = RTDescriptorSet;
     IndexDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     IndexDescriptorSet.dstBinding = 4;
-    IndexDescriptorSet.descriptorCount = 1;
-    IndexDescriptorSet.pBufferInfo = &IndexBufferInfo;
+    IndexDescriptorSet.descriptorCount = static_cast<uint32_t>(IndexBufferInfoList.size());
+    IndexDescriptorSet.pBufferInfo = IndexBufferInfoList.data();
 
     std::vector<Material> MaterialList;
     for (int x = 0; x < ModelList.size(); x++)
@@ -761,6 +767,18 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     DiffuseMapDescriptor.descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
     DiffuseMapDescriptor.pImageInfo = DiffuseMapInfoList.data();
 
+    VkDescriptorImageInfo ShadowRayTraceImageDescriptor{};
+    ShadowRayTraceImageDescriptor.imageView = shadowStorageImage.view;
+    ShadowRayTraceImageDescriptor.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+
+    VkWriteDescriptorSet ImageDescriptorSet2{};
+    ImageDescriptorSet2.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    ImageDescriptorSet2.dstSet = RTDescriptorSet;
+    ImageDescriptorSet2.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+    ImageDescriptorSet2.dstBinding = 7;
+    ImageDescriptorSet2.pImageInfo = &ShadowRayTraceImageDescriptor;
+    ImageDescriptorSet2.descriptorCount = 1;
+
     VkDescriptorImageInfo CubeMapImage = {};
     CubeMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     CubeMapImage.imageView = textureManager.GetCubeMapTexture().GetTextureView();
@@ -783,6 +801,7 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
         IndexDescriptorSet,
         MaterialDescriptorSet,
         DiffuseMapDescriptor,
+        ImageDescriptorSet2,
         CubeMapDescriptor
     };
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, VK_NULL_HANDLE);
@@ -905,7 +924,8 @@ void RayTraceRenderer::Resize(VulkanEngine& engine, int swapChainFramebuffersSiz
     vkDestroyImage(engine.Device, storageImage.image, nullptr);
     vkFreeMemory(engine.Device, storageImage.memory, nullptr);
 
-    createStorageImage(engine);
+    createStorageImage(engine, storageImage);
+    createStorageImage(engine, shadowStorageImage);
 
     VkDescriptorImageInfo storageImageDescriptor{ VK_NULL_HANDLE, storageImage.view, VK_IMAGE_LAYOUT_GENERAL };
 

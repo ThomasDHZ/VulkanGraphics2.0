@@ -30,21 +30,41 @@
 const uint32_t WIDTH = 1920;
 const uint32_t HEIGHT = 1080;
 
-std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+ std::vector<Vertex> vertices =
+{
+	{{-0.5,-0.5,-0.5}, {0,-1,0}, {0,1}},
+	{{0.5,-0.5,-0.5}, {0,-1,0}, {1,1}},
+	{{0.5,-0.5,0.5}, {0,-1,0}, {1,0}},
+	{{-0.5,-0.5,0.5}, {0,-1,0}, {0,0}},
+	{{-0.5,0.5,-0.5}, {0,0,-1}, {0,0}},
+	{{0.5,0.5,-0.5}, {0,0,-1}, {1,0}},
+	{{0.5,-0.5,-0.5}, {0,0,-1}, {1,1}},
+	{{-0.5,-0.5,-0.5}, {0,0,-1}, {0,1}},
+	{{0.5,0.5,-0.5}, {1,0,0}, {0,0}},
+	{{0.5,0.5,0.5}, {1,0,0}, {1,0}},
+	{{0.5,-0.5,0.5}, {1,0,0}, {1,1}},
+	{{0.5,-0.5,-0.5}, {1,0,0}, {0,1}},
+	{{0.5,0.5,0.5}, {0,0,1}, {1,0}},
+	{{-0.5,0.5,0.5}, {0,0,1}, {0,0}},
+	{{-0.5,-0.5,0.5}, {0,0,1}, {0,1}},
+	{{0.5,-0.5,0.5}, {0,0,1}, {1,1}},
+	{{-0.5,0.5,0.5}, {-1,0,0}, {1,0}},
+	{{-0.5,0.5,-0.5}, {-1,0,0}, {0,0}},
+	{{-0.5,-0.5,-0.5}, {-1,0,0}, {0,1}},
+	{{-0.5,-0.5,0.5}, {-1,0,0}, {1,1}},
+	{{-0.5,0.5,-0.5}, {0,1,0}, {0,1}},
+	{{-0.5,0.5,0.5}, {0,1,0}, {0,0}},
+	{{0.5,0.5,0.5}, {0,1,0}, {1,0}},
+	{{0.5,0.5,-0.5}, {0,1,0}, {1,1}},
 };
 
-std::vector<uint32_t> indices = {
-    0, 1, 2, 2, 3, 0,
-    4, 5, 6, 6, 7, 4
+ std::vector<uint32_t> indices = {
+	0,1,2, 0,2,3,
+	4,5,6, 4,6,7,
+	8,9,10, 8,10,11,
+	12,13,14, 12,14,15,
+	16,17,18, 16,18,19,
+	20,21,22, 20,22,23,
 };
 
 class HelloTriangleApplication {
@@ -63,17 +83,20 @@ private:
     RayTraceRenderer RayRenderer;
     InterfaceRenderPass interfaceRenderPass;
     MainRenderPass RenderPass;
-
+    Keyboard keyboard;
+    Mouse mouse;
     TextureManager textureManager;
 
-    std::vector<RayTraceModel> mesh;
-    SceneDataBufferData ubo{};
-
+    std::shared_ptr<PerspectiveCamera> camera;
+    std::vector<RayTraceModel> ModelList;
+    
     VkDescriptorPool descriptorPool;
     VkDescriptorSetLayout descriptorSetLayout;
     std::vector<VkDescriptorSet> descriptorSets;
 
     std::vector<VkCommandBuffer> commandBuffers;
+    std::shared_ptr<SceneDataStruct> SceneData;
+
 
     size_t currentFrame = 0;
 
@@ -84,33 +107,39 @@ private:
         window = VulkanWindow(WIDTH, HEIGHT, "VulkanEngine");
         engine = VulkanEngine(window.GetWindowPtr());
 
+        textureManager = TextureManager();
+        textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
+        textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+        textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/container2.png", VK_FORMAT_R8G8B8A8_UNORM);
+
         createDescriptorSetLayout();
         RenderPass = MainRenderPass(engine, descriptorSetLayout);
 
         interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
-        textureManager = TextureManager();
-        auto a = textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB);
 
-        uint32_t VertexCount = vertices.size();
-        uint32_t IndexCount = indices.size();
-        mesh.emplace_back(RayTraceModel(engine, vertices, indices));
+        ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
 
+
+
+        SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
         createDescriptorPool();
         createDescriptorSets();
         createCommandBuffers();
 
+        camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-        ubo.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
-        ubo.dlight.ambient = glm::vec4(0.2f);
-        ubo.dlight.diffuse = glm::vec4(0.5f);
-        ubo.dlight.specular = glm::vec4(1.0f);
 
-        ubo.plight.position = glm::vec4(0.0f);
-        ubo.plight.ambient = glm::vec4(0.2f);
-        ubo.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-        ubo.plight.specular = glm::vec4(1.0f);
+        SceneData->SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
+        SceneData->SceneData.dlight.ambient = glm::vec4(0.2f);
+        SceneData->SceneData.dlight.diffuse = glm::vec4(0.5f);
+        SceneData->SceneData.dlight.specular = glm::vec4(1.0f);
 
-        RayRenderer = RayTraceRenderer(engine, textureManager, mesh);
+        SceneData->SceneData.plight.position = glm::vec4(0.0f);
+        SceneData->SceneData.plight.ambient = glm::vec4(0.2f);
+        SceneData->SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+        SceneData->SceneData.plight.specular = glm::vec4(1.0f);
+
+        RayRenderer = RayTraceRenderer(engine, textureManager, ModelList);
     }
 
     void mainLoop() {
@@ -123,18 +152,18 @@ private:
             {
               ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
               ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
-              ImGui::SliderFloat3("Pos", &ubo.dlight.direction.x, -1000.0f, 1000.0f);
-              ImGui::SliderFloat3("Ambient", &ubo.dlight.ambient.x, 0.0f, 1.0f);
-              ImGui::SliderFloat3("Diffuse", &ubo.dlight.diffuse.x, 0.0f, 1.0f);
-              ImGui::SliderFloat3("Speculare", &ubo.dlight.specular.x, 0.0f, 1.0f);
+              ImGui::SliderFloat3("Pos", &SceneData->SceneData.dlight.direction.x, -1000.0f, 1000.0f);
+              ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
+              ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
+              ImGui::SliderFloat3("Speculare", &SceneData->SceneData.dlight.specular.x, 0.0f, 1.0f);
 
-              ImGui::SliderFloat3("Pos2", &ubo.plight.position.x, -10.0f, 10.0f);
-              ImGui::SliderFloat3("Ambient2", &ubo.plight.ambient.x, 0.0f, 1.0f);
-              ImGui::SliderFloat3("Diffuse2", &ubo.plight.diffuse.x, 0.0f, 1.0f);
-              ImGui::SliderFloat3("Speculare2", &ubo.plight.specular.x, 0.0f, 1.0f);
-              ImGui::SliderFloat("constant", &ubo.plight.constant, 0.0f, 100.0f);
-              ImGui::SliderFloat("linear", &ubo.plight.linear, 0.0f, 100.0f);
-              ImGui::SliderFloat("quadratic", &ubo.plight.quadratic, 0.0f, 100.0f);
+              ImGui::SliderFloat3("Pos2", &SceneData->SceneData.plight.position.x, -10.0f, 10.0f);
+              ImGui::SliderFloat3("Ambient2", &SceneData->SceneData.plight.ambient.x, 0.0f, 1.0f);
+              ImGui::SliderFloat3("Diffuse2", &SceneData->SceneData.plight.diffuse.x, 0.0f, 1.0f);
+              ImGui::SliderFloat3("Speculare2", &SceneData->SceneData.plight.specular.x, 0.0f, 1.0f);
+              ImGui::SliderFloat("constant", &SceneData->SceneData.plight.constant, 0.0f, 100.0f);
+              ImGui::SliderFloat("linear", &SceneData->SceneData.plight.linear, 0.0f, 100.0f);
+              ImGui::SliderFloat("quadratic", &SceneData->SceneData.plight.quadratic, 0.0f, 100.0f);
             }
             ImGui::Render();
 
@@ -146,7 +175,10 @@ private:
 
     void cleanup() 
     {
-        mesh[0].Destory(engine.Device);
+        for (auto model : ModelList)
+        {
+            model.Destory(engine.Device);
+        }
         textureManager.Destory(engine);
         interfaceRenderPass.Destroy(engine.Device);
         RenderPass.Destroy(engine);
@@ -194,11 +226,11 @@ private:
         uboLayoutBinding.descriptorCount = 1;
         uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         uboLayoutBinding.pImmutableSamplers = nullptr;
-        uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
         VkDescriptorSetLayoutBinding samplerLayoutBinding{};
         samplerLayoutBinding.binding = 6;
-        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
         samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         samplerLayoutBinding.pImmutableSamplers = nullptr;
         samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -246,7 +278,7 @@ private:
 
         for (size_t i = 0; i < engine.SwapChain.SwapChainImages.size(); i++) {
             VkDescriptorBufferInfo bufferInfo{};
-            bufferInfo.buffer = mesh[0].MeshList[0].UniformBuffer.Buffer;
+            bufferInfo.buffer = SceneData->SceneDataBuffer.Buffer;
             bufferInfo.offset = 0;
             bufferInfo.range = sizeof(SceneDataBufferData);
 
@@ -265,13 +297,23 @@ private:
             descriptorWrites[0].descriptorCount = 1;
             descriptorWrites[0].pBufferInfo = &bufferInfo;
 
+
+            std::vector<VkDescriptorImageInfo> DiffuseMapInfoList;
+            for (auto texture : textureManager.GetTextureList())
+            {
+                VkDescriptorImageInfo DiffuseMapImage = {};
+                DiffuseMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                DiffuseMapImage.imageView = texture->GetTextureView();
+                DiffuseMapImage.sampler = texture->GetTextureSampler();
+                DiffuseMapInfoList.emplace_back(DiffuseMapImage);
+            }
             descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[1].dstSet = descriptorSets[i];
             descriptorWrites[1].dstBinding = 6;
             descriptorWrites[1].dstArrayElement = 0;
             descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            descriptorWrites[1].descriptorCount = 1;
-            descriptorWrites[1].pImageInfo = &imageInfo;
+            descriptorWrites[1].descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
+            descriptorWrites[1].pImageInfo = DiffuseMapInfoList.data();
 
             vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
@@ -313,18 +355,13 @@ private:
             renderPassInfo.pClearValues = clearValues.data();
 
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
-
-            VkBuffer vertexBuffers[] = { mesh[0].MeshList[0].VertexBuffer.Buffer };
-            VkDeviceSize offsets[] = { 0 };
-            vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
-
-            vkCmdBindIndexBuffer(commandBuffers[i], mesh[0].MeshList[0].IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-
             vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 
-            vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+            for (auto model : ModelList)
+            {
+                model.Draw(commandBuffers[i], RenderPass.forwardRendereringPipeline);
+            }
 
             vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -335,19 +372,26 @@ private:
     }
 
     void updateUniformBuffer(uint32_t currentImage) {
+
+        keyboard.Update(window.GetWindowPtr(), camera);
+        mouse.Update(window.GetWindowPtr(), camera);
+        camera->Update(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height);
+
         static auto startTime = std::chrono::high_resolution_clock::now();
 
         auto  currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-
-        SceneDataBufferData ubo{};
-        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        ubo.proj = glm::perspective(glm::radians(45.0f), engine.SwapChain.SwapChainResolution.width / (float)engine.SwapChain.SwapChainResolution.height, 0.1f, 10.0f);
-        ubo.proj[1][1] *= -1;
-
-        mesh[0].MeshList[0].UniformBuffer.CopyBufferToMemory(engine.Device, &ubo, sizeof(ubo));
+        SceneData->SceneData.model = glm::mat4(1.0f);
+        SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
+        SceneData->SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
+        SceneData->SceneData.projInverse[1][1] *= -1;
+        SceneData->SceneData.view = camera->GetViewMatrix(); 
+        SceneData->SceneData.proj = camera->GetProjectionMatrix();
+        SceneData->SceneData.proj[1][1] *= -1;
+        SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+        SceneData->SceneData.vertexSize = sizeof(Vertex);
+        SceneData->Update(engine);
     }
 
     void drawFrame() {
@@ -365,7 +409,7 @@ private:
         }
 
         interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
-        RayRenderer.updateUniformBuffers(engine, window.GetWindowPtr(), ubo);
+        RayRenderer.updateUniformBuffers(engine, window.GetWindowPtr(), SceneData->SceneData, camera);
         updateUniformBuffer(imageIndex);
 
         if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {

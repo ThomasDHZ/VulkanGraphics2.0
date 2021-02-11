@@ -179,6 +179,7 @@
   <ItemGroup>
     <None Include="alpha.rahit" />
     <None Include="Shader\closesthit.rchit" />
+    <None Include="Shader\Lighting.glsl" />
     <None Include="Shader\miss.rmiss" />
     <None Include="Shader\raygen.rgen" />
     <None Include="Shader\shader.frag" />
@@ -209,6 +210,7 @@
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
+    <ClInclude Include="SceneData.h" />
     <ClInclude Include="SceneRenderingPipeline.h" />
     <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="Texture.h" />

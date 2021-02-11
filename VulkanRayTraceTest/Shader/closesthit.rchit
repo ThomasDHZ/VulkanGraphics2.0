@@ -2,7 +2,10 @@
 #extension GL_EXT_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable
 
+#include "Lighting.glsl"
+
 layout(location = 0) rayPayloadInEXT vec3 hitValue;
+layout(location = 1) rayPayloadEXT vec3 ShadowhitValue;
 layout(location = 2) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
@@ -13,26 +16,6 @@ struct VertexData
 	vec2 UV;
 	vec3 Tangent;
 	vec3 BiTangent;
-};
-
-
-struct DirectionalLight
-{
-	vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-struct PointLight 
-{
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-	float constant;
-    float linear;
-    float quadratic;
 };
 
 struct MaterialInfo
@@ -157,20 +140,24 @@ void main()
 
 	 	const Material material = BuildMaterial(UV);
 
-	vec3 lightDir = normalize(-ubo.dlight.direction);
-	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
-
-	vec3 ambient = ubo.dlight.ambient *  material.DiffuseMap;
-    vec3 diffuse = ubo.dlight.diffuse * diff *   material.DiffuseMap;
- 
-	 hitValue = ambient + diffuse;
-
-
-
-//	 vec3 lightVector = normalize(ubo.dlight.direction);
-//	float dot_product = max(dot(lightVector, normal), 0.2);
-//	hitValue = vec3(0.7f) * dot_product;
+//	vec3 lightDir = normalize(-ubo.dlight.direction);
+//	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
 //
+//	vec3 ambient = ubo.dlight.ambient *  vec3(0.7f);
+//    vec3 diffuse = ubo.dlight.diffuse * diff *   vec3(0.7f);
+// 
+// 	vec3 halfwayDir = normalize(ubo.dlight.direction + ubo.viewPos);  
+//         float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+//		vec3 specular = ubo.dlight.specular * spec * vec3(1.0f);
+//	
+//	 hitValue = ambient + diffuse + specular;
+//
+
+
+	 vec3 lightVector = normalize(ubo.dlight.direction);
+	float dot_product = max(dot(lightVector, normal), 0.2);
+	hitValue = vec3(0.7f) * dot_product;
+
 
 
 
@@ -181,7 +168,7 @@ void main()
 
 
 	float spec = 0.0f;
-//  if(dot(normal, L) > 0)
+//  if(dot(normal, lightVector) > 0)
 //  {
 	// Shadow casting
 	float tmin = 0.001;
@@ -189,17 +176,11 @@ void main()
 	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 	shadowed = true;  
 	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
 	if (shadowed) {
 		hitValue *= 0.3f;
 	}
-	else
-	{
-		vec3 halfwayDir = normalize(ubo.dlight.direction + ubo.viewPos);  
-         spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
-		vec3 specular = ubo.dlight.specular * spec * material.Specular;
-		hitValue += specular;
-	}
+//	}
 
 
 }

@@ -5,5 +5,5 @@ layout(location = 0) rayPayloadInEXT vec3 hitValue;
 layout(binding = 10, set = 0) uniform samplerCube DiffuseMap;
 void main()
 {
-    hitValue = vec3(0.0f);
+    hitValue = texture(DiffuseMap, gl_WorldRayDirectionEXT).rgb;
 }

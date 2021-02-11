@@ -2,6 +2,8 @@
 #extension GL_EXT_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable
 
+#include "Lighting.glsl"
+
 layout(location = 0) rayPayloadInEXT vec3 hitValue;
 layout(location = 2) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
@@ -13,26 +15,6 @@ struct VertexData
 	vec2 UV;
 	vec3 Tangent;
 	vec3 BiTangent;
-};
-
-
-struct DirectionalLight
-{
-	vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
-struct PointLight 
-{
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-	float constant;
-    float linear;
-    float quadratic;
 };
 
 struct MaterialInfo

@@ -61,31 +61,11 @@ void RayTraceModel::LoadMesh(VulkanEngine& engine, TextureManager& textureManage
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-		Mesh ModelMesh{};
-		ModelMesh.vertices = LoadVertices(mesh);
-		ModelMesh.indices = LoadIndices(mesh);
-		ModelMesh.material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
-
-		ModelMesh.Transform = glm::mat4(1.0f);
-		ModelMesh.Transform = glm::translate(ModelMesh.Transform, glm::vec3(0.0f, 0.0f, 0.0f));
-		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		ModelMesh.Transform = glm::rotate(ModelMesh.Transform, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		ModelMesh.Transform = glm::transpose(ModelMesh.Transform);
-
-		ModelMesh.VertexCount = ModelMesh.vertices.size();
-		ModelMesh.IndexCount = ModelMesh.indices.size();
-		ModelMesh.TriangleCount = static_cast<uint32_t>(ModelMesh.indices.size()) / 3;
-
-		ModelMesh.VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelMesh.VertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.vertices.data());
-		ModelMesh.IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelMesh.IndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelMesh.indices.data());
-		ModelMesh.TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelMesh.Transform);
-
-		ModelMesh.VertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelMesh.VertexBuffer.Buffer);
-		ModelMesh.IndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelMesh.IndexBuffer.Buffer);
-		ModelMesh.TransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelMesh.TransformBuffer.Buffer);
-
-		MeshList.emplace_back(ModelMesh);
+		auto vertices = LoadVertices(mesh);
+		auto indices = LoadIndices(mesh);
+		auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
+		
+		MeshList.emplace_back(Mesh(engine, vertices, indices, material));
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -242,6 +222,14 @@ void RayTraceModel::Update()
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
 	ModelTransform = glm::transpose(ModelTransform);
+}
+
+void RayTraceModel::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
+{
+	for (auto mesh : MeshList)
+	{
+		mesh.Draw(commandBuffer, pipeline);
+	}
 }
 
 void RayTraceModel::Destory(VkDevice& device)

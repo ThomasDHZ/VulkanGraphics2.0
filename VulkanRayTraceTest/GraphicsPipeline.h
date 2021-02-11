@@ -16,6 +16,13 @@ struct DescriptorSetLayoutBindingInfo
 	VkShaderStageFlags StageFlags;
 };
 
+struct MeshInfo
+{
+	int MeshID;
+	int MaterialID;
+};
+
+
 class GraphicsPipeline
 {
 protected:
