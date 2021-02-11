@@ -22,6 +22,7 @@ struct Material
 	alignas(4) uint32_t DepthMapID = 0;
 	alignas(4) uint32_t AlphaMapID = 0;
 	alignas(4) uint32_t EmissionMapID = 0;
+	alignas(4) uint32_t ShadowMapID = 0;
 };
 
 struct MeshDetails

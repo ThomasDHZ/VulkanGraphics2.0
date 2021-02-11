@@ -19,6 +19,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int
 	TextureID = textureID;
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
+	TextureFormat = format;
 
 	LoadTexture(engine, TextureLocation, format);
 }
@@ -27,6 +28,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat for
 {
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
+	TextureFormat = format;
 
 	LoadTexture(engine, TextureLocation, format);
 }
@@ -327,6 +329,28 @@ void Texture::CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo Texture
 	}
 
 	vkBindImageMemory(engine.Device, Image, Memory, 0);
+}
+
+void Texture::UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout)
+{
+	VkImageMemoryBarrier imageMemoryBarrier{};
+	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	imageMemoryBarrier.oldLayout = oldImageLayout;
+	imageMemoryBarrier.newLayout = newImageLayout;
+	imageMemoryBarrier.image = Image;
+	imageMemoryBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	imageMemoryBarrier.srcAccessMask = 0;
+
+	vkCmdPipelineBarrier(
+		buffer,
+		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &imageMemoryBarrier);
 }
 
 void Texture::Delete(VulkanEngine& engine)

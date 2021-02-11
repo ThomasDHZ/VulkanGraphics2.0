@@ -25,6 +25,8 @@
 #include "CubeMapTexture.h"
 #include "TextureManager.h"
 #include "VulkanEngine.h"
+#include "RenderedColorTexture.h"
+#include "RenderedRayTracedColorTexture.h"
 
 struct RayTracingScratchBuffer
 {
@@ -33,12 +35,12 @@ struct RayTracingScratchBuffer
     VkDeviceMemory memory = VK_NULL_HANDLE;
 };
 
-struct StorageImage {
-    VkDeviceMemory memory = VK_NULL_HANDLE;
-    VkImage image = VK_NULL_HANDLE;
-    VkImageView view = VK_NULL_HANDLE;
-    VkFormat format;
-};
+//struct StorageImage {
+//    VkDeviceMemory memory = VK_NULL_HANDLE;
+//    VkImage image = VK_NULL_HANDLE;
+//    VkImageView view = VK_NULL_HANDLE;
+//    VkFormat format;
+//};
 
 struct AccelerationStructure {
     VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
@@ -82,8 +84,8 @@ private:
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
-    StorageImage storageImage;
-    StorageImage shadowStorageImage;
+    RenderedRayTracedColorTexture storageImage;
+    RenderedRayTracedColorTexture shadowStorageImage;
 
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
     VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
@@ -122,7 +124,6 @@ public:
 
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
-    void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
     void createSceneDataBuffer(VulkanEngine& engine);
@@ -143,14 +144,6 @@ public:
     uint32_t getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties);
     VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin);
     VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin);
-    void setImageLayout(
-        VkCommandBuffer cmdbuffer,
-        VkImage image,
-        VkImageLayout oldImageLayout,
-        VkImageLayout newImageLayout,
-        VkImageSubresourceRange subresourceRange,
-        VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-        VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
     VkPipelineShaderStageCreateInfo loadShader(VulkanEngine& engine, std::string fileName, VkShaderStageFlagBits stage);
     VkShaderModule loadShader(VulkanEngine& engine, const char* fileName, VkDevice device);
     uint32_t alignedSize(uint32_t value, uint32_t alignment);

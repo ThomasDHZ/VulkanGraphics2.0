@@ -31,6 +31,7 @@ struct MaterialInfo
 	uint DepthMapID;
 	uint AlphaMapID;
 	uint EmissionMapID;
+		uint ShadowMapID;
 };
 
 struct Material
@@ -47,6 +48,7 @@ struct Material
 	vec3 DepthMap;
 	vec3 AlphaMap;
 	vec3 EmissionMap;
+		vec3 ShadowMap;
 };
 
 layout(binding = 0) uniform accelerationStructureEXT topLevelAS;

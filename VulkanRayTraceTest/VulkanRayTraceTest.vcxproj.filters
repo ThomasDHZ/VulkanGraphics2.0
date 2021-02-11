@@ -117,6 +117,9 @@
     <ClCompile Include="SceneRenderingPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderedRayTracedColorTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -141,6 +144,9 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\Lighting.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\RasterShadowClosestHit.rchit">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -248,6 +254,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SceneData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedRayTracedColorTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

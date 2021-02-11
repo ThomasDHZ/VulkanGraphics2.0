@@ -33,6 +33,7 @@ struct MaterialInfo
 	uint DepthMapID;
 	uint AlphaMapID;
 	uint EmissionMapID;
+	uint ShadowMapID;
 };
 
 struct Material
@@ -49,6 +50,7 @@ struct Material
 	vec3 DepthMap;
 	vec3 AlphaMap;
 	vec3 EmissionMap;
+	vec3 ShadowMap;
 };
 
 layout(binding = 0) uniform UniformBufferObject {
@@ -90,6 +92,7 @@ Material BuildMaterial()
 	material.NormalMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].NormalMapID], UV));
 	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].AlphaMapID], UV));
 	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].EmissionMapID], UV));
+	material.ShadowMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].ShadowMapID], UV));
 	return material;
 }
 
@@ -108,5 +111,15 @@ void main()
     float spec = pow(max(dot(Normal, halfwayDir), 0.0), material.Shininess);
     vec3 specular = scenedata.dlight.specular * spec * material.SpecularMap;
 
-	 outColor = vec4(ambient + diffuse + specular, 1.0f);
+	vec3 color = ambient + diffuse;
+
+	if(material.ShadowMap == vec3(1.0f, 0.0f, 0.0f))
+	{
+		color *= 0.3f;
+	}
+	else
+	{
+		color += specular;
+	}
+	 outColor = vec4(color, 1.0f);
 }
