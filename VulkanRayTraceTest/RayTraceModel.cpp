@@ -8,12 +8,12 @@ RayTraceModel::RayTraceModel()
 
 RayTraceModel::RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList));
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0));
 }
 
 RayTraceModel::RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material));
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, 0));
 }
 
 RayTraceModel::RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
@@ -65,7 +65,7 @@ void RayTraceModel::LoadMesh(VulkanEngine& engine, TextureManager& textureManage
 		auto indices = LoadIndices(mesh);
 		auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
 		
-		MeshList.emplace_back(Mesh(engine, vertices, indices, material));
+		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)

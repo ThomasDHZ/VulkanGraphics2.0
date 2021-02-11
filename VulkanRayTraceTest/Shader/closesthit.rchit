@@ -116,7 +116,7 @@ Material BuildMaterial(vec2 UV)
 	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].AlphaMapID], UV));
 	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].EmissionMapID], UV));
 	return material;
-};
+}
 
 void main()
 {
@@ -140,26 +140,23 @@ void main()
 
 	 	const Material material = BuildMaterial(UV);
 
-//	vec3 lightDir = normalize(-ubo.dlight.direction);
-//	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
-//
-//	vec3 ambient = ubo.dlight.ambient *  vec3(0.7f);
-//    vec3 diffuse = ubo.dlight.diffuse * diff *   vec3(0.7f);
-// 
-// 	vec3 halfwayDir = normalize(ubo.dlight.direction + ubo.viewPos);  
-//         float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
-//		vec3 specular = ubo.dlight.specular * spec * vec3(1.0f);
-//	
-//	 hitValue = ambient + diffuse + specular;
-//
+	vec3 lightDir = normalize(-ubo.dlight.direction);
+	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
 
-
-	 vec3 lightVector = normalize(ubo.dlight.direction);
-	float dot_product = max(dot(lightVector, normal), 0.2);
-	hitValue = vec3(0.7f) * dot_product;
+	vec3 ambient = ubo.dlight.ambient *  material.DiffuseMap;
+    vec3 diffuse = ubo.dlight.diffuse * diff *   material.DiffuseMap;
+ 
+ 	vec3 halfwayDir = normalize(ubo.dlight.direction + ubo.viewPos);  
+         float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
+		vec3 specular = ubo.dlight.specular * spec * material.SpecularMap;
+	
+	 hitValue = ambient + diffuse + specular;
 
 
 
+//	 vec3 lightVector = normalize(ubo.dlight.direction);
+//	float dot_product = max(dot(lightVector, normal), 0.2);
+//	hitValue = vec3(0.7f) * dot_product;
 
 
 
@@ -167,19 +164,22 @@ void main()
 
 
 
-	float spec = 0.0f;
-//  if(dot(normal, lightVector) > 0)
-//  {
-	// Shadow casting
-	float tmin = 0.001;
-	float tmax = 10000.0;
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	shadowed = true;  
-	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
-	if (shadowed) {
-		hitValue *= 0.3f;
-	}
+
+
+
+//	float spec = 0.0f;
+////  if(dot(normal, lightVector) > 0)
+////  {
+//	// Shadow casting
+//	float tmin = 0.001;
+//	float tmax = 10000.0;
+//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+//	shadowed = true;  
+//	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
+//	if (shadowed) {
+//		hitValue *= 0.3f;
+//	}
 //	}
 
 

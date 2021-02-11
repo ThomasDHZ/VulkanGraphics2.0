@@ -52,6 +52,7 @@ public:
 		VulkanBuffer TransformBuffer;
 		VulkanBuffer MaterialBuffer;
 	
+		uint32_t MeshID;
 		uint32_t TriangleCount;
 		uint32_t VertexCount;
 		uint32_t IndexCount;
@@ -61,8 +62,8 @@ public:
 		VkDeviceOrHostAddressConstKHR TransformBufferDeviceAddress{};
 
 	Mesh();
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial, uint32_t meshID);
 	~Mesh();
 
 	//void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

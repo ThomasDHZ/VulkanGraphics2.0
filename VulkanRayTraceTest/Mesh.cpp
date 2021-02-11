@@ -5,8 +5,9 @@ Mesh::Mesh()
 }
 
 
-Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID)
 {
+	MeshID = meshID;
 	vertices = VertexList;
 	indices = IndexList;
 
@@ -27,8 +28,9 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	TransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(TransformBuffer.Buffer);
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial, uint32_t meshID)
 {
+	MeshID = meshID;
 	vertices = VertexList;
 	indices = IndexList;
 	material = MeshMaterial;
@@ -90,7 +92,7 @@ Mesh::~Mesh()
 void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
 {
 	MeshInfo meshInfo;
-	meshInfo.MeshID = 0;
+	meshInfo.MeshID = MeshID;
 	meshInfo.MaterialID = 0;
 
 	VkBuffer vertexBuffers[] = { VertexBuffer.Buffer };

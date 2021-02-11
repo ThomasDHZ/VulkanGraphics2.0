@@ -65,7 +65,7 @@ layout(binding = 0) uniform UniformBufferObject {
 //layout(binding = 1, set = 0, rgba8) uniform image2D image;
 //layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 //layout(binding = 4) buffer Indices { uint i[]; } indices[];
-//layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
+layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
 layout(binding = 6) uniform sampler2D TextureMap[];
 //layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
 
@@ -76,34 +76,37 @@ layout(location = 2) in vec2 UV;
 
 layout(location = 0) out vec4 outColor;
 
-void main() {
 
-//	vec3 lightDir = normalize(-scenedata.dlight.direction);
-//	float diff = max(dot(scenedata.dlight.direction, lightDir), 0.0);
-//
-//	vec3 ambient = scenedata.dlight.ambient *  vec3(0.7f);
-//    vec3 diffuse = scenedata.dlight.diffuse * diff *   vec3(0.7f);
-// 
-// 	vec3 halfwayDir = normalize(scenedata.dlight.direction + scenedata.viewPos);  
-//    float spec = pow(max(dot(Normal, halfwayDir), 0.0), 32.0f);
-//    vec3 specular = scenedata.dlight.specular * spec * 1.0f;
-		
-//	vec3 color = vec3(1.0f);
-//	if(Mesh.MeshID == 0)
-//	{
-//		color = vec3(1.0f, 0.0f, 0.0f);
-//	}
-//	if(Mesh.MeshID == 1)
-//	{
-//		color = vec3(0.0f, 1.0f, 0.0f);
-//	}
-//	if(Mesh.MeshID == 2)
-//	{
-//		color = vec3(0.0f, 0.0f, 1.0f);
-//	}
-//	 vec3 lightVector = normalize(scenedata.dlight.direction);
-//	float dot_product = max(dot(lightVector, Normal), 0.2);
-//	outColor = vec4(color * dot_product, 1.0f);
+Material BuildMaterial()
+{
+	Material material;
+	material.Ambient = MaterialList.materialInfo[Mesh.MeshID].Ambient;
+	material.Diffuse = MaterialList.materialInfo[Mesh.MeshID].Diffuse;
+	material.Specular = MaterialList.materialInfo[Mesh.MeshID].Specular;
+	material.Shininess = MaterialList.materialInfo[Mesh.MeshID].Shininess;
+	material.Reflectivness = MaterialList.materialInfo[Mesh.MeshID].Reflectivness;
+	material.DiffuseMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].DiffuseMapID], UV));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].SpecularMapID], UV));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].NormalMapID], UV));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].AlphaMapID], UV));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].EmissionMapID], UV));
+	return material;
+}
 
-	 outColor = texture(TextureMap[Mesh.MaterialID], UV);
+void main() 
+{
+
+	Material material = BuildMaterial();
+
+	vec3 lightDir = normalize(-scenedata.dlight.direction);
+	float diff = max(dot(scenedata.dlight.direction, lightDir), 0.0);
+
+	vec3 ambient = scenedata.dlight.ambient *  material.DiffuseMap;
+    vec3 diffuse = scenedata.dlight.diffuse * diff *   material.DiffuseMap;
+ 
+ 	vec3 halfwayDir = normalize(scenedata.dlight.direction + scenedata.viewPos);  
+    float spec = pow(max(dot(Normal, halfwayDir), 0.0), material.Shininess);
+    vec3 specular = scenedata.dlight.specular * spec * material.SpecularMap;
+
+	 outColor = vec4(ambient + diffuse + specular, 1.0f);
 }

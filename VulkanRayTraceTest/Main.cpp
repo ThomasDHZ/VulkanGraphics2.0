@@ -89,7 +89,8 @@ private:
 
     std::shared_ptr<PerspectiveCamera> camera;
     std::vector<RayTraceModel> ModelList;
-    
+    VulkanBuffer MaterialBuffer;
+
     VkDescriptorPool descriptorPool;
     VkDescriptorSetLayout descriptorSetLayout;
     std::vector<VkDescriptorSet> descriptorSets;
@@ -108,18 +109,11 @@ private:
         engine = VulkanEngine(window.GetWindowPtr());
 
         textureManager = TextureManager();
-        textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
-        textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-        textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/container2.png", VK_FORMAT_R8G8B8A8_UNORM);
+        ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
         createDescriptorSetLayout();
         RenderPass = MainRenderPass(engine, descriptorSetLayout);
-
         interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
-
-        ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.obj"));
-
-
 
         SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
         createDescriptorPool();
@@ -228,6 +222,13 @@ private:
         uboLayoutBinding.pImmutableSamplers = nullptr;
         uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
+        VkDescriptorSetLayoutBinding MaterialLayoutBinding{};
+        MaterialLayoutBinding.binding = 5;
+        MaterialLayoutBinding.descriptorCount = 1;
+        MaterialLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        MaterialLayoutBinding.pImmutableSamplers = nullptr;
+        MaterialLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
         VkDescriptorSetLayoutBinding samplerLayoutBinding{};
         samplerLayoutBinding.binding = 6;
         samplerLayoutBinding.descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
@@ -235,7 +236,7 @@ private:
         samplerLayoutBinding.pImmutableSamplers = nullptr;
         samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
+        std::array<VkDescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, MaterialLayoutBinding, samplerLayoutBinding };
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -276,6 +277,17 @@ private:
             throw std::runtime_error("failed to allocate descriptor sets!");
         }
 
+        std::vector<Material> MaterialList;
+        for (int x = 0; x < ModelList.size(); x++)
+        {
+            for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+            {
+                MaterialList.emplace_back(ModelList[x].MeshList[y].material);
+            }
+        }
+        MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material) * MaterialList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, MaterialList.data());
+
+
         for (size_t i = 0; i < engine.SwapChain.SwapChainImages.size(); i++) {
             VkDescriptorBufferInfo bufferInfo{};
             bufferInfo.buffer = SceneData->SceneDataBuffer.Buffer;
@@ -287,7 +299,7 @@ private:
             imageInfo.imageView = textureManager.GetTexture(0)->GetTextureView();
             imageInfo.sampler = textureManager.GetTexture(0)->GetTextureSampler();
 
-            std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+            std::array<VkWriteDescriptorSet, 3> descriptorWrites{};
 
             descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[0].dstSet = descriptorSets[i];
@@ -297,6 +309,17 @@ private:
             descriptorWrites[0].descriptorCount = 1;
             descriptorWrites[0].pBufferInfo = &bufferInfo;
 
+            VkDescriptorBufferInfo MaterialBufferInfo = {};
+            MaterialBufferInfo.buffer = MaterialBuffer.Buffer;
+            MaterialBufferInfo.offset = 0;
+            MaterialBufferInfo.range = VK_WHOLE_SIZE;
+
+            descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[1].dstSet = descriptorSets[i];
+            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            descriptorWrites[1].dstBinding = 5;
+            descriptorWrites[1].pBufferInfo = &MaterialBufferInfo;
+            descriptorWrites[1].descriptorCount = 1;
 
             std::vector<VkDescriptorImageInfo> DiffuseMapInfoList;
             for (auto texture : textureManager.GetTextureList())
@@ -307,13 +330,13 @@ private:
                 DiffuseMapImage.sampler = texture->GetTextureSampler();
                 DiffuseMapInfoList.emplace_back(DiffuseMapImage);
             }
-            descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[1].dstSet = descriptorSets[i];
-            descriptorWrites[1].dstBinding = 6;
-            descriptorWrites[1].dstArrayElement = 0;
-            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            descriptorWrites[1].descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
-            descriptorWrites[1].pImageInfo = DiffuseMapInfoList.data();
+            descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[2].dstSet = descriptorSets[i];
+            descriptorWrites[2].dstBinding = 6;
+            descriptorWrites[2].dstArrayElement = 0;
+            descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[2].descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
+            descriptorWrites[2].pImageInfo = DiffuseMapInfoList.data();
 
             vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
