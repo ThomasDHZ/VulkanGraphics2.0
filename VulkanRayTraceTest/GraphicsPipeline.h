@@ -42,4 +42,6 @@ public:
 
 	void UpdateSwapChain(VulkanEngine& renderer);
 	void Destroy(VulkanEngine& renderer);
+
+	VkDescriptorSetLayout CreateDescriptorSetLayout(VulkanEngine& renderer, std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo);
 };

@@ -113,13 +113,13 @@ void main()
 
 	vec3 color = ambient + diffuse;
 
-	if(material.ShadowMap == vec3(1.0f, 0.0f, 0.0f))
-	{
-		color *= 0.3f;
-	}
-	else
-	{
-		color += specular;
-	}
+//	if(material.ShadowMap == vec3(1.0f, 0.0f, 0.0f))
+//	{
+//		color *= 0.3f;
+//	}
+//	else
+//	{
+//		color += specular;
+//	}
 	 outColor = vec4(color, 1.0f);
 }

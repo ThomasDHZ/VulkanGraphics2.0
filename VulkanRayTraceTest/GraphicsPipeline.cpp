@@ -49,6 +49,37 @@ VkShaderModule GraphicsPipeline::CreateShaderModule(VulkanEngine& renderer, cons
 	return shaderModule;
 }
 
+VkDescriptorSetLayout GraphicsPipeline::CreateDescriptorSetLayout(VulkanEngine& renderer, std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo)
+{
+
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindingList = {};
+
+	for (auto Binding : LayoutBindingInfo)
+	{
+		VkDescriptorSetLayoutBinding LayoutBinding = {};
+		LayoutBinding.binding = Binding.Binding;
+		LayoutBinding.descriptorCount = 1;
+		LayoutBinding.descriptorType = Binding.DescriptorType;
+		LayoutBinding.pImmutableSamplers = nullptr;
+		LayoutBinding.stageFlags = Binding.StageFlags;
+
+		LayoutBindingList.emplace_back(LayoutBinding);
+	}
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = static_cast<uint32_t>(LayoutBindingList.size());
+	layoutInfo.pBindings = LayoutBindingList.data();
+
+	VkDescriptorSetLayout layout;
+	if (vkCreateDescriptorSetLayout(renderer.Device, &layoutInfo, nullptr, &layout) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor set layout!");
+	}
+
+	return layout;
+}
+
+
 void GraphicsPipeline::CreatePipeLineLayout(VulkanEngine& renderer, VkPipelineLayoutCreateInfo PipelineLayoutInfo)
 {
 	if (vkCreatePipelineLayout(renderer.Device, &PipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)

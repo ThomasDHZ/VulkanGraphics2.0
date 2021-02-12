@@ -84,8 +84,8 @@ private:
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
-    RenderedRayTracedColorTexture storageImage;
-    RenderedRayTracedColorTexture shadowStorageImage;
+    std::shared_ptr<RenderedRayTracedColorTexture> storageImage;
+    std::shared_ptr<RenderedRayTracedColorTexture> shadowStorageImage;
 
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
     VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
@@ -109,7 +109,7 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList);
+    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList, std::shared_ptr<RenderedRayTracedColorTexture> storageImage, std::shared_ptr<RenderedRayTracedColorTexture> shadowStorageImage);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);

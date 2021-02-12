@@ -26,6 +26,7 @@
 #include "VulkanWindow.h"
 #include "VulkanEngine.h"
 #include "MainRenderPass.h"
+#include "FrameBufferRenderPass.h"
 
 const uint32_t WIDTH = 1920;
 const uint32_t HEIGHT = 1080;
@@ -81,6 +82,7 @@ private:
     VulkanWindow window;
     VulkanEngine engine;
     RayTraceRenderer RayRenderer;
+    FrameBufferRenderPass frameBufferRenderPass;
     InterfaceRenderPass interfaceRenderPass;
     MainRenderPass RenderPass;
     Keyboard keyboard;
@@ -98,6 +100,8 @@ private:
     std::vector<VkCommandBuffer> commandBuffers;
     std::shared_ptr<SceneDataStruct> SceneData;
 
+    std::shared_ptr<RenderedRayTracedColorTexture> storageImage;
+    std::shared_ptr<RenderedRayTracedColorTexture> shadowStorageImage;
 
     size_t currentFrame = 0;
 
@@ -109,10 +113,17 @@ private:
         engine = VulkanEngine(window.GetWindowPtr());
 
         textureManager = TextureManager();
+        storageImage = std::make_shared<RenderedRayTracedColorTexture>(engine);
+        shadowStorageImage = std::make_shared<RenderedRayTracedColorTexture>(engine);
+
+        textureManager.AddTexture(engine, storageImage);
+        textureManager.AddTexture(engine, shadowStorageImage);
+
         ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
         createDescriptorSetLayout();
         RenderPass = MainRenderPass(engine, descriptorSetLayout);
+        frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(0));
         interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
 
         SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
@@ -133,7 +144,7 @@ private:
         SceneData->SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
         SceneData->SceneData.plight.specular = glm::vec4(1.0f);
 
-        RayRenderer = RayTraceRenderer(engine, textureManager, ModelList);
+        RayRenderer = RayTraceRenderer(engine, textureManager, ModelList, storageImage, shadowStorageImage);
     }
 
     void mainLoop() {
@@ -387,6 +398,8 @@ private:
             }
 
             vkCmdEndRenderPass(commandBuffers[i]);
+            frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
+
 
             if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to record command buffer!");

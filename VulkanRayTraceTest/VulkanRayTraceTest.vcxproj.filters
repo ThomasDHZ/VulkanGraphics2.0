@@ -120,6 +120,12 @@
     <ClCompile Include="RenderedRayTracedColorTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBufferRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferRenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -147,6 +153,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\RasterShadowClosestHit.rchit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\FrameBufferShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\FrameBufferShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -257,6 +269,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderedRayTracedColorTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

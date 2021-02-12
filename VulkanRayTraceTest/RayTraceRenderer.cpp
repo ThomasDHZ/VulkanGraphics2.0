@@ -9,8 +9,11 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList, std::shared_ptr<RenderedRayTracedColorTexture> StorageImage, std::shared_ptr<RenderedRayTracedColorTexture> ShadowStorageImage)
 {
+    storageImage = StorageImage;
+    shadowStorageImage = ShadowStorageImage;
+
     textureManager = textureManagerz;
     ModelList = modelList;
 
@@ -65,9 +68,6 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
         }
     }
    createTopLevelAccelerationStructure(engine);
-   storageImage = RenderedRayTracedColorTexture(engine);
-   shadowStorageImage = RenderedRayTracedColorTexture(engine);
-
    createRayTracingPipeline(engine);
    createShaderBindingTable(engine);
    createSceneDataBuffer(engine);
@@ -600,7 +600,7 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     AccelerationDesciptorSet.pNext = &AccelerationDescriptorStructure;
 
     VkDescriptorImageInfo RayTraceImageDescriptor{};
-    RayTraceImageDescriptor.imageView = storageImage.View;
+    RayTraceImageDescriptor.imageView = storageImage->View;
     RayTraceImageDescriptor.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
     VkWriteDescriptorSet ImageDescriptorSet{};
@@ -703,7 +703,7 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     DiffuseMapDescriptor.pImageInfo = DiffuseMapInfoList.data();
 
     VkDescriptorImageInfo ShadowRayTraceImageDescriptor{};
-    ShadowRayTraceImageDescriptor.imageView = shadowStorageImage.View;
+    ShadowRayTraceImageDescriptor.imageView = shadowStorageImage->View;
     ShadowRayTraceImageDescriptor.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 
     VkWriteDescriptorSet ImageDescriptorSet2{};
@@ -813,7 +813,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
         barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier2.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
         barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        barrier2.image = storageImage.Image;
+        barrier2.image = storageImage->Image;
         barrier2.subresourceRange = subresourceRange;
         barrier2.srcAccessMask = 0;
         barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
@@ -826,7 +826,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
         copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
         copyRegion.dstOffset = { 0, 0, 0 };
         copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
-        vkCmdCopyImage(drawCmdBuffers[i], storageImage.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+        vkCmdCopyImage(drawCmdBuffers[i], storageImage->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 
         VkImageMemoryBarrier barrier3 = {};
@@ -844,7 +844,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
         barrier4.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier4.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         barrier4.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-        barrier4.image = storageImage.Image;
+        barrier4.image = storageImage->Image;
         barrier4.subresourceRange = subresourceRange;
         barrier4.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
         barrier4.dstAccessMask = 0;
@@ -855,10 +855,10 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
 }
 void RayTraceRenderer::Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height)
 {
-    storageImage.RecreateRendererTexture(engine);
-    shadowStorageImage.RecreateRendererTexture(engine);
+    storageImage->RecreateRendererTexture(engine);
+    shadowStorageImage->RecreateRendererTexture(engine);
 
-    VkDescriptorImageInfo storageImageDescriptor{ VK_NULL_HANDLE, storageImage.View, VK_IMAGE_LAYOUT_GENERAL };
+    VkDescriptorImageInfo storageImageDescriptor{ VK_NULL_HANDLE, storageImage->View, VK_IMAGE_LAYOUT_GENERAL };
 
     VkWriteDescriptorSet writeDescriptorSet{};
     writeDescriptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
