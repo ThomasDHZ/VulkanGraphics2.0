@@ -119,7 +119,7 @@ void main()
 //	}
 //	else
 //	{
-//		color += specular;
+		color += specular;
 //	}
 	 outColor = vec4(color, 1.0f);
 }
