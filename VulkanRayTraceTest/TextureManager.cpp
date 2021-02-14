@@ -19,12 +19,6 @@ uint32_t TextureManager::LoadTexture(VulkanEngine& engine, const std::string Tex
 	return TextureID;
 }
 
-void TextureManager::AddTexture(VulkanEngine& engine, std::shared_ptr<Texture> texture)
-{
-	texture->TextureID = TextureList.size();
-	TextureList.emplace_back(texture);
-}
-
 void TextureManager::LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles)
 {
 	CubeMap = CubeMapTexture(engine, CubeMapFiles, 0);

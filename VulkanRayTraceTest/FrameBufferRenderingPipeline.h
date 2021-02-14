@@ -12,4 +12,3 @@ public:
 
 	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, VkDescriptorSetLayout layout);
 };
-

@@ -12,7 +12,7 @@ class FrameBufferRenderPass
 {
 private:
 
-	 std::vector<Vertex> FrameBufferVertices =
+	std::vector<Vertex> FrameBufferVertices =
 	{
 		{{1.0f, 1.0f, 0.0f},   {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}},
 		{{1.0f, -1.0f, 0.0f},  {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}},
@@ -20,8 +20,8 @@ private:
 		{{-1.0f, 1.0f, 0.0f},  {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}},
 	};
 
-	 std::vector<uint32_t> FrameBufferIndices = {
-		0, 1, 3, 1, 2, 3
+	std::vector<uint32_t> FrameBufferIndices = {
+	   0, 1, 3, 1, 2, 3
 	};
 
 	Mesh mesh;

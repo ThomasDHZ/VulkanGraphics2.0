@@ -27,7 +27,6 @@
 #include "VulkanEngine.h"
 #include "MainRenderPass.h"
 #include "FrameBufferRenderPass.h"
-#include "Renderer.h"
 
 const uint32_t WIDTH = 1920;
 const uint32_t HEIGHT = 1080;
@@ -82,21 +81,25 @@ private:
 
     VulkanWindow window;
     VulkanEngine engine;
+    RayTraceRenderer RayRenderer;
+    InterfaceRenderPass interfaceRenderPass;
+    MainRenderPass RenderPass;
     Keyboard keyboard;
     Mouse mouse;
     TextureManager textureManager;
 
-    Renderer renderer;
+    FrameBufferRenderPass frameBufferRenderPass;
 
+    std::shared_ptr<PerspectiveCamera> camera;
     std::vector<RayTraceModel> ModelList;
     VulkanBuffer MaterialBuffer;
-    std::shared_ptr<PerspectiveCamera> camera;
-    std::shared_ptr<SceneDataStruct> SceneData;
 
+    VkDescriptorPool descriptorPool;
+    VkDescriptorSetLayout descriptorSetLayout;
+    std::vector<VkDescriptorSet> descriptorSets;
 
     std::vector<VkCommandBuffer> commandBuffers;
-
-
+    std::shared_ptr<SceneDataStruct> SceneData;
 
 
     size_t currentFrame = 0;
@@ -109,15 +112,16 @@ private:
         engine = VulkanEngine(window.GetWindowPtr());
 
         textureManager = TextureManager();
-
-
         ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+
+        createDescriptorSetLayout();
+        RenderPass = MainRenderPass(engine, descriptorSetLayout);
+        interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
+        frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
+
         SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
-
-
-        renderer = Renderer(engine, window, textureManager, ModelList);
-    
-        renderer.SetUpDescriptorSets(engine, textureManager, ModelList, MaterialBuffer, SceneData);
+        createDescriptorPool();
+        createDescriptorSets();
         createCommandBuffers();
 
         camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -133,6 +137,7 @@ private:
         SceneData->SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
         SceneData->SceneData.plight.specular = glm::vec4(1.0f);
 
+        RayRenderer = RayTraceRenderer(engine, textureManager, ModelList);
     }
 
     void mainLoop() {
@@ -173,12 +178,12 @@ private:
             model.Destory(engine.Device);
         }
         textureManager.Destory(engine);
-        renderer.interfaceRenderPass.Destroy(engine.Device);
-        renderer.RenderPass.Destroy(engine);
-        renderer.RayRenderer.Destory(engine);
+        interfaceRenderPass.Destroy(engine.Device);
+        RenderPass.Destroy(engine);
+        RayRenderer.Destory(engine);
 
-        vkDestroyDescriptorPool(engine.Device, renderer.descriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, renderer.descriptorSetLayout, nullptr);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
 
         engine.Destroy();
         window.Destroy();
@@ -199,21 +204,150 @@ private:
         }
 
         vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
-        vkDestroyDescriptorPool(engine.Device, renderer.descriptorPool, nullptr);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
 
-        renderer.SetUpDescriptorPool(engine);
-        renderer.SetUpDescriptorSets(engine, textureManager, ModelList, MaterialBuffer, SceneData);
+        createDescriptorPool();
+        createDescriptorSets();
 
         engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
-        renderer.RenderPass.UpdateSwapChain(engine, renderer.descriptorSetLayout);
-        renderer.interfaceRenderPass.UpdateSwapChain(engine.Device, engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
-        renderer.RayRenderer.Resize(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height);
+        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        interfaceRenderPass.UpdateSwapChain(engine.Device, engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
+        RayRenderer.Resize(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height);
 
         createCommandBuffers();
     }
 
+
+    void createDescriptorSetLayout() {
+        VkDescriptorSetLayoutBinding uboLayoutBinding{};
+        uboLayoutBinding.binding = 0;
+        uboLayoutBinding.descriptorCount = 1;
+        uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        uboLayoutBinding.pImmutableSamplers = nullptr;
+        uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        VkDescriptorSetLayoutBinding MaterialLayoutBinding{};
+        MaterialLayoutBinding.binding = 5;
+        MaterialLayoutBinding.descriptorCount = 1;
+        MaterialLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+        MaterialLayoutBinding.pImmutableSamplers = nullptr;
+        MaterialLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+        samplerLayoutBinding.binding = 6;
+        samplerLayoutBinding.descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
+        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
+        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        std::array<VkDescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, MaterialLayoutBinding, samplerLayoutBinding };
+        VkDescriptorSetLayoutCreateInfo layoutInfo{};
+        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+        layoutInfo.pBindings = bindings.data();
+
+        if (vkCreateDescriptorSetLayout(engine.Device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create descriptor set layout!");
+        }
+    }
+
+    void createDescriptorPool() {
+        std::array<VkDescriptorPoolSize, 2> poolSizes{};
+        poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSizes[0].descriptorCount = static_cast<uint32_t>(engine.SwapChain.SwapChainImages.size());
+        poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[1].descriptorCount = static_cast<uint32_t>(engine.SwapChain.SwapChainImages.size());
+        VkDescriptorPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+        poolInfo.pPoolSizes = poolSizes.data();
+        poolInfo.maxSets = static_cast<uint32_t>(engine.SwapChain.SwapChainImages.size());
+
+        if (vkCreateDescriptorPool(engine.Device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create descriptor pool!");
+        }
+    }
+
+    void createDescriptorSets() {
+        std::vector<VkDescriptorSetLayout> layouts(engine.SwapChain.SwapChainImages.size(), descriptorSetLayout);
+        VkDescriptorSetAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool = descriptorPool;
+        allocInfo.descriptorSetCount = static_cast<uint32_t>(engine.SwapChain.SwapChainImages.size());
+        allocInfo.pSetLayouts = layouts.data();
+
+        descriptorSets.resize(engine.SwapChain.SwapChainImages.size());
+        if (vkAllocateDescriptorSets(engine.Device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate descriptor sets!");
+        }
+
+        std::vector<Material> MaterialList;
+        for (int x = 0; x < ModelList.size(); x++)
+        {
+            for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+            {
+                MaterialList.emplace_back(ModelList[x].MeshList[y].material);
+            }
+        }
+        MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material) * MaterialList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, MaterialList.data());
+
+
+        for (size_t i = 0; i < engine.SwapChain.SwapChainImages.size(); i++) {
+            VkDescriptorBufferInfo bufferInfo{};
+            bufferInfo.buffer = SceneData->SceneDataBuffer.Buffer;
+            bufferInfo.offset = 0;
+            bufferInfo.range = sizeof(SceneDataBufferData);
+
+            VkDescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            imageInfo.imageView = textureManager.GetTexture(0)->GetTextureView();
+            imageInfo.sampler = textureManager.GetTexture(0)->GetTextureSampler();
+
+            std::array<VkWriteDescriptorSet, 3> descriptorWrites{};
+
+            descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[0].dstSet = descriptorSets[i];
+            descriptorWrites[0].dstBinding = 0;
+            descriptorWrites[0].dstArrayElement = 0;
+            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[0].descriptorCount = 1;
+            descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+            VkDescriptorBufferInfo MaterialBufferInfo = {};
+            MaterialBufferInfo.buffer = MaterialBuffer.Buffer;
+            MaterialBufferInfo.offset = 0;
+            MaterialBufferInfo.range = VK_WHOLE_SIZE;
+
+            descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[1].dstSet = descriptorSets[i];
+            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            descriptorWrites[1].dstBinding = 5;
+            descriptorWrites[1].pBufferInfo = &MaterialBufferInfo;
+            descriptorWrites[1].descriptorCount = 1;
+
+            std::vector<VkDescriptorImageInfo> DiffuseMapInfoList;
+            for (auto texture : textureManager.GetTextureList())
+            {
+                VkDescriptorImageInfo DiffuseMapImage = {};
+                DiffuseMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                DiffuseMapImage.imageView = texture->GetTextureView();
+                DiffuseMapImage.sampler = texture->GetTextureSampler();
+                DiffuseMapInfoList.emplace_back(DiffuseMapImage);
+            }
+            descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[2].dstSet = descriptorSets[i];
+            descriptorWrites[2].dstBinding = 6;
+            descriptorWrites[2].dstArrayElement = 0;
+            descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[2].descriptorCount = static_cast<uint32_t>(textureManager.GetTextureList().size());
+            descriptorWrites[2].pImageInfo = DiffuseMapInfoList.data();
+
+            vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+        }
+    }
+
     void createCommandBuffers() {
-        commandBuffers.resize(renderer.RenderPass.SwapChainFramebuffers.size());
+        commandBuffers.resize(RenderPass.SwapChainFramebuffers.size());
 
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -235,8 +369,8 @@ private:
 
             VkRenderPassBeginInfo renderPassInfo{};
             renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderPassInfo.renderPass = renderer.RenderPass.RenderPass;
-            renderPassInfo.framebuffer = renderer.RenderPass.SwapChainFramebuffers[i];
+            renderPassInfo.renderPass = RenderPass.RenderPass;
+            renderPassInfo.framebuffer = RenderPass.SwapChainFramebuffers[i];
             renderPassInfo.renderArea.offset = { 0, 0 };
             renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
 
@@ -248,18 +382,16 @@ private:
             renderPassInfo.pClearValues = clearValues.data();
 
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer.RenderPass.forwardRendereringPipeline->ShaderPipeline);
-            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer.RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &renderer.descriptorSets[i], 0, nullptr);
+            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
+            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 
             for (auto model : ModelList)
             {
-                model.Draw(commandBuffers[i], renderer.RenderPass.forwardRendereringPipeline);
+                model.Draw(commandBuffers[i], RenderPass.forwardRendereringPipeline);
             }
 
             vkCmdEndRenderPass(commandBuffers[i]);
-           // frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
-
-
+        //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
             if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to record command buffer!");
             }
@@ -303,8 +435,8 @@ private:
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-        renderer.interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
-        renderer.RayRenderer.updateUniformBuffers(engine, window.GetWindowPtr(), SceneData->SceneData, camera);
+        interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
+        RayRenderer.updateUniformBuffers(engine, window.GetWindowPtr(), SceneData->SceneData, camera);
         updateUniformBuffer(imageIndex);
 
         if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
@@ -319,12 +451,12 @@ private:
         if (!RayTraceSwitch)
         {
             CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
-            CommandBufferSubmitList.emplace_back(renderer.interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+            CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
         }
         else
         {
-           CommandBufferSubmitList.emplace_back(renderer.RayRenderer.drawCmdBuffers[imageIndex]);
-            CommandBufferSubmitList.emplace_back(renderer.interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+            CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
+            CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
         }
 
         VkSubmitInfo submitInfo{};

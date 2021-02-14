@@ -26,12 +26,16 @@ public:
 
 	void SetUpDescriptorPool(VulkanEngine& engine);
 	void SetUpDescriptorLayout(VulkanEngine& engine, TextureManager& textureManager);
-	void SetUpDescriptorSets(VulkanEngine& engine, TextureManager& textureManager, std::vector<RayTraceModel>& ModelList, VulkanBuffer& MaterialBuffer, std::shared_ptr<SceneDataStruct>& SceneData);
+	void SetUpDescriptorSets(VulkanEngine& engine, TextureManager& textureManager, std::vector<RayTraceModel>& ModelList);
 
-	FrameBufferRenderPass frameBufferRenderPass;
+//	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
+
+	VulkanBuffer MaterialBuffer;
+
+	std::shared_ptr<SceneDataStruct> SceneData;
 
 	std::shared_ptr<RenderedRayTracedColorTexture> storageImage;
 	std::shared_ptr<RenderedRayTracedColorTexture> shadowStorageImage;

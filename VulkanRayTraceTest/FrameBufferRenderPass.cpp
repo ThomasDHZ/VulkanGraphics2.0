@@ -26,7 +26,7 @@ void FrameBufferRenderPass::CreateDescriptorSetLayout(VulkanEngine& engine)
     descriptorLayout = frameBufferPipeline->CreateDescriptorSetLayout(engine, LayoutBindingInfo);
 }
 
-void FrameBufferRenderPass::CreateDescriptorPool(VulkanEngine& engine) 
+void FrameBufferRenderPass::CreateDescriptorPool(VulkanEngine& engine)
 {
     std::array<VkDescriptorPoolSize, 1> poolSizes{};
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -59,14 +59,14 @@ void FrameBufferRenderPass::CreateDescriptorSets(VulkanEngine& engine, std::shar
 
     for (size_t i = 0; i < engine.SwapChain.SwapChainImages.size(); i++)
     {
- 
+
         std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 
         VkDescriptorImageInfo DiffuseMapImage = {};
         DiffuseMapImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         DiffuseMapImage.imageView = texture->GetTextureView();
         DiffuseMapImage.sampler = texture->GetTextureSampler();
-   
+
         descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrites[0].dstSet = descriptorSets[i];
         descriptorWrites[0].dstBinding = 0;

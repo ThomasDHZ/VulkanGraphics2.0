@@ -8,13 +8,15 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, TextureManager& t
 {
     storageImage = std::make_shared<RenderedRayTracedColorTexture>(engine);
     shadowStorageImage = std::make_shared<RenderedRayTracedColorTexture>(engine);
-    textureManager.AddTexture(engine, storageImage);
-    textureManager.AddTexture(engine, shadowStorageImage);
+    //textureManager.AddTexture(engine, storageImage);
+    //textureManager.AddTexture(engine, shadowStorageImage);
+
+    SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
 
     SetUpDescriptorLayout(engine, textureManager);
     RenderPass = MainRenderPass(engine, descriptorSetLayout);
-    frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
-    RayRenderer = RayTraceRenderer(engine, textureManager, ModelList, storageImage, shadowStorageImage);
+   // frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
+   // RayRenderer = RayTraceRenderer(engine, textureManager, ModelList, storageImage, shadowStorageImage);
     interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
     SetUpDescriptorPool(engine);
 }
@@ -75,7 +77,7 @@ void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
     }
 }
 
-void Renderer::SetUpDescriptorSets(VulkanEngine& engine, TextureManager& textureManager, std::vector<RayTraceModel>& ModelList, VulkanBuffer& MaterialBuffer, std::shared_ptr<SceneDataStruct>& SceneData)
+void Renderer::SetUpDescriptorSets(VulkanEngine& engine, TextureManager& textureManager, std::vector<RayTraceModel>& ModelList)
 {
     std::vector<VkDescriptorSetLayout> layouts(engine.SwapChain.SwapChainImages.size(), descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};

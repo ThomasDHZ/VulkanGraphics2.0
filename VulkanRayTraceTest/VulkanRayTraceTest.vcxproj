@@ -183,8 +183,6 @@
   <ItemGroup>
     <None Include="alpha.rahit" />
     <None Include="Shader\closesthit.rchit" />
-    <None Include="Shader\FrameBufferShader.frag" />
-    <None Include="Shader\FrameBufferShader.vert" />
     <None Include="Shader\Lighting.glsl" />
     <None Include="Shader\miss.rmiss" />
     <None Include="Shader\RasterShadowClosestHit.rchit" />
