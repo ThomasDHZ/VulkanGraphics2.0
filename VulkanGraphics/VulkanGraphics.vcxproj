@@ -204,6 +204,7 @@
     <ClCompile Include="RenderedGBufferNormalTexture.cpp" />
     <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
     <ClCompile Include="RenderedHDRColorTexture.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RendereredTexture.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="RenderToTextureRenderPass.cpp" />
@@ -348,6 +349,7 @@
     <ClInclude Include="RenderedGBufferNormalTexture.h" />
     <ClInclude Include="RenderedGBufferPositionTexture.h" />
     <ClInclude Include="RenderedHDRColorTexture.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="RendereredTexture.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="RenderToTextureRenderPass.h" />

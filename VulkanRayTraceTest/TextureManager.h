@@ -13,6 +13,7 @@ private:
 
 public:
 	TextureManager();
+	TextureManager(VulkanEngine& engine);
 	~TextureManager();
 
 	uint32_t LoadTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);

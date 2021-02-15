@@ -4,6 +4,11 @@ TextureManager::TextureManager()
 {
 }
 
+TextureManager::TextureManager(VulkanEngine& engine)
+{
+	LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/DefaultTexture.png", VK_FORMAT_R8G8B8A8_UNORM);
+}
+
 TextureManager::~TextureManager()
 {
 }

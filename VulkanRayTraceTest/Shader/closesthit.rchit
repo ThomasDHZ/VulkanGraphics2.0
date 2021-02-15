@@ -174,16 +174,16 @@ void main()
 	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 	shadowed = true;  
 	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
-//	if (shadowed) {
-//		hitValue *= 0.3f;
-//	}
-//	else
-//	{
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+	if (shadowed) {
+		hitValue *= 0.3f;
+	}
+	else
+	{
 			vec3 halfwayDir = normalize(ubo.dlight.direction + ubo.viewPos);  
          spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 		vec3 specular = ubo.dlight.specular * spec * material.Specular;
 		hitValue += specular;
-	//}
+	}
 //  }
 }
