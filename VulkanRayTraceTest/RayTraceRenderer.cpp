@@ -46,17 +46,9 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
   //  ModelList.emplace_back(RayTraceModel(textureManager, device, physicalDevice, commandPool, graphicsQueue, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
 
  // textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/Models/viking_room.png", VK_FORMAT_R8G8B8A8_UNORM);
- textureManager.LoadTexture(engine, "C:/Users/dotha/source/repos/VulkanGraphics/texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-   // stbi_set_flip_vertically_on_load(true);
-    std::string CubeMapFiles[6];
-    CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
-    CubeMapFiles[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
-    CubeMapFiles[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
-    CubeMapFiles[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
-    CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
-    CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
-    textureManager.LoadCubeMap(engine, CubeMapFiles);
+   // stbi_set_flip_vertically_on_load(true);
+
 
     std::vector<Material> MaterialList;
     for (int x = 0; x < ModelList.size(); x++)
@@ -136,7 +128,6 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
         raygenShaderBindingTable.DestoryBuffer(engine.Device);
         missShaderBindingTable.DestoryBuffer(engine.Device);
         hitShaderBindingTable.DestoryBuffer(engine.Device);
-        SceneDataBuffer.DestoryBuffer(engine.Device);
 
         vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
         descriptorPool = VK_NULL_HANDLE;
@@ -396,47 +387,8 @@ void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelera
     vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
 }
 
-void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData, std::shared_ptr<PerspectiveCamera> camera)
-{
-
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto  currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-
-    ModelList[0].ModelTransform = glm::mat4(1.0f);
-   // ModelList[0].Update();
-
-
-    sceneData.model = ModelList[0].ModelTransform;
-    sceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
-    sceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
-    sceneData.projInverse[1][1] *= -1;
-    sceneData.view = camera->GetViewMatrix();
-    sceneData.proj = camera->GetProjectionMatrix();
-    sceneData.proj[1][1] *= -1;
-    sceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    sceneData.vertexSize = sizeof(Vertex);
-    SceneDataBuffer.CopyBufferToMemory(engine.Device, &sceneData, sizeof(sceneData));
-
-    createTopLevelAccelerationStructure(engine);
-}
-
 void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
 {
-    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, (uint32_t)VertexBufferList.size() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, (uint32_t)IndexBufferList.size() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, static_cast<uint32_t>(textureManager.GetTextureList().size()) });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
-    RayTraceDescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
-
     std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
 
     VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
@@ -512,39 +464,6 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     raygenShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
     missShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
     hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
-}
-void RayTraceRenderer::createSceneDataBuffer(VulkanEngine& engine)
-{
-
-    SceneDataBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(SceneDataBufferData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-}
-void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
-{
-    RTDescriptorSet = engine.CreateDescriptorSets(descriptorPool, RayTraceDescriptorSetLayout);
-
-    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = AddAcclerationStructureBinding(engine, topLevelAS.handle);
-    VkDescriptorImageInfo RayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, storageImage);
-    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneDataBuffer.Buffer, SceneDataBuffer.BufferSize);
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = AddVertexBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = AddIndexBufferListDescriptor();
-    VkDescriptorBufferInfo MaterialBufferInfo = AddBufferDescriptor(engine, MaterialBuffer.Buffer, VK_WHOLE_SIZE);
-    std::vector<VkDescriptorImageInfo> TextureBufferInfo = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    VkDescriptorImageInfo ShadowRayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, shadowStorageImage);
-    VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(textureManager.GetCubeMapTexture()));
-
-    std::vector<VkWriteDescriptorSet> RayTraceDescriptorSets{};
-
-    RayTraceDescriptorSets.emplace_back(AddAccelerationBuffer(engine, 0, AccelerationDescriptorStructure));
-    RayTraceDescriptorSets.emplace_back(AddStorageImageBuffer(engine, 1, RTDescriptorSet, RayTraceImageDescriptor));
-    RayTraceDescriptorSets.emplace_back(AddDescriptorSetBuffer(engine, 2, RTDescriptorSet, SceneDataBufferInfo));
-    RayTraceDescriptorSets.emplace_back(AddStorageBuffer(engine, 3, RTDescriptorSet, VertexBufferInfoList));
-    RayTraceDescriptorSets.emplace_back(AddStorageBuffer(engine, 4, RTDescriptorSet, IndexBufferInfoList));
-    RayTraceDescriptorSets.emplace_back(AddStorageBuffer(engine, 5, RTDescriptorSet, MaterialBufferInfo));
-    RayTraceDescriptorSets.emplace_back(AddDescriptorSetTexture(engine, 6, RTDescriptorSet, TextureBufferInfo));
-    RayTraceDescriptorSets.emplace_back(AddStorageImageBuffer(engine, 7, RTDescriptorSet, ShadowRayTraceImageDescriptor));
-    RayTraceDescriptorSets.emplace_back(AddDescriptorSetTexture(engine, 10, RTDescriptorSet, CubeMapImage));
-
-    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(RayTraceDescriptorSets.size()), RayTraceDescriptorSets.data(), 0, VK_NULL_HANDLE);
 }
 
 void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages)

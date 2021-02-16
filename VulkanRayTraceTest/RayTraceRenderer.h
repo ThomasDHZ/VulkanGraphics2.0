@@ -84,16 +84,11 @@ private:
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
-    RenderedRayTracedColorTexture storageImage;
-    RenderedRayTracedColorTexture shadowStorageImage;
-
 
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
-
-    VulkanBuffer SceneDataBuffer;
 
     VkWriteDescriptorSetAccelerationStructureKHR AddAcclerationStructureBinding(VulkanEngine& engine, VkAccelerationStructureKHR& handle);
     VkDescriptorPoolSize AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType);
@@ -115,6 +110,9 @@ private:
     VkWriteDescriptorSet AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo);
 
 public:
+
+    RenderedRayTracedColorTexture storageImage;
+    RenderedRayTracedColorTexture shadowStorageImage;
 
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
     VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
@@ -140,20 +138,15 @@ public:
     std::vector<VulkanBuffer> IndexBufferList;
     VulkanBuffer MaterialBuffer;
 
-    std::shared_ptr<SceneDataBufferData> sceneData;
-
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
     void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
     void createSceneDataBuffer(VulkanEngine& engine);
-    void createDescriptorSets(VulkanEngine& engine);
     void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
 
     void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
-
-    void updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData, std::shared_ptr<PerspectiveCamera> camera);
 
     VkResult createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
