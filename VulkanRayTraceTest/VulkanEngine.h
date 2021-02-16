@@ -11,6 +11,15 @@
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
+struct DescriptorSetLayoutBindingInfo
+{
+	uint32_t Binding;
+	VkDescriptorType DescriptorType;
+	VkShaderStageFlags StageFlags;
+	uint32_t Count;
+};
+
+
 class VulkanEngine
 {
 private:
@@ -87,6 +96,12 @@ public:
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	uint64_t GetBufferDeviceAddress(VkBuffer buffer);
+
+	VkDescriptorPoolSize AddDsecriptorPoolBinding(VkDescriptorType descriptorType);
+
+	VkDescriptorPool CreateDescriptorPool(std::vector<VkDescriptorPoolSize> DescriptorPoolInfo);
+	VkDescriptorSetLayout CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo);
+	std::vector<VkDescriptorSet> CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout);
 
 	VkInstance GetVulkanInstance() { return Instance; }
 	VkDevice GetVulkanDevice() { return Device; }

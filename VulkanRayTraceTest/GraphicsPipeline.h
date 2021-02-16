@@ -9,13 +9,6 @@ enum RendererType
 	RT_ShadowRenderer
 };
 
-struct DescriptorSetLayoutBindingInfo
-{
-	uint32_t Binding;
-	VkDescriptorType DescriptorType;
-	VkShaderStageFlags StageFlags;
-};
-
 struct MeshInfo
 {
 	int MeshID;

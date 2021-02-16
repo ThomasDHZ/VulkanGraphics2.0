@@ -87,11 +87,6 @@ private:
     RenderedRayTracedColorTexture storageImage;
     RenderedRayTracedColorTexture shadowStorageImage;
 
-    VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
-    VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
-    VkDescriptorSet       RTDescriptorSet = VK_NULL_HANDLE;
-    VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
-    VkDescriptorPool      descriptorPool = VK_NULL_HANDLE;
 
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
@@ -102,6 +97,12 @@ private:
 
 public:
 
+    VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
+    VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
+    VkDescriptorSet       RTDescriptorSet = VK_NULL_HANDLE;
+    VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
+    VkDescriptorPool      descriptorPool = VK_NULL_HANDLE;
+
     std::vector<AccelerationStructure> bottomLevelASList{};
     AccelerationStructure topLevelAS{};
 
@@ -109,7 +110,7 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList);
+    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList, VkDescriptorPool& descpool);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);

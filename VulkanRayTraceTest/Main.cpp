@@ -44,17 +44,15 @@ private:
     VulkanEngine engine;
     Renderer renderer;
 
-    TextureManager textureManager;
     std::vector<RayTraceModel> ModelList;
 
-    void initVulkan() {
+    void initVulkan() 
+    {
         window = VulkanWindow(WIDTH, HEIGHT, "VulkanEngine");
         engine = VulkanEngine(window.GetWindowPtr());
+        renderer = Renderer(engine, window);
 
-        textureManager = TextureManager(engine);
-        ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
-
-        renderer = Renderer(engine, window, textureManager, ModelList);
+        //renderer.AddModel(engine, window, textureManager, "");
     }
 
     void mainLoop() {
@@ -69,7 +67,7 @@ private:
             }
             ImGui::Render();
 
-            renderer.Draw(engine, window, ModelList);
+            renderer.Draw(engine, window);
         }
 
         vkDeviceWaitIdle(engine.Device);

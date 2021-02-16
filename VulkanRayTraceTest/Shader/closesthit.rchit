@@ -69,7 +69,6 @@ layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
 layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
 layout(binding = 6) uniform sampler2D TextureMap[];
-layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
 
 struct Vertex
 {

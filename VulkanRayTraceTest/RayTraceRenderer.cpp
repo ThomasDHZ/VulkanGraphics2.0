@@ -9,10 +9,11 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList, VkDescriptorPool& descpool)
 {
     textureManager = textureManagerz;
     ModelList = modelList;
+    descriptorPool = descpool;
 
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 deviceProperties2{};
@@ -57,6 +58,17 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
 
     textureManager.LoadCubeMap(engine, CubeMapFiles);
 
+    std::vector<Material> MaterialList;
+    for (int x = 0; x < ModelList.size(); x++)
+    {
+        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        {
+            MaterialList.emplace_back(ModelList[x].MeshList[y].material);
+        }
+    }
+    MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material) * MaterialList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, MaterialList.data());
+
+
     for (int x = 0; x < ModelList.size(); x++)
     {
         for (int y = 0; y < ModelList[x].MeshList.size(); y++)
@@ -68,11 +80,11 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
    storageImage = RenderedRayTracedColorTexture(engine);
    shadowStorageImage = RenderedRayTracedColorTexture(engine);
 
-   createRayTracingPipeline(engine);
-   createShaderBindingTable(engine);
-   createSceneDataBuffer(engine);
-   createDescriptorSets(engine);
-   buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
+   //createRayTracingPipeline(engine);
+   //createShaderBindingTable(engine);
+   //createSceneDataBuffer(engine);
+   //createDescriptorSets(engine);
+   //buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
 }
 RayTraceRenderer::~RayTraceRenderer()
 {
@@ -414,6 +426,7 @@ void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* wi
 void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
 {
     std::vector<VkDescriptorSetLayoutBinding> RTDescriptorSetBindings;
+
     VkDescriptorSetLayoutBinding              AccelerationStructureBinding = {};
     AccelerationStructureBinding.binding = 0;
     AccelerationStructureBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
@@ -483,13 +496,13 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     RTDescriptorSetLayout.pBindings = RTDescriptorSetBindings.data();
     vkCreateDescriptorSetLayout(engine.Device, &RTDescriptorSetLayout, nullptr, &RayTraceDescriptorSetLayout);
 
+    std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
+
     VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
     PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     PipelineLayoutCreateInfo.setLayoutCount = 1;
     PipelineLayoutCreateInfo.pSetLayouts = &RayTraceDescriptorSetLayout;
     vkCreatePipelineLayout(engine.Device, &PipelineLayoutCreateInfo, nullptr, &RayTracePipelineLayout);
-
-    std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
 
     ShaderList.emplace_back(loadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR RayGeneratorShaderInfo = {};
@@ -566,18 +579,6 @@ void RayTraceRenderer::createSceneDataBuffer(VulkanEngine& engine)
 }
 void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
 {
-    std::vector<VkDescriptorPoolSize> poolSizes = {
-        {VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1},
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4},
-      { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2 }};
-
-    VkDescriptorPoolCreateInfo RayTraceDescriptorPoolInfo = {};
-    RayTraceDescriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    RayTraceDescriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-    RayTraceDescriptorPoolInfo.pPoolSizes = poolSizes.data();
-    RayTraceDescriptorPoolInfo.maxSets = 1;
-    vkCreateDescriptorPool(engine.Device, &RayTraceDescriptorPoolInfo, nullptr, &descriptorPool);
 
     VkDescriptorSetAllocateInfo RayTraceDescriptorSetAllocateInfo = {};
     RayTraceDescriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -626,7 +627,6 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
 
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
-    std::vector<VkDescriptorBufferInfo> OffsetBufferInfoList;
     for (int x = 0; x < VertexBufferList.size(); x++)
     {
         VkDescriptorBufferInfo VertexBufferInfo = {};
@@ -660,16 +660,6 @@ void RayTraceRenderer::createDescriptorSets(VulkanEngine& engine)
     IndexDescriptorSet.dstBinding = 4;
     IndexDescriptorSet.descriptorCount = static_cast<uint32_t>(IndexBufferInfoList.size());
     IndexDescriptorSet.pBufferInfo = IndexBufferInfoList.data();
-
-    std::vector<Material> MaterialList;
-    for (int x = 0; x < ModelList.size(); x++)
-    {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            MaterialList.emplace_back(ModelList[x].MeshList[y].material);
-        }
-    }
-    MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material) * MaterialList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, MaterialList.data());
 
     VkDescriptorBufferInfo MaterialBufferInfo = {};
     MaterialBufferInfo.buffer = MaterialBuffer.Buffer;

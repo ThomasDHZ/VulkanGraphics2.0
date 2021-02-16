@@ -429,3 +429,77 @@ uint64_t VulkanEngine::GetBufferDeviceAddress(VkBuffer buffer)
 	BufferDevice.buffer = buffer;
 	return vkGetBufferDeviceAddressKHR(Device, &BufferDevice);
 }
+
+VkDescriptorPoolSize VulkanEngine::AddDsecriptorPoolBinding(VkDescriptorType descriptorType)
+{
+	VkDescriptorPoolSize DescriptorPoolBinding = {};
+	DescriptorPoolBinding.type = descriptorType;
+	DescriptorPoolBinding.descriptorCount = static_cast<uint32_t>(SwapChain.GetSwapChainImageCount());
+
+	return DescriptorPoolBinding;
+}
+
+VkDescriptorPool VulkanEngine::CreateDescriptorPool(std::vector<VkDescriptorPoolSize> DescriptorPoolInfo)
+{
+	VkDescriptorPoolCreateInfo poolInfo = {};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = static_cast<uint32_t>(DescriptorPoolInfo.size());
+	poolInfo.pPoolSizes = DescriptorPoolInfo.data();
+	poolInfo.maxSets = static_cast<uint32_t>(SwapChain.GetSwapChainImageCount());
+
+	VkDescriptorPool descriptorPool;
+	if (vkCreateDescriptorPool(Device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor pool!");
+	}
+
+	return descriptorPool;
+}
+
+VkDescriptorSetLayout VulkanEngine::CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo)
+{
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindingList = {};
+
+	for (auto Binding : LayoutBindingInfo)
+	{
+		VkDescriptorSetLayoutBinding LayoutBinding = {};
+		LayoutBinding.binding = Binding.Binding;
+		LayoutBinding.descriptorCount = Binding.Count;
+		LayoutBinding.descriptorType = Binding.DescriptorType;
+		LayoutBinding.pImmutableSamplers = nullptr;
+		LayoutBinding.stageFlags = Binding.StageFlags;
+
+		LayoutBindingList.emplace_back(LayoutBinding);
+	}
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = static_cast<uint32_t>(LayoutBindingList.size());
+	layoutInfo.pBindings = LayoutBindingList.data();
+
+	VkDescriptorSetLayout descriptorSet;
+	if (vkCreateDescriptorSetLayout(Device, &layoutInfo, nullptr, &descriptorSet) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor set layout!");
+	}
+
+	return descriptorSet;
+}
+
+std::vector<VkDescriptorSet> VulkanEngine::CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout)
+{
+
+	std::vector<VkDescriptorSetLayout> layouts(SwapChain.GetSwapChainImageCount(), layout);
+	VkDescriptorSetAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(SwapChain.GetSwapChainImageCount());
+	allocInfo.pSetLayouts = layouts.data();
+
+
+	std::vector<VkDescriptorSet> DescriptorSets;
+	DescriptorSets.resize(SwapChain.GetSwapChainImageCount());
+	if (vkAllocateDescriptorSets(Device, &allocInfo, DescriptorSets.data()) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate descriptor sets!");
+	}
+
+	return DescriptorSets;
+}
