@@ -484,20 +484,16 @@ VkDescriptorSetLayout VulkanEngine::CreateDescriptorSetLayout(std::vector<Descri
 	return descriptorSet;
 }
 
-std::vector<VkDescriptorSet> VulkanEngine::CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout)
+VkDescriptorSet VulkanEngine::CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout)
 {
-
-	std::vector<VkDescriptorSetLayout> layouts(SwapChain.GetSwapChainImageCount(), layout);
 	VkDescriptorSetAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(SwapChain.GetSwapChainImageCount());
-	allocInfo.pSetLayouts = layouts.data();
+	allocInfo.descriptorSetCount = 1;
+	allocInfo.pSetLayouts = &layout;
 
-
-	std::vector<VkDescriptorSet> DescriptorSets;
-	DescriptorSets.resize(SwapChain.GetSwapChainImageCount());
-	if (vkAllocateDescriptorSets(Device, &allocInfo, DescriptorSets.data()) != VK_SUCCESS) {
+	VkDescriptorSet DescriptorSets;
+	if (vkAllocateDescriptorSets(Device, &allocInfo, &DescriptorSets) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 

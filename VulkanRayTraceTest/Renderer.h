@@ -23,7 +23,7 @@ private:
 
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet> descriptorSets;
+	VkDescriptorSet descriptorSets;
 
 	std::vector<VkCommandBuffer> commandBuffers;
 

@@ -337,15 +337,12 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     VkDescriptorBufferInfo MaterialBufferInfo = AddBufferDescriptorInfo(engine, MaterialBuffer.Buffer, VK_WHOLE_SIZE);
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = AddImageDescriptorInfo(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
-    {
-        std::vector<VkWriteDescriptorSet> DescriptorList;
-        DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 0, descriptorSets[i], SceneDataBufferInfo));
-        DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets[i], MaterialBufferInfo));
-        DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, descriptorSets[i], TextureBufferInfo));
-        
-        vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
-    }
+    std::vector<VkWriteDescriptorSet> DescriptorList;
+    DescriptorList.emplace_back(AddDescriptorSetBufferInfo(engine, 0, descriptorSets, SceneDataBufferInfo));
+    DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, MaterialBufferInfo));
+    DescriptorList.emplace_back(AddDescriptorSetTextureInfo(engine, 6, descriptorSets, TextureBufferInfo));
+
+    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
 void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
@@ -386,7 +383,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 
         vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
+        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
 
         for (auto model : ModelList)
         {
