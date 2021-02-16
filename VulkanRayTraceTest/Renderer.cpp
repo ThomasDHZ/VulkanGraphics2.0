@@ -309,7 +309,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     uint32_t imageIndex;
     VkResult result = vkAcquireNextImageKHR(engine.Device, engine.SwapChain.GetSwapChain(), UINT64_MAX, engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
-    UpdateSwapChain(engine, window);
+
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         UpdateSwapChain(engine, window);
         return;
