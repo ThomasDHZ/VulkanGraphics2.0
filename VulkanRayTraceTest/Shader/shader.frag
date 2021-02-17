@@ -111,15 +111,8 @@ void main()
     float spec = pow(max(dot(Normal, halfwayDir), 0.0), material.Shininess);
     vec3 specular = scenedata.dlight.specular * spec * material.SpecularMap;
 
-	vec3 color = ambient + diffuse;
+	vec3 color = ambient + diffuse + specular;
 
-	if(material.ShadowMap == vec3(1.0f, 0.0f, 0.0f))
-	{
-		color *= 0.3f;
-	}
-	else
-	{
-		color += specular;
-	}
+
 	 outColor = vec4(color, 1.0f);
 }

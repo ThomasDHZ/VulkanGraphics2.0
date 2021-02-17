@@ -147,7 +147,7 @@ void main()
 	vec3 ambient = ubo.dlight.ambient *  material.DiffuseMap;
     vec3 diffuse = ubo.dlight.diffuse * diff *   material.DiffuseMap;
  
-	 hitValue = ambient + diffuse ;
+	hitValue = ambient + diffuse;
 
 
 

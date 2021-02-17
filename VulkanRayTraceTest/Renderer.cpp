@@ -16,6 +16,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //};
 
     textureManager = TextureManager(engine);
+    ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
     CubeMapFiles[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
@@ -25,10 +27,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
 
     textureManager.LoadCubeMap(engine, CubeMapFiles);
-
-    ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
-
-    SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
 
     std::vector<Material> MaterialList;
     for (int x = 0; x < ModelList.size(); x++)
@@ -41,6 +39,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material) * MaterialList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, MaterialList.data());
 
 
+    SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
+
     SetUpDescriptorLayout(engine);
     RenderPass = MainRenderPass(engine, descriptorSetLayout);
     //frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
@@ -51,6 +51,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SetUpRayTraceDescriptorSetLayout(engine);
     RayRenderer.createRayTracingPipeline(engine);
     RayRenderer.createShaderBindingTable(engine);
+    RayRenderer.createSceneDataBuffer(engine);
     SetUpRayTraceDescriptorSet(engine);
     RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
 
@@ -134,6 +135,7 @@ void Renderer::SetUpRayTraceDescriptorSet(VulkanEngine& engine)
     RayTraceDescriptorSets.emplace_back(AddDescriptorSetTexture(engine, 10, RayRenderer.RTDescriptorSet, CubeMapImage));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(RayTraceDescriptorSets.size()), RayTraceDescriptorSets.data(), 0, VK_NULL_HANDLE);
+
 }
 
 void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
@@ -281,8 +283,6 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->SceneData.vertexSize = sizeof(Vertex);
     SceneData->Update(engine);
-
-    RayRenderer.createTopLevelAccelerationStructure(engine);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -319,6 +319,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
 
     interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
+    RayRenderer.updateUniformBuffers(engine, window.GetWindowPtr(), SceneData->SceneData, camera);
     Update(engine, window, imageIndex);
 
     if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {

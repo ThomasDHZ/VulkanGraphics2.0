@@ -28,8 +28,8 @@
 #include "MainRenderPass.h"
 #include "Renderer.h"
 
-const uint32_t WIDTH = 1920;
-const uint32_t HEIGHT = 1080;
+const uint32_t WIDTH = 1280;
+const uint32_t HEIGHT = 720;
 
 class HelloTriangleApplication {
 public:
@@ -63,8 +63,7 @@ private:
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
             {
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-                //renderer.GUIUpdate(engine);
+                renderer.GUIUpdate(engine);
             }
             ImGui::Render();
 
