@@ -21,7 +21,9 @@ public:
 	VkAccelerationStructureKHR BufferHandle = VK_NULL_HANDLE;
 
 	VulkanBuffer();
+	VulkanBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
 	~VulkanBuffer();
+	
 	VkResult CreateBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
 	void CopyBuffer(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 	void CopyBufferToMemory(VkDevice& device, void* DataToCopy, VkDeviceSize BufferSize);

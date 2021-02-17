@@ -37,10 +37,18 @@ struct MeshOffsets
 	uint32_t IndiceOffset;
 };
 
+struct AccelerationStructure {
+	VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
+	uint64_t deviceAddress = 0;
+	VkDeviceMemory memory = VK_NULL_HANDLE;
+	VkBuffer buffer = VK_NULL_HANDLE;
+};
+
 class Mesh
 {
 private:
 	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
+	void MeshBottomLevelAccelerationStructure(VulkanEngine& engine);
 
 public:
 		std::vector<Vertex> vertices;
@@ -54,20 +62,26 @@ public:
 		VulkanBuffer MaterialBuffer;
 	
 		uint32_t MeshID;
-		uint32_t TriangleCount;
+		uint32_t PrimitiveCount; //TriangleCount
 		uint32_t VertexCount;
 		uint32_t IndexCount;
 	
+		std::shared_ptr<AccelerationStructure> BottomLevelAccelerationStructure;
+
 		VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress{};
 		VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress{};
 		VkDeviceOrHostAddressConstKHR TransformBufferDeviceAddress{};
+
+		VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
+		VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
+		VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
 
 	Mesh();
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial, uint32_t meshID);
 	~Mesh();
 
-	//void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);

@@ -41,10 +41,6 @@ private:
 	std::shared_ptr<SceneDataStruct> SceneData;
 	std::vector<RayTraceModel> RenderModel;
 
-	void SetUpRayTracingDescriptorPool(VulkanEngine& engine);
-	void SetUpRayTraceDescriptorSetLayout(VulkanEngine& engine);
-	void SetUpRayTraceDescriptorSet(VulkanEngine& engine);
-
 	void SetUpDescriptorPool(VulkanEngine& engine);
 	void SetUpDescriptorLayout(VulkanEngine& engine);
 	void SetUpDescriptorSets(VulkanEngine& engine);

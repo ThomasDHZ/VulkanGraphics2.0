@@ -42,24 +42,7 @@ struct StorageImage {
     VkFormat format;
 };
 
-struct AccelerationStructure {
-    VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
-    uint64_t deviceAddress = 0;
-    VkDeviceMemory memory = VK_NULL_HANDLE;
-    VkBuffer buffer = VK_NULL_HANDLE;
 
-    //void Destory(VkDevice& device)
-    //{
-    //    vkFreeMemory(device, memory, nullptr);
-    //    vkDestroyBuffer(device, buffer, nullptr);
-    //    vkDestroyAccelerationStructureKHR(device, handle, nullptr);
-
-    //    memory = VK_NULL_HANDLE;
-    //    buffer = VK_NULL_HANDLE;
-    //    handle = VK_NULL_HANDLE;
-    //    deviceAddress = 0;
-    //}
-};
 
 class RayTraceRenderer
 {
@@ -93,9 +76,9 @@ public:
 
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
     VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
-    VkDescriptorSet       RTDescriptorSet = VK_NULL_HANDLE;
-    VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
-    VkDescriptorPool      descriptorPool = VK_NULL_HANDLE;
+    //VkDescriptorSet       RTDescriptorSet = VK_NULL_HANDLE;
+    //VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
+    //VkDescriptorPool      descriptorPool = VK_NULL_HANDLE;
 
     std::vector<AccelerationStructure> bottomLevelASList{};
     AccelerationStructure topLevelAS{};
@@ -104,7 +87,7 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList, VkDescriptorPool& descpool);
+    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);
@@ -113,27 +96,27 @@ public:
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
-    VulkanBuffer MaterialBuffer;
 
 
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
-    void createRayTracingPipeline(VulkanEngine& engine);
+    void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     void createShaderBindingTable(VulkanEngine& engine);
-    void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
-    void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
+    void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set);
+    void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set);
 
     void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
 
-    void updateUniformBuffers(VulkanEngine& engine);
+    void UpdateAccelerationStructure(VulkanEngine& engine);
 
     VkResult createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void deleteScratchBuffer(VulkanEngine& engine, RayTracingScratchBuffer& scratchBuffer);
     void createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
     RayTracingScratchBuffer createScratchBuffer(VulkanEngine& engine, VkDeviceSize size);
-    uint64_t getBufferDeviceAddress(VulkanEngine& engine, VkBuffer buffer);
+
+
     uint32_t getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties);
     VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin);
     VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin);
@@ -158,9 +141,4 @@ public:
         VkImageSubresourceRange subresourceRange,
         VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
         VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
-
-    VkCommandBuffer beginSingleTimeCommands(VulkanEngine& engine);
-    void endSingleTimeCommands(VulkanEngine& engine, VkCommandBuffer commandBuffer);
-    uint32_t findMemoryType(VulkanEngine& engine, uint32_t typeFilter, VkMemoryPropertyFlags properties);
-    uint64_t getBufferDeviceAddress(VkDevice& device, VkBuffer buffer);
 };

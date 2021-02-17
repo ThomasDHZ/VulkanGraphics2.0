@@ -4,14 +4,12 @@ MainRenderPass::MainRenderPass()
 {
 }
 
-MainRenderPass::MainRenderPass(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
+MainRenderPass::MainRenderPass(VulkanEngine& engine)
 {
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-
-    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, DescriptorLayout);
 }
 
 MainRenderPass::~MainRenderPass()
@@ -100,6 +98,11 @@ void MainRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
+}
+
+void MainRenderPass::StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
+{
+    forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, DescriptorLayout);
 }
 
 void MainRenderPass::UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)

@@ -20,6 +20,11 @@ VulkanBuffer::VulkanBuffer()
 {
 }
 
+VulkanBuffer::VulkanBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
+{
+	CreateBuffer(device, physicalDevice, BufferSize, usage, properties, BufferData);
+}
+
 VulkanBuffer::~VulkanBuffer()
 {
 }

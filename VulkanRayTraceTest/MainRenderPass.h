@@ -27,7 +27,7 @@ private:
 
 public:
 	MainRenderPass();
-	MainRenderPass(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
+	MainRenderPass(VulkanEngine& engine);
 	~MainRenderPass();
 
 	VkRenderPass RenderPass;
@@ -35,6 +35,7 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
 
+	void StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
 	void UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
 	void Destroy(VulkanEngine& engine);
 
