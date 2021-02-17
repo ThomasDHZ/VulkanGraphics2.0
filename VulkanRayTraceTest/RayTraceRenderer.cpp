@@ -104,7 +104,6 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
         raygenShaderBindingTable.DestoryBuffer(engine.Device);
         missShaderBindingTable.DestoryBuffer(engine.Device);
         hitShaderBindingTable.DestoryBuffer(engine.Device);
-        SceneDataBuffer.DestoryBuffer(engine.Device);
 
         vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
         descriptorPool = VK_NULL_HANDLE;
@@ -459,30 +458,8 @@ void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelera
     vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
 }
 
-void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData, std::shared_ptr<PerspectiveCamera> camera)
+void RayTraceRenderer::updateUniformBuffers(VulkanEngine& engine)
 {
-
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto  currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-
-    ModelList[0].ModelTransform = glm::mat4(1.0f);
-   // ModelList[0].Update();
-
-
-    sceneData.model = ModelList[0].ModelTransform;
-    sceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
-    sceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
-    sceneData.projInverse[1][1] *= -1;
-    sceneData.view = camera->GetViewMatrix();
-    sceneData.proj = camera->GetProjectionMatrix();
-    sceneData.proj[1][1] *= -1;
-    sceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    sceneData.vertexSize = sizeof(Vertex);
-    SceneDataBuffer.CopyBufferToMemory(engine.Device, &sceneData, sizeof(sceneData));
-
     createTopLevelAccelerationStructure(engine);
 }
 
@@ -563,11 +540,6 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     raygenShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
     missShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
     hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
-}
-void RayTraceRenderer::createSceneDataBuffer(VulkanEngine& engine)
-{
-
-    SceneDataBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(SceneDataBufferData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
 void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages)

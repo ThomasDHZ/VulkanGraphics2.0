@@ -89,8 +89,6 @@ private:
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
 
-    VulkanBuffer SceneDataBuffer;
-
 public:
 
     StorageImage storageImage;
@@ -119,20 +117,18 @@ public:
     std::vector<VulkanBuffer> IndexBufferList;
     VulkanBuffer MaterialBuffer;
 
-    std::shared_ptr<SceneDataBufferData> sceneData;
 
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
-    void createSceneDataBuffer(VulkanEngine& engine);
     void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages);
     void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height);
 
     void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
 
-    void updateUniformBuffers(VulkanEngine& engine, GLFWwindow* window, SceneDataBufferData& sceneData, std::shared_ptr<PerspectiveCamera> camera);
+    void updateUniformBuffers(VulkanEngine& engine);
 
     VkResult createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);

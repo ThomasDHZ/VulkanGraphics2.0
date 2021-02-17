@@ -18,7 +18,7 @@ private:
 	Mouse mouse;
 
 	VkDescriptorPool RayTracingDescriptorPool = VK_NULL_HANDLE;
-	//VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
+	VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
 	VkDescriptorSet RayTraceDescriptorSets = VK_NULL_HANDLE;
 
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;

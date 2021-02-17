@@ -51,7 +51,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SetUpRayTraceDescriptorSetLayout(engine);
     RayRenderer.createRayTracingPipeline(engine);
     RayRenderer.createShaderBindingTable(engine);
-    RayRenderer.createSceneDataBuffer(engine);
     SetUpRayTraceDescriptorSet(engine);
     RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages);
 
@@ -316,7 +315,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
 
     interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
-    RayRenderer.updateUniformBuffers(engine, window.GetWindowPtr(), SceneData->SceneData, camera);
+    RayRenderer.updateUniformBuffers(engine);
     Update(engine, window, imageIndex);
 
     if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
