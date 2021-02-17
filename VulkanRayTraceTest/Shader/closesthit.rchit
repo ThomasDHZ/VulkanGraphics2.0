@@ -5,7 +5,6 @@
 #include "Lighting.glsl"
 
 layout(location = 0) rayPayloadInEXT vec3 hitValue;
-layout(location = 1) rayPayloadEXT vec3 ShadowhitValue;
 layout(location = 2) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 

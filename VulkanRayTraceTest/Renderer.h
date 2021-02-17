@@ -52,7 +52,7 @@ private:
 
 	VkWriteDescriptorSetAccelerationStructureKHR AddAcclerationStructureBinding(VulkanEngine& engine, VkAccelerationStructureKHR& handle);
 	VkDescriptorPoolSize AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType);
-	VkDescriptorImageInfo AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, RenderedRayTracedColorTexture texture);
+	VkDescriptorImageInfo AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, StorageImage& texture);
 	std::vector<VkDescriptorImageInfo> AddTextureDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout);
 	VkDescriptorImageInfo AddTextureDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture);
 	VkDescriptorBufferInfo AddStorageDescriptor(VulkanEngine& engine, VulkanBuffer buffer);
@@ -68,6 +68,7 @@ private:
 	VkWriteDescriptorSet AddDescriptorSetBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
 	VkWriteDescriptorSet AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
 	VkWriteDescriptorSet AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo);
+
 
 public:
 	TextureManager textureManager;

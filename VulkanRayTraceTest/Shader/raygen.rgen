@@ -17,7 +17,6 @@ layout(binding = 2, set = 0) uniform CameraProperties
 	PointLight plight;
 	int vertexSize;
 } cam;
-layout(binding = 7, set = 0, rgba8) uniform image2D ShadowImage;
 
 layout(location = 0) rayPayloadEXT vec3 hitValue;
 layout(location = 1) rayPayloadEXT vec3 ShadowhitValue;
@@ -36,10 +35,8 @@ void main()
 	float tmax = 10000.0;
 
     hitValue = vec3(0.0f);
-	ShadowhitValue = vec3(0.0f);
 
     traceRayEXT(topLevelAS, gl_RayFlagsOpaqueEXT, 0xff, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 
 	imageStore(image, ivec2(gl_LaunchIDEXT.xy), vec4(hitValue, 0.0));
-	imageStore(ShadowImage, ivec2(gl_LaunchIDEXT.xy), vec4(ShadowhitValue, 0.0));
 }

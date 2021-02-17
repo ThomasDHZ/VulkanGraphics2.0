@@ -35,12 +35,12 @@ struct RayTracingScratchBuffer
     VkDeviceMemory memory = VK_NULL_HANDLE;
 };
 
-//struct StorageImage {
-//    VkDeviceMemory memory = VK_NULL_HANDLE;
-//    VkImage image = VK_NULL_HANDLE;
-//    VkImageView view = VK_NULL_HANDLE;
-//    VkFormat format;
-//};
+struct StorageImage {
+    VkDeviceMemory memory = VK_NULL_HANDLE;
+    VkImage image = VK_NULL_HANDLE;
+    VkImageView view = VK_NULL_HANDLE;
+    VkFormat format;
+};
 
 struct AccelerationStructure {
     VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
@@ -84,7 +84,6 @@ private:
     VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
-
     std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
     VulkanBuffer raygenShaderBindingTable;
     VulkanBuffer missShaderBindingTable;
@@ -94,8 +93,7 @@ private:
 
 public:
 
-        RenderedRayTracedColorTexture storageImage;
-    RenderedRayTracedColorTexture shadowStorageImage;
+    StorageImage storageImage;
 
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
     VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
@@ -119,11 +117,13 @@ public:
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
+    VulkanBuffer MaterialBuffer;
 
     std::shared_ptr<SceneDataBufferData> sceneData;
 
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
+    void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
     void createSceneDataBuffer(VulkanEngine& engine);
@@ -156,7 +156,14 @@ public:
             matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
         };
     }
-
+    void setImageLayout(
+        VkCommandBuffer cmdbuffer,
+        VkImage image,
+        VkImageLayout oldImageLayout,
+        VkImageLayout newImageLayout,
+        VkImageSubresourceRange subresourceRange,
+        VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+        VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
 
     VkCommandBuffer beginSingleTimeCommands(VulkanEngine& engine);
     void endSingleTimeCommands(VulkanEngine& engine, VkCommandBuffer commandBuffer);

@@ -18,16 +18,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     textureManager = TextureManager(engine);
     ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
-    std::string CubeMapFiles[6];
-    CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
-    CubeMapFiles[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
-    CubeMapFiles[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
-    CubeMapFiles[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
-    CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
-    CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
-
-    textureManager.LoadCubeMap(engine, CubeMapFiles);
-
     std::vector<Material> MaterialList;
     for (int x = 0; x < ModelList.size(); x++)
     {
@@ -38,6 +28,16 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     }
     MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material) * MaterialList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, MaterialList.data());
 
+
+    std::string CubeMapFiles[6];
+    CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
+    CubeMapFiles[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
+    CubeMapFiles[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
+    CubeMapFiles[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
+    CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
+    CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
+
+    textureManager.LoadCubeMap(engine, CubeMapFiles);
 
     SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
 
@@ -119,7 +119,6 @@ void Renderer::SetUpRayTraceDescriptorSet(VulkanEngine& engine)
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = AddIndexBufferListDescriptor();
     VkDescriptorBufferInfo MaterialBufferInfo = AddBufferDescriptor(engine, MaterialBuffer.Buffer, VK_WHOLE_SIZE);
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    VkDescriptorImageInfo ShadowRayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, RayRenderer.shadowStorageImage);
     VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(textureManager.GetCubeMapTexture()));
 
     std::vector<VkWriteDescriptorSet> RayTraceDescriptorSets{};
@@ -131,11 +130,9 @@ void Renderer::SetUpRayTraceDescriptorSet(VulkanEngine& engine)
     RayTraceDescriptorSets.emplace_back(AddStorageBuffer(engine, 4, RayRenderer.RTDescriptorSet, IndexBufferInfoList));
     RayTraceDescriptorSets.emplace_back(AddStorageBuffer(engine, 5, RayRenderer.RTDescriptorSet, MaterialBufferInfo));
     RayTraceDescriptorSets.emplace_back(AddDescriptorSetTexture(engine, 6, RayRenderer.RTDescriptorSet, TextureBufferInfo));
-    RayTraceDescriptorSets.emplace_back(AddStorageImageBuffer(engine, 7, RayRenderer.RTDescriptorSet, ShadowRayTraceImageDescriptor));
     RayTraceDescriptorSets.emplace_back(AddDescriptorSetTexture(engine, 10, RayRenderer.RTDescriptorSet, CubeMapImage));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(RayTraceDescriptorSets.size()), RayTraceDescriptorSets.data(), 0, VK_NULL_HANDLE);
-
 }
 
 void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
@@ -454,10 +451,10 @@ VkDescriptorImageInfo Renderer::AddTextureDescriptor(VulkanEngine& engine, VkIma
     return DescriptorImage;
 }
 
-VkDescriptorImageInfo Renderer::AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, RenderedRayTracedColorTexture texture)
+VkDescriptorImageInfo Renderer::AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, StorageImage& texture)
 {
     VkDescriptorImageInfo RayTraceImageDescriptor{};
-    RayTraceImageDescriptor.imageView = texture.View;
+    RayTraceImageDescriptor.imageView = texture.view;
     RayTraceImageDescriptor.imageLayout = ImageLayout;
     return RayTraceImageDescriptor;
 }
