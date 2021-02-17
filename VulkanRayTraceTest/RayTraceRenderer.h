@@ -64,8 +64,6 @@ struct AccelerationStructure {
 class RayTraceRenderer
 {
 private:
-    TextureManager textureManager;
-
     PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
     PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
     PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR;

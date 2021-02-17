@@ -11,7 +11,6 @@ RayTraceRenderer::RayTraceRenderer()
 }
 RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList, VkDescriptorPool& descpool)
 {
-    textureManager = textureManagerz;
     ModelList = modelList;
     descriptorPool = descpool;
 

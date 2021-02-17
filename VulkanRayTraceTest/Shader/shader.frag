@@ -53,7 +53,7 @@ struct Material
 	vec3 ShadowMap;
 };
 
-layout(binding = 0) uniform UniformBufferObject {
+layout(binding = 2) uniform UniformBufferObject {
 	mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;

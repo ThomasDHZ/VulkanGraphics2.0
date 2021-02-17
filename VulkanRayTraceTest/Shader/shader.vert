@@ -9,7 +9,7 @@ layout(push_constant) uniform MeshInfo
 	int MaterialID;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject {
+layout(binding = 2) uniform UniformBufferObject {
 	mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
