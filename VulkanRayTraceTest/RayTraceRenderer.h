@@ -96,6 +96,7 @@ public:
 
 
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
+    void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model);
     void createTopLevelAccelerationStructure(VulkanEngine& engine);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);

@@ -73,9 +73,11 @@ public:
 		VulkanBuffer MaterialBuffer;
 	
 		uint32_t MeshID;
-		uint32_t PrimitiveCount; //TriangleCount
 		uint32_t VertexCount;
 		uint32_t IndexCount;
+		uint32_t PrimitiveCount; //TriangleCount
+		uint32_t FirstIndex;     //primitiveOffset
+		uint32_t VertexOffset;   //firstVertex
 	
 		AccelerationStructure BottomLevelAccelerationStructure;
 
