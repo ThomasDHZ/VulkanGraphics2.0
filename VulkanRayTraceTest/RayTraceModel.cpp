@@ -68,6 +68,9 @@ RayTraceModel::~RayTraceModel()
 
 void RayTraceModel::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
+	uint32_t TotalVertex = 0;
+	uint32_t TotalIndex = 0;
+
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -77,6 +80,10 @@ void RayTraceModel::LoadMesh(VulkanEngine& engine, TextureManager& textureManage
 		auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
 		
 		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
+		MeshList.back().VertexOffset = TotalVertex;
+		MeshList.back().FirstIndex = TotalIndex;
+		TotalVertex += MeshList.back().VertexCount;
+		TotalIndex += MeshList.back().IndexCount;
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)

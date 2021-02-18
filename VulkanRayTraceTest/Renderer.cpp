@@ -16,6 +16,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //};
 
     textureManager = TextureManager(engine);
+    ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
     ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
     std::vector<Material> MaterialList;
@@ -443,7 +444,7 @@ std::vector<VkDescriptorBufferInfo> Renderer::AddVertexBufferListDescriptor()
     for (int x = 0; x < RayRenderer.VertexBufferList.size(); x++)
     {
         VkDescriptorBufferInfo VertexBufferInfo = {};
-        VertexBufferInfo.buffer = ModelList[0].MeshList[x].VertexBuffer.Buffer;
+        VertexBufferInfo.buffer = RayRenderer.VertexBufferList[x].Buffer;
         VertexBufferInfo.offset = 0;
         VertexBufferInfo.range = VK_WHOLE_SIZE;
         VertexBufferInfoList.emplace_back(VertexBufferInfo);
@@ -457,7 +458,7 @@ std::vector<VkDescriptorBufferInfo> Renderer::AddIndexBufferListDescriptor()
     for (int x = 0; x < RayRenderer.IndexBufferList.size(); x++)
     {
         VkDescriptorBufferInfo IndexBufferInfo = {};
-        IndexBufferInfo.buffer = ModelList[0].MeshList[x].IndexBuffer.Buffer;
+        IndexBufferInfo.buffer = RayRenderer.IndexBufferList[x].Buffer;
         IndexBufferInfo.offset = 0;
         IndexBufferInfo.range = VK_WHOLE_SIZE;
         IndexBufferInfoList.emplace_back(IndexBufferInfo);

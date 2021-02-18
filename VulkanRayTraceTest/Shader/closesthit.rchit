@@ -110,11 +110,30 @@ Material BuildMaterial(vec2 UV)
 	material.Specular = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Specular;
 	material.Shininess = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Shininess;
 	material.Reflectivness = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Reflectivness;
-	material.DiffuseMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
+
+	if(MaterialList.materialInfo[gl_InstanceCustomIndexEXT].DiffuseMapID == 0)
+	{
+		material.DiffuseMap = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Diffuse;
+	}
+	else
+	{
+		material.DiffuseMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
+	}
+
+	if(MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID == 0)
+	{
+		material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
+	}
+	else
+	{
+		material.SpecularMap = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Specular;
+	}
+
 	material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
 	material.NormalMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].NormalMapID], UV));
 	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].AlphaMapID], UV));
 	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].EmissionMapID], UV));
+	material.ShadowMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].ShadowMapID], UV));
 	return material;
 }
 
@@ -140,16 +159,16 @@ void main()
 
 	 	const Material material = BuildMaterial(UV);
 
-	vec3 lightDir = normalize(-ubo.dlight.direction);
-	vec3 ambient  =  CalcAmbient(ubo.dlight.ambient, vec3(0.7f));
-    vec3 diffuse  =  CalcDiffuse(ubo.dlight.direction, ubo.dlight.diffuse, vec3(0.7f));
-	hitValue = ambient + diffuse;
+//	vec3 lightDir = normalize(-ubo.dlight.direction);
+//	vec3 ambient  =  CalcAmbient(ubo.dlight.ambient, vec3(0.7f));
+//    vec3 diffuse  =  CalcDiffuse(ubo.dlight.direction, ubo.dlight.diffuse, vec3(0.7f));
+//	hitValue = ambient + diffuse;
+//
 
 
-
-//	 vec3 lightVector = normalize(ubo.dlight.direction);
-//	float dot_product = max(dot(lightVector, normal), 0.2);
-//	hitValue = vec3(0.7f) * dot_product;
+	 vec3 lightVector = normalize(ubo.dlight.direction);
+	float dot_product = max(dot(lightVector, normal), 0.2);
+	hitValue = material.DiffuseMap * dot_product;
 
 
 
@@ -175,7 +194,7 @@ void main()
 //	}
 //	else
 //	{	
-		hitValue += CalcSpecular(ubo.dlight.direction , ubo.dlight.specular, vec3(1.0f), ubo.viewPos, normal, material.Shininess);
+	//	hitValue += CalcSpecular(ubo.dlight.direction , ubo.dlight.specular, vec3(1.0f), ubo.viewPos, normal, material.Shininess);
 //	}
 //  }
 }

@@ -198,11 +198,11 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AccelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
     AccelerationBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
     AccelerationBuildGeometryInfo.srcAccelerationStructure = nullptr;
-    AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.deviceAddress;
+    AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.BufferDeviceAddress;
 
-    AcclerationCommandBuffer(AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
+    AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
 
-    deleteScratchBuffer(scratchBuffer);
+    scratchBuffer.DestoryBuffer(engine.Device);
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
 
