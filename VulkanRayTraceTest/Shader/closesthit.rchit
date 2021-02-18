@@ -149,15 +149,18 @@ void main()
 
 	// Interpolate normal
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
-	vec3 color = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
+
+	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
+	worldPos = vec3(ubo.model * vec4(worldPos, 1.0));
+
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	 normal = vec3(ubo.model * vec4(normal, 1.0));
+	normal =   mat3(transpose(inverse(ubo.model))) * normal;  
+
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 
-	 vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
-	 worldPos = vec3(ubo.model * vec4(worldPos, 1.0));
-
-	 	const Material material = BuildMaterial(UV);
+	vec3 color = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
+	
+	const Material material = BuildMaterial(UV);
 
 //	vec3 lightDir = normalize(-ubo.dlight.direction);
 //	vec3 ambient  =  CalcAmbient(ubo.dlight.ambient, vec3(0.7f));

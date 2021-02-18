@@ -10,7 +10,7 @@
 #include "Vertex.h"
 #include "Mesh.h"
 
-class RayTraceModel
+class Model
 {
 private:
 	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
@@ -55,11 +55,11 @@ public:
 	VkDeviceOrHostAddressConstKHR ModelIndexBufferDeviceAddress{};
 	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
 
-	RayTraceModel();
-	RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
-	RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
-	~RayTraceModel();
+	Model();
+	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
+	Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
+	~Model();
 
 	void Update();
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);

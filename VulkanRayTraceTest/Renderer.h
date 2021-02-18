@@ -4,9 +4,8 @@
 #include "InterfaceRenderPass.h"
 #include "MainRenderPass.h"
 #include "TextureManager.h"
-#include "RayTraceModel.h"
+#include "Model.h"
 #include "RayTraceRenderer.h"
-#include "RayTraceModel.h"
 
 class Renderer
 {
@@ -39,7 +38,7 @@ private:
 
 	VulkanBuffer MaterialBuffer;
 	std::shared_ptr<SceneDataStruct> SceneData;
-	std::vector<RayTraceModel> RenderModel;
+	std::vector<Model> RenderModel;
 
 	void SetUpDescriptorPool(VulkanEngine& engine);
 	void SetUpDescriptorLayout(VulkanEngine& engine);
@@ -68,7 +67,7 @@ private:
 
 public:
 	TextureManager textureManager;
-	std::vector<RayTraceModel> ModelList;
+	std::vector<Model> ModelList;
 
 	Renderer();
 	Renderer(VulkanEngine& engine, VulkanWindow& window);

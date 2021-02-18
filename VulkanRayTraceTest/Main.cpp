@@ -44,7 +44,7 @@ private:
     VulkanEngine engine;
     Renderer renderer;
 
-    std::vector<RayTraceModel> ModelList;
+    std::vector<Model> ModelList;
 
     void initVulkan() 
     {

@@ -16,7 +16,7 @@
 #include "VulkanBuffer.h"
 #include <vector>
 #include "Buffer.h"
-#include "RayTraceModel.h"
+#include "Model.h"
 #include "PerspectiveCamera.h"
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -84,20 +84,20 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList);
+    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<Model>& modelList);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);
 
-    std::vector<RayTraceModel> ModelList;
+    std::vector<Model> ModelList;
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
 
 
-    void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh);
-    void createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model);
-    void createTopLevelAccelerationStructure(VulkanEngine& engine);
+    void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model, Mesh& mesh);
+    void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model);
+    void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     void createShaderBindingTable(VulkanEngine& engine);
@@ -106,7 +106,7 @@ public:
 
     void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
 
-    void UpdateAccelerationStructure(VulkanEngine& engine);
+    void UpdateAccelerationStructure(VulkanEngine& engine, std::vector<Model>& modelList);
 
     VkResult createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);

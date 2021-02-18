@@ -6,8 +6,9 @@
 
 layout(push_constant) uniform MeshInfo
 {
-	int MeshID;
-	int MaterialID;
+	uint MeshID;
+	uint ModelID;
+	uint MaterialID;
 } Mesh;
 
 struct VertexData

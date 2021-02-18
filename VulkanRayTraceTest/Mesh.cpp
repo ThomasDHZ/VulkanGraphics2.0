@@ -218,6 +218,7 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 {
 	MeshInfo meshInfo;
 	meshInfo.MeshID = MeshID;
+	meshInfo.ModelID = 0;
 	meshInfo.MaterialID = 0;
 
 	VkBuffer vertexBuffers[] = { VertexBuffer.Buffer };

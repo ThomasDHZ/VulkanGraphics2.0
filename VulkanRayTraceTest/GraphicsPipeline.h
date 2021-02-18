@@ -11,8 +11,9 @@ enum RendererType
 
 struct MeshInfo
 {
-	int MeshID;
-	int MaterialID;
+	uint32_t MeshID;
+	uint32_t ModelID;
+	uint32_t MaterialID;
 };
 
 

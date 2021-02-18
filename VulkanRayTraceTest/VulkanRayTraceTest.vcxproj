@@ -161,9 +161,10 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRenderPass.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ModelRenderManager.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
-    <ClCompile Include="RayTraceModel.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
@@ -211,9 +212,10 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="MainRenderPass.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="ModelRenderManager.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PerspectiveCamera.h" />
-    <ClInclude Include="RayTraceModel.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />

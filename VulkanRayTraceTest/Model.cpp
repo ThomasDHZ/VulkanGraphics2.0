@@ -1,22 +1,22 @@
-#include "RayTraceModel.h"
+#include "Model.h"
 #include <chrono>
 
 
-RayTraceModel::RayTraceModel()
+Model::Model()
 {
 }
 
-RayTraceModel::RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0));
 }
 
-RayTraceModel::RayTraceModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
+Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
 {
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, 0));
 }
 
-RayTraceModel::RayTraceModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
+Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
 {
 	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(engine.Device, "vkCmdBuildAccelerationStructuresKHR"));
@@ -62,11 +62,11 @@ RayTraceModel::RayTraceModel(VulkanEngine& engine, TextureManager& textureManage
 	ModelTransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelTransformBuffer.Buffer);
 }
 
-RayTraceModel::~RayTraceModel()
+Model::~Model()
 {
 }
 
-void RayTraceModel::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -92,7 +92,7 @@ void RayTraceModel::LoadMesh(VulkanEngine& engine, TextureManager& textureManage
 	}
 }
 
-std::vector<Vertex> RayTraceModel::LoadVertices(aiMesh* mesh)
+std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 {
 	std::vector<Vertex> VertexList;
 
@@ -140,7 +140,7 @@ std::vector<Vertex> RayTraceModel::LoadVertices(aiMesh* mesh)
 	return VertexList;
 }
 
-std::vector<uint32_t> RayTraceModel::LoadIndices(aiMesh* mesh)
+std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 {
 	std::vector<uint32_t> IndexList;
 
@@ -157,7 +157,7 @@ std::vector<uint32_t> RayTraceModel::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-Material RayTraceModel::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+Material Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	Material ModelMaterial;
 
@@ -231,7 +231,7 @@ Material RayTraceModel::LoadMaterial(VulkanEngine& engine, TextureManager& textu
 	return ModelMaterial;
 }
 
-void RayTraceModel::Update()
+void Model::Update()
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -239,10 +239,9 @@ void RayTraceModel::Update()
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
-	ModelTransform = glm::transpose(ModelTransform);
 }
 
-void RayTraceModel::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
+void Model::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
 {
 	for (auto mesh : MeshList)
 	{
@@ -250,7 +249,7 @@ void RayTraceModel::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<Graphics
 	}
 }
 
-void RayTraceModel::Destory(VkDevice& device)
+void Model::Destory(VkDevice& device)
 {
 	for (auto& mesh : MeshList)
 	{

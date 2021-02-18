@@ -16,8 +16,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //};
 
     textureManager = TextureManager(engine);
-    ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
-    ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+    ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
+ //   ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
     std::vector<Material> MaterialList;
     for (int x = 0; x < ModelList.size(); x++)
@@ -189,7 +189,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 
 void Renderer::AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath)
 {
-    ModelList.emplace_back(RayTraceModel(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+    ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
     UpdateSwapChain(engine, window);
 }
 
@@ -239,7 +239,11 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    SceneData->SceneData.model = glm::mat4(1.0f);
+    for (auto& model : ModelList)
+    {
+        model.Update();
+    }
+    SceneData->SceneData.model = ModelList[0].ModelTransform;
     SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     SceneData->SceneData.projInverse[1][1] *= -1;
@@ -250,7 +254,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->SceneData.vertexSize = sizeof(Vertex);
     SceneData->Update(engine);
 
-    RayRenderer.UpdateAccelerationStructure(engine);
+    RayRenderer.UpdateAccelerationStructure(engine, ModelList);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -261,6 +265,10 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Speculare", &SceneData->SceneData.dlight.specular.x, 0.0f, 1.0f);
+
+    ImGui::SliderFloat3("Transform", &ModelList[0].ModelPosition.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Rotate", &ModelList[0].ModelRotation.x, 0.0f, 360.0f);
+    ImGui::SliderFloat3("Scale", &ModelList[0].ModelScale.x, 0.0f, 1.0f);
 
     ImGui::SliderFloat3("Pos2", &SceneData->SceneData.plight.position.x, -10.0f, 10.0f);
     ImGui::SliderFloat3("Ambient2", &SceneData->SceneData.plight.ambient.x, 0.0f, 1.0f);

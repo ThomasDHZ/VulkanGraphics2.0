@@ -9,7 +9,7 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<RayTraceModel>& modelList)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<Model>& modelList)
 {
     ModelList = modelList;
 
@@ -43,7 +43,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
             createBottomLevelAccelerationStructure(engine, ModelList[x], ModelList[x].MeshList[y]);
         }
     }
-   createTopLevelAccelerationStructure(engine);
+   createTopLevelAccelerationStructure(engine, modelList);
    createStorageImage(engine, storageImage);
 }
 RayTraceRenderer::~RayTraceRenderer()
@@ -76,7 +76,7 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     }
 }
 
-void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model, Mesh& mesh)
+void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model, Mesh& mesh)
 {
     AccelerationStructure bottomLevelAS{};
 
@@ -131,7 +131,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
 
-void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, RayTraceModel& model)
+void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model)
 {
     AccelerationStructure bottomLevelAS{};
 
@@ -206,13 +206,13 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
 
-void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine)
+void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model)
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
     for (auto x = 0; x < bottomLevelASList.size(); x++)
     {
-        glm::mat4 transformMatrix2 = ModelList[0].ModelTransform;
+        glm::mat4 transformMatrix2 = glm::transpose(model[0].ModelTransform);
         VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
         VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
@@ -419,9 +419,9 @@ void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelera
     vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
 }
 
-void RayTraceRenderer::UpdateAccelerationStructure(VulkanEngine& engine)
+void RayTraceRenderer::UpdateAccelerationStructure(VulkanEngine& engine, std::vector<Model>& modelList)
 {
-    createTopLevelAccelerationStructure(engine);
+    createTopLevelAccelerationStructure(engine, modelList);
 }
 
 void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout)
