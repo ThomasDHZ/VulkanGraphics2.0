@@ -48,8 +48,19 @@ class Mesh
 {
 private:
 	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
-	void MeshBottomLevelAccelerationStructure(VulkanEngine& engine);
+	PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
+	PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR;
+	PFN_vkGetAccelerationStructureBuildSizesKHR vkGetAccelerationStructureBuildSizesKHR;
+	PFN_vkGetAccelerationStructureDeviceAddressKHR vkGetAccelerationStructureDeviceAddressKHR;
+	PFN_vkCmdBuildAccelerationStructuresKHR vkCmdBuildAccelerationStructuresKHR;
+	PFN_vkBuildAccelerationStructuresKHR vkBuildAccelerationStructuresKHR;
+	PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR;
+	PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
+	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
+	void MeshBottomLevelAccelerationStructure(VulkanEngine& engine);
+	void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo);
+	void CreateAccelerationStructure(VulkanEngine& engine, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR& buildSizeInfo);
 public:
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
@@ -66,7 +77,7 @@ public:
 		uint32_t VertexCount;
 		uint32_t IndexCount;
 	
-		std::shared_ptr<AccelerationStructure> BottomLevelAccelerationStructure;
+		AccelerationStructure BottomLevelAccelerationStructure;
 
 		VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress{};
 		VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress{};

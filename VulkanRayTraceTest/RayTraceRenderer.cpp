@@ -310,40 +310,6 @@ void RayTraceRenderer::setImageLayout(
         1, &imageMemoryBarrier);
 }
 
-RayTracingScratchBuffer RayTraceRenderer::createScratchBuffer(VulkanEngine& engine, VkDeviceSize size)
-{
-    RayTracingScratchBuffer scratchBuffer{};
-
-    VkBufferCreateInfo bufferCreateInfo{};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    bufferCreateInfo.size = size;
-    bufferCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-    vkCreateBuffer(engine.Device, &bufferCreateInfo, nullptr, &scratchBuffer.handle);
-
-    VkMemoryRequirements memoryRequirements{};
-    vkGetBufferMemoryRequirements(engine.Device, scratchBuffer.handle, &memoryRequirements);
-
-    VkMemoryAllocateFlagsInfo memoryAllocateFlagsInfo{};
-    memoryAllocateFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-    memoryAllocateFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-
-    VkMemoryAllocateInfo memoryAllocateInfo = {};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAllocateInfo.pNext = &memoryAllocateFlagsInfo;
-    memoryAllocateInfo.allocationSize = memoryRequirements.size;
-    memoryAllocateInfo.memoryTypeIndex = getMemoryType(engine, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &scratchBuffer.memory);
-    vkBindBufferMemory(engine.Device, scratchBuffer.handle, scratchBuffer.memory, 0);
-
-    VkBufferDeviceAddressInfoKHR bufferDeviceAddressInfo{};
-    bufferDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
-    bufferDeviceAddressInfo.buffer = scratchBuffer.handle;
-    scratchBuffer.deviceAddress = vkGetBufferDeviceAddressKHR(engine.Device, &bufferDeviceAddressInfo);
-
-    return scratchBuffer;
-}
-
-
 void RayTraceRenderer::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo)
 {
     VkCommandBufferAllocateInfo CommandBufferAllocateInfo{};
@@ -573,19 +539,10 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
         vkEndCommandBuffer(drawCmdBuffers[i]);
     }
 }
+
 void RayTraceRenderer::Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set)
 {
     buildCommandBuffers(engine, swapChainFramebuffersSize, swapChainImages, set);
-}
-
-void RayTraceRenderer::deleteScratchBuffer(VulkanEngine& engine, RayTracingScratchBuffer& scratchBuffer)
-{
-    if (scratchBuffer.memory != VK_NULL_HANDLE) {
-        vkFreeMemory(engine.Device, scratchBuffer.memory, nullptr);
-    }
-    if (scratchBuffer.handle != VK_NULL_HANDLE) {
-        vkDestroyBuffer(engine.Device, scratchBuffer.handle, nullptr);
-    }
 }
 
 void RayTraceRenderer::createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo)
@@ -595,16 +552,20 @@ void RayTraceRenderer::createAccelerationStructure(VulkanEngine& engine, Acceler
     bufferCreateInfo.size = buildSizeInfo.accelerationStructureSize;
     bufferCreateInfo.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
     vkCreateBuffer(engine.Device, &bufferCreateInfo, nullptr, &accelerationStructure.buffer);
+
     VkMemoryRequirements memoryRequirements{};
     vkGetBufferMemoryRequirements(engine.Device, accelerationStructure.buffer, &memoryRequirements);
+
     VkMemoryAllocateFlagsInfo memoryAllocateFlagsInfo{};
     memoryAllocateFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
     memoryAllocateFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
+
     VkMemoryAllocateInfo memoryAllocateInfo{};
     memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memoryAllocateInfo.pNext = &memoryAllocateFlagsInfo;
     memoryAllocateInfo.allocationSize = memoryRequirements.size;
     memoryAllocateInfo.memoryTypeIndex = getMemoryType(engine, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
     vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &accelerationStructure.memory);
     vkBindBufferMemory(engine.Device, accelerationStructure.buffer, accelerationStructure.memory, 0);
 

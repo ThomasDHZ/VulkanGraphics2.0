@@ -141,11 +141,8 @@ void main()
 	 	const Material material = BuildMaterial(UV);
 
 	vec3 lightDir = normalize(-ubo.dlight.direction);
-	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
-
-	vec3 ambient = ubo.dlight.ambient *  material.DiffuseMap;
-    vec3 diffuse = ubo.dlight.diffuse * diff *   material.DiffuseMap;
- 
+	vec3 ambient  =  CalcAmbient(ubo.dlight.ambient, vec3(0.7f));
+    vec3 diffuse  =  CalcDiffuse(ubo.dlight.direction, ubo.dlight.diffuse, vec3(0.7f));
 	hitValue = ambient + diffuse;
 
 
@@ -163,25 +160,22 @@ void main()
 
 
 
-	float spec = 0.0f;
-//  if(dot(normal, lightDir) > 0)
-//  {
-	// Shadow casting
-	float tmin = 0.001;
-	float tmax = 10000.0;
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	shadowed = true;  
-	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
-	if (shadowed) {
-		hitValue *= 0.3f;
-	}
-	else
-	{
-			vec3 halfwayDir = normalize(ubo.dlight.direction + ubo.viewPos);  
-         spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
-		vec3 specular = ubo.dlight.specular * spec * material.Specular;
-		hitValue += specular;
-	}
+//	float spec = 0.0f;
+////  if(dot(normal, lightDir) > 0)
+////  {
+//	// Shadow casting
+//	float tmin = 0.001;
+//	float tmax = 10000.0;
+//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+//	shadowed = true;  
+//	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+//	if (shadowed) {
+//		hitValue *= 0.3f;
+//	}
+//	else
+//	{	
+		hitValue += CalcSpecular(ubo.dlight.direction , ubo.dlight.specular, vec3(1.0f), ubo.viewPos, normal, material.Shininess);
+//	}
 //  }
 }

@@ -76,9 +76,6 @@ public:
 
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
     VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
-    //VkDescriptorSet       RTDescriptorSet = VK_NULL_HANDLE;
-    //VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
-    //VkDescriptorPool      descriptorPool = VK_NULL_HANDLE;
 
     std::vector<AccelerationStructure> bottomLevelASList{};
     AccelerationStructure topLevelAS{};
@@ -112,9 +109,7 @@ public:
 
     VkResult createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-    void deleteScratchBuffer(VulkanEngine& engine, RayTracingScratchBuffer& scratchBuffer);
-    void createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
-    RayTracingScratchBuffer createScratchBuffer(VulkanEngine& engine, VkDeviceSize size);
+   void createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
 
 
     uint32_t getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties);

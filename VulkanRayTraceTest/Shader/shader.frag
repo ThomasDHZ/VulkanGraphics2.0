@@ -101,18 +101,10 @@ void main()
 
 	Material material = BuildMaterial();
 
-	vec3 lightDir = normalize(-scenedata.dlight.direction);
-	float diff = max(dot(scenedata.dlight.direction, lightDir), 0.0);
 
-	vec3 ambient = scenedata.dlight.ambient *  material.DiffuseMap;
-    vec3 diffuse = scenedata.dlight.diffuse * diff *   material.DiffuseMap;
- 
- 	vec3 halfwayDir = normalize(scenedata.dlight.direction + scenedata.viewPos);  
-    float spec = pow(max(dot(Normal, halfwayDir), 0.0), material.Shininess);
-    vec3 specular = scenedata.dlight.specular * spec * material.SpecularMap;
-
+	vec3 ambient  =  CalcAmbient(scenedata.dlight.ambient, vec3(0.7f));
+    vec3 diffuse  =  CalcDiffuse(scenedata.dlight.direction, scenedata.dlight.diffuse, vec3(0.7f));
+	vec3 specular = CalcSpecular(scenedata.dlight.direction , scenedata.dlight.specular, vec3(1.0f), scenedata.viewPos, Normal, material.Shininess);
 	vec3 color = ambient + diffuse + specular;
-
-
 	 outColor = vec4(color, 1.0f);
 }
