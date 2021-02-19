@@ -47,7 +47,6 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
-	ModelTransform = glm::transpose(ModelTransform);
 
 	ModelVertexCount = ModelVertices.size();
 	ModelIndexCount = ModelIndices.size();
@@ -231,7 +230,7 @@ Material Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManage
 	return ModelMaterial;
 }
 
-void Model::Update()
+void Model::Update(VulkanEngine& engine)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -239,6 +238,11 @@ void Model::Update()
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
+
+	for(auto& mesh : MeshList)
+	{
+		mesh.Update(engine);
+	}
 }
 
 void Model::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)

@@ -89,11 +89,9 @@ public:
 
     void Destory(VulkanEngine& engine);
 
-    std::vector<Model> ModelList;
-
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
-
+    std::vector<VulkanBuffer> MaterialBufferList;
 
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model, Mesh& mesh);
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model);
@@ -105,8 +103,6 @@ public:
     void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set);
 
     void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
-
-    void UpdateAccelerationStructure(VulkanEngine& engine, std::vector<Model>& modelList);
 
     VkResult createBuffer(VulkanEngine& engine, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags memoryPropertyFlags, Buffer* buffer, VkDeviceSize size, void* data);
     void createBuffer(VulkanEngine& engine, VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);

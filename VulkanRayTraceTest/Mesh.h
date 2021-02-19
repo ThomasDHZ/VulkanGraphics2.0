@@ -62,9 +62,11 @@ private:
 	void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo);
 	void CreateAccelerationStructure(VulkanEngine& engine, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR& buildSizeInfo);
 public:
-		std::vector<Vertex> vertices;
-		std::vector<uint32_t> indices;
-		glm::mat4 Transform;
+		glm::mat4 MeshTransform;
+		glm::vec3 MeshPosition = glm::vec3(0.0f);
+		glm::vec3 MeshRotation = glm::vec3(0.0f);
+		glm::vec3 MeshScale = glm::vec3(1.0f);
+
 		Material material;
 	
 		VulkanBuffer IndexBuffer;
@@ -78,6 +80,8 @@ public:
 		uint32_t PrimitiveCount; //TriangleCount
 		uint32_t FirstIndex;     //primitiveOffset
 		uint32_t VertexOffset;   //firstVertex
+
+		bool ShowMesh = true;
 	
 		AccelerationStructure BottomLevelAccelerationStructure;
 
@@ -96,6 +100,7 @@ public:
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
+	void Update(VulkanEngine& engine);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 };

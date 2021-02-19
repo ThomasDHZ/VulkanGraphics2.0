@@ -61,7 +61,7 @@ public:
 	Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
 	~Model();
 
-	void Update();
+	void Update(VulkanEngine& engine);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VkDevice& device);
 };

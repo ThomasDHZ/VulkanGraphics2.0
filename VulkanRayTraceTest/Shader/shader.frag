@@ -34,7 +34,7 @@ struct MaterialInfo
 	uint DepthMapID;
 	uint AlphaMapID;
 	uint EmissionMapID;
-	uint ShadowMapID;
+		uint ShadowMapID;
 };
 
 struct Material
@@ -51,7 +51,7 @@ struct Material
 	vec3 DepthMap;
 	vec3 AlphaMap;
 	vec3 EmissionMap;
-	vec3 ShadowMap;
+		vec3 ShadowMap;
 };
 
 layout(binding = 2) uniform UniformBufferObject {
@@ -68,7 +68,7 @@ layout(binding = 2) uniform UniformBufferObject {
 //layout(binding = 1, set = 0, rgba8) uniform image2D image;
 //layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 //layout(binding = 4) buffer Indices { uint i[]; } indices[];
-layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
+layout(binding = 5) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 6) uniform sampler2D TextureMap[];
 //layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
 
@@ -83,35 +83,35 @@ layout(location = 0) out vec4 outColor;
 Material BuildMaterial()
 {
 	Material material;
-	material.Ambient = MaterialList.materialInfo[Mesh.MeshID].Ambient;
-	material.Diffuse = MaterialList.materialInfo[Mesh.MeshID].Diffuse;
-	material.Specular = MaterialList.materialInfo[Mesh.MeshID].Specular;
-	material.Shininess = MaterialList.materialInfo[Mesh.MeshID].Shininess;
-	material.Reflectivness = MaterialList.materialInfo[Mesh.MeshID].Reflectivness;
+	material.Ambient = MaterialList[Mesh.MeshID].material.Ambient;
+	material.Diffuse = MaterialList[Mesh.MeshID].material.Diffuse;
+	material.Specular = MaterialList[Mesh.MeshID].material.Specular;
+	material.Shininess = MaterialList[Mesh.MeshID].material.Shininess;
+	material.Reflectivness = MaterialList[Mesh.MeshID].material.Reflectivness;
 
-	if(MaterialList.materialInfo[Mesh.MeshID].DiffuseMapID == 0)
+	if(MaterialList[Mesh.MeshID].material.DiffuseMapID == 0)
 	{
-		material.DiffuseMap = MaterialList.materialInfo[Mesh.MeshID].Diffuse;
+		material.DiffuseMap = MaterialList[Mesh.MeshID].material.Diffuse;
 	}
 	else
 	{
-		material.DiffuseMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].DiffuseMapID], UV));
+		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.DiffuseMapID], UV));
 	}
 
-	if(MaterialList.materialInfo[Mesh.MeshID].SpecularMapID == 0)
+	if(MaterialList[Mesh.MeshID].material.SpecularMapID == 0)
 	{
-		material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].SpecularMapID], UV));
+		material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], UV));
 	}
 	else
 	{
-		material.SpecularMap = MaterialList.materialInfo[Mesh.MeshID].Specular;
+		material.SpecularMap = MaterialList[Mesh.MeshID].material.Specular;
 	}
 
-	material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].SpecularMapID], UV));
-	material.NormalMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].NormalMapID], UV));
-	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].AlphaMapID], UV));
-	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].EmissionMapID], UV));
-	material.ShadowMap = vec3(texture(TextureMap[MaterialList.materialInfo[Mesh.MeshID].ShadowMapID], UV));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], UV));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.NormalMapID], UV));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.AlphaMapID], UV));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.EmissionMapID], UV));
+	material.ShadowMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.ShadowMapID], UV));
 	return material;
 }
 

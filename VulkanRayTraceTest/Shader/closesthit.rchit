@@ -66,7 +66,7 @@ layout(binding = 2) uniform UBO
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
-layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
+layout(binding = 5) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 6) uniform sampler2D TextureMap[];
 
 struct Vertex
@@ -105,35 +105,35 @@ Vertex unpack(uint index)
 Material BuildMaterial(vec2 UV)
 {
 	Material material;
-	material.Ambient = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Ambient;
-	material.Diffuse = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Diffuse;
-	material.Specular = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Specular;
-	material.Shininess = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Shininess;
-	material.Reflectivness = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Reflectivness;
+	material.Ambient = MaterialList[gl_InstanceCustomIndexEXT].material.Ambient;
+	material.Diffuse = MaterialList[gl_InstanceCustomIndexEXT].material.Diffuse;
+	material.Specular = MaterialList[gl_InstanceCustomIndexEXT].material.Specular;
+	material.Shininess = MaterialList[gl_InstanceCustomIndexEXT].material.Shininess;
+	material.Reflectivness = MaterialList[gl_InstanceCustomIndexEXT].material.Reflectivness;
 
-	if(MaterialList.materialInfo[gl_InstanceCustomIndexEXT].DiffuseMapID == 0)
+	if(MaterialList[gl_InstanceCustomIndexEXT].material.DiffuseMapID == 0)
 	{
-		material.DiffuseMap = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Diffuse;
+		material.DiffuseMap = MaterialList[gl_InstanceCustomIndexEXT].material.Diffuse;
 	}
 	else
 	{
-		material.DiffuseMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].DiffuseMapID], UV));
+		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.DiffuseMapID], UV));
 	}
 
-	if(MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID == 0)
+	if(MaterialList[gl_InstanceCustomIndexEXT].material.SpecularMapID == 0)
 	{
-		material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
+		material.SpecularMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.SpecularMapID], UV));
 	}
 	else
 	{
-		material.SpecularMap = MaterialList.materialInfo[gl_InstanceCustomIndexEXT].Specular;
+		material.SpecularMap = MaterialList[gl_InstanceCustomIndexEXT].material.Specular;
 	}
 
-	material.SpecularMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].SpecularMapID], UV));
-	material.NormalMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].NormalMapID], UV));
-	material.AlphaMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].AlphaMapID], UV));
-	material.EmissionMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].EmissionMapID], UV));
-	material.ShadowMap = vec3(texture(TextureMap[MaterialList.materialInfo[gl_InstanceCustomIndexEXT].ShadowMapID], UV));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.SpecularMapID], UV));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.NormalMapID], UV));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.AlphaMapID], UV));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.EmissionMapID], UV));
+	material.ShadowMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.ShadowMapID], UV));
 	return material;
 }
 

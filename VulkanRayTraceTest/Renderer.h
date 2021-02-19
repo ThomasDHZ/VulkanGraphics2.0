@@ -34,9 +34,10 @@ private:
 	size_t currentFrame = 0;
 
 	bool RayTraceSwitch = false;
+	bool UpdateRenderer = false;
 	bool framebufferResized = false;
 
-	VulkanBuffer MaterialBuffer;
+	std::vector<VulkanBuffer> MaterialBuffer;
 	std::shared_ptr<SceneDataStruct> SceneData;
 	std::vector<Model> RenderModel;
 
