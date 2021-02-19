@@ -161,6 +161,9 @@
     <None Include="Shader\RasterShadowClosestHit.rchit">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\Material.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffer.h">

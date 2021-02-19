@@ -17,7 +17,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     textureManager = TextureManager(engine);
     ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
- //   ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+   // ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
     std::vector<Material> MaterialList;
     for (int x = 0; x < ModelList.size(); x++)
@@ -429,6 +429,41 @@ VkDescriptorImageInfo Renderer::AddTextureDescriptor(VulkanEngine& engine, VkIma
     return DescriptorImage;
 }
 
+std::vector<VkDescriptorBufferInfo> Renderer::AddVertexBufferListDescriptor()
+{
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
+    for (int x = 0; x < ModelList.size(); x++)
+    {
+        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        {
+            VkDescriptorBufferInfo VertexBufferInfo = {};
+            VertexBufferInfo.buffer = ModelList[x].MeshList[y].VertexBuffer.Buffer;
+            VertexBufferInfo.offset = 0;
+            VertexBufferInfo.range = VK_WHOLE_SIZE;
+            VertexBufferInfoList.emplace_back(VertexBufferInfo);
+        }
+    }
+    return VertexBufferInfoList;
+}
+
+std::vector<VkDescriptorBufferInfo> Renderer::AddIndexBufferListDescriptor()
+{
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
+    for (int x = 0; x < ModelList.size(); x++)
+    {
+        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        {
+            VkDescriptorBufferInfo IndexBufferInfo = {};
+            IndexBufferInfo.buffer = ModelList[x].MeshList[y].IndexBuffer.Buffer;
+            IndexBufferInfo.offset = 0;
+            IndexBufferInfo.range = VK_WHOLE_SIZE;
+            IndexBufferInfoList.emplace_back(IndexBufferInfo);
+        }
+    }
+    return IndexBufferInfoList;
+}
+
+
 VkDescriptorImageInfo Renderer::AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, StorageImage& texture)
 {
     VkDescriptorImageInfo RayTraceImageDescriptor{};
@@ -444,34 +479,6 @@ VkDescriptorBufferInfo Renderer::AddBufferDescriptor(VulkanEngine& engine, VkBuf
     BufferInfo.offset = 0;
     BufferInfo.range = BufferSize;
     return BufferInfo;
-}
-
-std::vector<VkDescriptorBufferInfo> Renderer::AddVertexBufferListDescriptor()
-{
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
-    for (int x = 0; x < RayRenderer.VertexBufferList.size(); x++)
-    {
-        VkDescriptorBufferInfo VertexBufferInfo = {};
-        VertexBufferInfo.buffer = RayRenderer.VertexBufferList[x].Buffer;
-        VertexBufferInfo.offset = 0;
-        VertexBufferInfo.range = VK_WHOLE_SIZE;
-        VertexBufferInfoList.emplace_back(VertexBufferInfo);
-    }
-    return VertexBufferInfoList;
-}
-
-std::vector<VkDescriptorBufferInfo> Renderer::AddIndexBufferListDescriptor()
-{
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
-    for (int x = 0; x < RayRenderer.IndexBufferList.size(); x++)
-    {
-        VkDescriptorBufferInfo IndexBufferInfo = {};
-        IndexBufferInfo.buffer = RayRenderer.IndexBufferList[x].Buffer;
-        IndexBufferInfo.offset = 0;
-        IndexBufferInfo.range = VK_WHOLE_SIZE;
-        IndexBufferInfoList.emplace_back(IndexBufferInfo);
-    }
-    return IndexBufferInfoList;
 }
 
 VkWriteDescriptorSet Renderer::AddDescriptorSetBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
