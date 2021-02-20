@@ -1,0 +1,78 @@
+# MTL written from C:\Users\dotha\source\repos\VulkanGraphics\Models\vulkanscene_shadow.obj
+newmtl Black
+Kd 0.018921 0.018921 0.018921
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl Black_001
+Kd 0.018921 0.018921 0.018921
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl Black_002
+Kd 0.018921 0.018921 0.018921
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl Black_003
+Kd 0.018921 0.018921 0.018921
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl Logo_001
+Kd 0.8 0.003758 0.006106
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl Logo_003
+Kd 0.8 0.003758 0.006106
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl Material_046001
+Kd 0.64 0.64 0.64
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl White
+Kd 0.537705 0.537705 0.537705
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl White_001
+Kd 0.537705 0.537705 0.537705
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl White_002
+Kd 0.537705 0.537705 0.537705
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
+newmtl White_003
+Kd 0.537705 0.537705 0.537705
+Ns 225
+d 1
+illum 2
+Ka 1 1 1
+Ks 0.5 0.5 0.5
