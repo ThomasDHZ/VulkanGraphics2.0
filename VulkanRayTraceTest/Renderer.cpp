@@ -1,5 +1,4 @@
 #include "Renderer.h"
-
 Renderer::Renderer()
 {
 }
@@ -16,16 +15,16 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //};
 
     textureManager = TextureManager(engine);
-    ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/vulkanscene_shadow.obj"));
+    ModelList.emplace_back(Model(engine, textureManager, "../Models/vulkanscene_shadow.obj"));
    // ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
     std::string CubeMapFiles[6];
-    CubeMapFiles[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
-    CubeMapFiles[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
-    CubeMapFiles[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
-    CubeMapFiles[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
-    CubeMapFiles[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
-    CubeMapFiles[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg";
+    CubeMapFiles[0] = "../texture/skybox/right.jpg";
+    CubeMapFiles[1] = "../texture/skybox/left.jpg";
+    CubeMapFiles[2] = "../texture/skybox/top.jpg";
+    CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
+    CubeMapFiles[4] = "../texture/skybox/back.jpg";
+    CubeMapFiles[5] = "../texture/skybox/front.jpg";
 
     textureManager.LoadCubeMap(engine, CubeMapFiles);
 
@@ -89,7 +88,7 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, (uint32_t)RayRenderer.VertexBufferList.size() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, (uint32_t)RayRenderer.IndexBufferList.size() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, (uint32_t)RayRenderer.MaterialBufferList.size() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, static_cast<uint32_t>(textureManager.GetTextureList().size()) });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
@@ -191,7 +190,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 
 void Renderer::AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath)
 {
-    ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+    ModelList.emplace_back(Model(engine, textureManager, FilePath));
     UpdateSwapChain(engine, window);
 }
 

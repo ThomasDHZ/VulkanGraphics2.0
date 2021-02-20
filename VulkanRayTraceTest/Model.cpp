@@ -239,10 +239,10 @@ void Model::Update(VulkanEngine& engine)
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
 
-	for(auto& mesh : MeshList)
-	{
-		mesh.Update(engine);
-	}
+	//for(auto& mesh : MeshList)
+	//{
+	//	mesh.Update(engine);
+	//}
 }
 
 void Model::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)

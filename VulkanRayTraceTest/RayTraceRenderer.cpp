@@ -34,13 +34,14 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(engine.Device, "vkCreateRayTracingPipelinesKHR"));
  
-    for (int x = 0; x < model.size(); x++)
-    {
-        for (int y = 0; y < model[x].MeshList.size(); y++)
-        {
-            createBottomLevelAccelerationStructure(engine, model[x], model[x].MeshList[y]);
-        }
-    }
+    //for (int x = 0; x < model.size(); x++)
+    //{
+    //    for (int y = 0; y < model[x].MeshList.size(); y++)
+    //    {
+    //        createBottomLevelAccelerationStructure(engine, model[x], model[x].MeshList[y]);
+    //    }
+    //}
+   createBottomLevelAccelerationStructure(engine, model[0]);
    createTopLevelAccelerationStructure(engine, model);
    createStorageImage(engine, storageImage);
 }
@@ -388,7 +389,7 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescript
     PipelineLayoutCreateInfo.pSetLayouts = &layout;
     vkCreatePipelineLayout(engine.Device, &PipelineLayoutCreateInfo, nullptr, &RayTracePipelineLayout);
 
-    ShaderList.emplace_back(loadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
+    ShaderList.emplace_back(loadShader(engine, "Shader/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR RayGeneratorShaderInfo = {};
     RayGeneratorShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     RayGeneratorShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
@@ -398,7 +399,7 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescript
     RayGeneratorShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(RayGeneratorShaderInfo);
 
-    ShaderList.emplace_back(loadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/miss.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
+    ShaderList.emplace_back(loadShader(engine, "Shader/miss.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR MissShaderInfo = {};
     MissShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     MissShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
@@ -408,7 +409,7 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescript
     MissShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(MissShaderInfo);
 
-    ShaderList.emplace_back(loadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/shadow.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
+    ShaderList.emplace_back(loadShader(engine, "Shader/shadow.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ShadowShaderInfo = {};
     ShadowShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     ShadowShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
@@ -418,7 +419,7 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescript
     ShadowShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(ShadowShaderInfo);
 
-    ShaderList.emplace_back(loadShader(engine, "C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
+    ShaderList.emplace_back(loadShader(engine, "Shader/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ClosestHitShaderInfo = {};
     ClosestHitShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     ClosestHitShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;

@@ -15,8 +15,8 @@ ForwardRenderingPipeline::~ForwardRenderingPipeline()
 
 void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, VkDescriptorSetLayout& DescriptorLayout)
 {
-    auto vertShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/vert.spv");
-    auto fragShaderCode = ReadShaderFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanRayTraceTest/Shader/frag.spv");
+    auto vertShaderCode = ReadShaderFile("Shader/vert.spv");
+    auto fragShaderCode = ReadShaderFile("Shader/frag.spv");
 
     VkShaderModule vertShaderModule = CreateShaderModule(renderer, vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(renderer, fragShaderCode);

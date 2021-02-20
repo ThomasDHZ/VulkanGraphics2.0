@@ -33,7 +33,7 @@ private:
 
 	size_t currentFrame = 0;
 
-	bool RayTraceSwitch = false;
+	bool RayTraceSwitch = true;
 	bool UpdateRenderer = false;
 	bool framebufferResized = false;
 
