@@ -86,11 +86,11 @@ Vertex unpack(uint index)
 {
 	const int m = ubo.vertexSize / 16;
 
-	vec4 d0 = vertices[gl_GeometryIndexEXT ].v[m * index + 0];
-	vec4 d1 = vertices[gl_GeometryIndexEXT ].v[m * index + 1];
-	vec4 d2 = vertices[gl_GeometryIndexEXT ].v[m * index + 2];
-	vec4 d3 = vertices[gl_GeometryIndexEXT ].v[m * index + 3];
-	vec4 d4 = vertices[gl_GeometryIndexEXT ].v[m * index + 4];
+	vec4 d0 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 0];
+	vec4 d1 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 1];
+	vec4 d2 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 2];
+	vec4 d3 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 3];
+	vec4 d4 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 4];
 
 	Vertex v;
 	v.pos = d0.xyz;
@@ -105,43 +105,43 @@ Vertex unpack(uint index)
 Material BuildMaterial(vec2 UV)
 {
 	Material material;
-	material.Ambient = MaterialList[gl_GeometryIndexEXT ].material.Ambient;
-	material.Diffuse = MaterialList[gl_GeometryIndexEXT ].material.Diffuse;
-	material.Specular = MaterialList[gl_GeometryIndexEXT ].material.Specular;
-	material.Shininess = MaterialList[gl_GeometryIndexEXT ].material.Shininess;
-	material.Reflectivness = MaterialList[gl_GeometryIndexEXT ].material.Reflectivness;
+	material.Ambient = MaterialList[gl_InstanceCustomIndexEXT].material.Ambient;
+	material.Diffuse = MaterialList[gl_InstanceCustomIndexEXT].material.Diffuse;
+	material.Specular = MaterialList[gl_InstanceCustomIndexEXT].material.Specular;
+	material.Shininess = MaterialList[gl_InstanceCustomIndexEXT].material.Shininess;
+	material.Reflectivness = MaterialList[gl_InstanceCustomIndexEXT].material.Reflectivness;
 
-	if(MaterialList[gl_GeometryIndexEXT ].material.DiffuseMapID == 0)
+	if(MaterialList[gl_InstanceCustomIndexEXT].material.DiffuseMapID == 0)
 	{
-		material.DiffuseMap = MaterialList[gl_GeometryIndexEXT ].material.Diffuse;
+		material.DiffuseMap = MaterialList[gl_InstanceCustomIndexEXT].material.Diffuse;
 	}
 	else
 	{
-		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[gl_GeometryIndexEXT ].material.DiffuseMapID], UV));
+		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.DiffuseMapID], UV));
 	}
 
-	if(MaterialList[gl_GeometryIndexEXT ].material.SpecularMapID == 0)
+	if(MaterialList[gl_InstanceCustomIndexEXT].material.SpecularMapID == 0)
 	{
-		material.SpecularMap = vec3(texture(TextureMap[MaterialList[gl_GeometryIndexEXT ].material.SpecularMapID], UV));
+		material.SpecularMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.SpecularMapID], UV));
 	}
 	else
 	{
-		material.SpecularMap = MaterialList[gl_GeometryIndexEXT ].material.Specular;
+		material.SpecularMap = MaterialList[gl_InstanceCustomIndexEXT].material.Specular;
 	}
 
-	material.SpecularMap = vec3(texture(TextureMap[MaterialList[gl_GeometryIndexEXT ].material.SpecularMapID], UV));
-	material.NormalMap = vec3(texture(TextureMap[MaterialList[gl_GeometryIndexEXT ].material.NormalMapID], UV));
-	material.AlphaMap = vec3(texture(TextureMap[MaterialList[gl_GeometryIndexEXT ].material.AlphaMapID], UV));
-	material.EmissionMap = vec3(texture(TextureMap[MaterialList[gl_GeometryIndexEXT ].material.EmissionMapID], UV));
-	material.ShadowMap = vec3(texture(TextureMap[MaterialList[gl_GeometryIndexEXT ].material.ShadowMapID], UV));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.SpecularMapID], UV));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.NormalMapID], UV));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.AlphaMapID], UV));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.EmissionMapID], UV));
+	material.ShadowMap = vec3(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.ShadowMapID], UV));
 	return material;
 }
 
 void main()
 {
-    const ivec3 index = ivec3(indices[gl_GeometryIndexEXT ].i[3 * gl_PrimitiveID], 
-						      indices[gl_GeometryIndexEXT ].i[3 * gl_PrimitiveID + 1], 
-						      indices[gl_GeometryIndexEXT ].i[3 * gl_PrimitiveID + 2]);
+    const ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
+						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
+						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
 
 	const Vertex v0 = unpack(index.x);
 	const Vertex v1 = unpack(index.y);

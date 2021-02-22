@@ -10,8 +10,6 @@
 class Renderer
 {
 private:
-
-
 	std::shared_ptr<PerspectiveCamera> camera;
 	Keyboard keyboard;
 	Mouse mouse;

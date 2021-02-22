@@ -100,7 +100,7 @@ public:
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
-	void Update(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, glm::mat4 ModelTransfrom);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 };

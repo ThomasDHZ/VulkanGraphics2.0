@@ -23,6 +23,7 @@
     <ProjectGuid>{790D6C84-478C-47AE-B2F4-6E3E7CF8FEB3}</ProjectGuid>
     <RootNamespace>VulkanGraphics</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>VulkanGraphics</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

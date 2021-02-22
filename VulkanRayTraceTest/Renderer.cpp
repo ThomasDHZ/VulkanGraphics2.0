@@ -15,7 +15,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //};
 
     textureManager = TextureManager(engine);
-    ModelList.emplace_back(Model(engine, textureManager, "../Models/vulkanscene_shadow.obj"));
+    ModelList.emplace_back(Model(engine, textureManager, "../Models/vulkanscene_shadowWhole.obj"));
    // ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
 
     std::string CubeMapFiles[6];
@@ -249,6 +249,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     {
         model.Update(engine);
     }
+    RayRenderer.createTopLevelAccelerationStructure(engine, ModelList);
 
     SceneData->SceneData.model = ModelList[0].ModelTransform;
     SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -260,9 +261,6 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->SceneData.vertexSize = sizeof(Vertex);
     SceneData->Update(engine);
-
-    //RayRenderer.createBottomLevelAccelerationStructure(engine, ModelList[0]);
-    RayRenderer.createTopLevelAccelerationStructure(engine, ModelList);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)

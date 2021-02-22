@@ -24,6 +24,7 @@
     <ProjectGuid>{8b0bd21b-371f-47c1-a5c6-dfa5d647df03}</ProjectGuid>
     <RootNamespace>VulkanRayTraceTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>VulkanRayTraceTest</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

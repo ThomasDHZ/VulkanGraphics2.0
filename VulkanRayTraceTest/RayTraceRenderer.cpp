@@ -34,14 +34,14 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(engine.Device, "vkCreateRayTracingPipelinesKHR"));
  
-    //for (int x = 0; x < model.size(); x++)
-    //{
-    //    for (int y = 0; y < model[x].MeshList.size(); y++)
-    //    {
-    //        createBottomLevelAccelerationStructure(engine, model[x], model[x].MeshList[y]);
-    //    }
-    //}
-   createBottomLevelAccelerationStructure(engine, model[0]);
+    for (int x = 0; x < model.size(); x++)
+    {
+        for (int y = 0; y < model[x].MeshList.size(); y++)
+        {
+            createBottomLevelAccelerationStructure(engine, model[x], model[x].MeshList[y]);
+        }
+    }
+  // createBottomLevelAccelerationStructure(engine, model[0]);
    createTopLevelAccelerationStructure(engine, model);
    createStorageImage(engine, storageImage);
 }
