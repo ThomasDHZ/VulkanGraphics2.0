@@ -266,5 +266,15 @@ void Mesh::Destory(VulkanEngine& engine)
 	VertexBuffer.DestoryBuffer(engine.Device);
 	IndexBuffer.DestoryBuffer(engine.Device);
 	TransformBuffer.DestoryBuffer(engine.Device);
+	TransformInverseBuffer.DestoryBuffer(engine.Device);
 	MaterialBuffer.DestoryBuffer(engine.Device);
+
+	vkFreeMemory(engine.Device, BottomLevelAccelerationStructure.memory, nullptr);
+	vkDestroyBuffer(engine.Device, BottomLevelAccelerationStructure.buffer, nullptr);
+	vkDestroyAccelerationStructureKHR(engine.Device, BottomLevelAccelerationStructure.handle, nullptr);
+
+	BottomLevelAccelerationStructure.memory = VK_NULL_HANDLE;
+	BottomLevelAccelerationStructure.buffer = VK_NULL_HANDLE;
+	BottomLevelAccelerationStructure.handle = VK_NULL_HANDLE;
+	BottomLevelAccelerationStructure.deviceAddress = 0;
 }

@@ -52,17 +52,6 @@ RayTraceRenderer::~RayTraceRenderer()
 
 void RayTraceRenderer::Destory(VulkanEngine& engine)
 {
-    for (auto& Blas : bottomLevelASList)
-    {
-        vkFreeMemory(engine.Device, Blas.memory, nullptr);
-        vkDestroyBuffer(engine.Device, Blas.buffer, nullptr);
-        vkDestroyAccelerationStructureKHR(engine.Device, Blas.handle, nullptr);
-
-        Blas.memory = VK_NULL_HANDLE;
-        Blas.buffer = VK_NULL_HANDLE;
-        Blas.handle = VK_NULL_HANDLE;
-        Blas.deviceAddress = 0;
-    }
     {
         vkFreeMemory(engine.Device, topLevelAS.memory, nullptr);
         vkDestroyBuffer(engine.Device, topLevelAS.buffer, nullptr);
@@ -73,21 +62,23 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
         topLevelAS.handle = VK_NULL_HANDLE;
         topLevelAS.deviceAddress = 0;
     }
+
+    vkDestroyPipeline(engine.Device, RayTracePipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, RayTracePipelineLayout, nullptr);
+
+    RayTracePipeline = VK_NULL_HANDLE;
+    RayTracePipelineLayout = VK_NULL_HANDLE;
 }
 
 void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model, Mesh& mesh)
 {
     AccelerationStructure bottomLevelAS{};
-
-    VertexBufferList.emplace_back(mesh.VertexBuffer);
-    IndexBufferList.emplace_back(mesh.IndexBuffer);
-    MaterialBufferList.emplace_back(mesh.MaterialBuffer);
     bottomLevelASList.emplace_back(bottomLevelAS);
 }
 
 void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model)
 {
-    AccelerationStructure bottomLevelAS{};
+  /*  AccelerationStructure bottomLevelAS{};
 
     std::vector<uint32_t> PrimitiveCountList;
     std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList;
@@ -117,9 +108,6 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
         AccelerationStructureBuildRangeInfo.transformOffset = 0;
         AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
     }
-
-    VertexBufferList.emplace_back(model.ModelVertexBuffer);
-    IndexBufferList.emplace_back(model.ModelIndexBuffer);
 
     VkAccelerationStructureBuildGeometryInfoKHR AccelerationStructureBuildGeometryInfo = {};
     AccelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -157,7 +145,7 @@ void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engi
     AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
 
     scratchBuffer.DestoryBuffer(engine.Device);
-    bottomLevelASList.emplace_back(bottomLevelAS);
+    bottomLevelASList.emplace_back(bottomLevelAS);*/
 }
 
 void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model)

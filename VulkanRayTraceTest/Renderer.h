@@ -14,14 +14,9 @@ private:
 	Keyboard keyboard;
 	Mouse mouse;
 
-	VkDescriptorPool RayTracingDescriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSetLayout RayTraceDescriptorSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet RayTraceDescriptorSets = VK_NULL_HANDLE;
-
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
 	VkDescriptorSet descriptorSets;
-
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	//FrameBufferRenderPass frameBufferRenderPass;
@@ -35,7 +30,6 @@ private:
 	bool UpdateRenderer = false;
 	bool framebufferResized = false;
 
-	std::vector<VulkanBuffer> MaterialBuffer;
 	std::shared_ptr<SceneDataStruct> SceneData;
 	std::vector<Model> RenderModel;
 

@@ -41,7 +41,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
     RenderPass.StartPipeline(engine, descriptorSetLayout);
     RayRenderer.createShaderBindingTable(engine);
-    SetUpDescriptorLayout(engine);
     SetUpDescriptorSets(engine);
     RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
 
@@ -87,8 +86,8 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, (uint32_t)RayRenderer.VertexBufferList.size() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, (uint32_t)RayRenderer.IndexBufferList.size() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
@@ -279,7 +278,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     {
         model.Update(engine);
     }
-    RayRenderer.createTopLevelAccelerationStructure(engine, ModelList);
+    //RayRenderer.createTopLevelAccelerationStructure(engine, ModelList);
 
     SceneData->SceneData.model = ModelList[0].ModelTransform;
     SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -414,13 +413,14 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     for (auto model : ModelList)
     {
-        model.Destory(engine.Device);
+        model.Destory(engine);
     }
 
     textureManager.Destory(engine);
     interfaceRenderPass.Destroy(engine.Device);
     RenderPass.Destroy(engine);
-    RayRenderer.Destory(engine);
+    SceneData->Destroy(engine);
+    //RayRenderer.Destory(engine);
 
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);

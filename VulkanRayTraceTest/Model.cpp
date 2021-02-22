@@ -253,21 +253,14 @@ void Model::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline
 	}
 }
 
-void Model::Destory(VkDevice& device)
+void Model::Destory(VulkanEngine& engine)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh.VertexBuffer.DestoryBuffer(device);
-		mesh.IndexBuffer.DestoryBuffer(device);
-		mesh.TransformBuffer.DestoryBuffer(device);
-		mesh.MaterialBuffer.DestoryBuffer(device);
+		mesh.Destory(engine);
 	}
-	for (auto& buffer : MeshOffsetBufferList)
-	{
-		buffer.DestoryBuffer(device);
-	}
-	 ModelIndexBuffer.DestoryBuffer(device);
-	 ModelVertexBuffer.DestoryBuffer(device);
-	 ModelTransformBuffer.DestoryBuffer(device);
-	 ModelUniformBuffer.DestoryBuffer(device);
+
+	 ModelIndexBuffer.DestoryBuffer(engine.Device);
+	 ModelVertexBuffer.DestoryBuffer(engine.Device);
+	 ModelTransformBuffer.DestoryBuffer(engine.Device);
 }

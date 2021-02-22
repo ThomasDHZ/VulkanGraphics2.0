@@ -35,8 +35,6 @@ public:
 	glm::vec3 ModelScale = glm::vec3(1.0f);
 
 	std::vector<Mesh> MeshList;
-	std::vector<MeshOffsets> MeshOffsetList;
-	std::vector<VulkanBuffer> MeshOffsetBufferList;
 
 	std::vector<Vertex> ModelVertices;
 	std::vector<uint32_t> ModelIndices;
@@ -45,7 +43,6 @@ public:
 	VulkanBuffer ModelIndexBuffer;
 	VulkanBuffer ModelVertexBuffer;
 	VulkanBuffer ModelTransformBuffer;
-	VulkanBuffer ModelUniformBuffer;
 
 	uint32_t ModelTriangleCount;
 	uint32_t ModelVertexCount;
@@ -63,6 +60,6 @@ public:
 
 	void Update(VulkanEngine& engine);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
-	void Destory(VkDevice& device);
+	void Destory(VulkanEngine& engine);
 };
 

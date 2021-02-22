@@ -88,11 +88,6 @@ public:
 
     void Destory(VulkanEngine& engine);
 
-    std::vector<VulkanBuffer> VertexBufferList;
-    std::vector<VulkanBuffer> IndexBufferList;
-    std::vector<VulkanBuffer> TransformBufferList;
-    std::vector<VulkanBuffer> MaterialBufferList;
-
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model, Mesh& mesh);
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model);
     void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model);
