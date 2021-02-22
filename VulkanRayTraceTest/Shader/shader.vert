@@ -21,6 +21,7 @@ layout(binding = 2) uniform UniformBufferObject {
 	PointLight plight;
 	int vertexSize;
 } ubo;
+layout(binding = 5) buffer Transform { mat4 transform; } MeshTransform[];
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;

@@ -65,12 +65,10 @@ layout(binding = 2) uniform UniformBufferObject {
 	PointLight plight;
 	int vertexSize;
 } scenedata;
-//layout(binding = 1, set = 0, rgba8) uniform image2D image;
-//layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
-//layout(binding = 4) buffer Indices { uint i[]; } indices[];
-layout(binding = 5) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 6) uniform sampler2D TextureMap[];
-//layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
+
+layout(binding = 5) buffer Transform { mat4 transform; } MeshTransform[];
+layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 7) uniform sampler2D TextureMap[];
 
 
 layout(location = 0) in vec3 FragPos;

@@ -61,6 +61,16 @@ private:
 	void MeshBottomLevelAccelerationStructure(VulkanEngine& engine);
 	void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo);
 	void CreateAccelerationStructure(VulkanEngine& engine, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR& buildSizeInfo);
+	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
+	{
+		return VkTransformMatrixKHR
+		{
+			matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+			matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+			matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+		};
+	}
+
 public:
 		glm::mat4 MeshTransform;
 		glm::vec3 MeshPosition = glm::vec3(0.0f);

@@ -90,6 +90,7 @@ public:
 
     std::vector<VulkanBuffer> VertexBufferList;
     std::vector<VulkanBuffer> IndexBufferList;
+    std::vector<VulkanBuffer> TransformBufferList;
     std::vector<VulkanBuffer> MaterialBufferList;
 
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model, Mesh& mesh);
@@ -112,6 +113,7 @@ public:
     VkPipelineShaderStageCreateInfo loadShader(VulkanEngine& engine, std::string fileName, VkShaderStageFlagBits stage);
     VkShaderModule loadShader(VulkanEngine& engine, const char* fileName, VkDevice device);
     uint32_t alignedSize(uint32_t value, uint32_t alignment);
+
 
     VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
     {

@@ -66,8 +66,9 @@ layout(binding = 2) uniform UBO
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
-layout(binding = 5) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 6) uniform sampler2D TextureMap[];
+layout(binding = 5) buffer Transform { mat4 transform; } MeshTransform[];
+layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 7) uniform sampler2D TextureMap[];
 
 struct Vertex
 {
