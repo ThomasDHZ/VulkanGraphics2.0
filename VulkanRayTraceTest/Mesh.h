@@ -82,6 +82,7 @@ public:
 		VulkanBuffer IndexBuffer;
 		VulkanBuffer VertexBuffer;
 		VulkanBuffer TransformBuffer;
+		VulkanBuffer TransformInverseBuffer;
 		VulkanBuffer MaterialBuffer;
 	
 		uint32_t MeshID;
@@ -97,7 +98,7 @@ public:
 
 		VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress{};
 		VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress{};
-		VkDeviceOrHostAddressConstKHR TransformBufferDeviceAddress{};
+		VkDeviceOrHostAddressConstKHR TransformInverseBufferDeviceAddress{};
 
 		VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
 		VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};

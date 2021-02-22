@@ -66,9 +66,10 @@ layout(binding = 2) uniform UBO
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
-layout(binding = 5) buffer Transform { mat4 transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 7) uniform sampler2D TextureMap[];
+layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer TransformInverse { mat4 TransformInverse; } MeshTransformInverse[];
+layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 8) uniform sampler2D TextureMap[];
 
 struct Vertex
 {
@@ -152,10 +153,10 @@ void main()
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
-	worldPos = vec3(ubo.model * vec4(worldPos, 1.0));
+	worldPos = vec3((ubo.model * MeshTransformInverse[gl_InstanceCustomIndexEXT].TransformInverse) * vec4(worldPos, 1.0));
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	normal =   mat3(transpose(inverse(ubo.model))) * normal;  
+	normal =   mat3(transpose(inverse((ubo.model * MeshTransformInverse[gl_InstanceCustomIndexEXT].TransformInverse)))) * normal;  
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 

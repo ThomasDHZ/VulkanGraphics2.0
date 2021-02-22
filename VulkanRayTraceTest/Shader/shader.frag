@@ -65,10 +65,10 @@ layout(binding = 2) uniform UniformBufferObject {
 	PointLight plight;
 	int vertexSize;
 } scenedata;
-
-layout(binding = 5) buffer Transform { mat4 transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 7) uniform sampler2D TextureMap[];
+layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer TransformInverse { mat4 TransformInverse; } MeshTransformInverse[];
+layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 8) uniform sampler2D TextureMap[];
 
 
 layout(location = 0) in vec3 FragPos;

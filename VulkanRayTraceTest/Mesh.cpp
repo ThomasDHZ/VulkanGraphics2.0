@@ -193,11 +193,12 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
 	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
 	TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
+	TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);
 
 	VertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(VertexBuffer.Buffer);
 	IndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(IndexBuffer.Buffer);
-	TransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(TransformBuffer.Buffer);
+	TransformInverseBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(TransformInverseBuffer.Buffer);
 
 	PrimitiveCount = IndexCount / 3;
 
@@ -211,7 +212,7 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
 	AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
 	AccelerationStructureGeometry.geometry.triangles.indexData = IndexBufferDeviceAddress;
-	AccelerationStructureGeometry.geometry.triangles.transformData = TransformBufferDeviceAddress;
+	AccelerationStructureGeometry.geometry.triangles.transformData = TransformInverseBufferDeviceAddress;
 
 	AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCount;
 	AccelerationStructureBuildRangeInfo.primitiveOffset = 0;
@@ -235,7 +236,8 @@ void Mesh::Update(VulkanEngine& engine, glm::mat4 ModelTransfrom)
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 	VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
-	TransformBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
+	TransformBuffer.CopyBufferToMemory(engine.Device, &MeshTransform, sizeof(MeshTransform));
+	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
 
 	MeshBottomLevelAccelerationStructure(engine);
 }

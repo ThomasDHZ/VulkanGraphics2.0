@@ -1,5 +1,6 @@
 #version 450
 #extension GL_ARB_separate_shader_objects : enable
+#extension GL_EXT_nonuniform_qualifier : enable
 
 #include "Lighting.glsl"
 
@@ -21,7 +22,8 @@ layout(binding = 2) uniform UniformBufferObject {
 	PointLight plight;
 	int vertexSize;
 } ubo;
-layout(binding = 5) buffer Transform { mat4 transform; } MeshTransform[];
+layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer TransformInverse { mat4 TransformInverse; } MeshTransformInverse[];
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -38,9 +40,9 @@ layout(location = 2) out vec2 UV;
 
 void main() 
 {
-    FragPos = vec3(ubo.model * vec4(aPos, 1.0));
+    FragPos = vec3(ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0));
 	UV = aTexCoords;
-    Normal = mat3(transpose(inverse(ubo.model))) * aNormal;  
+    Normal = mat3(transpose(inverse(ubo.model * MeshTransform[Mesh.MeshID].Transform))) * aNormal;  
     
     gl_Position = ubo.proj * ubo.view * vec4(FragPos, 1.0);
 }
