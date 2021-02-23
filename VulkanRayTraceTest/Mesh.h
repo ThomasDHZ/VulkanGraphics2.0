@@ -7,42 +7,8 @@
 #include "Texture.h"
 #include "ForwardRenderingPipeline.h"
 #include "SceneData.h"
-
-struct Material
-{
-	alignas(16) glm::vec3 Ambient = glm::vec3(0.2f);
-	alignas(16) glm::vec3 Diffuse = glm::vec3(0.6f);
-	alignas(16) glm::vec3 Specular = glm::vec3(1.0f);
-	alignas(4) float Shininess = 32;
-	alignas(4) float Reflectivness = 0;
-
-	alignas(4) uint32_t DiffuseMapID = 0;
-	alignas(4) uint32_t SpecularMapID = 0;
-	alignas(4) uint32_t NormalMapID = 0;
-	alignas(4) uint32_t DepthMapID = 0;
-	alignas(4) uint32_t AlphaMapID = 0;
-	alignas(4) uint32_t EmissionMapID = 0;
-	alignas(4) uint32_t ShadowMapID = 0;
-};
-
-struct MeshDetails
-{
-	std::vector<Vertex> vertices;
-	std::vector<uint32_t> indices;
-};
-
-struct MeshOffsets
-{
-	uint32_t VertexOffset;
-	uint32_t IndiceOffset;
-};
-
-struct AccelerationStructure {
-	VkAccelerationStructureKHR handle = VK_NULL_HANDLE;
-	uint64_t deviceAddress = 0;
-	VkDeviceMemory memory = VK_NULL_HANDLE;
-	VkBuffer buffer = VK_NULL_HANDLE;
-};
+#include "AccelerationStructure.h"
+#include "MaterialManager.h"
 
 class Mesh
 {
@@ -59,8 +25,6 @@ private:
 	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
 	void MeshBottomLevelAccelerationStructure(VulkanEngine& engine);
-	void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo);
-	void CreateAccelerationStructure(VulkanEngine& engine, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR& buildSizeInfo);
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
 	{
 		return VkTransformMatrixKHR
@@ -84,7 +48,8 @@ public:
 		VulkanBuffer TransformBuffer;
 		VulkanBuffer TransformInverseBuffer;
 		VulkanBuffer MaterialBuffer;
-	
+		AccelerationStructure BottomLevelAccelerationBuffer;
+
 		uint32_t MeshID;
 		uint32_t VertexCount;
 		uint32_t IndexCount;
@@ -93,12 +58,6 @@ public:
 		uint32_t VertexOffset;   //firstVertex
 
 		bool ShowMesh = true;
-	
-		AccelerationStructure BottomLevelAccelerationStructure;
-
-		VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress{};
-		VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress{};
-		VkDeviceOrHostAddressConstKHR TransformInverseBufferDeviceAddress{};
 
 		VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
 		VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};

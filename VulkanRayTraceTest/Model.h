@@ -24,6 +24,8 @@ private:
 	PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
 	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
+	void BottomLevelAccelerationStructure(VulkanEngine& engine);
+	void TopLevelAccelerationStructure(VulkanEngine& engine);
 	void LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
@@ -48,9 +50,14 @@ public:
 	uint32_t ModelVertexCount;
 	uint32_t ModelIndexCount;
 
+	AccelerationStructure BottomLevelAccelerationBuffer;
+	AccelerationStructure TopLevelAccelerationBuffer;
+
 	VkDeviceOrHostAddressConstKHR ModelVertexBufferDeviceAddress{};
 	VkDeviceOrHostAddressConstKHR ModelIndexBufferDeviceAddress{};
 	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
+
+	std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
 
 	Model();
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
@@ -61,5 +68,15 @@ public:
 	void Update(VulkanEngine& engine);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
+
+	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
+	{
+		return VkTransformMatrixKHR
+		{
+			matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+			matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+			matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+		};
+	}
 };
 

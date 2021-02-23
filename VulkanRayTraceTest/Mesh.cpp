@@ -54,6 +54,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 
+	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);
 }
 
@@ -85,9 +86,9 @@ void Mesh::MeshBottomLevelAccelerationStructure(VulkanEngine& engine)
 	AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
 	vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
 
-	if (BottomLevelAccelerationStructure.handle == VK_NULL_HANDLE)
+	if (BottomLevelAccelerationBuffer.handle == VK_NULL_HANDLE)
 	{
-		CreateAccelerationStructure(engine, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
+		BottomLevelAccelerationBuffer.CreateAccelerationStructure(engine, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
 	}
 
 	VulkanBuffer scratchBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -101,104 +102,36 @@ void Mesh::MeshBottomLevelAccelerationStructure(VulkanEngine& engine)
 	AccelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
 	AccelerationBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
 	AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.BufferDeviceAddress;
-	if (BottomLevelAccelerationStructure.handle == VK_NULL_HANDLE)
+	if (BottomLevelAccelerationBuffer.handle == VK_NULL_HANDLE)
 	{
-		AccelerationBuildGeometryInfo.dstAccelerationStructure = BottomLevelAccelerationStructure.handle;
+		AccelerationBuildGeometryInfo.dstAccelerationStructure = BottomLevelAccelerationBuffer.handle;
 	}
 	else
 	{
-		AccelerationBuildGeometryInfo.srcAccelerationStructure = BottomLevelAccelerationStructure.handle;
-		AccelerationBuildGeometryInfo.dstAccelerationStructure = BottomLevelAccelerationStructure.handle;
+		AccelerationBuildGeometryInfo.srcAccelerationStructure = BottomLevelAccelerationBuffer.handle;
+		AccelerationBuildGeometryInfo.dstAccelerationStructure = BottomLevelAccelerationBuffer.handle;
 	}
 
-	AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
+	BottomLevelAccelerationBuffer.AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
 
 	scratchBuffer.DestoryBuffer(engine.Device);
 }
 
-void Mesh::AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo)
-{
-	VkCommandBufferAllocateInfo CommandBufferAllocateInfo{};
-	CommandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	CommandBufferAllocateInfo.commandPool = engine.CommandPool;
-	CommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	CommandBufferAllocateInfo.commandBufferCount = 1;
-
-	VkCommandBuffer cmdBuffer;
-	vkAllocateCommandBuffers(engine.Device, &CommandBufferAllocateInfo, &cmdBuffer);
-
-	VkCommandBufferBeginInfo cmdBufferBeginInfo{};
-	cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-	auto AccelerationStructureBuildRangeInfoPtr = AccelerationStructureBuildRangeInfo.data();
-	vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-	vkCmdBuildAccelerationStructuresKHR(cmdBuffer, 1, &AccelerationStructureBuildGeometryInfo, &AccelerationStructureBuildRangeInfoPtr);
-	vkEndCommandBuffer(cmdBuffer);
-
-	VkSubmitInfo submitInfo{};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &cmdBuffer;
-	VkFenceCreateInfo fenceCreateInfo{};
-	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceCreateInfo.flags = 0;
-
-	VkFence fence;
-	vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-	vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-	vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
-	vkDestroyFence(engine.Device, fence, nullptr);
-	vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
-}
-
-void Mesh::CreateAccelerationStructure(VulkanEngine& engine, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR& buildSizeInfo)
-{
-	VkBufferCreateInfo bufferCreateInfo{};
-	bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferCreateInfo.size = buildSizeInfo.accelerationStructureSize;
-	bufferCreateInfo.usage = VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
-	vkCreateBuffer(engine.Device, &bufferCreateInfo, nullptr, &BottomLevelAccelerationStructure.buffer);
-
-	VkMemoryRequirements memoryRequirements{};
-	vkGetBufferMemoryRequirements(engine.Device, BottomLevelAccelerationStructure.buffer, &memoryRequirements);
-
-	VkMemoryAllocateFlagsInfo memoryAllocateFlagsInfo{};
-	memoryAllocateFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO;
-	memoryAllocateFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-
-	VkMemoryAllocateInfo memoryAllocateInfo{};
-	memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	memoryAllocateInfo.pNext = &memoryAllocateFlagsInfo;
-	memoryAllocateInfo.allocationSize = memoryRequirements.size;
-	memoryAllocateInfo.memoryTypeIndex = engine.FindMemoryType(memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-	vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &BottomLevelAccelerationStructure.memory);
-	vkBindBufferMemory(engine.Device, BottomLevelAccelerationStructure.buffer, BottomLevelAccelerationStructure.memory, 0);
-
-	VkAccelerationStructureCreateInfoKHR accelerationStructureCreate_info{};
-	accelerationStructureCreate_info.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
-	accelerationStructureCreate_info.buffer = BottomLevelAccelerationStructure.buffer;
-	accelerationStructureCreate_info.size = buildSizeInfo.accelerationStructureSize;
-	accelerationStructureCreate_info.type = type;
-	vkCreateAccelerationStructureKHR(engine.Device, &accelerationStructureCreate_info, nullptr, &BottomLevelAccelerationStructure.handle);
-
-	VkAccelerationStructureDeviceAddressInfoKHR accelerationDeviceAddressInfo{};
-	accelerationDeviceAddressInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_DEVICE_ADDRESS_INFO_KHR;
-	accelerationDeviceAddressInfo.accelerationStructure = BottomLevelAccelerationStructure.handle;
-	BottomLevelAccelerationStructure.deviceAddress = vkGetAccelerationStructureDeviceAddressKHR(engine.Device, &accelerationDeviceAddressInfo);
-}
-
 void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
+	VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress;
+	VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress;
+	VkDeviceOrHostAddressConstKHR TransformInverseBufferDeviceAddress;
+
 	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
 	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
 	TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);
 
-	VertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(VertexBuffer.Buffer);
-	IndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(IndexBuffer.Buffer);
-	TransformInverseBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(TransformInverseBuffer.Buffer);
+	 VertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(VertexBuffer.Buffer);
+	 IndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(IndexBuffer.Buffer);
+	 TransformInverseBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(TransformInverseBuffer.Buffer);
 
 	PrimitiveCount = IndexCount / 3;
 
@@ -224,7 +157,6 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 
 void Mesh::Update(VulkanEngine& engine, glm::mat4 ModelTransfrom)
 {
-
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -268,13 +200,5 @@ void Mesh::Destory(VulkanEngine& engine)
 	TransformBuffer.DestoryBuffer(engine.Device);
 	TransformInverseBuffer.DestoryBuffer(engine.Device);
 	MaterialBuffer.DestoryBuffer(engine.Device);
-
-	vkFreeMemory(engine.Device, BottomLevelAccelerationStructure.memory, nullptr);
-	vkDestroyBuffer(engine.Device, BottomLevelAccelerationStructure.buffer, nullptr);
-	vkDestroyAccelerationStructureKHR(engine.Device, BottomLevelAccelerationStructure.handle, nullptr);
-
-	BottomLevelAccelerationStructure.memory = VK_NULL_HANDLE;
-	BottomLevelAccelerationStructure.buffer = VK_NULL_HANDLE;
-	BottomLevelAccelerationStructure.handle = VK_NULL_HANDLE;
-	BottomLevelAccelerationStructure.deviceAddress = 0;
+	BottomLevelAccelerationBuffer.Destroy(engine);
 }

@@ -15,8 +15,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //};
 
     textureManager = TextureManager(engine);
-    ModelList.emplace_back(Model(engine, textureManager, "../Models/vulkanscene_shadowWhole.obj"));
-   // ModelList.emplace_back(Model(engine, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/Models/Sponza/Sponza.obj"));
+    modelRenderManager = ModelRenderManager(engine);
+//    modelRenderManager.AddModel(engine, textureManager, "../Models/vulkanscene_shadowWhole.obj");
+    modelRenderManager.AddModel(engine, textureManager, "../Models/Sponza/Sponza.obj");
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -36,7 +37,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
     
     SetUpDescriptorPool(engine);
-    RayRenderer = RayTraceRenderer(engine, textureManager, ModelList);
+    RayRenderer = RayTraceRenderer(engine, textureManager, modelRenderManager.ModelList);
     SetUpDescriptorLayout(engine);
     RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
     RenderPass.StartPipeline(engine, descriptorSetLayout);
@@ -74,7 +75,6 @@ void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
@@ -86,12 +86,11 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 11 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, static_cast<uint32_t>(textureManager.GetTextureList().size()) });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetVertexBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount(textureManager) });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
@@ -102,50 +101,12 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 
     VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = AddAcclerationStructureBinding(engine, RayRenderer.topLevelAS.handle);
     VkDescriptorImageInfo RayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = AddVertexBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = AddIndexBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = modelRenderManager.GetVertexBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
     VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->SceneDataBuffer.Buffer, SceneData->SceneDataBuffer.BufferSize);
-
-    std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
-    for (int x = 0; x < ModelList.size(); x++)
-    {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            VkDescriptorBufferInfo MaterialBufferInfo = {};
-            MaterialBufferInfo.buffer = ModelList[x].MeshList[y].MaterialBuffer.Buffer;
-            MaterialBufferInfo.offset = 0;
-            MaterialBufferInfo.range = VK_WHOLE_SIZE;
-            MaterialBufferList.emplace_back(MaterialBufferInfo);
-        }
-    }
-
-    std::vector<VkDescriptorBufferInfo> TransformBufferList{};
-    for (int x = 0; x < ModelList.size(); x++)
-    {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            VkDescriptorBufferInfo TransformBufferInfo = {};
-            TransformBufferInfo.buffer = ModelList[x].MeshList[y].TransformBuffer.Buffer;
-            TransformBufferInfo.offset = 0;
-            TransformBufferInfo.range = VK_WHOLE_SIZE;
-            TransformBufferList.emplace_back(TransformBufferInfo);
-        }
-    }
-
-    std::vector<VkDescriptorBufferInfo> TransformInverseBufferList{};
-    for (int x = 0; x < ModelList.size(); x++)
-    {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            VkDescriptorBufferInfo TransformInverseBufferInfo = {};
-            TransformInverseBufferInfo.buffer = ModelList[x].MeshList[y].TransformInverseBuffer.Buffer;
-            TransformInverseBufferInfo.offset = 0;
-            TransformInverseBufferInfo.range = VK_WHOLE_SIZE;
-            TransformInverseBufferList.emplace_back(TransformInverseBufferInfo);
-        }
-    }
-
-    std::vector<VkDescriptorImageInfo> TextureBufferInfo = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor(textureManager);
     VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(textureManager.GetCubeMapTexture()));
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
@@ -155,9 +116,8 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     DescriptorList.emplace_back(AddStorageBuffer(engine, 3, descriptorSets, VertexBufferInfoList));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 4, descriptorSets, IndexBufferInfoList));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, TransformBufferList));
-    DescriptorList.emplace_back(AddStorageBuffer(engine, 6, descriptorSets, TransformInverseBufferList));
-    DescriptorList.emplace_back(AddStorageBuffer(engine, 7, descriptorSets, MaterialBufferList));
-    DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 8, descriptorSets, TextureBufferInfo));
+    DescriptorList.emplace_back(AddStorageBuffer(engine, 6, descriptorSets, MaterialBufferList));
+    DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 7, descriptorSets, TextureBufferInfo));
     DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 10, descriptorSets, CubeMapImage));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
@@ -203,7 +163,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
 
-        for (auto model : ModelList)
+        for (auto model : modelRenderManager.ModelList)
         {
             model.Draw(commandBuffers[i], RenderPass.forwardRendereringPipeline);
         }
@@ -219,7 +179,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 
 void Renderer::AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath)
 {
-    ModelList.emplace_back(Model(engine, textureManager, FilePath));
+    modelRenderManager.ModelList.emplace_back(Model(engine, textureManager, FilePath));
     UpdateSwapChain(engine, window);
 }
 
@@ -274,13 +234,13 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    for (auto& model : ModelList)
+    for (auto& model : modelRenderManager.ModelList)
     {
         model.Update(engine);
     }
-    //RayRenderer.createTopLevelAccelerationStructure(engine, ModelList);
+    RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
 
-    SceneData->SceneData.model = ModelList[0].ModelTransform;
+    SceneData->SceneData.model = modelRenderManager.ModelList[0].ModelTransform;
     SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     SceneData->SceneData.projInverse[1][1] *= -1;
@@ -301,20 +261,20 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Speculare", &SceneData->SceneData.dlight.specular.x, 0.0f, 1.0f);
 
-    ImGui::SliderFloat3("Transform", &ModelList[0].ModelPosition.x, -10.0f, 10.0f);
-    ImGui::SliderFloat3("Rotate", &ModelList[0].ModelRotation.x, 0.0f, 360.0f);
-    ImGui::SliderFloat3("Scale", &ModelList[0].ModelScale.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Transform", &modelRenderManager.ModelList[0].ModelPosition.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Rotate", &modelRenderManager.ModelList[0].ModelRotation.x, 0.0f, 360.0f);
+    ImGui::SliderFloat3("Scale", &modelRenderManager.ModelList[0].ModelScale.x, 0.0f, 1.0f);
 
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelRenderManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelRenderManager.ModelList[x].MeshList.size(); y++)
         {
             auto a = std::to_string(y);
-            ImGui::Checkbox(a.c_str(), &ModelList[x].MeshList[y].ShowMesh);
+            ImGui::Checkbox(a.c_str(), &modelRenderManager.ModelList[x].MeshList[y].ShowMesh);
 
-            ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
-            ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
-            ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
+            ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
         }
     }
 
@@ -411,7 +371,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
 void Renderer::Destroy(VulkanEngine& engine)
 {
-    for (auto model : ModelList)
+    for (auto model : modelRenderManager.ModelList)
     {
         model.Destory(engine);
     }
@@ -420,7 +380,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     interfaceRenderPass.Destroy(engine.Device);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
-    //RayRenderer.Destory(engine);
+    RayRenderer.Destory(engine);
 
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
@@ -478,39 +438,39 @@ VkDescriptorImageInfo Renderer::AddTextureDescriptor(VulkanEngine& engine, VkIma
     return DescriptorImage;
 }
 
-std::vector<VkDescriptorBufferInfo> Renderer::AddVertexBufferListDescriptor()
-{
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
-    for (int x = 0; x < ModelList.size(); x++)
-    {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            VkDescriptorBufferInfo VertexBufferInfo = {};
-            VertexBufferInfo.buffer = ModelList[x].MeshList[y].VertexBuffer.Buffer;
-            VertexBufferInfo.offset = 0;
-            VertexBufferInfo.range = VK_WHOLE_SIZE;
-            VertexBufferInfoList.emplace_back(VertexBufferInfo);
-        }
-    }
-    return VertexBufferInfoList;
-}
-
-std::vector<VkDescriptorBufferInfo> Renderer::AddIndexBufferListDescriptor()
-{
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
-    for (int x = 0; x < ModelList.size(); x++)
-    {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            VkDescriptorBufferInfo IndexBufferInfo = {};
-            IndexBufferInfo.buffer = ModelList[x].MeshList[y].IndexBuffer.Buffer;
-            IndexBufferInfo.offset = 0;
-            IndexBufferInfo.range = VK_WHOLE_SIZE;
-            IndexBufferInfoList.emplace_back(IndexBufferInfo);
-        }
-    }
-    return IndexBufferInfoList;
-}
+//std::vector<VkDescriptorBufferInfo> Renderer::AddVertexBufferListDescriptor()
+//{
+//    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
+//    for (int x = 0; x < modelRenderManager.ModelList.size(); x++)
+//    {
+//        for (int y = 0; y < modelRenderManager.ModelList[x].MeshList.size(); y++)
+//        {
+//            VkDescriptorBufferInfo VertexBufferInfo = {};
+//            VertexBufferInfo.buffer = modelRenderManager.ModelList[x].MeshList[y].VertexBuffer.Buffer;
+//            VertexBufferInfo.offset = 0;
+//            VertexBufferInfo.range = VK_WHOLE_SIZE;
+//            VertexBufferInfoList.emplace_back(VertexBufferInfo);
+//        }
+//    }
+//    return VertexBufferInfoList;
+//}
+//
+//std::vector<VkDescriptorBufferInfo> Renderer::AddIndexBufferListDescriptor()
+//{
+//    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
+//    for (int x = 0; x < modelRenderManager.ModelList.size(); x++)
+//    {
+//        for (int y = 0; y < modelRenderManager.ModelList[x].MeshList.size(); y++)
+//        {
+//            VkDescriptorBufferInfo IndexBufferInfo = {};
+//            IndexBufferInfo.buffer = modelRenderManager.ModelList[x].MeshList[y].IndexBuffer.Buffer;
+//            IndexBufferInfo.offset = 0;
+//            IndexBufferInfo.range = VK_WHOLE_SIZE;
+//            IndexBufferInfoList.emplace_back(IndexBufferInfo);
+//        }
+//    }
+//    return IndexBufferInfoList;
+//}
 
 
 VkDescriptorImageInfo Renderer::AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, StorageImage& texture)

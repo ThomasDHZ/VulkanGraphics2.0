@@ -9,6 +9,7 @@ Model::Model()
 Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0));
+
 }
 
 Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
@@ -59,10 +60,82 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 	ModelVertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelVertexBuffer.Buffer);
 	ModelIndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelIndexBuffer.Buffer);
 	ModelTransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelTransformBuffer.Buffer);
+
+	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
+	BottomLevelAccelerationStructure(engine);
 }
 
 Model::~Model()
 {
+}
+
+void Model::BottomLevelAccelerationStructure(VulkanEngine& engine)
+{
+	std::vector<uint32_t> PrimitiveCountList;
+	std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList;
+	std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationBuildStructureRangeInfos;
+	for (auto x = 0; x < MeshList.size(); x++)
+	{
+		const Mesh mesh = MeshList[x];
+		PrimitiveCountList.emplace_back(mesh.IndexCount / 3);
+
+		VkAccelerationStructureGeometryKHR AccelerationStructureGeometry = {};
+		AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
+		AccelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+		AccelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+		AccelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+		AccelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+		AccelerationStructureGeometry.geometry.triangles.vertexData = ModelVertexBufferDeviceAddress;
+		AccelerationStructureGeometry.geometry.triangles.maxVertex = mesh.VertexCount;
+		AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
+		AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+		AccelerationStructureGeometry.geometry.triangles.indexData = ModelIndexBufferDeviceAddress;
+		AccelerationStructureGeometryList.emplace_back(AccelerationStructureGeometry);
+
+		VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
+		AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList[x];
+		AccelerationStructureBuildRangeInfo.primitiveOffset = mesh.FirstIndex * sizeof(uint32_t);
+		AccelerationStructureBuildRangeInfo.firstVertex = mesh.VertexOffset;
+		AccelerationStructureBuildRangeInfo.transformOffset = 0;
+		AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
+	}
+
+	VkAccelerationStructureBuildGeometryInfoKHR AccelerationStructureBuildGeometryInfo = {};
+	AccelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+	AccelerationStructureBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+	AccelerationStructureBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+	AccelerationStructureBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
+	AccelerationStructureBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
+
+	PrimitiveCountList.resize(AccelerationBuildStructureRangeInfos.size());
+	for (auto x = 0; x < AccelerationBuildStructureRangeInfos.size(); x++)
+	{
+		PrimitiveCountList[x] = AccelerationBuildStructureRangeInfos[x].primitiveCount;
+	}
+
+	VkAccelerationStructureBuildSizesInfoKHR AccelerationStructureBuildSizesInfo = {};
+	AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
+	vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
+
+	BottomLevelAccelerationBuffer.CreateAccelerationStructure(engine, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
+
+	VulkanBuffer scratchBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	scratchBuffer.BufferDeviceAddress = engine.GetBufferDeviceAddress(scratchBuffer.Buffer);
+
+	VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
+	AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
+	AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+	AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
+	AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
+	AccelerationBuildGeometryInfo.dstAccelerationStructure = BottomLevelAccelerationBuffer.handle;
+	AccelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
+	AccelerationBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
+	AccelerationBuildGeometryInfo.srcAccelerationStructure = nullptr;
+	AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.BufferDeviceAddress;
+
+	BottomLevelAccelerationBuffer.AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
+
+	scratchBuffer.DestoryBuffer(engine.Device);
 }
 
 void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
@@ -263,4 +336,10 @@ void Model::Destory(VulkanEngine& engine)
 	 ModelIndexBuffer.DestoryBuffer(engine.Device);
 	 ModelVertexBuffer.DestoryBuffer(engine.Device);
 	 ModelTransformBuffer.DestoryBuffer(engine.Device);
+
+	 if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
+	 {
+		 BottomLevelAccelerationBuffer.Destroy(engine);
+	 }
 }
+

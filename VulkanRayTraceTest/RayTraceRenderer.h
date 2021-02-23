@@ -26,13 +26,7 @@
 #include "VulkanEngine.h"
 #include "RenderedColorTexture.h"
 #include "RenderedRayTracedColorTexture.h"
-
-struct RayTracingScratchBuffer
-{
-    uint64_t deviceAddress = 0;
-    VkBuffer handle = VK_NULL_HANDLE;
-    VkDeviceMemory memory = VK_NULL_HANDLE;
-};
+#include "AccelerationStructure.h"
 
 struct StorageImage {
     VkDeviceMemory memory = VK_NULL_HANDLE;
@@ -40,7 +34,6 @@ struct StorageImage {
     VkImageView view = VK_NULL_HANDLE;
     VkFormat format;
 };
-
 
 
 class RayTraceRenderer
@@ -76,7 +69,6 @@ public:
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
     VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
 
-    std::vector<AccelerationStructure> bottomLevelASList{};
     AccelerationStructure topLevelAS{};
 
     std::vector<VkShaderModule> shaderModules;
@@ -88,7 +80,6 @@ public:
 
     void Destory(VulkanEngine& engine);
 
-    void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model, Mesh& mesh);
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model);
     void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
@@ -96,11 +87,6 @@ public:
     void createShaderBindingTable(VulkanEngine& engine);
     void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set);
     void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set);
-
-    void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& VkAccelerationStructureBuildGeometryInfoKHR, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& accelerationStructureBuildRangeInfoKHR);
-
-   void createAccelerationStructure(VulkanEngine& engine, AccelerationStructure& accelerationStructure, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR buildSizeInfo);
-
 
     uint32_t getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties);
     VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin);

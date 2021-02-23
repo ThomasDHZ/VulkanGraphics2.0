@@ -5,22 +5,33 @@
 class ModelRenderManager
 {
 private:
-	std::vector<Model> ModelList;
-	std::vector<Material> MaterialList;
-
 	std::vector<VulkanBuffer> VertexBufferList;
 	std::vector<VulkanBuffer> IndexBufferList;
 
-	std::vector<VkDescriptorBufferInfo> VertexBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> IndexBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> MaterialBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> TextureBufferListDescriptor();
 public:
+	std::vector<Model> ModelList;
+	std::vector<Material> MaterialList;
+
 	ModelRenderManager();
 	ModelRenderManager(VulkanEngine& engine);
 	~ModelRenderManager();
 
+
 	void AddModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
 	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
+
+
+	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetTransformInverseBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo> GetTextureBufferListDescriptor(TextureManager& textureManager);
+
+	uint32_t GetVertexBufferListDescriptorCount();
+	uint32_t GetIndexBufferListDescriptorCount();
+	uint32_t GetTransformBufferListDescriptorCount();
+	uint32_t GetMaterialBufferListDescriptorCount();
+	uint32_t GetTextureBufferListDescriptorCount(TextureManager& textureManager);
 };
 
