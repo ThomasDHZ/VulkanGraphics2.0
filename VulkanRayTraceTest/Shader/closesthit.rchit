@@ -149,7 +149,6 @@ void main()
 	const Vertex v1 = unpack(index.y);
 	const Vertex v2 = unpack(index.z);
 
-	// Interpolate normal
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;

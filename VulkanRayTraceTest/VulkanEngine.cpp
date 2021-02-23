@@ -236,6 +236,15 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	vkGetDeviceQueue(Device, PresentFamily, 0, &PresentQueue);
 
 	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetBufferDeviceAddressKHR"));
+	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(Device, "vkCmdBuildAccelerationStructuresKHR"));
+	vkBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(Device, "vkBuildAccelerationStructuresKHR"));
+	vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(vkGetDeviceProcAddr(Device, "vkCreateAccelerationStructureKHR"));
+	vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(vkGetDeviceProcAddr(Device, "vkDestroyAccelerationStructureKHR"));
+	vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(vkGetDeviceProcAddr(Device, "vkGetAccelerationStructureBuildSizesKHR"));
+	vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(Device, "vkGetAccelerationStructureDeviceAddressKHR"));
+	vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(Device, "vkCmdTraceRaysKHR"));
+	vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(Device, "vkGetRayTracingShaderGroupHandlesKHR"));
+	vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(Device, "vkCreateRayTracingPipelinesKHR"));
 }
 
 bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
@@ -352,6 +361,35 @@ void VulkanEngine::InitializeSyncObjects()
 	}
 }
 
+VkShaderModule VulkanEngine::ReadShaderFile(const std::string& filename)
+{
+	std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open()) {
+		throw std::runtime_error("failed to open file!");
+	}
+
+	size_t fileSize = (size_t)file.tellg();
+	std::vector<char> buffer(fileSize);
+
+	file.seekg(0);
+	file.read(buffer.data(), fileSize);
+
+	file.close();
+
+	VkShaderModuleCreateInfo createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.codeSize = buffer.size();
+	createInfo.pCode = reinterpret_cast<const uint32_t*>(buffer.data());
+
+	VkShaderModule shaderModule;
+	if (vkCreateShaderModule(Device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create shader module!");
+	}
+
+	return shaderModule;
+}
+
 void VulkanEngine::Destroy()
 {
 	SwapChain.Destroy(Device);
@@ -430,6 +468,17 @@ uint64_t VulkanEngine::GetBufferDeviceAddress(VkBuffer buffer)
 	return vkGetBufferDeviceAddressKHR(Device, &BufferDevice);
 }
 
+VkPipelineShaderStageCreateInfo VulkanEngine::CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages)
+{
+	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	vertShaderStageInfo.stage = shaderStages;
+	vertShaderStageInfo.module = ReadShaderFile(filename);
+	vertShaderStageInfo.pName = "main";
+
+	return vertShaderStageInfo;
+}
+
 VkDescriptorPoolSize VulkanEngine::AddDsecriptorPoolBinding(VkDescriptorType descriptorType)
 {
 	VkDescriptorPoolSize DescriptorPoolBinding = {};
@@ -498,5 +547,10 @@ VkDescriptorSet VulkanEngine::CreateDescriptorSets(VkDescriptorPool descriptorPo
 	}
 
 	return DescriptorSets;
+}
+
+uint32_t VulkanEngine::GetAlignedSize(uint32_t value, uint32_t alignment)
+{
+	return (value + alignment - 1) & ~(alignment - 1);
 }
 

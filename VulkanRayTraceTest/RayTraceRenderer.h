@@ -39,17 +39,6 @@ struct StorageImage {
 class RayTraceRenderer
 {
 private:
-    PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
-    PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
-    PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR;
-    PFN_vkGetAccelerationStructureBuildSizesKHR vkGetAccelerationStructureBuildSizesKHR;
-    PFN_vkGetAccelerationStructureDeviceAddressKHR vkGetAccelerationStructureDeviceAddressKHR;
-    PFN_vkCmdBuildAccelerationStructuresKHR vkCmdBuildAccelerationStructuresKHR;
-    PFN_vkBuildAccelerationStructuresKHR vkBuildAccelerationStructuresKHR;
-    PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR;
-    PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
-    PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
-
     VkPhysicalDeviceBufferDeviceAddressFeatures enabledBufferDeviceAddresFeatures{};
     VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures{};
     VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{};
@@ -75,7 +64,7 @@ public:
     std::vector<VkCommandBuffer> drawCmdBuffers;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<Model>& modelList);
+    RayTraceRenderer(VulkanEngine& engine, std::vector<Model>& modelList);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);
@@ -88,13 +77,8 @@ public:
     void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set);
     void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set);
 
-    uint32_t getMemoryType(VulkanEngine& engine, uint32_t typeBits, VkMemoryPropertyFlags properties);
-    VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin);
+   VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin);
     VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin);
-    VkPipelineShaderStageCreateInfo loadShader(VulkanEngine& engine, std::string fileName, VkShaderStageFlagBits stage);
-    VkShaderModule loadShader(VulkanEngine& engine, const char* fileName, VkDevice device);
-    uint32_t alignedSize(uint32_t value, uint32_t alignment);
-
 
     VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
     {

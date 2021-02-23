@@ -8,6 +8,7 @@
 #include "VulkanWindow.h"
 #include "VulkanSwapChain.h"
 #include "VulkanDebugger.h"
+#include <fstream>
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -42,8 +43,6 @@ private:
 	std::vector<const char*> ValidationLayers;
 	std::vector<const char*> DeviceExtensions;
 
-
-
 	VulkanDebugger VulkanDebug;
 
 	void SetUpDeviceFeatures(GLFWwindow* window);
@@ -59,7 +58,7 @@ private:
 	void InitializeCommandPool();
 	void InitializeSyncObjects();
 
-	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
+	VkShaderModule ReadShaderFile(const std::string& filename);
 
 public:
 	VkInstance Instance = VK_NULL_HANDLE;
@@ -90,18 +89,32 @@ public:
 	std::vector<VkSurfaceFormatKHR> GetSurfaceFormatList(VkPhysicalDevice GPUDevice);
 	std::vector<VkPresentModeKHR> GetPresentModeList(VkPhysicalDevice GPUDevice, VkSurfaceKHR Surface);
 
+
 	void Destroy();
 
 	VkCommandBuffer beginSingleTimeCommands();
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	uint64_t GetBufferDeviceAddress(VkBuffer buffer);
+	VkPipelineShaderStageCreateInfo CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages);
 
 	VkDescriptorPoolSize AddDsecriptorPoolBinding(VkDescriptorType descriptorType);
 
 	VkDescriptorPool CreateDescriptorPool(std::vector<VkDescriptorPoolSize> DescriptorPoolInfo);
 	VkDescriptorSetLayout CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo);
 	VkDescriptorSet CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout);
+	uint32_t GetAlignedSize(uint32_t value, uint32_t alignment);
+
+	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
+	PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
+	PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR;
+	PFN_vkGetAccelerationStructureBuildSizesKHR vkGetAccelerationStructureBuildSizesKHR;
+	PFN_vkGetAccelerationStructureDeviceAddressKHR vkGetAccelerationStructureDeviceAddressKHR;
+	PFN_vkCmdBuildAccelerationStructuresKHR vkCmdBuildAccelerationStructuresKHR;
+	PFN_vkBuildAccelerationStructuresKHR vkBuildAccelerationStructuresKHR;
+	PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR;
+	PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
+	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
 	VkInstance GetVulkanInstance() { return Instance; }
 	VkDevice GetVulkanDevice() { return Device; }

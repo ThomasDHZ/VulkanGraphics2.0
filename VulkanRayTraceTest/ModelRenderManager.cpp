@@ -6,13 +6,14 @@ ModelRenderManager::ModelRenderManager()
 
 ModelRenderManager::ModelRenderManager(VulkanEngine& engine)
 {
+    textureManager = TextureManager(engine);
 }
 
 ModelRenderManager::~ModelRenderManager()
 {
 }
 
-void ModelRenderManager::AddModel(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
+void ModelRenderManager::AddModel(VulkanEngine& engine, const std::string& FilePath)
 {
     ModelList.emplace_back(Model(engine, textureManager, FilePath));
 }
@@ -109,7 +110,7 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetTransformBufferListDe
     return TransformBufferList;
 }
 
-std::vector<VkDescriptorImageInfo> ModelRenderManager::GetTextureBufferListDescriptor(TextureManager& textureManager)
+std::vector<VkDescriptorImageInfo> ModelRenderManager::GetTextureBufferListDescriptor()
 {
     std::vector<VkDescriptorImageInfo> DescriptorImageList;
     for (auto texture : textureManager.GetTextureList())
@@ -175,7 +176,7 @@ uint32_t ModelRenderManager::GetMaterialBufferListDescriptorCount()
     return count++;
 }
 
-uint32_t ModelRenderManager::GetTextureBufferListDescriptorCount(TextureManager& textureManager)
+uint32_t ModelRenderManager::GetTextureBufferListDescriptorCount()
 {
     return textureManager.GetTextureList().size();
 }

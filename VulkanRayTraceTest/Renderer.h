@@ -47,8 +47,6 @@ private:
 	VkDescriptorBufferInfo AddStorageDescriptor(VulkanEngine& engine, VulkanBuffer buffer);
 	std::vector<VkDescriptorBufferInfo> AddStorageDescriptor(VulkanEngine& engine, std::vector<VulkanBuffer> BufferList);
 	VkDescriptorBufferInfo AddBufferDescriptor(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize);
-	//std::vector<VkDescriptorBufferInfo> AddVertexBufferListDescriptor();
-	//std::vector<VkDescriptorBufferInfo> AddIndexBufferListDescriptor();
 
 	VkWriteDescriptorSet AddAccelerationBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure);
 	VkWriteDescriptorSet AddStorageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo);
@@ -60,7 +58,6 @@ private:
 
 
 public:
-	TextureManager textureManager;
 	ModelRenderManager modelRenderManager;
 
 	Renderer();
