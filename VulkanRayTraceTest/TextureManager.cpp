@@ -15,12 +15,12 @@ TextureManager::~TextureManager()
 
 uint32_t TextureManager::LoadTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format)
 {
-	uint32_t TextureID = IsTextureLoaded(TextureLocation);
-	if (TextureID == -1)
-	{
+	//uint32_t TextureID = IsTextureLoaded(TextureLocation);
+	//if (TextureID == -1)
+	//{
 		unsigned int TextureID = TextureList.size();
 		TextureList.emplace_back(std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format, TextureID)));
-	}
+	//}
 	return TextureID;
 }
 

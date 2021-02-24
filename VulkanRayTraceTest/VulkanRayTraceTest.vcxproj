@@ -145,6 +145,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccelerationStructure.cpp" />
+    <ClCompile Include="Animation3D.cpp" />
+    <ClCompile Include="AnimationPlayer3D.cpp" />
+    <ClCompile Include="Bone.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
@@ -197,6 +200,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
+    <ClInclude Include="Animation3D.h" />
+    <ClInclude Include="AnimationPlayer3D.h" />
+    <ClInclude Include="bone.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />

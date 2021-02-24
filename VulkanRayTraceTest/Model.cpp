@@ -28,15 +28,12 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 		return;
 	}
 
+	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
+	LoadNodeTree(Scene->mRootNode);
+	LoadAnimations(Scene);
 	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
 
-	ModelTransform = glm::mat4(1.0f);
-	ModelTransform = glm::translate(ModelTransform, ModelPosition);
-	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	ModelTransform = glm::scale(ModelTransform, ModelScale);
-
+	ModelTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	ModelVertexCount = ModelVertices.size();
 	ModelIndexCount = ModelIndices.size();
 	ModelTriangleCount = static_cast<uint32_t>(ModelIndices.size()) / 3;
@@ -44,10 +41,6 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 	ModelVertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelVertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelVertices.data());
 	ModelIndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelIndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelIndices.data());
 	ModelTransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelTransform);
-
-	ModelVertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelVertexBuffer.Buffer);
-	ModelIndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelIndexBuffer.Buffer);
-	ModelTransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelTransformBuffer.Buffer);
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	BottomLevelAccelerationStructure(engine);
@@ -64,6 +57,14 @@ void Model::BottomLevelAccelerationStructure(VulkanEngine& engine)
 	std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationBuildStructureRangeInfos;
 	for (auto x = 0; x < MeshList.size(); x++)
 	{
+
+		VkDeviceOrHostAddressConstKHR ModelVertexBufferDeviceAddress{};
+		VkDeviceOrHostAddressConstKHR ModelIndexBufferDeviceAddress{};
+		VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
+		ModelVertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelVertexBuffer.Buffer);
+		ModelIndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelIndexBuffer.Buffer);
+		ModelTransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelTransformBuffer.Buffer);
+
 		const Mesh mesh = MeshList[x];
 		PrimitiveCountList.emplace_back(mesh.IndexCount / 3);
 
@@ -126,6 +127,91 @@ void Model::BottomLevelAccelerationStructure(VulkanEngine& engine)
 	scratchBuffer.DestoryBuffer(engine.Device);
 }
 
+void Model::LoadNodeTree(const aiNode* Node, int parentNodeID)
+{
+	NodeMap node;
+	node.NodeID = NodeMapList.size();
+	node.ParentNodeID = parentNodeID;
+	node.NodeString = Node->mName.C_Str();
+	node.NodeTransform = Node->mTransformation;
+	if (parentNodeID != -1)
+	{
+		NodeMapList[parentNodeID].ChildNodeList.emplace_back(node.NodeID);
+	}
+	NodeMapList.emplace_back(node);
+
+	for (int x = 0; x < Node->mNumChildren; x++)
+	{
+		LoadNodeTree(Node->mChildren[x], node.NodeID);
+	}
+}
+
+void Model::LoadAnimations(const aiScene* scene)
+{
+	for (int x = 0; x < scene->mNumAnimations; x++)
+	{
+		aiAnimation* assImpAnimation = scene->mAnimations[x];
+
+		Animation3D animation = Animation3D();
+		animation.TicksPerSec = assImpAnimation->mTicksPerSecond;
+		animation.AnimationTime = assImpAnimation->mDuration * animation.TicksPerSec;
+
+		for (int y = 0; y < assImpAnimation->mNumChannels; y++)
+		{
+			KeyFrame keyframe;
+			aiNodeAnim* channel = assImpAnimation->mChannels[y];
+
+			for (auto bone : BoneList)
+			{
+				if (channel->mNodeName.C_Str() == bone->BoneName)
+				{
+					keyframe.BoneName = channel->mNodeName.C_Str();
+					keyframe.BoneId = bone->BoneID;
+					break;
+				}
+			}
+
+			for (int z = 0; z < channel->mNumPositionKeys; z++)
+			{
+				KeyFrameInfo PosKeyFrame;
+				PosKeyFrame.Time = channel->mPositionKeys[z].mTime;
+				PosKeyFrame.AnimationInfo = aiVector3D(channel->mPositionKeys[z].mValue.x, channel->mPositionKeys[z].mValue.y, channel->mPositionKeys[z].mValue.z);
+				keyframe.BonePosition.emplace_back(PosKeyFrame);
+			}
+
+			for (int z = 0; z < channel->mNumRotationKeys; z++)
+			{
+				KeyFrameRotationInfo RotKeyFrame;
+				RotKeyFrame.Time = channel->mRotationKeys[z].mTime;
+				RotKeyFrame.AnimationInfo = aiQuaternion(channel->mRotationKeys[z].mValue.w, channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
+				keyframe.BoneRotation.emplace_back(RotKeyFrame);
+			}
+
+			for (int z = 0; z < channel->mNumScalingKeys; z++)
+			{
+				KeyFrameInfo ScaleKeyFrame;
+				ScaleKeyFrame.Time = channel->mScalingKeys[z].mTime;
+				ScaleKeyFrame.AnimationInfo = aiVector3D(channel->mScalingKeys[z].mValue.x, channel->mScalingKeys[z].mValue.y, channel->mScalingKeys[z].mValue.z);
+				keyframe.BoneScale.emplace_back(ScaleKeyFrame);
+			}
+
+			animation.AddBoneKeyFrame(keyframe);
+		}
+
+		AnimationList.emplace_back(animation);
+	}
+}
+
+void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
+{
+	for (int x = 0; x < mesh->mNumBones; x++)
+	{
+		bool Exists = false;
+		auto node = RootNode->FindNode(mesh->mBones[x]->mName.data);
+		BoneList.emplace_back(std::make_shared<Bone>(mesh->mBones[x]->mName.data, x, AssimpToGLMMatrixConverter(mesh->mBones[x]->mOffsetMatrix)));
+	}
+}
+
 void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	uint32_t TotalVertex = 0;
@@ -139,7 +225,10 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 		auto indices = LoadIndices(mesh);
 		auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
 		
+		LoadBones(scene->mRootNode, mesh, vertices);
+
 		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
+		MeshList.back().MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
 		MeshList.back().VertexOffset = TotalVertex;
 		MeshList.back().FirstIndex = TotalIndex;
 		TotalVertex += MeshList.back().VertexCount;
@@ -164,7 +253,7 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 
 		if(mesh->mColors[0])
 		{
-			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
+			//vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
 		}
 		else
 		{
@@ -195,6 +284,36 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 
 		VertexList.emplace_back(vertex);
 		ModelVertices.emplace_back(vertex);
+	}
+
+	for (int x = 0; x < mesh->mNumBones; x++)
+	{
+		std::vector<unsigned int> AffectedVertices;
+		AffectedVertices.resize(VertexList.size(), 0);
+
+		aiBone* bone = mesh->mBones[x];
+		for (int y = 0; y < bone->mNumWeights; y++)
+		{
+			unsigned int vertexID = bone->mWeights[y].mVertexId;
+			float weight = bone->mWeights[y].mWeight;
+			BoneWeightPlacement(VertexList, vertexID, x, weight);
+		}
+	}
+
+	for (int x = 0; x < VertexList.size(); x++)
+	{
+		float Weight = VertexList[x].BoneWeights.x +
+			VertexList[x].BoneWeights.y +
+			VertexList[x].BoneWeights.z +
+			VertexList[x].BoneWeights.w;
+		if (Weight != 1.0f)
+		{
+			VertexList[x].BoneWeights = glm::vec4(
+				VertexList[x].BoneWeights.x / Weight,
+				VertexList[x].BoneWeights.y / Weight,
+				VertexList[x].BoneWeights.z / Weight,
+				VertexList[x].BoneWeights.w / Weight);
+		}
 	}
 
 	return VertexList;
@@ -291,6 +410,38 @@ Material Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManage
 	return ModelMaterial;
 }
 
+void Model::BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight)
+{
+	for (unsigned int i = 0; i < MAX_BONE_VERTEX_COUNT; i++)
+	{
+		if (VertexList[vertexID].BoneWeights[i] == 0.0)
+		{
+			VertexList[vertexID].BoneID[i] = bone_id;
+			VertexList[vertexID].BoneWeights[i] = weight;
+			return;
+		}
+	}
+}
+
+void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
+{
+	glm::mat4 glmTransform = AssimpToGLMMatrixConverter(NodeMapList[NodeID].NodeTransform);
+	glm::mat4 GlobalTransform = ParentMatrix * glmTransform;
+
+	for (auto mesh : MeshList)
+	{
+		if (mesh.NodeID == NodeID)
+		{
+			mesh.MeshTransform = GlobalTransform;
+		}
+	}
+
+	for (int x = 0; x < NodeMapList[NodeID].ChildNodeList.size(); x++)
+	{
+		LoadMeshTransform(NodeMapList[NodeID].ChildNodeList[x], GlobalTransform);
+	}
+}
+
 void Model::Update(VulkanEngine& engine)
 {
 	ModelTransform = glm::mat4(1.0f);
@@ -300,6 +451,14 @@ void Model::Update(VulkanEngine& engine)
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
 
+	if (NodeMapList.size() > 0)
+	{
+		LoadMeshTransform(0, ModelTransform);
+	}
+	if (BoneList.size() > 0)
+	{
+		AnimationPlayer.Update();
+	}
 	for(auto& mesh : MeshList)
 	{
 		mesh.Update(engine, ModelTransform);
@@ -331,3 +490,25 @@ void Model::Destory(VulkanEngine& engine)
 	 }
 }
 
+glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
+{
+	glm::mat4 GLMMatrix;
+	for (int y = 0; y < 4; y++)
+	{
+		for (int x = 0; x < 4; x++)
+		{
+			GLMMatrix[x][y] = AssMatrix[y][x];
+		}
+	}
+	return GLMMatrix;
+}
+
+VkTransformMatrixKHR Model::GLMToVkTransformMatrix(glm::mat4 matrix)
+{
+	return VkTransformMatrixKHR
+	{
+		matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+		matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+		matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+	};
+}

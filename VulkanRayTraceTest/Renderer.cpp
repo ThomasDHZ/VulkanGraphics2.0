@@ -16,8 +16,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     auto a = sizeof(Mesh);
     auto b = sizeof(Model);
     modelRenderManager = ModelRenderManager(engine);
-    modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
-    //modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
+    modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+    //modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+   // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";

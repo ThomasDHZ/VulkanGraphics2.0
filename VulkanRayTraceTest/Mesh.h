@@ -27,6 +27,8 @@ private:
 
 public:
 		glm::mat4 MeshTransform;
+		glm::mat4 BoneTransform;
+
 		glm::vec3 MeshPosition = glm::vec3(0.0f);
 		glm::vec3 MeshRotation = glm::vec3(0.0f);
 		glm::vec3 MeshScale = glm::vec3(1.0f);
@@ -40,7 +42,10 @@ public:
 		VulkanBuffer MaterialBuffer;
 		AccelerationStructure BottomLevelAccelerationBuffer;
 
-		uint32_t MeshID;
+		std::string MeshName;
+		uint32_t MeshID = 0;
+		uint32_t NodeID = 0;
+		uint32_t BoneCount = 0;
 		uint32_t VertexCount;
 		uint32_t IndexCount;
 		uint32_t PrimitiveCount; //TriangleCount

@@ -9,16 +9,39 @@
 #include "TextureManager.h"
 #include "Vertex.h"
 #include "Mesh.h"
+#include <unordered_map>
+#include "Animation3D.h"
+#include "AnimationPlayer3D.h"
+
+const unsigned int MAX_BONE_VERTEX_COUNT = 4;
+
+class Node
+{
+	unsigned int NodeID;
+	std::shared_ptr<Node> ParentNode;
+	std::vector<std::shared_ptr<Node>> Children;
+};
 
 class Model
 {
 private:
 	void BottomLevelAccelerationStructure(VulkanEngine& engine);
 	void TopLevelAccelerationStructure(VulkanEngine& engine);
+
+	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
+	void LoadAnimations(const aiScene* scene);
 	void LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
 	Material LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
+	void BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight);
+	void LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix);
+
+	std::vector<Animation3D> AnimationList;
+	std::vector<NodeMap> NodeMapList;
+	glm::mat4 GlobalInverseTransformMatrix;
+	AnimationPlayer3D AnimationPlayer;
 
 public:
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
@@ -26,6 +49,7 @@ public:
 	glm::vec3 ModelScale = glm::vec3(1.0f);
 
 	std::vector<Mesh> MeshList;
+	std::vector<std::shared_ptr<Bone>> BoneList;
 
 	std::vector<Vertex> ModelVertices;
 	std::vector<uint32_t> ModelIndices;
@@ -42,10 +66,6 @@ public:
 	AccelerationStructure BottomLevelAccelerationBuffer;
 	AccelerationStructure TopLevelAccelerationBuffer;
 
-	VkDeviceOrHostAddressConstKHR ModelVertexBufferDeviceAddress{};
-	VkDeviceOrHostAddressConstKHR ModelIndexBufferDeviceAddress{};
-	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
-
 	std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
 
 	Model();
@@ -58,14 +78,7 @@ public:
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 
-	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
-	{
-		return VkTransformMatrixKHR
-		{
-			matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
-			matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
-			matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
-		};
-	}
+	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix);
+	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix);
 };
 

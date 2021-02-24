@@ -92,14 +92,14 @@ void RenderManager::CMDBuffer(VulkanEngine& engine, std::shared_ptr<Camera> came
         if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
-     //   MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList);
-       // ShadowRenderCMDBuffer(engine, ModelList, i);
-       // SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList, MeshList);
-      //  GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
-       // SSAORenderCMDBuffer(engine, camera, i);
-      //  TextureRenderCMDBuffer(engine, i, SpriteList);
-     //   bloomRenderPass.Draw(engine, commandBuffers, i);
-     //   FrameBufferRenderCMDBuffer(engine, i);
+        MainRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList);
+        ShadowRenderCMDBuffer(engine, ModelList, i);
+        SceneRenderCMDBuffer(engine, ModelList, skybox, i, lightmanager, SpriteList, MeshList);
+        GBufferRenderCMDBuffer(engine, ModelList, skybox, i);
+        SSAORenderCMDBuffer(engine, camera, i);
+        TextureRenderCMDBuffer(engine, i, SpriteList);
+        bloomRenderPass.Draw(engine, commandBuffers, i);
+        FrameBufferRenderCMDBuffer(engine, i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -163,11 +163,12 @@ void RenderManager::Draw(VulkanEngine& engine, GLFWwindow* window, std::shared_p
     }
     engine.imagesInFlight[engine.DrawFrame] = engine.inFlightFences[currentFrame];
 
-    rayTracer.updateUniformBuffers(engine, window);
+    RendererUpdate(engine, camera);
+//    rayTracer.updateUniformBuffers(engine, window);
     //interfaceRenderPass.Draw(engine);
 
     std::array<VkCommandBuffer, 1> submitCommandBuffers =
-    { rayTracer.drawCmdBuffers[engine.DrawFrame] };
+    { commandBuffers[engine.DrawFrame] };
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
