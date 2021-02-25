@@ -56,14 +56,14 @@ layout(binding = 2) uniform UBO
 {
 	mat4 viewInverse;
 	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-	mat4 model;
-	DirectionalLight dlight;
+    mat4 model;
+    mat4 view;
+    mat4 proj;
+    DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-	int vertexSize;
-	mat4 BoneTransform[100];
+    int vertexSize;
+    mat4 BoneTransform[100];
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
@@ -141,6 +141,8 @@ Material BuildMaterial(vec2 UV)
 
 void main()
 {
+
+
 	const mat4 rayTransform = MeshTransform[gl_InstanceCustomIndexEXT].Transform;
     const ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
 						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
@@ -153,10 +155,18 @@ void main()
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
-	worldPos = vec3((ubo.model * rayTransform) * vec4(worldPos, 1.0));
+
+		mat4 BoneTransform = mat4(1.0f);
+	//   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
+	//   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
+	//   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
+	//   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
+    vec4 BonePosition = BoneTransform * vec4(worldPos, 1.0);
+
+	worldPos = vec3((ubo.model * rayTransform * BonePosition) * vec4(worldPos, 1.0));
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	normal =   mat3(transpose(inverse((ubo.model * rayTransform)))) * normal;  
+	normal = mat3(transpose(inverse((ubo.view * ubo.model * rayTransform * BoneTransform)))) * normal;  
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 

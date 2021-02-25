@@ -41,17 +41,21 @@ layout(location = 2) out vec2 UV;
 void main() 
 {
    mat4 BoneTransform = mat4(1.0f);
-   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
-   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
-   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
-   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
-   
+//   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
+//   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
+//   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
+//   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
     vec4 BonePosition = BoneTransform * vec4(aPos, 1.0);
 
     FragPos = vec3(ubo.model * BonePosition);    
     UV = aTexCoords;
-    Normal = normalize(transpose(inverse(mat3(ubo.view * ubo.model * BoneTransform))) * aNormal);
+    Normal = normalize(transpose(inverse(mat3(ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform * BoneTransform))) * aNormal);
 
-    gl_Position = ubo.proj * ubo.view * ubo.model * BonePosition;
+    gl_Position = ubo.proj * ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform * BonePosition;
 }
 
+//    FragPos = vec3(ubo.model * vec4(aPos, 1.0));
+//	UV = aTexCoords;
+//    Normal = mat3(transpose(inverse(ubo.model))) * aNormal;  
+//    
+//    gl_Position = ubo.proj * ubo.view * vec4(FragPos, 1.0);

@@ -268,7 +268,7 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 
 		if(mesh->mColors[0])
 		{
-			//vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
+			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
 		}
 		else
 		{

@@ -57,13 +57,14 @@ layout(binding = 2) uniform UBO
 {
 	mat4 viewInverse;
 	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-	mat4 model;
-	DirectionalLight dlight;
+    mat4 model;
+    mat4 view;
+    mat4 proj;
+    DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-	int vertexSize;
+    int vertexSize;
+    mat4 BoneTransform[100];
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
