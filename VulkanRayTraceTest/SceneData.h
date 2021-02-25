@@ -29,6 +29,7 @@ struct SceneDataBufferData {
 	alignas(16) glm::vec3 viewPos;
 	PointLight plight;
 	alignas(4) int vertexSize;
+	glm::mat4 BoneTransform[100];
 };
 
 struct SceneDataStruct

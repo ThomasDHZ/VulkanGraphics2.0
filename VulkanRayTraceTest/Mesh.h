@@ -9,6 +9,8 @@
 #include "SceneData.h"
 #include "AccelerationStructure.h"
 #include "MaterialManager.h"
+#include "bone.h"
+#include "PosDataStruct.h"
 
 class Mesh
 {
@@ -27,7 +29,6 @@ private:
 
 public:
 		glm::mat4 MeshTransform;
-		glm::mat4 BoneTransform;
 
 		glm::vec3 MeshPosition = glm::vec3(0.0f);
 		glm::vec3 MeshRotation = glm::vec3(0.0f);
@@ -65,7 +66,8 @@ public:
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
-	void Update(VulkanEngine& engine, glm::mat4 ModelTransfrom);
+	void Update(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<PosDataStruct> scenedata);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 };

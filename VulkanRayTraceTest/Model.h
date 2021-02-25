@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "Animation3D.h"
 #include "AnimationPlayer3D.h"
+#include "PosDataStruct.h"
 
 const unsigned int MAX_BONE_VERTEX_COUNT = 4;
 
@@ -26,7 +27,6 @@ class Model
 {
 private:
 	void BottomLevelAccelerationStructure(VulkanEngine& engine);
-	void TopLevelAccelerationStructure(VulkanEngine& engine);
 
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
@@ -34,7 +34,7 @@ private:
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
 	Material LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
-	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
+	void LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
 	void BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight);
 	void LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix);
 
@@ -74,7 +74,7 @@ public:
 	Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
 	~Model();
 
-	void Update(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, std::shared_ptr<PosDataStruct> scenedata);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 

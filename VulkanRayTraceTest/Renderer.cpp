@@ -31,7 +31,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
 
     SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
-
+    PosData = std::make_shared<PosDataStruct>(PosDataStruct(engine));
 
     RenderPass = MainRenderPass(engine);
     //frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
@@ -48,7 +48,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     SetUpCommandBuffers(engine);
 
-    camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
+    camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
 
     SceneData->SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
     SceneData->SceneData.dlight.ambient = glm::vec4(0.2f);
@@ -77,6 +77,7 @@ void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
@@ -92,6 +93,7 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
@@ -108,6 +110,7 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
     VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->SceneDataBuffer.Buffer, SceneData->SceneDataBuffer.BufferSize);
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor();
+    VkDescriptorBufferInfo PosDataBufferInfo = AddBufferDescriptor(engine, PosData->SceneDataBuffer.Buffer, PosData->SceneDataBuffer.BufferSize);
     VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(modelRenderManager.textureManager.GetCubeMapTexture()));
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
@@ -119,6 +122,7 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, TransformBufferList));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 6, descriptorSets, MaterialBufferList));
     DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 7, descriptorSets, TextureBufferInfo));
+    DescriptorList.emplace_back(AddDescriptorSetBuffer(engine, 8, descriptorSets, PosDataBufferInfo));
     DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 10, descriptorSets, CubeMapImage));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
@@ -237,7 +241,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
     for (auto& model : modelRenderManager.ModelList)
     {
-        model.Update(engine);
+        model.Update(engine, PosData);
     }
     RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
 
@@ -251,6 +255,15 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->SceneData.vertexSize = sizeof(Vertex);
     SceneData->Update(engine);
+
+    PosData->SceneData.view = camera->GetViewMatrix();
+    PosData->SceneData.proj = camera->GetProjectionMatrix();
+    PosData->SceneData.proj[1][1] *= -1;
+    PosData->Update(engine);
+
+    engine.Mat4Logger("View", camera->GetViewMatrix());
+    engine.Mat4Logger("proj", camera->GetProjectionMatrix());
+    int a = 34;
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)

@@ -144,6 +144,9 @@
     <ClCompile Include="Animation3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PosDataStruct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -308,6 +311,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Animation3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PosDataStruct.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "RayTraceRenderer.h"
 #include "ModelRenderManager.h"
+#include "PosDataStruct.h"
 
 class Renderer
 {
@@ -32,6 +33,7 @@ private:
 	bool framebufferResized = false;
 
 	std::shared_ptr<SceneDataStruct> SceneData;
+	std::shared_ptr<PosDataStruct> PosData;
 	std::vector<Model> RenderModel;
 
 	void SetUpDescriptorPool(VulkanEngine& engine);

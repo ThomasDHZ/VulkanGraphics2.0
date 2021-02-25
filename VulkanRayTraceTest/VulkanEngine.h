@@ -9,6 +9,8 @@
 #include "VulkanSwapChain.h"
 #include "VulkanDebugger.h"
 #include <fstream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -104,6 +106,7 @@ public:
 	VkDescriptorSetLayout CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo);
 	VkDescriptorSet CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout);
 	uint32_t GetAlignedSize(uint32_t value, uint32_t alignment);
+	void Mat4Logger(std::string name, glm::mat4 matrix);
 
 	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
 	PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;

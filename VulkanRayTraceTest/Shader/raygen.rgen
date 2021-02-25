@@ -16,6 +16,7 @@ layout(binding = 2, set = 0) uniform CameraProperties
 	vec3 viewPos;
 	PointLight plight;
 	int vertexSize;
+		mat4 BoneTransform[100];
 } cam;
 
 layout(location = 0) rayPayloadEXT vec3 hitValue;

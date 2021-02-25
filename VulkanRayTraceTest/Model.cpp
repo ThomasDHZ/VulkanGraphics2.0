@@ -33,6 +33,13 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 	LoadAnimations(Scene);
 	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
 
+	LoadMeshTransform(0, ModelTransform);
+
+	if (AnimationList.size() > 0)
+	{
+		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
+	}
+
 	ModelTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	ModelVertexCount = ModelVertices.size();
 	ModelIndexCount = ModelIndices.size();
@@ -202,7 +209,7 @@ void Model::LoadAnimations(const aiScene* scene)
 	}
 }
 
-void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
+void Model::LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
 {
 	for (int x = 0; x < mesh->mNumBones; x++)
 	{
@@ -225,7 +232,7 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 		auto indices = LoadIndices(mesh);
 		auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
 		
-		LoadBones(scene->mRootNode, mesh, vertices);
+		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
 		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
 		MeshList.back().MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
@@ -233,6 +240,14 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 		MeshList.back().FirstIndex = TotalIndex;
 		TotalVertex += MeshList.back().VertexCount;
 		TotalIndex += MeshList.back().IndexCount;
+		for (auto nodeMap : NodeMapList)
+		{
+			if (nodeMap.NodeString == node->mName.C_Str())
+			{
+				MeshList.back().NodeID = nodeMap.NodeID;
+				nodeMap.MeshID = MeshList.back().MeshID;
+			}
+		}
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -442,7 +457,7 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 	}
 }
 
-void Model::Update(VulkanEngine& engine)
+void Model::Update(VulkanEngine& engine, std::shared_ptr<PosDataStruct> scenedata)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -451,17 +466,13 @@ void Model::Update(VulkanEngine& engine)
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
 
-	if (NodeMapList.size() > 0)
+
+	LoadMeshTransform(0, ModelTransform);
+	AnimationPlayer.Update();
+
+	for (auto& mesh : MeshList)
 	{
-		LoadMeshTransform(0, ModelTransform);
-	}
-	if (BoneList.size() > 0)
-	{
-		AnimationPlayer.Update();
-	}
-	for(auto& mesh : MeshList)
-	{
-		mesh.Update(engine, ModelTransform);
+		mesh.Update(engine, BoneList, scenedata);
 	}
 }
 

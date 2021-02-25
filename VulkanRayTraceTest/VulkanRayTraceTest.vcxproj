@@ -170,6 +170,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="PosDataStruct.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="PosDataStruct.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
