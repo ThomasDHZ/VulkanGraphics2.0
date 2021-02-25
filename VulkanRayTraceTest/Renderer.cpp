@@ -38,27 +38,27 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
     
     SetUpDescriptorPool(engine);
-   // RayRenderer = RayTraceRenderer(engine, modelRenderManager.ModelList);
+    RayRenderer = RayTraceRenderer(engine, modelRenderManager.ModelList);
     SetUpDescriptorLayout(engine);
-   // RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
+    RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
     RenderPass.StartPipeline(engine, descriptorSetLayout);
-   // RayRenderer.createShaderBindingTable(engine);
+    RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
-   // RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
+    RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
 
     SetUpCommandBuffers(engine);
 
     camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height), glm::vec3(0.0f)));
 
-    //SceneData->SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
-    //SceneData->SceneData.dlight.ambient = glm::vec4(0.2f);
-    //SceneData->SceneData.dlight.diffuse = glm::vec4(0.5f);
-    //SceneData->SceneData.dlight.specular = glm::vec4(1.0f);
+    SceneData->SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
+    SceneData->SceneData.dlight.ambient = glm::vec4(0.2f);
+    SceneData->SceneData.dlight.diffuse = glm::vec4(0.5f);
+    SceneData->SceneData.dlight.specular = glm::vec4(1.0f);
 
-    //SceneData->SceneData.plight.position = glm::vec4(0.0f);
-    //SceneData->SceneData.plight.ambient = glm::vec4(0.2f);
-    //SceneData->SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    //SceneData->SceneData.plight.specular = glm::vec4(1.0f);
+    SceneData->SceneData.plight.position = glm::vec4(0.0f);
+    SceneData->SceneData.plight.ambient = glm::vec4(0.2f);
+    SceneData->SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    SceneData->SceneData.plight.specular = glm::vec4(1.0f);
 }
 
 Renderer::~Renderer()
@@ -102,8 +102,8 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 {
     descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
 
-  //  VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = AddAcclerationStructureBinding(engine, RayRenderer.topLevelAS.handle);
-   // VkDescriptorImageInfo RayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
+    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = AddAcclerationStructureBinding(engine, RayRenderer.topLevelAS.handle);
+    VkDescriptorImageInfo RayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = modelRenderManager.GetVertexBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor();
@@ -114,8 +114,8 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(modelRenderManager.textureManager.GetCubeMapTexture()));
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-   // DescriptorList.emplace_back(AddAccelerationBuffer(engine, 0, AccelerationDescriptorStructure));
-   // DescriptorList.emplace_back(AddStorageImageBuffer(engine, 1, descriptorSets, RayTraceImageDescriptor));
+    DescriptorList.emplace_back(AddAccelerationBuffer(engine, 0, AccelerationDescriptorStructure));
+    DescriptorList.emplace_back(AddStorageImageBuffer(engine, 1, descriptorSets, RayTraceImageDescriptor));
     DescriptorList.emplace_back(AddDescriptorSetBuffer(engine, 2, descriptorSets, SceneDataBufferInfo));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 3, descriptorSets, VertexBufferInfoList));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 4, descriptorSets, IndexBufferInfoList));
@@ -210,15 +210,15 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
     interfaceRenderPass.UpdateSwapChain(engine.Device, engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
 
-  //  vkDestroyImageView(engine.Device, RayRenderer.storageImage.view, nullptr);
-  //  vkDestroyImage(engine.Device, RayRenderer.storageImage.image, nullptr);
-  //  vkFreeMemory(engine.Device, RayRenderer.storageImage.memory, nullptr);
+    vkDestroyImageView(engine.Device, RayRenderer.storageImage.view, nullptr);
+    vkDestroyImage(engine.Device, RayRenderer.storageImage.image, nullptr);
+    vkFreeMemory(engine.Device, RayRenderer.storageImage.memory, nullptr);
 
- //   RayRenderer.createStorageImage(engine, RayRenderer.storageImage);
+    RayRenderer.createStorageImage(engine, RayRenderer.storageImage);
     SetUpDescriptorPool(engine);
     SetUpDescriptorSets(engine);
 
-    //RayRenderer.Resize(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, descriptorSets);
+    RayRenderer.Resize(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, descriptorSets);
 
     SetUpCommandBuffers(engine);
 }
@@ -243,15 +243,17 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     {
         model.Update(engine, SceneData);
     }
-   // RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
-
-
-
+    RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
 
     SceneData->SceneData.model = modelRenderManager.ModelList[0].MeshList[0].MeshTransform;
+    SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
+    SceneData->SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
+    SceneData->SceneData.projInverse[1][1] *= -1;
     SceneData->SceneData.view = camera->GetViewMatrix();
     SceneData->SceneData.proj = camera->GetProjectionMatrix();
     SceneData->SceneData.proj[1][1] *= -1;
+    SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+    SceneData->SceneData.vertexSize = sizeof(Vertex);
     SceneData->Update(engine);
 
     //PosData->SceneData.view = camera->GetViewMatrix();
@@ -268,35 +270,35 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
-    //ImGui::SliderFloat3("Pos", &SceneData->SceneData.dlight.direction.x, -1000.0f, 1000.0f);
-    //ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare", &SceneData->SceneData.dlight.specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Pos", &SceneData->SceneData.dlight.direction.x, -1000.0f, 1000.0f);
+    ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare", &SceneData->SceneData.dlight.specular.x, 0.0f, 1.0f);
 
-    //ImGui::SliderFloat3("Transform", &modelRenderManager.ModelList[0].ModelPosition.x, -10.0f, 10.0f);
-    //ImGui::SliderFloat3("Rotate", &modelRenderManager.ModelList[0].ModelRotation.x, 0.0f, 360.0f);
-    //ImGui::SliderFloat3("Scale", &modelRenderManager.ModelList[0].ModelScale.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Transform", &modelRenderManager.ModelList[0].ModelPosition.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Rotate", &modelRenderManager.ModelList[0].ModelRotation.x, 0.0f, 360.0f);
+    ImGui::SliderFloat3("Scale", &modelRenderManager.ModelList[0].ModelScale.x, 0.0f, 1.0f);
 
-    //for (int x = 0; x < modelRenderManager.ModelList.size(); x++)
-    //{
-    //    for (int y = 0; y < modelRenderManager.ModelList[x].MeshList.size(); y++)
-    //    {
-    //        auto a = std::to_string(y);
-    //        ImGui::Checkbox(a.c_str(), &modelRenderManager.ModelList[x].MeshList[y].ShowMesh);
+    for (int x = 0; x < modelRenderManager.ModelList.size(); x++)
+    {
+        for (int y = 0; y < modelRenderManager.ModelList[x].MeshList.size(); y++)
+        {
+            auto a = std::to_string(y);
+            ImGui::Checkbox(a.c_str(), &modelRenderManager.ModelList[x].MeshList[y].ShowMesh);
 
-    //        ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
-    //        ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
-    //        ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
-    //    }
-    //}
+            ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
+            ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
+        }
+    }
 
-    //ImGui::SliderFloat3("Pos2", &SceneData->SceneData.plight.position.x, -10.0f, 10.0f);
-    //ImGui::SliderFloat3("Ambient2", &SceneData->SceneData.plight.ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse2", &SceneData->SceneData.plight.diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare2", &SceneData->SceneData.plight.specular.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat("constant", &SceneData->SceneData.plight.constant, 0.0f, 100.0f);
-    //ImGui::SliderFloat("linear", &SceneData->SceneData.plight.linear, 0.0f, 100.0f);
-    //ImGui::SliderFloat("quadratic", &SceneData->SceneData.plight.quadratic, 0.0f, 100.0f);
+    ImGui::SliderFloat3("Pos2", &SceneData->SceneData.plight.position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Ambient2", &SceneData->SceneData.plight.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse2", &SceneData->SceneData.plight.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare2", &SceneData->SceneData.plight.specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant", &SceneData->SceneData.plight.constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear", &SceneData->SceneData.plight.linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic", &SceneData->SceneData.plight.quadratic, 0.0f, 100.0f);
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
@@ -326,16 +328,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
-  /*  if (RayTraceSwitch)
-    {*/
+    if (RayTraceSwitch)
+    {
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
-    //}
-    //else
-    //{
-    //   // CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
-    //  //  CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
-    //}
+    }
+    else
+    {
+        CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+    }
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -392,7 +394,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     interfaceRenderPass.Destroy(engine.Device);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
-    //RayRenderer.Destory(engine);
+    RayRenderer.Destory(engine);
 
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);

@@ -24,7 +24,7 @@ private:
 	//FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
-	//RayTraceRenderer RayRenderer;
+	RayTraceRenderer RayRenderer;
 
 	size_t currentFrame = 0;
 
