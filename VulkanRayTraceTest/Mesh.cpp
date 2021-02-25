@@ -166,8 +166,6 @@ void Mesh::Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>
 		scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 	}
 
-	engine.Mat4Logger("Meshtransform", MeshTransform);
-
 	glm::mat4 FinalTransform = MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 	VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);

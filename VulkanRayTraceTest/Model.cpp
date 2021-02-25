@@ -266,9 +266,10 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.Position = glm::vec3{ mesh->mVertices[x].x, mesh->mVertices[x].y, mesh->mVertices[x].z };
 		vertex.Normal = glm::vec3{ mesh->mNormals[x].x, mesh->mNormals[x].y, mesh->mNormals[x].z };
 
-		if(mesh->mColors[0])
+	
+		if(mesh->mColors[x])
 		{
-			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
+			//vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
 		}
 		else
 		{
@@ -284,7 +285,6 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 			vertex.Tangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
 			vertex.BiTangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
 		}
-
 		if (mesh->mTextureCoords[0])
 		{
 			vertex.TexureCoord = glm::vec2{ mesh->mTextureCoords[0][x].x, mesh->mTextureCoords[0][x].y };

@@ -157,10 +157,10 @@ void main()
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
 
 		mat4 BoneTransform = mat4(1.0f);
-	//   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
-	//   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
-	//   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
-	//   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
+//	   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
+//	   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
+//	   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
+//	   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
     vec4 BonePosition = BoneTransform * vec4(worldPos, 1.0);
 
 	worldPos = vec3((ubo.model * rayTransform * BonePosition) * vec4(worldPos, 1.0));
