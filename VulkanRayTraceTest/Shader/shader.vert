@@ -12,16 +12,10 @@ layout(push_constant) uniform MeshInfo
 } Mesh;
 
 layout(binding = 2) uniform UniformBufferObject {
-	mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-	mat4 model;
-	DirectionalLight dlight;
-	vec3 viewPos;
-	PointLight plight;
-	int vertexSize;
-	mat4 BoneTransform[100];
+    mat4 model;
+    mat4 view;
+    mat4 proj;
+    mat4 BoneTransform[100];
 } ubo;
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 

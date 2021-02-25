@@ -74,7 +74,7 @@ public:
 	Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
 	~Model();
 
-	void Update(VulkanEngine& engine, std::shared_ptr<PosDataStruct> scenedata);
+	void Update(VulkanEngine& engine, std::shared_ptr<SceneDataStruct> scenedata);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 

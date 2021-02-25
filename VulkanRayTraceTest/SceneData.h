@@ -20,15 +20,9 @@ struct PointLight {
 };
 
 struct SceneDataBufferData {
-	alignas(16) glm::mat4 viewInverse;
-	alignas(16) glm::mat4 projInverse;
+	alignas(16) glm::mat4 model;
 	alignas(16) glm::mat4 view;
 	alignas(16) glm::mat4 proj;
-	alignas(16) glm::mat4 model;
-	DirectionalLight dlight;
-	alignas(16) glm::vec3 viewPos;
-	PointLight plight;
-	alignas(4) int vertexSize;
 	glm::mat4 BoneTransform[100];
 };
 

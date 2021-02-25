@@ -152,7 +152,7 @@ void Mesh::Update(VulkanEngine& engine)
 	MeshBottomLevelAccelerationStructure(engine);
 }
 
-void Mesh::Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<PosDataStruct> scenedata)
+void Mesh::Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<SceneDataStruct> scenedata)
 {
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
