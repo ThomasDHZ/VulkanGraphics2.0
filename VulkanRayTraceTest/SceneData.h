@@ -40,11 +40,18 @@ struct SceneDataStruct
 
 	SceneDataStruct()
 	{
-
+		for (auto& bone : SceneData.BoneTransform)
+		{
+			bone = glm::mat4(1.0f);
+		}
 	}
 
 	SceneDataStruct(VulkanEngine& engine)
 	{
+		for (auto& bone : SceneData.BoneTransform)
+		{
+			bone = glm::mat4(1.0f);
+		}
 		SceneDataBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(SceneDataBufferData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 

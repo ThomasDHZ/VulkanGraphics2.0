@@ -268,14 +268,14 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.Normal = glm::vec3{ mesh->mNormals[x].x, mesh->mNormals[x].y, mesh->mNormals[x].z };
 
 	
-		if(mesh->mColors[x])
-		{
-			//vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
-		}
-		else
-		{
+		//if(mesh->mColors[x])
+		//{
+		//	vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
+		//}
+		//else
+		//{
 			vertex.Color = glm::vec4{ 0.6f, 0.6f, 0.6f, 1.0f };
-		}
+		//}
 		if (mesh->mTangents)
 		{
 			vertex.Tangant = glm::vec4{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z, 0.0f };
@@ -467,9 +467,14 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataStruct> scened
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
 
-
-	LoadMeshTransform(0, ModelTransform);
-	AnimationPlayer.Update();
+	if (NodeMapList.size() > 0)
+	{
+		LoadMeshTransform(0, ModelTransform);
+	}
+	if (BoneList.size() > 0)
+	{
+		AnimationPlayer.Update();
+	}
 
 	for (auto& mesh : MeshList)
 	{

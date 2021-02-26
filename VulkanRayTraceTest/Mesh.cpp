@@ -163,28 +163,32 @@ void Mesh::Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
 
-	for (auto bone : BoneList)
+	if (BoneList.size() != 0)
 	{
-		scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
-	}
+		std::vector<Vertex> newVertexList = VertexList;
+		for (auto bone : BoneList)
+		{
+			scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
+		}
 
-	std::vector<Vertex> newVertexList = VertexList;
-	for (auto& vertex : newVertexList)
-	{
-		glm::mat4 BoneTransform = glm::mat4(1.0f);
-		BoneTransform = scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
-		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
-		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
-		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
-		vertex.Position = glm::vec3(BoneTransform * glm::vec4(vertex.Position, 1.0));
-		vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.view * scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
+		for (auto& vertex : newVertexList)
+		{
+			glm::mat4 BoneTransform = glm::mat4(1.0f);
+			BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
+			vertex.Position = glm::vec3(BoneTransform * glm::vec4(vertex.Position, 1.0));
+			vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.view * scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
+		}
+
+		VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
 	}
 
 	glm::mat4 FinalTransform = MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 	VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
-	VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
 	TransformBuffer.CopyBufferToMemory(engine.Device, &MeshTransform, sizeof(MeshTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
 	MeshBottomLevelAccelerationStructure(engine);

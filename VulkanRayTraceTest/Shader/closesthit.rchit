@@ -160,14 +160,8 @@ void main()
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
 	worldPos = vec3((ubo.model * rayTransform) * vec4(worldPos, 1.0));
 
-	   mat4 BoneTransform = mat4(1.0f);
-//   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
-//   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
-//   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
-//   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
-   vec4 BonePosition = BoneTransform * vec4(worldPos, 1.0);
-
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
+	normal = mat3(transpose(inverse((ubo.model * rayTransform)))) * normal;  
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 
