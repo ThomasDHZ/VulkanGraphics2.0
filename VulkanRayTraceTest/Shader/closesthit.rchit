@@ -63,6 +63,7 @@ layout(binding = 2) uniform UBO
 	vec3 viewPos;
 	PointLight plight;
     int vertexSize;
+	mat4 PVM;
     mat4 BoneTransform[100];
 } ubo;
 layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];

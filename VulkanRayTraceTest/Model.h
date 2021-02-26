@@ -12,7 +12,6 @@
 #include <unordered_map>
 #include "Animation3D.h"
 #include "AnimationPlayer3D.h"
-#include "PosDataStruct.h"
 
 const unsigned int MAX_BONE_VERTEX_COUNT = 4;
 

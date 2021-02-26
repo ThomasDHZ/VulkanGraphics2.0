@@ -64,6 +64,7 @@ layout(binding = 2) uniform UniformBufferObject {
 	vec3 viewPos;
 	PointLight plight;
 	int vertexSize;	
+	mat4 PVM;
 	mat4 BoneTransform[100];
 } scenedata;
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];

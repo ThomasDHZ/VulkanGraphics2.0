@@ -131,6 +131,8 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	AccelerationStructureBuildRangeInfo.transformOffset = 0;
 
 	MeshBottomLevelAccelerationStructure(engine);
+
+	MeshBottomLevelAccelerationStructure(engine);
 }
 
 void Mesh::Update(VulkanEngine& engine)
@@ -173,6 +175,17 @@ void Mesh::Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>
 	TransformBuffer.CopyBufferToMemory(engine.Device, &MeshTransform, sizeof(MeshTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
 
+	std::vector<Vertex> newVertexList = VertexList;
+	for (auto& vertex : newVertexList)
+	{
+		glm::mat4 BoneTransform = glm::mat4(1.0f);
+		BoneTransform = scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
+		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
+		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
+		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
+		vertex.Position = glm::vec3(BoneTransform * glm::vec4(vertex.Position, 1.0));
+	}
+	VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
 	MeshBottomLevelAccelerationStructure(engine);
 }
 

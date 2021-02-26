@@ -228,13 +228,14 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-		auto vertices = LoadVertices(mesh);
-		auto indices = LoadIndices(mesh);
-		auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
+		 auto vertices = LoadVertices(mesh);
+		 auto indices = LoadIndices(mesh);
+		 auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
 		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
+		MeshList.back().VertexList = vertices;
 		MeshList.back().MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
 		MeshList.back().VertexOffset = TotalVertex;
 		MeshList.back().FirstIndex = TotalIndex;

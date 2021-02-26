@@ -5,4 +5,5 @@ C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 RasterShadowClosestHit.rchit -o RasterShadowClosestHit.rchit.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe shader.vert -o vert.spv
 C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe shader.frag -o frag.spv
+C:/VulkanSDK/1.2.162.0/Bin32/glslc.exe animate.comp -o animate.spv
 pause

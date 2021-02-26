@@ -7,7 +7,6 @@
 #include "Model.h"
 #include "RayTraceRenderer.h"
 #include "ModelRenderManager.h"
-#include "PosDataStruct.h"
 
 class Renderer
 {

@@ -236,6 +236,8 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+
+
     for (auto& model : modelRenderManager.ModelList)
     {
         model.Update(engine, SceneData);
@@ -251,6 +253,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->SceneData.proj[1][1] *= -1;
     SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->SceneData.vertexSize = sizeof(Vertex);
+    SceneData->SceneData.PVM = SceneData->SceneData.proj * SceneData->SceneData.view * SceneData->SceneData.model;
     SceneData->Update(engine);
 }
 
