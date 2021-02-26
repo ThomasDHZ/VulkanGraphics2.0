@@ -27,6 +27,7 @@ private:
 	}
 
 public:
+	std::vector<Vertex> VertexList;
 		glm::mat4 MeshTransform;
 
 		glm::vec3 MeshPosition = glm::vec3(0.0f);

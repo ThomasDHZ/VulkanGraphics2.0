@@ -94,7 +94,9 @@ Vertex unpack(uint index)
 	vec4 d2 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 2];
 	vec4 d3 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 3];
 	vec4 d4 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 4];
-
+	vec4 d5 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 5];
+	vec4 d6 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 6];
+	
 	Vertex v;
 	v.pos = d0.xyz;
 	v.normal = vec3(d0.w, d1.x, d1.y);
@@ -102,6 +104,8 @@ Vertex unpack(uint index)
 	v.tangent = vec4(d2.x, d2.y, d2.z, d2.w);
     v.BiTangant = vec4(d3.x, d3.y, d3.z, d3.w);
 	v.Color = vec4(d4.x, d4.y, d4.z, d4.z);
+	v.BoneID = vec4(d5.x, d5.y, d5.z, d5.z);
+	v.BoneWeights = vec4(d6.x, d6.y, d6.z, d6.z);
 	return v;
 }
 
@@ -142,8 +146,6 @@ Material BuildMaterial(vec2 UV)
 
 void main()
 {
-
-
 	const mat4 rayTransform = MeshTransform[gl_InstanceCustomIndexEXT].Transform;
     const ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
 						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
@@ -156,18 +158,16 @@ void main()
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
+	worldPos = vec3((ubo.model * rayTransform) * vec4(worldPos, 1.0));
 
-		mat4 BoneTransform = mat4(1.0f);
-//	   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
-//	   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
-//	   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
-//	   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
-    vec4 BonePosition = BoneTransform * vec4(worldPos, 1.0);
-
-	worldPos = vec3((ubo.model * rayTransform * BonePosition) * vec4(worldPos, 1.0));
+	   mat4 BoneTransform = mat4(1.0f);
+//   BoneTransform =  ubo.BoneTransform[BoneID[0]] * BoneWeights[0];
+//   BoneTransform += ubo.BoneTransform[BoneID[1]] * BoneWeights[1];
+//   BoneTransform += ubo.BoneTransform[BoneID[2]] * BoneWeights[2];
+//   BoneTransform += ubo.BoneTransform[BoneID[3]] * BoneWeights[3];
+   vec4 BonePosition = BoneTransform * vec4(worldPos, 1.0);
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	normal = mat3(transpose(inverse((ubo.view * ubo.model * rayTransform * BoneTransform)))) * normal;  
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 

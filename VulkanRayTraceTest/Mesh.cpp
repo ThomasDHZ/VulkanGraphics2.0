@@ -168,13 +168,6 @@ void Mesh::Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>
 		scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 	}
 
-	glm::mat4 FinalTransform = MeshTransform;
-	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
-	VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
-
-	TransformBuffer.CopyBufferToMemory(engine.Device, &MeshTransform, sizeof(MeshTransform));
-	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
-
 	std::vector<Vertex> newVertexList = VertexList;
 	for (auto& vertex : newVertexList)
 	{
@@ -184,8 +177,16 @@ void Mesh::Update(VulkanEngine& engine, const std::vector<std::shared_ptr<Bone>>
 		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
 		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
 		vertex.Position = glm::vec3(BoneTransform * glm::vec4(vertex.Position, 1.0));
+		vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.view * scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
 	}
+
+	glm::mat4 FinalTransform = MeshTransform;
+	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
+	VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
+
 	VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
+	TransformBuffer.CopyBufferToMemory(engine.Device, &MeshTransform, sizeof(MeshTransform));
+	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
 	MeshBottomLevelAccelerationStructure(engine);
 }
 

@@ -29,7 +29,7 @@ void main()
 
     FragPos = vec3(ubo.model * BonePosition);    
     TexCoords = aTexCoords;
-    Normal = normalize(transpose(inverse(mat3(ubo.view * ubo.model * BoneTransform))) * aNormal);
+    Normal = normalize(transpose(inverse(mat3(ubo.model * BoneTransform))) * aNormal);
 
     vec3 T = normalize(mat3(ubo.model) * aTangent);
     vec3 B = normalize(mat3(ubo.model) * aBitangent);
