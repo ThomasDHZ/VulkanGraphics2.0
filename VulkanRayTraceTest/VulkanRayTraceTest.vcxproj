@@ -149,6 +149,7 @@
     <ClCompile Include="AnimationPlayer3D.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="ComputeHelper.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
     <ClCompile Include="FrameBufferRenderingPipeline.cpp" />
@@ -188,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.rahit" />
+    <None Include="Shader\animate.comp" />
     <None Include="Shader\closesthit.rchit" />
     <None Include="Shader\Material.glsl" />
     <None Include="Shader\Lighting.glsl" />
@@ -204,6 +206,7 @@
     <ClInclude Include="AnimationPlayer3D.h" />
     <ClInclude Include="bone.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ComputeHelper.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
     <ClInclude Include="FrameBufferRenderingPipeline.h" />

@@ -44,6 +44,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
     RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
+    AnimationRenderer = ComputeHelper(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[0].MeshList[0].TransformBuffer);
 
     SetUpCommandBuffers(engine);
 

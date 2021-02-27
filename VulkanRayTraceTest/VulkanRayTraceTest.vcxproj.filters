@@ -144,6 +144,9 @@
     <ClCompile Include="Animation3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ComputeHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -174,6 +177,9 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\Material.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\animate.comp">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -308,6 +314,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Animation3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComputeHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

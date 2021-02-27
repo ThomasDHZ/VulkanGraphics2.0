@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "RayTraceRenderer.h"
 #include "ModelRenderManager.h"
+#include "ComputeHelper.h"
 
 class Renderer
 {
@@ -24,6 +25,7 @@ private:
 	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
+	ComputeHelper AnimationRenderer;
 
 	size_t currentFrame = 0;
 
