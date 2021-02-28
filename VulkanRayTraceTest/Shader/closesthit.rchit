@@ -161,7 +161,7 @@ void main()
 	worldPos = vec3((ubo.proj * ubo.view * ubo.model * rayTransform) * vec4(worldPos, 1.0));
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	normal = mat3(transpose(inverse((ubo.proj * ubo.view * ubo.model * rayTransform)))) * normal;  
+	normal = mat3(transpose(inverse(ubo.model * rayTransform))) * normal;  
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 

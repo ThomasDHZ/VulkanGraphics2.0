@@ -16,8 +16,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     auto a = sizeof(Mesh);
     auto b = sizeof(Model);
     modelRenderManager = ModelRenderManager(engine);
-   // modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-    modelRenderManager.AddModel(engine, "../Models/nanosuit/nanosuit.obj");
+    modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     std::string CubeMapFiles[6];
@@ -296,6 +296,8 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+    //AnimationRenderer.Compute(engine, commandBuffers[currentFrame], modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
+    //vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
     VkResult result = vkAcquireNextImageKHR(engine.Device, engine.SwapChain.GetSwapChain(), UINT64_MAX, engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
@@ -343,7 +345,6 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-
     vkResetFences(engine.Device, 1, &engine.inFlightFences[currentFrame]);
 
     if (vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, engine.inFlightFences[currentFrame]) != VK_SUCCESS) {
@@ -384,6 +385,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 
     modelRenderManager.textureManager.Destory(engine);
     interfaceRenderPass.Destroy(engine.Device);
+    AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     RayRenderer.Destory(engine);

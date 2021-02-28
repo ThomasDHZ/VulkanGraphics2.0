@@ -65,35 +65,35 @@ void ComputeHelper::SetUpDescriptorSets(VulkanEngine& engine, VulkanBuffer& buff
 void ComputeHelper::CreateShaderPipeLine(VulkanEngine& engine)
 {
 	auto ComputeShaderCode = engine.CreateShader("Shader/animate.spv", VK_SHADER_STAGE_COMPUTE_BIT);
-
-	VkPipelineShaderStageCreateInfo ComputeShaderStages[] = { ComputeShaderCode };
+	
+	VkPushConstantRange pushConstantRange{};
+	pushConstantRange.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+	pushConstantRange.offset = 0;
+	pushConstantRange.size = sizeof(MeshInfo);
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pushConstantRangeCount = 1;
 	pipelineLayoutInfo.pSetLayouts = &descriptorLayout;
+	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 	vkCreatePipelineLayout(engine.Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout);
-
-	VkComputePipelineCreateInfo ComputePipelineInfo{};
-	ComputePipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-	ComputePipelineInfo.layout = ShaderPipelineLayout;
-	ComputePipelineInfo.flags = 0;
 
 	VkPipelineCacheCreateInfo pipelineCacheInfo{};
 	pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 	vkCreatePipelineCache(engine.Device, &pipelineCacheInfo, nullptr, &PipelineCache);
 
-	//VkPipelineShaderStageCreateInfo pipelineShaderStageInfo {};
-	//pipelineShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	//pipelineShaderStageInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-	//pipelineShaderStageInfo.module = &ComputeShaderStages;
-	//pipelineShaderStageInfo.pName = "main";
+	VkComputePipelineCreateInfo ComputePipelineInfo{};
+	ComputePipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	ComputePipelineInfo.layout = ShaderPipelineLayout;
+	ComputePipelineInfo.flags = 0;
+	ComputePipelineInfo.stage = ComputeShaderCode;
 
-	//if (vkCreateComputePipelines(engine.Device, PipelineCache, 1, &ComputePipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
-	//	throw std::runtime_error("failed to create compute pipeline!");
-	//}
+	if (vkCreateComputePipelines(engine.Device, PipelineCache, 1, &ComputePipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create compute pipeline!");
+	}
 
-	vkDestroyShaderModule(engine.Device, ComputeShaderStages->module, nullptr);
+	vkDestroyShaderModule(engine.Device, ComputeShaderCode.module, nullptr);
 }
 
 VkDescriptorBufferInfo ComputeHelper::AddBufferDescriptor(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize)
@@ -116,4 +116,71 @@ VkWriteDescriptorSet ComputeHelper::AddWriteDescriptorSet(VulkanEngine& engine, 
 	BufferDescriptor.descriptorCount = 1;
 	BufferDescriptor.pBufferInfo = &BufferInfo;
 	return BufferDescriptor;
+}
+
+void ComputeHelper::Compute(VulkanEngine& engine, VkCommandBuffer& commandBuffer, VulkanBuffer& buffer, uint32_t currentFrame)
+{
+	MeshInfo meshInfo;
+	meshInfo.MeshID = 0;
+	meshInfo.ModelID = 0;
+	meshInfo.MaterialID = 0;
+
+	VkCommandBufferBeginInfo CommandBufferBeginInfo{};
+	CommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	vkBeginCommandBuffer(commandBuffer, &CommandBufferBeginInfo);
+
+	VkBufferMemoryBarrier BufferMemoryBarrier{};
+	BufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	BufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	BufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	BufferMemoryBarrier.buffer = buffer.Buffer;
+	BufferMemoryBarrier.size = VK_WHOLE_SIZE;
+	BufferMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+	BufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+	BufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	BufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	vkCmdPipelineBarrier(
+		commandBuffer,
+		VK_PIPELINE_STAGE_HOST_BIT,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		0,
+		0, nullptr,
+		1, &BufferMemoryBarrier,
+		0, nullptr);
+
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipeline);
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipelineLayout, 0, 1, &descriptorSets, 0, 0);
+	vkCmdPushConstants(commandBuffer, ShaderPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT , 0, sizeof(MeshInfo), &meshInfo);
+	vkCmdDispatch(commandBuffer, buffer.BufferSize, 1, 1);
+
+	BufferMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+	BufferMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	BufferMemoryBarrier.buffer = buffer.Buffer;
+	BufferMemoryBarrier.size = VK_WHOLE_SIZE;
+	BufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	BufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	vkCmdPipelineBarrier(
+		commandBuffer,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		VK_PIPELINE_STAGE_TRANSFER_BIT,
+		0,
+		0, nullptr,
+		1, &BufferMemoryBarrier,
+		0, nullptr);
+
+	vkEndCommandBuffer(commandBuffer);
+
+	vkResetFences(engine.Device, 1, &engine.inFlightFences[currentFrame]);
+	const VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	VkSubmitInfo computeSubmitInfo{};
+	computeSubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	computeSubmitInfo.pWaitDstStageMask = &waitStageMask;
+	computeSubmitInfo.commandBufferCount = 1;
+	computeSubmitInfo.pCommandBuffers = &commandBuffer;
+	vkQueueSubmit(engine.GraphicsQueue, 1, &computeSubmitInfo, engine.inFlightFences[currentFrame]);
+	vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+}
+
+void ComputeHelper::Destroy(VulkanEngine& engine)
+{
 }

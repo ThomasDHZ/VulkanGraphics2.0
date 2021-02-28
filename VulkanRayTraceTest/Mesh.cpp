@@ -162,27 +162,27 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
 
-	//if (BoneList.size() != 0)
-	//{
-	//	std::vector<Vertex> newVertexList = VertexList;
-	//	for (auto bone : BoneList)
-	//	{
-	//		scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
-	//	}
+	if (BoneList.size() != 0)
+	{
+		std::vector<Vertex> newVertexList = VertexList;
+		for (auto bone : BoneList)
+		{
+			scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
+		}
 
-	//	for (auto& vertex : newVertexList)
-	//	{
-	//		glm::mat4 BoneTransform = glm::mat4(1.0f);
-	//		BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
-	//		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
-	//		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
-	//		BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
-	//		vertex.Position = glm::vec3(BoneTransform * glm::vec4(vertex.Position, 1.0));
-	//		vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.view * scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
-	//	}
+	/*	for (auto& vertex : newVertexList)
+		{
+			glm::mat4 BoneTransform = glm::mat4(1.0f);
+			BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
+			vertex.Position = glm::vec3(MeshTransform * BoneTransform * glm::vec4(vertex.Position, 1.0));
+			vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
+		}*/
 
-	//	VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
-	//}
+		VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
+	}
 
 	glm::mat4 FinalTransform =  MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);

@@ -41,9 +41,9 @@ layout(location = 2) out vec2 UV;
 
 void main() 
 {
-    FragPos = vec3(ubo.proj * ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0));   
+    FragPos = vec3(ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0));   
 	UV = aTexCoords;
-    Normal = mat3(transpose(inverse(ubo.proj * ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform))) * aNormal;  
+    Normal = mat3(transpose(inverse(ubo.model * MeshTransform[Mesh.MeshID].Transform))) * aNormal;  
     
-    gl_Position = ubo.proj * ubo.view * ubo.model * transpose(inverse(MeshTransform[Mesh.MeshID].Transform)) * vec4(aPos, 1.0);
+    gl_Position = ubo.proj * ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0);
 }
