@@ -158,10 +158,10 @@ void main()
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
-	worldPos = vec3((ubo.model * rayTransform) * vec4(worldPos, 1.0));
+	worldPos = vec3((ubo.proj * ubo.view * ubo.model * rayTransform) * vec4(worldPos, 1.0));
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
-	normal = mat3(transpose(inverse((ubo.model * rayTransform)))) * normal;  
+	normal = mat3(transpose(inverse((ubo.proj * ubo.view * ubo.model * rayTransform)))) * normal;  
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
 

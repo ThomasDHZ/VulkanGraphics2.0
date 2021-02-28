@@ -467,10 +467,7 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataStruct> scened
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
 
-	if (NodeMapList.size() > 0)
-	{
-		LoadMeshTransform(0, ModelTransform);
-	}
+	LoadMeshTransform(0, ModelTransform);
 	if (BoneList.size() > 0)
 	{
 		AnimationPlayer.Update();
@@ -478,7 +475,7 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataStruct> scened
 
 	for (auto& mesh : MeshList)
 	{
-		mesh.Update(engine, BoneList, scenedata);
+		mesh.Update(engine, ModelTransform, BoneList, scenedata);
 	}
 }
 

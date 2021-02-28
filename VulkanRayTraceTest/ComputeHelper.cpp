@@ -1,4 +1,5 @@
 #include "ComputeHelper.h"
+#include "Vertex.h"
 
 ComputeHelper::ComputeHelper()
 {
@@ -54,9 +55,9 @@ void ComputeHelper::SetUpDescriptorSets(VulkanEngine& engine, VulkanBuffer& buff
 	VkDescriptorBufferInfo TransformDataBufferInfo = AddBufferDescriptor(engine, buffer2.Buffer, buffer2.BufferSize);
 
 	std::vector<VkWriteDescriptorSet> DescriptorList;
-	DescriptorList.emplace_back(AddStorageBuffer(engine, 0, descriptorSets, VertexBufferInfo));
-	DescriptorList.emplace_back(AddStorageBuffer(engine, 2, descriptorSets, SceneDataBufferInfo));
-	DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, TransformDataBufferInfo));
+	DescriptorList.emplace_back(AddWriteDescriptorSet(engine, 0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(AddWriteDescriptorSet(engine, 2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+	DescriptorList.emplace_back(AddWriteDescriptorSet(engine, 5, descriptorSets, TransformDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
 
 	vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -65,29 +66,34 @@ void ComputeHelper::CreateShaderPipeLine(VulkanEngine& engine)
 {
 	auto ComputeShaderCode = engine.CreateShader("Shader/animate.spv", VK_SHADER_STAGE_COMPUTE_BIT);
 
-	VkPipelineShaderStageCreateInfo FrameBufferShaderStages[] = { ComputeShaderCode };
+	VkPipelineShaderStageCreateInfo ComputeShaderStages[] = { ComputeShaderCode };
 
-	VkPipelineLayoutCreateInfo FrameBufferPipelineLayoutInfo = {};
-	FrameBufferPipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	FrameBufferPipelineLayoutInfo.setLayoutCount = 1;
-	FrameBufferPipelineLayoutInfo.pSetLayouts = &descriptorLayout;
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &descriptorLayout;
+	vkCreatePipelineLayout(engine.Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout);
 
-	if (vkCreatePipelineLayout(engine.Device, &FrameBufferPipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to create pipeline layout!");
-	}
+	VkComputePipelineCreateInfo ComputePipelineInfo{};
+	ComputePipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	ComputePipelineInfo.layout = ShaderPipelineLayout;
+	ComputePipelineInfo.flags = 0;
 
-	VkGraphicsPipelineCreateInfo FrameBufferPipelineInfo = {};
-	FrameBufferPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	FrameBufferPipelineInfo.stageCount = 1;
-	FrameBufferPipelineInfo.pStages = FrameBufferShaderStages;
-	FrameBufferPipelineInfo.layout = ShaderPipelineLayout;
+	VkPipelineCacheCreateInfo pipelineCacheInfo{};
+	pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+	vkCreatePipelineCache(engine.Device, &pipelineCacheInfo, nullptr, &PipelineCache);
 
-	if (vkCreateGraphicsPipelines(engine.Device, VK_NULL_HANDLE, 1, &FrameBufferPipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create graphics pipeline!");
-	}
+	//VkPipelineShaderStageCreateInfo pipelineShaderStageInfo {};
+	//pipelineShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	//pipelineShaderStageInfo.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+	//pipelineShaderStageInfo.module = &ComputeShaderStages;
+	//pipelineShaderStageInfo.pName = "main";
 
-	vkDestroyShaderModule(engine.Device, FrameBufferShaderStages->module, nullptr);
+	//if (vkCreateComputePipelines(engine.Device, PipelineCache, 1, &ComputePipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
+	//	throw std::runtime_error("failed to create compute pipeline!");
+	//}
+
+	vkDestroyShaderModule(engine.Device, ComputeShaderStages->module, nullptr);
 }
 
 VkDescriptorBufferInfo ComputeHelper::AddBufferDescriptor(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize)
@@ -99,14 +105,14 @@ VkDescriptorBufferInfo ComputeHelper::AddBufferDescriptor(VulkanEngine& engine, 
 	return BufferInfo;
 }
 
-VkWriteDescriptorSet ComputeHelper::AddStorageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
+VkWriteDescriptorSet ComputeHelper::AddWriteDescriptorSet(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo, VkDescriptorType descriptorType)
 {
 	VkWriteDescriptorSet BufferDescriptor = {};
 	BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	BufferDescriptor.dstSet = DescriptorSet;
 	BufferDescriptor.dstBinding = BindingNumber;
 	BufferDescriptor.dstArrayElement = 0;
-	BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	BufferDescriptor.descriptorType = descriptorType;
 	BufferDescriptor.descriptorCount = 1;
 	BufferDescriptor.pBufferInfo = &BufferInfo;
 	return BufferDescriptor;
