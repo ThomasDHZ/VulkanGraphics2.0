@@ -56,7 +56,7 @@ void main()
 
     vec3 T = normalize(mat3(ubo.model) * vec3(aTangent));
     vec3 B = normalize(mat3(ubo.model) * vec3(aBitangent));
-    vec3 N = normalize(mat3(ubo.model) * normalize(transpose(inverse(mat3(ubo.view * ubo.model))) * aNormal));
+    vec3 N = normalize(mat3(ubo.model) * Normal);
     TBN = transpose(mat3(T, B, N));
 
     gl_Position = ubo.proj * ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0);
