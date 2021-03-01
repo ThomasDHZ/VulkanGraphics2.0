@@ -17,7 +17,13 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     auto b = sizeof(Model);
     auto c = sizeof(Material);
     modelRenderManager = ModelRenderManager(engine);
-    modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+    
+    modelRenderManager.AddModel(engine, "../Models/Cube.obj");
+    Material material{};
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+    //   modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
@@ -253,8 +259,9 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->SceneData.proj = camera->GetProjectionMatrix();
     SceneData->SceneData.proj[1][1] *= -1;
     SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SceneData->SceneData.vertexSize = sizeof(Vertex);
+    SceneData->SceneData.vertexSize = time;
     SceneData->SceneData.PVM = SceneData->SceneData.proj * SceneData->SceneData.view * SceneData->SceneData.model;
+    SceneData->SceneData.timer = time;
     SceneData->Update(engine);
 }
 

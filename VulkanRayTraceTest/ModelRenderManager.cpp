@@ -18,6 +18,16 @@ void ModelRenderManager::AddModel(VulkanEngine& engine, const std::string& FileP
     ModelList.emplace_back(Model(engine, textureManager, FilePath));
 }
 
+void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+{
+    ModelList.emplace_back(Model(engine, VertexList, IndexList));
+}
+
+void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
+{
+    ModelList.emplace_back(Model(engine, VertexList, IndexList, material));
+}
+
 void ModelRenderManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet)
 {
     //std::vector<VkDescriptorBufferInfo> VertexDescriptorInfo = VertexBufferListDescriptor();

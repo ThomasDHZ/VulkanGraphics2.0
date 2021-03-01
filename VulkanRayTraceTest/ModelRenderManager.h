@@ -18,6 +18,8 @@ public:
 	~ModelRenderManager();
 
 	void AddModel(VulkanEngine& engine, const std::string& FilePath);
+	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
 	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();

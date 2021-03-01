@@ -15,7 +15,7 @@ layout(binding = 2, set = 0) uniform CameraProperties
     DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-    int vertexSize;
+    float vertexSize;
 	mat4 PVM;
     mat4 BoneTransform[100];
 } cam;

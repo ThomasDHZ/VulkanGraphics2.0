@@ -63,7 +63,7 @@ layout(binding = 2) uniform UniformBufferObject {
 	DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-	int vertexSize;	
+	float vertexSize;	
 	mat4 PVM;
 	mat4 BoneTransform[100];
 } scenedata;
@@ -75,7 +75,7 @@ layout(binding = 7) uniform sampler2D TextureMap[];
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec2 UV;
-
+layout(location = 3) in mat3 TBN;
 layout(location = 0) out vec4 outColor;
 
 
@@ -119,16 +119,40 @@ void main()
 
 	Material material = BuildMaterial();
 
+    vec3 TangentLightPos = TBN * scenedata.dlight.direction;
+    vec3 TangentViewPos  = TBN * scenedata.viewPos;
+    vec3 TangentFragPos  = TBN * FragPos;
+
+	vec3 normal = vec3(texture(TextureMap[2], UV)).rgb;
+    // transform normal vector to range [-1,1]
+    normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space
+   
+    // get diffuse color
+    vec3 color = vec3(texture(TextureMap[1], UV)).rgb;
+    // ambient
+    vec3 ambient = 0.1 * color;
+    // diffuse
+    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+    float diff = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = diff * color;
+    // specular
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 halfwayDir = normalize(lightDir + viewDir);  
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+
+    vec3 specular = vec3(0.2) * spec;
+    outColor = vec4(ambient + diffuse + specular, 1.0);
 
 //	vec3 ambient  =  CalcAmbient(scenedata.dlight.ambient, vec3(0.7f));
 //    vec3 diffuse  =  CalcDiffuse(scenedata.dlight.direction, scenedata.dlight.diffuse, vec3(0.7f));
 //	vec3 specular = CalcSpecular(scenedata.dlight.direction , scenedata.dlight.specular, vec3(1.0f), scenedata.viewPos, Normal, material.Shininess);
 //	vec3 color = ambient + diffuse + specular;
 
-	 vec3 lightVector = normalize(scenedata.dlight.direction);
-	float dot_product = max(dot(lightVector, Normal), 0.2);
-	vec3 color = material.DiffuseMap * dot_product;
-
-
-	 outColor = vec4(color, 1.0f);
+//	 vec3 lightVector = normalize(scenedata.dlight.direction);
+//	float dot_product = max(dot(lightVector, Normal), 0.2);
+//	vec3 color =  vec3(texture(TextureMap[2], UV)) * dot_product;
+//
+//
+//	 outColor = vec4(color, 1.0f);
 }

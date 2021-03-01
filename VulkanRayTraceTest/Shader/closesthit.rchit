@@ -79,9 +79,10 @@ layout(binding = 2) uniform UBO
     DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-    int vertexSize;
+    float vertexSize;
 	mat4 PVM;
     mat4 BoneTransform[100];
+	float timer;
 } ubo;
 layout(binding = 3, scalar) buffer Vertices
 {
@@ -139,6 +140,8 @@ void main()
 	const Vertex v1 = vertices[gl_InstanceCustomIndexEXT].v[index.y];
 	const Vertex v2 = vertices[gl_InstanceCustomIndexEXT].v[index.z];
 
+
+
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 
 	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
@@ -147,11 +150,21 @@ void main()
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
 	normal = mat3(transpose(inverse(ubo.model * rayTransform))) * normal;  
 
+//	vec3 tangent = normalize(v0.tangent * barycentricCoords.x + v1.tangent * barycentricCoords.y + v2.tangent * barycentricCoords.z);
+//	tangent = mat3(transpose(inverse(ubo.model * rayTransform))) * tangent;  
+//
+//	vec3 bitangent = normalize(v0.bitangent * barycentricCoords.x + v1.bitangent * barycentricCoords.y + v2.bitangent * barycentricCoords.z);
+//	bitangent = mat3(transpose(inverse(ubo.model * rayTransform))) * bitangent;  
+//
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
-
 	vec3 color = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
 	
 	const Material material = BuildMaterial(UV);
+
+//	vec3 T = normalize(mat3(ubo.model) * vec3(tangent));
+//    vec3 B = normalize(mat3(ubo.model) * vec3(bitangent));
+//    vec3 N = normalize(mat3(ubo.model) * normalize(transpose(inverse(mat3(ubo.view * ubo.model))) * aNormal));
+//    TBN = transpose(mat3(T, B, N));
 
 //	vec3 lightDir = normalize(-ubo.dlight.direction);
 //	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
@@ -165,15 +178,6 @@ void main()
 	 vec3 lightVector = normalize(ubo.dlight.direction);
 	float dot_product = max(dot(lightVector, normal), 0.2);
 	hitValue = material.DiffuseMap * dot_product;
-
-
-
-
-
-
-
-
-
 
 //	float spec = 0.0f;
 ////  if(dot(normal, lightDir) > 0)
