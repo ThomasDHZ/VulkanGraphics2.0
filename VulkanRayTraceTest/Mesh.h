@@ -10,6 +10,7 @@
 #include "AccelerationStructure.h"
 #include "MaterialManager.h"
 #include "bone.h"
+#include "ComputeHelper.h"
 
 class Mesh
 {
@@ -28,36 +29,36 @@ private:
 
 public:
 	std::vector<Vertex> VertexList;
-		glm::mat4 MeshTransform;
+	glm::mat4 MeshTransform;
 
-		glm::vec3 MeshPosition = glm::vec3(0.0f);
-		glm::vec3 MeshRotation = glm::vec3(0.0f);
-		glm::vec3 MeshScale = glm::vec3(1.0f);
+	glm::vec3 MeshPosition = glm::vec3(0.0f);
+	glm::vec3 MeshRotation = glm::vec3(0.0f);
+	glm::vec3 MeshScale = glm::vec3(1.0f);
 
-		Material material;
-	
-		VulkanBuffer IndexBuffer;
-		VulkanBuffer VertexBuffer;
-		VulkanBuffer TransformBuffer;
-		VulkanBuffer TransformInverseBuffer;
-		VulkanBuffer MaterialBuffer;
-		AccelerationStructure BottomLevelAccelerationBuffer;
+	Material material;
 
-		std::string MeshName;
-		uint32_t MeshID = 0;
-		uint32_t NodeID = 0;
-		uint32_t BoneCount = 0;
-		uint32_t VertexCount;
-		uint32_t IndexCount;
-		uint32_t PrimitiveCount; //TriangleCount
-		uint32_t FirstIndex;     //primitiveOffset
-		uint32_t VertexOffset;   //firstVertex
+	VulkanBuffer IndexBuffer;
+	VulkanBuffer VertexBuffer;
+	VulkanBuffer TransformBuffer;
+	VulkanBuffer TransformInverseBuffer;
+	VulkanBuffer MaterialBuffer;
+	AccelerationStructure BottomLevelAccelerationBuffer;
 
-		bool ShowMesh = true;
+	std::string MeshName;
+	uint32_t MeshID = 0;
+	uint32_t NodeID = 0;
+	uint32_t BoneCount = 0;
+	uint32_t VertexCount;
+	uint32_t IndexCount;
+	uint32_t PrimitiveCount; //TriangleCount
+	uint32_t FirstIndex;     //primitiveOffset
+	uint32_t VertexOffset;   //firstVertex
 
-		VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
-		VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
-		VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
+	bool ShowMesh = true;
+
+	VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
+	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
+	VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
 
 	Mesh();
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID);

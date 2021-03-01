@@ -15,9 +15,10 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //};
     auto a = sizeof(Mesh);
     auto b = sizeof(Model);
+    auto c = sizeof(Material);
     modelRenderManager = ModelRenderManager(engine);
     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+  // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     std::string CubeMapFiles[6];
@@ -172,6 +173,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
         }
 
         vkCmdEndRenderPass(commandBuffers[i]);
+        AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
         //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
@@ -223,7 +225,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
 void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
 {
-    if (UpdateRenderer)
+    if(UpdateRenderer)
     {
         UpdateSwapChain(engine, window);
     }
@@ -236,8 +238,6 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-
 
     for (auto& model : modelRenderManager.ModelList)
     {
@@ -296,8 +296,6 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-    //AnimationRenderer.Compute(engine, commandBuffers[currentFrame], modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
-    //vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
     VkResult result = vkAcquireNextImageKHR(engine.Device, engine.SwapChain.GetSwapChain(), UINT64_MAX, engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
@@ -325,11 +323,13 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     if (RayTraceSwitch)
     {
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
 
@@ -372,7 +372,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");
     }
-
+    
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 

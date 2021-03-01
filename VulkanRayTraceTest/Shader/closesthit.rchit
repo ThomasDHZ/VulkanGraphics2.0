@@ -1,6 +1,8 @@
 #version 460
 #extension GL_EXT_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_EXT_scalar_block_layout : enable
+#extension GL_EXT_scalar_block_layout : enable
 
 #include "Lighting.glsl"
 
@@ -51,6 +53,21 @@ struct Material
 		vec3 ShadowMap;
 };
 
+struct Vertex
+{
+  vec3 pos;
+  float padding1;
+  vec3 normal;
+  float padding2;
+  vec2 uv;
+  vec2 padding3;
+  vec4 tangent;
+  vec4 BiTangant;
+  vec4 Color;
+  vec4 BoneID;
+  vec4 BoneWeights;
+ };
+
 layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
@@ -66,48 +83,15 @@ layout(binding = 2) uniform UBO
 	mat4 PVM;
     mat4 BoneTransform[100];
 } ubo;
-layout(binding = 3) buffer Vertices { vec4 v[]; } vertices[];
+layout(binding = 3, scalar) buffer Vertices
+{
+  Vertex v[];
+}
+vertices[];
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
-
-struct Vertex
-{
-  vec3 pos;
-  vec3 normal;
-  vec2 uv;
-  vec4 tangent;
-  vec4 BiTangant;
-  vec4 Color;
-  vec4 BoneID;
-  vec4 BoneWeights;
- };
-
-
-Vertex unpack(uint index)
-{
-	const int m = ubo.vertexSize / 16;
-
-	vec4 d0 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 0];
-	vec4 d1 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 1];
-	vec4 d2 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 2];
-	vec4 d3 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 3];
-	vec4 d4 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 4];
-	vec4 d5 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 5];
-	vec4 d6 = vertices[gl_InstanceCustomIndexEXT].v[m * index + 6];
-	
-	Vertex v;
-	v.pos = d0.xyz;
-	v.normal = vec3(d0.w, d1.x, d1.y);
-	v.uv = vec2(d1.zw);
-	v.tangent = vec4(d2.x, d2.y, d2.z, d2.w);
-    v.BiTangant = vec4(d3.x, d3.y, d3.z, d3.w);
-	v.Color = vec4(d4.x, d4.y, d4.z, d4.z);
-	v.BoneID = vec4(d5.x, d5.y, d5.z, d5.z);
-	v.BoneWeights = vec4(d6.x, d6.y, d6.z, d6.z);
-	return v;
-}
 
 Material BuildMaterial(vec2 UV)
 {
@@ -151,9 +135,9 @@ void main()
 						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
 						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
 
-	const Vertex v0 = unpack(index.x);
-	const Vertex v1 = unpack(index.y);
-	const Vertex v2 = unpack(index.z);
+	const Vertex v0 = vertices[gl_InstanceCustomIndexEXT].v[index.x];
+	const Vertex v1 = vertices[gl_InstanceCustomIndexEXT].v[index.y];
+	const Vertex v2 = vertices[gl_InstanceCustomIndexEXT].v[index.z];
 
 	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
 

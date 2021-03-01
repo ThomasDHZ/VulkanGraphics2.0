@@ -11,7 +11,6 @@ private:
 	VkDescriptorSet descriptorSets;
 	VkPipelineLayout ShaderPipelineLayout;
 	VkPipeline ShaderPipeline;
-
 	VkPipelineCache PipelineCache;
 
 	void SetUpDescriptorPool(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<SceneDataStruct> sceneData, VulkanBuffer& buffer2);
@@ -28,7 +27,9 @@ public:
 	ComputeHelper(VulkanEngine& engine, std::vector<VulkanBuffer>& buffer);
 	~ComputeHelper();
 
-	void Compute(VulkanEngine& engine, VkCommandBuffer& commandBuffer, VulkanBuffer& buffer, uint32_t currentFrame);
+	VkCommandBuffer commandBuffer;
+
+	void Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame);
 	void Destroy(VulkanEngine& engine);
 };
 

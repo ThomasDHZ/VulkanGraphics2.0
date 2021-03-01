@@ -9,14 +9,20 @@ layout(location = 1) rayPayloadEXT vec3 ShadowhitValue;
 layout(location = 2) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
-struct VertexData
+struct Vertex
 {
-	vec3 Position;
-	vec3 Normal;
-	vec2 UV;
-	vec3 Tangent;
-	vec3 BiTangent;
-};
+  vec3 pos;
+  float padding1;
+  vec3 normal;
+  float padding2;
+  vec2 uv;
+  vec2 padding3;
+  vec4 tangent;
+  vec4 BiTangant;
+  vec4 Color;
+  vec4 BoneID;
+  vec4 BoneWeights;
+ };
 
 struct MaterialInfo
 {

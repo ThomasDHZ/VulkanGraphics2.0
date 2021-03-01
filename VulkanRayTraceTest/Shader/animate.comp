@@ -7,8 +7,11 @@
 struct Vertex
 {
   vec3 pos;
+  float padding1;
   vec3 normal;
+  float padding2;
   vec2 uv;
+  vec2 padding3;
   vec4 tangent;
   vec4 BiTangant;
   vec4 Color;

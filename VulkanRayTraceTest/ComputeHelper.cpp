@@ -13,6 +13,16 @@ ComputeHelper::ComputeHelper(VulkanEngine& engine, VulkanBuffer& buffer, std::sh
 	SetUpDescriptorLayout(engine, buffer, sceneData, buffer2);
 	SetUpDescriptorSets(engine, buffer, sceneData, buffer2);
 	CreateShaderPipeLine(engine);
+
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = engine.CommandPool;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandBufferCount = 1;
+
+	if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &commandBuffer) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate command buffers!");
+	}
 }
 
 ComputeHelper::ComputeHelper(VulkanEngine& engine, std::vector<VulkanBuffer>& bufferList)
@@ -118,7 +128,7 @@ VkWriteDescriptorSet ComputeHelper::AddWriteDescriptorSet(VulkanEngine& engine, 
 	return BufferDescriptor;
 }
 
-void ComputeHelper::Compute(VulkanEngine& engine, VkCommandBuffer& commandBuffer, VulkanBuffer& buffer, uint32_t currentFrame)
+void ComputeHelper::Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame)
 {
 	MeshInfo meshInfo;
 	meshInfo.MeshID = 0;
@@ -127,6 +137,7 @@ void ComputeHelper::Compute(VulkanEngine& engine, VkCommandBuffer& commandBuffer
 
 	VkCommandBufferBeginInfo CommandBufferBeginInfo{};
 	CommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	CommandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 	vkBeginCommandBuffer(commandBuffer, &CommandBufferBeginInfo);
 
 	VkBufferMemoryBarrier BufferMemoryBarrier{};
@@ -169,18 +180,19 @@ void ComputeHelper::Compute(VulkanEngine& engine, VkCommandBuffer& commandBuffer
 		0, nullptr);
 
 	vkEndCommandBuffer(commandBuffer);
-
-	vkResetFences(engine.Device, 1, &engine.inFlightFences[currentFrame]);
-	const VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_TRANSFER_BIT;
-	VkSubmitInfo computeSubmitInfo{};
-	computeSubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	computeSubmitInfo.pWaitDstStageMask = &waitStageMask;
-	computeSubmitInfo.commandBufferCount = 1;
-	computeSubmitInfo.pCommandBuffers = &commandBuffer;
-	vkQueueSubmit(engine.GraphicsQueue, 1, &computeSubmitInfo, engine.inFlightFences[currentFrame]);
-	vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 }
 
 void ComputeHelper::Destroy(VulkanEngine& engine)
 {
+	vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+	vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+	vkDestroyPipelineCache(engine.Device, PipelineCache, nullptr);
+	vkDestroyDescriptorSetLayout(engine.Device, descriptorLayout, nullptr);
+	vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+	
+	ShaderPipeline = VK_NULL_HANDLE;
+	ShaderPipelineLayout = VK_NULL_HANDLE;
+	PipelineCache = VK_NULL_HANDLE;
+	descriptorLayout = VK_NULL_HANDLE;
+	descriptorPool = VK_NULL_HANDLE;
 }
