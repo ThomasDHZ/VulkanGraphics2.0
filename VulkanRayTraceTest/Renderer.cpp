@@ -262,7 +262,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->SceneData.vertexSize = time;
     SceneData->SceneData.PVM = SceneData->SceneData.proj * SceneData->SceneData.view * SceneData->SceneData.model;
-    SceneData->SceneData.timer = time;
+   // SceneData->SceneData.timer = time;
     SceneData->Update(engine);
 }
 

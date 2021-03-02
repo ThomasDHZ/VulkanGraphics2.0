@@ -2,7 +2,6 @@
 #extension GL_EXT_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
-#extension GL_EXT_scalar_block_layout : enable
 
 #include "Lighting.glsl"
 
@@ -151,7 +150,7 @@ void main()
     vec3 N = normalize(mat3(ubo.model) * normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-	vec3 color2 = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
+	vec3 color = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
 	
 	const Material material = BuildMaterial(UV);
 
@@ -163,13 +162,13 @@ void main()
     vec3 TangentFragPos  = TBN * worldPos;
 
 	    // get diffuse color
-    vec3 color = vec3(texture(TextureMap[1], UV)).rgb;
+    vec3 difcolor = vec3(texture(TextureMap[1], UV)).rgb;
     // ambient
-    vec3 ambient = 0.1 * color;
+    vec3 ambient = 0.1 * difcolor;
     // diffuse
     vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
     float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * color;
+    vec3 diffuse = diff * difcolor;
     // specular
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
@@ -177,7 +176,7 @@ void main()
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
     vec3 specular = vec3(0.2) * spec;
-    hitValue = color2;
+    hitValue = ambient + diffuse + spec;
 
 //	vec3 lightDir = normalize(-ubo.dlight.direction);
 //	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);

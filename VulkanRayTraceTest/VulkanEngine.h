@@ -11,6 +11,7 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define VKB_VALIDATION_LAYERS
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 

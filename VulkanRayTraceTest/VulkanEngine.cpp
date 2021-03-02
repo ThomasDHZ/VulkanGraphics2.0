@@ -22,6 +22,7 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	DeviceExtensions.emplace_back(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_SPIRV_1_4_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME);
+	DeviceExtensions.emplace_back(VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME);
 
 	VkApplicationInfo VulkanInfo = {};
 	VulkanInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -31,12 +32,22 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	VulkanInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	VulkanInfo.apiVersion = VK_API_VERSION_1_2;
 
+	VkValidationFeatureEnableEXT enabled[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT };
+
+	VkValidationFeaturesEXT ValidationFeatures{};
+	ValidationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+	ValidationFeatures.disabledValidationFeatureCount = 0;
+	ValidationFeatures.enabledValidationFeatureCount = 1;
+	ValidationFeatures.pEnabledValidationFeatures = enabled;
+	ValidationFeatures.pDisabledValidationFeatures = nullptr;
+
 	std::vector<const char*> ExtensionList = getRequiredExtensions();
 	VkInstanceCreateInfo VulkanCreateInfo = {};
 	VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	VulkanCreateInfo.pApplicationInfo = &VulkanInfo;
 	VulkanCreateInfo.enabledExtensionCount = static_cast<uint32_t>(ExtensionList.size());
 	VulkanCreateInfo.ppEnabledExtensionNames = ExtensionList.data();
+	VulkanCreateInfo.pNext = &ValidationFeatures;
 
 #ifdef NDEBUG
 	VulkanCreateInfo.enabledLayerCount = 0;
@@ -177,6 +188,8 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	deviceFeatures.samplerAnisotropy = VK_TRUE;
 	deviceFeatures.fillModeNonSolid = VK_TRUE;
 	deviceFeatures.wideLines = VK_TRUE;
+	deviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
+	deviceFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
 
 	VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
 	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;

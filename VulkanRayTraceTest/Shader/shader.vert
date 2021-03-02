@@ -1,6 +1,8 @@
-#version 450
+#version 460
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_EXT_scalar_block_layout : enable
+#extension GL_EXT_debug_printf : enable
 
 #include "Lighting.glsl"
 
@@ -11,6 +13,26 @@ layout(push_constant) uniform MeshInfo
 	uint MaterialID;
 } Mesh;
 
+struct Vertex
+{
+  vec3 pos;
+  float padding1;
+  vec3 normal;
+  float padding2;
+  vec2 uv;
+  vec2 padding3;
+  vec4 tangent;
+  vec4 BiTangant;
+  vec4 Color;
+  ivec4 BoneID;
+  vec4 BoneWeights;
+ };
+
+layout(binding = 3, scalar) buffer Vertices
+{
+  Vertex v[];
+}
+vertices[];
 layout(binding = 2) uniform UniformBufferObject {
 	mat4 viewInverse;
 	mat4 projInverse;
@@ -42,6 +64,7 @@ layout(location = 3) out mat3 TBN;
 
 void main() 
 {
+    debugPrintfEXT("Hit");
     FragPos = vec3(ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0));   
 	UV = aTexCoords;
     Normal = mat3(transpose(inverse(ubo.model * MeshTransform[Mesh.MeshID].Transform))) * aNormal;  

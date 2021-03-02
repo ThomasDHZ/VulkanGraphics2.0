@@ -161,7 +161,7 @@ void ComputeHelper::Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipeline);
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipelineLayout, 0, 1, &descriptorSets, 0, 0);
-	vkCmdPushConstants(commandBuffer, ShaderPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT , 0, sizeof(MeshInfo), &meshInfo);
+	vkCmdPushConstants(commandBuffer, ShaderPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT , 0, sizeof(meshInfo), &meshInfo);
 	vkCmdDispatch(commandBuffer, buffer.BufferSize, 1, 1);
 
 	BufferMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
