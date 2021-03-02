@@ -34,12 +34,7 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 
 	VkValidationFeatureEnableEXT enabled[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT };
 
-	VkValidationFeaturesEXT ValidationFeatures{};
-	ValidationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-	ValidationFeatures.disabledValidationFeatureCount = 0;
-	ValidationFeatures.enabledValidationFeatureCount = 1;
-	ValidationFeatures.pEnabledValidationFeatures = enabled;
-	ValidationFeatures.pDisabledValidationFeatures = nullptr;
+
 
 	std::vector<const char*> ExtensionList = getRequiredExtensions();
 	VkInstanceCreateInfo VulkanCreateInfo = {};
@@ -47,7 +42,6 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	VulkanCreateInfo.pApplicationInfo = &VulkanInfo;
 	VulkanCreateInfo.enabledExtensionCount = static_cast<uint32_t>(ExtensionList.size());
 	VulkanCreateInfo.ppEnabledExtensionNames = ExtensionList.data();
-	VulkanCreateInfo.pNext = &ValidationFeatures;
 
 #ifdef NDEBUG
 	VulkanCreateInfo.enabledLayerCount = 0;
@@ -56,9 +50,18 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	VkDebugUtilsMessengerCreateInfoEXT DebugInfo;
 	VulkanDebug.CreateDebugMessengerInfo(DebugInfo);
 
+	VkValidationFeaturesEXT ValidationFeatures{};
+	ValidationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+	ValidationFeatures.disabledValidationFeatureCount = 0;
+	ValidationFeatures.enabledValidationFeatureCount = 1;
+	ValidationFeatures.pEnabledValidationFeatures = enabled;
+	ValidationFeatures.pDisabledValidationFeatures = nullptr;
+	ValidationFeatures.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugInfo;
+
 	VulkanCreateInfo.enabledLayerCount = static_cast<unsigned int>(ValidationLayers.size());
 	VulkanCreateInfo.ppEnabledLayerNames = ValidationLayers.data();
-	VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugInfo;
+	VulkanCreateInfo.pNext = &ValidationFeatures;
+
 #endif
 
 	if (vkCreateInstance(&VulkanCreateInfo, nullptr, &Instance) != VK_SUCCESS) {
