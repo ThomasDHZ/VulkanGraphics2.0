@@ -46,14 +46,6 @@ void main()
 	UV = aTexCoords;
     Normal = mat3(transpose(inverse(ubo.model * MeshTransform[Mesh.MeshID].Transform))) * aNormal;  
     
-//    mat3 normalMatrix = transpose(inverse(mat3(ubo.model)));
-//    vec3 T = normalize(normalMatrix * vec3(aTangent));
-//    vec3 N = normalize(normalMatrix * aNormal);
-//    T = normalize(T - dot(T, N) * N);
-//    vec3 B = cross(N, T);
-//    mat3 TBN = transpose(mat3(T, B, N)); 
-
-
     vec3 T = normalize(mat3(ubo.model) * vec3(aTangent));
     vec3 B = normalize(mat3(ubo.model) * vec3(aBitangent));
     vec3 N = normalize(mat3(ubo.model) * Normal);

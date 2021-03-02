@@ -151,7 +151,7 @@ void main()
     vec3 N = normalize(mat3(ubo.model) * normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-//	vec3 color = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
+	vec3 color2 = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
 	
 	const Material material = BuildMaterial(UV);
 
@@ -177,7 +177,7 @@ void main()
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
     vec3 specular = vec3(0.2) * spec;
-    hitValue = ambient + diffuse + specular;
+    hitValue = color2;
 
 //	vec3 lightDir = normalize(-ubo.dlight.direction);
 //	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);

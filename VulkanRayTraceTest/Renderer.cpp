@@ -18,12 +18,13 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     auto c = sizeof(Material);
     modelRenderManager = ModelRenderManager(engine);
     
-    modelRenderManager.AddModel(engine, "../Models/Cube.obj");
-    Material material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    material.NormalMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    //modelRenderManager.AddModel(engine, "../Models/Cube.obj");
+    //Material material{};
+    //material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    //material.NormalMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+  //  modelRenderManager.ModelList[0].MeshList[0].material = material;
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-    //   modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+       modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 

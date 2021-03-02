@@ -124,8 +124,7 @@ void main()
     vec3 TangentFragPos  = TBN * FragPos;
 
 	vec3 normal = vec3(texture(TextureMap[2], UV)).rgb;
-    // transform normal vector to range [-1,1]
-    normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space
+    normal = normalize(normal * 2.0 - 1.0);  
    
     // get diffuse color
     vec3 color = vec3(texture(TextureMap[1], UV)).rgb;
@@ -143,16 +142,4 @@ void main()
 
     vec3 specular = vec3(0.2) * spec;
     outColor = vec4(ambient + diffuse + specular, 1.0);
-
-//	vec3 ambient  =  CalcAmbient(scenedata.dlight.ambient, vec3(0.7f));
-//    vec3 diffuse  =  CalcDiffuse(scenedata.dlight.direction, scenedata.dlight.diffuse, vec3(0.7f));
-//	vec3 specular = CalcSpecular(scenedata.dlight.direction , scenedata.dlight.specular, vec3(1.0f), scenedata.viewPos, Normal, material.Shininess);
-//	vec3 color = ambient + diffuse + specular;
-
-//	 vec3 lightVector = normalize(scenedata.dlight.direction);
-//	float dot_product = max(dot(lightVector, Normal), 0.2);
-//	vec3 color =  vec3(texture(TextureMap[2], UV)) * dot_product;
-//
-//
-//	 outColor = vec4(color, 1.0f);
 }

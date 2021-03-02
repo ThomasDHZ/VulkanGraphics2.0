@@ -1,0 +1,17 @@
+# OBJ written from C:\Users\dotha\source\repos\VulkanGraphics\Models\plain.obj
+# Units	meters
+
+o Mesh
+v 5 -5 5
+v -5 -5 5
+v 5 5 5
+v -5 5 5
+vn 0 0 1
+vt 1 1
+vt 0 1
+vt 0 0
+vt 1 0
+mtllib plain.mtl
+usemtl Default
+g Default
+f 3/1/1 4/2/1 2/3/1 1/4/1

@@ -170,16 +170,16 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 			scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
 
-		for (auto& vertex : newVertexList)
-		{
-			glm::mat4 BoneTransform = glm::mat4(1.0f);
-			BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
-			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
-			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
-			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
-			vertex.Position = glm::vec3(MeshTransform * BoneTransform * glm::vec4(vertex.Position, 1.0));
-			vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
-		}
+		//for (auto& vertex : newVertexList)
+		//{
+		//	glm::mat4 BoneTransform = glm::mat4(1.0f);
+		//	BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
+		//	BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
+		//	BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
+		//	BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
+		//	vertex.Position = glm::vec3(MeshTransform * BoneTransform * glm::vec4(vertex.Position, 1.0));
+		//	vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
+		//}
 
 		VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
 	}
@@ -202,11 +202,9 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 		meshInfo.ModelID = 0;
 		meshInfo.MaterialID = 0;
 
-
-		VkBuffer vertexBuffers[] = { VertexBuffer.Buffer };
 		VkDeviceSize offsets[] = { 0 };
 
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
 		vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdPushConstants(commandBuffer, pipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(MeshInfo), &meshInfo);
 		vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
