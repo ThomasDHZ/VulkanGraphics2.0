@@ -64,7 +64,8 @@ layout(location = 3) out mat3 TBN;
 
 void main() 
 {
-    debugPrintfEXT("H");
+  debugPrintfEXT("VertexID: %i - BoneID = %i, %i, %i, %i \n", gl_VertexIndex, BoneID.x, BoneID.y, BoneID.z, BoneID.w);
+
     FragPos = vec3(ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0));   
 	UV = aTexCoords;
     Normal = mat3(transpose(inverse(ubo.model * MeshTransform[Mesh.MeshID].Transform))) * aNormal;  

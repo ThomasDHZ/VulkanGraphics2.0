@@ -54,10 +54,10 @@ layout(push_constant) uniform MeshInfo
 
 void main()
 {
-
   Vertex v0 = vertices.v[gl_GlobalInvocationID.x];
-
-  mat4 BoneTransform = mat4(1.0f);
+//  debugPrintfEXT("camPos = %i, %i, %i, %i \n", v0.BoneID.x, v0.BoneID.y, v0.BoneID.z, v0.BoneID.w);
+ 
+ mat4 BoneTransform = mat4(1.0f);
 //  BoneTransform =  ubo.BoneTransform[v0.BoneID[0]] * v0.BoneWeights[0];
 //  BoneTransform += ubo.BoneTransform[v0.BoneID[1]] * v0.BoneWeights[1];
 //  BoneTransform += ubo.BoneTransform[v0.BoneID[2]] * v0.BoneWeights[2];

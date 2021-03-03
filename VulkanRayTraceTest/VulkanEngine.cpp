@@ -23,7 +23,6 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	DeviceExtensions.emplace_back(VK_KHR_SPIRV_1_4_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_SHADER_NON_SEMANTIC_INFO_EXTENSION_NAME);
-	_putenv_s("DEBUG_PRINTF_TO_STDOUT", "1");
 
 	VkApplicationInfo VulkanInfo = {};
 	VulkanInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -33,10 +32,7 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	VulkanInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	VulkanInfo.apiVersion = VK_API_VERSION_1_2;
 
-	VkValidationFeatureEnableEXT enabled[] = { VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT };
-	VkValidationFeatureDisableEXT disabled[] = {
-	VK_VALIDATION_FEATURE_DISABLE_THREAD_SAFETY_EXT, VK_VALIDATION_FEATURE_DISABLE_API_PARAMETERS_EXT,
-		VK_VALIDATION_FEATURE_DISABLE_OBJECT_LIFETIMES_EXT, VK_VALIDATION_FEATURE_DISABLE_CORE_CHECKS_EXT };
+
 	std::vector<const char*> ExtensionList = getRequiredExtensions();
 	VkInstanceCreateInfo VulkanCreateInfo = {};
 	VulkanCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -50,6 +46,11 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 #else
 	VkDebugUtilsMessengerCreateInfoEXT DebugInfo;
 	VulkanDebug.CreateDebugMessengerInfo(DebugInfo);
+
+	VkValidationFeatureEnableEXT enabled[] = { VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT };
+	VkValidationFeatureDisableEXT disabled[] = {
+	VK_VALIDATION_FEATURE_DISABLE_THREAD_SAFETY_EXT, VK_VALIDATION_FEATURE_DISABLE_API_PARAMETERS_EXT,
+		VK_VALIDATION_FEATURE_DISABLE_OBJECT_LIFETIMES_EXT, VK_VALIDATION_FEATURE_DISABLE_CORE_CHECKS_EXT };
 
 	VkValidationFeaturesEXT ValidationFeatures{};
 	ValidationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
