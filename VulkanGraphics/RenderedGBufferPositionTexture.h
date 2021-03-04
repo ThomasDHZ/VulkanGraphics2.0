@@ -4,13 +4,13 @@
 class RenderedGBufferPositionTexture : public Texture
 {
 private:
-    void CreateTextureImage(VulkanEngine& engine);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextureImage(VulkanEngine& renderer);
+    void CreateTextureView(VulkanEngine& renderer);
+    void CreateTextureSampler(VulkanEngine& renderer);
 public:
     RenderedGBufferPositionTexture();
-    RenderedGBufferPositionTexture(VulkanEngine& engine);
+    RenderedGBufferPositionTexture(VulkanEngine& renderer);
     ~RenderedGBufferPositionTexture();
 
-    void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture(VulkanEngine& renderer);
 };

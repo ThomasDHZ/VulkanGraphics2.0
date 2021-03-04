@@ -4,10 +4,10 @@ SpriteTexture2D::SpriteTexture2D() : Texture()
 {
 }
 
-SpriteTexture2D::SpriteTexture2D(VulkanEngine& engine, VkFormat format, std::string TextureLocation, unsigned int textureID) : Texture(engine, TextureLocation, textureID, TextureType::vkTexture2D, format)
+SpriteTexture2D::SpriteTexture2D(VulkanEngine& renderer, VkFormat format, std::string TextureLocation, unsigned int textureID) : Texture(renderer, TextureLocation, textureID, TextureType::vkTexture2D, format)
 {
-	CreateTextureView(engine, format);
-	CreateTextureSampler(engine);
+	CreateTextureView(renderer, format);
+	CreateTextureSampler(renderer);
 	//ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
@@ -15,7 +15,7 @@ SpriteTexture2D::~SpriteTexture2D()
 {
 }
 
-void SpriteTexture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
+void SpriteTexture2D::CreateTextureView(VulkanEngine& renderer, VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -28,10 +28,10 @@ void SpriteTexture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	View = engine.CreateTextureView(TextureImageViewInfo);
+	Texture::CreateTextureView(renderer, TextureImageViewInfo);
 }
 
-void SpriteTexture2D::CreateTextureSampler(VulkanEngine& engine)
+void SpriteTexture2D::CreateTextureSampler(VulkanEngine& renderer)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -48,5 +48,5 @@ void SpriteTexture2D::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-	Sampler = engine.CreateTextureSampler(TextureImageSamplerInfo);
+	Texture::CreateTextureSampler(renderer, TextureImageSamplerInfo);
 }

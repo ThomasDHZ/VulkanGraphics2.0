@@ -18,6 +18,7 @@ private:
 protected:
     TextureInfo TextureData;
     VkDeviceMemory Memory = VK_NULL_HANDLE;
+    VkImage Image = VK_NULL_HANDLE;
     VkSampler Sampler = VK_NULL_HANDLE;
 
     void KTXTransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
@@ -30,9 +31,10 @@ protected:
     virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
+    virtual void CreateTextureView(VulkanEngine& engine, VkImageViewCreateInfo TextureImageViewInfo);
+    virtual void CreateTextureSampler(VulkanEngine& engine, VkSamplerCreateInfo TextureImageSamplerInfo);
 
 public:
-    VkImage Image = VK_NULL_HANDLE;
     VkImageView View = VK_NULL_HANDLE;
     VkDescriptorSet ImGuiDescriptorSet = VK_NULL_HANDLE;
 

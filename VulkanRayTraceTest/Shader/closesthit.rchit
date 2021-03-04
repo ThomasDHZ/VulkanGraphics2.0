@@ -121,6 +121,49 @@ Material BuildMaterial(vec2 UV)
 	return material;
 }
 
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{ 
+    float heightScale = 0.1;
+    // number of depth layers
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec2 P = viewDir.xy / viewDir.z * heightScale; 
+    vec2 deltaTexCoords = P / numLayers;
+  
+    // get initial values
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = texture(TextureMap[3], currentTexCoords).r;
+      
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        // shift texture coordinates along direction of P
+        currentTexCoords -= deltaTexCoords;
+        // get depthmap value at current texture coordinates
+        currentDepthMapValue = texture(TextureMap[3], currentTexCoords).r;  
+        // get depth of next layer
+        currentLayerDepth += layerDepth;  
+    }
+    
+    // get texture coordinates before collision (reverse operations)
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    // get depth after and before collision for linear interpolation
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(TextureMap[3], prevTexCoords).r - currentLayerDepth + layerDepth;
+ 
+    // interpolation of texture coordinates
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
+
 void main()
 {
 	const mat4 rayTransform = MeshTransform[gl_InstanceCustomIndexEXT].Transform;
@@ -150,33 +193,36 @@ void main()
     vec3 N = normalize(mat3(ubo.model) * normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-	vec3 color = normalize(v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z);
-	
-	const Material material = BuildMaterial(UV);
-
-	normal = vec3(texture(TextureMap[2], UV)).rgb;
-	normal = normalize(normal * 2.0 - 1.0); 
-
-	vec3 TangentLightPos = TBN * ubo.dlight.direction;
+    vec3 TangentLightPos = TBN * ubo.plight.position;
     vec3 TangentViewPos  = TBN * ubo.viewPos;
     vec3 TangentFragPos  = TBN * worldPos;
+  // offset texture coordinates with Parallax Mapping
+    // offset texture coordinates with Parallax Mapping
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    
+    UV = ParallaxMapping(UV,  viewDir);       
+//    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//        discard;
 
-	    // get diffuse color
-    vec3 difcolor = vec3(texture(TextureMap[1], UV)).rgb;
+    // obtain normal from normal map
+    vec3 normal2 = texture(TextureMap[2], UV).rgb;
+    normal2 = normalize(normal2 * 2.0 - 1.0);   
+   
+    // get diffuse color
+    vec3 color = texture(TextureMap[1], UV).rgb;
     // ambient
-    vec3 ambient = 0.1 * difcolor;
+    vec3 ambient = 0.1 * color;
     // diffuse
     vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-    float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * difcolor;
-    // specular
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    float diff = max(dot(lightDir, normal2), 0.0);
+    vec3 diffuse = diff * color;
+    // specular    
     vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+    float spec = pow(max(dot(normal2, halfwayDir), 0.0), 32.0);
 
     vec3 specular = vec3(0.2) * spec;
-    hitValue = ambient + diffuse + spec;
+    hitValue = ambient + diffuse ;
 
 //	vec3 lightDir = normalize(-ubo.dlight.direction);
 //	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
@@ -194,19 +240,19 @@ void main()
 //	float spec = 0.0f;
 ////  if(dot(normal, lightDir) > 0)
 ////  {
-//	// Shadow casting
-//	float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
-//	if (shadowed) {
-//		hitValue *= 0.3f;
-//	}
-//	else
-//	{	
-//		hitValue += CalcSpecular(ubo.dlight.direction , ubo.dlight.specular, vec3(1.0f), ubo.viewPos, normal, material.Shininess);
-//	}
-//  }
+	// Shadow casting
+	float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+	if (shadowed) {
+		hitValue *= vec3(0.0f, 1.0f, 0.0f);
+	}
+	else
+	{	
+		hitValue += specular;
+	}
+ // }
 }

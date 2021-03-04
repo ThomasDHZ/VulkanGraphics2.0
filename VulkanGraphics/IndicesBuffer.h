@@ -13,7 +13,7 @@ private:
 public:
 
 	IndicesBuffer();
-	IndicesBuffer(VulkanEngine& renderer, const std::vector<uint32_t>& indicesdata);
+	IndicesBuffer(VulkanEngine& renderer, const std::vector<uint16_t>& indicesdata);
 	~IndicesBuffer();
 
 	void Destory(VulkanEngine& renderer);

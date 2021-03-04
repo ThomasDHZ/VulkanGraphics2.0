@@ -7,7 +7,7 @@
 struct ColisionGeo
 {
 	std::vector<glm::vec3> CollisionVertexs;
-	std::vector<uint32_t> CollisionIndices;
+	std::vector<uint16_t> CollisionIndices;
 };
 
 enum ObjectFlags

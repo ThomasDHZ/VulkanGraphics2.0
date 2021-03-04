@@ -4,13 +4,13 @@
 class RenderedGammaTexture : public Texture
 {
 private:
-    void CreateTextureImage(VulkanEngine& engine);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextureImage(VulkanEngine& renderer);
+    void CreateTextureView(VulkanEngine& renderer);
+    void CreateTextureSampler(VulkanEngine& renderer);
 public:
     RenderedGammaTexture();
-    RenderedGammaTexture(VulkanEngine& engine);
+    RenderedGammaTexture(VulkanEngine& renderer);
     ~RenderedGammaTexture();
 
-    void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture(VulkanEngine& renderer);
 };

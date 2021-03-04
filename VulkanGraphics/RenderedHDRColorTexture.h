@@ -4,13 +4,13 @@
 class RenderedHDRColorTexture : public Texture
 {
 private:
-    void CreateTextureImage(VulkanEngine& engine);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextureImage(VulkanEngine& renderer);
+    void CreateTextureView(VulkanEngine& renderer);
+    void CreateTextureSampler(VulkanEngine& renderer);
 public:
     RenderedHDRColorTexture();
-    RenderedHDRColorTexture(VulkanEngine& engine);
+    RenderedHDRColorTexture(VulkanEngine& renderer);
     ~RenderedHDRColorTexture();
 
-    void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture(VulkanEngine& renderer);
 };

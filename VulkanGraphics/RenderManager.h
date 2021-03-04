@@ -15,13 +15,10 @@
 #include "Object2D.h"
 #include "SceneToTextureRendererPass.h"
 #include "BloomRenderPass.h"
-#include "RayTraceRenderer.h"
 
 class RenderManager
 {
 private:
-	
-
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
 
@@ -31,8 +28,6 @@ private:
 	}
 
 	std::vector<BaseMesh> MeshDrawList;
-
-	RayTraceRenderer rayTracer;
 
 	FrameBufferMesh frameBuffer;
 	DeferredFrameBufferMesh SSAOFrameBuffer;

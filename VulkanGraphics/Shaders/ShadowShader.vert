@@ -7,7 +7,6 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
-    mat4 lightSpaceMatrix;
     mat4 BoneTransform[100];
 } ubo;
 
@@ -23,7 +22,10 @@ layout(location = 0) out vec2 fragTexCoord;
 
 void main() 
 {
-    gl_Position = ubo.lightSpaceMatrix * ubo.model * vec4(inPosition, 1.0);
+    mat4 BoneTransform = mat4(1.0f);
+    vec4 BonePosisition = BoneTransform * vec4(inPosition, 1.0);
+
+    gl_Position = ubo.proj * ubo.view * ubo.model * BonePosisition;
     fragTexCoord = inTexCoord;
 }
 

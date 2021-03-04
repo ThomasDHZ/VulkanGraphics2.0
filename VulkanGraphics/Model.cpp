@@ -5,12 +5,12 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags)
+Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags)
 {
 	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, vertexdata, indicesdata, textures, layout, renderFlags)));
 }
 
-Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags, std::shared_ptr<Texture> shadowTexture)
+Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, VkDescriptorSetLayout layout, int renderFlags)
 {
 	RenderFlags = renderFlags;
 	Assimp::Importer ModelImporter;
@@ -25,20 +25,20 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManag
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 
 	LoadNodeTree(Scene->mRootNode);
-//	LoadAnimations(Scene);
-	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene, shadowTexture);
-//
-//	for (auto mesh : SubMeshList)
-//	{
-//		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, mesh, layout, renderFlags)));
-//	}
-//
-//	LoadMeshTransform(0, ModelTransformMatrix);
-//
-//	if (AnimationList.size() > 0)
-//	{
-//		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
-//	}
+	LoadAnimations(Scene);
+	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
+
+	for (auto mesh : SubMeshList)
+	{
+		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, textureManager, mesh, layout, renderFlags)));
+	}
+
+	LoadMeshTransform(0, ModelTransformMatrix);
+
+	if (AnimationList.size() > 0)
+	{
+		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
+	}
 }
 
 Model::~Model()
@@ -46,7 +46,7 @@ Model::~Model()
 
 }
 
-void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, std::shared_ptr<Texture> shadowTexture)
+void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
@@ -57,7 +57,7 @@ void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& te
 		NewMesh.NodeName = node->mName.C_Str();
 		NewMesh.VertexList = LoadVertices(mesh);
 		NewMesh.IndexList = LoadIndices(mesh);
-		LoadTextures(renderer, textureManager, NewMesh, FilePath, mesh, scene, shadowTexture);
+		LoadTextures(renderer, textureManager, NewMesh, FilePath, mesh, scene);
 		NewMesh.TransformMatrix = AssimpToGLMMatrixConverter(node->mTransformation);
 		LoadBones(scene->mRootNode, mesh, NewMesh.VertexList);
 		for (auto nodeMap : NodeMapList)
@@ -73,7 +73,7 @@ void Model::LoadMesh(VulkanEngine& renderer, std::shared_ptr<TextureManager>& te
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(renderer, textureManager, FilePath, node->mChildren[i], scene, shadowTexture);
+		LoadMesh(renderer, textureManager, FilePath, node->mChildren[i], scene);
 	}
 }
 
@@ -89,13 +89,13 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 
 		if (mesh->mTangents)
 		{
-			vertex.Tangant = glm::vec4{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z, 0.0f };
-			vertex.BiTangant = glm::vec4{ mesh->mBitangents[x].x, mesh->mBitangents[x].y, mesh->mBitangents[x].z, 0.0f };
+			vertex.Tangant = glm::vec3{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z };
+			vertex.BiTangant = glm::vec3{ mesh->mBitangents[x].x, mesh->mBitangents[x].y, mesh->mBitangents[x].z };
 		}
 		else
 		{
-			vertex.Tangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
-			vertex.BiTangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
+			vertex.Tangant = glm::vec3{ 0.0f, 0.0f, 0.0f };
+			vertex.BiTangant = glm::vec3{ 0.0f, 0.0f, 0.0f };
 		}
 
 		if (mesh->mTextureCoords[0])
@@ -111,8 +111,6 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.BoneWeights = glm::vec4(0.0f);
 
 		VertexList.emplace_back(vertex);
-		VertexList2.emplace_back(vertex);
-		VertexCount++;
 	}
 
 	for (int x = 0; x < mesh->mNumBones; x++)
@@ -148,9 +146,9 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 	return VertexList;
 }
 
-std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
+std::vector<uint16_t> Model::LoadIndices(aiMesh* mesh)
 {
-	std::vector<uint32_t> IndexList;
+	std::vector<uint16_t> IndexList;
 
 	for (int x = 0; x < mesh->mNumFaces; x++)
 	{
@@ -158,11 +156,9 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 		for (int y = 0; y < Faces.mNumIndices; y++)
 		{
 			IndexList.emplace_back(Faces.mIndices[y]);
-			IndexList2.emplace_back(Faces.mIndices[y]);
-			IndexCount++;
 		}
 	}
-	
+
 	return IndexList;
 }
 
@@ -283,38 +279,181 @@ void Model::LoadAnimations(const aiScene* scene)
 	}
 }
 
-void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshData& Properties, const std::string& FilePath, aiMesh* mesh, const aiScene* scene, std::shared_ptr<Texture> shadowTexture)
+void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, MeshData& Properties, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
 	MeshTextures meshTextures;
-	meshTextures.DiffuseMap = DefaultTexture;
-	meshTextures.RendererShadowMap = shadowTexture;
-	meshTextures.ReflectionMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/metallic.png";
-	meshTextures.CubeMap[0] = DefaultTexture;
-	meshTextures.CubeMap[1] = DefaultTexture;
-	meshTextures.CubeMap[2] = DefaultTexture;
-	meshTextures.CubeMap[3] = DefaultTexture;
-	meshTextures.CubeMap[4] = DefaultTexture;
-	meshTextures.CubeMap[5] = DefaultTexture;
+	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2.jpg";
+	meshTextures.SpecularMap = DefaultTexture;
+	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_normal.jpg";
+	meshTextures.AlphaMap = DefaultTexture;
+	meshTextures.DepthMap = "C:/Users/dotha/source/repos/VulkanGraphics/texture/bricks2_disp.jpg";
+	meshTextures.EmissionMap = DefaultTexture;
+	meshTextures.ReflectionMap = DefaultTexture;
+	meshTextures.CubeMap[0] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/left.jpg";
+	meshTextures.CubeMap[1] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/right.jpg";
+	meshTextures.CubeMap[2] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/top.jpg";
+	meshTextures.CubeMap[3] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/bottom.jpg";
+	meshTextures.CubeMap[4] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/back.jpg";
+	meshTextures.CubeMap[5] = "C:/Users/dotha/source/repos/VulkanGraphics/texture/skybox/front.jpg"; 
 
 	Properties.properties.material.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
 	Properties.properties.material.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
 	Properties.properties.material.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	Properties.properties.material.shininess = 32;
-	Properties.properties.material.reflectivness = 0;
+	Properties.properties.material.reflectivness = 50;
 	Properties.properties.minLayers = 8.0f;
 	Properties.properties.maxLayers = 32.0f;
 	Properties.properties.heightScale = 0.1f;
 
+	//if (std::string(mesh->mName.C_Str()) == "Demon_HeadA")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHeadA_4/DemonsHeadA_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHeadA_4/DemonsHeadA_emissive.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_HeadB")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHeadB_4/DemonsHeadB_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHeadB_4/DemonsHeadB_emissive.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_HeadC")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHeadC_4/DemonsHeadC_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHeadC_4/DemonsHeadC_emissive.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Body")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsBodyB_4/DemonsBodyB_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsBodyB_4/DemonsBodyB_albedoOpacity_normal.bmp";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsBodyB_4/DemonsBodyB_emissive.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_A1")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_emissive.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_A2")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_emissive.png";
+
+	//}
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_A3")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_emissive.png";
+
+	//}
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_A4")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsA_4/DemonsHornsA_emissive.png";
+
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_B1")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_emissive.png";
+
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_B2")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_emissive.png";
+	//}
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_B3")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_emissive.png";
+	//}
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_B4")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_albedoOpacity.png";
+	//	meshTextures.EmissionMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsB_4/DemonsHornsB_emissive.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_C1")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsC_4/DemonsHornsC_albedoOpacity.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_C2")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsC_4/DemonsHornsC_albedoOpacity.png";
+	//}
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_C3")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsC_4/DemonsHornsC_albedoOpacity.png";
+	//}
+	//if (std::string(mesh->mName.C_Str()) == "Demon_Horns_C4")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_DemonsHornsC_4/DemonsHornsC_albedoOpacity.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Chest_Armor")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Waist_Armor")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "Tassets")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "L_Greave")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "R_Greave")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "L_Bracer")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "R_Bracer")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "L_Shoulder_Armor")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
+
+	//if (std::string(mesh->mName.C_Str()) == "R_Shoulder_Armor")
+	//{
+	//	meshTextures.DiffuseMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor_4/DemonsArmor_albedoOpacity.png";
+	//	meshTextures.NormalMap = "C:/Users/dotha/source/repos/VulkanGraphics/VulkanGraphics/Models/Demon/tex_Demon Armor/DemonsArmor_normal.png";
+	//}
 
 	aiColor3D color(0.f, 0.f, 0.f);
-	material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	Properties.properties.material.ambient.r = color.r;
-	Properties.properties.material.ambient.g = color.g;
-	Properties.properties.material.ambient.b = color.b;
-
 	material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
 	Properties.properties.material.diffuse.r = color.r;
 	Properties.properties.material.diffuse.g = color.g;
@@ -332,107 +471,112 @@ void Model::LoadTextures(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 
 	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &Properties.properties.material.reflectivness))
 	{
+		Properties.properties.material.reflectivness = 1.0f - Properties.properties.material.reflectivness;
+	}
+	else
+	{
 		Properties.properties.material.reflectivness = 0.0f;
 	}
 
-	aiString TextureLocation;
-	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
-	{
-		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-		if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
-		{
-			meshTextures.DiffuseMap = directory + TextureLocation.C_Str();
-		}
-	}
+	//aiString TextureLocation;
+	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
+	//{
+	//	material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
+	//	if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
+	//	{
+	//		meshTextures.DiffuseMap = directory + TextureLocation.C_Str();
+	//	}
+	//}
 
-	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
-	{
-		material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
-		if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
-		{
-			meshTextures.SpecularMap = directory + TextureLocation.C_Str();
-		}
-	}
+	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
+	//{
+	//	material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
+	//	if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
+	//	{
+	//		meshTextures.SpecularMap = directory + TextureLocation.C_Str();
+	//	}
+	//}
 
-	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
-	{
-		material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
-		if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
-		{
-			meshTextures.NormalMap = directory + TextureLocation.C_Str();
-		}
-	}
+	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
+	//{
+	//	material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
+	//	if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
+	//	{
+	//		meshTextures.NormalMap = directory + TextureLocation.C_Str();
+	//	}
+	//}
 
-	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
-	{
-		material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
-		if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
-		{
-			meshTextures.DepthMap = directory + TextureLocation.C_Str();
-		}
-	}
+	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
+	//{
+	//	material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
+	//	if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
+	//	{
+	//		meshTextures.DepthMap = directory + TextureLocation.C_Str();
+	//	}
+	//}
 
-	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
-	{
-		material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
-		if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
-		{
-			meshTextures.AlphaMap = directory + TextureLocation.C_Str();
-		}
-	}
+	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
+	//{
+	//	material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
+	//	if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
+	//	{
+	//		meshTextures.AlphaMap = directory + TextureLocation.C_Str();
+	//	}
+	//}
 
-	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
-	{
-		material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
-		if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
-		{
-			meshTextures.EmissionMap = directory + TextureLocation.C_Str();
-		}
-	}
+	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
+	//{
+	//	material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
+	//	if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
+	//	{
+	//		meshTextures.EmissionMap = directory + TextureLocation.C_Str();
+	//	}
+	//}
 
-	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_REFLECTION); x++)
-	{
-		material->GetTexture(aiTextureType_REFLECTION, x, &TextureLocation);
-		if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
-		{
-			meshTextures.ReflectionMap = directory + TextureLocation.C_Str();
-		}
-	}
+	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_REFLECTION); x++)
+	//{
+	//	material->GetTexture(aiTextureType_REFLECTION, x, &TextureLocation);
+	//	if (!textureManager->GetTextureByName(directory + TextureLocation.C_Str()))
+	//	{
+	//		meshTextures.ReflectionMap = directory + TextureLocation.C_Str();
+	//	}
+	//}
 
-	if (meshTextures.DiffuseMap != DefaultTexture)
-	{
-		Properties.properties.UseDiffuseMapBit = 1;
-	}
+	//if (meshTextures.DiffuseMap != DefaultTexture)
+	//{
+	//	Properties.properties.UseDiffuseMapBit = 1;
+	//}
 
-	if (meshTextures.SpecularMap != DefaultTexture)
-	{
-		Properties.properties.UseSpecularMapBit = 1;
-	}
+	//if (meshTextures.SpecularMap != DefaultTexture)
+	//{
+	//	Properties.properties.UseSpecularMapBit = 1;
+	//}
 
-	if (meshTextures.NormalMap != DefaultTexture)
-	{
-		Properties.properties.UseNormalMapBit = 1;
-	}
+	//if (meshTextures.NormalMap != DefaultTexture)
+	//{
+	//	Properties.properties.UseNormalMapBit = 1;
+	//}
 
-	if (meshTextures.DepthMap != DefaultTexture)
-	{
-		Properties.properties.UseDepthMapBit = 1;
-	}
+	//if (meshTextures.DepthMap != DefaultTexture)
+	//{
+	//	Properties.properties.UseDepthMapBit = 1;
+	//}
 
-	if (meshTextures.AlphaMap != DefaultTexture)
-	{
-		Properties.properties.UseAlphaMapBit = 1;
-	}
+	//if (meshTextures.AlphaMap != DefaultTexture)
+	//{
+	//	Properties.properties.UseAlphaMapBit = 1;
+	//}
 
-	if (meshTextures.EmissionMap != DefaultTexture)
-	{
-		Properties.properties.UseEmissionMapBit = 1;
-	}
+	//if (meshTextures.EmissionMap != DefaultTexture)
+	//{
+	//	Properties.properties.UseEmissionMapBit = 1;
+	//}
 
-	if (meshTextures.ReflectionMap != DefaultTexture)
-	{
-		Properties.properties.UseReflectionMapBit = 1;
-	}
+	//if (meshTextures.ReflectionMap != DefaultTexture)
+	//{
+	//	Properties.properties.UseReflectionMapBit = 1;
+	//}
+
 
 	Properties.TextureList = meshTextures;
 }
@@ -460,12 +604,12 @@ void Model::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsP
 
 void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light)
 {
-	glm::mat4 modelMatrix = ModelTransformMatrix;
+	glm::mat4 modelMatrix = glm::mat4(1.0f);/*
 	modelMatrix = glm::translate(modelMatrix, ModelPosition);
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	modelMatrix = glm::scale(modelMatrix, ModelScale);
+	modelMatrix = glm::scale(modelMatrix, ModelScale);*/
 
 	if (NodeMapList.size() > 0)
 	{
@@ -518,9 +662,6 @@ void Model::UpdateImGUI()
 	ImGui::SliderFloat3("Position", &MeshList[0]->MeshPosition.x, 0.0f, 20.0f);
 	ImGui::SliderFloat3("Rotation", &MeshList[0]->MeshRotate.x, 0.0f, 360.0f);
 	ImGui::SliderFloat3("Scale", &MeshList[0]->MeshScale.x, 0.0f, 20.0f);
-	ImGui::SliderFloat("Shininess", &MeshList[0]->properites.material.shininess, 0.001f, 256.0f);
-	ImGui::SliderFloat("Reflectivness", &MeshList[0]->properites.material.reflectivness, 0.0f, 1.0f);
-
 	ImGui::SliderFloat("Anibar", AnimationPlayer.GetAnimationTimePtr(), 0.0f, AnimationPlayer.GetAnimationLength());
 	ImGui::SliderFloat("PlaySpeed", AnimationPlayer.GetAnimationPlaySpeedPtr(), 0.0f, 10.0f);
 	ImGui::End();

@@ -90,7 +90,7 @@ void Sprite::Move(std::vector<std::shared_ptr<Object2D>>& ObjectList, glm::vec3 
 
 void Sprite::SetUpSprite(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex> SpriteVertices, const MeshTextures& SpriteTextures, glm::vec2 StartPos, VkDescriptorSetLayout& layout)
 {
-	const std::vector<uint32_t> SpriteIndices =
+	const std::vector<uint16_t> SpriteIndices =
 	{
 		  0, 1, 2, 2, 3, 0
 	};
@@ -103,7 +103,7 @@ void Sprite::SetUpSprite(VulkanEngine& engine, std::shared_ptr<TextureManager> t
 
 void Sprite::SetUpSprite(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::vector<Vertex> SpriteVertices, const MeshTextures& SpriteTextures, glm::vec2 StartPos, CustomBuffer custom, VkDescriptorSetLayout& layout)
 {
-	const std::vector<uint32_t> SpriteIndices =
+	const std::vector<uint16_t> SpriteIndices =
 	{
 		  0, 1, 2, 2, 3, 0
 	};

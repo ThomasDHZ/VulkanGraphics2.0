@@ -4,13 +4,13 @@
 class RenderedGBufferNormalTexture : public Texture
 {
 private:
-    void CreateTextureImage(VulkanEngine& engine);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextureImage(VulkanEngine& renderer);
+    void CreateTextureView(VulkanEngine& renderer);
+    void CreateTextureSampler(VulkanEngine& renderer);
 public:
     RenderedGBufferNormalTexture();
-    RenderedGBufferNormalTexture(VulkanEngine& engine);
+    RenderedGBufferNormalTexture(VulkanEngine& renderer);
     ~RenderedGBufferNormalTexture();
 
-    void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture(VulkanEngine& renderer);
 };

@@ -73,9 +73,10 @@ layout(binding = 7) uniform sampler2D TextureMap[];
 
 
 layout(location = 0) in vec3 FragPos;
-layout(location = 1) in vec3 Normal;
-layout(location = 2) in vec2 UV;
+layout(location = 1) in vec2 TexCoords;
+layout(location = 2) in vec3 Normal;
 layout(location = 3) in mat3 TBN;
+
 layout(location = 0) out vec4 outColor;
 
 
@@ -94,48 +95,96 @@ Material BuildMaterial()
 	}
 	else
 	{
-		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.DiffuseMapID], UV));
+		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.DiffuseMapID], TexCoords));
 	}
 
 	if(MaterialList[Mesh.MeshID].material.SpecularMapID == 0)
 	{
-		material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], UV));
+		material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], TexCoords));
 	}
 	else
 	{
 		material.SpecularMap = MaterialList[Mesh.MeshID].material.Specular;
 	}
 
-	material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], UV));
-	material.NormalMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.NormalMapID], UV));
-	material.AlphaMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.AlphaMapID], UV));
-	material.EmissionMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.EmissionMapID], UV));
-	material.ShadowMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.ShadowMapID], UV));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], TexCoords));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.NormalMapID], TexCoords));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.AlphaMapID], TexCoords));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.EmissionMapID], TexCoords));
+	material.ShadowMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.ShadowMapID], TexCoords));
 	return material;
+}
+
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{ 
+    float heightScale = 0.1;
+    // number of depth layers
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    vec2 P = viewDir.xy / viewDir.z * heightScale; 
+    vec2 deltaTexCoords = P / numLayers;
+  
+    // get initial values
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = texture(TextureMap[3], currentTexCoords).r;
+      
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        // shift texture coordinates along direction of P
+        currentTexCoords -= deltaTexCoords;
+        // get depthmap value at current texture coordinates
+        currentDepthMapValue = texture(TextureMap[3], currentTexCoords).r;  
+        // get depth of next layer
+        currentLayerDepth += layerDepth;  
+    }
+    
+    // get texture coordinates before collision (reverse operations)
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    // get depth after and before collision for linear interpolation
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(TextureMap[3], prevTexCoords).r - currentLayerDepth + layerDepth;
+ 
+    // interpolation of texture coordinates
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
 }
 
 void main() 
 {
-
-	Material material = BuildMaterial();
-
-    vec3 TangentLightPos = TBN * scenedata.dlight.direction;
+    vec3 TangentLightPos = TBN * scenedata.plight.position;
     vec3 TangentViewPos  = TBN * scenedata.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
+  // offset texture coordinates with Parallax Mapping
+    // offset texture coordinates with Parallax Mapping
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec2 texCoords = TexCoords;
+    
+    texCoords = ParallaxMapping(TexCoords,  viewDir);       
+    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+        discard;
 
-	vec3 normal = vec3(texture(TextureMap[2], UV)).rgb;
-    normal = normalize(normal * 2.0 - 1.0);  
+    // obtain normal from normal map
+    vec3 normal = texture(TextureMap[2], texCoords).rgb;
+    normal = normalize(normal * 2.0 - 1.0);   
    
     // get diffuse color
-    vec3 color = vec3(texture(TextureMap[1], UV)).rgb;
+    vec3 color = texture(TextureMap[1], texCoords).rgb;
     // ambient
     vec3 ambient = 0.1 * color;
     // diffuse
     vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
     float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = diff * color;
-    // specular
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    // specular    
     vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);

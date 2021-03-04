@@ -142,7 +142,7 @@ void CubeMapTexture::CreateTextureView(VulkanEngine& engine)
 	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 	TextureImageViewInfo.subresourceRange.layerCount = 6;
 
-	View = engine.CreateTextureView(TextureImageViewInfo);
+	Texture::CreateTextureView(engine, TextureImageViewInfo);
 }
 
 void CubeMapTexture::CreateTextureSampler(VulkanEngine& engine)
@@ -163,5 +163,5 @@ void CubeMapTexture::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
 
-	Sampler = engine.CreateTextureSampler(TextureImageSamplerInfo);
+	Texture::CreateTextureSampler(engine, TextureImageSamplerInfo);
 }

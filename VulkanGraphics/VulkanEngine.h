@@ -9,18 +9,7 @@ const std::vector<const char*> validationLayers = {
 };
 
 const std::vector<const char*> deviceExtensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-	VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-	VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-	VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-	VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME,
-	VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME,
-	VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
-	VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
-	VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
-	VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME,
-	VK_KHR_SPIRV_1_4_EXTENSION_NAME,
-	VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -28,7 +17,6 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 class VulkanEngine
 {
 private:
-
 protected:
 
 	struct VulkanSemaphores
@@ -48,7 +36,6 @@ protected:
 	VulkanDebugger VulkanDebug;
 
 	std::vector<VkLayerProperties> VulkanLayers;
-	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
 
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 	VkFormat findDepthFormat();
@@ -80,29 +67,13 @@ public:
 	VkQueue PresentQueue = VK_NULL_HANDLE;
 	VkCommandPool RenderCommandPool = VK_NULL_HANDLE;
 	VulkanSwapChain SwapChain;
-	VkPhysicalDeviceRayTracingPipelinePropertiesKHR  RayTracingPipelineProperties;
-	VkPhysicalDeviceAccelerationStructureFeaturesKHR RayTracinDeviceProperties{};
 
 	VulkanEngine();
 	VulkanEngine(GLFWwindow* window);
 	~VulkanEngine();
 
 	uint32_t DrawFrame = 0;
-	VkDeviceOrHostAddressConstKHR BufferToDeviceAddress(VkBuffer buffer);
-	VkImageView CreateTextureView(VkImageViewCreateInfo TextureImageViewInfo);
-	VkSampler CreateTextureSampler(VkSamplerCreateInfo TextureImageSamplerInfo);
-
-	VkCommandBuffer BeginSingleTimeCommand();
-	void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
 	void Destory();
-
-	std::vector<VkSurfaceFormatKHR> GetSurfaceFormatList(VkPhysicalDevice GPUDevice);
-	std::vector<VkPresentModeKHR> GetPresentModeList(VkPhysicalDevice GPUDevice, VkSurfaceKHR Surface);
-	VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice);
-	VkPhysicalDeviceRayTracingPipelinePropertiesKHR GetRayTracingPipelineProperties(VkPhysicalDevice GPUDevice);
-	VkPhysicalDeviceAccelerationStructureFeaturesKHR GetRayTracingAccelerationStructureFeatures(VkPhysicalDevice GPUDevice);
-
-	uint32_t GetShaderGroupAlignment(VkPhysicalDevice GPUDevice);
 
 	VkInstance GetVulkanInstance() { return Instance; }
 	VkDevice GetVulkanDevice() { return Device; }

@@ -291,27 +291,6 @@
     <ClCompile Include="RenderedGammaTexture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="RayTraceRenderer.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="TransformBuffer.cpp">
-      <Filter>Source Files\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanBuffer.cpp">
-      <Filter>Source Files\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="RayTraceVertexBuffer.cpp">
-      <Filter>Source Files\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="RayTraceIndicesBuffer.cpp">
-      <Filter>Source Files\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="RayTraceTexture.cpp">
-      <Filter>Source Files\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\WireFrameShader.frag">
@@ -432,33 +411,6 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shaders\Shader2D_BloomOutput.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\PBR_BloomOutput.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\PBR_BloomOutput.vert">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\Structs.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\VertexStructs.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\PBR.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\closesthit.rchit">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\miss.rmiss">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\raygen.rgen">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="shadow.rmiss">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -732,27 +684,6 @@
     </ClInclude>
     <ClInclude Include="RenderedGammaTexture.h">
       <Filter>Header Files\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="RayTraceRenderer.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="TransformBuffer.h">
-      <Filter>Header Files\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanBuffer.h">
-      <Filter>Header Files\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="RayTraceVertexBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RayTraceIndicesBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RayTraceTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

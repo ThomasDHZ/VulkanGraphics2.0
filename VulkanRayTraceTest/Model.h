@@ -68,6 +68,7 @@ public:
 	std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
 
 	Model();
+	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList);
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
 	Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);

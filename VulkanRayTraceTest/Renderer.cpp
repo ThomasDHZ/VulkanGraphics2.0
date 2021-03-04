@@ -18,13 +18,15 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     auto c = sizeof(Material);
     modelRenderManager = ModelRenderManager(engine);
     
-    //modelRenderManager.AddModel(engine, "../Models/Cube.obj");
-    //Material material{};
-    //material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    //material.NormalMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/Brick_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-  //  modelRenderManager.ModelList[0].MeshList[0].material = material;
+    modelRenderManager.AddModel(engine, "../Models/plain.obj");
+    Material material{};
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/bricks2.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/bricks2_normal.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DepthMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/bricks2_disp.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    modelRenderManager.ModelList[0].MeshList[0].material = material;
+  //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-       modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+    //   modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
@@ -63,7 +65,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->SceneData.dlight.diffuse = glm::vec4(0.5f);
     SceneData->SceneData.dlight.specular = glm::vec4(1.0f);
 
-    SceneData->SceneData.plight.position = glm::vec4(0.0f);
+    SceneData->SceneData.plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
     SceneData->SceneData.plight.ambient = glm::vec4(0.2f);
     SceneData->SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
     SceneData->SceneData.plight.specular = glm::vec4(1.0f);
@@ -252,7 +254,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     }
     RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
 
-    SceneData->SceneData.model = modelRenderManager.ModelList[0].ModelTransform;
+    SceneData->SceneData.model = glm::mat4(1.0f);
     SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     SceneData->SceneData.projInverse[1][1] *= -1;

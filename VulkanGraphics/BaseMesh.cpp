@@ -15,7 +15,7 @@ BaseMesh::BaseMesh(VulkanEngine& engine, const MeshData& meshData, int renderFla
     }
 }
 
-BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint32_t>& Indicesdata, int renderFlags)
+BaseMesh::BaseMesh(VulkanEngine& engine, const std::vector<Vertex>& Vertexdata, const std::vector<uint16_t>& Indicesdata, int renderFlags)
 {
     RenderFlags = renderFlags;
     MeshVertex = VertexBuffer(engine, Vertexdata);
@@ -282,7 +282,7 @@ void BaseMesh::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<Graphi
         }
         else
         {
-            vkCmdBindIndexBuffer(RenderCommandBuffer, MeshIndices.GetIndiceBuffer(), 0, VK_INDEX_TYPE_UINT32);
+            vkCmdBindIndexBuffer(RenderCommandBuffer, MeshIndices.GetIndiceBuffer(), 0, VK_INDEX_TYPE_UINT16);
             vkCmdDrawIndexed(RenderCommandBuffer, static_cast<uint32_t>(MeshIndices.GetIndiceCount()), 1, 0, 0, 0);
         }
     }

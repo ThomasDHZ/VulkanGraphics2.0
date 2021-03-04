@@ -61,6 +61,7 @@ public:
 	VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
 
 	Mesh();
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial, uint32_t meshID);
 	~Mesh();

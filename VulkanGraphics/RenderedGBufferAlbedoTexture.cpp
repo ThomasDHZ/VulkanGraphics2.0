@@ -5,11 +5,11 @@ RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture() : Texture()
 {
 }
 
-RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
+RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(VulkanEngine& renderer) : Texture(renderer, TextureType::vkRenderedTexture)
 {
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    CreateTextureImage(renderer);
+    CreateTextureView(renderer);
+    CreateTextureSampler(renderer);
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
@@ -17,14 +17,14 @@ RenderedGBufferAlbedoTexture::~RenderedGBufferAlbedoTexture()
 {
 }
 
-void RenderedGBufferAlbedoTexture::CreateTextureImage(VulkanEngine& engine)
+void RenderedGBufferAlbedoTexture::CreateTextureImage(VulkanEngine& renderer)
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
     TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-    TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
-    TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
+    TextureInfo.extent.width = renderer.SwapChain.GetSwapChainResolution().width;
+    TextureInfo.extent.height = renderer.SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
@@ -32,10 +32,10 @@ void RenderedGBufferAlbedoTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-    Texture::CreateTextureImage(engine, TextureInfo);
+    Texture::CreateTextureImage(renderer, TextureInfo);
 }
 
-void RenderedGBufferAlbedoTexture::CreateTextureView(VulkanEngine& engine)
+void RenderedGBufferAlbedoTexture::CreateTextureView(VulkanEngine& renderer)
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -49,10 +49,10 @@ void RenderedGBufferAlbedoTexture::CreateTextureView(VulkanEngine& engine)
     TextureImageViewInfo.subresourceRange.layerCount = 1;
     TextureImageViewInfo.image = Image;
 
-    View = engine.CreateTextureView(TextureImageViewInfo);
+    Texture::CreateTextureView(renderer, TextureImageViewInfo);
 }
 
-void RenderedGBufferAlbedoTexture::CreateTextureSampler(VulkanEngine& engine)
+void RenderedGBufferAlbedoTexture::CreateTextureSampler(VulkanEngine& renderer)
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -68,14 +68,14 @@ void RenderedGBufferAlbedoTexture::CreateTextureSampler(VulkanEngine& engine)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    Sampler = engine.CreateTextureSampler(TextureImageSamplerInfo);
+    Texture::CreateTextureSampler(renderer, TextureImageSamplerInfo);
 }
 
-void RenderedGBufferAlbedoTexture::RecreateRendererTexture(VulkanEngine& engine)
+void RenderedGBufferAlbedoTexture::RecreateRendererTexture(VulkanEngine& renderer)
 {
-    Texture::Delete(engine);
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    Texture::Delete(renderer);
+    CreateTextureImage(renderer);
+    CreateTextureView(renderer);
+    CreateTextureSampler(renderer);
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

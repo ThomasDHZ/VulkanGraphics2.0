@@ -58,22 +58,20 @@ layout (location = 6) in ivec4 BoneID;
 layout (location = 7) in vec4 BoneWeights;
 
 layout(location = 0) out vec3 FragPos;
-layout(location = 1) out vec3 Normal;
-layout(location = 2) out vec2 UV;
+layout(location = 1) out vec2 TexCoords;
+layout(location = 2) out vec3 Normal;
 layout(location = 3) out mat3 TBN;
 
 void main() 
 {
-  debugPrintfEXT("VertexID: %i - BoneID = %i, %i, %i, %i \n", gl_VertexIndex, BoneID.x, BoneID.y, BoneID.z, BoneID.w);
+    FragPos = vec3(ubo.model * vec4(aPos, 1.0));    
+    TexCoords = aTexCoords;
+    Normal = aNormal;
 
-    FragPos = vec3(ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0));   
-	UV = aTexCoords;
-    Normal = mat3(transpose(inverse(ubo.model * MeshTransform[Mesh.MeshID].Transform))) * aNormal;  
-    
     vec3 T = normalize(mat3(ubo.model) * vec3(aTangent));
     vec3 B = normalize(mat3(ubo.model) * vec3(aBitangent));
-    vec3 N = normalize(mat3(ubo.model) * Normal);
+    vec3 N = normalize(mat3(ubo.model) * aNormal);
     TBN = transpose(mat3(T, B, N));
 
-    gl_Position = ubo.proj * ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0);
+    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(aPos, 1.0);
 }

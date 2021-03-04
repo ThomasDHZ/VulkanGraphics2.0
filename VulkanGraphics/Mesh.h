@@ -12,14 +12,14 @@ struct DirectionalLightStruct {
 };
 
 struct PointLightStruct {
-    alignas(16) glm::vec3 position = glm::vec3(0.5f, 1.0f, 0.3f);
+    alignas(16) glm::vec3 position = glm::vec3(0.0f);
 
     alignas(4) float constant = 1.0f;
     alignas(4) float linear = 0.09f;
     alignas(4) float quadratic = 0.032f;
 
-    alignas(16) glm::vec3 ambient = glm::vec3(1.0f, 1.0f, 1.0f);
-    alignas(16) glm::vec3 diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    alignas(16) glm::vec3 ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    alignas(16) glm::vec3 diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     alignas(16) glm::vec3 specular = glm::vec3(1.0f, 1.0f, 1.0f);
     alignas(4)  int InUseFlag = 1;
 };
@@ -45,8 +45,6 @@ struct LightBufferObject
     PointLightStruct pLight[4];
     SpotLightStruct sLight;
     alignas(16) glm::vec3 viewPos;
-    alignas(16) glm::vec3 lightPositions[4];
-    alignas(16) glm::vec3 lightColors[4];
 };
 
 struct MapBits
@@ -64,7 +62,6 @@ struct VertexMatrixObject {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
-    alignas(16) glm::mat4 lightSpaceMatrix;
     glm::mat4 BoneTransform[300];
 };
 
@@ -112,12 +109,12 @@ public:
 
     Mesh();
     Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, int renderFlags);
-    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, int renderFlags);
-    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, VkDescriptorSetLayout& layout, int renderFlags);
-    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, VkDescriptorSetLayout& layout, CustomBuffer customBuffer, int renderFlags);
+    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, int renderFlags);
+    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout& layout, int renderFlags);
+    Mesh(VulkanEngine& engine, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, VkDescriptorSetLayout& layout, CustomBuffer customBuffer, int renderFlags);
     Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const MeshData& meshData, VkDescriptorSetLayout& layout, int renderFlags);
-    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
-    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint32_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, VkDescriptorSetLayout& layout, int renderFlags);
+    Mesh(VulkanEngine& engine, std::shared_ptr<TextureManager>& textureManager, const std::vector<Vertex>& vertexdata, const std::vector<uint16_t>& indicesdata, MeshTextures textures, CustomBuffer customBuffer, VkDescriptorSetLayout& layout, int renderFlags);
     ~Mesh();
 
     void SetTransformMatrix(glm::mat4 NewTranformMatrix);
