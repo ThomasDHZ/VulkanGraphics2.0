@@ -52,17 +52,18 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 	VK_VALIDATION_FEATURE_DISABLE_THREAD_SAFETY_EXT, VK_VALIDATION_FEATURE_DISABLE_API_PARAMETERS_EXT,
 		VK_VALIDATION_FEATURE_DISABLE_OBJECT_LIFETIMES_EXT, VK_VALIDATION_FEATURE_DISABLE_CORE_CHECKS_EXT };
 
-	VkValidationFeaturesEXT ValidationFeatures{};
-	ValidationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-	ValidationFeatures.disabledValidationFeatureCount = 4;
-	ValidationFeatures.enabledValidationFeatureCount = 1;
-	ValidationFeatures.pEnabledValidationFeatures = enabled;
-	ValidationFeatures.pDisabledValidationFeatures = disabled;
-	ValidationFeatures.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugInfo;
+	//VkValidationFeaturesEXT ValidationFeatures{};
+	//ValidationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+	//ValidationFeatures.disabledValidationFeatureCount = 4;
+	//ValidationFeatures.enabledValidationFeatureCount = 1;
+	//ValidationFeatures.pEnabledValidationFeatures = enabled;
+	//ValidationFeatures.pDisabledValidationFeatures = disabled;
+	//ValidationFeatures.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugInfo;
 
 	VulkanCreateInfo.enabledLayerCount = static_cast<unsigned int>(ValidationLayers.size());
 	VulkanCreateInfo.ppEnabledLayerNames = ValidationLayers.data();
-	VulkanCreateInfo.pNext = &ValidationFeatures;
+	//VulkanCreateInfo.pNext = &ValidationFeatures;
+	VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugInfo;
 
 #endif
 

@@ -59,6 +59,7 @@ private:
 	VkWriteDescriptorSet AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
 	VkWriteDescriptorSet AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo);
 
+	//Mesh mesh;
 
 public:
 	ModelRenderManager modelRenderManager;
@@ -67,6 +68,7 @@ public:
 	Renderer(VulkanEngine& engine, VulkanWindow& window);
 	~Renderer();
 
+	std::vector<Vertex> CalcVertex();
 	void AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath);
 	void UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);

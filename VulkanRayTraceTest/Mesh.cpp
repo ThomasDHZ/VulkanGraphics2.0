@@ -6,10 +6,20 @@ Mesh::Mesh()
 
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 {
+	std::vector<uint32_t> indices{};
+
+	MeshID = 0;
 	material = Material();
+
+	MeshTransform = glm::mat4(1.0f);
+	MeshTransform = glm::transpose(MeshTransform);
+
 	VertexCount = VertexList.size();
-	TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
-	TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
+	IndexCount = indices.size();
+	PrimitiveCount = static_cast<uint32_t>(indices.size()) / 3;
+
+	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
+	SetUpMesh(engine, VertexList, indices);
 }
 
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID)
@@ -24,6 +34,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 
+	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);
 }
 
@@ -109,7 +120,11 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	VkDeviceOrHostAddressConstKHR TransformInverseBufferDeviceAddress;
 
 	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
-	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+	if (IndexCount != 0)
+	{
+		IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+		IndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(IndexBuffer.Buffer);
+	}
 	TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);
@@ -129,7 +144,10 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	AccelerationStructureGeometry.geometry.triangles.maxVertex = VertexCount;
 	AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
 	AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-	AccelerationStructureGeometry.geometry.triangles.indexData = IndexBufferDeviceAddress;
+	if (IndexCount != 0)
+	{
+		AccelerationStructureGeometry.geometry.triangles.indexData = IndexBufferDeviceAddress;
+	}
 	AccelerationStructureGeometry.geometry.triangles.transformData = TransformInverseBufferDeviceAddress;
 
 	AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCount;
@@ -137,7 +155,10 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	AccelerationStructureBuildRangeInfo.firstVertex = 0;
 	AccelerationStructureBuildRangeInfo.transformOffset = 0;
 
-	MeshBottomLevelAccelerationStructure(engine);
+	if (IndexCount != 0)
+	{
+		MeshBottomLevelAccelerationStructure(engine);
+	}
 }
 
 void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix)
@@ -155,7 +176,10 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix)
 
 	TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
-	MeshBottomLevelAccelerationStructure(engine);
+	if (IndexCount != 0)
+	{
+		MeshBottomLevelAccelerationStructure(engine);
+	}
 }
 
 void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<SceneDataStruct> scenedata)
@@ -174,19 +198,19 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 			scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
 
-		//std::vector<Vertex> newVertexList = VertexList;
-		//for (auto& vertex : newVertexList)
-		//{
-		//	glm::mat4 BoneTransform = glm::mat4(1.0f);
-		//	BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
-		//	BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
-		//	BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
-		//	BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
-		//	vertex.Position = glm::vec3(MeshTransform * BoneTransform * glm::vec4(vertex.Position, 1.0));
-		//	vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
-		//}
+		std::vector<Vertex> newVertexList = VertexList;
+		for (auto& vertex : newVertexList)
+		{
+			glm::mat4 BoneTransform = glm::mat4(1.0f);
+			BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
+			BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
+			vertex.Position = glm::vec3(MeshTransform * BoneTransform * glm::vec4(vertex.Position, 1.0));
+			vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
+		}
 
-		//VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
+		VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
 	}
 
 	glm::mat4 FinalTransform =  MeshTransform;
@@ -195,7 +219,11 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 
 	TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
-	MeshBottomLevelAccelerationStructure(engine);
+
+	if (IndexCount != 0)
+	{
+		MeshBottomLevelAccelerationStructure(engine);
+	}
 }
 
 void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)

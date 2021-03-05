@@ -115,12 +115,45 @@ Material BuildMaterial()
 	return material;
 }
 
+#define MAX_STEPS 100
+#define MAX_DIST 100.0f
+#define SURF_DIST 0.01
+
+//float GetDistance(vec3 pointPixel, vec3 RayDirection)
+//{
+// return length(pointPixel - texture(TextureMap[2], RayDirection.xy).rgb) - texture(RayDirection[3], RayDirection.xy).r;
+//}
+//
+//float RayMarch(vec3 cameraView, vec3 RayDirection)
+//{
+//    float d0 = 0;
+//    for(int x = 0; x < MAX_STEPS; x++)
+//    {
+//        vec3 point = cameraView + d0 * RayDirection;
+//        float ds = GetDistance(point);
+//        d0 += ds;
+//        if(ds < SURF_DIST || d0 > MAX_DIST)
+//        {
+//            break;
+//        }
+//    }
+//    return d0;
+//}
+
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 { 
-    float heightScale = 0.1;
+
+//	vec2 direction = viewDir.xy * 0.21f;
+//	for(int x = 0; x < 4; x++)
+//	{
+//		float parallax = texture(TextureMap[3], texCoords).r;
+//		texCoords += direction * parallax;
+//	}
+//	return texCoords;
+    float heightScale = 0.05f;
     // number of depth layers
-    const float minLayers = 8;
-    const float maxLayers = 32;
+    const float minLayers = 20;
+    const float maxLayers = 40;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
@@ -190,5 +223,63 @@ void main()
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
     vec3 specular = vec3(0.2) * spec;
-    outColor = vec4(ambient + diffuse + specular, 1.0);
+
+    outColor = vec4(ambient + diffuse + specular, 1.0f);
+//
+//
+//    	const int search_steps = 128;
+//	
+//	vec3 p = vec3(texCoords,0);
+//	
+//	vec3 o = TangentViewPos + p;
+//	o.z = texture(TextureMap[3],o.xy).r;
+//	
+//	vec3 v = o - p;
+//	v /= v.z;
+//	v *= 1.0-o.z;
+//	v /= search_steps;
+//
+//	p = o;
+//
+//	for( int i=0;i<search_steps;i++ )
+//	{
+//		float d = texture(TextureMap[3],p.xy).r;
+//
+//		if ( d <= p.z )
+//			p += v;
+//	}
+//	float d = texture(TextureMap[3],texCoords).r;
+//	
+//	float r = length(p.xy-texCoords);
+//	
+//	r = (p.z >= d) ? 1.0 : r / (d - p.z);		
+//
+//	vec2 temp = texCoords;
+//	temp.x = 1 - texCoords.x;
+//	temp.y = 1 - texCoords.y;
+//	float best_r = texture(TextureMap[3],temp).x;
+//	if ( r > best_r )
+//		r = best_r;
+//		saturate
+
+
+
+//	vec3 p;
+//	p.xy = texCoords + TangentViewPos.xy;
+//	p.z = texture(TextureMap[3],p.xy).r;
+//	
+//	float d = texture(TextureMap[3], texCoords).r;
+//
+//	float r = length(TangentViewPos.xy);
+//	r = (p.z >= d) ? 1.0 : r / (d - p.z);
+//		
+//	vec2 temp = texCoords;
+//	temp.y = 1 - texCoords.y;
+//
+//	float best_r = texture(TextureMap[3], temp).x;
+//	if ( r > best_r )
+//		r = best_r;
+//		
+//
+//    outColor = vec4(r,r,r,r);
 }

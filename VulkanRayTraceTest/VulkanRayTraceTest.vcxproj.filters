@@ -182,6 +182,9 @@
     <None Include="Shader\animate.comp">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\Logger.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">

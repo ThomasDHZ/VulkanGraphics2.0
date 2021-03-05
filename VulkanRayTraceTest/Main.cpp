@@ -28,9 +28,6 @@
 #include "MainRenderPass.h"
 #include "Renderer.h"
 
-const uint32_t WIDTH = 1280;
-const uint32_t HEIGHT = 720;
-
 class HelloTriangleApplication {
 public:
     void run() {
@@ -44,15 +41,12 @@ private:
     VulkanEngine engine;
     Renderer renderer;
 
-    std::vector<Model> ModelList;
 
     void initVulkan() 
     {
-        window = VulkanWindow(WIDTH, HEIGHT, "VulkanEngine");
+        window = VulkanWindow(1280, 720, "VulkanEngine");
         engine = VulkanEngine(window.GetWindowPtr());
         renderer = Renderer(engine, window);
-
-        //renderer.AddModel(engine, window, textureManager, "");
     }
 
     void mainLoop() {

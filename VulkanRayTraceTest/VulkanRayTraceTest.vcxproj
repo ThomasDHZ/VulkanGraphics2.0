@@ -191,6 +191,7 @@
     <None Include="alpha.rahit" />
     <None Include="Shader\animate.comp" />
     <None Include="Shader\closesthit.rchit" />
+    <None Include="Shader\Logger.glsl" />
     <None Include="Shader\Material.glsl" />
     <None Include="Shader\Lighting.glsl" />
     <None Include="Shader\miss.rmiss" />

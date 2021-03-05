@@ -604,12 +604,12 @@ void Model::Draw(VkCommandBuffer& RenderCommandBuffer, std::shared_ptr<GraphicsP
 
 void Model::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera>& camera, LightBufferObject& light)
 {
-	glm::mat4 modelMatrix = glm::mat4(1.0f);/*
+	glm::mat4 modelMatrix = ModelTransformMatrix;
 	modelMatrix = glm::translate(modelMatrix, ModelPosition);
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	modelMatrix = glm::scale(modelMatrix, ModelScale);*/
+	modelMatrix = glm::scale(modelMatrix, ModelScale);
 
 	if (NodeMapList.size() > 0)
 	{

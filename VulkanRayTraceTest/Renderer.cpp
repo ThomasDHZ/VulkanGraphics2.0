@@ -10,25 +10,96 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //    {{-0.5,-0.5,-0.5}, {0,-1,0}, {0,1}}
     //};
 
-    //std::vector<uint32_t> indices = {
-    //   0,1
-    //};
+    std::vector<uint32_t> indices = {
+       0,1,2,0,2,3 
+    };
     auto a = sizeof(Mesh);
     auto b = sizeof(Model);
     auto c = sizeof(Material);
     modelRenderManager = ModelRenderManager(engine);
     
-    modelRenderManager.AddModel(engine, "../Models/plain.obj");
+    auto v = CalcVertex();
+    //modelRenderManager.AddModel(engine, v, indices);
+   // modelRenderManager.AddModel(engine, v);
+    modelRenderManager.AddModel(engine, "../Models/cube.obj");
     Material material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/bricks2.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material.NormalMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/bricks2_normal.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material.DepthMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/bricks2_disp.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DepthMapID = modelRenderManager.textureManager.LoadTexture(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     modelRenderManager.ModelList[0].MeshList[0].material = material;
+
+
+    //auto v = CalcVertex();
+    //mesh = Mesh(engine, CalcVertex());
+
+
   //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-    //   modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+      //modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
+    //v2fConnector distanceVertex(a2vConnector a2v, uniform float4x4 modelViewProj, uniform float3 eyeCoord, uniform float3 lightCoord, uniform float invBumpDepth) {
+    //    v2fConnector v2f;      // Project position into screen space      // and pass through texture coordinate   
+    //    v2f.projCoord = mul(modelViewProj, float4 (a2v.objCoord, 1));    
+    //    v2f.texCoord = float3 (a2v.texCoord, 1);      // Transform the eye vector into tangent space.    // Adjust the slope in tangent space based on bump depth     
+    //    float3 eyeVec = eyeCoord - a2v.objCoord;   
+    //    float3 tanEyeVec;   
+    //    tanEyeVec.x = dot(a2v.objTangent, eyeVec);   
+    //    tanEyeVec.y = dot(a2v.objBinormal, eyeVec);    
+    //    tanEyeVec.z = -invBumpDepth * dot(a2v.objNormal, eyeVec);    
+    //    v2f.tanEyeVec = tanEyeVec;      // Transform the light vector into tangent space.    // We will use this later for tangent-space normal mapping      
+    //    float3 lightVec = lightCoord - a2v.objCoord;    
+    //    float3 tanLightVec;    
+    //    tanLightVec.x = dot(a2v.objTangent, lightVec);    
+    //    tanLightVec.y = dot(a2v.objBinormal, lightVec);    
+    //    tanLightVec.z = dot(a2v.objNormal, lightVec);   
+    //    v2f.tanLightVec = tanLightVec;      
+    //    return v2f;    
+    //} 
+
+    //f2fConnector distanceFragment(v2fConnector v2f, uniform sampler2D colorTex, uniform sampler2D normalTex, uniform sampler3D distanceTex, uniform float3 normalizationFactor) 
+    //{
+    //    f2fConnector f2f;      // Normalize the offset vector in texture space.      // The normalization factor ensures we are normalized with respect    // to a distance which is defined in terms of pixels.   
+    //    float3 offset = normalize(v2f.tanEyeVec);   
+    //    offset *= normalizationFactor;     
+    //    float3 texCoord = v2f.texCoord;      // March a ray     
+    //    for (int i = 0; i < NUM_ITERATIONS; i++) 
+    //    {     
+    //        float distance = f1tex3D(distanceTex, texCoord);      
+    //        texCoord += distance * offset;    
+    //    }      // Compute derivatives of unperturbed texcoords.    // This is because the offset texcoords will have discontinuities      // which lead to incorrect filtering.    
+    //    
+    //    float2 dx = ddx(v2f.texCoord.xy);    
+    //    float2 dy = ddy(v2f.texCoord.xy);      // Do bump-mapped lighting in tangent space.    // 'normalTex' stores tangent-space normals remapped      // into the range [0, 1].   
+    //    float3 tanNormal = 2 * f3tex2D(normalTex, texCoord.xy, dx, dy) - 1;    
+    //    float3 tanLightVec = normalize(v2f.tanLightVec);   
+    //    float diffuse = dot(tanNormal, tanLightVec);      // Multiply diffuse lighting by texture color      f2f.COL.rgb = diffuse * f3tex2D(colorTex, texCoord.xy, dx, dy);    f2f.COL.a = 1;      return f2f;   
+    //} 
+
+
+    //float4 depth2relaxedcone(in float2 TexCoord : TEXCOORD0, in Sampler2D ReliefSampler, in float3 Offset) : COLOR{ const int search_steps = 128;   float3 src = float3(TexCoord,0);  // Source texel    
+    //float3 dst = src + Offset;  // Destination texel  
+    //dst.z = tex2D(ReliefSampler,dst.xy).w;  // Set dest. depth    
+    //float3 vec = dst - src; // Ray direction  
+    //vec /= vec.z;  // Scale ray direction so that vec.z = 1.0   
+    //vec *= 1.0 - dst.z;  // Scale again    
+    //float3 step_fwd = vec/search_steps;  // Length of a forward step    // Search until a new point outside the surface    
+    //float3 ray_pos = dst + step_fwd;   
+    //
+    //for( int i=1; i<search_steps; i++ )   
+    //{     
+    //    float current_depth = tex2D(ReliefSampler, ray_pos.xy).w;     
+    //    if ( current_depth <= ray_pos.z )       
+    //        ray_pos += step_fwd;   
+    //}   // Original texel depth    
+    //float src_texel_depth = tex2D(ReliefSampler,TexCoord).w;   // Compute the cone ratio    
+    //float cone_ratio = (ray_pos.z >= src_texel_depth) ? 1.0 : length(ray_pos.xy - TexCoord) /  (src_texel_depth - ray_pos.z);   // Check for minimum value with previous pass result    
+    //float best_ratio = tex2D(ResultSampler, TexCoord).x;   
+    //if ( cone_ratio > best_ratio )     
+    //    cone_ratio = best_ratio;   
+    //return float4(cone_ratio, cone_ratio, cone_ratio, cone_ratio); 
+    //} 
+
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -254,7 +325,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     }
     RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
 
-    SceneData->SceneData.model = glm::mat4(1.0f);
+    SceneData->SceneData.model = modelRenderManager.ModelList[0].ModelTransform;
     SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
     SceneData->SceneData.projInverse[1][1] *= -1;
@@ -571,4 +642,72 @@ VkWriteDescriptorSet Renderer::AddDescriptorSetTexture(VulkanEngine& engine, uns
     TextureDescriptor.descriptorCount = static_cast<uint32_t>(TextureImageInfo.size());
     TextureDescriptor.pImageInfo = TextureImageInfo.data();
     return TextureDescriptor;
+}
+
+std::vector<Vertex> Renderer::CalcVertex()
+{
+    glm::vec3 pos1(-1.0f, 1.0f, 0.0f);
+    glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
+    glm::vec3 pos3(1.0f, -1.0f, 0.0f);
+    glm::vec3 pos4(1.0f, 1.0f, 0.0f);
+    // texture coordinates
+    glm::vec2 uv1(0.0f, 1.0f);
+    glm::vec2 uv2(0.0f, 0.0f);
+    glm::vec2 uv3(1.0f, 0.0f);
+    glm::vec2 uv4(1.0f, 1.0f);
+    // normal vector
+    glm::vec3 nm(0.0f, 0.0f, 1.0f);
+
+    // calculate tangent/bitangent vectors of both triangles
+    glm::vec3 tangent1, bitangent1;
+    glm::vec3 tangent2, bitangent2;
+    // triangle 1
+    // ----------
+    glm::vec3 edge1 = pos2 - pos1;
+    glm::vec3 edge2 = pos3 - pos1;
+    glm::vec2 deltaUV1 = uv2 - uv1;
+    glm::vec2 deltaUV2 = uv3 - uv1;
+
+    float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent1 = glm::normalize(tangent1);
+
+    bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent1 = glm::normalize(bitangent1);
+
+    // triangle 2
+    // ----------
+    edge1 = pos3 - pos1;
+    edge2 = pos4 - pos1;
+    deltaUV1 = uv3 - uv1;
+    deltaUV2 = uv4 - uv1;
+
+    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent2 = glm::normalize(tangent2);
+
+
+    bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent2 = glm::normalize(bitangent2);
+
+    return {
+        // positions            // normal         // texcoords  // tangent                          // bitangent
+        {{pos1.x, pos1.y, pos1.z}, {0.0f}, {nm.x, nm.y, nm.z}, {0.0f}, {uv1.x, uv1.y}, {0.0f, 0.0f}, {tangent1.x, tangent1.y, tangent1.z}, {0.0f}, {bitangent1.x, bitangent1.y, bitangent1.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+        {{pos2.x, pos2.y, pos2.z}, {0.0f}, {nm.x, nm.y, nm.z}, {0.0f }, {uv2.x, uv2.y}, { 0.0f, 0.0f }, {tangent1.x, tangent1.y, tangent1.z}, {0.0f}, {bitangent1.x, bitangent1.y, bitangent1.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+        {{pos3.x, pos3.y, pos3.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv3.x, uv3.y}, { 0.0f, 0.0f }, {tangent1.x, tangent1.y, tangent1.z}, {0.0f}, {bitangent1.x, bitangent1.y, bitangent1.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+
+        {{pos1.x, pos1.y, pos1.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv1.x, uv1.y}, { 0.0f, 0.0f }, {tangent2.x, tangent2.y, tangent2.z}, {0.0f}, {bitangent2.x, bitangent2.y, bitangent2.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+        {{pos3.x, pos3.y, pos3.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv3.x, uv3.y}, { 0.0f, 0.0f }, {tangent2.x, tangent2.y, tangent2.z}, {0.0f}, {bitangent2.x, bitangent2.y, bitangent2.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+        {{pos4.x, pos4.y, pos4.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv4.x, uv4.y}, { 0.0f, 0.0f }, {tangent2.x, tangent2.y, tangent2.z}, {0.0f}, {bitangent2.x, bitangent2.y, bitangent2.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}}
+    };
 }
