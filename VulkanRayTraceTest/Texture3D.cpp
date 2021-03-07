@@ -1,26 +1,27 @@
-#include "Texuture2D.h"
+#include "Texture3D.h"
 #include "ImGui/imgui_impl_vulkan.h"
 #include <stdexcept>
 
-Texture2D::Texture2D() : Texture()
+Texture3D::Texture3D() : Texture()
 {
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(engine, TextureLocation, textureID, format, TextureType::vkTexture2D)
+Texture3D::Texture3D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture()
 {
+	LoadDDSTexture(engine, TextureLocation, format);
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
 }
 
-Texture2D::~Texture2D()
+Texture3D::~Texture3D()
 {
 }
 
-void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
+void Texture3D::CreateTextureView(VulkanEngine& engine, VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_3D;
 	TextureImageViewInfo.format = format;
 	TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
@@ -34,12 +35,13 @@ void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
 	}
 }
 
-void Texture2D::CreateTextureSampler(VulkanEngine& engine)
+void Texture3D::CreateTextureSampler(VulkanEngine& engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	TextureImageSamplerInfo.magFilter = VK_FILTER_NEAREST;
-	TextureImageSamplerInfo.minFilter = VK_FILTER_NEAREST;
+	TextureImageSamplerInfo.magFilter = VK_FILTER_LINEAR;
+	TextureImageSamplerInfo.minFilter = VK_FILTER_LINEAR;
+	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 	TextureImageSamplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	TextureImageSamplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	TextureImageSamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -49,7 +51,6 @@ void Texture2D::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.unnormalizedCoordinates = VK_FALSE;
 	TextureImageSamplerInfo.compareEnable = VK_FALSE;
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
 	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{

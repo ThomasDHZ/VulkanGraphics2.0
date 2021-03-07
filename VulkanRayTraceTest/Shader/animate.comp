@@ -78,8 +78,8 @@ void main()
 //  BoneTransform += ubo.BoneTransform[v0.BoneID[3]] * v0.BoneWeights[3];
   vec4 BonePosition = BoneTransform * vec4(v0.Position, 1.0);
 
-  v0.Position = vec3(ubo.model * MeshTransform[0].Transform * BonePosition);
-  v0.Normal = normalize(transpose(inverse(mat3(ubo.model * MeshTransform[0].Transform * BoneTransform))) * v0.Normal);
-	v0.Color = vec4(v0.BoneID.xyz, 1.0f);
+ // v0.Position = vec3(ubo.model * MeshTransform[0].Transform * BonePosition);
+ // v0.Normal = normalize(transpose(inverse(mat3(ubo.model * MeshTransform[0].Transform * BoneTransform))) * v0.Normal);
+//	v0.Color = vec4(v0.BoneID.xyz, 1.0f);
   vertices.v[gl_GlobalInvocationID.x] = v0;
 }

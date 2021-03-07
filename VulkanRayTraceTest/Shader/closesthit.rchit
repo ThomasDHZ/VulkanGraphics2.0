@@ -85,6 +85,7 @@ layout(binding = 4) buffer Indices { uint i[]; } indices[];
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
+layout(binding = 8) uniform sampler3D Texture3DMap[];
 
 Material BuildMaterial(vec2 UV)
 {

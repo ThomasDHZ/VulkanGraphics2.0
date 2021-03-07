@@ -20,7 +20,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "InterfaceRenderPass.h"
-#include "Texuture2D.h"
+#include "Texture2D.h"
 #include "CubeMapTexture.h"
 #include "TextureManager.h"
 #include "VulkanEngine.h"

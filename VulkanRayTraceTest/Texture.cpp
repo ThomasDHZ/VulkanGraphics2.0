@@ -134,13 +134,14 @@ void Texture::TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayou
 	barrier.subresourceRange.levelCount = 1;
 	barrier.subresourceRange.baseArrayLayer = 0;
 
-	if (TypeOfTexture == TextureType::vkTexture2D)
+	if (TypeOfTexture == TextureType::vkTexture2D ||
+		TypeOfTexture == TextureType::vkTexture3D)
 	{
 		barrier.subresourceRange.layerCount = 1;
 	}
 	else if (TypeOfTexture == TextureType::vkTextureCube)
 	{
-		barrier.subresourceRange.layerCount = 6;
+		barrier.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
 	}
 
 	VkPipelineStageFlags sourceStage;
@@ -236,6 +237,44 @@ void Texture::LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, 
 
 	vkDestroyBuffer(engine.Device, stagingBuffer, nullptr);
 	vkFreeMemory(engine.Device, stagingBufferMemory, nullptr);*/
+}
+
+void Texture::LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
+{
+	DDSTextureLoader ddsLoader = DDSTextureLoader();
+	TextureInfo textureInfo = ddsLoader.DDSSTextureLoader(TextureLocation);
+	
+	Width = textureInfo.Width;
+	Height = textureInfo.Height;
+	Depth = textureInfo.Depth;
+
+	VkDeviceSize imageSize = Width * Height * Depth * textureInfo.BytesOfKeyValueData;
+
+	VulkanBuffer StagingBuffer;
+	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &textureInfo.TextureData[0]);
+
+	VkImageCreateInfo TextureInfo = {};
+	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	TextureInfo.imageType = VK_IMAGE_TYPE_3D;
+	TextureInfo.extent.width = Width;
+	TextureInfo.extent.height = Height;
+	TextureInfo.extent.depth = Depth;
+	TextureInfo.mipLevels = 1;
+	TextureInfo.arrayLayers = 1;
+	TextureInfo.format = format;
+	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	Texture::CreateTextureImage(engine, TextureInfo);
+
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(engine, StagingBuffer.Buffer);
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	StagingBuffer.DestoryBuffer(engine.Device);
 }
 
 void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)

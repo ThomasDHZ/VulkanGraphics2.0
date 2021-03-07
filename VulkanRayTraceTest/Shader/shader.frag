@@ -1,6 +1,7 @@
 #version 460
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_EXT_debug_printf : enable
 
 #include "Lighting.glsl"
 
@@ -66,10 +67,12 @@ layout(binding = 2) uniform UniformBufferObject {
 	float vertexSize;	
 	mat4 PVM;
 	mat4 BoneTransform[100];
+    int DepthSampler;
 } scenedata;
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
+layout(binding = 8) uniform sampler3D Texture3DMap[];
 
 
 layout(location = 0) in vec3 FragPos;
@@ -193,6 +196,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
 void main() 
 {
+ //debugPrintfEXT("Depth: %i \n",  scenedata.DepthSampler);
     vec3 TangentLightPos = TBN * scenedata.plight.position;
     vec3 TangentViewPos  = TBN * scenedata.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
@@ -201,26 +205,26 @@ void main()
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = TexCoords;
     
-    texCoords = ParallaxMapping(TexCoords,  viewDir);       
-    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-        discard;
-
+//    texCoords = ParallaxMapping(TexCoords,  viewDir);       
+//    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//        discard;
+//
     // obtain normal from normal map
-    vec3 normal = texture(TextureMap[2], texCoords).rgb;
-    normal = normalize(normal * 2.0 - 1.0);   
+//    vec3 normal = texture(TextureMap[2], texCoords.xy).rgb;
+//    normal = normalize(normal * 2.0 - 1.0);   
    
     // get diffuse color
-    vec3 color = texture(TextureMap[1], texCoords).rgb;
+    vec3 color = texture(Texture3DMap[0], vec3(texCoords, 15)).rrr;
     // ambient
     vec3 ambient = 0.1 * color;
     // diffuse
     vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-    float diff = max(dot(lightDir, normal), 0.0);
+    float diff = max(dot(lightDir, Normal), 0.0);
     vec3 diffuse = diff * color;
     // specular    
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, Normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+    float spec = pow(max(dot(Normal, halfwayDir), 0.0), 32.0);
 
     vec3 specular = vec3(0.2) * spec;
 

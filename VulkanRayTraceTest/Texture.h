@@ -1,10 +1,12 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include "VulkanEngine.h"
+#include "DDSTextureLoader.h"
 
 enum TextureType
 {
     vkTexture2D,
+    vkTexture3D,
     vkTextureCube,
     vkRenderedTexture
 };
@@ -22,6 +24,7 @@ protected:
     void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
 
     virtual void LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
+    virtual void LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     //virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
@@ -40,6 +43,7 @@ public:
 
     int Width;
     int Height;
+    int Depth;
 
     Texture();
     Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int textureID, VkFormat format, TextureType textureType);

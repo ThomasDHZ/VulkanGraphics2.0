@@ -89,7 +89,7 @@ public:
 		info.MipLevels = Header.mipMapCount;
 		info.BytesOfKeyValueData = Header.ddspf.RGBBitCount / 8;
 		info.TextureSize = length - sizeof(Header);
-		info.TextureType = VK_IMAGE_TYPE_2D;
+		//info.TextureType = VK_IMAGE_TYPE_2D;
 
 		info.TextureData.resize(info.TextureSize);
 		file.read(reinterpret_cast<char*>(info.TextureData.data()), info.TextureData.size());

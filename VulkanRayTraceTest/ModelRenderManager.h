@@ -2,6 +2,12 @@
 #include "VulkanEngine.h"
 #include "Model.h"
 
+struct MaterialStruct
+{
+	Material material;
+	VulkanBuffer MaterialBuffer;
+};
+
 class ModelRenderManager
 {
 private:
@@ -27,7 +33,8 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetTransformInverseBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
-	std::vector<VkDescriptorImageInfo> GetTextureBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
 
 	uint32_t GetVertexBufferListDescriptorCount();
 	uint32_t GetIndexBufferListDescriptorCount();

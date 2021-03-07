@@ -41,6 +41,7 @@ public:
 	VulkanBuffer VertexBuffer;
 	VulkanBuffer TransformBuffer;
 	VulkanBuffer TransformInverseBuffer;
+
 	VulkanBuffer MaterialBuffer;
 	AccelerationStructure BottomLevelAccelerationBuffer;
 

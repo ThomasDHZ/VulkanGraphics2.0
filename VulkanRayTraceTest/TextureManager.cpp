@@ -24,6 +24,17 @@ uint32_t TextureManager::LoadTexture(VulkanEngine& engine, const std::string Tex
 	return TextureID;
 }
 
+uint32_t TextureManager::Load3DTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format)
+{
+	//uint32_t TextureID = IsTextureLoaded(TextureLocation);
+	//if (TextureID == -1)
+	//{
+	unsigned int TextureID = TextureList.size();
+	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, TextureLocation, format, TextureID)));
+	//}
+	return TextureID;
+}
+
 void TextureManager::LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles)
 {
 	CubeMap = CubeMapTexture(engine, CubeMapFiles, 0);
@@ -37,6 +48,11 @@ void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[
 void TextureManager::UnloadAllTextures(VulkanEngine& engine)
 {
 	for (auto& texture : TextureList)
+	{
+		texture->Delete(engine);
+	}
+
+	for (auto& texture : Texture3DList)
 	{
 		texture->Delete(engine);
 	}

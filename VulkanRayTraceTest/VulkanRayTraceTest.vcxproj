@@ -151,6 +151,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="ComputeHelper.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
+    <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
     <ClCompile Include="FrameBufferRenderingPipeline.cpp" />
     <ClCompile Include="FrameBufferRenderPass.cpp" />
@@ -179,8 +180,9 @@
     <ClCompile Include="SceneRenderingPipeline.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="TextureManager.cpp" />
-    <ClCompile Include="Texuture2D.cpp" />
+    <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
@@ -209,6 +211,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComputeHelper.h" />
     <ClInclude Include="CubeMapTexture.h" />
+    <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
     <ClInclude Include="FrameBufferRenderingPipeline.h" />
     <ClInclude Include="FrameBufferRenderPass.h" />
@@ -230,6 +233,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="Pixel.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
@@ -239,8 +243,9 @@
     <ClInclude Include="SceneRenderingPipeline.h" />
     <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Texture3D.h" />
     <ClInclude Include="TextureManager.h" />
-    <ClInclude Include="Texuture2D.h" />
+    <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebugger.h" />

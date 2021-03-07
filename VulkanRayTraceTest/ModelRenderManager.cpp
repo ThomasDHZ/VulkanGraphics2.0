@@ -87,6 +87,7 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetIndexBufferListDescri
 
 std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDescriptor()
 {
+
     std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
     for (int x = 0; x < ModelList.size(); x++)
     {
@@ -124,6 +125,20 @@ std::vector<VkDescriptorImageInfo> ModelRenderManager::GetTextureBufferListDescr
 {
     std::vector<VkDescriptorImageInfo> DescriptorImageList;
     for (auto texture : textureManager.GetTextureList())
+    {
+        VkDescriptorImageInfo DescriptorImage{};
+        DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        DescriptorImage.imageView = texture->GetTextureView();
+        DescriptorImage.sampler = texture->GetTextureSampler();
+        DescriptorImageList.emplace_back(DescriptorImage);
+    }
+    return DescriptorImageList;
+}
+
+std::vector<VkDescriptorImageInfo> ModelRenderManager::Get3DTextureBufferListDescriptor()
+{
+    std::vector<VkDescriptorImageInfo> DescriptorImageList;
+    for (auto texture : textureManager.Get3DTextureList())
     {
         VkDescriptorImageInfo DescriptorImage{};
         DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

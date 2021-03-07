@@ -198,7 +198,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 			scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
 
-		std::vector<Vertex> newVertexList = VertexList;
+	/*	std::vector<Vertex> newVertexList = VertexList;
 		for (auto& vertex : newVertexList)
 		{
 			glm::mat4 BoneTransform = glm::mat4(1.0f);
@@ -210,7 +210,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 			vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
 		}
 
-		VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
+		VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());*/
 	}
 
 	glm::mat4 FinalTransform =  MeshTransform;
