@@ -242,18 +242,18 @@ void main()
 ////  if(dot(normal, lightDir) > 0)
 ////  {
 	// Shadow casting
-	float tmin = 0.001;
-	float tmax = 10000.0;
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	shadowed = true;  
-	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
-	if (shadowed) {
-		hitValue *= vec3(0.0f, 1.0f, 0.0f);
-	}
-	else
-	{	
+//	float tmin = 0.001;
+//	float tmax = 10000.0;
+//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+//	shadowed = true;  
+//	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+//	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+//	if (shadowed) {
+//		hitValue *= vec3(0.0f, 1.0f, 0.0f);
+//	}
+//	else
+//	{	
 		hitValue += specular;
-	}
+//	}
  // }
 }

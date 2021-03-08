@@ -67,7 +67,7 @@ layout(binding = 2) uniform UniformBufferObject {
 	float vertexSize;	
 	mat4 PVM;
 	mat4 BoneTransform[100];
-    int DepthSampler;
+    float DepthSampler;
 } scenedata;
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
@@ -196,7 +196,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
 void main() 
 {
- //debugPrintfEXT("Depth: %i \n",  scenedata.DepthSampler);
+ debugPrintfEXT("Depth: %i \n",  scenedata.DepthSampler);
     vec3 TangentLightPos = TBN * scenedata.plight.position;
     vec3 TangentViewPos  = TBN * scenedata.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
@@ -214,7 +214,7 @@ void main()
 //    normal = normalize(normal * 2.0 - 1.0);   
    
     // get diffuse color
-    vec3 color = texture(Texture3DMap[0], vec3(texCoords, 15)).rrr;
+    vec3 color = texture(Texture3DMap[0], vec3(texCoords, scenedata.DepthSampler)).rgb;
     // ambient
     vec3 ambient = 0.1 * color;
     // diffuse

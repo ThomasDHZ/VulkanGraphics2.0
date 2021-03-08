@@ -26,7 +26,8 @@ protected:
     virtual void LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
-    //virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
+    virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
+    virtual void CreateTexture3D(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
     void UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
 public:
@@ -46,10 +47,12 @@ public:
     int Depth;
 
     Texture();
+    Texture(unsigned int textureID, TextureType textureType);
+    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID, TextureType textureType);
+    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID, TextureType textureType);
     Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int textureID, VkFormat format, TextureType textureType);
     Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType);
     Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType);
-    //Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, TextureType textureType, VkFormat format);
     Texture(VulkanEngine& engine, TextureType textureType);
     ~Texture();
 
