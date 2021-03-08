@@ -196,7 +196,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
 void main() 
 {
- debugPrintfEXT("Depth: %i \n",  scenedata.DepthSampler);
+// debugPrintfEXT("Depth: %i \n",  scenedata.DepthSampler);
     vec3 TangentLightPos = TBN * scenedata.plight.position;
     vec3 TangentViewPos  = TBN * scenedata.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
@@ -205,16 +205,16 @@ void main()
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = TexCoords;
     
-//    texCoords = ParallaxMapping(TexCoords,  viewDir);       
-//    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-//        discard;
-//
-    // obtain normal from normal map
-//    vec3 normal = texture(TextureMap[2], texCoords.xy).rgb;
-//    normal = normalize(normal * 2.0 - 1.0);   
+    texCoords = ParallaxMapping(TexCoords,  viewDir);       
+    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+        discard;
+
+   //  obtain normal from normal map
+    vec3 normal = texture(TextureMap[2], texCoords.xy).rgb;
+    normal = normalize(normal * 2.0 - 1.0);   
    
     // get diffuse color
-    vec3 color = texture(Texture3DMap[0], vec3(texCoords, scenedata.DepthSampler)).rgb;
+    vec3 color = texture(TextureMap[1], texCoords.xy).rgb;
     // ambient
     vec3 ambient = 0.1 * color;
     // diffuse
@@ -222,9 +222,9 @@ void main()
     float diff = max(dot(lightDir, Normal), 0.0);
     vec3 diffuse = diff * color;
     // specular    
-    vec3 reflectDir = reflect(-lightDir, Normal);
+    vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(Normal, halfwayDir), 0.0), 32.0);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
     vec3 specular = vec3(0.2) * spec;
 

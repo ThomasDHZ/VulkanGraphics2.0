@@ -26,41 +26,41 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
    // modelRenderManager.AddModel(engine, v);
     modelRenderManager.AddModel(engine, "../Models/cube.obj");
 
-    int Width = 255;
-    int Height = 255;
-    int Depth = 8;
-    std::vector<Pixel> pixel;
+    //int Width = 255;
+    //int Height = 255;
+    //int Depth = 8;
+    //std::vector<Pixel> pixel;
 
-    for (int z = 0; z < Depth; z++)
-    {
-        for (int x = 0; x < Width; x++)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                switch (z)
-                {
-                    case 0: pixel.emplace_back(Pixel{ 0xff, 0xff, 0xff, 0xff }); break;
-                    case 1: pixel.emplace_back(Pixel{ 0xff, 0x00, 0x00, 0xff }); break;
-                    case 2: pixel.emplace_back(Pixel{ 0x00, 0xff, 0x00, 0xff }); break;
-                    case 3: pixel.emplace_back(Pixel{ 0x00, 0x00, 0xff, 0xff }); break;
-                    case 4: pixel.emplace_back(Pixel{ 0xff, 0xff, 0x00, 0xff }); break;
-                    case 5: pixel.emplace_back(Pixel{ 0xff, 0x00, 0xff, 0xff }); break;
-                    case 6: pixel.emplace_back(Pixel{ 0x00, 0xff, 0xff, 0xff }); break;
-                    case 7: pixel.emplace_back(Pixel{ 0x00, 0x00, 0x00, 0xff }); break;
-                }
-            }
-        }
-    }
+    //for (int z = 0; z < Depth; z++)
+    //{
+    //    for (int x = 0; x < Width; x++)
+    //    {
+    //        for (int y = 0; y < Height; y++)
+    //        {
+    //            switch (z)
+    //            {
+    //                case 0: pixel.emplace_back(Pixel{ 0xff, 0xff, 0xff, 0xff }); break;
+    //                case 1: pixel.emplace_back(Pixel{ 0xff, 0x00, 0x00, 0xff }); break;
+    //                case 2: pixel.emplace_back(Pixel{ 0x00, 0xff, 0x00, 0xff }); break;
+    //                case 3: pixel.emplace_back(Pixel{ 0x00, 0x00, 0xff, 0xff }); break;
+    //                case 4: pixel.emplace_back(Pixel{ 0xff, 0xff, 0x00, 0xff }); break;
+    //                case 5: pixel.emplace_back(Pixel{ 0xff, 0x00, 0xff, 0xff }); break;
+    //                case 6: pixel.emplace_back(Pixel{ 0x00, 0xff, 0xff, 0xff }); break;
+    //                case 7: pixel.emplace_back(Pixel{ 0x00, 0x00, 0x00, 0xff }); break;
+    //            }
+    //        }
+    //    }
+    //}
   
-    auto ab =  modelRenderManager.textureManager.LoadTexture3D(engine, Width, Height, Depth, pixel, VK_FORMAT_R8G8B8A8_UNORM);
+    //auto ab =  modelRenderManager.textureManager.LoadTexture3D(engine, Width, Height, Depth, pixel, VK_FORMAT_R8G8B8A8_UNORM);
 
     Material material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/stone.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/stone.tga", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     modelRenderManager.ModelList[0].MeshList[0].material = material;
 
-    //modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
+    modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/stoneSphere.dds", VK_FORMAT_R8_UNORM);
      /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
 
 
@@ -382,7 +382,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
-    ImGui::SliderFloat("DepthSampler", &SceneData->SceneData.DepthSampler, 0, 8);
+    ImGui::SliderFloat("DepthSampler", &SceneData->SceneData.DepthSampler, 0, 1);
     ImGui::SliderFloat3("Pos", &SceneData->SceneData.dlight.direction.x, -1000.0f, 1000.0f);
     ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
