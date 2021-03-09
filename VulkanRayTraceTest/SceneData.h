@@ -30,7 +30,7 @@ struct SceneDataBufferData {
 	PointLight plight;
 	alignas(4) float vertexSize;
 	alignas(16) glm::mat4 PVM;
-	alignas(16) glm::mat4 BoneTransform[100];
+	alignas(16) glm::mat4 BoneTransform[1000];
 	alignas(4) float DepthSampler;
 };
 

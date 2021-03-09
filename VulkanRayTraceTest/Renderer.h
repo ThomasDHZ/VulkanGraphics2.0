@@ -8,12 +8,13 @@
 #include "RayTraceRenderer.h"
 #include "ModelRenderManager.h"
 #include "ComputeHelper.h"
+#include "OrthographicCamera.h"
 
 
 class Renderer
 {
 private:
-	std::shared_ptr<PerspectiveCamera> camera;
+	std::shared_ptr<OrthographicCamera> camera;
 	Keyboard keyboard;
 	Mouse mouse;
 

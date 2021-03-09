@@ -7,15 +7,15 @@
 struct Vertex
 {
 	glm::vec3 Position = glm::vec3(0.0f);
-	float	  Padding1 = 0xFFFFFFFFF;
+	float	  Padding1 = 0.0f;
 	glm::vec3 Normal = glm::vec3(0.0f);
-	float	  Padding2 = 0xFFFFFFFFF;
+	float	  Padding2 = 0.0f;
 	glm::vec2 TexureCoord = glm::vec2(0.0f);
-	glm::vec2 Padding3 = glm::vec2(0xFFFFFFFFF);
+	glm::vec2 Padding3 = glm::vec2(0.0f);
 	glm::vec3 Tangant = glm::vec3(0.0f);
-	float	  Padding4 = 0xFFFFFFFFF;
+	float	  Padding4 = 0.0f;
 	glm::vec3 BiTangant = glm::vec3(0.0f);
-	float	  Padding5 = 0xFFFFFFFFF;
+	float	  Padding5 = 0.0f;
 	glm::vec4 Color = glm::vec4(0.0f);
 	glm::ivec4 BoneID = glm::ivec4(0);
 	glm::vec4 BoneWeights = glm::vec4(0.0f);

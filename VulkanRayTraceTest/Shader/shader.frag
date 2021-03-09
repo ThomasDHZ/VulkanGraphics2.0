@@ -1,15 +1,16 @@
 #version 460
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_EXT_debug_printf : enable
 
 #include "Lighting.glsl"
 
-layout(push_constant) uniform MeshInfo
+layout(push_constant) uniform ConstMeshProperties
 {
 	uint MeshID;
 	uint ModelID;
 	uint MaterialID;
-} Mesh;
+} ConstMesh;
 
 struct VertexData
 {
@@ -51,7 +52,7 @@ struct Material
 	vec3 DepthMap;
 	vec3 AlphaMap;
 	vec3 EmissionMap;
-		vec3 ShadowMap;
+	vec3 ShadowMap;
 };
 
 layout(binding = 2) uniform UniformBufferObject {
@@ -67,6 +68,13 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 PVM;
 	mat4 BoneTransform[100];
 } scenedata;
+//layout(binding = 3) uniform MeshProperties 
+//{
+//	mat4 model;
+//	mat4 BoneTransform[100];
+//	vec2 UVOffset;
+//} meshProperties;
+
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
@@ -83,35 +91,35 @@ layout(location = 0) out vec4 outColor;
 Material BuildMaterial()
 {
 	Material material;
-	material.Ambient = MaterialList[Mesh.MeshID].material.Ambient;
-	material.Diffuse = MaterialList[Mesh.MeshID].material.Diffuse;
-	material.Specular = MaterialList[Mesh.MeshID].material.Specular;
-	material.Shininess = MaterialList[Mesh.MeshID].material.Shininess;
-	material.Reflectivness = MaterialList[Mesh.MeshID].material.Reflectivness;
+	material.Ambient = MaterialList[ConstMesh.MeshID].material.Ambient;
+	material.Diffuse = MaterialList[ConstMesh.MeshID].material.Diffuse;
+	material.Specular = MaterialList[ConstMesh.MeshID].material.Specular;
+	material.Shininess = MaterialList[ConstMesh.MeshID].material.Shininess;
+	material.Reflectivness = MaterialList[ConstMesh.MeshID].material.Reflectivness;
 
-	if(MaterialList[Mesh.MeshID].material.DiffuseMapID == 0)
+	if(MaterialList[ConstMesh.MeshID].material.DiffuseMapID == 0)
 	{
-		material.DiffuseMap = MaterialList[Mesh.MeshID].material.Diffuse;
+		material.DiffuseMap = MaterialList[ConstMesh.MeshID].material.Diffuse;
 	}
 	else
 	{
-		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.DiffuseMapID], TexCoords));
+		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.DiffuseMapID], TexCoords));
 	}
 
-	if(MaterialList[Mesh.MeshID].material.SpecularMapID == 0)
+	if(MaterialList[ConstMesh.MeshID].material.SpecularMapID == 0)
 	{
-		material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], TexCoords));
+		material.SpecularMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.SpecularMapID], TexCoords));
 	}
 	else
 	{
-		material.SpecularMap = MaterialList[Mesh.MeshID].material.Specular;
+		material.SpecularMap = MaterialList[ConstMesh.MeshID].material.Specular;
 	}
 
-	material.SpecularMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.SpecularMapID], TexCoords));
-	material.NormalMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.NormalMapID], TexCoords));
-	material.AlphaMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.AlphaMapID], TexCoords));
-	material.EmissionMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.EmissionMapID], TexCoords));
-	material.ShadowMap = vec3(texture(TextureMap[MaterialList[Mesh.MeshID].material.ShadowMapID], TexCoords));
+	material.SpecularMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.SpecularMapID], TexCoords));
+	material.NormalMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.NormalMapID], TexCoords));
+	material.AlphaMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.AlphaMapID], TexCoords));
+	material.EmissionMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.EmissionMapID], TexCoords));
+	material.ShadowMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.ShadowMapID], TexCoords));
 	return material;
 }
 
@@ -167,28 +175,33 @@ void main()
     // offset texture coordinates with Parallax Mapping
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = TexCoords;
-    
-    texCoords = ParallaxMapping(TexCoords,  viewDir);       
-    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-        discard;
+//    
+//    texCoords = ParallaxMapping(TexCoords,  viewDir);       
+//    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//        discard;
+//
+//    // obtain normal from normal map
+//    vec3 normal = texture(TextureMap[2], texCoords).rgb;
+//    normal = normalize(normal * 2.0 - 1.0);   
+//   
+//    // get diffuse color
+//    vec3 color = texture(TextureMap[1], texCoords).rgb;
+//    // ambient
+//    vec3 ambient = 0.1 * color;
+//    // diffuse
+//    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+//    float diff = max(dot(lightDir, normal), 0.0);
+//    vec3 diffuse = diff * color;
+//    // specular    
+//    vec3 reflectDir = reflect(-lightDir, normal);
+//    vec3 halfwayDir = normalize(lightDir + viewDir);  
+//    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
-    // obtain normal from normal map
-    vec3 normal = texture(TextureMap[2], texCoords).rgb;
-    normal = normalize(normal * 2.0 - 1.0);   
-   
-    // get diffuse color
-    vec3 color = texture(TextureMap[1], texCoords).rgb;
-    // ambient
-    vec3 ambient = 0.1 * color;
-    // diffuse
-    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-    float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * color;
-    // specular    
-    vec3 reflectDir = reflect(-lightDir, normal);
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+//    vec3 specular = vec3(0.2) * spec;
 
-    vec3 specular = vec3(0.2) * spec;
-    outColor = vec4(ambient + diffuse + specular, 1.0);
+	if(texture(TextureMap[4], texCoords).r == 0.0f)
+	{
+		discard;
+	}
+    outColor = vec4(texture(TextureMap[1], texCoords).rgb, 1.0);
 }

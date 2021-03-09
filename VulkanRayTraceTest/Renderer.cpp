@@ -1,19 +1,23 @@
 #include "Renderer.h"
+#include <stb_image.h>
 Renderer::Renderer()
 {
 }
 
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
-    //std::vector<Vertex> vertices =
-    //{
-    //    {{-0.5,-0.5,-0.5}, {0,-1,0}, {0,1}}
-    //};
+    std::vector<Vertex> MegaManVertices =
+	{
+		{{0.5f,  0.5f, 0.0f},  { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+		{{0.5f, -0.5f, 0.0f},  { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+		{{-0.5f, -0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+        {{-0.5f,  0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
+	};
 
-
-
-    std::vector<uint32_t> indices = {
-       0,1,2,0,2,3 
+    std::vector<uint32_t> indices = 
+    {
+        0, 1, 3,
+        1, 2, 3 
     };
     auto a = sizeof(Mesh);
     auto b = sizeof(Model);
@@ -22,55 +26,26 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
 
     auto v = CalcVertex();
-    //modelRenderManager.AddModel(engine, v, indices);
+    modelRenderManager.AddModel(engine, MegaManVertices, indices);
    // modelRenderManager.AddModel(engine, v);
-   // modelRenderManager.AddModel(engine, "../Models/cube.obj");
+ //  modelRenderManager.AddModel(engine, "../Models/plain.obj");
 
-    int Width = 255;
-    int Height = 255;
-    int Depth = 8;
-    std::vector<Pixel> pixel;
+    stbi_set_flip_vertically_on_load(true);
+    Material material{};
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    modelRenderManager.ModelList[0].MeshList[0].material = material;
 
-    for (int z = 0; z < Depth; z++)
-    {
-        for (int x = 0; x < Width; x++)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                switch (z)
-                {
-                    case 0: pixel.emplace_back(Pixel{ 0xff, 0xff, 0xff, 0xff }); break;
-                    case 1: pixel.emplace_back(Pixel{ 0xff, 0x00, 0x00, 0xff }); break;
-                    case 2: pixel.emplace_back(Pixel{ 0x00, 0xff, 0x00, 0xff }); break;
-                    case 3: pixel.emplace_back(Pixel{ 0x00, 0x00, 0xff, 0xff }); break;
-                    case 4: pixel.emplace_back(Pixel{ 0xff, 0xff, 0x00, 0xff }); break;
-                    case 5: pixel.emplace_back(Pixel{ 0xff, 0x00, 0xff, 0xff }); break;
-                    case 6: pixel.emplace_back(Pixel{ 0x00, 0xff, 0xff, 0xff }); break;
-                    case 7: pixel.emplace_back(Pixel{ 0x00, 0x00, 0x00, 0xff }); break;
-                }
-            }
-        }
-    }
-  
-    auto ab =  modelRenderManager.textureManager.LoadTexture3D(engine, Width, Height, Depth, pixel, VK_FORMAT_R8G8B8A8_UNORM);
-
-  /*  Material material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
-    modelRenderManager.ModelList[0].MeshList[0].material = material;*/
-
-    //modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
+    modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
      /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
-
-
-    //auto v = CalcVertex();
-    //mesh = Mesh(engine, CalcVertex());
 
 
   //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-      modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+//      modelRenderManager.AddModel(engine, "../Models/vampire/dancing_vampire.dae");
+  //    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
@@ -102,7 +77,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     SetUpCommandBuffers(engine);
 
-    camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
+    camera = std::make_shared<OrthographicCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
     SceneData->SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
     SceneData->SceneData.dlight.ambient = glm::vec4(0.2f);
@@ -288,7 +263,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
     keyboard.Update(window.GetWindowPtr(), camera);
     mouse.Update(window.GetWindowPtr(), camera);
-    camera->Update(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height);
+    camera->Update(engine);
 
     static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -380,16 +355,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
+   // modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+       // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }

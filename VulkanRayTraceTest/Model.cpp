@@ -8,13 +8,21 @@ Model::Model()
 
 Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0));
+	Material material{};
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
+	MeshList.back().VertexList = VertexList;
+	MeshList.back().MeshTransform = glm::mat4(1.0f);
+	//MeshList.back().VertexOffset = TotalVertex;
+	//MeshList.back().FirstIndex = TotalIndex;
+//	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0));
 
 }
 
 Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, 0));
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
+	MeshList.back().VertexList = VertexList;
+	MeshList.back().MeshTransform = glm::mat4(1.0f);
 }
 
 Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
