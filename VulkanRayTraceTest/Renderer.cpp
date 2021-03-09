@@ -24,44 +24,44 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     auto v = CalcVertex();
     //modelRenderManager.AddModel(engine, v, indices);
    // modelRenderManager.AddModel(engine, v);
-    modelRenderManager.AddModel(engine, "../Models/cube.obj");
+   // modelRenderManager.AddModel(engine, "../Models/cube.obj");
 
-    //int Width = 255;
-    //int Height = 255;
-    //int Depth = 8;
-    //std::vector<Pixel> pixel;
+ /*   int Width = 255;
+    int Height = 255;
+    int Depth = 8;
+    std::vector<Pixel> pixel;
 
-    //for (int z = 0; z < Depth; z++)
-    //{
-    //    for (int x = 0; x < Width; x++)
-    //    {
-    //        for (int y = 0; y < Height; y++)
-    //        {
-    //            switch (z)
-    //            {
-    //                case 0: pixel.emplace_back(Pixel{ 0xff, 0xff, 0xff, 0xff }); break;
-    //                case 1: pixel.emplace_back(Pixel{ 0xff, 0x00, 0x00, 0xff }); break;
-    //                case 2: pixel.emplace_back(Pixel{ 0x00, 0xff, 0x00, 0xff }); break;
-    //                case 3: pixel.emplace_back(Pixel{ 0x00, 0x00, 0xff, 0xff }); break;
-    //                case 4: pixel.emplace_back(Pixel{ 0xff, 0xff, 0x00, 0xff }); break;
-    //                case 5: pixel.emplace_back(Pixel{ 0xff, 0x00, 0xff, 0xff }); break;
-    //                case 6: pixel.emplace_back(Pixel{ 0x00, 0xff, 0xff, 0xff }); break;
-    //                case 7: pixel.emplace_back(Pixel{ 0x00, 0x00, 0x00, 0xff }); break;
-    //            }
-    //        }
-    //    }
-    //}
+    for (int z = 0; z < Depth; z++)
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                switch (z)
+                {
+                    case 0: pixel.emplace_back(Pixel{ 0xff, 0xff, 0xff, 0xff }); break;
+                    case 1: pixel.emplace_back(Pixel{ 0xff, 0x00, 0x00, 0xff }); break;
+                    case 2: pixel.emplace_back(Pixel{ 0x00, 0xff, 0x00, 0xff }); break;
+                    case 3: pixel.emplace_back(Pixel{ 0x00, 0x00, 0xff, 0xff }); break;
+                    case 4: pixel.emplace_back(Pixel{ 0xff, 0xff, 0x00, 0xff }); break;
+                    case 5: pixel.emplace_back(Pixel{ 0xff, 0x00, 0xff, 0xff }); break;
+                    case 6: pixel.emplace_back(Pixel{ 0x00, 0xff, 0xff, 0xff }); break;
+                    case 7: pixel.emplace_back(Pixel{ 0x00, 0x00, 0x00, 0xff }); break;
+                }
+            }
+        }
+    }
   
-    //auto ab =  modelRenderManager.textureManager.LoadTexture3D(engine, Width, Height, Depth, pixel, VK_FORMAT_R8G8B8A8_UNORM);
+    auto ab =  modelRenderManager.textureManager.LoadTexture3D(engine, Width, Height, Depth, pixel, VK_FORMAT_R8G8B8A8_UNORM);*/
 
-    Material material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/stone.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/stone.tga", VK_FORMAT_R8G8B8A8_UNORM);
+/*    Material material{};
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     modelRenderManager.ModelList[0].MeshList[0].material = material;
-
-    modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/stoneSphere.dds", VK_FORMAT_R8_UNORM);
-     /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
+     */
+    modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/four_objectsSphere.dds", VK_FORMAT_R8_UNORM);
+   /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
 
 
     //auto v = CalcVertex();
@@ -70,72 +70,12 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
   //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-      //modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+      modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
-    //v2fConnector distanceVertex(a2vConnector a2v, uniform float4x4 modelViewProj, uniform float3 eyeCoord, uniform float3 lightCoord, uniform float invBumpDepth) {
-    //    v2fConnector v2f;      // Project position into screen space      // and pass through texture coordinate   
-    //    v2f.projCoord = mul(modelViewProj, float4 (a2v.objCoord, 1));    
-    //    v2f.texCoord = float3 (a2v.texCoord, 1);      // Transform the eye vector into tangent space.    // Adjust the slope in tangent space based on bump depth     
-    //    float3 eyeVec = eyeCoord - a2v.objCoord;   
-    //    float3 tanEyeVec;   
-    //    tanEyeVec.x = dot(a2v.objTangent, eyeVec);   
-    //    tanEyeVec.y = dot(a2v.objBinormal, eyeVec);    
-    //    tanEyeVec.z = -invBumpDepth * dot(a2v.objNormal, eyeVec);    
-    //    v2f.tanEyeVec = tanEyeVec;      // Transform the light vector into tangent space.    // We will use this later for tangent-space normal mapping      
-    //    float3 lightVec = lightCoord - a2v.objCoord;    
-    //    float3 tanLightVec;    
-    //    tanLightVec.x = dot(a2v.objTangent, lightVec);    
-    //    tanLightVec.y = dot(a2v.objBinormal, lightVec);    
-    //    tanLightVec.z = dot(a2v.objNormal, lightVec);   
-    //    v2f.tanLightVec = tanLightVec;      
-    //    return v2f;    
-    //} 
-
-    //f2fConnector distanceFragment(v2fConnector v2f, uniform sampler2D colorTex, uniform sampler2D normalTex, uniform sampler3D distanceTex, uniform float3 normalizationFactor) 
-    //{
-    //    f2fConnector f2f;      // Normalize the offset vector in texture space.      // The normalization factor ensures we are normalized with respect    // to a distance which is defined in terms of pixels.   
-    //    float3 offset = normalize(v2f.tanEyeVec);   
-    //    offset *= normalizationFactor;     
-    //    float3 texCoord = v2f.texCoord;      // March a ray     
-    //    for (int i = 0; i < NUM_ITERATIONS; i++) 
-    //    {     
-    //        float distance = f1tex3D(distanceTex, texCoord);      
-    //        texCoord += distance * offset;    
-    //    }      // Compute derivatives of unperturbed texcoords.    // This is because the offset texcoords will have discontinuities      // which lead to incorrect filtering.    
-    //    
-    //    float2 dx = ddx(v2f.texCoord.xy);    
-    //    float2 dy = ddy(v2f.texCoord.xy);      // Do bump-mapped lighting in tangent space.    // 'normalTex' stores tangent-space normals remapped      // into the range [0, 1].   
-    //    float3 tanNormal = 2 * f3tex2D(normalTex, texCoord.xy, dx, dy) - 1;    
-    //    float3 tanLightVec = normalize(v2f.tanLightVec);   
-    //    float diffuse = dot(tanNormal, tanLightVec);      // Multiply diffuse lighting by texture color      f2f.COL.rgb = diffuse * f3tex2D(colorTex, texCoord.xy, dx, dy);    f2f.COL.a = 1;      return f2f;   
-    //} 
-
-
-    //float4 depth2relaxedcone(in float2 TexCoord : TEXCOORD0, in Sampler2D ReliefSampler, in float3 Offset) : COLOR{ const int search_steps = 128;   float3 src = float3(TexCoord,0);  // Source texel    
-    //float3 dst = src + Offset;  // Destination texel  
-    //dst.z = tex2D(ReliefSampler,dst.xy).w;  // Set dest. depth    
-    //float3 vec = dst - src; // Ray direction  
-    //vec /= vec.z;  // Scale ray direction so that vec.z = 1.0   
-    //vec *= 1.0 - dst.z;  // Scale again    
-    //float3 step_fwd = vec/search_steps;  // Length of a forward step    // Search until a new point outside the surface    
-    //float3 ray_pos = dst + step_fwd;   
-    //
-    //for( int i=1; i<search_steps; i++ )   
-    //{     
-    //    float current_depth = tex2D(ReliefSampler, ray_pos.xy).w;     
-    //    if ( current_depth <= ray_pos.z )       
-    //        ray_pos += step_fwd;   
-    //}   // Original texel depth    
-    //float src_texel_depth = tex2D(ReliefSampler,TexCoord).w;   // Compute the cone ratio    
-    //float cone_ratio = (ray_pos.z >= src_texel_depth) ? 1.0 : length(ray_pos.xy - TexCoord) /  (src_texel_depth - ray_pos.z);   // Check for minimum value with previous pass result    
-    //float best_ratio = tex2D(ResultSampler, TexCoord).x;   
-    //if ( cone_ratio > best_ratio )     
-    //    cone_ratio = best_ratio;   
-    //return float4(cone_ratio, cone_ratio, cone_ratio, cone_ratio); 
-    //} 
-
-
+      //auto vertexz = modelRenderManager.ModelList[0].MeshList[0].VertexList[4259];
+      //std::cout << "Bone ID: " << vertexz.BoneID.x << " " << vertexz.BoneID.y << " " << vertexz.BoneID.z << " " << vertexz.BoneID.w << std::endl;
+      //std::cout << "BoneWeight : " << vertexz.BoneWeights.x << " " << vertexz.BoneWeights.y << " " << vertexz.BoneWeights.z << " " << vertexz.BoneWeights.w << std::endl;
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
     CubeMapFiles[1] = "../texture/skybox/left.jpg";
@@ -291,7 +231,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
         }
 
         vkCmdEndRenderPass(commandBuffers[i]);
-        AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
+        AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame, modelRenderManager.ModelList[0].MeshList[0].VertexList);
         //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
@@ -382,7 +322,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
-    ImGui::SliderFloat("DepthSampler", &SceneData->SceneData.DepthSampler, 0, 1);
+    ImGui::SliderFloat("DepthSampler", &SceneData->SceneData.DepthSampler, 0, .3f);
     ImGui::SliderFloat3("Pos", &SceneData->SceneData.dlight.direction.x, -1000.0f, 1000.0f);
     ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
@@ -441,19 +381,22 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
+    
     if (RayTraceSwitch)
     {
-        CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
+        modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
         CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
+       modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
+       CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
-
+   
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount = 1;

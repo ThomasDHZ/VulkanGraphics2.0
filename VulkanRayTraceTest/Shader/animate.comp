@@ -59,27 +59,15 @@ layout(push_constant) uniform MeshInfo
 void main()
 {
   Vertex v0 = vertices.v[gl_GlobalInvocationID.x];
-// debugPrintfEXT("BoneID = %i, %i, %i, %i, %i \n", gl_GlobalInvocationID.x, v0.BoneID.x, v0.BoneID.y, v0.BoneID.z, v0.BoneID.w);
-// debugPrintfEXT("BoneWeights = %i, %f, %f, %f, %f \n", gl_GlobalInvocationID.x, v0.BoneWeights.x, v0.BoneWeights.y, v0.BoneWeights.z, v0.BoneWeights.w);
-//  debugPrintfEXT("BoneWeights = %i \n, 
-//					%f, %f, %f, %f \n,
-//					%f, %f, %f, %f \n,
-//					%f, %f, %f, %f \n,
-//					%f, %f, %f, %f \n", gl_GlobalInvocationID.x, 
-//					ubo.BoneTransform[gl_GlobalInvocationID.x][0][0], ubo.BoneTransform[gl_GlobalInvocationID.x][0][1], ubo.BoneTransform[gl_GlobalInvocationID.x][0][2], ubo.BoneTransform[gl_GlobalInvocationID.x][0][3],
-//					ubo.BoneTransform[gl_GlobalInvocationID.x][1][0], ubo.BoneTransform[gl_GlobalInvocationID.x][1][1], ubo.BoneTransform[gl_GlobalInvocationID.x][1][2], ubo.BoneTransform[gl_GlobalInvocationID.x][1][3],
-//					ubo.BoneTransform[gl_GlobalInvocationID.x][2][0], ubo.BoneTransform[gl_GlobalInvocationID.x][2][1], ubo.BoneTransform[gl_GlobalInvocationID.x][2][2], ubo.BoneTransform[gl_GlobalInvocationID.x][2][3],
-//					ubo.BoneTransform[gl_GlobalInvocationID.x][3][0], ubo.BoneTransform[gl_GlobalInvocationID.x][3][1], ubo.BoneTransform[gl_GlobalInvocationID.x][3][2], ubo.BoneTransform[gl_GlobalInvocationID.x][3][3]);
-// 
+
  mat4 BoneTransform = mat4(1.0f);
-//  BoneTransform =  ubo.BoneTransform[v0.BoneID[0]] * v0.BoneWeights[0];
-//  BoneTransform += ubo.BoneTransform[v0.BoneID[1]] * v0.BoneWeights[1];
-//  BoneTransform += ubo.BoneTransform[v0.BoneID[2]] * v0.BoneWeights[2];
-//  BoneTransform += ubo.BoneTransform[v0.BoneID[3]] * v0.BoneWeights[3];
+  BoneTransform =  ubo.BoneTransform[v0.BoneID[0]] * v0.BoneWeights[0];
+  BoneTransform += ubo.BoneTransform[v0.BoneID[1]] * v0.BoneWeights[1];
+  BoneTransform += ubo.BoneTransform[v0.BoneID[2]] * v0.BoneWeights[2];
+  BoneTransform += ubo.BoneTransform[v0.BoneID[3]] * v0.BoneWeights[3];
   vec4 BonePosition = BoneTransform * vec4(v0.Position, 1.0);
 
- // v0.Position = vec3(ubo.model * MeshTransform[0].Transform * BonePosition);
- // v0.Normal = normalize(transpose(inverse(mat3(ubo.model * MeshTransform[0].Transform * BoneTransform))) * v0.Normal);
-//	v0.Color = vec4(v0.BoneID.xyz, 1.0f);
+//  v0.Position = vec3(ubo.model * MeshTransform[0].Transform * BonePosition);
+//  v0.Normal = normalize(transpose(inverse(mat3(ubo.model * MeshTransform[0].Transform * BoneTransform))) * v0.Normal);
   vertices.v[gl_GlobalInvocationID.x] = v0;
 }

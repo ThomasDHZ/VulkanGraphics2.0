@@ -118,10 +118,24 @@ Material BuildMaterial()
 	return material;
 }
 
+#define NUM_ITERATIONS 16
 #define MAX_STEPS 100
 #define MAX_DIST 100.0f
 #define SURF_DIST 0.01
 
+bool DEPTH_BIAS = false;
+bool BORDER_CLAMP = false;
+
+vec3 ambientLightColor = {0.15, 0.15, 0.15};
+vec3 lightPos;
+vec3 lightColor = {1.0f, 1.0f, 1.0f};
+
+vec3 Kd = {0.8, 0.8, 0.8};
+vec3 Ks = {0.3, 0.3, 0.3};
+float specularPower = 64.0;
+float tile = 1.0;
+
+float depth = 0.1;
 //float GetDistance(vec3 pointPixel, vec3 RayDirection)
 //{
 // return length(pointPixel - texture(TextureMap[2], RayDirection.xy).rgb) - texture(RayDirection[3], RayDirection.xy).r;
@@ -145,18 +159,10 @@ Material BuildMaterial()
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 { 
-
-//	vec2 direction = viewDir.xy * 0.21f;
-//	for(int x = 0; x < 4; x++)
-//	{
-//		float parallax = texture(TextureMap[3], texCoords).r;
-//		texCoords += direction * parallax;
-//	}
-//	return texCoords;
-    float heightScale = 0.05f;
+    float heightScale = scenedata.DepthSampler;
     // number of depth layers
-    const float minLayers = 20;
-    const float maxLayers = 40;
+    const float minLayers = 8;
+    const float maxLayers = 32;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
@@ -194,9 +200,107 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
     return finalTexCoords;
 }
 
+
+void SphereTrace()
+{
+    vec3 p,v;
+    p = vec3(TexCoords, 0);
+    v = scenedata.viewPos;
+    v.xy *= 16 / 256;
+
+    for (int i = 0; i < NUM_ITERATIONS; i++)
+	{
+		float stepDist = texture(Texture3DMap[0], p).x;
+		p += v * stepDist;
+	}
+
+}
+
+vec4 phongShading(vec3 normal, vec3 lightVec, vec3 eyeVec, vec3 materialColor)
+{
+	vec3 halfVec = normalize(lightVec + eyeVec);
+
+	float diffuseInt = clamp(dot(lightVec, normal), 0.0f, 1.0f);
+	float specularInt = clamp(dot(halfVec, normal), 0.0f, 1.0f);
+	specularInt = pow(specularInt, specularPower);
+
+	vec4 finalColor;
+	finalColor.xyz = materialColor * (ambientLightColor + lightColor * diffuseInt * Kd) +
+		specularInt * Ks;
+	finalColor.w = 1.0f;
+
+	return finalColor;
+}
+
+vec4 bump_ps(vec2 uv0, vec3 eyeVec, vec3 lightVec)
+{
+//	if (BORDER_CLAMP)
+//	{
+//		if (uv0.x < 0.0) discard;
+//		if (uv0.x > 1.0f) discard;
+//		if (uv0.y < 0.0) discard;
+//		if (uv0.y > 1.0f) discard;
+//	}
+
+// View and light vectors
+vec3 v = normalize(eyeVec);
+vec3 l1 = normalize(lightVec);
+
+// Diffuse texture color
+vec3 color = texture(TextureMap[1], uv0).rgb;
+
+// Bump map
+//vec3 n = texture(TextureMap[2], uv0).rgb;
+//n.xy = n.xy * 2.0 - 1.0;
+//n.y = -n.y;
+//n.z = sqrt(1.0 - dot(n.xy, n.xy));
+
+vec3 n = texture(TextureMap[2], uv0.xy).rgb;
+    n = normalize(n * 2.0 - 1.0);  
+
+//return vec4(n, 1.0f);
+return phongShading(n, l1, -v, color);
+}
+
+
+vec4 sphere_ps()
+{
+    vec3 TangentLightPos = TBN * scenedata.plight.position;
+    vec3 TangentViewPos  = TBN * scenedata.viewPos;
+    vec3 TangentFragPos  = TBN * FragPos;
+
+	vec3 p,v;
+
+	p = vec3(TexCoords, 0);
+
+	// Texture width MUST be equal to texture height
+	TangentViewPos *= -scenedata.DepthSampler * 15.0f / 256.0f *
+		256;
+
+	v = normalize(TangentViewPos);
+	v.z = abs(v.z);
+
+//	if (DEPTH_BIAS)
+//	{
+//		float db = 1.0 - v.z;
+//		db *= db;
+//		db = 1.0 - db * db;
+//		v.xy *= db;
+//	}
+
+	v.xy *= 16 / 256.0f;
+
+	for (int i = 0; i < NUM_ITERATIONS; i++)
+	{
+		float stepDist = texture(Texture3DMap[0], p).x;
+		p += v * stepDist;
+	}
+
+	return bump_ps(p.xy, TangentViewPos, TangentLightPos);
+}
+
 void main() 
 {
-// debugPrintfEXT("Depth: %i \n",  scenedata.DepthSampler);
     vec3 TangentLightPos = TBN * scenedata.plight.position;
     vec3 TangentViewPos  = TBN * scenedata.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
@@ -205,85 +309,28 @@ void main()
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 texCoords = TexCoords;
     
-    texCoords = ParallaxMapping(TexCoords,  viewDir);       
-    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-        discard;
-
-   //  obtain normal from normal map
-    vec3 normal = texture(TextureMap[2], texCoords.xy).rgb;
-    normal = normalize(normal * 2.0 - 1.0);   
-   
-    // get diffuse color
-    vec3 color = texture(TextureMap[1], texCoords.xy).rgb;
-    // ambient
-    vec3 ambient = 0.1 * color;
-    // diffuse
-    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-    float diff = max(dot(lightDir, Normal), 0.0);
-    vec3 diffuse = diff * color;
-    // specular    
-    vec3 reflectDir = reflect(-lightDir, normal);
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-
-    vec3 specular = vec3(0.2) * spec;
-
-    outColor = vec4(ambient + diffuse + specular, 1.0f);
+		 outColor = vec4(texture(TextureMap[1], texCoords).rgb, 1.0f);
+//    texCoords = ParallaxMapping(TexCoords,  viewDir);       
+////    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+////        discard;
 //
+//    // obtain normal from normal map
+//    vec3 normal = texture(TextureMap[2], texCoords).rgb;
+//    normal = normalize(normal * 2.0 - 1.0);   
+//   
+//    // get diffuse color
+//    vec3 color = texture(TextureMap[1], texCoords).rgb;
+//    // ambient
+//    vec3 ambient = 0.1 * color;
+//    // diffuse
+//    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+//    float diff = max(dot(lightDir, normal), 0.0);
+//    vec3 diffuse = diff * color;
+//    // specular    
+//    vec3 reflectDir = reflect(-lightDir, normal);
+//    vec3 halfwayDir = normalize(lightDir + viewDir);  
+//    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 //
-//    	const int search_steps = 128;
-//	
-//	vec3 p = vec3(texCoords,0);
-//	
-//	vec3 o = TangentViewPos + p;
-//	o.z = texture(TextureMap[3],o.xy).r;
-//	
-//	vec3 v = o - p;
-//	v /= v.z;
-//	v *= 1.0-o.z;
-//	v /= search_steps;
-//
-//	p = o;
-//
-//	for( int i=0;i<search_steps;i++ )
-//	{
-//		float d = texture(TextureMap[3],p.xy).r;
-//
-//		if ( d <= p.z )
-//			p += v;
-//	}
-//	float d = texture(TextureMap[3],texCoords).r;
-//	
-//	float r = length(p.xy-texCoords);
-//	
-//	r = (p.z >= d) ? 1.0 : r / (d - p.z);		
-//
-//	vec2 temp = texCoords;
-//	temp.x = 1 - texCoords.x;
-//	temp.y = 1 - texCoords.y;
-//	float best_r = texture(TextureMap[3],temp).x;
-//	if ( r > best_r )
-//		r = best_r;
-//		saturate
-
-
-
-//	vec3 p;
-//	p.xy = texCoords + TangentViewPos.xy;
-//	p.z = texture(TextureMap[3],p.xy).r;
-//	
-//	float d = texture(TextureMap[3], texCoords).r;
-//
-//	float r = length(TangentViewPos.xy);
-//	r = (p.z >= d) ? 1.0 : r / (d - p.z);
-//		
-//	vec2 temp = texCoords;
-//	temp.y = 1 - texCoords.y;
-//
-//	float best_r = texture(TextureMap[3], temp).x;
-//	if ( r > best_r )
-//		r = best_r;
-//		
-//
-//    outColor = vec4(r,r,r,r);
+//    vec3 specular = vec3(0.2) * spec;
+//    outColor = vec4(ambient + diffuse + specular, 1.0);
 }
