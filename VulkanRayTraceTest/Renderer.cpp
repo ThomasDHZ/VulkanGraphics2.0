@@ -26,7 +26,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
    // modelRenderManager.AddModel(engine, v);
    // modelRenderManager.AddModel(engine, "../Models/cube.obj");
 
- /*   int Width = 255;
+    int Width = 255;
     int Height = 255;
     int Depth = 8;
     std::vector<Pixel> pixel;
@@ -52,16 +52,16 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
         }
     }
   
-    auto ab =  modelRenderManager.textureManager.LoadTexture3D(engine, Width, Height, Depth, pixel, VK_FORMAT_R8G8B8A8_UNORM);*/
+    auto ab =  modelRenderManager.textureManager.LoadTexture3D(engine, Width, Height, Depth, pixel, VK_FORMAT_R8G8B8A8_UNORM);
 
-/*    Material material{};
+  /*  Material material{};
     material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
-    modelRenderManager.ModelList[0].MeshList[0].material = material;
-     */
-    modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/four_objectsSphere.dds", VK_FORMAT_R8_UNORM);
-   /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
+    modelRenderManager.ModelList[0].MeshList[0].material = material;*/
+
+    //modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
+     /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
 
 
     //auto v = CalcVertex();
@@ -73,9 +73,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
       modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
-      //auto vertexz = modelRenderManager.ModelList[0].MeshList[0].VertexList[4259];
-      //std::cout << "Bone ID: " << vertexz.BoneID.x << " " << vertexz.BoneID.y << " " << vertexz.BoneID.z << " " << vertexz.BoneID.w << std::endl;
-      //std::cout << "BoneWeight : " << vertexz.BoneWeights.x << " " << vertexz.BoneWeights.y << " " << vertexz.BoneWeights.z << " " << vertexz.BoneWeights.w << std::endl;
+
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
     CubeMapFiles[1] = "../texture/skybox/left.jpg";
@@ -231,7 +229,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
         }
 
         vkCmdEndRenderPass(commandBuffers[i]);
-        AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame, modelRenderManager.ModelList[0].MeshList[0].VertexList);
+        AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
         //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
@@ -322,7 +320,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
-    ImGui::SliderFloat("DepthSampler", &SceneData->SceneData.DepthSampler, 0, .3f);
+    ImGui::SliderFloat("DepthSampler", &SceneData->SceneData.DepthSampler, 0, 8);
     ImGui::SliderFloat3("Pos", &SceneData->SceneData.dlight.direction.x, -1000.0f, 1000.0f);
     ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
@@ -381,22 +379,21 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
-    
+
+    modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-        modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
         CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-       modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
-       CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
-   
+
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount = 1;

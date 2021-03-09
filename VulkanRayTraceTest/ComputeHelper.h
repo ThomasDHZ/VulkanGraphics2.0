@@ -1,5 +1,4 @@
 #pragma once
-#include "Vertex.h"
 #include "GraphicsPipeline.h"
 #include "VulkanBuffer.h"
 #include "SceneData.h"
@@ -30,7 +29,7 @@ public:
 
 	VkCommandBuffer commandBuffer;
 
-	void Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame, std::vector<Vertex>& vertexList);
+	void Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame);
 	void Destroy(VulkanEngine& engine);
 };
 

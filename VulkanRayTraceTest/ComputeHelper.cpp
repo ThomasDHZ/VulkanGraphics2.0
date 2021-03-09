@@ -128,7 +128,7 @@ VkWriteDescriptorSet ComputeHelper::AddWriteDescriptorSet(VulkanEngine& engine, 
 	return BufferDescriptor;
 }
 
-void ComputeHelper::Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame, std::vector<Vertex>& vertexList)
+void ComputeHelper::Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame)
 {
 	MeshInfo meshInfo;
 	meshInfo.MeshID = 0;
