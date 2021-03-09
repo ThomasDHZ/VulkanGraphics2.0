@@ -79,7 +79,7 @@ void ComputeHelper::CreateShaderPipeLine(VulkanEngine& engine)
 	VkPushConstantRange pushConstantRange{};
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 	pushConstantRange.offset = 0;
-	pushConstantRange.size = sizeof(MeshInfo);
+	pushConstantRange.size = sizeof(ConstMeshInfo);
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -130,7 +130,7 @@ VkWriteDescriptorSet ComputeHelper::AddWriteDescriptorSet(VulkanEngine& engine, 
 
 void ComputeHelper::Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame)
 {
-	MeshInfo meshInfo;
+	ConstMeshInfo meshInfo;
 	meshInfo.MeshID = 0;
 	meshInfo.ModelID = 0;
 	meshInfo.MaterialID = 0;
@@ -161,7 +161,7 @@ void ComputeHelper::Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipeline);
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipelineLayout, 0, 1, &descriptorSets, 0, 0);
-	vkCmdPushConstants(commandBuffer, ShaderPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT , 0, sizeof(meshInfo), &meshInfo);
+	vkCmdPushConstants(commandBuffer, ShaderPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT , 0, sizeof(ConstMeshInfo), &meshInfo);
 	vkCmdDispatch(commandBuffer, buffer.BufferSize, 1, 1);
 
 	BufferMemoryBarrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;

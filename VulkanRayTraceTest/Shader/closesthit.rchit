@@ -188,6 +188,8 @@ void main()
 
 	vec3 tangent = v0.tangent * barycentricCoords.x + v1.tangent * barycentricCoords.y + v2.tangent * barycentricCoords.z;
 	vec3 bitangent = v0.BiTangant * barycentricCoords.x + v1.BiTangant * barycentricCoords.y + v2.BiTangant * barycentricCoords.z;
+	vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z;
+
 
 	vec3 T = normalize(mat3(ubo.model) * vec3(tangent));
     vec3 B = normalize(mat3(ubo.model) * vec3(bitangent));
@@ -206,24 +208,24 @@ void main()
 //        discard;
 
     // obtain normal from normal map
-    vec3 normal2 = texture(TextureMap[2], UV).rgb;
-    normal2 = normalize(normal2 * 2.0 - 1.0);   
-   
-    // get diffuse color
-    vec3 color = texture(TextureMap[1], UV).rgb;
-    // ambient
-    vec3 ambient = 0.1 * color;
-    // diffuse
-    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-    float diff = max(dot(lightDir, normal2), 0.0);
-    vec3 diffuse = diff * color;
-    // specular    
-    vec3 reflectDir = reflect(-lightDir, normal);
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal2, halfwayDir), 0.0), 32.0);
-
-    vec3 specular = vec3(0.2) * spec;
-    hitValue = ambient + diffuse ;
+//    vec3 normal2 = texture(TextureMap[2], UV).rgb;
+//    normal2 = normalize(normal2 * 2.0 - 1.0);   
+//   
+//    // get diffuse color
+//    vec3 color = texture(TextureMap[1], UV).rgb;
+//    // ambient
+//    vec3 ambient = 0.1 * color;
+//    // diffuse
+//    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+//    float diff = max(dot(lightDir, normal2), 0.0);
+//    vec3 diffuse = diff * color;
+//    // specular    
+//    vec3 reflectDir = reflect(-lightDir, normal);
+//    vec3 halfwayDir = normalize(lightDir + viewDir);  
+//    float spec = pow(max(dot(normal2, halfwayDir), 0.0), 32.0);
+//
+//    vec3 specular = vec3(0.2) * spec;
+    hitValue = color;
 
 //	vec3 lightDir = normalize(-ubo.dlight.direction);
 //	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);
@@ -253,7 +255,7 @@ void main()
 //	}
 //	else
 //	{	
-		hitValue += specular;
+		//hitValue += specular;
 //	}
  // }
 }

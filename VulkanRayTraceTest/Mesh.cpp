@@ -197,20 +197,6 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 		{
 			scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
-
-		std::vector<Vertex> newVertexList = VertexList;
-		for (auto& vertex : newVertexList)
-		{
-			glm::mat4 BoneTransform = glm::mat4(1.0f);
-			//BoneTransform =  scenedata->SceneData.BoneTransform[vertex.BoneID[0]] * vertex.BoneWeights[0];
-			//BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[1]] * vertex.BoneWeights[1];
-			//BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[2]] * vertex.BoneWeights[2];
-			//BoneTransform += scenedata->SceneData.BoneTransform[vertex.BoneID[3]] * vertex.BoneWeights[3];
-			vertex.Position = glm::vec3(MeshTransform * BoneTransform * glm::vec4(vertex.Position, 1.0));
-			vertex.Normal = glm::normalize(glm::transpose(glm::inverse(glm::mat3(scenedata->SceneData.model * MeshTransform * BoneTransform))) * vertex.Normal);
-		}
-
-		VertexBuffer.CopyBufferToMemory(engine.Device, &newVertexList[0], sizeof(Vertex) * newVertexList.size());
 	}
 
 	glm::mat4 FinalTransform =  MeshTransform;
@@ -230,14 +216,14 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 {
 	if (ShowMesh)
 	{
-		MeshInfo meshInfo;
+		ConstMeshInfo meshInfo;
 		meshInfo.MeshID = MeshID;
 		meshInfo.ModelID = 0;
 		meshInfo.MaterialID = 0;
 
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
-		vkCmdPushConstants(commandBuffer, pipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(MeshInfo), &meshInfo);
+		vkCmdPushConstants(commandBuffer, pipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstMeshInfo), &meshInfo);
 		if (IndexCount == 0)
 		{
 			vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);

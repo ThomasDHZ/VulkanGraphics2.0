@@ -117,7 +117,7 @@ void ForwardRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, cons
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(MeshInfo);
+    pushConstantRange.size = sizeof(ConstMeshInfo);
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;

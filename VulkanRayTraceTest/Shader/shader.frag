@@ -68,12 +68,12 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 PVM;
 	mat4 BoneTransform[100];
 } scenedata;
-//layout(binding = 3) uniform MeshProperties 
-//{
-//	mat4 model;
-//	mat4 BoneTransform[100];
-//	vec2 UVOffset;
-//} meshProperties;
+layout(binding = 3) uniform MeshProperties 
+{
+	mat4 model;
+	mat4 BoneTransform[100];
+	vec2 UVOffset;
+} meshProperties;
 
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
@@ -199,9 +199,9 @@ void main()
 
 //    vec3 specular = vec3(0.2) * spec;
 
-	if(texture(TextureMap[4], texCoords).r == 0.0f)
-	{
-		discard;
-	}
-    outColor = vec4(texture(TextureMap[1], texCoords).rgb, 1.0);
+//	if(texture(TextureMap[4], texCoords).r == 0.0f)
+//	{
+//		discard;
+//	}
+    outColor = vec4(1.0f, 0.0f, 0.0f, 1.0);
 }

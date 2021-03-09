@@ -9,7 +9,7 @@ enum RendererType
 	RT_ShadowRenderer
 };
 
-struct MeshInfo
+struct ConstMeshInfo
 {
 	uint32_t MeshID;
 	uint32_t ModelID;
