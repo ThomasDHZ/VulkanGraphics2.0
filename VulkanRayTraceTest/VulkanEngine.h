@@ -11,6 +11,7 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "VulkanBuffer.h"
 #define VKB_VALIDATION_LAYERS
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -23,6 +24,12 @@ struct DescriptorSetLayoutBindingInfo
 	uint32_t Count;
 };
 
+struct StorageImage {
+	VkDeviceMemory memory = VK_NULL_HANDLE;
+	VkImage image = VK_NULL_HANDLE;
+	VkImageView view = VK_NULL_HANDLE;
+	VkFormat format;
+};
 
 class VulkanEngine
 {
@@ -103,9 +110,22 @@ public:
 
 	VkDescriptorPoolSize AddDsecriptorPoolBinding(VkDescriptorType descriptorType);
 
+
 	VkDescriptorPool CreateDescriptorPool(std::vector<VkDescriptorPoolSize> DescriptorPoolInfo);
 	VkDescriptorSetLayout CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo);
 	VkDescriptorSet CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout);
+	VkDescriptorBufferInfo AddBufferDescriptor(VulkanBuffer& buffer);
+
+	VkWriteDescriptorSet AddAccelerationBuffer(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure);
+	VkWriteDescriptorSet AddStorageImageBuffer(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
+	VkWriteDescriptorSet AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo, VkDescriptorType descriptorType);
+	VkWriteDescriptorSet AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList, VkDescriptorType descriptorType);
+	VkWriteDescriptorSet AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
+	VkWriteDescriptorSet AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo);
+	VkWriteDescriptorSetAccelerationStructureKHR AddAcclerationStructureBinding(VkAccelerationStructureKHR& handle);
+	VkDescriptorImageInfo AddRayTraceReturnImageDescriptor(VkImageLayout ImageLayout, StorageImage& texture);
+	VkDescriptorImageInfo AddTextureDescriptor(VkImageView view, VkSampler sampler);
+
 	uint32_t GetAlignedSize(uint32_t value, uint32_t alignment);
 	void Mat4Logger(std::string name, glm::mat4 matrix);
 

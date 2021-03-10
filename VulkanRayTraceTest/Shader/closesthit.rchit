@@ -76,7 +76,7 @@ layout(binding = 2) uniform UBO
     mat4 BoneTransform[100];
 	float timer;
 } ubo;
-layout(binding = 3) uniform MeshProperties 
+layout(binding = 3) buffer MeshProperties 
 {
 	mat4 model;
 	mat4 BoneTransform[100];

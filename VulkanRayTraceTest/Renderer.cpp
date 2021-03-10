@@ -102,7 +102,7 @@ void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
@@ -119,7 +119,7 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetVertexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
@@ -134,30 +134,30 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 {
     descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
 
-    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = AddAcclerationStructureBinding(engine, RayRenderer.topLevelAS.handle);
-    VkDescriptorImageInfo RayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
+    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
+    VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = modelRenderManager.GetVertexBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
-    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->VulkanBufferData.Buffer, SceneData->VulkanBufferData.BufferSize);
-    VkDescriptorBufferInfo MeshPropertyDataBufferInfo = AddBufferDescriptor(engine, modelRenderManager.ModelList[0].MeshList[0].MeshProperties.VulkanBufferData.Buffer, modelRenderManager.ModelList[0].MeshList[0].MeshProperties.VulkanBufferData.BufferSize);
+    VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
+    VkDescriptorBufferInfo MeshPropertyDataBufferInfo = engine.AddBufferDescriptor(modelRenderManager.ModelList[0].MeshList[0].MeshProperties.VulkanBufferData);
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = modelRenderManager.Get3DTextureBufferListDescriptor();
-    VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(modelRenderManager.textureManager.GetCubeMapTexture()));
+    VkDescriptorImageInfo CubeMapImage = engine.AddTextureDescriptor(modelRenderManager.textureManager.GetCubeMapTexture().View, modelRenderManager.textureManager.GetCubeMapTexture().Sampler);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(AddAccelerationBuffer(engine, 0, AccelerationDescriptorStructure));
-    DescriptorList.emplace_back(AddStorageImageBuffer(engine, 1, descriptorSets, RayTraceImageDescriptor));
-    DescriptorList.emplace_back(AddDescriptorSetBuffer(engine, 2, descriptorSets, SceneDataBufferInfo));
-    DescriptorList.emplace_back(AddDescriptorSetBuffer(engine, 3, descriptorSets, MeshPropertyDataBufferInfo));
-    DescriptorList.emplace_back(AddStorageBuffer(engine, 4, descriptorSets, VertexBufferInfoList));
-    DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, IndexBufferInfoList));
-    DescriptorList.emplace_back(AddStorageBuffer(engine, 6, descriptorSets, TransformBufferList));
-    DescriptorList.emplace_back(AddStorageBuffer(engine, 7, descriptorSets, MaterialBufferList));
-    DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 8, descriptorSets, TextureBufferInfo));
-    DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 9, descriptorSets, Texture3DBufferInfo));
-    DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 10, descriptorSets, CubeMapImage));
+    DescriptorList.emplace_back(engine.AddAccelerationBuffer(0, descriptorSets, AccelerationDescriptorStructure));
+    DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, descriptorSets, RayTraceImageDescriptor));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshPropertyDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(4, descriptorSets, VertexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(5, descriptorSets, IndexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(6, descriptorSets, TransformBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(7, descriptorSets, MaterialBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, descriptorSets, TextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, descriptorSets, Texture3DBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, descriptorSets, CubeMapImage));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -432,175 +432,6 @@ void Renderer::Destroy(VulkanEngine& engine)
 
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
-}
-
-VkWriteDescriptorSet Renderer::AddAccelerationBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure)
-{
-    VkWriteDescriptorSet AccelerationDesciptorSet = {};
-    AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    AccelerationDesciptorSet.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
-    AccelerationDesciptorSet.dstSet = descriptorSets;
-    AccelerationDesciptorSet.dstBinding = BindingNumber;
-    AccelerationDesciptorSet.descriptorCount = 1;
-    AccelerationDesciptorSet.pNext = &accelerationStructure;
-    return AccelerationDesciptorSet;
-}
-
-VkWriteDescriptorSetAccelerationStructureKHR Renderer::AddAcclerationStructureBinding(VulkanEngine& engine, VkAccelerationStructureKHR& handle)
-{
-    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
-    AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
-    AccelerationDescriptorStructure.accelerationStructureCount = 1;
-    AccelerationDescriptorStructure.pAccelerationStructures = &handle;
-    return AccelerationDescriptorStructure;
-}
-
-VkDescriptorPoolSize Renderer::AddDsecriptorPoolBinding(VulkanEngine& engine, VkDescriptorType descriptorType)
-{
-    VkDescriptorPoolSize DescriptorPoolBinding = {};
-    DescriptorPoolBinding.type = descriptorType;
-    DescriptorPoolBinding.descriptorCount = static_cast<uint32_t>(engine.SwapChain.GetSwapChainImageCount());
-    return DescriptorPoolBinding;
-}
-
-std::vector<VkDescriptorImageInfo> Renderer::AddTextureDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout)
-{
-    std::vector<VkDescriptorImageInfo> DescriptorImageList;
-    for (auto texture : modelRenderManager.textureManager.GetTextureList())
-    {
-        VkDescriptorImageInfo DescriptorImage{};
-        DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        DescriptorImage.imageView = texture->GetTextureView();
-        DescriptorImage.sampler = texture->GetTextureSampler();
-        DescriptorImageList.emplace_back(DescriptorImage);
-    }
-    return DescriptorImageList;
-}
-
-VkDescriptorImageInfo Renderer::AddTextureDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, std::shared_ptr<Texture> texture)
-{
-    VkDescriptorImageInfo DescriptorImage{};
-    DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    DescriptorImage.imageView = texture->GetTextureView();
-    DescriptorImage.sampler = texture->GetTextureSampler();
-    return DescriptorImage;
-}
-
-VkDescriptorImageInfo Renderer::AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, StorageImage& texture)
-{
-    VkDescriptorImageInfo RayTraceImageDescriptor{};
-    RayTraceImageDescriptor.imageView = texture.view;
-    RayTraceImageDescriptor.imageLayout = ImageLayout;
-    return RayTraceImageDescriptor;
-}
-
-VkDescriptorBufferInfo Renderer::AddBufferDescriptor(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize)
-{
-    VkDescriptorBufferInfo BufferInfo = {};
-    BufferInfo.buffer = Buffer;
-    BufferInfo.offset = 0;
-    BufferInfo.range = BufferSize;
-    return BufferInfo;
-}
-
-VkWriteDescriptorSet Renderer::AddDescriptorSetBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
-{
-    VkWriteDescriptorSet BufferDescriptor = {};
-    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    BufferDescriptor.dstSet = DescriptorSet;
-    BufferDescriptor.dstBinding = BindingNumber;
-    BufferDescriptor.dstArrayElement = 0;
-    BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    BufferDescriptor.descriptorCount = 1;
-    BufferDescriptor.pBufferInfo = &BufferInfo;
-    return BufferDescriptor;
-}
-
-VkWriteDescriptorSet Renderer::AddStorageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
-{
-    VkWriteDescriptorSet BufferDescriptor = {};
-    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    BufferDescriptor.dstSet = DescriptorSet;
-    BufferDescriptor.dstBinding = BindingNumber;
-    BufferDescriptor.dstArrayElement = 0;
-    BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    BufferDescriptor.descriptorCount = 1;
-    BufferDescriptor.pBufferInfo = &BufferInfo;
-    return BufferDescriptor;
-}
-
-VkWriteDescriptorSet Renderer::AddStorageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList)
-{
-    VkWriteDescriptorSet BufferDescriptor = {};
-    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    BufferDescriptor.dstSet = DescriptorSet;
-    BufferDescriptor.dstBinding = BindingNumber;
-    BufferDescriptor.dstArrayElement = 0;
-    BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-    BufferDescriptor.descriptorCount = static_cast<uint32_t>(BufferInfoList.size());
-    BufferDescriptor.pBufferInfo = BufferInfoList.data();
-    return BufferDescriptor;
-}
-
-VkDescriptorBufferInfo Renderer::AddStorageDescriptor(VulkanEngine& engine, VulkanBuffer BufferList)
-{
-    VkDescriptorBufferInfo BufferInfo = {};
-    BufferInfo.buffer = BufferList.Buffer;
-    BufferInfo.offset = 0;
-    BufferInfo.range = VK_WHOLE_SIZE;
-    return BufferInfo;
-}
-
-std::vector<VkDescriptorBufferInfo> Renderer::AddStorageDescriptor(VulkanEngine& engine, std::vector<VulkanBuffer> BufferList)
-{
-    std::vector<VkDescriptorBufferInfo> BufferInfoList;
-    for (int x = 0; x < BufferInfoList.size(); x++)
-    {
-        VkDescriptorBufferInfo BufferInfo = {};
-        BufferInfo.buffer = BufferInfoList[x].buffer;
-        BufferInfo.offset = 0;
-        BufferInfo.range = VK_WHOLE_SIZE;
-        BufferInfoList.emplace_back(BufferInfo);
-    }
-    return BufferInfoList;
-}
-
-VkWriteDescriptorSet Renderer::AddStorageImageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
-{
-    VkWriteDescriptorSet ImageDescriptor{};
-    ImageDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    ImageDescriptor.dstSet = DescriptorSet;
-    ImageDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
-    ImageDescriptor.dstBinding = BindingNumber;
-    ImageDescriptor.pImageInfo = &TextureImageInfo;
-    ImageDescriptor.descriptorCount = 1;
-    return ImageDescriptor;
-}
-
-VkWriteDescriptorSet Renderer::AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
-{
-    VkWriteDescriptorSet TextureDescriptor = {};
-    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    TextureDescriptor.dstSet = DescriptorSet;
-    TextureDescriptor.dstBinding = BindingNumber;
-    TextureDescriptor.dstArrayElement = 0;
-    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    TextureDescriptor.descriptorCount = 1;
-    TextureDescriptor.pImageInfo = &TextureImageInfo;
-    return TextureDescriptor;
-}
-
-VkWriteDescriptorSet Renderer::AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo)
-{
-    VkWriteDescriptorSet TextureDescriptor = {};
-    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    TextureDescriptor.dstSet = DescriptorSet;
-    TextureDescriptor.dstBinding = BindingNumber;
-    TextureDescriptor.dstArrayElement = 0;
-    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    TextureDescriptor.descriptorCount = static_cast<uint32_t>(TextureImageInfo.size());
-    TextureDescriptor.pImageInfo = TextureImageInfo.data();
-    return TextureDescriptor;
 }
 
 std::vector<Vertex> Renderer::CalcVertex()

@@ -568,6 +568,117 @@ VkDescriptorSet VulkanEngine::CreateDescriptorSets(VkDescriptorPool descriptorPo
 	return DescriptorSets;
 }
 
+VkDescriptorBufferInfo VulkanEngine::AddBufferDescriptor(VulkanBuffer& buffer)
+{
+	VkDescriptorBufferInfo BufferInfo = {};
+	BufferInfo.buffer = buffer.Buffer;
+	BufferInfo.offset = 0;
+	BufferInfo.range = buffer.BufferSize;
+	return BufferInfo;
+}
+
+VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo, VkDescriptorType descriptorType)
+{
+	VkWriteDescriptorSet BufferDescriptor = {};
+	BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	BufferDescriptor.dstSet = DescriptorSet;
+	BufferDescriptor.dstBinding = BindingNumber;
+	BufferDescriptor.dstArrayElement = 0;
+	BufferDescriptor.descriptorType = descriptorType;
+	BufferDescriptor.descriptorCount = 1;
+	BufferDescriptor.pBufferInfo = &BufferInfo;
+	return BufferDescriptor;
+}
+
+VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList, VkDescriptorType descriptorType)
+{
+	VkWriteDescriptorSet BufferDescriptor = {};
+	BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	BufferDescriptor.dstSet = DescriptorSet;
+	BufferDescriptor.dstBinding = BindingNumber;
+	BufferDescriptor.dstArrayElement = 0;
+	BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	BufferDescriptor.descriptorCount = static_cast<uint32_t>(BufferInfoList.size());
+	BufferDescriptor.pBufferInfo = BufferInfoList.data();
+	return BufferDescriptor;
+}
+
+VkWriteDescriptorSet VulkanEngine::AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+{
+	VkWriteDescriptorSet TextureDescriptor = {};
+	TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	TextureDescriptor.dstSet = DescriptorSet;
+	TextureDescriptor.dstBinding = BindingNumber;
+	TextureDescriptor.dstArrayElement = 0;
+	TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	TextureDescriptor.descriptorCount = 1;
+	TextureDescriptor.pImageInfo = &TextureImageInfo;
+	return TextureDescriptor;
+}
+
+VkWriteDescriptorSet VulkanEngine::AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo)
+{
+	VkWriteDescriptorSet TextureDescriptor = {};
+	TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	TextureDescriptor.dstSet = DescriptorSet;
+	TextureDescriptor.dstBinding = BindingNumber;
+	TextureDescriptor.dstArrayElement = 0;
+	TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	TextureDescriptor.descriptorCount = static_cast<uint32_t>(TextureImageInfo.size());
+	TextureDescriptor.pImageInfo = TextureImageInfo.data();
+	return TextureDescriptor;
+}
+
+VkWriteDescriptorSet VulkanEngine::AddStorageImageBuffer(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+{
+	VkWriteDescriptorSet ImageDescriptor{};
+	ImageDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	ImageDescriptor.dstSet = DescriptorSet;
+	ImageDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+	ImageDescriptor.dstBinding = BindingNumber;
+	ImageDescriptor.pImageInfo = &TextureImageInfo;
+	ImageDescriptor.descriptorCount = 1;
+	return ImageDescriptor;
+}
+
+VkWriteDescriptorSet VulkanEngine::AddAccelerationBuffer(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure)
+{
+	VkWriteDescriptorSet AccelerationDesciptorSet = {};
+	AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	AccelerationDesciptorSet.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+	AccelerationDesciptorSet.dstSet = DescriptorSet;
+	AccelerationDesciptorSet.dstBinding = BindingNumber;
+	AccelerationDesciptorSet.descriptorCount = 1;
+	AccelerationDesciptorSet.pNext = &accelerationStructure;
+	return AccelerationDesciptorSet;
+}
+
+VkWriteDescriptorSetAccelerationStructureKHR VulkanEngine::AddAcclerationStructureBinding(VkAccelerationStructureKHR& handle)
+{
+	VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
+	AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+	AccelerationDescriptorStructure.accelerationStructureCount = 1;
+	AccelerationDescriptorStructure.pAccelerationStructures = &handle;
+	return AccelerationDescriptorStructure;
+}
+
+VkDescriptorImageInfo VulkanEngine::AddRayTraceReturnImageDescriptor(VkImageLayout ImageLayout, StorageImage& texture)
+{
+	VkDescriptorImageInfo RayTraceImageDescriptor{};
+	RayTraceImageDescriptor.imageView = texture.view;
+	RayTraceImageDescriptor.imageLayout = ImageLayout;
+	return RayTraceImageDescriptor;
+}
+
+VkDescriptorImageInfo VulkanEngine::AddTextureDescriptor(VkImageView view, VkSampler sampler)
+{
+	VkDescriptorImageInfo DescriptorImage{};
+	DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	DescriptorImage.imageView = view;
+	DescriptorImage.sampler = sampler;
+	return DescriptorImage;
+}
+
 uint32_t VulkanEngine::GetAlignedSize(uint32_t value, uint32_t alignment)
 {
 	return (value + alignment - 1) & ~(alignment - 1);

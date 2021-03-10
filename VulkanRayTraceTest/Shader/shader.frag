@@ -69,7 +69,7 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 BoneTransform[100];
 } scenedata;
 
-layout(binding = 3) uniform MeshProperties 
+layout(binding = 3) buffer MeshProperties 
 {
 	mat4 model;
 	mat4 BoneTransform[100];

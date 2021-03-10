@@ -28,14 +28,6 @@
 #include "RenderedRayTracedColorTexture.h"
 #include "AccelerationStructure.h"
 
-struct StorageImage {
-    VkDeviceMemory memory = VK_NULL_HANDLE;
-    VkImage image = VK_NULL_HANDLE;
-    VkImageView view = VK_NULL_HANDLE;
-    VkFormat format;
-};
-
-
 class RayTraceRenderer
 {
 private:

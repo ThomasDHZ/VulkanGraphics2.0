@@ -42,7 +42,7 @@ void ComputeHelper::SetUpDescriptorPool(VulkanEngine& engine, VulkanBuffer& buff
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
 	DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-	DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+	DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
 
     descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
@@ -53,7 +53,7 @@ void ComputeHelper::SetUpDescriptorLayout(VulkanEngine& engine, VulkanBuffer& bu
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
+	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
 	descriptorLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
@@ -62,17 +62,16 @@ void ComputeHelper::SetUpDescriptorSets(VulkanEngine& engine, VulkanBuffer& buff
 {
 	descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorLayout);
 
-	VkDescriptorBufferInfo VertexBufferInfo = AddBufferDescriptor(engine, buffer.Buffer, buffer.BufferSize);
-	VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, sceneData->VulkanBufferData.Buffer, sceneData->VulkanBufferData.BufferSize);
-	VkDescriptorBufferInfo MeshDataufferInfo = AddBufferDescriptor(engine, meshdata.VulkanBufferData.Buffer, meshdata.VulkanBufferData.BufferSize);
-	VkDescriptorBufferInfo TransformDataBufferInfo = AddBufferDescriptor(engine, buffer2.Buffer, buffer2.BufferSize);
+	VkDescriptorBufferInfo VertexBufferInfo = engine.AddBufferDescriptor(buffer);
+	VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(sceneData->VulkanBufferData);
+	VkDescriptorBufferInfo MeshDataufferInfo = engine.AddBufferDescriptor(meshdata.VulkanBufferData);
+	VkDescriptorBufferInfo TransformDataBufferInfo = engine.AddBufferDescriptor(buffer2);
 
 	std::vector<VkWriteDescriptorSet> DescriptorList;
-	DescriptorList.emplace_back(AddWriteDescriptorSet(engine, 0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(AddWriteDescriptorSet(engine, 2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-	DescriptorList.emplace_back(AddWriteDescriptorSet(engine, 3, descriptorSets, MeshDataufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-	DescriptorList.emplace_back(AddWriteDescriptorSet(engine, 6, descriptorSets, TransformDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-
+	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshDataufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(6, descriptorSets, TransformDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
 	vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
@@ -108,28 +107,6 @@ void ComputeHelper::CreateShaderPipeLine(VulkanEngine& engine)
 	}
 
 	vkDestroyShaderModule(engine.Device, ComputeShaderCode.module, nullptr);
-}
-
-VkDescriptorBufferInfo ComputeHelper::AddBufferDescriptor(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize)
-{
-	VkDescriptorBufferInfo BufferInfo = {};
-	BufferInfo.buffer = Buffer;
-	BufferInfo.offset = 0;
-	BufferInfo.range = BufferSize;
-	return BufferInfo;
-}
-
-VkWriteDescriptorSet ComputeHelper::AddWriteDescriptorSet(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo, VkDescriptorType descriptorType)
-{
-	VkWriteDescriptorSet BufferDescriptor = {};
-	BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	BufferDescriptor.dstSet = DescriptorSet;
-	BufferDescriptor.dstBinding = BindingNumber;
-	BufferDescriptor.dstArrayElement = 0;
-	BufferDescriptor.descriptorType = descriptorType;
-	BufferDescriptor.descriptorCount = 1;
-	BufferDescriptor.pBufferInfo = &BufferInfo;
-	return BufferDescriptor;
 }
 
 void ComputeHelper::Compute(VulkanEngine& engine, VulkanBuffer& buffer, uint32_t currentFrame)
