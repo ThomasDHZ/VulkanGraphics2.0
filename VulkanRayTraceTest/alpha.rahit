@@ -89,7 +89,7 @@ layout(binding = 3, scalar) buffer Vertices
 layout(binding = 4) buffer Indices { uint i[]; } indices[];
 layout(binding = 5) buffer MaterialInfos { MaterialInfo materialInfo[]; } MaterialList;
 layout(binding = 6) uniform sampler2D TextureMap[];
-layout(binding = 8) readonly buffer _TexCoordBuf {float texcoord0[];};
+layout(binding = 9) readonly buffer _TexCoordBuf {float texcoord0[];};
 
 //Vertex unpack(uint index)
 //{

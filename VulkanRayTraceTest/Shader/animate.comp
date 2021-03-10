@@ -43,7 +43,7 @@ layout(binding = 2) uniform UniformBufferObject {
     mat4 BoneTransform[1000];
     float timer;
 } ubo;
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout(push_constant) uniform ConstMeshProperties
 {

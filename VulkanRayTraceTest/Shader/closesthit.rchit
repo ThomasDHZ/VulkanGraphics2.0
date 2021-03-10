@@ -76,16 +76,12 @@ layout(binding = 2) uniform UBO
     mat4 BoneTransform[100];
 	float timer;
 } ubo;
-layout(binding = 3, scalar) buffer Vertices
-{
-  Vertex v[];
-}
-vertices[];
-layout(binding = 4) buffer Indices { uint i[]; } indices[];
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 7) uniform sampler2D TextureMap[];
-layout(binding = 8) uniform sampler3D Texture3DMap[];
+layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
+layout(binding = 5) buffer Indices { uint i[]; } indices[];
+layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 8) uniform sampler2D TextureMap[];
+layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 Material BuildMaterial(vec2 UV)
 {
@@ -201,9 +197,9 @@ void main()
     vec3 TangentFragPos  = TBN * worldPos;
   // offset texture coordinates with Parallax Mapping
     // offset texture coordinates with Parallax Mapping
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+  //  vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     
-    UV = ParallaxMapping(UV,  viewDir);       
+   // UV = ParallaxMapping(UV,  viewDir);       
 //    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
 //        discard;
 
@@ -225,7 +221,7 @@ void main()
 //    float spec = pow(max(dot(normal2, halfwayDir), 0.0), 32.0);
 //
 //    vec3 specular = vec3(0.2) * spec;
-    hitValue = color;
+    hitValue = texture(TextureMap[1], UV).rgb;
 
 //	vec3 lightDir = normalize(-ubo.dlight.direction);
 //	float diff = max(dot(ubo.dlight.direction, lightDir), 0.0);

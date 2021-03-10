@@ -164,13 +164,7 @@
     <None Include="Shader\raygen.rgen">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\shadow.rmiss.spv">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\closesthit.rchit">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="alpha.rahit">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\shader.frag">
@@ -182,16 +176,10 @@
     <None Include="Shader\Lighting.glsl">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\RasterShadowClosestHit.rchit">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\Material.glsl">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\animate.comp">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\Logger.glsl">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

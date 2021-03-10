@@ -46,7 +46,7 @@ layout(binding = 2) uniform UniformBufferObject {
     mat4 PVM;
     mat4 BoneTransform[100];
 } ubo;
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;

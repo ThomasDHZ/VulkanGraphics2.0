@@ -68,17 +68,17 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 PVM;
 	mat4 BoneTransform[100];
 } scenedata;
-layout(binding = 3) uniform MeshProperties 
-{
-	mat4 model;
-	mat4 BoneTransform[100];
-	vec2 UVOffset;
-} meshProperties;
-
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 7) uniform sampler2D TextureMap[];
-
+//layout(binding = 3) uniform MeshProperties 
+//{
+//	mat4 model;
+//	mat4 BoneTransform[100];
+//	vec2 UVOffset;
+//} meshProperties;
+//
+layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 8) uniform sampler2D TextureMap[];
+layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -203,5 +203,5 @@ void main()
 //	{
 //		discard;
 //	}
-    outColor = vec4(1.0f, 0.0f, 0.0f, 1.0);
+    outColor = vec4(texture(TextureMap[1], texCoords).rgb, 1.0);
 }
