@@ -59,7 +59,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     modelRenderManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
 
-    SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
+    SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
 
     RenderPass = MainRenderPass(engine);
     //frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
@@ -73,22 +73,22 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
     RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
-    AnimationRenderer = ComputeHelper(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[0].MeshList[0].TransformBuffer);
+    AnimationRenderer = ComputeHelper(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[0].MeshList[0].TransformBuffer, modelRenderManager.ModelList[0].MeshList[0].MeshProperties);
 
     SetUpCommandBuffers(engine);
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-    SceneData->SceneData.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
-    SceneData->SceneData.dlight.ambient = glm::vec4(0.2f);
-    SceneData->SceneData.dlight.diffuse = glm::vec4(0.5f);
-    SceneData->SceneData.dlight.specular = glm::vec4(1.0f);
+    SceneData->UniformDataInfo.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
+    SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
+    SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);
+    SceneData->UniformDataInfo.dlight.specular = glm::vec4(1.0f);
 
-    SceneData->SceneData.plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    SceneData->SceneData.plight.ambient = glm::vec4(0.2f);
-    SceneData->SceneData.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    SceneData->SceneData.plight.specular = glm::vec4(1.0f);
-    SceneData->SceneData.DepthSampler = 0.0f;
+    SceneData->UniformDataInfo.plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    SceneData->UniformDataInfo.plight.ambient = glm::vec4(0.2f);
+    SceneData->UniformDataInfo.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    SceneData->UniformDataInfo.plight.specular = glm::vec4(1.0f);
+    SceneData->UniformDataInfo.DepthSampler = 0.0f;
 }
 
 Renderer::~Renderer()
@@ -101,6 +101,7 @@ void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
@@ -118,6 +119,7 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetVertexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
@@ -138,7 +140,8 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
-    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->SceneDataBuffer.Buffer, SceneData->SceneDataBuffer.BufferSize);
+    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->VulkanBufferData.Buffer, SceneData->VulkanBufferData.BufferSize);
+    VkDescriptorBufferInfo MeshPropertyDataBufferInfo = AddBufferDescriptor(engine, modelRenderManager.ModelList[0].MeshList[0].MeshProperties.VulkanBufferData.Buffer, modelRenderManager.ModelList[0].MeshList[0].MeshProperties.VulkanBufferData.BufferSize);
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = modelRenderManager.Get3DTextureBufferListDescriptor();
     VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(modelRenderManager.textureManager.GetCubeMapTexture()));
@@ -147,6 +150,7 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     DescriptorList.emplace_back(AddAccelerationBuffer(engine, 0, AccelerationDescriptorStructure));
     DescriptorList.emplace_back(AddStorageImageBuffer(engine, 1, descriptorSets, RayTraceImageDescriptor));
     DescriptorList.emplace_back(AddDescriptorSetBuffer(engine, 2, descriptorSets, SceneDataBufferInfo));
+    DescriptorList.emplace_back(AddDescriptorSetBuffer(engine, 3, descriptorSets, MeshPropertyDataBufferInfo));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 4, descriptorSets, VertexBufferInfoList));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, IndexBufferInfoList));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 6, descriptorSets, TransformBufferList));
@@ -276,16 +280,16 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     }
     RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
 
-    SceneData->SceneData.model = modelRenderManager.ModelList[0].ModelTransform;
-    SceneData->SceneData.viewInverse = glm::inverse(camera->GetViewMatrix());
-    SceneData->SceneData.projInverse = glm::inverse(camera->GetProjectionMatrix());
-    SceneData->SceneData.projInverse[1][1] *= -1;
-    SceneData->SceneData.view = camera->GetViewMatrix();
-    SceneData->SceneData.proj = camera->GetProjectionMatrix();
-    SceneData->SceneData.proj[1][1] *= -1;
-    SceneData->SceneData.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SceneData->SceneData.vertexSize = time;
-    SceneData->SceneData.PVM = SceneData->SceneData.proj * SceneData->SceneData.view * SceneData->SceneData.model;
+    SceneData->UniformDataInfo.model = modelRenderManager.ModelList[0].ModelTransform;
+    SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
+    SceneData->UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
+    SceneData->UniformDataInfo.projInverse[1][1] *= -1;
+    SceneData->UniformDataInfo.view = camera->GetViewMatrix();
+    SceneData->UniformDataInfo.proj = camera->GetProjectionMatrix();
+    SceneData->UniformDataInfo.proj[1][1] *= -1;
+    SceneData->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+    SceneData->UniformDataInfo.vertexSize = time;
+    SceneData->UniformDataInfo.PVM = SceneData->UniformDataInfo.proj * SceneData->UniformDataInfo.view * SceneData->UniformDataInfo.model;
    // SceneData->SceneData.timer = time;
     SceneData->Update(engine);
 }
@@ -295,11 +299,11 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
-    ImGui::SliderFloat("DepthSampler", &SceneData->SceneData.DepthSampler, 0, 8);
-    ImGui::SliderFloat3("Pos", &SceneData->SceneData.dlight.direction.x, -1000.0f, 1000.0f);
-    ImGui::SliderFloat3("Ambient", &SceneData->SceneData.dlight.ambient.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse", &SceneData->SceneData.dlight.diffuse.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Speculare", &SceneData->SceneData.dlight.specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("DepthSampler", &SceneData->UniformDataInfo.DepthSampler, 0, 1);
+    ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1000.0f, 1000.0f);
+    ImGui::SliderFloat3("Ambient", &SceneData->UniformDataInfo.dlight.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare", &SceneData->UniformDataInfo.dlight.specular.x, 0.0f, 1.0f);
 
     ImGui::SliderFloat3("Transform", &modelRenderManager.ModelList[0].ModelPosition.x, -10.0f, 10.0f);
     ImGui::SliderFloat3("Rotate", &modelRenderManager.ModelList[0].ModelRotation.x, 0.0f, 360.0f);
@@ -318,13 +322,13 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
         }
     }
 
-    ImGui::SliderFloat3("Pos2", &SceneData->SceneData.plight.position.x, -10.0f, 10.0f);
-    ImGui::SliderFloat3("Ambient2", &SceneData->SceneData.plight.ambient.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse2", &SceneData->SceneData.plight.diffuse.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Speculare2", &SceneData->SceneData.plight.specular.x, 0.0f, 1.0f);
-    ImGui::SliderFloat("constant", &SceneData->SceneData.plight.constant, 0.0f, 100.0f);
-    ImGui::SliderFloat("linear", &SceneData->SceneData.plight.linear, 0.0f, 100.0f);
-    ImGui::SliderFloat("quadratic", &SceneData->SceneData.plight.quadratic, 0.0f, 100.0f);
+    ImGui::SliderFloat3("Pos2", &SceneData->UniformDataInfo.plight.position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Ambient2", &SceneData->UniformDataInfo.plight.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse2", &SceneData->UniformDataInfo.plight.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare2", &SceneData->UniformDataInfo.plight.specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant", &SceneData->UniformDataInfo.plight.constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear", &SceneData->UniformDataInfo.plight.linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic", &SceneData->UniformDataInfo.plight.quadratic, 0.0f, 100.0f);
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)

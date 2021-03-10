@@ -10,6 +10,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 
 	MeshID = 0;
 	material = Material();
+	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -26,6 +27,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 {
 	MeshID = meshID;
 	material = Material();
+	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -42,6 +44,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 {
 	MeshID = meshID;
 	material = MeshMaterial;
+	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -182,7 +185,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix)
 	}
 }
 
-void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<SceneDataStruct> scenedata)
+void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<SceneDataUniformBuffer> scenedata)
 {
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
@@ -195,16 +198,19 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	{
 		for (auto bone : BoneList)
 		{
-			scenedata->SceneData.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
+			scenedata->UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
+			MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
 	}
 
 	glm::mat4 FinalTransform =  MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
+
 	VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
 	TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
+	MeshProperties.Update(engine);
 
 	if (IndexCount != 0)
 	{

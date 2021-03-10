@@ -466,7 +466,7 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 	}
 }
 
-void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataStruct> scenedata)
+void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer> scenedata)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);

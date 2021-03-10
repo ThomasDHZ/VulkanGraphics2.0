@@ -35,7 +35,7 @@ private:
 	bool UpdateRenderer = false;
 	bool framebufferResized = false;
 
-	std::shared_ptr<SceneDataStruct> SceneData;
+	std::shared_ptr<SceneDataUniformBuffer> SceneData;
 	std::vector<Model> RenderModel;
 
 	void SetUpDescriptorPool(VulkanEngine& engine);

@@ -68,13 +68,14 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 PVM;
 	mat4 BoneTransform[100];
 } scenedata;
-//layout(binding = 3) uniform MeshProperties 
-//{
-//	mat4 model;
-//	mat4 BoneTransform[100];
-//	vec2 UVOffset;
-//} meshProperties;
-//
+
+layout(binding = 3) uniform MeshProperties 
+{
+	mat4 model;
+	mat4 BoneTransform[100];
+	vec2 UVOffset;
+} meshProperties;
+
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];

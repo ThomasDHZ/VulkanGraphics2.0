@@ -19,7 +19,7 @@ struct PointLight {
 	alignas(4) float quadratic = 0.032f;
 };
 
-struct SceneDataBufferData {
+struct SceneDataBuffer {
 	alignas(16) glm::mat4 viewInverse;
 	alignas(16) glm::mat4 projInverse;
 	alignas(16) glm::mat4 model;
@@ -34,35 +34,39 @@ struct SceneDataBufferData {
 	alignas(4) float DepthSampler;
 };
 
-struct SceneDataStruct
+struct MeshProperties
 {
-	VulkanBuffer SceneDataBuffer;
-	SceneDataBufferData SceneData;
+	alignas(16) glm::mat4 model;
+	alignas(16) glm::mat4 BoneTransform[100];
+	alignas(16) glm::vec2 UVOffset;
+};
 
-	SceneDataStruct()
+template <class T>
+class UniformData
+{
+public:
+	VulkanBuffer VulkanBufferData;
+	T UniformDataInfo;
+
+	UniformData()
 	{
-		for (auto& bone : SceneData.BoneTransform)
-		{
-			bone = glm::mat4(1.0f);
-		}
 	}
 
-	SceneDataStruct(VulkanEngine& engine)
+	UniformData(VulkanEngine& engine)
 	{
-		for (auto& bone : SceneData.BoneTransform)
-		{
-			bone = glm::mat4(1.0f);
-		}
-		SceneDataBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(SceneDataBufferData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VulkanBufferData.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
 	void Update(VulkanEngine& engine)
 	{
-		SceneDataBuffer.CopyBufferToMemory(engine.Device, &SceneData, sizeof(SceneDataBufferData));
+		VulkanBufferData.CopyBufferToMemory(engine.Device, &UniformDataInfo, sizeof(T));
 	}
 
 	void Destroy(VulkanEngine& engine)
 	{
-		SceneDataBuffer.DestoryBuffer(engine.Device);
+		VulkanBufferData.DestoryBuffer(engine.Device);
 	}
 };
+
+typedef UniformData<SceneDataBuffer> SceneDataUniformBuffer;
+typedef UniformData<MeshProperties> MeshPropertiesUniformBuffer;

@@ -76,6 +76,12 @@ layout(binding = 2) uniform UBO
     mat4 BoneTransform[100];
 	float timer;
 } ubo;
+layout(binding = 3) uniform MeshProperties 
+{
+	mat4 model;
+	mat4 BoneTransform[100];
+	vec2 UVOffset;
+} meshProperties;
 layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];

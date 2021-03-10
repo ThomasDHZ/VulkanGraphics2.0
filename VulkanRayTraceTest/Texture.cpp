@@ -303,6 +303,7 @@ void Texture::LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, 
 
 void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
 {
+	Depth = 1;
 	int ColorChannels;
 	stbi_uc* pixels = stbi_load(TextureLocation.c_str(), &Width, &Height, &ColorChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = Width * Height * 4;
@@ -337,6 +338,7 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 
 void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format)
 {
+	Depth = 0;
 	VkDeviceSize imageSize = Width * Height * sizeof(Pixel);
 
 	VulkanBuffer StagingBuffer;

@@ -13,9 +13,9 @@ private:
 	VkPipeline ShaderPipeline;
 	VkPipelineCache PipelineCache;
 
-	void SetUpDescriptorPool(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<SceneDataStruct> sceneData, VulkanBuffer& buffer2);
-    void SetUpDescriptorLayout(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<SceneDataStruct> sceneData, VulkanBuffer& buffer2);
-    void SetUpDescriptorSets(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<SceneDataStruct> sceneData, VulkanBuffer& buffer2);
+	void SetUpDescriptorPool(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<UniformData<SceneDataBuffer>> sceneData, VulkanBuffer& buffer2, MeshPropertiesUniformBuffer& meshdata);
+    void SetUpDescriptorLayout(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<UniformData<SceneDataBuffer>> sceneData, VulkanBuffer& buffer2, MeshPropertiesUniformBuffer& meshdata);
+    void SetUpDescriptorSets(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<UniformData<SceneDataBuffer>> sceneData, VulkanBuffer& buffer2, MeshPropertiesUniformBuffer& meshdata);
 	void CreateShaderPipeLine(VulkanEngine& engine);
 
 	VkDescriptorBufferInfo AddBufferDescriptor(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize);
@@ -23,7 +23,7 @@ private:
   
 public:
 	ComputeHelper();
-	ComputeHelper(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<SceneDataStruct> sceneData, VulkanBuffer& buffer2);
+	ComputeHelper(VulkanEngine& engine, VulkanBuffer& buffer, std::shared_ptr<UniformData<SceneDataBuffer>> sceneData, VulkanBuffer& buffer2, MeshPropertiesUniformBuffer& meshdata);
 	ComputeHelper(VulkanEngine& engine, std::vector<VulkanBuffer>& buffer);
 	~ComputeHelper();
 
