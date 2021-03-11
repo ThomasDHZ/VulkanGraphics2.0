@@ -184,7 +184,7 @@ void main()
 	worldPos = vec3(ubo.model * rayTransform * vec4(worldPos, 1.0));
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
-         UV = UV + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
+      //   UV = UV + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
 	normal = mat3(transpose(inverse(ubo.model * rayTransform))) * normal;  
