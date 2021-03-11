@@ -30,6 +30,7 @@ public:
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetMeshDataListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetTransformInverseBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();

@@ -71,10 +71,10 @@ layout(binding = 2) uniform UniformBufferObject {
 
 layout(binding = 3) buffer MeshProperties 
 {
-	mat4 model;
+	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
-} meshProperties;
+} meshProperties[];
 
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
@@ -175,7 +175,7 @@ void main()
   // offset texture coordinates with Parallax Mapping
     // offset texture coordinates with Parallax Mapping
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-    vec2 texCoords = TexCoords;
+    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshID].UVOffset;
 //    
 //    texCoords = ParallaxMapping(TexCoords,  viewDir);       
 //    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
@@ -200,9 +200,9 @@ void main()
 
 //    vec3 specular = vec3(0.2) * spec;
 
-//	if(texture(TextureMap[4], texCoords).r == 0.0f)
-//	{
-//		discard;
-//	}
+	if(texture(TextureMap[4], texCoords).r == 0.0f)
+	{
+		discard;
+	}
     outColor = vec4(texture(TextureMap[1], texCoords).rgb, 1.0);
 }

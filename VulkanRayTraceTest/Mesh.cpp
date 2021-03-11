@@ -203,6 +203,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 		}
 	}
 
+	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
 	glm::mat4 FinalTransform =  MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 
@@ -248,6 +249,7 @@ void Mesh::Destory(VulkanEngine& engine)
 	IndexBuffer.DestoryBuffer(engine.Device);
 	TransformBuffer.DestoryBuffer(engine.Device);
 	TransformInverseBuffer.DestoryBuffer(engine.Device);
+	MeshProperties.Destroy(engine);
 	MaterialBuffer.DestoryBuffer(engine.Device);
 	BottomLevelAccelerationBuffer.Destroy(engine);
 }

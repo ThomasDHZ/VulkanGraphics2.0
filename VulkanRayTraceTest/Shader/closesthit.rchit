@@ -78,10 +78,10 @@ layout(binding = 2) uniform UBO
 } ubo;
 layout(binding = 3) buffer MeshProperties 
 {
-	mat4 model;
+	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
-} meshProperties;
+} meshProperties[];
 layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
@@ -184,6 +184,7 @@ void main()
 	worldPos = vec3(ubo.model * rayTransform * vec4(worldPos, 1.0));
 
 	vec2 UV = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
+         UV = UV + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
 
 	vec3 normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
 	normal = mat3(transpose(inverse(ubo.model * rayTransform))) * normal;  

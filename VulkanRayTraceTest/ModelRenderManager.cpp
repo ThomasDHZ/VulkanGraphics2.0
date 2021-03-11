@@ -104,6 +104,23 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDes
     return MaterialBufferList;
 }
 
+std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMeshDataListDescriptor()
+{
+    std::vector<VkDescriptorBufferInfo> TransformBufferList{};
+    for (int x = 0; x < ModelList.size(); x++)
+    {
+        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        {
+            VkDescriptorBufferInfo TransformBufferInfo = {};
+            TransformBufferInfo.buffer = ModelList[x].MeshList[y].MeshProperties.VulkanBufferData.Buffer;
+            TransformBufferInfo.offset = 0;
+            TransformBufferInfo.range = VK_WHOLE_SIZE;
+            TransformBufferList.emplace_back(TransformBufferInfo);
+        }
+    }
+    return TransformBufferList;
+}
+
 std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetTransformBufferListDescriptor()
 {
     std::vector<VkDescriptorBufferInfo> TransformBufferList{};

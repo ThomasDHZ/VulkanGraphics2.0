@@ -46,6 +46,13 @@ layout(binding = 2) uniform UniformBufferObject {
     mat4 PVM;
     mat4 BoneTransform[100];
 } ubo;
+layout(binding = 3) buffer MeshProperties 
+{
+	mat4 ModelTransform;
+	mat4 BoneTransform[100];
+	vec2 UVOffset;
+} meshProperties[];
+
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout (location = 0) in vec3 aPos;
@@ -73,5 +80,5 @@ void main()
     vec3 N = normalize(mat3(ubo.model) * aNormal);
     TBN = transpose(mat3(T, B, N));
 
-    gl_Position = ubo.proj * ubo.view * ubo.model * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0);
+    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshID].ModelTransform * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0);
 }
