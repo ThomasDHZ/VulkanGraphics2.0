@@ -83,7 +83,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
         {
             if (model[x].MeshList[y].ShowMesh)
             {
-                glm::mat4 transformMatrix2 = glm::transpose(model[0].ModelTransform);
+                glm::mat4 transformMatrix2 = glm::transpose(model[x].ModelTransform);
                 VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
                 VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
@@ -97,21 +97,6 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
             }
         }
     }
-
-    //for (int x = 0; x < model.size(); x++)
-    //{
-    //    glm::mat4 transformMatrix2 = glm::transpose(model[0].ModelTransform);
-    //    VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
-
-    //    VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
-    //    AccelerationStructureInstance.transform = transformMatrix;
-    //    AccelerationStructureInstance.instanceCustomIndex = 0;
-    //    AccelerationStructureInstance.mask = 0xFF;
-    //    AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
-    //    AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    //    AccelerationStructureInstance.accelerationStructureReference = model[x].BottomLevelAccelerationBuffer.AccelerationBuffer.BufferDeviceAddress;
-    //    AccelerationStructureInstanceList.emplace_back(AccelerationStructureInstance);
-    //}
 
     VulkanBuffer instancesBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(VkAccelerationStructureInstanceKHR) * AccelerationStructureInstanceList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, AccelerationStructureInstanceList.data());
 

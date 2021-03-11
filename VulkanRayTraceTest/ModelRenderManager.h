@@ -37,6 +37,7 @@ public:
 	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
 	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
 
+	uint32_t GetMeshPropertiesBufferListDescriptorCount();
 	uint32_t GetVertexBufferListDescriptorCount();
 	uint32_t GetIndexBufferListDescriptorCount();
 	uint32_t GetTransformBufferListDescriptorCount();

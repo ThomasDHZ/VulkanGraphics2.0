@@ -166,6 +166,19 @@ std::vector<VkDescriptorImageInfo> ModelRenderManager::Get3DTextureBufferListDes
     return DescriptorImageList;
 }
 
+uint32_t ModelRenderManager::GetMeshPropertiesBufferListDescriptorCount()
+{
+    uint32_t count = 0;
+    for (int x = 0; x < ModelList.size(); x++)
+    {
+        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        {
+            count++;
+        }
+    }
+    return count++;
+}
+
 uint32_t ModelRenderManager::GetVertexBufferListDescriptorCount()
 {
     uint32_t count = 0;
