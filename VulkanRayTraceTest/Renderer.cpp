@@ -7,36 +7,40 @@ Renderer::Renderer()
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
     modelRenderManager = ModelRenderManager(engine);
- //   std::vector<Vertex> MegaManVertices =
-	//{
-	//	{{0.5f,  0.5f, 0.0f},  { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-	//	{{0.5f, -0.5f, 0.0f},  { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-	//	{{-0.5f, -0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
- //       {{-0.5f,  0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
-	//};
+    std::vector<Vertex> MegaManVertices =
+	{
+		{ {0.5f,  0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+		{{ 0.5f, -0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+		{{-0.5f, -0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f , 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+        {{-0.5f,  0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f , 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
+	};
 
- //   std::vector<uint32_t> indices = 
- //   {
- //       0, 1, 3,
- //       1, 2, 3 
- //   };
- //   auto a = sizeof(Mesh);
- //   auto b = sizeof(Model);
- //   auto c = sizeof(Material);
+    std::vector<Vertex> MegaManVertices2 =
+    {
+        { {1.5f,  1.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+        {{ 1.5f, -1.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+        {{-1.5f, -1.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f , 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+        {{-1.5f,  1.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f , 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
+    };
 
 
- //   auto v = CalcVertex();
- //   modelRenderManager.AddModel(engine, MegaManVertices, indices);
- //  // modelRenderManager.AddModel(engine, v);
- ////  modelRenderManager.AddModel(engine, "../Models/plain.obj");
+    std::vector<uint32_t> indices = 
+    {
+        0, 1, 3,
+        1, 2, 3 
+    };
 
- //   stbi_set_flip_vertically_on_load(true);
+    modelRenderManager.AddModel(engine, MegaManVertices, indices);
+    modelRenderManager.AddModel(engine, MegaManVertices2, indices);
+    modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
+
+    stbi_set_flip_vertically_on_load(true);
     Material material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../Models/TestAnimModel/diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-   // modelRenderManager.ModelList[0].MeshList[0].material = material;
+    modelRenderManager.ModelList[0].MeshList[0].material = material;
 
     modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
      /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
@@ -44,7 +48,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
   //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+   //  modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
   //    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -313,12 +317,12 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     {
         for (int y = 0; y < modelRenderManager.ModelList[x].MeshList.size(); y++)
         {
-            auto a = std::to_string(y);
+            auto a = std::to_string(x + y);
             ImGui::Checkbox(a.c_str(), &modelRenderManager.ModelList[x].MeshList[y].ShowMesh);
 
-            ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
-            ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
-            ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
+            ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
         }
     }
 
@@ -359,16 +363,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
+  //  modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+       // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+      //  CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
