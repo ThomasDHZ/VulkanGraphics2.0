@@ -192,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\animate.comp" />
+    <None Include="Shader\anyhit.rahit" />
     <None Include="Shader\closesthit.rchit" />
     <None Include="Shader\Material.glsl" />
     <None Include="Shader\Lighting.glsl" />
@@ -199,6 +200,8 @@
     <None Include="Shader\raygen.rgen" />
     <None Include="Shader\shader.frag" />
     <None Include="Shader\shader.vert" />
+    <None Include="Shader\shadow.rmiss" />
+    <None Include="Shader\Vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />

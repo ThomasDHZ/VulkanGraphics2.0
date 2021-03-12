@@ -1,0 +1,82 @@
+#version 460
+#extension GL_EXT_ray_tracing : require
+#extension GL_EXT_nonuniform_qualifier : enable
+#extension GL_EXT_scalar_block_layout : enable
+#extension GL_EXT_debug_printf : enable
+
+#include "Vertex.glsl"
+#include "Lighting.glsl"
+#include "Material.glsl"
+
+hitAttributeEXT vec2 attribs;
+
+layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 1, set = 0, rgba8) uniform image2D image;
+layout(binding = 2) uniform UBO 
+{
+	mat4 viewInverse;
+	mat4 projInverse;
+    mat4 model;
+    mat4 view;
+    mat4 proj;
+    DirectionalLight dlight;
+	vec3 viewPos;
+	PointLight plight;
+    float vertexSize;
+	mat4 PVM;
+    mat4 BoneTransform[100];
+	float timer;
+} ubo;
+layout(binding = 3) buffer MeshProperties 
+{
+	mat4 ModelTransform;
+	mat4 BoneTransform[100];
+	vec2 UVOffset;
+} meshProperties[];
+layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
+layout(binding = 5) buffer Indices { uint i[]; } indices[];
+layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 8) uniform sampler2D TextureMap[];
+
+layout(location = 0) rayPayloadEXT vec3 hitValue2;
+
+Vertex BuildVertexInfo()
+{
+    Vertex vertex;
+    const ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID], 
+						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1], 
+						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
+
+	const Vertex v0 = vertices[gl_InstanceCustomIndexEXT].v[index.x];
+	const Vertex v1 = vertices[gl_InstanceCustomIndexEXT].v[index.y];
+	const Vertex v2 = vertices[gl_InstanceCustomIndexEXT].v[index.z];
+
+	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
+
+	vertex.pos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
+	vertex.pos = vec3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform * vec4(vertex.pos, 1.0));
+
+    vertex.normal = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
+	vertex.normal = mat3(transpose(inverse(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform))) * vertex.normal;  
+
+	vertex.uv = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
+    vertex.uv += meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
+
+	vertex.tangent = v0.tangent * barycentricCoords.x + v1.tangent * barycentricCoords.y + v2.tangent * barycentricCoords.z;
+	vertex.BiTangant = v0.BiTangant * barycentricCoords.x + v1.BiTangant * barycentricCoords.y + v2.BiTangant * barycentricCoords.z;
+
+    //const vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z
+	//vertex.Color = vec4(color, 1.0f);
+
+    return vertex;
+}
+
+void main() 
+{
+   Vertex vertex = BuildVertexInfo();
+
+	if(texture(TextureMap[4], vertex.uv).r == 0.0f)
+	{
+		ignoreIntersectionEXT;
+	}
+}

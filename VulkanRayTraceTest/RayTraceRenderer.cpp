@@ -68,11 +68,6 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     }
 }
 
-void RayTraceRenderer::createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model)
-{
-
-}
-
 void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model)
 {
     uint32_t PrimitiveCount = 1;
@@ -106,7 +101,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
     VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
     AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
     AccelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_INSTANCES_KHR;
-    AccelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+    AccelerationStructureGeometry.flags = VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR;
     AccelerationStructureGeometry.geometry.instances.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_INSTANCES_DATA_KHR;
     AccelerationStructureGeometry.geometry.instances.arrayOfPointers = VK_FALSE;
     AccelerationStructureGeometry.geometry.instances.data = DeviceOrHostAddressConst;
@@ -303,7 +298,9 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescript
     ClosestHitShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
     ClosestHitShaderInfo.generalShader = VK_SHADER_UNUSED_KHR;
     ClosestHitShaderInfo.closestHitShader = static_cast<uint32_t>(ShaderList.size()) - 1;
-    ClosestHitShaderInfo.anyHitShader = VK_SHADER_UNUSED_KHR;
+
+    ShaderList.emplace_back(engine.CreateShader("Shader/anyhit.rahit.spv", VK_SHADER_STAGE_ANY_HIT_BIT_KHR));
+    ClosestHitShaderInfo.anyHitShader = static_cast<uint32_t>(ShaderList.size()) - 1;
     ClosestHitShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(ClosestHitShaderInfo);
 
@@ -334,7 +331,7 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
 
     raygenShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
     missShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
-    hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
+    hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }
 
 void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set)

@@ -61,7 +61,6 @@ public:
 
     void Destory(VulkanEngine& engine);
 
-    void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model);
     void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);

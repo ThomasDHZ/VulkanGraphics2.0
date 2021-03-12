@@ -182,6 +182,15 @@
     <None Include="Shader\animate.comp">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\anyhit.rahit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\shadow.rmiss">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Vertex.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">
