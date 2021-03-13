@@ -10,7 +10,6 @@
 #include "AccelerationStructure.h"
 #include "MaterialManager.h"
 #include "bone.h"
-#include "ComputeHelper.h"
 
 class Mesh
 {

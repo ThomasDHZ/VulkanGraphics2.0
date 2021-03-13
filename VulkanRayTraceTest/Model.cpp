@@ -483,6 +483,7 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer>
 	for (auto& mesh : MeshList)
 	{
 		mesh.Update(engine, ModelTransform, BoneList, scenedata);
+		mesh.VertexBuffer.CopyBufferToMemory(engine.Device, &mesh.VertexList[0], sizeof(Vertex) * mesh.VertexList.size());
 	}
 }
 
