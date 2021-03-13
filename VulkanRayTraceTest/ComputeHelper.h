@@ -1,7 +1,5 @@
 #pragma once
-#include "GraphicsPipeline.h"
-#include "VulkanBuffer.h"
-#include "SceneData.h"
+#include "Mesh.h"
 
 class ComputeHelper
 {

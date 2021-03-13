@@ -42,8 +42,11 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
      modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
      modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
      modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
      modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(5.0f, 0.0f, 0.0f);
+     modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
+     modelRenderManager.ModelList[2].MeshList[0].MeshPosition = glm::vec3(10.0f, 0.0f, 0.0f);
   //    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -73,7 +76,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SetUpDescriptorSets(engine);
     RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
     AnimationRenderer = ComputeHelper(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[0].MeshList[0].TransformBuffer, modelRenderManager.ModelList[0].MeshList[0].MeshProperties);
-
+    AnimationRenderer2 = ComputeHelper(engine, modelRenderManager.ModelList[1].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[1].MeshList[0].TransformBuffer, modelRenderManager.ModelList[1].MeshList[0].MeshProperties);
+    AnimationRenderer3 = ComputeHelper(engine, modelRenderManager.ModelList[2].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[2].MeshList[0].TransformBuffer, modelRenderManager.ModelList[2].MeshList[0].MeshProperties);
     SetUpCommandBuffers(engine);
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -208,6 +212,8 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 
         vkCmdEndRenderPass(commandBuffers[i]);
         AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
+        AnimationRenderer2.Compute(engine, modelRenderManager.ModelList[1].MeshList[0].VertexBuffer, currentFrame);
+        AnimationRenderer3.Compute(engine, modelRenderManager.ModelList[2].MeshList[0].VertexBuffer, currentFrame);
         //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
@@ -349,6 +355,10 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
     Update(engine, window, imageIndex);
+    modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
+    modelRenderManager.ModelList[1].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[1].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[1].MeshList[0].VertexList.size());
+    modelRenderManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[2].MeshList[0].VertexList.size());
+
 
     if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(engine.Device, 1, &engine.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -360,16 +370,19 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
         CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer2.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer3.commandBuffer);
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
         CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer2.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer3.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }

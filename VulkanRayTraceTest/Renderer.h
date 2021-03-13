@@ -28,6 +28,8 @@ private:
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
 	ComputeHelper AnimationRenderer;
+	ComputeHelper AnimationRenderer2;
+	ComputeHelper AnimationRenderer3;
 
 	size_t currentFrame = 0;
 
