@@ -200,9 +200,10 @@ void main()
 
 //    vec3 specular = vec3(0.2) * spec;
 
-	if(texture(TextureMap[4], texCoords).r == 0.0f)
+	if(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.AlphaMapID], TexCoords).r == 0.0f)
 	{
 		discard;
 	}
-    outColor = vec4(texture(TextureMap[1], texCoords).rgb, 1.0);
+
+    outColor = vec4(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.DiffuseMapID], TexCoords).rgb, 1.0);
 }

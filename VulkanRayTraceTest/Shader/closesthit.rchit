@@ -43,6 +43,24 @@ layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
+Vertex BuildVertexInfo();
+
+void main()
+{
+    Vertex vertex = BuildVertexInfo();
+
+	vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.tangent));
+    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.BiTangant));
+    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vertex.normal);
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    vec3 TangentLightPos = TBN * ubo.plight.position;
+    vec3 TangentViewPos  = TBN * ubo.viewPos;
+    vec3 TangentFragPos  = TBN * vertex.pos;
+
+    hitValue = texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.DiffuseMapID], vertex.uv).rgb;
+}
+
 Vertex BuildVertexInfo()
 {
     Vertex vertex;
@@ -68,49 +86,12 @@ Vertex BuildVertexInfo()
 	vertex.tangent = v0.tangent * barycentricCoords.x + v1.tangent * barycentricCoords.y + v2.tangent * barycentricCoords.z;
 	vertex.BiTangant = v0.BiTangant * barycentricCoords.x + v1.BiTangant * barycentricCoords.y + v2.BiTangant * barycentricCoords.z;
 
-   // const vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z
-	//vertex.Color = vec4(color, 1.0f);
+    vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z;
+	vertex.Color = vec4(color, 1.0f);
 
     return vertex;
 }
 
-void main()
-{
-    Vertex vertex = BuildVertexInfo();
-
-	vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.tangent));
-    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.BiTangant));
-    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vertex.normal);
-    mat3 TBN = transpose(mat3(T, B, N));
-
-    vec3 TangentLightPos = TBN * ubo.plight.position;
-    vec3 TangentViewPos  = TBN * ubo.viewPos;
-    vec3 TangentFragPos  = TBN * vertex.pos;
-
-    vec2 d = vertex.uv * 2.0 - 1.0;
-
-	float tMin = 0.001;
-	float tMax = 10000.0;
-  	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	vec4 target = ubo.projInverse * vec4(d.x, d.y, 1, 1) ;
-	vec4 rayDir = ubo.viewInverse*vec4(normalize(target.xyz), 0) ;
-
-    uint  flags     = gl_RayFlagsSkipClosestHitShaderEXT;
-    hitValue2 = vec3(0.0f);
-    traceRayEXT(topLevelAS,  // acceleration structure
-                flags,       // rayFlags
-                0xFF,        // cullMask
-                0,           // sbtRecordOffset
-                0,           // sbtRecordStride
-                1,           // missIndex
-                origin,      // ray origin
-                tMin,        // ray min range
-                rayDir.xyz,      // ray direction
-                tMax,        // ray max range
-                1            // payload (location = 1)
-               );
-    hitValue = texture(TextureMap[1], vertex.uv).rgb;
-}
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 { 

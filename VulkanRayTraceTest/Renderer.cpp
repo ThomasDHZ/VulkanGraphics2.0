@@ -21,18 +21,18 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
         1, 2, 3 
     };
 
-    modelRenderManager.AddModel(engine, MegaManVertices, indices);
+  /*  modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
 
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(true);*/
     Material material{};
     material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-    modelRenderManager.ModelList[0].MeshList[0].material = material;
+   // modelRenderManager.ModelList[0].MeshList[0].material = material;
 
     modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
      /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
@@ -40,7 +40,10 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
   //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
     // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-   //  modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
+     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(5.0f, 0.0f, 0.0f);
   //    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -119,7 +122,7 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetVertexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
@@ -188,7 +191,7 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
         renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
 
         std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+        clearValues[0].color = { 0.0f, 0.0f, 0.2f, 1.0f };
         clearValues[1].depthStencil = { 1.0f, 0 };
 
         renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -357,16 +360,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-  //  modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
+    modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-       // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-      //  CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
