@@ -33,6 +33,7 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
+	uint MaterialID;
 } meshProperties[];
 layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
@@ -42,24 +43,6 @@ layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
-
-Vertex BuildVertexInfo();
-
-void main()
-{
-    Vertex vertex = BuildVertexInfo();
-
-	vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.tangent));
-    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.BiTangant));
-    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vertex.normal);
-    mat3 TBN = transpose(mat3(T, B, N));
-
-    vec3 TangentLightPos = TBN * ubo.plight.position;
-    vec3 TangentViewPos  = TBN * ubo.viewPos;
-    vec3 TangentFragPos  = TBN * vertex.pos;
-
-    hitValue = texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.DiffuseMapID], vertex.uv).rgb;
-}
 
 Vertex BuildVertexInfo()
 {
@@ -86,12 +69,28 @@ Vertex BuildVertexInfo()
 	vertex.tangent = v0.tangent * barycentricCoords.x + v1.tangent * barycentricCoords.y + v2.tangent * barycentricCoords.z;
 	vertex.BiTangant = v0.BiTangant * barycentricCoords.x + v1.BiTangant * barycentricCoords.y + v2.BiTangant * barycentricCoords.z;
 
-    vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z;
-	vertex.Color = vec4(color, 1.0f);
+   // const vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z
+	//vertex.Color = vec4(color, 1.0f);
 
     return vertex;
 }
 
+void main()
+{
+    const Vertex vertex = BuildVertexInfo();
+    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialID].material;
+
+	vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.tangent));
+    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.BiTangant));
+    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vertex.normal);
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    vec3 TangentLightPos = TBN * ubo.plight.position;
+    vec3 TangentViewPos  = TBN * ubo.viewPos;
+    vec3 TangentFragPos  = TBN * vertex.pos;
+
+    hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb;
+}
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 { 

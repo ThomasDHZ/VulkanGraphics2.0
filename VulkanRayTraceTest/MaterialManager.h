@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-struct Material
+struct MaterialData
 {
 	alignas(16) glm::vec3 Ambient = glm::vec3(0.2f);
 	alignas(16) glm::vec3 Diffuse = glm::vec3(0.6f);
@@ -15,9 +15,17 @@ struct Material
 	alignas(4) uint32_t SpecularMapID = 0;
 	alignas(4) uint32_t NormalMapID = 0;
 	alignas(4) uint32_t DepthMapID = 0;
-	alignas(4) uint32_t AlphaMapID = 1;
+	alignas(4) uint32_t AlphaMapID = 0;
 	alignas(4) uint32_t EmissionMapID = 0;
 	alignas(4) uint32_t ShadowMapID = 0;
+};
+
+struct Material
+{
+	std::string MaterialName;
+	uint32_t MaterialID = 0;
+	MaterialData MaterialData;
+	VulkanBuffer MaterialBuffer;
 };
 
 class MaterialManager
@@ -27,5 +35,16 @@ private:
 
 	uint32_t IsMateralLoaded(std::string name);
 public:
+
+	MaterialManager();
+	MaterialManager(VulkanEngine& engine);
+	~MaterialManager();
+
+	void Update(VulkanEngine& engine);
+	void Destory(VulkanEngine& engine);
+
+	uint32_t LoadMaterial(VulkanEngine& engine, std::string MaterialName, MaterialData& materialData);
+	Material GetMaterial(uint32_t MaterialID);
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
 };
 

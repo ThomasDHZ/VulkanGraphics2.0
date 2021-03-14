@@ -8,7 +8,7 @@ Model::Model()
 
 Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	Material material{};
+	MaterialData material{};
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
@@ -18,7 +18,7 @@ Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<
 
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
+Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material)
 {
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
@@ -360,9 +360,9 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-Material Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+MaterialData Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
-	Material ModelMaterial;
+	MaterialData ModelMaterial;
 
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
@@ -483,7 +483,6 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer>
 	for (auto& mesh : MeshList)
 	{
 		mesh.Update(engine, ModelTransform, BoneList, scenedata);
-		mesh.VertexBuffer.CopyBufferToMemory(engine.Device, &mesh.VertexList[0], sizeof(Vertex) * mesh.VertexList.size());
 	}
 }
 

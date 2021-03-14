@@ -4,7 +4,7 @@
 
 struct MaterialStruct
 {
-	Material material;
+	MaterialData material;
 	VulkanBuffer MaterialBuffer;
 };
 
@@ -16,7 +16,7 @@ private:
 
 public:
 	std::vector<Model> ModelList;
-	std::vector<Material> MaterialList;
+	std::vector<MaterialData> MaterialList;
 	TextureManager textureManager;
 
 	ModelRenderManager();
@@ -25,7 +25,7 @@ public:
 
 	void AddModel(VulkanEngine& engine, const std::string& FilePath);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
+	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material);
 	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();

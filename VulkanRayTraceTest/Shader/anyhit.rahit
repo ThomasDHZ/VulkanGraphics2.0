@@ -32,6 +32,7 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
+	uint MaterialID;
 } meshProperties[];
 layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
@@ -40,18 +41,6 @@ layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList
 layout(binding = 8) uniform sampler2D TextureMap[];
 
 layout(location = 0) rayPayloadEXT vec3 hitValue2;
-
-Vertex BuildVertexInfo();
-
-void main() 
-{
-   Vertex vertex = BuildVertexInfo();
-
-   	if(texture(TextureMap[MaterialList[gl_InstanceCustomIndexEXT].material.AlphaMapID], vertex.uv).r == 0.0f)
-	{
-		ignoreIntersectionEXT;
-	}
-}
 
 Vertex BuildVertexInfo()
 {
@@ -78,8 +67,19 @@ Vertex BuildVertexInfo()
 	vertex.tangent = v0.tangent * barycentricCoords.x + v1.tangent * barycentricCoords.y + v2.tangent * barycentricCoords.z;
 	vertex.BiTangant = v0.BiTangant * barycentricCoords.x + v1.BiTangant * barycentricCoords.y + v2.BiTangant * barycentricCoords.z;
 
-    vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z;
-	vertex.Color = vec4(color, 1.0f);
+    //const vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z
+	//vertex.Color = vec4(color, 1.0f);
 
     return vertex;
+}
+
+void main() 
+{
+   const Vertex vertex = BuildVertexInfo();
+    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialID].material;
+
+	if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
+	{
+		ignoreIntersectionEXT;
+	}
 }

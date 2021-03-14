@@ -23,7 +23,7 @@ void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& Ver
     ModelList.emplace_back(Model(engine, VertexList, IndexList));
 }
 
-void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
+void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material)
 {
     ModelList.emplace_back(Model(engine, VertexList, IndexList, material));
 }

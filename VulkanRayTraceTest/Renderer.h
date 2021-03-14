@@ -7,7 +7,7 @@
 #include "Model.h"
 #include "RayTraceRenderer.h"
 #include "ModelRenderManager.h"
-#include "ComputeAnimator.h"
+#include "ComputeHelper.h"
 #include "OrthographicCamera.h"
 
 
@@ -27,9 +27,7 @@ private:
 	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
-	ComputeAnimator AnimationRenderer;
-	//ComputeHelper AnimationRenderer2;
-	//ComputeHelper AnimationRenderer3;
+	ComputeHelper AnimationRenderer;
 
 	size_t currentFrame = 0;
 
@@ -47,6 +45,7 @@ private:
 
 public:
 	ModelRenderManager modelRenderManager;
+	MaterialManager materialManager;
 
 	Renderer();
 	Renderer(VulkanEngine& engine, VulkanWindow& window);

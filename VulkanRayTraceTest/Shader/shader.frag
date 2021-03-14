@@ -74,6 +74,7 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
+	uint MaterialID;
 } meshProperties[];
 
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
@@ -169,6 +170,8 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
 void main() 
 {
+	const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshID].MaterialID].material;
+
     vec3 TangentLightPos = TBN * scenedata.plight.position;
     vec3 TangentViewPos  = TBN * scenedata.viewPos;
     vec3 TangentFragPos  = TBN * FragPos;
@@ -200,10 +203,9 @@ void main()
 
 //    vec3 specular = vec3(0.2) * spec;
 
-	if(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.AlphaMapID], TexCoords).r == 0.0f)
+	if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
 	{
 		discard;
 	}
-
-    outColor = vec4(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.DiffuseMapID], TexCoords).rgb, 1.0);
+    outColor = vec4(texture(TextureMap[material.DiffuseMapID], texCoords).rgb, 1.0);
 }
