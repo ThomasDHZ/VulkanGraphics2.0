@@ -24,12 +24,16 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-    modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
+    modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+    modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 2;
     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
-    modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
+    modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 2;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
     modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 0;
+    modelRenderManager.ModelList[3].MeshList[0].MeshID = 3;
+    modelRenderManager.ModelList[3].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
+
 
     stbi_set_flip_vertically_on_load(true);
     MaterialData material{};
@@ -45,7 +49,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
 
   //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
-    // modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+   
 
   //    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");

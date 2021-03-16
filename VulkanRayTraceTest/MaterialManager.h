@@ -15,7 +15,7 @@ struct MaterialData
 	alignas(4) uint32_t SpecularMapID = 0;
 	alignas(4) uint32_t NormalMapID = 0;
 	alignas(4) uint32_t DepthMapID = 0;
-	alignas(4) uint32_t AlphaMapID = 0;
+	alignas(4) uint32_t AlphaMapID = 1;
 	alignas(4) uint32_t EmissionMapID = 0;
 	alignas(4) uint32_t ShadowMapID = 0;
 };

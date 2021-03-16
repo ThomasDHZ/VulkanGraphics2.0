@@ -32,10 +32,8 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 
 uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, MaterialData& materialData)
 {
-	uint32_t MaterialID = IsMateralLoaded(MaterialName);
-	if (MaterialID == -1)
-	{
-		MaterialID = MaterialList.size();
+	
+	uint32_t MaterialID = MaterialList.size();
 
 		Material material{};
 		material.MaterialName = MaterialName;
@@ -43,7 +41,7 @@ uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string Materia
 		material.MaterialData = materialData;
 		material.MaterialBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(MaterialData), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &materialData);
 		MaterialList.emplace_back(material);
-	}
+	
 	return MaterialID;
 }
 
