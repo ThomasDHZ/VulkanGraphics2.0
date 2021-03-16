@@ -2,12 +2,6 @@
 #include "VulkanEngine.h"
 #include "Model.h"
 
-struct MaterialStruct
-{
-	MaterialData material;
-	VulkanBuffer MaterialBuffer;
-};
-
 class ModelRenderManager
 {
 private:
@@ -16,8 +10,8 @@ private:
 
 public:
 	std::vector<Model> ModelList;
-	std::vector<MaterialData> MaterialList;
 	TextureManager textureManager;
+	//MaterialManager materialManager;
 
 	ModelRenderManager();
 	ModelRenderManager(VulkanEngine& engine);

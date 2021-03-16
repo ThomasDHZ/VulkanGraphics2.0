@@ -51,7 +51,6 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
-	uint MaterialID;
 } meshProperties[];
 
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];

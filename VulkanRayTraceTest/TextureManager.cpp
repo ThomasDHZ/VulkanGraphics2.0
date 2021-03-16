@@ -7,7 +7,6 @@ TextureManager::TextureManager()
 TextureManager::TextureManager(VulkanEngine& engine)
 {
 	LoadTexture2D(engine, "../texture/DefaultTexture.png", VK_FORMAT_R8G8B8A8_UNORM);
-	LoadTexture2D(engine, "../texture/AlphaDefault.png", VK_FORMAT_R8G8B8A8_UNORM);
 }
 
 TextureManager::~TextureManager()

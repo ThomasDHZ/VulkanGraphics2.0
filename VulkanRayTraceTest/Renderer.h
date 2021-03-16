@@ -45,7 +45,6 @@ private:
 
 public:
 	ModelRenderManager modelRenderManager;
-	MaterialManager materialManager;
 
 	Renderer();
 	Renderer(VulkanEngine& engine, VulkanWindow& window);
