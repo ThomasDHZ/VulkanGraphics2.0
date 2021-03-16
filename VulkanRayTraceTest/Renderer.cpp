@@ -21,13 +21,11 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
         1, 2, 3 
     };
 
-    modelRenderManager.AddModel(engine, MegaManVertices, indices);
-    modelRenderManager.AddModel(engine, MegaManVertices, indices);
+    modelRenderManager.AddModel(engine, MegaManVertices, indices, 2);
+    modelRenderManager.AddModel(engine, MegaManVertices, indices, 2);
     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
     modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-    modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 2;
     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
-    modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 2;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
     modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 0;

@@ -66,7 +66,7 @@ public:
 	Mesh();
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData MeshMaterial, uint32_t meshID);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t MaterialID, uint32_t meshID);
 	~Mesh();
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

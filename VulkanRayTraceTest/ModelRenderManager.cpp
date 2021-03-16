@@ -23,9 +23,9 @@ void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& Ver
     ModelList.emplace_back(Model(engine, VertexList, IndexList));
 }
 
-void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material)
+void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID)
 {
-    ModelList.emplace_back(Model(engine, VertexList, IndexList, material));
+    ModelList.emplace_back(Model(engine, VertexList, IndexList, materialID));
 }
 
 void ModelRenderManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet)

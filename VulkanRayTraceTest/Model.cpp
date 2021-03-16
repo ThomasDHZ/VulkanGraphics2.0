@@ -9,7 +9,7 @@ Model::Model()
 Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	MaterialData material{};
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
 	//MeshList.back().VertexOffset = TotalVertex;
@@ -18,9 +18,9 @@ Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<
 
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material)
+Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, materialID, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
 }
@@ -238,11 +238,11 @@ void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materialManager, Tex
 
 		 auto vertices = LoadVertices(mesh);
 		 auto indices = LoadIndices(mesh);
-		 auto material = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
+		 auto materialID = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
-		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
+		MeshList.emplace_back(Mesh(engine, vertices, indices, materialID, MeshList.size()));
 		MeshList.back().VertexList = vertices;
 		MeshList.back().MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
 		MeshList.back().VertexOffset = TotalVertex;
@@ -360,7 +360,7 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-MaterialData Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+uint32_t Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	MaterialData ModelMaterial;
 
@@ -431,8 +431,7 @@ MaterialData Model::LoadMaterial(VulkanEngine& engine, MaterialManager& material
 		ModelMaterial.EmissionMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
-	auto a = materialManager.LoadMaterial(engine, "z", ModelMaterial);
-	return ModelMaterial;
+	return materialManager.LoadMaterial(engine, "z", ModelMaterial);
 }
 
 void Model::BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight)
