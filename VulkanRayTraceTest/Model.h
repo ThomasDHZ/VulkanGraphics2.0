@@ -29,10 +29,10 @@ private:
 
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
-	void LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
-	MaterialData LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	MaterialData LoadMaterial(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
 	void LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
 	void BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight);
 	void LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix);
@@ -71,7 +71,7 @@ public:
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList);
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material);
-	Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
+	Model(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath);
 	~Model();
 
 	void Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer> scenedata);

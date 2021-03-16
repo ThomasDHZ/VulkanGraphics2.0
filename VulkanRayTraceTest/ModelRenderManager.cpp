@@ -15,7 +15,7 @@ ModelRenderManager::~ModelRenderManager()
 
 void ModelRenderManager::AddModel(VulkanEngine& engine, const std::string& FilePath)
 {
-    ModelList.emplace_back(Model(engine, textureManager, FilePath));
+    ModelList.emplace_back(Model(engine, materialManager, textureManager, FilePath));
 }
 
 void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)

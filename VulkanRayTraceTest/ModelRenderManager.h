@@ -11,7 +11,7 @@ private:
 public:
 	std::vector<Model> ModelList;
 	TextureManager textureManager;
-	//MaterialManager materialManager;
+	MaterialManager materialManager;
 
 	ModelRenderManager();
 	ModelRenderManager(VulkanEngine& engine);

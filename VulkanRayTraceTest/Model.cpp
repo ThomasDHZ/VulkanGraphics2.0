@@ -25,7 +25,7 @@ Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
+Model::Model(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath)
 {
 	Assimp::Importer ModelImporter;
 
@@ -39,7 +39,7 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
+	LoadMesh(engine, materialManager, textureManager, FilePath, Scene->mRootNode, Scene);
 
 	LoadMeshTransform(0, ModelTransform);
 
@@ -227,7 +227,7 @@ void Model::LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh
 	}
 }
 
-void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -238,7 +238,7 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 
 		 auto vertices = LoadVertices(mesh);
 		 auto indices = LoadIndices(mesh);
-		 auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
+		 auto material = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
@@ -261,7 +261,7 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(engine, textureManager, FilePath, node->mChildren[i], scene);
+		LoadMesh(engine, materialManager, textureManager, FilePath, node->mChildren[i], scene);
 	}
 }
 
@@ -360,7 +360,7 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-MaterialData Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+MaterialData Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	MaterialData ModelMaterial;
 
@@ -431,6 +431,7 @@ MaterialData Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureMa
 		ModelMaterial.EmissionMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
+	auto a = materialManager.LoadMaterial(engine, "z", ModelMaterial);
 	return ModelMaterial;
 }
 

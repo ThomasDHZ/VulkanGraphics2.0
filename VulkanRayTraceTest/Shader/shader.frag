@@ -74,6 +74,7 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
+	uint MaterialID;
 } meshProperties[];
 
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
@@ -199,10 +200,10 @@ void main()
 //    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
 //    vec3 specular = vec3(0.2) * spec;
-
-	if(texture(TextureMap[4], texCoords).r == 0.0f)
+const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshID].MaterialID].material;
+if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
 	{
 		discard;
 	}
-    outColor = vec4(texture(TextureMap[1], texCoords).rgb, 1.0);
+    outColor = vec4(texture(TextureMap[material.DiffuseMapID], texCoords).rgb, 1.0);
 }
