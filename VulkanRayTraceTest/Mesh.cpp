@@ -9,8 +9,9 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 	std::vector<uint32_t> indices{};
 
 	MeshID = 0;
-	material = MaterialData();
+
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshProperties.UniformDataInfo.MaterialID = 0;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -26,8 +27,9 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID)
 {
 	MeshID = meshID;
-	material = MaterialData();
+
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshProperties.UniformDataInfo.MaterialID = 0;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -130,8 +132,7 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	}
 	TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
-	MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(MaterialData), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);
-
+	
 	VertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(VertexBuffer.Buffer);
 	IndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(IndexBuffer.Buffer);
 	TransformInverseBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(TransformInverseBuffer.Buffer);
@@ -250,6 +251,5 @@ void Mesh::Destory(VulkanEngine& engine)
 	TransformBuffer.DestoryBuffer(engine.Device);
 	TransformInverseBuffer.DestoryBuffer(engine.Device);
 	MeshProperties.Destroy(engine);
-	MaterialBuffer.DestoryBuffer(engine.Device);
 	BottomLevelAccelerationBuffer.Destroy(engine);
 }

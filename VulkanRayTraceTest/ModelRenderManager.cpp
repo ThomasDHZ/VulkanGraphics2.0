@@ -85,24 +85,24 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetIndexBufferListDescri
     return IndexBufferInfoList;
 }
 
-std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDescriptor()
-{
-
-    std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
-    for (int x = 0; x < ModelList.size(); x++)
-    {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            VkDescriptorBufferInfo MaterialBufferInfo = {};
-            MaterialBufferInfo.buffer = ModelList[x].MeshList[y].MaterialBuffer.Buffer;
-            MaterialBufferInfo.offset = 0;
-            MaterialBufferInfo.range = VK_WHOLE_SIZE;
-            MaterialBufferList.emplace_back(MaterialBufferInfo);
-        }
-    }
-
-    return MaterialBufferList;
-}
+//std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDescriptor()
+//{
+//
+//    std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
+//    for (int x = 0; x < ModelList.size(); x++)
+//    {
+//        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+//        {
+//            VkDescriptorBufferInfo MaterialBufferInfo = {};
+//            MaterialBufferInfo.buffer = ModelList[x].MeshList[y].MaterialBuffer.Buffer;
+//            MaterialBufferInfo.offset = 0;
+//            MaterialBufferInfo.range = VK_WHOLE_SIZE;
+//            MaterialBufferList.emplace_back(MaterialBufferInfo);
+//        }
+//    }
+//
+//    return MaterialBufferList;
+//}
 
 std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMeshDataListDescriptor()
 {

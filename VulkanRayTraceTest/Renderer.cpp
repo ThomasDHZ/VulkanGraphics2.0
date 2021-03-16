@@ -28,9 +28,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
-    modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 0;
     modelRenderManager.ModelList[3].MeshList[0].MeshID = 3;
-    modelRenderManager.ModelList[3].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
 
 
     stbi_set_flip_vertically_on_load(true);
@@ -40,7 +38,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
     modelRenderManager.materialManager.LoadMaterial(engine, "zdsf", material);
-    modelRenderManager.ModelList[0].MeshList[0].material = material;
 
     modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
      /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/

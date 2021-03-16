@@ -35,8 +35,6 @@ public:
 	glm::vec3 MeshRotation = glm::vec3(0.0f);
 	glm::vec3 MeshScale = glm::vec3(1.0f);
 
-	MaterialData material;
-
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
 	VulkanBuffer TransformBuffer;
@@ -44,7 +42,6 @@ public:
 
 	MeshPropertiesUniformBuffer MeshProperties;
 
-	VulkanBuffer MaterialBuffer;
 	AccelerationStructure BottomLevelAccelerationBuffer;
 
 	std::string MeshName;
