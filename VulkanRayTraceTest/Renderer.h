@@ -21,7 +21,7 @@ private:
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
 	VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
 	VkDescriptorSet descriptorSets;
-	std::vector<VkCommandBuffer> commandBuffers;
+	VkCommandBuffer RasterCommandBuffer;
 
 	//FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;

@@ -70,7 +70,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.StartPipeline(engine, descriptorSetLayout);
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
-    RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
     AnimationRenderer = ComputeHelper(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[0].MeshList[0].TransformBuffer, modelRenderManager.ModelList[0].MeshList[0].MeshProperties);
 
     SetUpCommandBuffers(engine);
@@ -87,18 +86,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
     SceneData->UniformDataInfo.plight.specular = glm::vec4(1.0f);
     SceneData->UniformDataInfo.DepthSampler = 0.0f;
-
-    commandBuffers.resize(RenderPass.SwapChainFramebuffers.size());
-
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.CommandPool;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
-    }
 }
 
 Renderer::~Renderer()
@@ -174,44 +161,14 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 
 void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 {
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = 1;
 
-    for (size_t i = 0; i < commandBuffers.size(); i++) {
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
-
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = RenderPass.RenderPass;
-        renderPassInfo.framebuffer = RenderPass.SwapChainFramebuffers[i];
-        renderPassInfo.renderArea.offset = { 0, 0 };
-        renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
-
-        std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-        clearValues[1].depthStencil = { 1.0f, 0 };
-
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
-
-        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
-
-        for (auto model : modelRenderManager.ModelList)
-        {
-            model.Draw(commandBuffers[i], RenderPass.forwardRendereringPipeline);
-        }
-
-        vkCmdEndRenderPass(commandBuffers[i]);
-        AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
-        //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
-        if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &RasterCommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
@@ -252,7 +209,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     SetUpDescriptorPool(engine);
     SetUpDescriptorSets(engine);
 
-    RayRenderer.Resize(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, descriptorSets);
+    RayRenderer.Resize(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, descriptorSets, 0);
 
     SetUpCommandBuffers(engine);
 }
@@ -350,15 +307,61 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
     Update(engine, window, imageIndex);
 
-
-
     if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(engine.Device, 1, &engine.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
 
-    SetUpCommandBuffers(engine);
-
     engine.imagesInFlight[imageIndex] = engine.inFlightFences[currentFrame];
+
+
+
+
+    /// <summary>
+    /// Draw Area
+    /// </summary>
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    if (vkBeginCommandBuffer(RasterCommandBuffer, &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = RenderPass.RenderPass;
+    renderPassInfo.framebuffer = RenderPass.SwapChainFramebuffers[imageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(RasterCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
+
+    for (auto model : modelRenderManager.ModelList)
+    {
+        model.Draw(RasterCommandBuffer, RenderPass.forwardRendereringPipeline);
+    }
+
+    vkCmdEndRenderPass(RasterCommandBuffer);
+    AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
+    //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
+    if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
+    }
+
+    RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets, imageIndex);
+
+    ///
+    ///Draw area
+    /// 
 
     VkSemaphore waitSemaphores[] = { engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
@@ -369,13 +372,13 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     if (RayTraceSwitch)
     {
        // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
-        CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
       //  CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
-        CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
+        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
 

@@ -53,7 +53,7 @@ public:
     AccelerationStructure topLevelAS{};
 
     std::vector<VkShaderModule> shaderModules;
-    std::vector<VkCommandBuffer> drawCmdBuffers;
+    VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderer();
     RayTraceRenderer(VulkanEngine& engine, std::vector<Model>& modelList);
@@ -65,8 +65,8 @@ public:
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     void createShaderBindingTable(VulkanEngine& engine);
-    void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set);
-    void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set);
+    void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex);
+    void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set, uint32_t imageIndex);
 
    VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin);
     VkCommandBuffer createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin);

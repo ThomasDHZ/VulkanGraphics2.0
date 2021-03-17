@@ -334,17 +334,15 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }
 
-void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set)
+void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex)
 {
-    drawCmdBuffers.resize(swapChainFramebuffersSize);
-
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = engine.CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = (uint32_t)drawCmdBuffers.size();
+    allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, drawCmdBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &RayTraceCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 
@@ -353,101 +351,99 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
 
     VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 
-    for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
-    {
-        vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo);
 
-        const uint32_t handleSizeAligned = engine.GetAlignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
+    vkBeginCommandBuffer(RayTraceCommandBuffer, &cmdBufInfo);
 
-        VkStridedDeviceAddressRegionKHR raygenShaderSbtEntry{};
-        raygenShaderSbtEntry.deviceAddress = engine.GetBufferDeviceAddress(raygenShaderBindingTable.Buffer);
-        raygenShaderSbtEntry.stride = handleSizeAligned;
-        raygenShaderSbtEntry.size = handleSizeAligned;
+    const uint32_t handleSizeAligned = engine.GetAlignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
 
-        VkStridedDeviceAddressRegionKHR missShaderSbtEntry{};
-        missShaderSbtEntry.deviceAddress = engine.GetBufferDeviceAddress(missShaderBindingTable.Buffer);
-        missShaderSbtEntry.stride = handleSizeAligned;
-        missShaderSbtEntry.size = handleSizeAligned;
+    VkStridedDeviceAddressRegionKHR raygenShaderSbtEntry{};
+    raygenShaderSbtEntry.deviceAddress = engine.GetBufferDeviceAddress(raygenShaderBindingTable.Buffer);
+    raygenShaderSbtEntry.stride = handleSizeAligned;
+    raygenShaderSbtEntry.size = handleSizeAligned;
 
-        VkStridedDeviceAddressRegionKHR hitShaderSbtEntry{};
-        hitShaderSbtEntry.deviceAddress = engine.GetBufferDeviceAddress(hitShaderBindingTable.Buffer);
-        hitShaderSbtEntry.stride = handleSizeAligned;
-        hitShaderSbtEntry.size = handleSizeAligned;
+    VkStridedDeviceAddressRegionKHR missShaderSbtEntry{};
+    missShaderSbtEntry.deviceAddress = engine.GetBufferDeviceAddress(missShaderBindingTable.Buffer);
+    missShaderSbtEntry.stride = handleSizeAligned;
+    missShaderSbtEntry.size = handleSizeAligned;
 
-        VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
+    VkStridedDeviceAddressRegionKHR hitShaderSbtEntry{};
+    hitShaderSbtEntry.deviceAddress = engine.GetBufferDeviceAddress(hitShaderBindingTable.Buffer);
+    hitShaderSbtEntry.stride = handleSizeAligned;
+    hitShaderSbtEntry.size = handleSizeAligned;
 
-        vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline);
-        vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &set, 0, 0);
+    VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 
-        engine.vkCmdTraceRaysKHR(
-            drawCmdBuffers[i],
-            &raygenShaderSbtEntry,
-            &missShaderSbtEntry,
-            &hitShaderSbtEntry,
-            &callableShaderSbtEntry,
-            engine.SwapChain.SwapChainResolution.width,
-            engine.SwapChain.SwapChainResolution.height,
-            1);
+    vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline);
+    vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &set, 0, 0);
 
-        VkImageMemoryBarrier barrier = {};
-        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier.image = swapChainImages[i];
-        barrier.subresourceRange = subresourceRange;
-        barrier.srcAccessMask = 0;
-        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    engine.vkCmdTraceRaysKHR(
+        RayTraceCommandBuffer,
+        &raygenShaderSbtEntry,
+        &missShaderSbtEntry,
+        &hitShaderSbtEntry,
+        &callableShaderSbtEntry,
+        engine.SwapChain.SwapChainResolution.width,
+        engine.SwapChain.SwapChainResolution.height,
+        1);
 
-        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+    VkImageMemoryBarrier barrier = {};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier.image = swapChainImages[imageIndex];
+    barrier.subresourceRange = subresourceRange;
+    barrier.srcAccessMask = 0;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
-        VkImageMemoryBarrier barrier2 = {};
-        barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier2.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
-        barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        barrier2.image = storageImage.image;
-        barrier2.subresourceRange = subresourceRange;
-        barrier2.srcAccessMask = 0;
-        barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
+    VkImageMemoryBarrier barrier2 = {};
+    barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier2.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
+    barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    barrier2.image = storageImage.image;
+    barrier2.subresourceRange = subresourceRange;
+    barrier2.srcAccessMask = 0;
+    barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
-        VkImageCopy copyRegion{};
-        copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-        copyRegion.srcOffset = { 0, 0, 0 };
-        copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-        copyRegion.dstOffset = { 0, 0, 0 };
-        copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
-        vkCmdCopyImage(drawCmdBuffers[i], storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
+
+    VkImageCopy copyRegion{};
+    copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+    copyRegion.srcOffset = { 0, 0, 0 };
+    copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+    copyRegion.dstOffset = { 0, 0, 0 };
+    copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
+    vkCmdCopyImage(RayTraceCommandBuffer, storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 
-        VkImageMemoryBarrier barrier3 = {};
-        barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        barrier3.image = swapChainImages[i];
-        barrier3.subresourceRange = subresourceRange;
-        barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        barrier3.dstAccessMask = 0;
+    VkImageMemoryBarrier barrier3 = {};
+    barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    barrier3.image = swapChainImages[imageIndex];
+    barrier3.subresourceRange = subresourceRange;
+    barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier3.dstAccessMask = 0;
 
-        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
+    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
 
-        VkImageMemoryBarrier barrier4 = {};
-        barrier4.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier4.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        barrier4.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-        barrier4.image = storageImage.image;
-        barrier4.subresourceRange = subresourceRange;
-        barrier4.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-        barrier4.dstAccessMask = 0;
+    VkImageMemoryBarrier barrier4 = {};
+    barrier4.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier4.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    barrier4.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+    barrier4.image = storageImage.image;
+    barrier4.subresourceRange = subresourceRange;
+    barrier4.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    barrier4.dstAccessMask = 0;
 
-        vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier4);
-        vkEndCommandBuffer(drawCmdBuffers[i]);
-    }
+    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier4);
+    vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
-void RayTraceRenderer::Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set)
+void RayTraceRenderer::Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set, uint32_t imageIndex)
 {
-    buildCommandBuffers(engine, swapChainFramebuffersSize, swapChainImages, set);
+    buildCommandBuffers(engine, swapChainFramebuffersSize, swapChainImages, set, imageIndex);
 }
 
 VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin)
