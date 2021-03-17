@@ -35,6 +35,8 @@ public:
 	glm::vec3 MeshRotation = glm::vec3(0.0f);
 	glm::vec3 MeshScale = glm::vec3(1.0f);
 
+	MaterialData material;
+
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
 	VulkanBuffer TransformBuffer;
@@ -42,6 +44,7 @@ public:
 
 	MeshPropertiesUniformBuffer MeshProperties;
 
+	VulkanBuffer MaterialBuffer;
 	AccelerationStructure BottomLevelAccelerationBuffer;
 
 	std::string MeshName;
@@ -63,7 +66,7 @@ public:
 	Mesh();
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t MaterialID, uint32_t meshID);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData MeshMaterial, uint32_t meshID);
 	~Mesh();
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

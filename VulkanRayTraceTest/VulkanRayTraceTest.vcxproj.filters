@@ -156,9 +156,6 @@
     <ClCompile Include="OrthographicCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ComputeAnimator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -341,9 +338,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OrthographicCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ComputeAnimator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -21,31 +21,28 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
         1, 2, 3 
     };
 
-    modelRenderManager.AddModel(engine, MegaManVertices, indices, 2);
-    modelRenderManager.AddModel(engine, MegaManVertices, indices, 2);
-    modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-    modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+    modelRenderManager.AddModel(engine, MegaManVertices, indices);
+    modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
-    modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
-    modelRenderManager.ModelList[3].MeshList[0].MeshID = 3;
-
 
     stbi_set_flip_vertically_on_load(true);
     MaterialData material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-    modelRenderManager.materialManager.LoadMaterial(engine, "zdsf", material);
+    material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    modelRenderManager.ModelList[0].MeshList[0].material = material;
 
     modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
      /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
 
 
   //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
-   
-
+     //modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+     //modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
+     //modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+     //modelRenderManager.ModelList[3].MeshList[0].MeshID = 3;
   //    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
   // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -74,7 +71,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
     RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
-    AnimationRenderer = ComputeAnimator(engine, modelRenderManager.ModelList);
+    AnimationRenderer = ComputeHelper(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[0].MeshList[0].TransformBuffer, modelRenderManager.ModelList[0].MeshList[0].MeshProperties);
 
     SetUpCommandBuffers(engine);
 
@@ -90,6 +87,18 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
     SceneData->UniformDataInfo.plight.specular = glm::vec4(1.0f);
     SceneData->UniformDataInfo.DepthSampler = 0.0f;
+
+    commandBuffers.resize(RenderPass.SwapChainFramebuffers.size());
+
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
 }
 
 Renderer::~Renderer()
@@ -124,7 +133,7 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetVertexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
@@ -139,7 +148,7 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = modelRenderManager.GetVertexBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.materialManager.GetMaterialBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
     VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = modelRenderManager.GetMeshDataListDescriptor();
@@ -165,17 +174,6 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 
 void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 {
-    commandBuffers.resize(RenderPass.SwapChainFramebuffers.size());
-
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.CommandPool;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
-    }
 
     for (size_t i = 0; i < commandBuffers.size(); i++) {
         VkCommandBufferBeginInfo beginInfo{};
@@ -209,12 +207,19 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
         }
 
         vkCmdEndRenderPass(commandBuffers[i]);
-        AnimationRenderer.Compute(engine, currentFrame);
+        AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
         //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
     }
+}
+
+
+void Renderer::AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath)
+{
+    modelRenderManager.ModelList.emplace_back(Model(engine, modelRenderManager.textureManager, FilePath));
+    UpdateSwapChain(engine, window);
 }
 
 void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
@@ -345,9 +350,14 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
     Update(engine, window, imageIndex);
 
+
+
     if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(engine.Device, 1, &engine.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
+
+    SetUpCommandBuffers(engine);
+
     engine.imagesInFlight[imageIndex] = engine.inFlightFences[currentFrame];
 
     VkSemaphore waitSemaphores[] = { engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
@@ -355,16 +365,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    modelRenderManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[2].MeshList[0].VertexList.size());
+  //  modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+       // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(commandBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+      //  CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.drawCmdBuffers[imageIndex]);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }

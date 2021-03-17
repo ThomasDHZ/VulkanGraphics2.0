@@ -9,7 +9,7 @@ Model::Model()
 Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	MaterialData material{};
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0, MeshList.size()));
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
 	//MeshList.back().VertexOffset = TotalVertex;
@@ -18,14 +18,14 @@ Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<
 
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID)
+Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, materialID, MeshList.size()));
+	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath)
+Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
 {
 	Assimp::Importer ModelImporter;
 
@@ -39,7 +39,7 @@ Model::Model(VulkanEngine& engine, MaterialManager& materialManager, TextureMana
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(engine, materialManager, textureManager, FilePath, Scene->mRootNode, Scene);
+	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
 
 	LoadMeshTransform(0, ModelTransform);
 
@@ -227,7 +227,7 @@ void Model::LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh
 	}
 }
 
-void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -238,11 +238,11 @@ void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materialManager, Tex
 
 		 auto vertices = LoadVertices(mesh);
 		 auto indices = LoadIndices(mesh);
-		 auto materialID = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
+		 auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
-		MeshList.emplace_back(Mesh(engine, vertices, indices, materialID, MeshList.size()));
+		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
 		MeshList.back().VertexList = vertices;
 		MeshList.back().MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
 		MeshList.back().VertexOffset = TotalVertex;
@@ -261,7 +261,7 @@ void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materialManager, Tex
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(engine, materialManager, textureManager, FilePath, node->mChildren[i], scene);
+		LoadMesh(engine, textureManager, FilePath, node->mChildren[i], scene);
 	}
 }
 
@@ -360,7 +360,7 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-uint32_t Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+MaterialData Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	MaterialData ModelMaterial;
 
@@ -431,7 +431,7 @@ uint32_t Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materialMana
 		ModelMaterial.EmissionMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
-	return materialManager.LoadMaterial(engine, "z", ModelMaterial);
+	return ModelMaterial;
 }
 
 void Model::BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight)

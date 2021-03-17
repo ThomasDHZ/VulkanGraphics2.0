@@ -33,7 +33,6 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
-    uint MaterialID;
 } meshProperties[];
 layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
@@ -77,10 +76,9 @@ Vertex BuildVertexInfo()
 
 void main()
 {
-    const Vertex vertex = BuildVertexInfo();
-    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialID].material;
-	
-    vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.tangent));
+    Vertex vertex = BuildVertexInfo();
+
+	vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.tangent));
     vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.BiTangant));
     vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vertex.normal);
     mat3 TBN = transpose(mat3(T, B, N));
@@ -97,7 +95,21 @@ void main()
 	vec4 target = ubo.projInverse * vec4(d.x, d.y, 1, 1) ;
 	vec4 rayDir = ubo.viewInverse*vec4(normalize(target.xyz), 0) ;
 
-hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb;
+    uint  flags     = gl_RayFlagsSkipClosestHitShaderEXT;
+    hitValue2 = vec3(0.0f);
+    traceRayEXT(topLevelAS,  // acceleration structure
+                flags,       // rayFlags
+                0xFF,        // cullMask
+                0,           // sbtRecordOffset
+                0,           // sbtRecordStride
+                1,           // missIndex
+                origin,      // ray origin
+                tMin,        // ray min range
+                rayDir.xyz,      // ray direction
+                tMax,        // ray max range
+                1            // payload (location = 1)
+               );
+    hitValue = texture(TextureMap[1], vertex.uv).rgb;
 }
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
