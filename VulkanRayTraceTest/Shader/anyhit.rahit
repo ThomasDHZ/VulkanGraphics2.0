@@ -33,6 +33,7 @@ layout(binding = 3) buffer MeshProperties
 layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];
 
 layout(location = 0) rayPayloadEXT vec3 hitValue2;
@@ -70,10 +71,11 @@ Vertex BuildVertexInfo()
 
 void main() 
 {
-   Vertex vertex = BuildVertexInfo();
+   const Vertex vertex = BuildVertexInfo();
+   const MaterialInfo material = MaterialList[gl_InstanceCustomIndexEXT].material;
 
-	if(texture(TextureMap[4], vertex.uv).r == 0.0f)
-	{
-		ignoreIntersectionEXT;
-	}
+   if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
+   {
+	 ignoreIntersectionEXT;
+   }
 }

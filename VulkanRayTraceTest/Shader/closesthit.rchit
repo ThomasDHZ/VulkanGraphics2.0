@@ -84,29 +84,9 @@ void main()
     vec3 TangentViewPos  = TBN * ubo.viewPos;
     vec3 TangentFragPos  = TBN * vertex.pos;
 
-    vec2 d = vertex.uv * 2.0 - 1.0;
-
-	float tMin = 0.001;
-	float tMax = 10000.0;
-  	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	vec4 target = ubo.projInverse * vec4(d.x, d.y, 1, 1) ;
-	vec4 rayDir = ubo.viewInverse*vec4(normalize(target.xyz), 0) ;
-
-    uint  flags     = gl_RayFlagsSkipClosestHitShaderEXT;
-    hitValue2 = vec3(0.0f);
-    traceRayEXT(topLevelAS,  // acceleration structure
-                flags,       // rayFlags
-                0xFF,        // cullMask
-                0,           // sbtRecordOffset
-                0,           // sbtRecordStride
-                1,           // missIndex
-                origin,      // ray origin
-                tMin,        // ray min range
-                rayDir.xyz,      // ray direction
-                tMax,        // ray max range
-                1            // payload (location = 1)
-               );
-    hitValue = texture(TextureMap[1], vertex.uv).rgb;
+    
+    const MaterialInfo material = MaterialList[gl_InstanceCustomIndexEXT].material;
+    hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb;
 }
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
