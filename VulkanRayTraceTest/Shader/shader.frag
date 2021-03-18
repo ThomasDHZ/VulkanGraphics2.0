@@ -10,6 +10,7 @@ layout(push_constant) uniform ConstMeshProperties
 	uint MeshID;
 	uint ModelID;
 	uint MaterialID;
+	vec2 UVOffset;
 } ConstMesh;
 
 struct VertexData
@@ -175,7 +176,7 @@ void main()
   // offset texture coordinates with Parallax Mapping
     // offset texture coordinates with Parallax Mapping
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshID].UVOffset;
+    vec2 texCoords = TexCoords + ConstMesh.UVOffset;
 //    
 //    texCoords = ParallaxMapping(TexCoords,  viewDir);       
 //    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)

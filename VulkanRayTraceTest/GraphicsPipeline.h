@@ -11,9 +11,10 @@ enum RendererType
 
 struct ConstMeshInfo
 {
-	uint32_t MeshID;
-	uint32_t ModelID;
-	uint32_t MaterialID;
+	alignas(4) uint32_t MeshID;
+	alignas(4) uint32_t ModelID;
+	alignas(4) uint32_t MaterialID;
+	alignas(8) glm::vec2 UVOffset;
 };
 
 

@@ -23,29 +23,52 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
+    modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+   // modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
+  //  modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
+    modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
+  //  modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 0;
 
     stbi_set_flip_vertically_on_load(true);
     MaterialData material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+   // modelRenderManager.materialManager.LoadMaterial(engine, "zdsf", material);
     modelRenderManager.ModelList[0].MeshList[0].material = material;
 
     modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
-     /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
 
 
-  //  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
-     //modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-     //modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
-     //modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-     //modelRenderManager.ModelList[3].MeshList[0].MeshID = 3;
-  //    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
-  // modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
-   // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
+    //modelRenderManager.AddModel(engine, MegaManVertices, indices);
+    //modelRenderManager.AddModel(engine, MegaManVertices, indices);
+    //modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
+  //  //modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
+
+  //  //stbi_set_flip_vertically_on_load(true);
+  //  //MaterialData material{};
+  //  //material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+  //  //material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+  //  //material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+  //  //material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+  //  //modelRenderManager.ModelList[0].MeshList[0].material = material;
+  //  //stbi_set_flip_vertically_on_load(false);
+
+  //  modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
+  //   /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
+
+
+  ////  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
+  //   //modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+  //   //modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
+  //   modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+  //   modelRenderManager.ModelList[0].MeshList[0].MeshID = 0;
+  ////    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
+  // //modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+  // // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -70,7 +93,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.StartPipeline(engine, descriptorSetLayout);
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
-    AnimationRenderer = ComputeHelper(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, SceneData, modelRenderManager.ModelList[0].MeshList[0].TransformBuffer, modelRenderManager.ModelList[0].MeshList[0].MeshProperties);
+    AnimationRenderer = AnimatorCompute(engine, modelRenderManager.ModelList);
 
     SetUpCommandBuffers(engine);
 
@@ -273,7 +296,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
             auto a = std::to_string(x + y);
             ImGui::Checkbox(a.c_str(), &modelRenderManager.ModelList[x].MeshList[y].ShowMesh);
 
-            ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+            ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].UVOffset.x, 0.0f, 1.0f);
             ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
             ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
             ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
@@ -351,7 +374,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
 
     vkCmdEndRenderPass(RasterCommandBuffer);
-    AnimationRenderer.Compute(engine, modelRenderManager.ModelList[0].MeshList[0].VertexBuffer, currentFrame);
+    AnimationRenderer.Compute(engine, imageIndex);
     //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -368,16 +391,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-  //  modelRenderManager.ModelList[0].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[0].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[0].MeshList[0].VertexList.size());
+    modelRenderManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[2].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-       // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-      //  CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
@@ -434,7 +457,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 
     modelRenderManager.textureManager.Destory(engine);
     interfaceRenderPass.Destroy(engine.Device);
-    AnimationRenderer.Destroy(engine);
+    //AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     RayRenderer.Destory(engine);

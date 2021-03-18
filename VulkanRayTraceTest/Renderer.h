@@ -7,8 +7,8 @@
 #include "Model.h"
 #include "RayTraceRenderer.h"
 #include "ModelRenderManager.h"
-#include "ComputeHelper.h"
 #include "OrthographicCamera.h"
+#include "AnimatorCompute.h"
 
 
 class Renderer
@@ -27,7 +27,7 @@ private:
 	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
-	ComputeHelper AnimationRenderer;
+	AnimatorCompute AnimationRenderer;
 
 	size_t currentFrame = 0;
 

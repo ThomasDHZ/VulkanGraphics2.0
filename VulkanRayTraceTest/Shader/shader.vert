@@ -11,6 +11,7 @@ layout(push_constant) uniform MeshInfo
 	uint MeshID;
 	uint ModelID;
 	uint MaterialID;
+    vec2 UVOffset;
 } Mesh;
 
 struct Vertex

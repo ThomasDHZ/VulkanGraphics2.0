@@ -10,7 +10,6 @@
 #include "AccelerationStructure.h"
 #include "MaterialManager.h"
 #include "bone.h"
-#include "ComputeHelper.h"
 
 class Mesh
 {
@@ -56,6 +55,7 @@ public:
 	uint32_t PrimitiveCount; //TriangleCount
 	uint32_t FirstIndex;     //primitiveOffset
 	uint32_t VertexOffset;   //firstVertex
+	glm::vec2 UVOffset = glm::vec2(0.0);
 
 	bool ShowMesh = true;
 
