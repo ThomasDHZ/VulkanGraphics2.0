@@ -62,8 +62,8 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 
 	VulkanCreateInfo.enabledLayerCount = static_cast<unsigned int>(ValidationLayers.size());
 	VulkanCreateInfo.ppEnabledLayerNames = ValidationLayers.data();
-	//VulkanCreateInfo.pNext = &ValidationFeatures;
-	VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugInfo;
+	VulkanCreateInfo.pNext = &ValidationFeatures;
+	//VulkanCreateInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&DebugInfo;
 
 #endif
 

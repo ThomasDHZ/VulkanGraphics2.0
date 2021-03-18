@@ -162,6 +162,7 @@ void main()
 
 //    vec3 specular = vec3(0.2) * spec;
 
+
 const MaterialInfo material = MaterialList[ConstMesh.MaterialIndex].material;
 if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
 	{

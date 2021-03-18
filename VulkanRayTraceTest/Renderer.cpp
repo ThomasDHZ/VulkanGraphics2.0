@@ -115,7 +115,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.plight.ambient = glm::vec4(0.2f);
     SceneData->UniformDataInfo.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
     SceneData->UniformDataInfo.plight.specular = glm::vec4(1.0f);
-    SceneData->UniformDataInfo.temp = 0.0f;
+
 }
 
 Renderer::~Renderer()
@@ -208,7 +208,6 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->UniformDataInfo.proj[1][1] *= -1;
     SceneData->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->UniformDataInfo.timer = time;
-    SceneData->UniformDataInfo.temp = textureIndex;
     SceneData->Update(engine);
 }
 

@@ -69,6 +69,11 @@ layout(location = 3) out mat3 TBN;
 
 void main() 
 {
+if(gl_VertexIndex == 0)
+{
+    debugPrintfEXT("Temp: %i \n", ubo.temp);
+}
+
     FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
