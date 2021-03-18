@@ -60,13 +60,11 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
-	mat4 model;
 	DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-	float vertexSize;	
-	mat4 PVM;
-	mat4 BoneTransform[100];
+    float timer;
+    int temp;
 } scenedata;
 
 layout(binding = 3) buffer MeshProperties 

@@ -14,6 +14,7 @@
 class Renderer
 {
 private:
+	int textureIndex = 0;
 	std::shared_ptr<PerspectiveCamera> camera;
 	Keyboard keyboard;
 	Mouse mouse;

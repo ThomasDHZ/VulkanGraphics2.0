@@ -22,16 +22,13 @@ struct PointLight {
 struct SceneDataBuffer {
 	alignas(16) glm::mat4 viewInverse;
 	alignas(16) glm::mat4 projInverse;
-	alignas(16) glm::mat4 model;
 	alignas(16) glm::mat4 view;
 	alignas(16) glm::mat4 proj;
 	DirectionalLight dlight;
 	alignas(16) glm::vec3 viewPos;
-	PointLight plight;
-	alignas(4) float vertexSize;
-	alignas(16) glm::mat4 PVM;
-	alignas(16) glm::mat4 BoneTransform[1000];
-	alignas(4) float DepthSampler;
+	PointLight  plight;
+	alignas(4)  float timer;
+	alignas(4)  int temp;
 };
 
 struct MeshProperties

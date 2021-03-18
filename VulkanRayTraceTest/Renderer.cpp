@@ -24,12 +24,15 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+    modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     modelRenderManager.ModelList[0].MeshList[0].MaterialIndex = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshIndex = 1;
     modelRenderManager.ModelList[1].MeshList[0].MaterialIndex = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshIndex = 2;
     modelRenderManager.ModelList[2].MeshList[0].MaterialIndex = 2;
+    modelRenderManager.ModelList[3].MeshList[0].MeshIndex = 3;
+    modelRenderManager.ModelList[3].MeshList[0].MaterialIndex = 3;
 
     stbi_set_flip_vertically_on_load(true);
     MaterialData material{};
@@ -112,7 +115,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.plight.ambient = glm::vec4(0.2f);
     SceneData->UniformDataInfo.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
     SceneData->UniformDataInfo.plight.specular = glm::vec4(1.0f);
-    SceneData->UniformDataInfo.DepthSampler = 0.0f;
+    SceneData->UniformDataInfo.temp = 0.0f;
 }
 
 Renderer::~Renderer()
@@ -263,7 +266,6 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     }
     RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.ModelList);
 
-    SceneData->UniformDataInfo.model = modelRenderManager.ModelList[0].ModelTransform;
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
     SceneData->UniformDataInfo.projInverse[1][1] *= -1;
@@ -271,9 +273,8 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->UniformDataInfo.proj = camera->GetProjectionMatrix();
     SceneData->UniformDataInfo.proj[1][1] *= -1;
     SceneData->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SceneData->UniformDataInfo.vertexSize = time;
-    SceneData->UniformDataInfo.PVM = SceneData->UniformDataInfo.proj * SceneData->UniformDataInfo.view * SceneData->UniformDataInfo.model;
-   // SceneData->SceneData.timer = time;
+    SceneData->UniformDataInfo.timer = time;
+    SceneData->UniformDataInfo.temp = textureIndex;
     SceneData->Update(engine);
 }
 
@@ -282,7 +283,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
-    ImGui::SliderFloat("DepthSampler", &SceneData->UniformDataInfo.DepthSampler, 0, 1);
+    ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 10);
     ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1000.0f, 1000.0f);
     ImGui::SliderFloat3("Ambient", &SceneData->UniformDataInfo.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
@@ -461,7 +462,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 
     modelRenderManager.textureManager.Destory(engine);
     interfaceRenderPass.Destroy(engine.Device);
-    //AnimationRenderer.Destroy(engine);
+    AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     RayRenderer.Destory(engine);

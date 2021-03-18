@@ -36,15 +36,13 @@ vertices[];
 layout(binding = 2) uniform UniformBufferObject {
 	mat4 viewInverse;
 	mat4 projInverse;
-    mat4 model;
-    mat4 view;
-    mat4 proj;
-    DirectionalLight dlight;
+	mat4 view;
+	mat4 proj;
+	DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-    int vertexSize;
-    mat4 PVM;
-    mat4 BoneTransform[100];
+	float timer;
+    int temp;
 } ubo;
 layout(binding = 3) buffer MeshProperties 
 {
@@ -71,13 +69,13 @@ layout(location = 3) out mat3 TBN;
 
 void main() 
 {
-    FragPos = vec3(ubo.model * vec4(aPos, 1.0));    
+    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
 
-    vec3 T = normalize(mat3(ubo.model) * vec3(aTangent));
-    vec3 B = normalize(mat3(ubo.model) * vec3(aBitangent));
-    vec3 N = normalize(mat3(ubo.model) * aNormal);
+    vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform) * vec3(aTangent));
+    vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform) * vec3(aBitangent));
+    vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform) * aNormal);
     TBN = transpose(mat3(T, B, N));
 
     gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
