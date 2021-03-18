@@ -24,12 +24,12 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-   // modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
+    modelRenderManager.ModelList[0].MeshList[0].MaterialID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
-  //  modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
+    modelRenderManager.ModelList[1].MeshList[0].MaterialID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
-  //  modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 0;
+    modelRenderManager.ModelList[2].MeshList[0].MaterialID = 2;
 
     stbi_set_flip_vertically_on_load(true);
     MaterialData material{};
@@ -37,8 +37,12 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
     material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-   // modelRenderManager.materialManager.LoadMaterial(engine, "zdsf", material);
+    stbi_set_flip_vertically_on_load(false);
+    materialManager.LoadMaterial(engine, "zdsf", material);
     modelRenderManager.ModelList[0].MeshList[0].material = material;
+    modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CopyBufferToMemory(engine.Device, &material, sizeof(material));
+    modelRenderManager.ModelList[1].MeshList[0].material = material;
+    modelRenderManager.ModelList[1].MeshList[0].MaterialBuffer.CopyBufferToMemory(engine.Device, &material, sizeof(material));
 
     modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
 

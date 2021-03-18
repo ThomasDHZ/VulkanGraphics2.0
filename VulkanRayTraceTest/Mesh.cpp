@@ -226,7 +226,7 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 		ConstMeshInfo meshInfo;
 		meshInfo.MeshID = MeshID;
 		meshInfo.ModelID = 0;
-		meshInfo.MaterialID = 0;
+		meshInfo.MaterialID = MaterialID;
 		meshInfo.UVOffset = UVOffset;
 
 		VkDeviceSize offsets[] = { 0 };
