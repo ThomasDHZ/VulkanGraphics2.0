@@ -8,9 +8,8 @@
 
 layout(push_constant) uniform MeshInfo
 {
-	uint MeshID;
-	uint ModelID;
-	uint MaterialID;
+	uint MeshIndex;
+	uint MaterialIndex;
     vec2 UVOffset;
 } Mesh;
 
@@ -81,5 +80,5 @@ void main()
     vec3 N = normalize(mat3(ubo.model) * aNormal);
     TBN = transpose(mat3(T, B, N));
 
-    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshID].ModelTransform * MeshTransform[Mesh.MeshID].Transform * vec4(aPos, 1.0);
+    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 }

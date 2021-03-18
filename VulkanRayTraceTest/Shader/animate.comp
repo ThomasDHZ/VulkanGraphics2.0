@@ -41,10 +41,9 @@ layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout(push_constant) uniform ConstMeshProperties
 {
-	uint MeshID;
-	uint ModelID;
-	uint MaterialID;
-		vec2 UVOffset;
+	uint MeshIndex;
+	uint MaterialIndex;
+	vec2 UVOffset;
 } ConstMesh;
 
 void main()
@@ -58,7 +57,7 @@ void main()
   BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[3]] * v0.BoneWeights[3];
   vec4 BonePosition = BoneTransform * vec4(v0.Position, 1.0);
 
-  v0.Position = vec3(meshProperties[ConstMesh.MeshID].ModelTransform * MeshTransform[0].Transform * BonePosition);
-  v0.Normal = normalize(transpose(inverse(mat3(meshProperties[ConstMesh.MeshID].ModelTransform * MeshTransform[0].Transform * BoneTransform))) * v0.Normal);
+  v0.Position = vec3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[0].Transform * BonePosition);
+  v0.Normal = normalize(transpose(inverse(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[0].Transform * BoneTransform))) * v0.Normal);
   vertices.v[gl_GlobalInvocationID.x] = v0;
 }

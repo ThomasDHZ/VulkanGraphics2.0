@@ -254,7 +254,7 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 			if (nodeMap.NodeString == node->mName.C_Str())
 			{
 				MeshList.back().NodeID = nodeMap.NodeID;
-				nodeMap.MeshID = MeshList.back().MeshID;
+				nodeMap.MeshID = MeshList.back().MeshIndex;
 			}
 		}
 	}

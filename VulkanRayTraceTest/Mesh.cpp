@@ -8,7 +8,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 {
 	std::vector<uint32_t> indices{};
 
-	MeshID = 0;
+	MeshIndex = 0;
 	material = MaterialData();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
@@ -25,7 +25,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID)
 {
-	MeshID = meshID;
+	MeshIndex = meshID;
 	material = MaterialData();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
@@ -42,7 +42,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData MeshMaterial, uint32_t meshID)
 {
-	MeshID = meshID;
+	MeshIndex = meshID;
 	material = MeshMaterial;
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
@@ -224,9 +224,8 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 	if (ShowMesh)
 	{
 		ConstMeshInfo meshInfo;
-		meshInfo.MeshID = MeshID;
-		meshInfo.ModelID = 0;
-		meshInfo.MaterialID = MaterialID;
+		meshInfo.MeshIndex = MeshIndex;
+		meshInfo.MaterialIndex = MaterialIndex;
 		meshInfo.UVOffset = UVOffset;
 
 		VkDeviceSize offsets[] = { 0 };

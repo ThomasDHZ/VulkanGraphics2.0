@@ -24,12 +24,12 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-    modelRenderManager.ModelList[0].MeshList[0].MaterialID = 1;
-    modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
-    modelRenderManager.ModelList[1].MeshList[0].MaterialID = 1;
+    modelRenderManager.ModelList[0].MeshList[0].MaterialIndex = 1;
+    modelRenderManager.ModelList[1].MeshList[0].MeshIndex = 1;
+    modelRenderManager.ModelList[1].MeshList[0].MaterialIndex = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
-    modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
-    modelRenderManager.ModelList[2].MeshList[0].MaterialID = 2;
+    modelRenderManager.ModelList[2].MeshList[0].MeshIndex = 2;
+    modelRenderManager.ModelList[2].MeshList[0].MaterialIndex = 2;
 
     stbi_set_flip_vertically_on_load(true);
     MaterialData material{};

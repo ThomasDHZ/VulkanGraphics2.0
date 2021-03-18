@@ -7,9 +7,8 @@
 
 layout(push_constant) uniform ConstMeshProperties
 {
-	uint MeshID;
-	uint ModelID;
-	uint MaterialID;
+	uint MeshIndex;
+	uint MaterialIndex;
 	vec2 UVOffset;
 } ConstMesh;
 
@@ -89,42 +88,6 @@ layout(location = 3) in mat3 TBN;
 
 layout(location = 0) out vec4 outColor;
 
-
-Material BuildMaterial()
-{
-	Material material;
-	material.Ambient = MaterialList[ConstMesh.MeshID].material.Ambient;
-	material.Diffuse = MaterialList[ConstMesh.MeshID].material.Diffuse;
-	material.Specular = MaterialList[ConstMesh.MeshID].material.Specular;
-	material.Shininess = MaterialList[ConstMesh.MeshID].material.Shininess;
-	material.Reflectivness = MaterialList[ConstMesh.MeshID].material.Reflectivness;
-
-	if(MaterialList[ConstMesh.MeshID].material.DiffuseMapID == 0)
-	{
-		material.DiffuseMap = MaterialList[ConstMesh.MeshID].material.Diffuse;
-	}
-	else
-	{
-		material.DiffuseMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.DiffuseMapID], TexCoords));
-	}
-
-	if(MaterialList[ConstMesh.MeshID].material.SpecularMapID == 0)
-	{
-		material.SpecularMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.SpecularMapID], TexCoords));
-	}
-	else
-	{
-		material.SpecularMap = MaterialList[ConstMesh.MeshID].material.Specular;
-	}
-
-	material.SpecularMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.SpecularMapID], TexCoords));
-	material.NormalMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.NormalMapID], TexCoords));
-	material.AlphaMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.AlphaMapID], TexCoords));
-	material.EmissionMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.EmissionMapID], TexCoords));
-	material.ShadowMap = vec3(texture(TextureMap[MaterialList[ConstMesh.MeshID].material.ShadowMapID], TexCoords));
-	return material;
-}
-
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 { 
     float heightScale = 0.1;
@@ -201,7 +164,7 @@ void main()
 
 //    vec3 specular = vec3(0.2) * spec;
 
-const MaterialInfo material = MaterialList[ConstMesh.MaterialID].material;
+const MaterialInfo material = MaterialList[ConstMesh.MaterialIndex].material;
 if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
 	{
 		discard;

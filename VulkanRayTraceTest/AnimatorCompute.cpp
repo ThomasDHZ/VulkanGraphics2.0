@@ -101,9 +101,8 @@ void AnimatorCompute::CreateShaderPipeLine(VulkanEngine& engine)
 void AnimatorCompute::Compute(VulkanEngine& engine, uint32_t currentFrame)
 {
 	ConstMeshInfo meshInfo;
-	meshInfo.MeshID = 0;
-	meshInfo.ModelID = 0;
-	meshInfo.MaterialID = 0;
+	meshInfo.MeshIndex = 0;
+	meshInfo.MaterialIndex = 0;
 
 	VkCommandBufferBeginInfo CommandBufferBeginInfo{};
 	CommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

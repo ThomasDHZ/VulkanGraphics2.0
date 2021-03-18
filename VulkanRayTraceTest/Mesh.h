@@ -47,9 +47,9 @@ public:
 	AccelerationStructure BottomLevelAccelerationBuffer;
 
 	std::string MeshName;
-	uint32_t MeshID = 0;
+	uint32_t MeshIndex = 0;
 	uint32_t NodeID = 0;
-	uint32_t MaterialID = 0;
+	uint32_t MaterialIndex = 0;
 	uint32_t BoneCount = 0;
 	uint32_t VertexCount;
 	uint32_t IndexCount;
