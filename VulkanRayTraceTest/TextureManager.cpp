@@ -7,22 +7,26 @@ TextureManager::TextureManager()
 TextureManager::TextureManager(VulkanEngine& engine)
 {
 	LoadTexture2D(engine, "../texture/DefaultTexture.png", VK_FORMAT_R8G8B8A8_UNORM);
+	TextureList[0]->FileName = "DefaultTexture";
+	
 	LoadTexture2D(engine, "../texture/AlphaDefault.png", VK_FORMAT_R8G8B8A8_UNORM);
+	TextureList[1]->FileName = "DefaultAlphaTexture";
 }
 
 TextureManager::~TextureManager()
 {
 }
 
-uint32_t TextureManager::LoadTexture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format)
+std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format)
 {
 	//uint32_t TextureID = IsTextureLoaded(TextureLocation);
 	//if (TextureID == -1)
 	//{
 		unsigned int TextureID = TextureList.size();
-		TextureList.emplace_back(std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format, TextureID)));
+		std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format, TextureID));
+		TextureList.emplace_back(texture);
 	//}
-	return TextureID;
+	return texture;
 }
 
 uint32_t TextureManager::LoadTexture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
@@ -97,4 +101,30 @@ uint32_t TextureManager::IsTextureLoaded(std::string name)
 	}
 
 	return textureID;
+}
+
+std::shared_ptr<Texture2D> TextureManager::GetTextureByName(const std::string TextureName)
+{
+	for (auto texture : TextureList)
+	{
+		if (texture->FileName == TextureName)
+		{
+			return texture;
+		}
+	}
+
+	return TextureList[0];
+}
+
+std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string TextureName)
+{
+	for (auto texture : Texture3DList)
+	{
+		if (texture->FileName == TextureName)
+		{
+			return texture;
+		}
+	}
+
+	return Texture3DList[0];
 }

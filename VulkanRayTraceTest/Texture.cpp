@@ -15,24 +15,27 @@ Texture::Texture()
 	Depth = 0;
 }
 
-Texture::Texture(unsigned int textureID, TextureType textureType)
+Texture::Texture(uint32_t textureID, TextureType textureType)
 {
 	TextureID = textureID;
+	TextureBufferIndex = textureID;
 	TypeOfTexture = textureType;
 }
 
-Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType)
 {
 	TextureID = textureID;
+	TextureBufferIndex = textureID;
 	Width = width;
 	Height = height;
 	TypeOfTexture = textureType;
 	CreateTexture(engine, PixelList, format);
 }
 
-Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType)
 {
 	TextureID = textureID;
+	TextureBufferIndex = textureID;
 	Width = width;
 	Height = height;
 	Depth = depth;
@@ -41,9 +44,10 @@ Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::ve
 	CreateTexture3D(engine, PixelList, format);
 }
 
-Texture::Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int textureID, VkFormat format, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, std::string TextureLocation, uint32_t textureID, VkFormat format, TextureType textureType)
 {
 	TextureID = textureID;
+	TextureBufferIndex = textureID;
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 	TextureFormat = format;
@@ -60,7 +64,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat for
 	LoadTexture(engine, TextureLocation, format);
 }
 
-Texture::Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, uint32_t textureID, TextureType textureType)
 {
 	TextureID = textureID;
 	TypeOfTexture = textureType;

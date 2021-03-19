@@ -38,7 +38,8 @@ public:
     VkFormat TextureFormat;
     VkDescriptorSet ImGuiDescriptorSet = VK_NULL_HANDLE;
 
-    unsigned int TextureID = 0;
+    uint32_t TextureID = 0;
+    uint32_t TextureBufferIndex = 0;
     std::string FileName;
     TextureType TypeOfTexture;
 
@@ -47,12 +48,12 @@ public:
     int Depth;
 
     Texture();
-    Texture(unsigned int textureID, TextureType textureType);
-    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID, TextureType textureType);
-    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID, TextureType textureType);
-    Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int textureID, VkFormat format, TextureType textureType);
+    Texture(uint32_t textureID, TextureType textureType);
+    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType);
+    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType);
+    Texture(VulkanEngine& engine, std::string TextureLocation, uint32_t textureID, VkFormat format, TextureType textureType);
     Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType);
-    Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType);
+    Texture(VulkanEngine& engine, uint32_t textureID, TextureType textureType);
     Texture(VulkanEngine& engine, TextureType textureType);
     ~Texture();
 

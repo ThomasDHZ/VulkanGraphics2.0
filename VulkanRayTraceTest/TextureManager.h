@@ -19,7 +19,7 @@ public:
 	TextureManager(VulkanEngine& engine);
 	~TextureManager();
 
-	uint32_t LoadTexture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
+	std::shared_ptr<Texture2D> LoadTexture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
 	uint32_t LoadTexture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format);
 	uint32_t Load3DTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
 	uint32_t LoadTexture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format);
@@ -28,6 +28,9 @@ public:
 	void UnloadAllTextures(VulkanEngine& engine);
 	void UnloadCubeMap(VulkanEngine& engine);
 	void Destory(VulkanEngine& engine);
+
+	std::shared_ptr<Texture2D> GetTextureByName(const std::string TextureName);
+	std::shared_ptr<Texture3D> Get3DTextureByName(const std::string TextureName);
 
 	std::shared_ptr<Texture2D> GetTexture(unsigned int TextureID) { return TextureList[TextureID]; };
 	std::shared_ptr<Texture3D> Get3DTexture(unsigned int TextureID) { return Texture3DList[TextureID]; };
