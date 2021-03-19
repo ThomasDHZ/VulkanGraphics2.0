@@ -7,6 +7,8 @@ Renderer::Renderer()
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
     modelRenderManager = ModelRenderManager(engine);
+    materialManager = MaterialManager(engine, modelRenderManager.textureManager);
+
     std::vector<Vertex> MegaManVertices =
 	{
 		{ {0.5f,  0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.05f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
@@ -21,31 +23,46 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
         1, 2, 3 
     };
 
+    stbi_set_flip_vertically_on_load(true);
+    Material material(engine, modelRenderManager.textureManager);
+    material.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material.materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    materialManager.LoadMaterial(engine, "zdsf", material);
+    stbi_set_flip_vertically_on_load(false);
+
+
+    stbi_set_flip_vertically_on_load(true);
+    Material material2(engine, modelRenderManager.textureManager);
+    material2.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material2.materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material2.materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material2.materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    materialManager.LoadMaterial(engine, "zdsf", material2);
+    stbi_set_flip_vertically_on_load(false);
+
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
-    modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-    modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+    modelRenderManager.AddModel(engine, materialManager,  "../Models/TestAnimModel/model.dae");
+    modelRenderManager.AddModel(engine, materialManager, "../Models/cyborg/cyborg.obj");
     modelRenderManager.ModelList[0].MeshList[0].MaterialIndex = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshIndex = 1;
-    modelRenderManager.ModelList[1].MeshList[0].MaterialIndex = 1;
+    modelRenderManager.ModelList[1].MeshList[0].MaterialIndex = 2;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshIndex = 2;
-    modelRenderManager.ModelList[2].MeshList[0].MaterialIndex = 2;
+    modelRenderManager.ModelList[2].MeshList[0].MaterialIndex = 3;
     modelRenderManager.ModelList[3].MeshList[0].MeshIndex = 3;
     modelRenderManager.ModelList[3].MeshList[0].MaterialIndex = 3;
 
-    stbi_set_flip_vertically_on_load(true);
-    MaterialData material{};
-    material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
-    material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
-    material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
-    material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
-    stbi_set_flip_vertically_on_load(false);
-    materialManager.LoadMaterial(engine, "zdsf", material);
-    modelRenderManager.ModelList[0].MeshList[0].material = material;
-    modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CopyBufferToMemory(engine.Device, &material, sizeof(material));
-    modelRenderManager.ModelList[1].MeshList[0].material = material;
-    modelRenderManager.ModelList[1].MeshList[0].MaterialBuffer.CopyBufferToMemory(engine.Device, &material, sizeof(material));
+    //Material material3(engine, modelRenderManager.textureManager);
+    //material3.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../Models/TestAnimModel/diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //materialManager.LoadMaterial(engine, "zdsf", material3);
+
+    //Material material4(engine, modelRenderManager.textureManager);
+    //material4.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../Models/cyborg/cyborg_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //materialManager.LoadMaterial(engine, "zdsf", material4);
+
 
     modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
 
@@ -100,7 +117,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.StartPipeline(engine, descriptorSetLayout);
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
-    AnimationRenderer = AnimatorCompute(engine, modelRenderManager.ModelList);
+    //AnimationRenderer = AnimatorCompute(engine, modelRenderManager.ModelList);
 
     SetUpCommandBuffers(engine);
 
@@ -134,13 +151,6 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
     if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
-}
-
-
-void Renderer::AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath)
-{
-    modelRenderManager.ModelList.emplace_back(Model(engine, modelRenderManager.textureManager, FilePath));
-    UpdateSwapChain(engine, window);
 }
 
 void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
@@ -312,7 +322,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
 
     vkCmdEndRenderPass(RasterCommandBuffer);
-    AnimationRenderer.Compute(engine, imageIndex);
+    //AnimationRenderer.Compute(engine, imageIndex);
     //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -329,16 +339,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    modelRenderManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[2].MeshList[0].VertexList.size());
+  //  modelRenderManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[2].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
@@ -395,7 +405,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 
     modelRenderManager.textureManager.Destory(engine);
     interfaceRenderPass.Destroy(engine.Device);
-    AnimationRenderer.Destroy(engine);
+   // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     RayRenderer.Destory(engine);

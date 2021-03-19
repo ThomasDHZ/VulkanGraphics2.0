@@ -4,9 +4,9 @@ MaterialManager::MaterialManager()
 {
 }
 
-MaterialManager::MaterialManager(VulkanEngine& engine)
+MaterialManager::MaterialManager(VulkanEngine& engine, TextureManager& textureManager)
 {
-	MaterialData materialData;
+	Material materialData(engine, textureManager);
 	LoadMaterial(engine, "Default Material", materialData);
 }
 
@@ -30,19 +30,14 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 }
 
 
-uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, MaterialData& materialData)
+uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, Material& material)
 {
 	uint32_t MaterialID = IsMateralLoaded(MaterialName);
 	if (MaterialID == -1)
 	{
-		MaterialID = MaterialList.size();
-
-		Material material{};
-		material.MaterialName = MaterialName;
-		material.MaterialID = MaterialID;
-		material.materialData = materialData;
-		material.MaterialBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(MaterialData), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &materialData);
 		MaterialList.emplace_back(material);
+		MaterialList.back().MaterialID = MaterialID;
+		MaterialList.back().UpdateBufferIndexs(engine);
 	}
 	return MaterialID;
 }
@@ -56,16 +51,14 @@ std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescri
 {
 
 	std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
-	/*for (int x = 0; x < MaterialList.size(); x++)
-	{*/
-
-
-	/*	VkDescriptorBufferInfo MaterialBufferInfo = {};
+	for (int x = 0; x < MaterialList.size(); x++)
+	{
+		VkDescriptorBufferInfo MaterialBufferInfo = {};
 		MaterialBufferInfo.buffer = MaterialList[x].MaterialBuffer.Buffer;
 		MaterialBufferInfo.offset = 0;
 		MaterialBufferInfo.range = VK_WHOLE_SIZE;
 		MaterialBufferList.emplace_back(MaterialBufferInfo);
-	}*/
+	}
 
 	return MaterialBufferList;
 }

@@ -27,7 +27,7 @@ private:
 	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
-	AnimatorCompute AnimationRenderer;
+	//AnimatorCompute AnimationRenderer;
 
 	size_t currentFrame = 0;
 
@@ -52,7 +52,6 @@ public:
 	~Renderer();
 
 	std::vector<Vertex> CalcVertex();
-	void AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath);
 	void UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);

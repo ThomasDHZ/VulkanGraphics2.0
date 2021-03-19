@@ -6,9 +6,9 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Model::Model(VulkanEngine& engine, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	MaterialData material{};
+	Material material(engine, textureManager);
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
@@ -18,14 +18,14 @@ Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<
 
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MaterialData& material)
+Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
 {
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
+Model::Model(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath)
 {
 	Assimp::Importer ModelImporter;
 
@@ -39,7 +39,7 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
+	LoadMesh(engine, materailManager, textureManager, FilePath, Scene->mRootNode, Scene);
 
 	LoadMeshTransform(0, ModelTransform);
 
@@ -227,7 +227,7 @@ void Model::LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh
 	}
 }
 
-void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -238,7 +238,7 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 
 		 auto vertices = LoadVertices(mesh);
 		 auto indices = LoadIndices(mesh);
-		 auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
+		 auto material = LoadMaterial(engine, materailManager, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
@@ -261,7 +261,7 @@ void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(engine, textureManager, FilePath, node->mChildren[i], scene);
+		LoadMesh(engine, materailManager, textureManager, FilePath, node->mChildren[i], scene);
 	}
 }
 
@@ -360,77 +360,78 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-MaterialData Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+Material Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
-	MaterialData ModelMaterial;
+	Material ModelMaterial = Material(engine, textureManager);
 
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
 	aiColor3D color(0.f, 0.f, 0.f);
 	material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	ModelMaterial.Ambient.r = color.r;
-	ModelMaterial.Ambient.g = color.g;
-	ModelMaterial.Ambient.b = color.b;
+	ModelMaterial.materialTexture.Ambient.r = color.r;
+	ModelMaterial.materialTexture.Ambient.g = color.g;
+	ModelMaterial.materialTexture.Ambient.b = color.b;
 
 	material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	ModelMaterial.Diffuse.r = color.r;
-	ModelMaterial.Diffuse.g = color.g;
-	ModelMaterial.Diffuse.b = color.b;
+	ModelMaterial.materialTexture.Diffuse.r = color.r;
+	ModelMaterial.materialTexture.Diffuse.g = color.g;
+	ModelMaterial.materialTexture.Diffuse.b = color.b;
 
 	material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	ModelMaterial.Specular.r = color.r;
-	ModelMaterial.Specular.g = color.g;
-	ModelMaterial.Specular.b = color.b;
+	ModelMaterial.materialTexture.Specular.r = color.r;
+	ModelMaterial.materialTexture.Specular.g = color.g;
+	ModelMaterial.materialTexture.Specular.b = color.b;
 
 
-	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &ModelMaterial.Shininess))
+	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &ModelMaterial.materialTexture.Shininess))
 	{
-		ModelMaterial.Shininess = 32.0f;
+		ModelMaterial.materialTexture.Shininess = 32.0f;
 	}
 
-	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &ModelMaterial.Reflectivness))
+	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &ModelMaterial.materialTexture.Reflectivness))
 	{
-		ModelMaterial.Reflectivness = 0.0f;
+		ModelMaterial.materialTexture.Reflectivness = 0.0f;
 	}
 
 	aiString TextureLocation;
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
 	{
 		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-		ModelMaterial.DiffuseMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
+		ModelMaterial.materialTexture.DiffuseMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
 	{
 		material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
-		ModelMaterial.SpecularMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
+		ModelMaterial.materialTexture.SpecularMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
 	{
 		material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
-		ModelMaterial.NormalMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
+		ModelMaterial.materialTexture.NormalMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
 	{
 		material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
-		ModelMaterial.DepthMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
+		ModelMaterial.materialTexture.DepthMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
 	{
 		material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
-		ModelMaterial.AlphaMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
+		ModelMaterial.materialTexture.AlphaMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
 	{
 		material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
-		ModelMaterial.EmissionMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM)->TextureID;
+		ModelMaterial.materialTexture.EmissionMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
+	materailManager.LoadMaterial(engine, "sfsd", ModelMaterial);
 	return ModelMaterial;
 }
 
