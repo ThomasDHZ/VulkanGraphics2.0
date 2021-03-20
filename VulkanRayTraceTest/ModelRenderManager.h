@@ -27,7 +27,7 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetMeshDataListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetTransformInverseBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor(std::vector<Material>& MaterialList);
 	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
 	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
 

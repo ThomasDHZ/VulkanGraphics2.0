@@ -4,10 +4,12 @@
 class MaterialManager
 {
 private:
-	std::vector<Material> MaterialList;
+
 
 	uint32_t IsMateralLoaded(std::string name);
 public:
+
+	std::vector<Material> MaterialList;
 
 	MaterialManager();
 	MaterialManager(VulkanEngine& engine, TextureManager& textureManager);

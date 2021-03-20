@@ -85,7 +85,7 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetIndexBufferListDescri
     return IndexBufferInfoList;
 }
 
-std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDescriptor(std::vector<Material>& MaterialList)
 {
 
     std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
