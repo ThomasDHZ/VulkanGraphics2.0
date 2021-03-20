@@ -19,7 +19,7 @@ public:
 
 	void AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
+	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
 	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();
@@ -27,7 +27,7 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetMeshDataListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetTransformInverseBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor(std::vector<Material>& MaterialList);
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor(std::vector<std::shared_ptr<Material>> MaterialList);
 	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
 	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
 

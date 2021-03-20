@@ -8,7 +8,7 @@ Model::Model()
 
 Model::Model(VulkanEngine& engine, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	Material material(engine, textureManager);
+	std::shared_ptr<Material> material = std::make_shared<Material>(engine, textureManager);
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
 	MeshList.back().MeshTransform = glm::mat4(1.0f);
@@ -18,7 +18,7 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, std::vector<V
 
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
+Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 {
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
 	MeshList.back().VertexList = VertexList;
@@ -360,75 +360,75 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-Material Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+std::shared_ptr<Material> Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
-	Material ModelMaterial = Material(engine, textureManager);
+	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(engine, textureManager);
 
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
 	aiColor3D color(0.f, 0.f, 0.f);
 	material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	ModelMaterial.materialTexture.Ambient.r = color.r;
-	ModelMaterial.materialTexture.Ambient.g = color.g;
-	ModelMaterial.materialTexture.Ambient.b = color.b;
+	ModelMaterial->materialTexture.Ambient.r = color.r;
+	ModelMaterial->materialTexture.Ambient.g = color.g;
+	ModelMaterial->materialTexture.Ambient.b = color.b;
 
 	material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	ModelMaterial.materialTexture.Diffuse.r = color.r;
-	ModelMaterial.materialTexture.Diffuse.g = color.g;
-	ModelMaterial.materialTexture.Diffuse.b = color.b;
+	ModelMaterial->materialTexture.Diffuse.r = color.r;
+	ModelMaterial->materialTexture.Diffuse.g = color.g;
+	ModelMaterial->materialTexture.Diffuse.b = color.b;
 
 	material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	ModelMaterial.materialTexture.Specular.r = color.r;
-	ModelMaterial.materialTexture.Specular.g = color.g;
-	ModelMaterial.materialTexture.Specular.b = color.b;
+	ModelMaterial->materialTexture.Specular.r = color.r;
+	ModelMaterial->materialTexture.Specular.g = color.g;
+	ModelMaterial->materialTexture.Specular.b = color.b;
 
 
-	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &ModelMaterial.materialTexture.Shininess))
+	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &ModelMaterial->materialTexture.Shininess))
 	{
-		ModelMaterial.materialTexture.Shininess = 32.0f;
+		ModelMaterial->materialTexture.Shininess = 32.0f;
 	}
 
-	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &ModelMaterial.materialTexture.Reflectivness))
+	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &ModelMaterial->materialTexture.Reflectivness))
 	{
-		ModelMaterial.materialTexture.Reflectivness = 0.0f;
+		ModelMaterial->materialTexture.Reflectivness = 0.0f;
 	}
 
 	aiString TextureLocation;
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
 	{
 		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-		ModelMaterial.materialTexture.DiffuseMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.DiffuseMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
 	{
 		material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
-		ModelMaterial.materialTexture.SpecularMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.SpecularMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
 	{
 		material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
-		ModelMaterial.materialTexture.NormalMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.NormalMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
 	{
 		material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
-		ModelMaterial.materialTexture.DepthMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.DepthMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
 	{
 		material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
-		ModelMaterial.materialTexture.AlphaMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.AlphaMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
 	{
 		material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
-		ModelMaterial.materialTexture.EmissionMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.EmissionMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	materailManager.LoadMaterial(engine, "sfsd", ModelMaterial);

@@ -6,7 +6,7 @@ MaterialManager::MaterialManager()
 
 MaterialManager::MaterialManager(VulkanEngine& engine, TextureManager& textureManager)
 {
-	Material materialData(engine, textureManager);
+	std::shared_ptr<Material> materialData = std::make_shared<Material>(engine, textureManager);
 	LoadMaterial(engine, "Default Material", materialData);
 }
 
@@ -19,9 +19,9 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 	uint32_t MaterialID = -1;
 	for (auto material : MaterialList)
 	{
-		if (material.MaterialName == name)
+		if (material->MaterialName == name)
 		{
-			MaterialID = material.MaterialID;
+			MaterialID = material->MaterialID;
 			return MaterialID;
 		}
 	}
@@ -30,19 +30,19 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 }
 
 
-uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, Material& material)
+uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, std::shared_ptr<Material> material)
 {
 	uint32_t MaterialID = IsMateralLoaded(MaterialName);
 	if (MaterialID == -1)
 	{
 		MaterialList.emplace_back(material);
-		MaterialList.back().MaterialID = MaterialID;
-		MaterialList.back().UpdateBufferIndexs(engine);
+		MaterialList.back()->MaterialID = MaterialID;
+		MaterialList.back()->UpdateBufferIndexs(engine);
 	}
 	return MaterialID;
 }
 
-Material MaterialManager::GetMaterial(uint32_t MaterialID)
+std::shared_ptr<Material> MaterialManager::GetMaterial(uint32_t MaterialID)
 {
 	return MaterialList[MaterialID];
 }
@@ -54,7 +54,7 @@ std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescri
 	for (int x = 0; x < MaterialList.size(); x++)
 	{
 		VkDescriptorBufferInfo MaterialBufferInfo = {};
-		MaterialBufferInfo.buffer = MaterialList[x].MaterialBuffer.Buffer;
+		MaterialBufferInfo.buffer = MaterialList[x]->MaterialBuffer.Buffer;
 		MaterialBufferInfo.offset = 0;
 		MaterialBufferInfo.range = VK_WHOLE_SIZE;
 		MaterialBufferList.emplace_back(MaterialBufferInfo);

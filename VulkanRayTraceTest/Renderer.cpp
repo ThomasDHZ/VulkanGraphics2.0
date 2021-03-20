@@ -24,21 +24,21 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     };
 
     stbi_set_flip_vertically_on_load(true);
-    Material material(engine, modelRenderManager.textureManager);
-    material.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    std::shared_ptr<Material> material = std::make_shared<Material>(engine, modelRenderManager.textureManager);
+    material->materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
     materialManager.LoadMaterial(engine, "zdsf", material);
     stbi_set_flip_vertically_on_load(false);
 
 
     stbi_set_flip_vertically_on_load(true);
-    Material material2(engine, modelRenderManager.textureManager);
-    material2.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material2.materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material2.materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material2.materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, modelRenderManager.textureManager);
+    material2->materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material2->materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material2->materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material2->materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
     materialManager.LoadMaterial(engine, "zdsf", material2);
     stbi_set_flip_vertically_on_load(false);
 
@@ -505,12 +505,12 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetMeshPropertiesBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetVertexBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 14 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
@@ -522,12 +522,12 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 
     VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
     VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = modelRenderManager.GetVertexBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor(materialManager.MaterialList);
-    std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
     VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = modelRenderManager.GetMeshDataListDescriptor();
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = modelRenderManager.GetVertexBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor(materialManager.MaterialList);
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = modelRenderManager.Get3DTextureBufferListDescriptor();
     VkDescriptorImageInfo CubeMapImage = engine.AddTextureDescriptor(modelRenderManager.textureManager.GetCubeMapTexture().View, modelRenderManager.textureManager.GetCubeMapTexture().Sampler);

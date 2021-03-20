@@ -42,7 +42,7 @@ public:
 	VulkanBuffer TransformInverseBuffer;
 
 	MeshPropertiesUniformBuffer MeshProperties;
-	Material material;
+	std::shared_ptr<Material> material;
 
 	AccelerationStructure BottomLevelAccelerationBuffer;
 
@@ -67,7 +67,7 @@ public:
 	Mesh();
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial, uint32_t meshID);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> MeshMaterial, uint32_t meshID);
 	~Mesh();
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

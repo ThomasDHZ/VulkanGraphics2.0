@@ -502,7 +502,7 @@ VkDescriptorPoolSize VulkanEngine::AddDsecriptorPoolBinding(VkDescriptorType des
 {
 	VkDescriptorPoolSize DescriptorPoolBinding = {};
 	DescriptorPoolBinding.type = descriptorType;
-	DescriptorPoolBinding.descriptorCount = static_cast<uint32_t>(SwapChain.GetSwapChainImageCount());
+	DescriptorPoolBinding.descriptorCount = 100;
 
 	return DescriptorPoolBinding;
 }
@@ -592,6 +592,10 @@ VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNu
 
 VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList, VkDescriptorType descriptorType)
 {
+	//if (BufferInfoList.size() == 4)
+	//{
+	//	BufferInfoList.emplace_back(BufferInfoList[0]);
+	//}
 	VkWriteDescriptorSet BufferDescriptor = {};
 	BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	BufferDescriptor.dstSet = DescriptorSet;

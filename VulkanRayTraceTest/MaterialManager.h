@@ -9,7 +9,7 @@ private:
 	uint32_t IsMateralLoaded(std::string name);
 public:
 
-	std::vector<Material> MaterialList;
+	std::vector<std::shared_ptr<Material>> MaterialList;
 
 	MaterialManager();
 	MaterialManager(VulkanEngine& engine, TextureManager& textureManager);
@@ -18,8 +18,8 @@ public:
 	void Update(VulkanEngine& engine);
 	void Destory(VulkanEngine& engine);
 
-	uint32_t LoadMaterial(VulkanEngine& engine, std::string MaterialName, Material& material);
-	Material GetMaterial(uint32_t MaterialID);
+	uint32_t LoadMaterial(VulkanEngine& engine, std::string MaterialName, std::shared_ptr<Material> material);
+	std::shared_ptr<Material> GetMaterial(uint32_t MaterialID);
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
 };
 

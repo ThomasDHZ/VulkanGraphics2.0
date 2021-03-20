@@ -9,7 +9,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 	std::vector<uint32_t> indices{};
 
 	MeshIndex = 0;
-	material = Material();
+	material = std::shared_ptr<Material>();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
@@ -26,7 +26,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID)
 {
 	MeshIndex = meshID;
-	material = Material();
+	material = std::shared_ptr<Material>();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
@@ -40,7 +40,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	SetUpMesh(engine, VertexList, IndexList);
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material MeshMaterial, uint32_t meshID)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> MeshMaterial, uint32_t meshID)
 {
 	MeshIndex = meshID;
 	material = MeshMaterial;
