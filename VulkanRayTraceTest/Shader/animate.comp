@@ -43,8 +43,6 @@ layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(push_constant) uniform ConstMeshProperties
 {
 	uint MeshIndex;
-	uint MaterialIndex;
-	vec2 UVOffset;
 } ConstMesh;
 
 void main()

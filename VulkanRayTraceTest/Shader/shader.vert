@@ -11,8 +11,6 @@
 layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
-	uint MaterialIndex;
-    vec2 UVOffset;
 } Mesh;
 
 layout(binding = 2) uniform UniformBufferObject {

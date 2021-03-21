@@ -223,8 +223,6 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 	{
 		ConstMeshInfo meshInfo;
 		meshInfo.MeshIndex = MeshIndex;
-		meshInfo.MaterialIndex = MaterialIndex;
-		meshInfo.UVOffset = UVOffset;
 
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);

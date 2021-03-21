@@ -12,8 +12,6 @@ enum RendererType
 struct ConstMeshInfo
 {
 	alignas(4) uint32_t MeshIndex;
-	alignas(4) uint32_t MaterialIndex;
-	alignas(8) glm::vec2 UVOffset;
 };
 
 

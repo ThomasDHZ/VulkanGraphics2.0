@@ -49,14 +49,12 @@ public:
 	std::string MeshName;
 	uint32_t MeshIndex = 0;
 	uint32_t NodeID = 0;
-	uint32_t MaterialIndex = 0;
 	uint32_t BoneCount = 0;
 	uint32_t VertexCount;
 	uint32_t IndexCount;
 	uint32_t PrimitiveCount; //TriangleCount
 	uint32_t FirstIndex;     //primitiveOffset
 	uint32_t VertexOffset;   //firstVertex
-	glm::vec2 UVOffset = glm::vec2(0.0);
 
 	bool ShowMesh = true;
 

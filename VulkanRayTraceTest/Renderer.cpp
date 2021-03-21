@@ -46,14 +46,10 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.AddModel(engine, MegaManVertices, indices);
     modelRenderManager.AddModel(engine, materialManager,  "../Models/TestAnimModel/model.dae");
     modelRenderManager.AddModel(engine, materialManager, "../Models/cyborg/cyborg.obj");
-    modelRenderManager.ModelList[0].MeshList[0].MaterialIndex = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshIndex = 1;
-    modelRenderManager.ModelList[1].MeshList[0].MaterialIndex = 2;
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshIndex = 2;
-    modelRenderManager.ModelList[2].MeshList[0].MaterialIndex = 3;
     modelRenderManager.ModelList[3].MeshList[0].MeshIndex = 3;
-    modelRenderManager.ModelList[3].MeshList[0].MaterialIndex = 4;
     modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
     modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 2;
     modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 3;
@@ -250,7 +246,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
             auto a = std::to_string(x + y);
             ImGui::Checkbox(a.c_str(), &modelRenderManager.ModelList[x].MeshList[y].ShowMesh);
 
-            ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].UVOffset.x, 0.0f, 1.0f);
+            ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
             ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
             ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
             ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &modelRenderManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
