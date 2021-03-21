@@ -117,7 +117,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.StartPipeline(engine, descriptorSetLayout);
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
-    //AnimationRenderer = AnimatorCompute(engine, modelRenderManager.ModelList);
+   AnimationRenderer = AnimatorCompute(engine, modelRenderManager.ModelList);
 
     SetUpCommandBuffers(engine);
 
@@ -324,7 +324,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
 
     vkCmdEndRenderPass(RasterCommandBuffer);
-    //AnimationRenderer.Compute(engine, imageIndex);
+    AnimationRenderer.Compute(engine, imageIndex);
     //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -341,16 +341,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-  //  modelRenderManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[2].MeshList[0].VertexList.size());
+    modelRenderManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.ModelList[2].MeshList[0].VertexList.size());
     if (RayTraceSwitch)
     {
-        //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-        //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
@@ -441,8 +441,9 @@ void Renderer::Destroy(VulkanEngine& engine)
     }
 
     modelRenderManager.textureManager.Destory(engine);
+    materialManager.Destory(engine);
     interfaceRenderPass.Destroy(engine.Device);
-   // AnimationRenderer.Destroy(engine);
+    AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     RayRenderer.Destory(engine);

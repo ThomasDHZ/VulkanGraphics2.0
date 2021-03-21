@@ -30,7 +30,7 @@ private:
 	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
-	//AnimatorCompute AnimationRenderer;
+	AnimatorCompute AnimationRenderer;
 
 	size_t currentFrame = 0;
 

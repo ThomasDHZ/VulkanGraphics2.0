@@ -77,4 +77,8 @@ void MaterialManager::DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Mater
 
 void MaterialManager::Destory(VulkanEngine& engine)
 {
+	for (auto& material : MaterialList)
+	{
+		material->Delete(engine);
+	}
 }

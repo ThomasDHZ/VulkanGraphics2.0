@@ -28,6 +28,7 @@ Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, 
 	TextureBufferIndex = textureID;
 	Width = width;
 	Height = height;
+	Depth = 1;
 	TypeOfTexture = textureType;
 	CreateTexture(engine, PixelList, format);
 }
@@ -46,6 +47,9 @@ Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::ve
 
 Texture::Texture(VulkanEngine& engine, std::string TextureLocation, uint32_t textureID, VkFormat format, TextureType textureType)
 {
+	Width = 0;
+	Height = 0;
+	Depth = 1;
 	TextureID = textureID;
 	TextureBufferIndex = textureID;
 	TypeOfTexture = textureType;
@@ -57,6 +61,9 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, uint32_t tex
 
 Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType)
 {
+	Width = 0;
+	Height = 0;
+	Depth = 1;
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 	TextureFormat = format;
@@ -66,6 +73,9 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat for
 
 Texture::Texture(VulkanEngine& engine, uint32_t textureID, TextureType textureType)
 {
+	Width = 0;
+	Height = 0;
+	Depth = 1;
 	TextureID = textureID;
 	TypeOfTexture = textureType;
 }
@@ -307,7 +317,6 @@ void Texture::LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, 
 
 void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
 {
-	Depth = 1;
 	int ColorChannels;
 	stbi_uc* pixels = stbi_load(TextureLocation.c_str(), &Width, &Height, &ColorChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = Width * Height * 4;
@@ -320,7 +329,7 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 	TextureInfo.imageType = VK_IMAGE_TYPE_2D;
 	TextureInfo.extent.width = Width;
 	TextureInfo.extent.height = Height;
-	TextureInfo.extent.depth = 1;
+	TextureInfo.extent.depth = Depth;
 	TextureInfo.mipLevels = 1;
 	TextureInfo.arrayLayers = 1;
 	TextureInfo.format = format;
@@ -342,7 +351,6 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 
 void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format)
 {
-	Depth = 0;
 	VkDeviceSize imageSize = Width * Height * sizeof(Pixel);
 
 	VulkanBuffer StagingBuffer;
@@ -353,7 +361,7 @@ void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, Vk
 	TextureInfo.imageType = VK_IMAGE_TYPE_2D;
 	TextureInfo.extent.width = Width;
 	TextureInfo.extent.height = Height;
-	TextureInfo.extent.depth = 1;
+	TextureInfo.extent.depth = Depth;
 	TextureInfo.mipLevels = 1;
 	TextureInfo.arrayLayers = 1;
 	TextureInfo.format = format;
