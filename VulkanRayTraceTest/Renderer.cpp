@@ -53,7 +53,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.ModelList[2].MeshList[0].MeshIndex = 2;
     modelRenderManager.ModelList[2].MeshList[0].MaterialIndex = 3;
     modelRenderManager.ModelList[3].MeshList[0].MeshIndex = 3;
-    modelRenderManager.ModelList[3].MeshList[0].MaterialIndex = 3;
+    modelRenderManager.ModelList[3].MeshList[0].MaterialIndex = 4;
 
     //Material material3(engine, modelRenderManager.textureManager);
     //material3.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../Models/TestAnimModel/diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
@@ -225,6 +225,8 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
+    ImGui::Checkbox("AddMaterial", &AddMaterialFlag);
+    ImGui::Checkbox("DeleteMaterial", &RemoveMaterialFlag);
 
     ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 10);
     ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1000.0f, 1000.0f);
@@ -393,6 +395,37 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         throw std::runtime_error("failed to present swap chain image!");
     }
     
+    if (AddMaterialFlag == true)
+    {
+        vkDeviceWaitIdle(engine.Device);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+
+        stbi_set_flip_vertically_on_load(true);
+        std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, modelRenderManager.textureManager);
+        material2->materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material2->materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material2->materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material2->materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+        materialManager.LoadMaterial(engine, "zdsf", material2);
+        stbi_set_flip_vertically_on_load(false);
+ 
+        SetUpDescriptorPool(engine);
+        SetUpDescriptorSets(engine);
+        AddMaterialFlag = false;
+    }
+
+    if (RemoveMaterialFlag == true)
+    {
+        vkDeviceWaitIdle(engine.Device);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+
+        materialManager.DeleteMaterial(engine, materialManager.MaterialList.back());
+
+        SetUpDescriptorPool(engine);
+        SetUpDescriptorSets(engine);
+        RemoveMaterialFlag = false;
+    }
+
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
@@ -505,12 +538,12 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 5 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 14 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 100 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 100 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 100 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 100 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 100 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 100 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);

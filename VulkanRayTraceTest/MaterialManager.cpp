@@ -67,6 +67,14 @@ void MaterialManager::Update(VulkanEngine& engine)
 {
 }
 
+void MaterialManager::DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Material> material)
+{
+	const int index = material->MaterialID;
+	material->Delete(engine);
+	MaterialList.erase(MaterialList.end() - 1);
+	int a = 34;
+}
+
 void MaterialManager::Destory(VulkanEngine& engine)
 {
 }

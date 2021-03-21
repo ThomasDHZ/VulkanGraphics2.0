@@ -14,6 +14,9 @@
 class Renderer
 {
 private:
+	bool AddMaterialFlag = false;
+	bool RemoveMaterialFlag = false;
+
 	std::shared_ptr<PerspectiveCamera> camera;
 	Keyboard keyboard;
 	Mouse mouse;

@@ -592,16 +592,16 @@ VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNu
 
 VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList, VkDescriptorType descriptorType)
 {
-	//if (BufferInfoList.size() == 4)
-	//{
-	//	BufferInfoList.emplace_back(BufferInfoList[0]);
-	//}
+	while (BufferInfoList.size() != 100)
+	{
+		BufferInfoList.emplace_back(BufferInfoList[0]);
+	}
 	VkWriteDescriptorSet BufferDescriptor = {};
 	BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	BufferDescriptor.dstSet = DescriptorSet;
 	BufferDescriptor.dstBinding = BindingNumber;
 	BufferDescriptor.dstArrayElement = 0;
-	BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	BufferDescriptor.descriptorType = descriptorType;
 	BufferDescriptor.descriptorCount = static_cast<uint32_t>(BufferInfoList.size());
 	BufferDescriptor.pBufferInfo = BufferInfoList.data();
 	return BufferDescriptor;

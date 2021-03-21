@@ -4,6 +4,7 @@
 #extension GL_EXT_debug_printf : enable
 
 #include "Lighting.glsl"
+#include "material.glsl"
 
 layout(push_constant) uniform ConstMeshProperties
 {
@@ -19,40 +20,6 @@ struct VertexData
 	vec2 UV;
 	vec3 Tangent;
 	vec3 BiTangent;
-};
-
-struct MaterialInfo
-{
-	vec3 Ambient;
-    vec3 Diffuse;
-    vec3 Specular;    
-    float Shininess;
-    float Reflectivness;
-
-	uint DiffuseMapID;
-	uint SpecularMapID;
-	uint NormalMapID;
-	uint DepthMapID;
-	uint AlphaMapID;
-	uint EmissionMapID;
-		uint ShadowMapID;
-};
-
-struct Material
-{
-	vec3 Ambient;
-    vec3 Diffuse;
-    vec3 Specular;    
-    float Shininess;
-    float Reflectivness;
-
-	vec3 DiffuseMap;
-	vec3 SpecularMap;
-	vec3 NormalMap;
-	vec3 DepthMap;
-	vec3 AlphaMap;
-	vec3 EmissionMap;
-	vec3 ShadowMap;
 };
 
 layout(binding = 2) uniform UniformBufferObject {
