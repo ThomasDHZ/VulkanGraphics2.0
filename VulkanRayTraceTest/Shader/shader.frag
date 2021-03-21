@@ -5,6 +5,7 @@
 
 #include "Lighting.glsl"
 #include "material.glsl"
+#include "vertex.glsl"
 
 layout(push_constant) uniform ConstMeshProperties
 {
@@ -39,8 +40,10 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
+    uint MaterialIndex;
 } meshProperties[];
-
+layout(binding = 4) buffer Vertices { Vertex v[]; } vertices[];
+layout(binding = 5) buffer Indices { uint i[]; } indices[];
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];
@@ -130,7 +133,7 @@ void main()
 //    vec3 specular = vec3(0.2) * spec;
 
 
-const MaterialInfo material = MaterialList[ConstMesh.MaterialIndex].material;
+const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
 if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
 	{
 		discard;

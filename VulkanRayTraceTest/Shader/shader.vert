@@ -5,6 +5,8 @@
 #extension GL_EXT_debug_printf : enable
 
 #include "Lighting.glsl"
+#include "material.glsl"
+#include "vertex.glsl"
 
 layout(push_constant) uniform MeshInfo
 {
@@ -13,26 +15,6 @@ layout(push_constant) uniform MeshInfo
     vec2 UVOffset;
 } Mesh;
 
-struct Vertex
-{
-  vec3 pos;
-  float padding1;
-  vec3 normal;
-  float padding2;
-  vec2 uv;
-  vec2 padding3;
-  vec4 tangent;
-  vec4 BiTangant;
-  vec4 Color;
-  ivec4 BoneID;
-  vec4 BoneWeights;
- };
-
-layout(binding = 3, scalar) buffer Vertices
-{
-  Vertex v[];
-}
-vertices[];
 layout(binding = 2) uniform UniformBufferObject {
 	mat4 viewInverse;
 	mat4 projInverse;
@@ -49,9 +31,12 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
+	uint MaterialIndex;
 } meshProperties[];
-
+layout(binding = 4) buffer Vertices { Vertex v[]; } vertices[];
+layout(binding = 5) buffer Indices { uint i[]; } indices[];
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 7) buffer MaterialInfos2 { MaterialInfo material; } MaterialList[];
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;

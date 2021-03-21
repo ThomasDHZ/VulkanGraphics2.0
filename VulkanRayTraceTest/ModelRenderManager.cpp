@@ -91,12 +91,11 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDes
     std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
     for (int x = 0; x < MaterialList.size(); x++)
     {
- 
-            VkDescriptorBufferInfo MaterialBufferInfo = {};
-            MaterialBufferInfo.buffer = MaterialList[x]->MaterialBuffer.Buffer;
-            MaterialBufferInfo.offset = 0;
-            MaterialBufferInfo.range = VK_WHOLE_SIZE;
-            MaterialBufferList.emplace_back(MaterialBufferInfo);
+        VkDescriptorBufferInfo MaterialBufferInfo = {};
+        MaterialBufferInfo.buffer = MaterialList[x]->MaterialBuffer.Buffer;
+        MaterialBufferInfo.offset = 0;
+        MaterialBufferInfo.range = VK_WHOLE_SIZE;
+        MaterialBufferList.emplace_back(MaterialBufferInfo);
     }
 
     return MaterialBufferList;
@@ -216,17 +215,15 @@ uint32_t ModelRenderManager::GetTransformBufferListDescriptorCount()
     return count++;
 }
 
-uint32_t ModelRenderManager::GetMaterialBufferListDescriptorCount()
+uint32_t ModelRenderManager::GetMaterialBufferListDescriptorCount(std::vector<std::shared_ptr<Material>> MaterialList)
 {
     uint32_t count = 0;
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < MaterialList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
-        {
-            count++;
-        }
+        count++;
     }
-    return count++;
+
+    return count;
 }
 
 uint32_t ModelRenderManager::GetTextureBufferListDescriptorCount()

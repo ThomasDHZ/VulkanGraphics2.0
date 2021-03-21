@@ -102,7 +102,6 @@ void AnimatorCompute::Compute(VulkanEngine& engine, uint32_t currentFrame)
 {
 	ConstMeshInfo meshInfo;
 	meshInfo.MeshIndex = 0;
-	meshInfo.MaterialIndex = 0;
 
 	VkCommandBufferBeginInfo CommandBufferBeginInfo{};
 	CommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

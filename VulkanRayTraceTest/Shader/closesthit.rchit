@@ -30,6 +30,7 @@ layout(binding = 3) buffer MeshProperties
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
+    uint MaterialIndex;
 } meshProperties[];
 layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
@@ -85,7 +86,7 @@ void main()
     vec3 TangentFragPos  = TBN * vertex.pos;
 
     
-    const MaterialInfo material = MaterialList[gl_InstanceCustomIndexEXT].material;
+   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
     hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb;
 }
 

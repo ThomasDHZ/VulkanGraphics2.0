@@ -35,7 +35,7 @@ public:
 	uint32_t GetVertexBufferListDescriptorCount();
 	uint32_t GetIndexBufferListDescriptorCount();
 	uint32_t GetTransformBufferListDescriptorCount();
-	uint32_t GetMaterialBufferListDescriptorCount();
+	uint32_t GetMaterialBufferListDescriptorCount(std::vector<std::shared_ptr<Material>> MaterialList);
 	uint32_t GetTextureBufferListDescriptorCount();
 };
 

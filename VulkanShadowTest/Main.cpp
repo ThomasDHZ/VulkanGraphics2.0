@@ -1,5 +1,3 @@
-
-
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -23,17 +21,10 @@
 #include <array>
 #include <optional>
 #include <set>
-#include "PerspectiveCamera.h"
-#include "Keyboard.h"
-#include "Mouse.h"
-#include "InterfaceRenderPass.h"
-#include "ShadowRenderPass.h"
-#include "Vertex.h"
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
-glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 const std::vector<const char*> validationLayers = {
@@ -43,8 +34,6 @@ const std::vector<const char*> validationLayers = {
 const std::vector<const char*> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
-
-
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -84,19 +73,63 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct Vertex {
+    glm::vec3 pos;
+    glm::vec3 color;
+    glm::vec2 texCoord;
 
+    static VkVertexInputBindingDescription getBindingDescription() {
+        VkVertexInputBindingDescription bindingDescription{};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        return bindingDescription;
+    }
+
+    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
+        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+        attributeDescriptions[2].binding = 0;
+        attributeDescriptions[2].location = 2;
+        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
+
+        return attributeDescriptions;
+    }
+};
 
 struct UniformBufferObject {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
-    alignas(16) glm::mat4 lightSpaceMatrix;
 };
 
-struct LightUniformBufferObject
-{
-    alignas(16) glm::vec3 lightPos;
-    alignas(16) glm::vec3 viewPos;
+const std::vector<Vertex> vertices = {
+    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+
+    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+};
+
+const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0,
+    4, 5, 6, 6, 7, 4
 };
 
 class HelloTriangleApplication {
@@ -143,59 +176,25 @@ private:
     VkDeviceMemory textureImageMemory;
     VkImageView textureImageView;
     VkSampler textureSampler;
-    VkDescriptorSet ImGuiDescriptorSet;
 
-    ShadowRenderPass shadowRenderPass;
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
 
-    struct Mesh
-    {
-        std::vector<ShadowVertex> vertices;
-        std::vector<uint32_t> indices;
+    std::vector<VkBuffer> uniformBuffers;
+    std::vector<VkDeviceMemory> uniformBuffersMemory;
 
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
+    VkDescriptorPool descriptorPool;
+    std::vector<VkDescriptorSet> descriptorSets;
 
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+    VkCommandBuffer commandBuffers;
 
-        VkDescriptorPool descriptorPool;
-        std::vector<VkDescriptorSet> descriptorSets;
-
-        std::vector<VkBuffer> uniformBuffers;
-        std::vector<VkDeviceMemory> uniformBuffersMemory;
-        std::vector<VkBuffer> lightuniformBuffers;
-        std::vector<VkDeviceMemory> lightuniformBuffersMemory;
-
-        void Draw(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, VkPipelineLayout pipelineLayout, int index)
-        {
-            vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-
-            VkBuffer vertexBuffers[] = { vertexBuffer };
-            VkDeviceSize offsets[] = { 0 };
-            vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-
-            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[index], 0, nullptr);
-
-            vkCmdDraw(commandBuffer, vertices.size(), 1, 0, 0);
-        }
-    };
-    Mesh planeMesh;
-    Mesh CubeMesh;
-    Mesh CubeMesh2;
-    Mesh CubeMesh3;
-
-    std::vector<VkCommandBuffer> commandBuffers;
-    InterfaceRenderPass interfaceRenderPass;
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
     std::vector<VkFence> inFlightFences;
     std::vector<VkFence> imagesInFlight;
     size_t currentFrame = 0;
-
-    Keyboard keyboard;
-    Mouse mouse;
-    std::shared_ptr<PerspectiveCamera> camera;
 
     bool framebufferResized = false;
 
@@ -214,9 +213,7 @@ private:
         app->framebufferResized = true;
     }
 
-    void initVulkan()
-    {
-
+    void initVulkan() {
         createInstance();
         setupDebugMessenger();
         createSurface();
@@ -227,203 +224,17 @@ private:
         createRenderPass();
         createDescriptorSetLayout();
         createGraphicsPipeline();
-
-
-
-        interfaceRenderPass = InterfaceRenderPass(device, instance, physicalDevice, graphicsQueue, window, swapChainImageViews, swapChainExtent);
-        shadowRenderPass = ShadowRenderPass(device, physicalDevice, commandPool, graphicsQueue, swapChainExtent);
-        camera = std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(800 / (float)600), glm::vec3(0.0f, 0.0f, 3.0f)));
-
         createCommandPool();
         createDepthResources();
         createFramebuffers();
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
-        ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, textureSampler, textureImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-        //Plane
-        {
-            planeMesh.vertices = {
-            {{25.0f, -0.5f,  25.0f},  {0.0f, 1.0f, 0.0f},  {25.0f,  0.0f} },
-            { {-25.0f, -0.5f,  25.0f},  {0.0f, 1.0f, 0.0f},   {0.0f,  0.0f }},
-            { {-25.0f, -0.5f, -25.0f},  {0.0f, 1.0f, 0.0f},   {0.0f, 25.0f }},
-
-            { { 25.0f, -0.5f,  25.0f},  {0.0f, 1.0f, 0.0f}, {25.0f,  0.0f }},
-            { {-25.0f, -0.5f, -25.0f},  {0.0f, 1.0f, 0.0f},  { 0.0f, 25.0f }},
-            { { 25.0f, -0.5f, -25.0f},  {0.0f, 1.0f, 0.0f}, { 25.0f, 25.0f }}
-            };
-
-            planeMesh.indices = {
-
-            };
-            createVertexBuffer(planeMesh);
-            createUniformBuffers(planeMesh);
-            createDescriptorPool(planeMesh);
-            createDescriptorSets(planeMesh);
-        }
-        //Cube1
-        {
-            CubeMesh.vertices = { 
-
-            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
-             { {1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 0.0f} } , // bottom-right         
-            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
-            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            { {-1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 1.0f} } , // top-left
-            // front face
-           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
-           { {  1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 0.0f} } , // bottom-right
-           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
-           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
-           { { -1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 1.0f} } , // top-left
-           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            // left face
-           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
-           { { -1.0f,  1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
-            { {-1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
-           { { -1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
-           { { -1.0f, -1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
-           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
-            // right face
-            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
-            { { 1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
-           { {  1.0f,  1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right         
-           { {  1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
-            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
-          { {   1.0f, -1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-left     
-            // bottom face
-           { { -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
-          { {   1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
-         { {    1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
-          { {   1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
-          { {  -1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
-          { {  -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
-            // top face
-         { {   -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
-         { {    1.0f,  1.0f , 1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
-          { {   1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right     
-          { {   1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
-          { {  -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
-          { {  -1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f } }  // bottom-left  
-            
-            };
-                CubeMesh.indices = {
-
-            };
-            createVertexBuffer(CubeMesh);
-            createUniformBuffers(CubeMesh);
-            createDescriptorPool(CubeMesh);
-            createDescriptorSets(CubeMesh);
-        }
-        //Cube2
-        {
-            CubeMesh2.vertices = {
-            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
-             { {1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 0.0f} } , // bottom-right         
-            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
-            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            { {-1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 1.0f} } , // top-left
-            // front face
-           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
-           { {  1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 0.0f} } , // bottom-right
-           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
-           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
-           { { -1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 1.0f} } , // top-left
-           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            // left face
-           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
-           { { -1.0f,  1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
-            { {-1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
-           { { -1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
-           { { -1.0f, -1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
-           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
-            // right face
-            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
-            { { 1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
-           { {  1.0f,  1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right         
-           { {  1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
-            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
-          { {   1.0f, -1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-left     
-            // bottom face
-           { { -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
-          { {   1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
-         { {    1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
-          { {   1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
-          { {  -1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
-          { {  -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
-            // top face
-         { {   -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
-         { {    1.0f,  1.0f , 1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
-          { {   1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right     
-          { {   1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
-          { {  -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
-          { {  -1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f } }  // bottom-left  
-            };
-            CubeMesh2.indices = {
-
-            };
-            createVertexBuffer(CubeMesh2);
-            createUniformBuffers(CubeMesh2);
-            createDescriptorPool(CubeMesh2);
-            createDescriptorSets(CubeMesh2);
-        }
-
-        //Cube3
-        {
-            CubeMesh3.vertices = {
-            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
-             { {1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 0.0f} } , // bottom-right         
-            { { 1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 1.0f, 1.0f} } , // top-right
-            { {-1.0f, -1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            { {-1.0f,  1.0f, -1.0f}, {  0.0f,  0.0f, -1.0f}, { 0.0f, 1.0f} } , // top-left
-            // front face
-           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
-           { {  1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 0.0f} } , // bottom-right
-           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
-           { {  1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 1.0f, 1.0f} } , // top-right
-           { { -1.0f,  1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 1.0f} } , // top-left
-           { { -1.0f, -1.0f,  1.0f}, {  0.0f,  0.0f,  1.0f}, { 0.0f, 0.0f} } , // bottom-left
-            // left face
-           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
-           { { -1.0f,  1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
-            { {-1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
-           { { -1.0f, -1.0f, -1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-left
-           { { -1.0f, -1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
-           { { -1.0f,  1.0f,  1.0f}, { -1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-right
-            // right face
-            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
-            { { 1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
-           { {  1.0f,  1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right         
-           { {  1.0f, -1.0f, -1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 1.0f} } , // bottom-right
-            { { 1.0f,  1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 1.0f, 0.0f} } , // top-left
-          { {   1.0f, -1.0f,  1.0f}, {  1.0f,  0.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-left     
-            // bottom face
-           { { -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
-          { {   1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-left
-         { {    1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
-          { {   1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-left
-          { {  -1.0f, -1.0f,  1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 0.0f} } , // bottom-right
-          { {  -1.0f, -1.0f, -1.0f}, {  0.0f, -1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-right
-            // top face
-         { {   -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
-         { {    1.0f,  1.0f , 1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
-          { {   1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 1.0f} } , // top-right     
-          { {   1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 1.0f, 0.0f} } , // bottom-right
-          { {  -1.0f,  1.0f, -1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 1.0f} } , // top-left
-          { {  -1.0f,  1.0f,  1.0f}, {  0.0f,  1.0f,  0.0f}, { 0.0f, 0.0f } }  // bottom-left  
-            };
-            CubeMesh3.indices = {
-
-            };
-            createVertexBuffer(CubeMesh3);
-            createUniformBuffers(CubeMesh3);
-            createDescriptorPool(CubeMesh3);
-            createDescriptorSets(CubeMesh3);
-        }
+        createVertexBuffer();
+        createIndexBuffer();
+        createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
         createCommandBuffers();
         createSyncObjects();
     }
@@ -431,19 +242,7 @@ private:
     void mainLoop() {
         while (!glfwWindowShouldClose(window)) {
             glfwPollEvents();
-
-            ImGui_ImplVulkan_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-            {
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-                ImGui::Image(shadowRenderPass.DebugColorTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-            }
-            ImGui::Render();
-
             drawFrame();
-            mouse.Update(window, camera);
-            keyboard.Update(window, camera);
         }
 
         vkDeviceWaitIdle(device);
@@ -458,7 +257,7 @@ private:
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
 
-        vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+        //vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
         vkDestroyPipeline(device, graphicsPipeline, nullptr);
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -471,11 +270,11 @@ private:
         vkDestroySwapchainKHR(device, swapChain, nullptr);
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
-            vkDestroyBuffer(device, planeMesh.uniformBuffers[i], nullptr);
-            vkFreeMemory(device, planeMesh.uniformBuffersMemory[i], nullptr);
+            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
         }
 
-        vkDestroyDescriptorPool(device, planeMesh.descriptorPool, nullptr);
+        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
     }
 
     void cleanup() {
@@ -489,11 +288,11 @@ private:
 
         vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-        vkDestroyBuffer(device, planeMesh.indexBuffer, nullptr);
-        vkFreeMemory(device, planeMesh.indexBufferMemory, nullptr);
+        vkDestroyBuffer(device, indexBuffer, nullptr);
+        vkFreeMemory(device, indexBufferMemory, nullptr);
 
-        vkDestroyBuffer(device, planeMesh.vertexBuffer, nullptr);
-        vkFreeMemory(device, planeMesh.vertexBufferMemory, nullptr);
+        vkDestroyBuffer(device, vertexBuffer, nullptr);
+        vkFreeMemory(device, vertexBufferMemory, nullptr);
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
@@ -535,10 +334,12 @@ private:
         createGraphicsPipeline();
         createDepthResources();
         createFramebuffers();
-        createUniformBuffers(planeMesh);
-        createDescriptorPool(planeMesh);
-        createDescriptorSets(planeMesh);
+        createUniformBuffers();
+        createDescriptorPool();
+        createDescriptorSets();
         createCommandBuffers();
+
+        imagesInFlight.resize(swapChainImages.size(), VK_NULL_HANDLE);
     }
 
     void createInstance() {
@@ -808,21 +609,7 @@ private:
         samplerLayoutBinding.pImmutableSamplers = nullptr;
         samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        VkDescriptorSetLayoutBinding samplerLayoutBinding2{};
-        samplerLayoutBinding2.binding = 2;
-        samplerLayoutBinding2.descriptorCount = 1;
-        samplerLayoutBinding2.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        samplerLayoutBinding2.pImmutableSamplers = nullptr;
-        samplerLayoutBinding2.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        VkDescriptorSetLayoutBinding samplerLayoutBinding3{};
-        samplerLayoutBinding3.binding = 3;
-        samplerLayoutBinding3.descriptorCount = 1;
-        samplerLayoutBinding3.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        samplerLayoutBinding3.pImmutableSamplers = nullptr;
-        samplerLayoutBinding3.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        std::array<VkDescriptorSetLayoutBinding, 4> bindings = { uboLayoutBinding, samplerLayoutBinding, samplerLayoutBinding2, samplerLayoutBinding3 };
+        std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -834,8 +621,8 @@ private:
     }
 
     void createGraphicsPipeline() {
-        auto vertShaderCode = readFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanShadowTest/Shaders/vert.spv");
-        auto fragShaderCode = readFile("C:/Users/dotha/source/repos/VulkanGraphics/VulkanShadowTest/Shaders/frag.spv");
+        auto vertShaderCode = readFile("shaders/vert.spv");
+        auto fragShaderCode = readFile("shaders/frag.spv");
 
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -857,8 +644,8 @@ private:
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-        auto bindingDescription = ShadowVertex::getBindingDescription();
-        auto attributeDescriptions = ShadowVertex::getAttributeDescriptions();
+        auto bindingDescription = Vertex::getBindingDescription();
+        auto attributeDescriptions = Vertex::getAttributeDescriptions();
 
         vertexInputInfo.vertexBindingDescriptionCount = 1;
         vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -895,7 +682,7 @@ private:
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
-        rasterizer.cullMode = VK_CULL_MODE_NONE;
+        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -989,6 +776,7 @@ private:
 
         VkCommandPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
         poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 
         if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
@@ -1033,7 +821,7 @@ private:
 
     void createTextureImage() {
         int texWidth, texHeight, texChannels;
-        stbi_uc* pixels = stbi_load("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load("C:/Users/dotha/source/repos/VulkanGraphics/texture/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
         if (!pixels) {
@@ -1216,8 +1004,8 @@ private:
         endSingleTimeCommands(commandBuffer);
     }
 
-    void createVertexBuffer(Mesh& meshi) {
-        VkDeviceSize bufferSize = sizeof(meshi.vertices[0]) * meshi.vertices.size();
+    void createVertexBuffer() {
+        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
@@ -1225,19 +1013,19 @@ private:
 
         void* data;
         vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-        memcpy(data, meshi.vertices.data(), (size_t)bufferSize);
+        memcpy(data, vertices.data(), (size_t)bufferSize);
         vkUnmapMemory(device, stagingBufferMemory);
 
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, meshi.vertexBuffer, meshi.vertexBufferMemory);
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
 
-        copyBuffer(stagingBuffer, meshi.vertexBuffer, bufferSize);
+        copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
         vkDestroyBuffer(device, stagingBuffer, nullptr);
         vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
-    void createIndexBuffer(Mesh& meshi) {
-        VkDeviceSize bufferSize = sizeof(meshi.indices[0]) * meshi.indices.size();
+    void createIndexBuffer() {
+        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
@@ -1245,52 +1033,34 @@ private:
 
         void* data;
         vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-        memcpy(data, meshi.indices.data(), (size_t)bufferSize);
+        memcpy(data, indices.data(), (size_t)bufferSize);
         vkUnmapMemory(device, stagingBufferMemory);
 
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, meshi.indexBuffer, meshi.indexBufferMemory);
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
 
-        copyBuffer(stagingBuffer, meshi.indexBuffer, bufferSize);
+        copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
         vkDestroyBuffer(device, stagingBuffer, nullptr);
         vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
-    void createUniformBuffers(Mesh& meshi) 
-    {
-        {
-            VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    void createUniformBuffers() {
+        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
-            meshi.uniformBuffers.resize(swapChainImages.size());
-            meshi.uniformBuffersMemory.resize(swapChainImages.size());
+        uniformBuffers.resize(swapChainImages.size());
+        uniformBuffersMemory.resize(swapChainImages.size());
 
-            for (size_t i = 0; i < swapChainImages.size(); i++) {
-                createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, meshi.uniformBuffers[i], meshi.uniformBuffersMemory[i]);
-            }
-        }
-
-        {
-            VkDeviceSize lightbufferSize = sizeof(LightUniformBufferObject);
-
-            meshi.lightuniformBuffers.resize(swapChainImages.size());
-            meshi.lightuniformBuffersMemory.resize(swapChainImages.size());
-
-            for (size_t i = 0; i < swapChainImages.size(); i++) {
-                createBuffer(lightbufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, meshi.lightuniformBuffers[i], meshi.lightuniformBuffersMemory[i]);
-            }
+        for (size_t i = 0; i < swapChainImages.size(); i++) {
+            createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
         }
     }
 
-    void createDescriptorPool(Mesh& meshi) {
-        std::array<VkDescriptorPoolSize, 4> poolSizes{};
+    void createDescriptorPool() {
+        std::array<VkDescriptorPoolSize, 2> poolSizes{};
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
         poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-        poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSizes[2].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-        poolSizes[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[3].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1298,50 +1068,39 @@ private:
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
 
-        if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &meshi.descriptorPool) != VK_SUCCESS) {
+        if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
         }
     }
 
-    void createDescriptorSets(Mesh& meshi) {
+    void createDescriptorSets() {
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = meshi.descriptorPool;
+        allocInfo.descriptorPool = descriptorPool;
         allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
         allocInfo.pSetLayouts = layouts.data();
 
-        meshi.descriptorSets.resize(swapChainImages.size());
-        if (vkAllocateDescriptorSets(device, &allocInfo, meshi.descriptorSets.data()) != VK_SUCCESS) {
+        descriptorSets.resize(swapChainImages.size());
+        if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate descriptor sets!");
         }
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
             VkDescriptorBufferInfo bufferInfo{};
-            bufferInfo.buffer = meshi.uniformBuffers[i];
+            bufferInfo.buffer = uniformBuffers[i];
             bufferInfo.offset = 0;
             bufferInfo.range = sizeof(UniformBufferObject);
-
-            VkDescriptorBufferInfo lightbufferInfo{};
-            lightbufferInfo.buffer = meshi.uniformBuffers[i];
-            lightbufferInfo.offset = 0;
-            lightbufferInfo.range = sizeof(LightUniformBufferObject);
 
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             imageInfo.imageView = textureImageView;
             imageInfo.sampler = textureSampler;
 
-            VkDescriptorImageInfo imageInfo2{};
-            imageInfo2.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo2.imageView = shadowRenderPass.DepthTexture->View;
-            imageInfo2.sampler = shadowRenderPass.DepthTexture->GetTextureSampler();
-
-
-            std::array<VkWriteDescriptorSet, 4> descriptorWrites{};
+            std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
 
             descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[0].dstSet = meshi.descriptorSets[i];
+            descriptorWrites[0].dstSet = descriptorSets[i];
             descriptorWrites[0].dstBinding = 0;
             descriptorWrites[0].dstArrayElement = 0;
             descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -1349,28 +1108,12 @@ private:
             descriptorWrites[0].pBufferInfo = &bufferInfo;
 
             descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[1].dstSet = meshi.descriptorSets[i];
+            descriptorWrites[1].dstSet = descriptorSets[i];
             descriptorWrites[1].dstBinding = 1;
             descriptorWrites[1].dstArrayElement = 0;
             descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             descriptorWrites[1].descriptorCount = 1;
             descriptorWrites[1].pImageInfo = &imageInfo;
-
-            descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[2].dstSet = meshi.descriptorSets[i];
-            descriptorWrites[2].dstBinding = 2;
-            descriptorWrites[2].dstArrayElement = 0;
-            descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            descriptorWrites[2].descriptorCount = 1;
-            descriptorWrites[2].pImageInfo = &imageInfo2;
-
-            descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[3].dstSet = meshi.descriptorSets[i];
-            descriptorWrites[3].dstBinding = 3;
-            descriptorWrites[3].dstArrayElement = 0;
-            descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrites[3].descriptorCount = 1;
-            descriptorWrites[3].pBufferInfo = &lightbufferInfo;
 
             vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
@@ -1458,77 +1201,17 @@ private:
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    void createCommandBuffers() 
-    {
-        {
-            commandBuffers.resize(swapChainFramebuffers.size());
+    void createCommandBuffers() {
 
-            VkCommandBufferAllocateInfo allocInfo{};
-            allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            allocInfo.commandPool = commandPool;
-            allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = commandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = 1;
 
-            if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-                throw std::runtime_error("failed to allocate command buffers!");
-            }
-
-            for (size_t i = 0; i < commandBuffers.size(); i++) {
-                VkCommandBufferBeginInfo beginInfo{};
-                beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-                if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
-                    throw std::runtime_error("failed to begin recording command buffer!");
-                }
-
-                VkRenderPassBeginInfo renderPassInfo{};
-                renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-                renderPassInfo.renderPass = renderPass;
-                renderPassInfo.framebuffer = swapChainFramebuffers[i];
-                renderPassInfo.renderArea.offset = { 0, 0 };
-                renderPassInfo.renderArea.extent = swapChainExtent;
-
-                std::array<VkClearValue, 2> clearValues{};
-                clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-                clearValues[1].depthStencil = { 1.0f, 0 };
-
-                renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-                renderPassInfo.pClearValues = clearValues.data();
-
-                vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-                planeMesh.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-                CubeMesh.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-                CubeMesh2.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-                CubeMesh3.Draw(commandBuffers[i], graphicsPipeline, pipelineLayout, i);
-                vkCmdEndRenderPass(commandBuffers[i]);
-
-
-                std::array<VkClearValue, 2> clearValues2{};
-                clearValues2[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-                clearValues2[1].depthStencil = { 1.0f, 0 };
-
-                VkRenderPassBeginInfo renderPassInfo2{};
-                renderPassInfo2.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-                renderPassInfo2.renderPass = shadowRenderPass.GetRenderPass();
-                renderPassInfo2.framebuffer = shadowRenderPass.SwapChainFramebuffers[i];
-                renderPassInfo2.renderArea.offset = { 0, 0 };
-                renderPassInfo2.renderArea.extent = swapChainExtent;
-                renderPassInfo2.clearValueCount = static_cast<uint32_t>(clearValues2.size());
-                renderPassInfo2.pClearValues = clearValues2.data();
-
-                vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo2, VK_SUBPASS_CONTENTS_INLINE);
-                planeMesh.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
-                CubeMesh.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
-                CubeMesh2.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
-                CubeMesh3.Draw(commandBuffers[i], shadowRenderPass.shadowRendereringPipeline->ShaderPipeline, shadowRenderPass.shadowRendereringPipeline->ShaderPipelineLayout, i);
-                vkCmdEndRenderPass(commandBuffers[i]);
-
-                if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-                    throw std::runtime_error("failed to record command buffer!");
-                }
-            }
+        if (vkAllocateCommandBuffers(device, &allocInfo, &commandBuffers) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate command buffers!");
         }
- 
     }
 
     void createSyncObjects() {
@@ -1559,104 +1242,16 @@ private:
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-        camera->Update();
-        keyboard.Update(window, camera);
-        mouse.Update(window, camera);
-          
-    
-        lightPos.x = sin(glfwGetTime()) * 3.0f;
-        lightPos.z = cos(glfwGetTime()) * 2.0f;
-        lightPos.y = 5.0 + cos(glfwGetTime()) * 1.0f;
-
-        glm::mat4 lightProjection, lightView;
-        glm::mat4 lightSpaceMatrix;
-        float near_plane = 1.0f, far_plane = 7.5f;
-        lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-        lightProjection[1][1] *= -1;
-        lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-        lightSpaceMatrix = lightProjection * lightView;
-
         UniformBufferObject ubo{};
-        ubo.model = glm::mat4(1.0f);
-        ubo.view = camera->GetViewMatrix();
-        ubo.proj = camera->GetProjectionMatrix();
+        ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
         ubo.proj[1][1] *= -1;
-        ubo.lightSpaceMatrix = lightSpaceMatrix;
 
         void* data;
-        vkMapMemory(device, planeMesh.uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
+        vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));
-        vkUnmapMemory(device, planeMesh.uniformBuffersMemory[currentImage]);
-
-        LightUniformBufferObject lubo{};
-        lubo.lightPos = lightPos;
-        lubo.viewPos = camera->Position;
-
-        void* data5;
-        vkMapMemory(device, planeMesh.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data5);
-        memcpy(data5, &lubo, sizeof(lubo));
-        vkUnmapMemory(device, planeMesh.lightuniformBuffersMemory[currentImage]);
-
-        UniformBufferObject ubo2{};
-        ubo2.model = glm::mat4(1.0f);
-        ubo2.model = glm::translate(ubo2.model, glm::vec3(0.0f, 1.5f, 0.0));
-        ubo2.model = glm::scale(ubo2.model, glm::vec3(0.5f));
-        ubo2.view = camera->GetViewMatrix();
-        ubo2.proj = camera->GetProjectionMatrix();
-        ubo2.proj[1][1] *= -1;
-        ubo2.lightSpaceMatrix = lightSpaceMatrix;
-
-
-        void* data2;
-        vkMapMemory(device, CubeMesh.uniformBuffersMemory[currentImage], 0, sizeof(ubo2), 0, &data2);
-        memcpy(data2, &ubo2, sizeof(ubo2));
-        vkUnmapMemory(device, CubeMesh.uniformBuffersMemory[currentImage]);
-
-        void* data6;
-        vkMapMemory(device, CubeMesh.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data6);
-        memcpy(data6, &lubo, sizeof(lubo));
-        vkUnmapMemory(device, CubeMesh.lightuniformBuffersMemory[currentImage]);
-
-        UniformBufferObject ubo3{};
-        ubo3.model = glm::mat4(1.0f);
-        ubo3.model = glm::translate(ubo3.model, glm::vec3(2.0f, 0.0f, 1.0));
-        ubo3.model = glm::scale(ubo3.model, glm::vec3(0.5f));
-        ubo3.view = camera->GetViewMatrix();
-        ubo3.proj = camera->GetProjectionMatrix();
-        ubo3.proj[1][1] *= -1;
-        ubo3.lightSpaceMatrix = lightSpaceMatrix;
-
-
-        void* data3;
-        vkMapMemory(device, CubeMesh2.uniformBuffersMemory[currentImage], 0, sizeof(ubo3), 0, &data3);
-        memcpy(data3, &ubo3, sizeof(ubo3));
-        vkUnmapMemory(device, CubeMesh2.uniformBuffersMemory[currentImage]);
-
-        void* data7;
-        vkMapMemory(device, CubeMesh2.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data7);
-        memcpy(data7, &lubo, sizeof(lubo));
-        vkUnmapMemory(device, CubeMesh2.lightuniformBuffersMemory[currentImage]);
-
-        UniformBufferObject ubo4{};
-        ubo4.model = glm::mat4(1.0f);
-        ubo4.model = glm::translate(ubo4.model, glm::vec3(-1.0f, 0.0f, 2.0));
-        ubo4.model = glm::rotate(ubo4.model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-        ubo4.model = glm::scale(ubo4.model, glm::vec3(0.25));
-        ubo4.view = camera->GetViewMatrix();
-        ubo4.proj = camera->GetProjectionMatrix();
-        ubo4.proj[1][1] *= -1;
-        ubo4.lightSpaceMatrix = lightSpaceMatrix;
-
-
-        void* data4;
-        vkMapMemory(device, CubeMesh3.uniformBuffersMemory[currentImage], 0, sizeof(ubo4), 0, &data4);
-        memcpy(data4, &ubo4, sizeof(ubo4));
-        vkUnmapMemory(device, CubeMesh3.uniformBuffersMemory[currentImage]);
-
-        void* data8;
-        vkMapMemory(device, CubeMesh3.lightuniformBuffersMemory[currentImage], 0, sizeof(lubo), 0, &data8);
-        memcpy(data8, &lubo, sizeof(lubo));
-        vkUnmapMemory(device, CubeMesh3.lightuniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
     }
 
     void drawFrame() {
@@ -1674,20 +1269,62 @@ private:
         }
 
         updateUniformBuffer(imageIndex);
-        interfaceRenderPass.Draw(device, imageIndex, swapChainExtent);
 
         if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
             vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
         }
         imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 
+
+
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffers, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPass;
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = swapChainExtent;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+        clearValues[1].depthStencil = { 1.0f, 0 };
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffers, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffers, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+        VkBuffer vertexBuffers[] = { vertexBuffer };
+        VkDeviceSize offsets[] = { 0 };
+        vkCmdBindVertexBuffers(commandBuffers, 0, 1, vertexBuffers, offsets);
+
+        vkCmdBindIndexBuffer(commandBuffers, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+        vkCmdBindDescriptorSets(commandBuffers, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[0], 0, nullptr);
+
+        vkCmdDrawIndexed(commandBuffers, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
+        vkCmdEndRenderPass(commandBuffers);
+
+        if (vkEndCommandBuffer(commandBuffers) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+
+
+
+
+
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-
-
-        std::array<VkCommandBuffer, 2> submitCommandBuffers =
-        { commandBuffers[imageIndex],  interfaceRenderPass.ImGuiCommandBuffers[imageIndex] };
 
         VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame] };
         VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
@@ -1695,9 +1332,8 @@ private:
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
 
-        submitInfo.commandBufferCount = static_cast<uint32_t>(submitCommandBuffers.size());
-        submitInfo.pCommandBuffers = submitCommandBuffers.data();
-
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffers;
 
         VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame] };
         submitInfo.signalSemaphoreCount = 1;
@@ -1954,4 +1590,3 @@ int main() {
 
     return EXIT_SUCCESS;
 }
-

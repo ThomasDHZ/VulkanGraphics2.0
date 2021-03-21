@@ -548,7 +548,7 @@ VkDescriptorSetLayout VulkanEngine::CreateDescriptorSetLayout(std::vector<Descri
 	if (vkCreateDescriptorSetLayout(Device, &layoutInfo, nullptr, &descriptorSet) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
-
+	
 	return descriptorSet;
 }
 
@@ -592,10 +592,6 @@ VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNu
 
 VkWriteDescriptorSet VulkanEngine::AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList, VkDescriptorType descriptorType)
 {
-	while (BufferInfoList.size() != 100)
-	{
-		BufferInfoList.emplace_back(BufferInfoList[0]);
-	}
 	VkWriteDescriptorSet BufferDescriptor = {};
 	BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	BufferDescriptor.dstSet = DescriptorSet;
