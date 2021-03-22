@@ -33,12 +33,12 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, std::shared_ptr<Material> material)
 {
 	uint32_t MaterialID = IsMateralLoaded(MaterialName);
-	if (MaterialID == -1)
-	{
+
 		MaterialList.emplace_back(material);
 		MaterialList.back()->MaterialID = MaterialID;
+		MaterialList.back()->MaterialBufferIndex = MaterialList.size();
 		MaterialList.back()->UpdateBufferIndexs(engine);
-	}
+	
 	return MaterialID;
 }
 
@@ -49,7 +49,6 @@ std::shared_ptr<Material> MaterialManager::GetMaterial(uint32_t MaterialID)
 
 std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescriptor()
 {
-
 	std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
 	for (int x = 0; x < MaterialList.size(); x++)
 	{
@@ -67,12 +66,30 @@ void MaterialManager::Update(VulkanEngine& engine)
 {
 }
 
+void MaterialManager::UpdateMaterialIndex(VulkanEngine& engine)
+{
+	for(int x = 0; x < MaterialList.size(); x++)
+	{
+		MaterialList[x]->MaterialBufferIndex = x;
+		MaterialList[x]->UpdateBufferIndexs(engine);
+	}
+}
+
 void MaterialManager::DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Material> material)
 {
-	const int index = material->MaterialID;
+	const int index = material->MaterialBufferIndex - 1;
+	for (int x = 0; x < MaterialList.size(); x++)
+	{
+		if (material->MaterialBufferIndex < MaterialList[x]->MaterialBufferIndex)
+		{
+			MaterialList[x]->MaterialBufferIndex -= 1;
+		}
+	}
+	
 	material->Delete(engine);
-	MaterialList.erase(MaterialList.end() - 1);
-	int a = 34;
+	MaterialList.erase(MaterialList.begin() + index);
+
+	UpdateMaterialIndex(engine);
 }
 
 void MaterialManager::Destory(VulkanEngine& engine)

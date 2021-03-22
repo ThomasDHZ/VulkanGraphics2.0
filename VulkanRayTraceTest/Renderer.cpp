@@ -50,10 +50,10 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
     modelRenderManager.ModelList[2].MeshList[0].MeshIndex = 2;
     modelRenderManager.ModelList[3].MeshList[0].MeshIndex = 3;
-    modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 1;
-    modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 2;
-    modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 3;
-    modelRenderManager.ModelList[3].MeshList[0].MeshProperties.UniformDataInfo.MaterialID = 4;
+    modelRenderManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 1;
+    modelRenderManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 2;
+    modelRenderManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 3;
+    modelRenderManager.ModelList[3].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 4;
 
     //Material material3(engine, modelRenderManager.textureManager);
     //material3.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../Models/TestAnimModel/diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
@@ -422,7 +422,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
         vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
 
-        materialManager.DeleteMaterial(engine, materialManager.MaterialList.back());
+        materialManager.DeleteMaterial(engine, materialManager.MaterialList[SceneData->UniformDataInfo.temp]);
 
         SetUpDescriptorPool(engine);
         SetUpDescriptorLayout(engine);
@@ -547,7 +547,7 @@ void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, modelRenderManager.GetVertexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, modelRenderManager.GetIndexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, modelRenderManager.GetTransformBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, modelRenderManager.GetMaterialBufferListDescriptorCount(materialManager.MaterialList) });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, 100 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });

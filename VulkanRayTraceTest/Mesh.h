@@ -42,7 +42,6 @@ public:
 	VulkanBuffer TransformInverseBuffer;
 
 	MeshPropertiesUniformBuffer MeshProperties;
-	std::shared_ptr<Material> material;
 
 	AccelerationStructure BottomLevelAccelerationBuffer;
 

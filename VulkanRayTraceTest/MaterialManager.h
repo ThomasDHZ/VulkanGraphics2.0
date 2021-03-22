@@ -16,6 +16,7 @@ public:
 	~MaterialManager();
 
 	void Update(VulkanEngine& engine);
+	void UpdateMaterialIndex(VulkanEngine& engine);
 	void DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Material> material);
 	void Destory(VulkanEngine& engine);
 
