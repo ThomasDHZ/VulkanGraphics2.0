@@ -9,6 +9,11 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager = ModelRenderManager(engine);
     materialManager = MaterialManager(engine, modelRenderManager.textureManager);
 
+    auto c = sizeof(VulkanBuffer);
+    auto d = sizeof(MeshProperties);
+    auto a = sizeof(Model);
+    auto b = sizeof(Mesh) - sizeof(MeshProperties);
+
     glm::vec2 SpriteSize(1.0f, 1.0f);
 
     std::vector<Vertex> SpriteVertices =

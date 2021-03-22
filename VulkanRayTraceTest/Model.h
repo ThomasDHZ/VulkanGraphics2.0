@@ -25,8 +25,6 @@ class Node
 class Model
 {
 private:
-	void BottomLevelAccelerationStructure(VulkanEngine& engine);
-
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
 	void LoadMesh(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
@@ -53,19 +51,6 @@ public:
 	std::vector<Vertex> ModelVertices;
 	std::vector<uint32_t> ModelIndices;
 	glm::mat4 ModelTransform;
-
-	VulkanBuffer ModelIndexBuffer;
-	VulkanBuffer ModelVertexBuffer;
-	VulkanBuffer ModelTransformBuffer;
-
-	uint32_t ModelTriangleCount;
-	uint32_t ModelVertexCount;
-	uint32_t ModelIndexCount;
-
-	AccelerationStructure BottomLevelAccelerationBuffer;
-	AccelerationStructure TopLevelAccelerationBuffer;
-
-	std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
 
 	Model();
 	Model(VulkanEngine& engine, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

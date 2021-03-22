@@ -34,6 +34,7 @@ public:
 	glm::vec3 MeshRotation = glm::vec3(0.0f);
 	glm::vec3 MeshScale = glm::vec3(1.0f);
 
+
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
 	VulkanBuffer TransformBuffer;
@@ -50,8 +51,6 @@ public:
 	uint32_t VertexCount;
 	uint32_t IndexCount;
 	uint32_t PrimitiveCount; //TriangleCount
-	uint32_t FirstIndex;     //primitiveOffset
-	uint32_t VertexOffset;   //firstVertex
 
 	bool ShowMesh = true;
 
