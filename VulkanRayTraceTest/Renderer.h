@@ -6,9 +6,9 @@
 #include "TextureManager.h"
 #include "Model.h"
 #include "RayTraceRenderer.h"
-#include "ModelRenderManager.h"
 #include "OrthographicCamera.h"
 #include "AnimatorCompute.h"
+#include "AssetManager.h"
 
 
 class Renderer
@@ -47,8 +47,7 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	ModelRenderManager modelRenderManager;
-	MaterialManager materialManager;
+	AssetManager modelRenderManager;
 
 	Renderer();
 	Renderer(VulkanEngine& engine, VulkanWindow& window);

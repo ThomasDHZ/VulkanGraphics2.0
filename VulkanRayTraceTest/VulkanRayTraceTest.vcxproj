@@ -170,7 +170,9 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="ModelRenderManager.cpp" />
+    <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="MeshManager.cpp" />
+    <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
@@ -234,7 +236,9 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="ModelRenderManager.h" />
+    <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="MeshManager.h" />
+    <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="PerspectiveCamera.h" />

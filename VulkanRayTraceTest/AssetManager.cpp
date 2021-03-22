@@ -1,39 +1,35 @@
-#include "ModelRenderManager.h"
+#include "AssetManager.h"
 
-ModelRenderManager::ModelRenderManager()
+AssetManager::AssetManager()
 {
 }
 
-ModelRenderManager::ModelRenderManager(VulkanEngine& engine)
+AssetManager::AssetManager(VulkanEngine& engine)
 {
     textureManager = TextureManager(engine);
+    materialManager = MaterialManager(engine, textureManager);
 }
 
-ModelRenderManager::~ModelRenderManager()
+AssetManager::~AssetManager()
 {
 }
 
-void ModelRenderManager::AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath)
+void AssetManager::AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath)
 {
-    ModelList.emplace_back(Model(engine, materailManager, textureManager, FilePath));
+    modelManager.ModelList.emplace_back(Model(engine, materailManager, textureManager, FilePath));
 }
 
-void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-    ModelList.emplace_back(Model(engine, textureManager, VertexList, IndexList));
+    modelManager.ModelList.emplace_back(Model(engine, textureManager, VertexList, IndexList));
 }
 
-void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
+void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 {
-    ModelList.emplace_back(Model(engine, VertexList, IndexList, material));
+    modelManager.ModelList.emplace_back(Model(engine, VertexList, IndexList, material));
 }
 
-void ModelRenderManager::AddLevelModel(VulkanEngine& engine)
-{
-    ModelList.emplace_back(LevelModel());
-}
-
-void ModelRenderManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet)
+void AssetManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet)
 {
     //std::vector<VkDescriptorBufferInfo> VertexDescriptorInfo = VertexBufferListDescriptor();
     //VkWriteDescriptorSet VertexDescriptor{};
@@ -56,15 +52,15 @@ void ModelRenderManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescripto
     //vkUpdateDescriptorSets(engine.Device, 1, &IndexDescriptor, 0, VK_NULL_HANDLE);
 }
 
-std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetVertexBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> AssetManager::GetVertexBufferListDescriptor()
 {
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             VkDescriptorBufferInfo VertexBufferInfo = {};
-            VertexBufferInfo.buffer = ModelList[x].MeshList[y].VertexBuffer.Buffer;
+            VertexBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].VertexBuffer.Buffer;
             VertexBufferInfo.offset = 0;
             VertexBufferInfo.range = VK_WHOLE_SIZE;
             VertexBufferInfoList.emplace_back(VertexBufferInfo);
@@ -73,15 +69,15 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetVertexBufferListDescr
     return VertexBufferInfoList;
 }
 
-std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetIndexBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> AssetManager::GetIndexBufferListDescriptor()
 {
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             VkDescriptorBufferInfo IndexBufferInfo = {};
-            IndexBufferInfo.buffer = ModelList[x].MeshList[y].IndexBuffer.Buffer;
+            IndexBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].IndexBuffer.Buffer;
             IndexBufferInfo.offset = 0;
             IndexBufferInfo.range = VK_WHOLE_SIZE;
             IndexBufferInfoList.emplace_back(IndexBufferInfo);
@@ -90,7 +86,7 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetIndexBufferListDescri
     return IndexBufferInfoList;
 }
 
-std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDescriptor(std::vector<std::shared_ptr<Material>> MaterialList)
+std::vector<VkDescriptorBufferInfo> AssetManager::GetMaterialBufferListDescriptor(std::vector<std::shared_ptr<Material>> MaterialList)
 {
 
     std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
@@ -106,15 +102,15 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMaterialBufferListDes
     return MaterialBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMeshDataListDescriptor()
+std::vector<VkDescriptorBufferInfo> AssetManager::GetMeshDataListDescriptor()
 {
     std::vector<VkDescriptorBufferInfo> TransformBufferList{};
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             VkDescriptorBufferInfo TransformBufferInfo = {};
-            TransformBufferInfo.buffer = ModelList[x].MeshList[y].MeshProperties.VulkanBufferData.Buffer;
+            TransformBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].MeshProperties.VulkanBufferData.Buffer;
             TransformBufferInfo.offset = 0;
             TransformBufferInfo.range = VK_WHOLE_SIZE;
             TransformBufferList.emplace_back(TransformBufferInfo);
@@ -123,15 +119,15 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetMeshDataListDescripto
     return TransformBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetTransformBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> AssetManager::GetTransformBufferListDescriptor()
 {
     std::vector<VkDescriptorBufferInfo> TransformBufferList{};
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             VkDescriptorBufferInfo TransformBufferInfo = {};
-            TransformBufferInfo.buffer = ModelList[x].MeshList[y].TransformBuffer.Buffer;
+            TransformBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].TransformBuffer.Buffer;
             TransformBufferInfo.offset = 0;
             TransformBufferInfo.range = VK_WHOLE_SIZE;
             TransformBufferList.emplace_back(TransformBufferInfo);
@@ -140,7 +136,7 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetTransformBufferListDe
     return TransformBufferList;
 }
 
-std::vector<VkDescriptorImageInfo> ModelRenderManager::GetTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> AssetManager::GetTextureBufferListDescriptor()
 {
     std::vector<VkDescriptorImageInfo> DescriptorImageList;
     for (auto texture : textureManager.GetTextureList())
@@ -154,7 +150,7 @@ std::vector<VkDescriptorImageInfo> ModelRenderManager::GetTextureBufferListDescr
     return DescriptorImageList;
 }
 
-std::vector<VkDescriptorImageInfo> ModelRenderManager::Get3DTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> AssetManager::Get3DTextureBufferListDescriptor()
 {
     std::vector<VkDescriptorImageInfo> DescriptorImageList;
     for (auto texture : textureManager.Get3DTextureList())
@@ -168,12 +164,12 @@ std::vector<VkDescriptorImageInfo> ModelRenderManager::Get3DTextureBufferListDes
     return DescriptorImageList;
 }
 
-uint32_t ModelRenderManager::GetMeshPropertiesBufferListDescriptorCount()
+uint32_t AssetManager::GetMeshPropertiesBufferListDescriptorCount()
 {
     uint32_t count = 0;
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             count++;
         }
@@ -181,12 +177,12 @@ uint32_t ModelRenderManager::GetMeshPropertiesBufferListDescriptorCount()
     return count++;
 }
 
-uint32_t ModelRenderManager::GetVertexBufferListDescriptorCount()
+uint32_t AssetManager::GetVertexBufferListDescriptorCount()
 {
     uint32_t count = 0;
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             count++;
         }
@@ -194,12 +190,12 @@ uint32_t ModelRenderManager::GetVertexBufferListDescriptorCount()
     return count++;
 }
 
-uint32_t ModelRenderManager::GetIndexBufferListDescriptorCount()
+uint32_t AssetManager::GetIndexBufferListDescriptorCount()
 {
     uint32_t count = 0;
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             count++;
         }
@@ -207,12 +203,12 @@ uint32_t ModelRenderManager::GetIndexBufferListDescriptorCount()
     return count++;
 }
 
-uint32_t ModelRenderManager::GetTransformBufferListDescriptorCount()
+uint32_t AssetManager::GetTransformBufferListDescriptorCount()
 {
     uint32_t count = 0;
-    for (int x = 0; x < ModelList.size(); x++)
+    for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
         {
             count++;
         }
@@ -220,7 +216,7 @@ uint32_t ModelRenderManager::GetTransformBufferListDescriptorCount()
     return count++;
 }
 
-uint32_t ModelRenderManager::GetMaterialBufferListDescriptorCount(std::vector<std::shared_ptr<Material>> MaterialList)
+uint32_t AssetManager::GetMaterialBufferListDescriptorCount(std::vector<std::shared_ptr<Material>> MaterialList)
 {
     uint32_t count = 0;
     for (int x = 0; x < MaterialList.size(); x++)
@@ -231,7 +227,7 @@ uint32_t ModelRenderManager::GetMaterialBufferListDescriptorCount(std::vector<st
     return count;
 }
 
-uint32_t ModelRenderManager::GetTextureBufferListDescriptorCount()
+uint32_t AssetManager::GetTextureBufferListDescriptorCount()
 {
     return textureManager.GetTextureList().size();
 }

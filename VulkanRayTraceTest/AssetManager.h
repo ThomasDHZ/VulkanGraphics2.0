@@ -1,26 +1,33 @@
 #pragma once
 #include "VulkanEngine.h"
 #include "Model.h"
-#include "LevelModel.h"
-class ModelRenderManager
+#include "MaterialManager.h"
+#include "TextureManager.h"
+#include "MeshManager.h"
+#include "ModelManager.h"
+class AssetManager
 {
 private:
 	std::vector<VulkanBuffer> VertexBufferList;
 	std::vector<VulkanBuffer> IndexBufferList;
 
 public:
-	std::vector<Model> ModelList;
+	MaterialManager materialManager;
 	TextureManager textureManager;
+	MeshManager meshManager;
+	ModelManager modelManager;
+
+
+	
 	//MaterialManager materialManager;
 
-	ModelRenderManager();
-	ModelRenderManager(VulkanEngine& engine);
-	~ModelRenderManager();
+	AssetManager();
+	AssetManager(VulkanEngine& engine);
+	~AssetManager();
 
 	void AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
-	void AddLevelModel(VulkanEngine& engine);
 	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();
