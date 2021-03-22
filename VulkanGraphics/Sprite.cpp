@@ -1,9 +1,14 @@
+#include "..\VulkanRayTraceTest\Sprite.h"
 #include "Sprite.h"
 #include "LevelSprite.h"
 
 
 
 Sprite::Sprite() : Object2D()
+{
+}
+
+Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec3 Position, std::shared_ptr<Material> material)
 {
 }
 

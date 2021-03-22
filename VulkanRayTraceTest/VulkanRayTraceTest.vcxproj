@@ -164,6 +164,7 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="InterfaceRenderPass.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="LevelModel.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRenderPass.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SceneRenderingPipeline.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="TextureManager.cpp" />
@@ -227,6 +229,7 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="InterfaceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="LevelModel.h" />
     <ClInclude Include="MainRenderPass.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
@@ -245,6 +248,7 @@
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="SceneRenderingPipeline.h" />
     <ClInclude Include="SceneRenderPass.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Texture3D.h" />
     <ClInclude Include="TextureManager.h" />

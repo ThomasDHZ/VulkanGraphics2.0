@@ -34,8 +34,6 @@ public:
 	glm::vec3 MeshRotation = glm::vec3(0.0f);
 	glm::vec3 MeshScale = glm::vec3(1.0f);
 
-	
-
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
 	VulkanBuffer TransformBuffer;

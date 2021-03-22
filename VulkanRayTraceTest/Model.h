@@ -73,6 +73,7 @@ public:
 	Model(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath);
 	~Model();
 
+	void AddMesh(Mesh& mesh);
 	void Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer> scenedata);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);

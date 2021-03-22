@@ -28,6 +28,11 @@ void ModelRenderManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& Ver
     ModelList.emplace_back(Model(engine, VertexList, IndexList, material));
 }
 
+void ModelRenderManager::AddLevelModel(VulkanEngine& engine)
+{
+    ModelList.emplace_back(LevelModel());
+}
+
 void ModelRenderManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet)
 {
     //std::vector<VkDescriptorBufferInfo> VertexDescriptorInfo = VertexBufferListDescriptor();

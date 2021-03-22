@@ -1,7 +1,7 @@
 #pragma once
 #include "VulkanEngine.h"
 #include "Model.h"
-
+#include "LevelModel.h"
 class ModelRenderManager
 {
 private:
@@ -20,6 +20,7 @@ public:
 	void AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
+	void AddLevelModel(VulkanEngine& engine);
 	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();
