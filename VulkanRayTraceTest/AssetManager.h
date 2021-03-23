@@ -7,10 +7,6 @@
 #include "ModelManager.h"
 class AssetManager
 {
-	friend class MaterialManager;
-	friend class TextureManager;
-	friend class MeshManager;
-	friend class ModelManager;
 private:
 
 public:
@@ -25,25 +21,22 @@ public:
 
 	void AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
-	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
+	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID);
 
 	void Update(VulkanEngine& engine);
 
-	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetMeshDataListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetTransformInverseBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor(std::vector<std::shared_ptr<Material>> MaterialList);
-	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
-	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors() { return meshManager.GetVertexBufferListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors() { return meshManager.GetIndexBufferListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors() { return meshManager.GetTransformBufferListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors() { return meshManager.GetMeshPropertiesListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor() { return materialManager.GetMaterialBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor() { return textureManager.GetTextureBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor() { return textureManager.GetTextureBufferListDescriptor(); }
+	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor() { return textureManager.GetSkyBoxTextureBufferListDescriptor(); }
 
-	uint32_t GetMeshPropertiesBufferListDescriptorCount();
-	uint32_t GetVertexBufferListDescriptorCount();
-	uint32_t GetIndexBufferListDescriptorCount();
-	uint32_t GetTransformBufferListDescriptorCount();
-	uint32_t GetMaterialBufferListDescriptorCount(std::vector<std::shared_ptr<Material>> MaterialList);
-	uint32_t GetTextureBufferListDescriptorCount();
+	uint32_t GetMeshDescriptorCount() { return meshManager.GetMeshDescriptorCount(); }
+	uint32_t GetMaterialDescriptorCount() { return materialManager.GetMaterialDescriptorCount(); }
+	uint32_t GetTextureBufferDescriptorCount() { return textureManager.GetTextureBufferDescriptorCount(); }
+	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager.Get3DTextureBufferDescriptorCount(); }
 };
 

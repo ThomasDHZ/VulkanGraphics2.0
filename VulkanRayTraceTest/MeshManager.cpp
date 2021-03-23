@@ -24,7 +24,7 @@ void MeshManager::Update(VulkanEngine& engine)
 	}
 }
 
-void MeshManager::UpdateMeshBufferIndex(VulkanEngine& engine)
+void MeshManager::UpdateBufferIndex(VulkanEngine& engine)
 {
 	for (int x = 0; x < MeshList.size(); x++)
 	{
@@ -38,4 +38,60 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsP
 	{
 		mesh->Draw(commandBuffer, pipeline);
 	}
+}
+
+std::vector<VkDescriptorBufferInfo> MeshManager::GetVertexBufferListDescriptors()
+{
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
+    for (auto& mesh : MeshList)
+    {
+        VkDescriptorBufferInfo VertexBufferInfo = {};
+        VertexBufferInfo.buffer = mesh->VertexBuffer.Buffer;
+        VertexBufferInfo.offset = 0;
+        VertexBufferInfo.range = VK_WHOLE_SIZE;
+        VertexBufferInfoList.emplace_back(VertexBufferInfo);
+    }
+    return VertexBufferInfoList;
+}
+
+std::vector<VkDescriptorBufferInfo> MeshManager::GetIndexBufferListDescriptors()
+{
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
+    for (auto& mesh : MeshList)
+    {
+        VkDescriptorBufferInfo IndexBufferInfo = {};
+        IndexBufferInfo.buffer = mesh->IndexBuffer.Buffer;
+        IndexBufferInfo.offset = 0;
+        IndexBufferInfo.range = VK_WHOLE_SIZE;
+        IndexBufferInfoList.emplace_back(IndexBufferInfo);
+    }
+    return IndexBufferInfoList;
+}
+
+std::vector<VkDescriptorBufferInfo> MeshManager::GetTransformBufferListDescriptors()
+{
+    std::vector<VkDescriptorBufferInfo> TransformBufferList{};
+    for (auto& mesh : MeshList)
+    {
+        VkDescriptorBufferInfo TransformBufferInfo = {};
+        TransformBufferInfo.buffer = mesh->TransformBuffer.Buffer;
+        TransformBufferInfo.offset = 0;
+        TransformBufferInfo.range = VK_WHOLE_SIZE;
+        TransformBufferList.emplace_back(TransformBufferInfo);
+    }
+    return TransformBufferList;
+}
+
+std::vector<VkDescriptorBufferInfo> MeshManager::GetMeshPropertiesListDescriptors()
+{
+    std::vector<VkDescriptorBufferInfo> MeshPropertiesmBufferList{};
+    for (auto& mesh : MeshList)
+    {
+        VkDescriptorBufferInfo MeshPropertiesmBufferBufferInfo = {};
+        MeshPropertiesmBufferBufferInfo.buffer = mesh->MeshProperties.VulkanBufferData.Buffer;
+        MeshPropertiesmBufferBufferInfo.offset = 0;
+        MeshPropertiesmBufferBufferInfo.range = VK_WHOLE_SIZE;
+        MeshPropertiesmBufferList.emplace_back(MeshPropertiesmBufferBufferInfo);
+    }
+    return MeshPropertiesmBufferList;
 }

@@ -128,3 +128,40 @@ std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string 
 
 	return Texture3DList[0];
 }
+
+std::vector<VkDescriptorImageInfo> TextureManager::GetTextureBufferListDescriptor()
+{
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	for (auto texture : TextureList)
+	{
+		VkDescriptorImageInfo DescriptorImage{};
+		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		DescriptorImage.imageView = texture->GetTextureView();
+		DescriptorImage.sampler = texture->GetTextureSampler();
+		DescriptorImageList.emplace_back(DescriptorImage);
+	}
+	return DescriptorImageList;
+}
+
+std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescriptor()
+{
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	for (auto texture : Texture3DList)
+	{
+		VkDescriptorImageInfo DescriptorImage{};
+		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		DescriptorImage.imageView = texture->GetTextureView();
+		DescriptorImage.sampler = texture->GetTextureSampler();
+		DescriptorImageList.emplace_back(DescriptorImage);
+	}
+	return DescriptorImageList;
+}
+
+VkDescriptorImageInfo TextureManager::GetSkyBoxTextureBufferListDescriptor()
+{
+	VkDescriptorImageInfo DescriptorImage{};
+	DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	DescriptorImage.imageView = CubeMap.GetTextureView();
+	DescriptorImage.sampler = CubeMap.GetTextureSampler();
+	return DescriptorImage;
+}

@@ -9,18 +9,17 @@ Model::Model()
 Model::Model(VulkanEngine& engine, MeshManager& meshManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	ModelID = engine.GenerateID();
-	std::shared_ptr<Material> material = std::make_shared<Material>(engine, textureManager);
-	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, material, MeshList.size()));
+	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, 0));
 	meshManager.MeshList.back()->ParentModelID = ModelID;
 	meshManager.MeshList.back()->VertexList = VertexList;
 	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
 	MeshList.emplace_back(meshManager.MeshList.back());
 }
 
-Model::Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID)
 {
 	ModelID = engine.GenerateID();
-	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, material, MeshList.size()));
+	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, materialID));
 	meshManager.MeshList.back()->ParentModelID = ModelID;
 	meshManager.MeshList.back()->VertexList = VertexList;
 	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
@@ -154,11 +153,11 @@ void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialMan
 
 		 auto vertices = LoadVertices(mesh);
 		 auto indices = LoadIndices(mesh);
-		 auto material = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
+		 auto materialID = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
-		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, material, MeshList.size()));
+		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, materialID));
 		meshManager.MeshList.back()->ParentModelID = ModelID;
 		meshManager.MeshList.back()->VertexList = vertices;
 		meshManager.MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
@@ -276,7 +275,7 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-std::shared_ptr<Material> Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+uint32_t Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(engine, textureManager);
 
@@ -347,8 +346,7 @@ std::shared_ptr<Material> Model::LoadMaterial(VulkanEngine& engine, MaterialMana
 		ModelMaterial->materialTexture.EmissionMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
-	materailManager.LoadMaterial(engine, "sfsd", ModelMaterial);
-	return ModelMaterial;
+	return materailManager.LoadMaterial(engine, "sfsd", ModelMaterial);
 }
 
 void Model::BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight)

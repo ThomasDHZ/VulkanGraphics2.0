@@ -37,4 +37,11 @@ public:
 	std::vector<std::shared_ptr<Texture2D>> GetTextureList() { return TextureList; }
 	std::vector<std::shared_ptr<Texture3D>> Get3DTextureList() { return Texture3DList; }
 	CubeMapTexture GetCubeMapTexture() { return CubeMap; }
+
+	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
+	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor();
+
+	uint32_t GetTextureBufferDescriptorCount() { return TextureList.size(); }
+	uint32_t Get3DTextureBufferDescriptorCount() { return TextureList.size(); }
 };

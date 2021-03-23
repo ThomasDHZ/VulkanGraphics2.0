@@ -32,7 +32,7 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 
 uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, std::shared_ptr<Material> material)
 {
-	uint32_t MaterialID = IsMateralLoaded(MaterialName);
+	uint32_t MaterialID = engine.GenerateID();
 
 		MaterialList.emplace_back(material);
 		MaterialList.back()->MaterialID = MaterialID;
@@ -62,11 +62,7 @@ std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescri
 	return MaterialBufferList;
 }
 
-void MaterialManager::Update(VulkanEngine& engine)
-{
-}
-
-void MaterialManager::UpdateMaterialIndex(VulkanEngine& engine)
+void MaterialManager::UpdateBufferIndex(VulkanEngine& engine)
 {
 	for(int x = 0; x < MaterialList.size(); x++)
 	{
@@ -82,7 +78,7 @@ void MaterialManager::DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Mater
 	material->Delete(engine);
 	MaterialList.erase(MaterialList.begin() + index);
 
-	UpdateMaterialIndex(engine);
+	UpdateBufferIndex(engine);
 }
 
 void MaterialManager::Destory(VulkanEngine& engine)

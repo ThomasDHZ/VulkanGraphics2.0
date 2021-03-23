@@ -16,7 +16,14 @@ public:
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
 	void Update(VulkanEngine& engine);
-	void UpdateMeshBufferIndex(VulkanEngine& engine);
+	void UpdateBufferIndex(VulkanEngine& engine);
 	void Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
+
+	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();
+	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors();
+	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors();
+	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors();
+
+	uint32_t GetMeshDescriptorCount() { return MeshList.size(); }
 };
 
