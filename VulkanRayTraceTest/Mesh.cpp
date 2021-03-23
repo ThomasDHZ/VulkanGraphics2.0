@@ -8,7 +8,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 {
 	std::vector<uint32_t> indices{};
 
-	MeshIndex = 0;
+	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
@@ -24,7 +24,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t meshID)
 {
-	MeshIndex = meshID;
+	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
@@ -40,7 +40,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> MeshMaterial, uint32_t meshID)
 {
-	MeshIndex = meshID;
+	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
 	MeshTransform = glm::mat4(1.0f);
@@ -219,7 +219,7 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 	if (ShowMesh)
 	{
 		ConstMeshInfo meshInfo;
-		meshInfo.MeshIndex = MeshIndex;
+		meshInfo.MeshIndex = MeshBufferIndex;
 
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);

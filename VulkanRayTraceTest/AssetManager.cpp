@@ -55,6 +55,8 @@ void AssetManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& 
 void AssetManager::Update(VulkanEngine& engine)
 {
     meshManager.Update(engine);
+    meshManager.UpdateMeshBufferIndex(engine);
+
     modelManager.Update(engine);
 }
 

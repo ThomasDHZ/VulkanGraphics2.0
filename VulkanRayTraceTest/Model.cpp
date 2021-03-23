@@ -169,7 +169,7 @@ void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialMan
 			if (nodeMap.NodeString == node->mName.C_Str())
 			{
 				meshManager.MeshList.back()->NodeID = nodeMap.NodeID;
-				nodeMap.MeshID = meshManager.MeshList.back()->MeshIndex;
+				nodeMap.MeshID = meshManager.MeshList.back()->MeshID;
 			}
 		}
 		MeshList.emplace_back(meshManager.MeshList.back());

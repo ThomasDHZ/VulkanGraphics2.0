@@ -24,6 +24,14 @@ void MeshManager::Update(VulkanEngine& engine)
 	}
 }
 
+void MeshManager::UpdateMeshBufferIndex(VulkanEngine& engine)
+{
+	for (int x = 0; x < MeshList.size(); x++)
+	{
+		MeshList[x]->MeshBufferIndex = x;
+	}
+}
+
 void MeshManager::Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
 {
 	for (auto& mesh : MeshList)

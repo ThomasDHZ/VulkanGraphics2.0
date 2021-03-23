@@ -16,6 +16,7 @@ public:
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
 	void Update(VulkanEngine& engine);
+	void UpdateMeshBufferIndex(VulkanEngine& engine);
 	void Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 };
 

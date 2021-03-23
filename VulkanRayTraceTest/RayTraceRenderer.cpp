@@ -83,7 +83,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
 
                 VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
                 AccelerationStructureInstance.transform = transformMatrix;
-                AccelerationStructureInstance.instanceCustomIndex = model[x]->MeshList[y]->MeshIndex;
+                AccelerationStructureInstance.instanceCustomIndex = model[x]->MeshList[y]->MeshID;
                 AccelerationStructureInstance.mask = 0xFF;
                 AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
                 AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;

@@ -47,10 +47,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.AddModel(engine, SpriteVertices, SpriteIndices);
     modelRenderManager.AddModel(engine, modelRenderManager.materialManager,  "../Models/TestAnimModel/model.dae");
     modelRenderManager.AddModel(engine, modelRenderManager.materialManager, "../Models/cyborg/cyborg.obj");
-    modelRenderManager.modelManager.ModelList[1]->MeshList[0]->MeshIndex = 1;
     modelRenderManager.modelManager.ModelList[1]->MeshList[0]->MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
-    modelRenderManager.modelManager.ModelList[2]->MeshList[0]->MeshIndex = 2;
-    modelRenderManager.modelManager.ModelList[3]->MeshList[0]->MeshIndex = 3;
     modelRenderManager.modelManager.ModelList[0]->MeshList[0]->MeshProperties.UniformDataInfo.MaterialIndex = 1;
     modelRenderManager.modelManager.ModelList[1]->MeshList[0]->MeshProperties.UniformDataInfo.MaterialIndex = 2;
     modelRenderManager.modelManager.ModelList[2]->MeshList[0]->MeshProperties.UniformDataInfo.MaterialIndex = 3;
