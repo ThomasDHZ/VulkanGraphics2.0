@@ -47,14 +47,14 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     modelRenderManager.AddModel(engine, SpriteVertices, SpriteIndices);
     modelRenderManager.AddModel(engine, modelRenderManager.materialManager,  "../Models/TestAnimModel/model.dae");
     modelRenderManager.AddModel(engine, modelRenderManager.materialManager, "../Models/cyborg/cyborg.obj");
-    modelRenderManager.modelManager.ModelList[1].MeshList[0].MeshIndex = 1;
-    modelRenderManager.modelManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
-    modelRenderManager.modelManager.ModelList[2].MeshList[0].MeshIndex = 2;
-    modelRenderManager.modelManager.ModelList[3].MeshList[0].MeshIndex = 3;
-    modelRenderManager.modelManager.ModelList[0].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 1;
-    modelRenderManager.modelManager.ModelList[1].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 2;
-    modelRenderManager.modelManager.ModelList[2].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 3;
-    modelRenderManager.modelManager.ModelList[3].MeshList[0].MeshProperties.UniformDataInfo.MaterialIndex = 4;
+    modelRenderManager.modelManager.ModelList[1]->MeshList[0]->MeshIndex = 1;
+    modelRenderManager.modelManager.ModelList[1]->MeshList[0]->MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
+    modelRenderManager.modelManager.ModelList[2]->MeshList[0]->MeshIndex = 2;
+    modelRenderManager.modelManager.ModelList[3]->MeshList[0]->MeshIndex = 3;
+    modelRenderManager.modelManager.ModelList[0]->MeshList[0]->MeshProperties.UniformDataInfo.MaterialIndex = 1;
+    modelRenderManager.modelManager.ModelList[1]->MeshList[0]->MeshProperties.UniformDataInfo.MaterialIndex = 2;
+    modelRenderManager.modelManager.ModelList[2]->MeshList[0]->MeshProperties.UniformDataInfo.MaterialIndex = 3;
+    modelRenderManager.modelManager.ModelList[3]->MeshList[0]->MeshProperties.UniformDataInfo.MaterialIndex = 4;
 
     //Material material3(engine, modelRenderManager.textureManager);
     //material3.materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../Models/TestAnimModel/diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
@@ -205,10 +205,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     auto  currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    for (auto& model : modelRenderManager.modelManager.ModelList)
-    {
-        model.Update(engine, SceneData);
-    }
+    modelRenderManager.Update(engine);
     RayRenderer.createTopLevelAccelerationStructure(engine, modelRenderManager.modelManager.ModelList);
 
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -238,19 +235,19 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 
     for (int x = 0; x < modelRenderManager.modelManager.ModelList.size(); x++)
     {
-        ImGui::SliderFloat3(("Model Transformx" + std::to_string(x)).c_str(), &modelRenderManager.modelManager.ModelList[x].ModelPosition.x, -10.0f, 10.0f);
-        ImGui::SliderFloat3(("Model Rotatex" + std::to_string(x)).c_str(), &modelRenderManager.modelManager.ModelList[x].ModelRotation.x, 0.0f, 360.0f);
-        ImGui::SliderFloat3(("Model Scalex" + std::to_string(x)).c_str(), &modelRenderManager.modelManager.ModelList[x].ModelScale.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("Model Transformx" + std::to_string(x)).c_str(), &modelRenderManager.modelManager.ModelList[x]->ModelPosition.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3(("Model Rotatex" + std::to_string(x)).c_str(), &modelRenderManager.modelManager.ModelList[x]->ModelRotation.x, 0.0f, 360.0f);
+        ImGui::SliderFloat3(("Model Scalex" + std::to_string(x)).c_str(), &modelRenderManager.modelManager.ModelList[x]->ModelScale.x, 0.0f, 1.0f);
 
-        for (int y = 0; y < modelRenderManager.modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelRenderManager.modelManager.ModelList[x]->MeshList.size(); y++)
         {
             auto a = std::to_string(x + y);
-            ImGui::Checkbox(a.c_str(), &modelRenderManager.modelManager.ModelList[x].MeshList[y].ShowMesh);
+            ImGui::Checkbox(a.c_str(), &modelRenderManager.modelManager.ModelList[x]->MeshList[y]->ShowMesh);
 
-            ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x].MeshList[y].MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x].MeshList[y].MeshPosition.x, -10.0f, 10.0f);
-            ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x].MeshList[y].MeshRotation.x, 0.0f, 360.0f);
-            ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x].MeshList[y].MeshScale.x, 0.0f, 1.0f);
+            ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x]->MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+            ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x]->MeshList[y]->MeshPosition.x, -10.0f, 10.0f);
+            ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x]->MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
+            ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &modelRenderManager.modelManager.ModelList[x]->MeshList[y]->MeshScale.x, 0.0f, 1.0f);
         }
     }
 
@@ -319,9 +316,9 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     vkCmdBindPipeline(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
 
-    for (auto model : modelRenderManager.modelManager.ModelList)
+    for (auto model : modelRenderManager.meshManager.MeshList)
     {
-        model.Draw(RasterCommandBuffer, RenderPass.forwardRendereringPipeline);
+        model->Draw(RasterCommandBuffer, RenderPass.forwardRendereringPipeline);
     }
 
     vkCmdEndRenderPass(RasterCommandBuffer);
@@ -342,7 +339,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    modelRenderManager.modelManager.ModelList[2].MeshList[0].VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.modelManager.ModelList[2].MeshList[0].VertexList[0], sizeof(Vertex) * modelRenderManager.modelManager.ModelList[2].MeshList[0].VertexList.size());
+    modelRenderManager.modelManager.ModelList[2]->MeshList[0]->VertexBuffer.CopyBufferToMemory(engine.Device, &modelRenderManager.modelManager.ModelList[2]->MeshList[0]->VertexList[0], sizeof(Vertex) * modelRenderManager.modelManager.ModelList[2]->MeshList[0]->VertexList.size());
     if (RayTraceSwitch)
     {
         CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
@@ -438,7 +435,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     for (auto model : modelRenderManager.modelManager.ModelList)
     {
-        model.Destory(engine);
+        model->Destory(engine);
     }
 
     modelRenderManager.textureManager.Destory(engine);

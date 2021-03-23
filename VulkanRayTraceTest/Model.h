@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "Animation3D.h"
 #include "AnimationPlayer3D.h"
+#include "MeshManager.h"
 
 const unsigned int MAX_BONE_VERTEX_COUNT = 4;
 
@@ -27,7 +28,7 @@ class Model
 private:
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
-	void LoadMesh(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
 	std::shared_ptr<Material> LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
@@ -41,11 +42,13 @@ private:
 	AnimationPlayer3D AnimationPlayer;
 
 public:
+	uint32_t ModelID = 0;
+
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
 	glm::vec3 ModelRotation = glm::vec3(0.0f);
 	glm::vec3 ModelScale = glm::vec3(1.0f);
 
-	std::vector<Mesh> MeshList;
+	std::vector<std::shared_ptr<Mesh>> MeshList;
 	std::vector<std::shared_ptr<Bone>> BoneList;
 
 	std::vector<Vertex> ModelVertices;
@@ -53,13 +56,12 @@ public:
 	glm::mat4 ModelTransform;
 
 	Model();
-	Model(VulkanEngine& engine, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
-	Model(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath);
+	Model(VulkanEngine& engine, MeshManager& meshManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
+	Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath);
 	~Model();
 
-	void AddMesh(Mesh& mesh);
-	void Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer> scenedata);
+	void Update(VulkanEngine& engine);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 

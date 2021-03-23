@@ -6,24 +6,30 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
+	ModelID = engine.GenerateID();
 	std::shared_ptr<Material> material = std::make_shared<Material>(engine, textureManager);
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
-	MeshList.back().VertexList = VertexList;
-	MeshList.back().MeshTransform = glm::mat4(1.0f);
-
+	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, material, MeshList.size()));
+	meshManager.MeshList.back()->ParentModelID = ModelID;
+	meshManager.MeshList.back()->VertexList = VertexList;
+	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
+	MeshList.emplace_back(meshManager.MeshList.back());
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, MeshList.size()));
-	MeshList.back().VertexList = VertexList;
-	MeshList.back().MeshTransform = glm::mat4(1.0f);
+	ModelID = engine.GenerateID();
+	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, material, MeshList.size()));
+	meshManager.MeshList.back()->ParentModelID = ModelID;
+	meshManager.MeshList.back()->VertexList = VertexList;
+	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
+	MeshList.emplace_back(meshManager.MeshList.back());
 }
 
-Model::Model(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath)
 {
+	ModelID = engine.GenerateID();
 	Assimp::Importer ModelImporter;
 
 	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -36,7 +42,7 @@ Model::Model(VulkanEngine& engine, MaterialManager& materailManager, TextureMana
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(engine, materailManager, textureManager, FilePath, Scene->mRootNode, Scene);
+	LoadMesh(engine, meshManager, materiallManager, textureManager, FilePath, Scene->mRootNode, Scene);
 
 	LoadMeshTransform(0, ModelTransform);
 
@@ -137,7 +143,7 @@ void Model::LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh
 	}
 }
 
-void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -148,28 +154,30 @@ void Model::LoadMesh(VulkanEngine& engine, MaterialManager& materailManager, Tex
 
 		 auto vertices = LoadVertices(mesh);
 		 auto indices = LoadIndices(mesh);
-		 auto material = LoadMaterial(engine, materailManager, textureManager, FilePath, mesh, scene);
+		 auto material = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
-		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
-		MeshList.back().VertexList = vertices;
-		MeshList.back().MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
-		TotalVertex += MeshList.back().VertexCount;
-		TotalIndex += MeshList.back().IndexCount;
+		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, material, MeshList.size()));
+		meshManager.MeshList.back()->ParentModelID = ModelID;
+		meshManager.MeshList.back()->VertexList = vertices;
+		meshManager.MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
+		TotalVertex += meshManager.MeshList.back()->VertexCount;
+		TotalIndex += meshManager.MeshList.back()->IndexCount;
 		for (auto nodeMap : NodeMapList)
 		{
 			if (nodeMap.NodeString == node->mName.C_Str())
 			{
-				MeshList.back().NodeID = nodeMap.NodeID;
-				nodeMap.MeshID = MeshList.back().MeshIndex;
+				meshManager.MeshList.back()->NodeID = nodeMap.NodeID;
+				nodeMap.MeshID = meshManager.MeshList.back()->MeshIndex;
 			}
 		}
+		MeshList.emplace_back(meshManager.MeshList.back());
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(engine, materailManager, textureManager, FilePath, node->mChildren[i], scene);
+		LoadMesh(engine, meshManager, materialManager, textureManager, FilePath, node->mChildren[i], scene);
 	}
 }
 
@@ -363,9 +371,9 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 
 	for (auto mesh : MeshList)
 	{
-		if (mesh.NodeID == NodeID)
+		if (mesh->NodeID == NodeID)
 		{
-			mesh.MeshTransform = GlobalTransform;
+			mesh->MeshTransform = GlobalTransform;
 		}
 	}
 
@@ -375,12 +383,7 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 	}
 }
 
-void Model::AddMesh(Mesh& mesh)
-{
-	MeshList.emplace_back(mesh);
-}
-
-void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer> scenedata)
+void Model::Update(VulkanEngine& engine)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -396,7 +399,7 @@ void Model::Update(VulkanEngine& engine, std::shared_ptr<SceneDataUniformBuffer>
 
 	for (auto& mesh : MeshList)
 	{
-		mesh.Update(engine, ModelTransform, BoneList, scenedata);
+		mesh->Update(engine, ModelTransform, BoneList);
 	}
 }
 
@@ -404,7 +407,7 @@ void Model::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline
 {
 	for (auto mesh : MeshList)
 	{
-		mesh.Draw(commandBuffer, pipeline);
+		mesh->Draw(commandBuffer, pipeline);
 	}
 }
 
@@ -412,7 +415,7 @@ void Model::Destory(VulkanEngine& engine)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh.Destory(engine);
+		mesh->Destory(engine);
 	}
 }
 

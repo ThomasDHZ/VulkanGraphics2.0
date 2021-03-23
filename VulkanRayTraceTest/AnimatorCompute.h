@@ -15,12 +15,12 @@ private:
 
 	void SetUpDescriptorPool(VulkanEngine& engine);
 	void SetUpDescriptorLayout(VulkanEngine& engine);
-	void SetUpDescriptorSets(VulkanEngine& engine, std::vector<Model>& modelList);
+	void SetUpDescriptorSets(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList);
 	void CreateShaderPipeLine(VulkanEngine& engine);
 
 public:
 	AnimatorCompute();
-	AnimatorCompute(VulkanEngine& engine, std::vector<Model>& modelList);
+	AnimatorCompute(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList);
 	~AnimatorCompute();
 
 	VkCommandBuffer commandBuffer;

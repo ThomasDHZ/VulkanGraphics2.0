@@ -56,12 +56,12 @@ public:
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, std::vector<Model>& modelList);
+    RayTraceRenderer(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);
 
-    void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model);
+    void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> model);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     void createShaderBindingTable(VulkanEngine& engine);

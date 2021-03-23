@@ -27,6 +27,10 @@ private:
 	}
 
 public:
+	uint32_t ParentModelID = 0;
+	std::shared_ptr<Mesh> ParentMesh;
+	std::vector<std::shared_ptr<Mesh>> ChildMesh;
+
 	std::vector<Vertex> VertexList;
 	glm::mat4 MeshTransform;
 
@@ -56,7 +60,6 @@ public:
 
 	VkAccelerationStructureGeometryKHR AccelerationStructureGeometry{};
 	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
-	VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
 
 	Mesh();
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList);
@@ -66,8 +69,8 @@ public:
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
-	void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix);
-	void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<SceneDataUniformBuffer> scenedata);
+	void Update(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 };

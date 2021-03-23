@@ -55,6 +55,8 @@ private:
 
 	VulkanDebugger VulkanDebug;
 
+	uint32_t NextID = 0;
+
 	void SetUpDeviceFeatures(GLFWwindow* window);
 
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
@@ -94,6 +96,8 @@ public:
 	VulkanEngine();
 	VulkanEngine(GLFWwindow* window);
 	~VulkanEngine();
+
+	uint32_t GenerateID();
 
 	VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice);
 	std::vector<VkSurfaceFormatKHR> GetSurfaceFormatList(VkPhysicalDevice GPUDevice);

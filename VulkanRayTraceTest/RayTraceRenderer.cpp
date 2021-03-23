@@ -9,7 +9,7 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, std::vector<Model>& model)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, std::vector<std::shared_ptr<Model>>  model)
 {
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 deviceProperties2{};
@@ -68,26 +68,26 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     }
 }
 
-void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model)
+void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> model)
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
     for (int x = 0; x < model.size(); x++)
     {
-        for (int y = 0; y < model[x].MeshList.size(); y++)
+        for (int y = 0; y < model[x]->MeshList.size(); y++)
         {
-            if (model[x].MeshList[y].ShowMesh)
+            if (model[x]->MeshList[y]->ShowMesh)
             {
-                glm::mat4 transformMatrix2 = glm::transpose(model[x].ModelTransform);
+                glm::mat4 transformMatrix2 = glm::transpose(model[x]->ModelTransform);
                 VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
                 VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
                 AccelerationStructureInstance.transform = transformMatrix;
-                AccelerationStructureInstance.instanceCustomIndex = model[x].MeshList[y].MeshIndex;
+                AccelerationStructureInstance.instanceCustomIndex = model[x]->MeshList[y]->MeshIndex;
                 AccelerationStructureInstance.mask = 0xFF;
                 AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
                 AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-                AccelerationStructureInstance.accelerationStructureReference = model[x].MeshList[y].BottomLevelAccelerationBuffer.AccelerationBuffer.BufferDeviceAddress;
+                AccelerationStructureInstance.accelerationStructureReference = model[x]->MeshList[y]->BottomLevelAccelerationBuffer.AccelerationBuffer.BufferDeviceAddress;
                 AccelerationStructureInstanceList.emplace_back(AccelerationStructureInstance);
             }
         }

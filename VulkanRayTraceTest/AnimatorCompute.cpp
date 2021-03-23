@@ -6,7 +6,7 @@ AnimatorCompute::AnimatorCompute()
 {
 }
 
-AnimatorCompute::AnimatorCompute(VulkanEngine& engine, std::vector<Model>& modelList)
+AnimatorCompute::AnimatorCompute(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList)
 {
 	SetUpDescriptorPool(engine);
 	SetUpDescriptorLayout(engine);
@@ -47,15 +47,15 @@ void AnimatorCompute::SetUpDescriptorLayout(VulkanEngine& engine)
 		descriptorLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 	
-void AnimatorCompute::SetUpDescriptorSets(VulkanEngine& engine, std::vector<Model>& modelList)
+void AnimatorCompute::SetUpDescriptorSets(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList)
 {
-	VertexBufferCopy = std::make_shared<VulkanBuffer>(modelList[2].MeshList[0].VertexBuffer);
+	VertexBufferCopy = std::make_shared<VulkanBuffer>(modelList[2]->MeshList[0]->VertexBuffer);
 
 	descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorLayout);
 
-	VkDescriptorBufferInfo VertexBufferInfo = engine.AddBufferDescriptor(modelList[2].MeshList[0].VertexBuffer);
-	VkDescriptorBufferInfo MeshDataufferInfo = engine.AddBufferDescriptor(modelList[2].MeshList[0].MeshProperties.VulkanBufferData);
-	VkDescriptorBufferInfo TransformDataBufferInfo = engine.AddBufferDescriptor(modelList[2].MeshList[0].TransformBuffer);
+	VkDescriptorBufferInfo VertexBufferInfo = engine.AddBufferDescriptor(modelList[2]->MeshList[0]->VertexBuffer);
+	VkDescriptorBufferInfo MeshDataufferInfo = engine.AddBufferDescriptor(modelList[2]->MeshList[0]->MeshProperties.VulkanBufferData);
+	VkDescriptorBufferInfo TransformDataBufferInfo = engine.AddBufferDescriptor(modelList[2]->MeshList[0]->TransformBuffer);
 
 	std::vector<VkWriteDescriptorSet> DescriptorList;
 	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));

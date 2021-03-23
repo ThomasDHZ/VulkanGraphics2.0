@@ -114,6 +114,12 @@ VulkanEngine::~VulkanEngine()
 
 }
 
+uint32_t VulkanEngine::GenerateID()
+{
+	NextID++;
+	return NextID;
+}
+
 void VulkanEngine::GetInstanceLayerProperties()
 {
 	uint32_t LayerCount;

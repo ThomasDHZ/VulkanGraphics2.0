@@ -16,17 +16,17 @@ AssetManager::~AssetManager()
 
 void AssetManager::AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath)
 {
-    modelManager.ModelList.emplace_back(Model(engine, materailManager, textureManager, FilePath));
+    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materailManager, textureManager, FilePath)));
 }
 
 void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-    modelManager.ModelList.emplace_back(Model(engine, textureManager, VertexList, IndexList));
+    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, textureManager, VertexList, IndexList)));
 }
 
 void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 {
-    modelManager.ModelList.emplace_back(Model(engine, VertexList, IndexList, material));
+    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material)));
 }
 
 void AssetManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet)
@@ -52,15 +52,21 @@ void AssetManager::UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& 
     //vkUpdateDescriptorSets(engine.Device, 1, &IndexDescriptor, 0, VK_NULL_HANDLE);
 }
 
+void AssetManager::Update(VulkanEngine& engine)
+{
+    meshManager.Update(engine);
+    modelManager.Update(engine);
+}
+
 std::vector<VkDescriptorBufferInfo> AssetManager::GetVertexBufferListDescriptor()
 {
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             VkDescriptorBufferInfo VertexBufferInfo = {};
-            VertexBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].VertexBuffer.Buffer;
+            VertexBufferInfo.buffer = modelManager.ModelList[x]->MeshList[y]->VertexBuffer.Buffer;
             VertexBufferInfo.offset = 0;
             VertexBufferInfo.range = VK_WHOLE_SIZE;
             VertexBufferInfoList.emplace_back(VertexBufferInfo);
@@ -74,10 +80,10 @@ std::vector<VkDescriptorBufferInfo> AssetManager::GetIndexBufferListDescriptor()
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             VkDescriptorBufferInfo IndexBufferInfo = {};
-            IndexBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].IndexBuffer.Buffer;
+            IndexBufferInfo.buffer = modelManager.ModelList[x]->MeshList[y]->IndexBuffer.Buffer;
             IndexBufferInfo.offset = 0;
             IndexBufferInfo.range = VK_WHOLE_SIZE;
             IndexBufferInfoList.emplace_back(IndexBufferInfo);
@@ -107,10 +113,10 @@ std::vector<VkDescriptorBufferInfo> AssetManager::GetMeshDataListDescriptor()
     std::vector<VkDescriptorBufferInfo> TransformBufferList{};
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             VkDescriptorBufferInfo TransformBufferInfo = {};
-            TransformBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].MeshProperties.VulkanBufferData.Buffer;
+            TransformBufferInfo.buffer = modelManager.ModelList[x]->MeshList[y]->MeshProperties.VulkanBufferData.Buffer;
             TransformBufferInfo.offset = 0;
             TransformBufferInfo.range = VK_WHOLE_SIZE;
             TransformBufferList.emplace_back(TransformBufferInfo);
@@ -124,10 +130,10 @@ std::vector<VkDescriptorBufferInfo> AssetManager::GetTransformBufferListDescript
     std::vector<VkDescriptorBufferInfo> TransformBufferList{};
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             VkDescriptorBufferInfo TransformBufferInfo = {};
-            TransformBufferInfo.buffer = modelManager.ModelList[x].MeshList[y].TransformBuffer.Buffer;
+            TransformBufferInfo.buffer = modelManager.ModelList[x]->MeshList[y]->TransformBuffer.Buffer;
             TransformBufferInfo.offset = 0;
             TransformBufferInfo.range = VK_WHOLE_SIZE;
             TransformBufferList.emplace_back(TransformBufferInfo);
@@ -169,7 +175,7 @@ uint32_t AssetManager::GetMeshPropertiesBufferListDescriptorCount()
     uint32_t count = 0;
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             count++;
         }
@@ -182,7 +188,7 @@ uint32_t AssetManager::GetVertexBufferListDescriptorCount()
     uint32_t count = 0;
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             count++;
         }
@@ -195,7 +201,7 @@ uint32_t AssetManager::GetIndexBufferListDescriptorCount()
     uint32_t count = 0;
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             count++;
         }
@@ -208,7 +214,7 @@ uint32_t AssetManager::GetTransformBufferListDescriptorCount()
     uint32_t count = 0;
     for (int x = 0; x < modelManager.ModelList.size(); x++)
     {
-        for (int y = 0; y < modelManager.ModelList[x].MeshList.size(); y++)
+        for (int y = 0; y < modelManager.ModelList[x]->MeshList.size(); y++)
         {
             count++;
         }

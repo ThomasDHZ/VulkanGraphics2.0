@@ -7,19 +7,17 @@
 #include "ModelManager.h"
 class AssetManager
 {
+	friend class MaterialManager;
+	friend class TextureManager;
+	friend class MeshManager;
+	friend class ModelManager;
 private:
-	std::vector<VulkanBuffer> VertexBufferList;
-	std::vector<VulkanBuffer> IndexBufferList;
 
 public:
 	MaterialManager materialManager;
 	TextureManager textureManager;
 	MeshManager meshManager;
 	ModelManager modelManager;
-
-
-	
-	//MaterialManager materialManager;
 
 	AssetManager();
 	AssetManager(VulkanEngine& engine);
@@ -29,6 +27,8 @@ public:
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
 	void UpdateMeshDescriptors(VulkanEngine& engine, VkDescriptorSet& descriptorSet);
+
+	void Update(VulkanEngine& engine);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptor();
 	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptor();
