@@ -13,13 +13,13 @@ void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 	MeshList.emplace_back(mesh);
 }
 
-void MeshManager::Update(VulkanEngine& engine)
+void MeshManager::Update(VulkanEngine& engine, MaterialManager& materialManager)
 {
 	for (auto& mesh : MeshList)
 	{
 		if (mesh->ParentMesh != 0)
 		{
-			mesh->Update(engine);
+			mesh->Update(engine, materialManager);
 		}
 	}
 }
@@ -38,6 +38,14 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsP
 	{
 		mesh->Draw(commandBuffer, pipeline);
 	}
+}
+
+void MeshManager::Destroy(VulkanEngine& engine)
+{
+    for (auto mesh : MeshList)
+    {
+        mesh->Destory(engine);
+    }
 }
 
 std::vector<VkDescriptorBufferInfo> MeshManager::GetVertexBufferListDescriptors()

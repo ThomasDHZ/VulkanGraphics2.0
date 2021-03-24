@@ -33,8 +33,15 @@ void AssetManager::Update(VulkanEngine& engine)
 {
     materialManager.UpdateBufferIndex(engine);
 
-    meshManager.Update(engine);
+    meshManager.Update(engine, materialManager);
     meshManager.UpdateBufferIndex(engine);
 
-    modelManager.Update(engine);
+    modelManager.Update(engine, materialManager);
+}
+
+void AssetManager::Delete(VulkanEngine& engine)
+{
+    meshManager.Destroy(engine);
+    textureManager.Destory(engine);
+    materialManager.Destory(engine);
 }

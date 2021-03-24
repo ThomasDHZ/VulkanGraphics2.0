@@ -61,9 +61,7 @@ public:
 	Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath);
 	~Model();
 
-	void Update(VulkanEngine& engine);
-	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
-	void Destory(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, MaterialManager& materialManager);
 
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix);
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix);

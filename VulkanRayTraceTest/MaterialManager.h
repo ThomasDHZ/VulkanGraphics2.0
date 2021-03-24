@@ -15,6 +15,7 @@ public:
 	MaterialManager(VulkanEngine& engine, TextureManager& textureManager);
 	~MaterialManager();
 
+	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
 	void UpdateBufferIndex(VulkanEngine& engine);
 	void DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Material> material);
 	void Destory(VulkanEngine& engine);

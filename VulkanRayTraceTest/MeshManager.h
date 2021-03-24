@@ -15,10 +15,11 @@ public:
 	~MeshManager();
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
-	void Update(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, MaterialManager& materialManager);
 	void UpdateBufferIndex(VulkanEngine& engine);
 	void Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
-
+	void Destroy(VulkanEngine& engine);
+		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();
 	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors();
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors();

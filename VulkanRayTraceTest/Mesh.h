@@ -28,6 +28,15 @@ private:
 
 public:
 	uint32_t ParentModelID = 0;
+	uint32_t MeshID = 0;
+	uint32_t MeshBufferIndex = 0;
+	uint32_t MaterialID = 0;
+	//uint32_t NodeID = 0;
+	uint32_t BoneCount = 0;
+	uint32_t VertexCount = 0;
+	uint32_t IndexCount = 0;
+	uint32_t PrimitiveCount; //TriangleCount
+
 	std::shared_ptr<Mesh> ParentMesh;
 	std::vector<std::shared_ptr<Mesh>> ChildMesh;
 
@@ -37,7 +46,6 @@ public:
 	glm::vec3 MeshPosition = glm::vec3(0.0f);
 	glm::vec3 MeshRotation = glm::vec3(0.0f);
 	glm::vec3 MeshScale = glm::vec3(1.0f);
-
 
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
@@ -49,13 +57,6 @@ public:
 	AccelerationStructure BottomLevelAccelerationBuffer;
 
 	std::string MeshName;
-	uint32_t MeshID = 0;
-	uint32_t MeshBufferIndex = 0;
-	uint32_t NodeID = 0;
-	uint32_t BoneCount = 0;
-	uint32_t VertexCount;
-	uint32_t IndexCount;
-	uint32_t PrimitiveCount; //TriangleCount
 
 	bool ShowMesh = true;
 
@@ -70,8 +71,8 @@ public:
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
-	void Update(VulkanEngine& engine);
-	void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList);
+	void Update(VulkanEngine& engine, MaterialManager& materialManager);
+	void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 };

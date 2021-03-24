@@ -24,6 +24,7 @@ public:
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID);
 
 	void Update(VulkanEngine& engine);
+	void Delete(VulkanEngine& engine);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors() { return meshManager.GetVertexBufferListDescriptors(); }
 	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors() { return meshManager.GetIndexBufferListDescriptors(); }

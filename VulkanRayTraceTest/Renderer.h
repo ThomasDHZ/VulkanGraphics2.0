@@ -47,7 +47,7 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	AssetManager modelRenderManager;
+	AssetManager assetManager;
 
 	Renderer();
 	Renderer(VulkanEngine& engine, VulkanWindow& window);

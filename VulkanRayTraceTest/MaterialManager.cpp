@@ -62,6 +62,20 @@ std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescri
 	return MaterialBufferList;
 }
 
+uint32_t MaterialManager::GetMaterialBufferIDByMaterialID(uint32_t MaterialID)
+{
+	uint32_t BufferIndex = 0;
+	for (auto& material : MaterialList)
+	{
+		if (MaterialID == material->MaterialID)
+		{
+			BufferIndex = material->MaterialBufferIndex;
+		}
+	}
+
+	return BufferIndex;
+}
+
 void MaterialManager::UpdateBufferIndex(VulkanEngine& engine)
 {
 	for(int x = 0; x < MaterialList.size(); x++)

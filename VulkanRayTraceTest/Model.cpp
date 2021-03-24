@@ -167,8 +167,7 @@ void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialMan
 		{
 			if (nodeMap.NodeString == node->mName.C_Str())
 			{
-				meshManager.MeshList.back()->NodeID = nodeMap.NodeID;
-				nodeMap.MeshID = meshManager.MeshList.back()->MeshID;
+				meshManager.MeshList.back()->MeshID = nodeMap.NodeID;
 			}
 		}
 		MeshList.emplace_back(meshManager.MeshList.back());
@@ -367,21 +366,13 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 	glm::mat4 glmTransform = AssimpToGLMMatrixConverter(NodeMapList[NodeID].NodeTransform);
 	glm::mat4 GlobalTransform = ParentMatrix * glmTransform;
 
-	for (auto mesh : MeshList)
-	{
-		if (mesh->NodeID == NodeID)
-		{
-			mesh->MeshTransform = GlobalTransform;
-		}
-	}
-
 	for (int x = 0; x < NodeMapList[NodeID].ChildNodeList.size(); x++)
 	{
 		LoadMeshTransform(NodeMapList[NodeID].ChildNodeList[x], GlobalTransform);
 	}
 }
 
-void Model::Update(VulkanEngine& engine)
+void Model::Update(VulkanEngine& engine, MaterialManager& materialManager)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -397,23 +388,7 @@ void Model::Update(VulkanEngine& engine)
 
 	for (auto& mesh : MeshList)
 	{
-		mesh->Update(engine, ModelTransform, BoneList);
-	}
-}
-
-void Model::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
-{
-	for (auto mesh : MeshList)
-	{
-		mesh->Draw(commandBuffer, pipeline);
-	}
-}
-
-void Model::Destory(VulkanEngine& engine)
-{
-	for (auto& mesh : MeshList)
-	{
-		mesh->Destory(engine);
+		mesh->Update(engine, ModelTransform, BoneList, materialManager);
 	}
 }
 
