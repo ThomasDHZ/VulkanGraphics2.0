@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include <stb_image.h>
+#include "Sprite.cpp"
 
 Renderer::Renderer()
 {
@@ -44,7 +45,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     material2->materialTexture.AlphaMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
     auto MarioMat = assetManager.materialManager.LoadMaterial(engine, "zdsf", material2);
  
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, SpriteVertices, SpriteIndices, MMMaterial)));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<Sprite>(Sprite(engine, glm::vec2(1.0f), glm::vec3(0.0f), MMMaterial)));
     assetManager.modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, assetManager.meshManager, SpriteVertices, SpriteIndices, MMMaterial)));
     assetManager.AddModel(engine, SpriteVertices, SpriteIndices, MarioMat);
     assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");

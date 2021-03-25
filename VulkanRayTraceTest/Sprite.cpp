@@ -5,7 +5,7 @@
 //
 //}
 //
-//Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
+//Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec3 Position, uint32_t materialID) : Mesh()
 //{
 //    std::vector<Vertex> SpriteVertices =
 //    {
@@ -21,18 +21,22 @@
 //        1, 2, 3
 //    };
 //
-//	//MeshIndex = meshID;
-//	MeshProperties = MeshPropertiesUniformBuffer(engine);
+//    MeshID = engine.GenerateID();
+//    MaterialID = materialID;
 //
-//	MeshTransform = glm::mat4(1.0f);
-//	MeshTransform = glm::transpose(MeshTransform);
+//    MeshProperties = MeshPropertiesUniformBuffer(engine);
+//    ParentModelID = 0;
+//    VertexList = SpriteVertices;
 //
-//	VertexCount = SpriteVertices.size();
-//	IndexCount = SpriteIndices.size();
-//	PrimitiveCount = static_cast<uint32_t>(SpriteIndices.size()) / 3;
+//    MeshTransform = glm::mat4(1.0f);
+//    MeshTransform = glm::transpose(MeshTransform);
 //
-//	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-//	SetUpMesh(engine, SpriteVertices, SpriteIndices);
+//    VertexCount = SpriteVertices.size();
+//    IndexCount = SpriteIndices.size();
+//    PrimitiveCount = static_cast<uint32_t>(SpriteIndices.size()) / 3;
+//
+//    BottomLevelAccelerationBuffer = AccelerationStructure(engine);
+//    SetUpMesh(engine, VertexList, SpriteIndices);
 //}
 //
 //Sprite::~Sprite()

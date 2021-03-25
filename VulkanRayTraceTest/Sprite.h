@@ -6,7 +6,7 @@
 //private: 
 //public:
 //	Sprite();
-//	Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec3 Position, std::shared_ptr<Material> material);
+//	Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec3 Position, uint32_t materialID);
 //	~Sprite();
 //};
 //
