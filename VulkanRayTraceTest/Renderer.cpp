@@ -99,7 +99,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     RenderPass = MainRenderPass(engine);
     //frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
-    interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
+    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     
     SetUpDescriptorPool(engine);
     RayRenderer = RayTraceRenderer(engine, assetManager);
@@ -164,7 +164,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
     RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
-    interfaceRenderPass.UpdateSwapChain(engine.Device, engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
+    interfaceRenderPass.UpdateSwapChain(engine);
 
     vkDestroyImageView(engine.Device, RayRenderer.storageImage.view, nullptr);
     vkDestroyImage(engine.Device, RayRenderer.storageImage.image, nullptr);
@@ -275,7 +275,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         throw std::runtime_error("failed to acquire swap chain image!");
     }
 
-    interfaceRenderPass.Draw(engine.Device, imageIndex, engine.SwapChain.SwapChainResolution);
+    interfaceRenderPass.Draw(engine, imageIndex);
     Update(engine, window, imageIndex);
 
     if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
@@ -430,7 +430,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 void Renderer::Destroy(VulkanEngine& engine)
 {
     assetManager.Delete(engine);
-    interfaceRenderPass.Destroy(engine.Device);
+    interfaceRenderPass.Destroy(engine);
     AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);

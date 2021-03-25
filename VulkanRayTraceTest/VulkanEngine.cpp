@@ -458,6 +458,25 @@ VkCommandBuffer  VulkanEngine::beginSingleTimeCommands() {
 	return commandBuffer;
 }
 
+VkCommandBuffer  VulkanEngine::beginSingleTimeCommands(VkCommandPool& commandPool) {
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	vkAllocateCommandBuffers(Device, &allocInfo, &commandBuffer);
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+	return commandBuffer;
+}
+
 void  VulkanEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 	vkEndCommandBuffer(commandBuffer);
 
@@ -470,6 +489,20 @@ void  VulkanEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 	vkQueueWaitIdle(GraphicsQueue);
 
 	vkFreeCommandBuffers(Device, CommandPool, 1, &commandBuffer);
+}
+
+void  VulkanEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer, VkCommandPool& commandPool) {
+	vkEndCommandBuffer(commandBuffer);
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(GraphicsQueue);
+
+	vkFreeCommandBuffers(Device, commandPool, 1, &commandBuffer);
 }
 
 uint32_t VulkanEngine::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {

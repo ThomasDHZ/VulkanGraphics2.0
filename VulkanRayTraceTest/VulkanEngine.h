@@ -107,7 +107,10 @@ public:
 	void Destroy();
 
 	VkCommandBuffer beginSingleTimeCommands();
+	VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+	void endSingleTimeCommands(VkCommandBuffer commandBuffer, VkCommandPool& commandPool);
+
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	uint64_t GetBufferDeviceAddress(VkBuffer buffer);
 	VkPipelineShaderStageCreateInfo CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages);
