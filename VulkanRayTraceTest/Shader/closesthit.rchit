@@ -85,9 +85,26 @@ void main()
     vec3 TangentViewPos  = TBN * ubo.viewPos;
     vec3 TangentFragPos  = TBN * vertex.pos;
 
-    
-   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-    hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb;
+    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+
+    vec3 lightVector = normalize(ubo.dlight.direction);
+	float dot_product = max(dot(lightVector, vertex.normal), 0.2);
+	hitValue = vec3(0.7f) * dot_product;
+    if(material.DiffuseMapID != 0)
+    {
+        hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb * dot_product;
+    }
+  
+
+    float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
+	if (shadowed) {
+		hitValue *= 0.3;
+	}
 }
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)

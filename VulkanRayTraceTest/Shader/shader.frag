@@ -130,11 +130,18 @@ void main()
 
 //    vec3 specular = vec3(0.2) * spec;
 
-
-const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
+    const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
+    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
 	{
 		discard;
 	}
-    outColor = vec4(texture(TextureMap[material.DiffuseMapID], texCoords).rgb, 1.0);
+
+    vec3 lightVector = normalize(scenedata.dlight.direction);
+	float dot_product = max(dot(lightVector, Normal), 0.2);
+	vec3 hitValue = vec3(0.7f) * dot_product;
+    if(material.DiffuseMapID != 0)
+    {
+        hitValue = texture(TextureMap[material.DiffuseMapID], texCoords).rgb * dot_product;
+    }
+    outColor = vec4(hitValue, 1.0);
 }

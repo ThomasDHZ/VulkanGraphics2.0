@@ -62,6 +62,7 @@ public:
 	~Model();
 
 	void Update(VulkanEngine& engine, MaterialManager& materialManager);
+	void AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh);
 
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix);
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix);

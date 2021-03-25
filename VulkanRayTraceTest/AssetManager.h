@@ -19,6 +19,7 @@ public:
 	AssetManager(VulkanEngine& engine);
 	~AssetManager();
 
+	void AddModel();
 	void AddModel(VulkanEngine& engine, const std::string& FilePath);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID);

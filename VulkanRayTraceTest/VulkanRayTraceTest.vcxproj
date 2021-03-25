@@ -171,8 +171,10 @@
     <ClCompile Include="LevelModel.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainRenderPass.cpp" />
+    <ClCompile Include="Mario.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
+    <ClCompile Include="MegaMan.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="MeshManager.cpp" />
@@ -237,8 +239,10 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="LevelModel.h" />
     <ClInclude Include="MainRenderPass.h" />
+    <ClInclude Include="Mario.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
+    <ClInclude Include="MegaMan.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="MeshManager.h" />

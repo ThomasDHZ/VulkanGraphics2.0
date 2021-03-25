@@ -392,6 +392,12 @@ void Model::Update(VulkanEngine& engine, MaterialManager& materialManager)
 	}
 }
 
+void Model::AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh)
+{
+	mesh->ParentModelID = ModelID;
+	MeshList.emplace_back(mesh);
+}
+
 glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
 {
 	glm::mat4 GLMMatrix;

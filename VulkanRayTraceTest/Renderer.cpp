@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include <stb_image.h>
-#include "Sprite.cpp"
+#include "Sprite.h"
+#include "MegaMan.h"
+#include "Mario.h"
 
 Renderer::Renderer()
 {
@@ -10,44 +12,17 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
     assetManager = AssetManager(engine);
 
-    auto c = sizeof(VulkanBuffer);
-    auto d = sizeof(MeshProperties);
-    auto a = sizeof(Model);
-    auto b = sizeof(Mesh) - sizeof(MeshProperties);
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f))));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f))));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f))));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(0.0f))));
 
-    glm::vec2 SpriteSize(1.0f, 1.0f);
-
-    std::vector<Vertex> SpriteVertices =
-    {
-        {{ 0.0f,         0.0f,         0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {1.0f,  0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-        {{ SpriteSize.x, 0.0f,         0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-        {{ SpriteSize.x, SpriteSize.y, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, -1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-        {{ 0.0f,         SpriteSize.y, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {1.0f, -1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
-    };
-
-    std::vector<uint32_t> SpriteIndices =
-    {
-        0, 1, 3,
-        1, 2, 3
-    };
-
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.AlphaMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-    auto MMMaterial = assetManager.materialManager.LoadMaterial(engine, "zdsf", material);
-
-    std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, assetManager.textureManager);
-    material2->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material2->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material2->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material2->materialTexture.AlphaMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-    auto MarioMat = assetManager.materialManager.LoadMaterial(engine, "zdsf", material2);
- 
-    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<Sprite>(Sprite(engine, glm::vec2(1.0f), glm::vec3(0.0f), MMMaterial)));
-    assetManager.modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, assetManager.meshManager, SpriteVertices, SpriteIndices, MMMaterial)));
-    assetManager.AddModel(engine, SpriteVertices, SpriteIndices, MarioMat);
+    assetManager.AddModel();
+    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[0]);
+    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
+    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
+    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
+    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
     assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
     assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     //assetManager.AddModel(engine, assetManager.materialManager, "../Models/TestAnimModel/model.dae");
@@ -190,11 +165,6 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     mouse.Update(window.GetWindowPtr(), camera);
     camera->Update(engine);
 
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto  currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
     assetManager.Update(engine);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
@@ -205,7 +175,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->UniformDataInfo.proj = camera->GetProjectionMatrix();
     SceneData->UniformDataInfo.proj[1][1] *= -1;
     SceneData->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SceneData->UniformDataInfo.timer = time;
+    SceneData->UniformDataInfo.timer = engine.VulkanTimer();
     SceneData->Update(engine);
 }
 

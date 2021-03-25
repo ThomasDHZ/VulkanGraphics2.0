@@ -120,6 +120,14 @@ uint32_t VulkanEngine::GenerateID()
 	return NextID;
 }
 
+float VulkanEngine::VulkanTimer()
+{
+	static auto startTime = std::chrono::high_resolution_clock::now();
+
+	auto  currentTime = std::chrono::high_resolution_clock::now();
+	return std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+}
+
 void VulkanEngine::GetInstanceLayerProperties()
 {
 	uint32_t LayerCount;

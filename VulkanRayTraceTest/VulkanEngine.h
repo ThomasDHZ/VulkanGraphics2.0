@@ -12,6 +12,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "VulkanBuffer.h"
+#include <chrono>
+
 #define VKB_VALIDATION_LAYERS
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -98,6 +100,7 @@ public:
 	~VulkanEngine();
 
 	uint32_t GenerateID();
+	float    VulkanTimer();
 
 	VkPhysicalDeviceFeatures GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice);
 	std::vector<VkSurfaceFormatKHR> GetSurfaceFormatList(VkPhysicalDevice GPUDevice);
@@ -116,8 +119,6 @@ public:
 	VkPipelineShaderStageCreateInfo CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages);
 
 	VkDescriptorPoolSize AddDsecriptorPoolBinding(VkDescriptorType descriptorType);
-
-
 	VkDescriptorPool CreateDescriptorPool(std::vector<VkDescriptorPoolSize> DescriptorPoolInfo);
 	VkDescriptorSetLayout CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo);
 	VkDescriptorSet CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout);

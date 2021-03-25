@@ -1,7 +1,12 @@
+#include "..\VulkanRayTraceTest\MegaMan.h"
 #include "MegaMan.h"
 #include "Water2D.h"
 
 MegaMan::MegaMan() : Sprite()
+{
+}
+
+MegaMan::MegaMan(VulkanEngine& engine, AssetManager& assetManager, glm::vec2 Position)
 {
 }
 
