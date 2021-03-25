@@ -15,13 +15,13 @@ void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 
 void MeshManager::Update(VulkanEngine& engine, MaterialManager& materialManager)
 {
-	for (auto& mesh : MeshList)
-	{
-		if (mesh->ParentMesh != 0)
-		{
-			mesh->Update(engine, materialManager);
-		}
-	}
+    for (auto& mesh : MeshList)
+    {
+        if (mesh->ParentModelID == 0)
+        {
+            mesh->Update(engine, materialManager);
+        }
+    }
 }
 
 void MeshManager::UpdateBufferIndex(VulkanEngine& engine)

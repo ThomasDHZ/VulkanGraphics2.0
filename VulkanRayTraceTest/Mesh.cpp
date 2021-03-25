@@ -173,12 +173,16 @@ void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager)
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
 
+	MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
 	glm::mat4 FinalTransform = MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
+
 	VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
 	TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
+	MeshProperties.Update(engine);
+
 	if (IndexCount != 0)
 	{
 		MeshBottomLevelAccelerationStructure(engine);

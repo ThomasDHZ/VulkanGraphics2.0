@@ -44,12 +44,15 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     material2->materialTexture.AlphaMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
     auto MarioMat = assetManager.materialManager.LoadMaterial(engine, "zdsf", material2);
  
-    assetManager.AddModel(engine, SpriteVertices, SpriteIndices, MMMaterial);
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, SpriteVertices, SpriteIndices, MMMaterial)));
+    assetManager.modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, assetManager.meshManager, SpriteVertices, SpriteIndices, MMMaterial)));
     assetManager.AddModel(engine, SpriteVertices, SpriteIndices, MarioMat);
     assetManager.AddModel(engine, assetManager.materialManager,  "../Models/TestAnimModel/model.dae");
     assetManager.AddModel(engine, assetManager.materialManager, "../Models/cyborg/cyborg.obj");
+    //assetManager.AddModel(engine, assetManager.materialManager, "../Models/TestAnimModel/model.dae");
+    //assetManager.AddModel(engine, assetManager.materialManager, "../Models/cyborg/cyborg.obj");
 
-    assetManager.modelManager.ModelList[1]->MeshList[0]->MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
+    //assetManager.modelManager.ModelList[1]->MeshList[0]->MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
 
     assetManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
 
@@ -218,24 +221,34 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Speculare", &SceneData->UniformDataInfo.dlight.specular.x, 0.0f, 1.0f);
 
-
-    for (int x = 0; x < assetManager.modelManager.ModelList.size(); x++)
+    for (int y = 0; y < assetManager.meshManager.MeshList.size(); y++)
     {
-        ImGui::SliderFloat3(("Model Transformx" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelPosition.x, -10.0f, 10.0f);
-        ImGui::SliderFloat3(("Model Rotatex" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelRotation.x, 0.0f, 360.0f);
-        ImGui::SliderFloat3(("Model Scalex" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelScale.x, 0.0f, 1.0f);
+        auto a = std::to_string(y);
+        ImGui::Checkbox(a.c_str(), &assetManager.meshManager.MeshList[y]->ShowMesh);
 
-        for (int y = 0; y < assetManager.modelManager.ModelList[x]->MeshList.size(); y++)
-        {
-            auto a = std::to_string(x + y);
-            ImGui::Checkbox(a.c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->ShowMesh);
-
-            ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-            ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshPosition.x, -10.0f, 10.0f);
-            ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
-            ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshScale.x, 0.0f, 1.0f);
-        }
+        ImGui::SliderFloat2(("UV Offset " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshPosition.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
+        ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshScale.x, 0.0f, 1.0f);
     }
+
+    //for (int x = 0; x < assetManager.modelManager.ModelList.size(); x++)
+    //{
+    //    ImGui::SliderFloat3(("Model Transformx" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelPosition.x, -10.0f, 10.0f);
+    //    ImGui::SliderFloat3(("Model Rotatex" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelRotation.x, 0.0f, 360.0f);
+    //    ImGui::SliderFloat3(("Model Scalex" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelScale.x, 0.0f, 1.0f);
+
+    //    for (int y = 0; y < assetManager.modelManager.ModelList[x]->MeshList.size(); y++)
+    //    {
+    //        auto a = std::to_string(x + y);
+    //        ImGui::Checkbox(a.c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->ShowMesh);
+
+    //        ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+    //        ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshPosition.x, -10.0f, 10.0f);
+    //        ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
+    //        ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshScale.x, 0.0f, 1.0f);
+    //    }
+    //}
 
     ImGui::SliderFloat3("Pos2", &SceneData->UniformDataInfo.plight.position.x, -10.0f, 10.0f);
     ImGui::SliderFloat3("Ambient2", &SceneData->UniformDataInfo.plight.ambient.x, 0.0f, 1.0f);
@@ -301,11 +314,8 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     vkCmdBeginRenderPass(RasterCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
-
-    for (auto model : assetManager.meshManager.MeshList)
-    {
-        model->Draw(RasterCommandBuffer, RenderPass.forwardRendereringPipeline);
-    }
+    
+    assetManager.Draw(RasterCommandBuffer, RenderPass.forwardRendereringPipeline);
 
     vkCmdEndRenderPass(RasterCommandBuffer);
     AnimationRenderer.Compute(engine, imageIndex);
