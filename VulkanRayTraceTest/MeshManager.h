@@ -25,6 +25,7 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors();
 	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors();
 
+	std::shared_ptr<Mesh> GetMeshIndex(uint32_t MeshID);
 	uint32_t GetMeshDescriptorCount() { return MeshList.size(); }
 };
 

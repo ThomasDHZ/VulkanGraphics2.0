@@ -6,11 +6,13 @@ AnimatorCompute::AnimatorCompute()
 {
 }
 
-AnimatorCompute::AnimatorCompute(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList)
+AnimatorCompute::AnimatorCompute(VulkanEngine& engine,  std::shared_ptr<Model> modelptr)
 {
+	model = modelptr;
+
 	SetUpDescriptorPool(engine);
 	SetUpDescriptorLayout(engine);
-	SetUpDescriptorSets(engine, modelList);
+	SetUpDescriptorSets(engine);
 	CreateShaderPipeLine(engine);
 
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -47,15 +49,16 @@ void AnimatorCompute::SetUpDescriptorLayout(VulkanEngine& engine)
 		descriptorLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 	
-void AnimatorCompute::SetUpDescriptorSets(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList)
+void AnimatorCompute::SetUpDescriptorSets(VulkanEngine& engine)
 {
-	VertexBufferCopy = std::make_shared<VulkanBuffer>(modelList[2]->MeshList[0]->VertexBuffer);
+	const auto mesh = model->MeshList[0];
+	VertexBufferCopy = std::make_shared<VulkanBuffer>(mesh->VertexBuffer);
 
 	descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorLayout);
 
-	VkDescriptorBufferInfo VertexBufferInfo = engine.AddBufferDescriptor(modelList[2]->MeshList[0]->VertexBuffer);
-	VkDescriptorBufferInfo MeshDataufferInfo = engine.AddBufferDescriptor(modelList[2]->MeshList[0]->MeshProperties.VulkanBufferData);
-	VkDescriptorBufferInfo TransformDataBufferInfo = engine.AddBufferDescriptor(modelList[2]->MeshList[0]->TransformBuffer);
+	VkDescriptorBufferInfo VertexBufferInfo = engine.AddBufferDescriptor(mesh->VertexBuffer);
+	VkDescriptorBufferInfo MeshDataufferInfo = engine.AddBufferDescriptor(mesh->MeshProperties.VulkanBufferData);
+	VkDescriptorBufferInfo TransformDataBufferInfo = engine.AddBufferDescriptor(mesh->TransformBuffer);
 
 	std::vector<VkWriteDescriptorSet> DescriptorList;
 	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
@@ -147,6 +150,7 @@ void AnimatorCompute::Compute(VulkanEngine& engine, uint32_t currentFrame)
 		1, &BufferMemoryBarrier,
 		0, nullptr);
 
+	model->MeshList[0]->VertexBuffer.CopyBufferToMemory(engine.Device, &model->MeshList[0]->VertexList[0], sizeof(Vertex) * model->MeshList[0]->VertexList.size());
 	vkEndCommandBuffer(commandBuffer);
 }
 

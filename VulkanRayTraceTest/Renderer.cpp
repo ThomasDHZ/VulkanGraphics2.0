@@ -107,7 +107,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.StartPipeline(engine, descriptorSetLayout);
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
-   AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList);
+   AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]);
 
     SetUpCommandBuffers(engine);
 
@@ -335,7 +335,6 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    assetManager.modelManager.ModelList[2]->MeshList[0]->VertexBuffer.CopyBufferToMemory(engine.Device, &assetManager.modelManager.ModelList[2]->MeshList[0]->VertexList[0], sizeof(Vertex) * assetManager.modelManager.ModelList[2]->MeshList[0]->VertexList.size());
     if (RayTraceSwitch)
     {
         CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);

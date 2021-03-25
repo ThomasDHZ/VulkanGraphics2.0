@@ -103,3 +103,17 @@ std::vector<VkDescriptorBufferInfo> MeshManager::GetMeshPropertiesListDescriptor
     }
     return MeshPropertiesmBufferList;
 }
+
+std::shared_ptr<Mesh> MeshManager::GetMeshIndex(uint32_t MeshID)
+{
+    std::shared_ptr<Mesh> meshptr;
+    for (auto& mesh : MeshList)
+    {
+        if (MeshID == mesh->MeshID)
+        {
+            meshptr = mesh;
+        }
+    }
+
+    return meshptr;
+}

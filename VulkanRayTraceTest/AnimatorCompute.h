@@ -1,5 +1,6 @@
 #pragma once
 #include "Model.h"
+#include "AssetManager.h"
 
 class AnimatorCompute
 {
@@ -12,15 +13,16 @@ private:
 	VkPipelineCache PipelineCache;
 
 	std::shared_ptr<VulkanBuffer> VertexBufferCopy;
+	std::shared_ptr<Model> model;
 
 	void SetUpDescriptorPool(VulkanEngine& engine);
 	void SetUpDescriptorLayout(VulkanEngine& engine);
-	void SetUpDescriptorSets(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList);
+	void SetUpDescriptorSets(VulkanEngine& engine);
 	void CreateShaderPipeLine(VulkanEngine& engine);
 
 public:
 	AnimatorCompute();
-	AnimatorCompute(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList);
+	AnimatorCompute(VulkanEngine& engine, std::shared_ptr<Model> model);
 	~AnimatorCompute();
 
 	VkCommandBuffer commandBuffer;
