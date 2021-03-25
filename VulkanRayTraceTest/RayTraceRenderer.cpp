@@ -9,7 +9,7 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, std::vector<std::shared_ptr<Model>>  model)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, AssetManager& assetManager)
 {
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 deviceProperties2{};
@@ -24,7 +24,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, std::vector<std::shared
     vkGetPhysicalDeviceFeatures2(engine.PhysicalDevice, &deviceFeatures2);
 
     topLevelAS = AccelerationStructure(engine);
-    createTopLevelAccelerationStructure(engine, model);
+    createTopLevelAccelerationStructure(engine, assetManager);
     createStorageImage(engine, storageImage);
 }
 
@@ -68,28 +68,30 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     }
 }
 
-void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> model)
+void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, AssetManager& assetManager)
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
-    for (int x = 0; x < model.size(); x++)
+    for (int x = 0; x < assetManager.meshManager.MeshList.size(); x++)
     {
-        for (int y = 0; y < model[x]->MeshList.size(); y++)
+        if (assetManager.meshManager.MeshList[x]->ShowMesh)
         {
-            if (model[x]->MeshList[y]->ShowMesh)
+            glm::mat4 transformMatrix2 = glm::transpose(glm::mat4(1.0f));
+            if (assetManager.meshManager.MeshList[x]->ParentModelID != 0)
             {
-                glm::mat4 transformMatrix2 = glm::transpose(model[x]->ModelTransform);
-                VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
-
-                VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
-                AccelerationStructureInstance.transform = transformMatrix;
-                AccelerationStructureInstance.instanceCustomIndex = model[x]->MeshList[y]->MeshBufferIndex;
-                AccelerationStructureInstance.mask = 0xFF;
-                AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
-                AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-                AccelerationStructureInstance.accelerationStructureReference = model[x]->MeshList[y]->BottomLevelAccelerationBuffer.AccelerationBuffer.BufferDeviceAddress;
-                AccelerationStructureInstanceList.emplace_back(AccelerationStructureInstance);
+                const auto model = assetManager.modelManager.GetModelIndex(assetManager.meshManager.MeshList[x]->ParentModelID);
+                transformMatrix2 = glm::transpose(model->ModelTransform);
             }
+            VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
+
+            VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
+            AccelerationStructureInstance.transform = transformMatrix;
+            AccelerationStructureInstance.instanceCustomIndex = assetManager.meshManager.MeshList[x]->MeshBufferIndex;
+            AccelerationStructureInstance.mask = 0xFF;
+            AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
+            AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+            AccelerationStructureInstance.accelerationStructureReference = assetManager.meshManager.MeshList[x]->BottomLevelAccelerationBuffer.AccelerationBuffer.BufferDeviceAddress;
+            AccelerationStructureInstanceList.emplace_back(AccelerationStructureInstance);
         }
     }
 

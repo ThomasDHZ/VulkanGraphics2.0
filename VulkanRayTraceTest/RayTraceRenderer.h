@@ -27,6 +27,7 @@
 #include "RenderedColorTexture.h"
 #include "RenderedRayTracedColorTexture.h"
 #include "AccelerationStructure.h"
+#include "AssetManager.h"
 
 class RayTraceRenderer
 {
@@ -56,12 +57,12 @@ public:
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> modelList);
+    RayTraceRenderer(VulkanEngine& engine, AssetManager& assetManager);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);
 
-    void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<std::shared_ptr<Model>> model);
+    void createTopLevelAccelerationStructure(VulkanEngine& engine, AssetManager& assetManager);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
     void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     void createShaderBindingTable(VulkanEngine& engine);

@@ -47,8 +47,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, SpriteVertices, SpriteIndices, MMMaterial)));
     assetManager.modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, assetManager.meshManager, SpriteVertices, SpriteIndices, MMMaterial)));
     assetManager.AddModel(engine, SpriteVertices, SpriteIndices, MarioMat);
-    assetManager.AddModel(engine, assetManager.materialManager,  "../Models/TestAnimModel/model.dae");
-    assetManager.AddModel(engine, assetManager.materialManager, "../Models/cyborg/cyborg.obj");
+    assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+    assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     //assetManager.AddModel(engine, assetManager.materialManager, "../Models/TestAnimModel/model.dae");
     //assetManager.AddModel(engine, assetManager.materialManager, "../Models/cyborg/cyborg.obj");
 
@@ -101,7 +101,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
     
     SetUpDescriptorPool(engine);
-    RayRenderer = RayTraceRenderer(engine, assetManager.modelManager.ModelList);
+    RayRenderer = RayTraceRenderer(engine, assetManager);
     SetUpDescriptorLayout(engine);
     RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
     RenderPass.StartPipeline(engine, descriptorSetLayout);
@@ -195,7 +195,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
     assetManager.Update(engine);
-    RayRenderer.createTopLevelAccelerationStructure(engine, assetManager.modelManager.ModelList);
+    RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());

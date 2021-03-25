@@ -14,9 +14,9 @@ AssetManager::~AssetManager()
 {
 }
 
-void AssetManager::AddModel(VulkanEngine& engine, MaterialManager& materailManager, const std::string& FilePath)
+void AssetManager::AddModel(VulkanEngine& engine, const std::string& FilePath)
 {
-    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materailManager, textureManager, FilePath)));
+    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materialManager, textureManager, FilePath)));
 }
 
 void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
