@@ -15,7 +15,7 @@ layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
 	DirectionalLight dlight;
-	PointLight plight;
+	PointLight plight[5];
 	SpotLight sLight;
     mat4 viewInverse;
 	mat4 projInverse;
@@ -39,8 +39,11 @@ layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList
 layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
 
-vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 Vertex BuildVertexInfo();
+vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, vec3 normal, vec3 viewDir);
+vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
 void main()
 {
@@ -51,7 +54,7 @@ void main()
     const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
     const mat3 TBN = transpose(mat3(T, B, N));
 
-    const vec3 TangentLightPos = TBN * ubo.plight.position;
+    const vec3 TangentLightPos = TBN * ubo.dlight.direction;
     const vec3 TangentViewPos  = TBN * ubo.viewPos;
     const vec3 TangentFragPos  = TBN * vertex.pos;
 
@@ -59,7 +62,7 @@ void main()
 
     vec3 lightVector = normalize(ubo.dlight.direction);
 	float dot_product = max(dot(lightVector, vertex.normal), 0.2);
-	hitValue = vec3(0.7f) * dot_product;
+	hitValue = vertex.Color.rgb * dot_product;
     if(material.DiffuseMapID != 0)
     {
         hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb * dot_product;
@@ -70,7 +73,7 @@ void main()
 	float tmax = 10000.0;
 	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 	shadowed = true;  
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 1);
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 1);
 	if (shadowed) {
 		hitValue *= 0.3;
 	}
@@ -105,6 +108,67 @@ Vertex BuildVertexInfo()
 	vertex.Color = vec4(color, 1.0f);
 
     return vertex;
+}
+
+vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, vec3 normal, vec3 viewDir)
+{
+    vec3 lightDir = normalize(-light.direction);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+
+    vec3 ambient = light.ambient * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+    vec3 specular = light.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], vertex.uv));
+    return (ambient + diffuse + specular);
+}
+
+vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+
+    vec3 ambient = light.ambient * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+    vec3 specular = light.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], vertex.uv));
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+    return (ambient + diffuse + specular);
+}
+
+vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+
+    float theta = dot(lightDir, normalize(-light.direction)); 
+    float epsilon = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
+    vec3 ambient = light.ambient * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+    vec3 specular = light.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], vertex.uv));
+    ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
+    return (ambient + diffuse + specular);
 }
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)

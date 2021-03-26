@@ -22,7 +22,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
-    //assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    /// assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
    // assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -62,11 +62,30 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);
     SceneData->UniformDataInfo.dlight.specular = glm::vec4(1.0f);
 
-    SceneData->UniformDataInfo.plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    SceneData->UniformDataInfo.plight.ambient = glm::vec4(0.2f);
-    SceneData->UniformDataInfo.plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    SceneData->UniformDataInfo.plight.specular = glm::vec4(1.0f);
+    SceneData->UniformDataInfo.plight[0].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    SceneData->UniformDataInfo.plight[0].ambient = glm::vec4(0.2f);
+    SceneData->UniformDataInfo.plight[0].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    SceneData->UniformDataInfo.plight[0].specular = glm::vec4(1.0f);
 
+    SceneData->UniformDataInfo.plight[1].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    SceneData->UniformDataInfo.plight[1].ambient = glm::vec4(0.2f);
+    SceneData->UniformDataInfo.plight[1].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    SceneData->UniformDataInfo.plight[1].specular = glm::vec4(1.0f);
+
+    SceneData->UniformDataInfo.plight[2].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    SceneData->UniformDataInfo.plight[2].ambient = glm::vec4(0.2f);
+    SceneData->UniformDataInfo.plight[2].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    SceneData->UniformDataInfo.plight[2].specular = glm::vec4(1.0f);
+
+    SceneData->UniformDataInfo.plight[3].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    SceneData->UniformDataInfo.plight[3].ambient = glm::vec4(0.2f);
+    SceneData->UniformDataInfo.plight[3].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    SceneData->UniformDataInfo.plight[3].specular = glm::vec4(1.0f);
+
+    SceneData->UniformDataInfo.plight[4].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    SceneData->UniformDataInfo.plight[4].ambient = glm::vec4(0.2f);
+    SceneData->UniformDataInfo.plight[4].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    SceneData->UniformDataInfo.plight[4].specular = glm::vec4(1.0f);
 }
 
 Renderer::~Renderer()
@@ -189,13 +208,45 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     //    }
     //}
 
-    ImGui::SliderFloat3("Pos2", &SceneData->UniformDataInfo.plight.position.x, -10.0f, 10.0f);
-    ImGui::SliderFloat3("Ambient2", &SceneData->UniformDataInfo.plight.ambient.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse2", &SceneData->UniformDataInfo.plight.diffuse.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Speculare2", &SceneData->UniformDataInfo.plight.specular.x, 0.0f, 1.0f);
-    ImGui::SliderFloat("constant", &SceneData->UniformDataInfo.plight.constant, 0.0f, 100.0f);
-    ImGui::SliderFloat("linear", &SceneData->UniformDataInfo.plight.linear, 0.0f, 100.0f);
-    ImGui::SliderFloat("quadratic", &SceneData->UniformDataInfo.plight.quadratic, 0.0f, 100.0f);
+    ImGui::SliderFloat3("Pos20", &SceneData->UniformDataInfo.plight[0].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Ambient20", &SceneData->UniformDataInfo.plight[0].ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse20", &SceneData->UniformDataInfo.plight[0].diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare20", &SceneData->UniformDataInfo.plight[0].specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant0", &SceneData->UniformDataInfo.plight[0].constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear0", &SceneData->UniformDataInfo.plight[0].linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic0", &SceneData->UniformDataInfo.plight[0].quadratic, 0.0f, 100.0f);
+
+    ImGui::SliderFloat3("Pos21", &SceneData->UniformDataInfo.plight[1].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Ambient21", &SceneData->UniformDataInfo.plight[1].ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse21", &SceneData->UniformDataInfo.plight[1].diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare21", &SceneData->UniformDataInfo.plight[1].specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant1", &SceneData->UniformDataInfo.plight[1].constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear1", &SceneData->UniformDataInfo.plight[1].linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic1", &SceneData->UniformDataInfo.plight[1].quadratic, 0.0f, 100.0f);
+
+    ImGui::SliderFloat3("Pos22", &SceneData->UniformDataInfo.plight[2].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Ambient22", &SceneData->UniformDataInfo.plight[2].ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse22", &SceneData->UniformDataInfo.plight[2].diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare22", &SceneData->UniformDataInfo.plight[2].specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant2", &SceneData->UniformDataInfo.plight[2].constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear2", &SceneData->UniformDataInfo.plight[2].linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic2", &SceneData->UniformDataInfo.plight[2].quadratic, 0.0f, 100.0f);
+
+    ImGui::SliderFloat3("Pos23", &SceneData->UniformDataInfo.plight[3].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Ambient23", &SceneData->UniformDataInfo.plight[3].ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse23", &SceneData->UniformDataInfo.plight[3].diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare23", &SceneData->UniformDataInfo.plight[3].specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant3", &SceneData->UniformDataInfo.plight[3].constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear3", &SceneData->UniformDataInfo.plight[3].linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic3", &SceneData->UniformDataInfo.plight[3].quadratic, 0.0f, 100.0f);
+
+    ImGui::SliderFloat3("Pos24", &SceneData->UniformDataInfo.plight[4].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Ambient24", &SceneData->UniformDataInfo.plight[4].ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse24", &SceneData->UniformDataInfo.plight[4].diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare24", &SceneData->UniformDataInfo.plight[4].specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant4", &SceneData->UniformDataInfo.plight[4].constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear4", &SceneData->UniformDataInfo.plight[4].linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic4", &SceneData->UniformDataInfo.plight[4].quadratic, 0.0f, 100.0f);
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)

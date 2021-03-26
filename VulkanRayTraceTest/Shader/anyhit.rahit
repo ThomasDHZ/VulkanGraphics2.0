@@ -15,7 +15,7 @@ layout(binding = 1, set = 0, rgba8) uniform image2D image;
 layout(binding = 2) uniform UBO 
 {
 	DirectionalLight dlight;
-	PointLight plight;
+	PointLight plight[5];
 	SpotLight sLight;
     mat4 viewInverse;
 	mat4 projInverse;

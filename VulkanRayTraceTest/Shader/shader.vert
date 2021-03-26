@@ -16,7 +16,7 @@ layout(push_constant) uniform MeshInfo
 layout(binding = 2) uniform UniformBufferObject 
 {
 	DirectionalLight dlight;
-	PointLight plight;
+	PointLight plight[5];
 	SpotLight sLight;
     mat4 viewInverse;
 	mat4 projInverse;
@@ -43,14 +43,15 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec4 aTangent;
 layout (location = 4) in vec4 aBitangent;
-layout (location = 5) in vec4 Color;
+layout (location = 5) in vec4 aColor;
 layout (location = 6) in ivec4 BoneID;
 layout (location = 7) in vec4 BoneWeights;
 
 layout(location = 0) out vec3 FragPos;
 layout(location = 1) out vec2 TexCoords;
-layout(location = 2) out vec3 Normal;
-layout(location = 3) out mat3 TBN;
+layout(location = 2) out vec4 Color;
+layout(location = 3) out vec3 Normal;
+layout(location = 4) out mat3 TBN;
 
 void main() 
 {
@@ -62,6 +63,7 @@ void main()
     FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
+	Color = aColor;
 
     vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aTangent));
     vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aBitangent));
