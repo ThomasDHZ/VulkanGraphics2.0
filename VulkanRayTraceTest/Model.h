@@ -13,6 +13,7 @@
 #include "Animation3D.h"
 #include "AnimationPlayer3D.h"
 #include "MeshManager.h"
+#include "AnimatorCompute.h"
 
 const unsigned int MAX_BONE_VERTEX_COUNT = 4;
 
@@ -40,7 +41,7 @@ private:
 	std::vector<NodeMap> NodeMapList;
 	glm::mat4 GlobalInverseTransformMatrix;
 	AnimationPlayer3D AnimationPlayer;
-
+	AnimatorCompute AnimationRenderer;
 public:
 	uint32_t ModelID = 0;
 

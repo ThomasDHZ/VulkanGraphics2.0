@@ -12,53 +12,22 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
     assetManager = AssetManager(engine);
 
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(0.0f))));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
 
     assetManager.AddModel();
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[0]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
-    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
-    assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-    assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-    //assetManager.AddModel(engine, assetManager.materialManager, "../Models/TestAnimModel/model.dae");
-    //assetManager.AddModel(engine, assetManager.materialManager, "../Models/cyborg/cyborg.obj");
-
-    //assetManager.modelManager.ModelList[1]->MeshList[0]->MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
+    //assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+   /// assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+   // assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     assetManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
-
-
-    //modelRenderManager.AddModel(engine, MegaManVertices, indices);
-    //modelRenderManager.AddModel(engine, MegaManVertices, indices);
-    //modelRenderManager.ModelList[1].MeshList[0].MeshID = 1;
-  //  //modelRenderManager.ModelList[1].MeshList[0].MeshPosition = glm::vec3(1.0f, 0.0f, 0.0f);
-
-  //  //stbi_set_flip_vertically_on_load(true);
-  //  //MaterialData material{};
-  //  //material.DiffuseMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-  //  //material.NormalMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-  //  //material.DepthMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-  //  //material.AlphaMapID = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-  //  //modelRenderManager.ModelList[0].MeshList[0].material = material;
-  //  //stbi_set_flip_vertically_on_load(false);
-
-  //  modelRenderManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
-  //   /*   modelRenderManager.ModelList[0].MeshList[0].MaterialBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(Material), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &material);*/
-
-
-  ////  modelRenderManager.ModelList[0].MeshList[0].ShowMesh = false;
-  //   //modelRenderManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-  //   //modelRenderManager.ModelList[2].MeshList[0].MeshID = 2;
-  //   modelRenderManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-  //   modelRenderManager.ModelList[0].MeshList[0].MeshID = 0;
-  ////    modelRenderManager.ModelList[0].ModelScale = glm::vec3(0.1f);
-  // //modelRenderManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
-  // // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -83,8 +52,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.StartPipeline(engine, descriptorSetLayout);
     RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
-   AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]);
-
+    //AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]->MeshList[0]);
     SetUpCommandBuffers(engine);
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -289,7 +257,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     assetManager.Draw(RasterCommandBuffer, RenderPass.forwardRendereringPipeline);
 
     vkCmdEndRenderPass(RasterCommandBuffer);
-    AnimationRenderer.Compute(engine, imageIndex);
+   // AnimationRenderer.Compute(engine, imageIndex);
     //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -308,13 +276,13 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     if (RayTraceSwitch)
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+        //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-        CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+       // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
         CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
@@ -401,7 +369,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
-    AnimationRenderer.Destroy(engine);
+   // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     RayRenderer.Destory(engine);

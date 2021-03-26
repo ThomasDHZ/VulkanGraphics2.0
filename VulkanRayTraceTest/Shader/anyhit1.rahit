@@ -39,6 +39,23 @@ layout(binding = 8) uniform sampler2D TextureMap[];
 
 layout(location = 1) rayPayloadEXT vec3 hitValue;
 
+Vertex BuildVertexInfo();
+
+void main() 
+{
+   const Vertex vertex = BuildVertexInfo();
+   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+
+   if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
+   {
+	 ignoreIntersectionEXT;
+   }
+   else
+   {
+	return;
+   }
+}
+
 Vertex BuildVertexInfo()
 {
     Vertex vertex;
@@ -68,19 +85,4 @@ Vertex BuildVertexInfo()
 	vertex.Color = vec4(color, 1.0f);
 
     return vertex;
-}
-
-void main() 
-{
-   const Vertex vertex = BuildVertexInfo();
-   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-
-   if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
-   {
-	 ignoreIntersectionEXT;
-   }
-   else
-   {
-	return;
-   }
 }

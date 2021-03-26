@@ -61,9 +61,9 @@ if(gl_VertexIndex == 0)
     TexCoords = aTexCoords;
     Normal = aNormal;
 
-    vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform) * vec3(aTangent));
-    vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform) * vec3(aBitangent));
-    vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform) * aNormal);
+    vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aTangent));
+    vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aBitangent));
+    vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * aNormal);
     TBN = transpose(mat3(T, B, N));
 
     gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);

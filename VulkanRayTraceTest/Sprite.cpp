@@ -28,7 +28,9 @@ Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm
     ParentModelID = 0;
     VertexList = SpriteVertices;
 
+    MeshPosition = Position;
     MeshTransform = glm::mat4(1.0f);
+    MeshTransform = glm::translate(MeshTransform, MeshPosition);
     MeshTransform = glm::transpose(MeshTransform);
 
     VertexCount = SpriteVertices.size();

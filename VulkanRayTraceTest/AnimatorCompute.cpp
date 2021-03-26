@@ -6,9 +6,9 @@ AnimatorCompute::AnimatorCompute()
 {
 }
 
-AnimatorCompute::AnimatorCompute(VulkanEngine& engine,  std::shared_ptr<Model> modelptr)
+AnimatorCompute::AnimatorCompute(VulkanEngine& engine,  std::shared_ptr<Mesh> meshptr)
 {
-	model = modelptr;
+	mesh = meshptr;
 
 	SetUpDescriptorPool(engine);
 	SetUpDescriptorLayout(engine);
@@ -51,7 +51,6 @@ void AnimatorCompute::SetUpDescriptorLayout(VulkanEngine& engine)
 	
 void AnimatorCompute::SetUpDescriptorSets(VulkanEngine& engine)
 {
-	const auto mesh = model->MeshList[0];
 	VertexBufferCopy = std::make_shared<VulkanBuffer>(mesh->VertexBuffer);
 
 	descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorLayout);
@@ -150,7 +149,7 @@ void AnimatorCompute::Compute(VulkanEngine& engine, uint32_t currentFrame)
 		1, &BufferMemoryBarrier,
 		0, nullptr);
 
-	model->MeshList[0]->VertexBuffer.CopyBufferToMemory(engine.Device, &model->MeshList[0]->VertexList[0], sizeof(Vertex) * model->MeshList[0]->VertexList.size());
+	mesh->VertexBuffer.CopyBufferToMemory(engine.Device, &mesh->VertexList[0], sizeof(Vertex) * mesh->VertexList.size());
 	vkEndCommandBuffer(commandBuffer);
 }
 

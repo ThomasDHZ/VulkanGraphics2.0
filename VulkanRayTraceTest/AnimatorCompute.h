@@ -1,6 +1,5 @@
 #pragma once
-#include "Model.h"
-#include "AssetManager.h"
+#include "Mesh.h"
 
 class AnimatorCompute
 {
@@ -13,7 +12,7 @@ private:
 	VkPipelineCache PipelineCache;
 
 	std::shared_ptr<VulkanBuffer> VertexBufferCopy;
-	std::shared_ptr<Model> model;
+	std::shared_ptr<Mesh> mesh;
 
 	void SetUpDescriptorPool(VulkanEngine& engine);
 	void SetUpDescriptorLayout(VulkanEngine& engine);
@@ -22,7 +21,7 @@ private:
 
 public:
 	AnimatorCompute();
-	AnimatorCompute(VulkanEngine& engine, std::shared_ptr<Model> model);
+	AnimatorCompute(VulkanEngine& engine, std::shared_ptr<Mesh> meshptr);
 	~AnimatorCompute();
 
 	VkCommandBuffer commandBuffer;

@@ -99,38 +99,15 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
 void main() 
 {
-    vec3 TangentLightPos = TBN * scenedata.plight.position;
-    vec3 TangentViewPos  = TBN * scenedata.viewPos;
-    vec3 TangentFragPos  = TBN * FragPos;
-  // offset texture coordinates with Parallax Mapping
-    // offset texture coordinates with Parallax Mapping
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
-//    
-//    texCoords = ParallaxMapping(TexCoords,  viewDir);       
-//    if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-//        discard;
-//
-//    // obtain normal from normal map
-//    vec3 normal = texture(TextureMap[2], texCoords).rgb;
-//    normal = normalize(normal * 2.0 - 1.0);   
-//   
-//    // get diffuse color
-//    vec3 color = texture(TextureMap[1], texCoords).rgb;
-//    // ambient
-//    vec3 ambient = 0.1 * color;
-//    // diffuse
-//    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-//    float diff = max(dot(lightDir, normal), 0.0);
-//    vec3 diffuse = diff * color;
-//    // specular    
-//    vec3 reflectDir = reflect(-lightDir, normal);
-//    vec3 halfwayDir = normalize(lightDir + viewDir);  
-//    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-
-//    vec3 specular = vec3(0.2) * spec;
-
     const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
+
+    const vec3 TangentLightPos = TBN * scenedata.plight.position;
+    const vec3 TangentViewPos  = TBN * scenedata.viewPos;
+    const vec3 TangentFragPos  = TBN * FragPos;
+
+    const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
+
     if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
 	{
 		discard;

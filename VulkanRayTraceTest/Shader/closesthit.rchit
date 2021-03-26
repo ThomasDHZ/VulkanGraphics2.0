@@ -39,6 +39,41 @@ layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
+Vertex BuildVertexInfo();
+
+void main()
+{
+    Vertex vertex = BuildVertexInfo();
+
+	const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+    const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+    const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+    const mat3 TBN = transpose(mat3(T, B, N));
+
+    const vec3 TangentLightPos = TBN * ubo.plight.position;
+    const vec3 TangentViewPos  = TBN * ubo.viewPos;
+    const vec3 TangentFragPos  = TBN * vertex.pos;
+
+    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+
+    vec3 lightVector = normalize(ubo.dlight.direction);
+	float dot_product = max(dot(lightVector, vertex.normal), 0.2);
+	hitValue = vec3(0.7f) * dot_product;
+    if(material.DiffuseMapID != 0)
+    {
+        hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb * dot_product;
+    }
+  
+
+    float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 1);
+	if (shadowed) {
+		hitValue *= 0.3;
+	}
+}
 
 Vertex BuildVertexInfo()
 {
@@ -69,41 +104,6 @@ Vertex BuildVertexInfo()
 	vertex.Color = vec4(color, 1.0f);
 
     return vertex;
-}
-
-void main()
-{
-    Vertex vertex = BuildVertexInfo();
-
-	vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.tangent));
-    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vec3(vertex.BiTangant));
-    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform ) * vertex.normal);
-    mat3 TBN = transpose(mat3(T, B, N));
-
-    vec3 TangentLightPos = TBN * ubo.plight.position;
-    vec3 TangentViewPos  = TBN * ubo.viewPos;
-    vec3 TangentFragPos  = TBN * vertex.pos;
-
-    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-
-    vec3 lightVector = normalize(ubo.dlight.direction);
-	float dot_product = max(dot(lightVector, vertex.normal), 0.2);
-	hitValue = vec3(0.7f) * dot_product;
-    if(material.DiffuseMapID != 0)
-    {
-        hitValue = texture(TextureMap[material.DiffuseMapID], vertex.uv).rgb * dot_product;
-    }
-  
-
-    float tmin = 0.001;
-	float tmax = 10000.0;
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	shadowed = true;  
-	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 1);
-	if (shadowed) {
-		hitValue *= 0.3;
-	}
 }
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
