@@ -7,13 +7,14 @@ layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 1, set = 0, rgba8) uniform image2D image;
 layout(binding = 2, set = 0) uniform CameraProperties 
 {
-	mat4 viewInverse;
+	DirectionalLight dlight;
+	PointLight plight;
+	SpotLight sLight;
+    mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
-	DirectionalLight dlight;
-	vec3 viewPos;
-	PointLight plight;
+    vec3 viewPos;
 	float timer;
     int temp;
 } cam;

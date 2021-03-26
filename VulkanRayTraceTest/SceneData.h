@@ -19,14 +19,28 @@ struct PointLight {
 	alignas(4) float quadratic = 0.032f;
 };
 
+struct SpotLight {
+	alignas(16) glm::vec3 position;
+	alignas(16) glm::vec3 direction;
+	alignas(16) glm::vec3 ambient;
+	alignas(16) glm::vec3 diffuse;
+	alignas(16) glm::vec3 specular;
+
+	alignas(4) float cutOff = glm::cos(glm::radians(12.5f));
+	alignas(4) float outerCutOff = glm::cos(glm::radians(15.0f));
+	alignas(4) float constant = 1.0f;
+	alignas(4) float linear = 0.09f;
+	alignas(4) float quadratic = 0.032f;
+};
 struct SceneDataBuffer {
+	DirectionalLight dlight;
+	PointLight plight;
+	SpotLight sLight;
 	alignas(16) glm::mat4 viewInverse;
 	alignas(16) glm::mat4 projInverse;
 	alignas(16) glm::mat4 view;
 	alignas(16) glm::mat4 proj;
-	DirectionalLight dlight;
 	alignas(16) glm::vec3 viewPos;
-	PointLight  plight;
 	alignas(4)  float timer;
 	alignas(4)  int temp;
 };

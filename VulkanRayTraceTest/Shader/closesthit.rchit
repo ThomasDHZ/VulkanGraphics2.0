@@ -14,14 +14,15 @@ hitAttributeEXT vec2 attribs;
 layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
-	mat4 viewInverse;
+	DirectionalLight dlight;
+	PointLight plight;
+	SpotLight sLight;
+    mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
-	DirectionalLight dlight;
-	vec3 viewPos;
-	PointLight plight;
-    float timer;
+    vec3 viewPos;
+	float timer;
     int temp;
 } ubo;
 layout(binding = 3) buffer MeshProperties 
