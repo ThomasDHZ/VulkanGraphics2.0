@@ -86,6 +86,10 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.plight[4].ambient = glm::vec4(0.2f);
     SceneData->UniformDataInfo.plight[4].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
     SceneData->UniformDataInfo.plight[4].specular = glm::vec4(1.0f);
+
+    SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
+    SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
+    SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
 }
 
 Renderer::~Renderer()
@@ -155,6 +159,8 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     assetManager.Update(engine);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
+    SceneData->UniformDataInfo.sLight.position = camera->GetPosition();
+    SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
     SceneData->UniformDataInfo.projInverse[1][1] *= -1;
@@ -247,6 +253,15 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat("constant4", &SceneData->UniformDataInfo.plight[4].constant, 0.0f, 100.0f);
     ImGui::SliderFloat("linear4", &SceneData->UniformDataInfo.plight[4].linear, 0.0f, 100.0f);
     ImGui::SliderFloat("quadratic4", &SceneData->UniformDataInfo.plight[4].quadratic, 0.0f, 100.0f);
+
+    ImGui::SliderFloat3("Ambient245", &SceneData->UniformDataInfo.sLight.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse245", &SceneData->UniformDataInfo.sLight.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare245", &SceneData->UniformDataInfo.sLight.specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant45", &SceneData->UniformDataInfo.sLight.constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear45", &SceneData->UniformDataInfo.sLight.linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic45", &SceneData->UniformDataInfo.sLight.quadratic, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic452", &SceneData->UniformDataInfo.sLight.cutOff, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic453", &SceneData->UniformDataInfo.sLight.outerCutOff, 0.0f, 100.0f);
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
