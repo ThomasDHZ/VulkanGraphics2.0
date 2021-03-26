@@ -306,6 +306,16 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescript
     ClosestHitShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(ClosestHitShaderInfo);
 
+    ShaderList.emplace_back(engine.CreateShader("Shader/anyhit1.rahit.spv", VK_SHADER_STAGE_ANY_HIT_BIT_KHR));
+    VkRayTracingShaderGroupCreateInfoKHR ShadwoHitShaderInfo = {};
+    ShadwoHitShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
+    ShadwoHitShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
+    ShadwoHitShaderInfo.generalShader = VK_SHADER_UNUSED_KHR;
+    ShadwoHitShaderInfo.closestHitShader = VK_SHADER_UNUSED_KHR;
+    ShadwoHitShaderInfo.anyHitShader = static_cast<uint32_t>(ShaderList.size()) - 1;
+    ShadwoHitShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
+    RayTraceShaders.emplace_back(ShadwoHitShaderInfo);
+
     VkRayTracingPipelineCreateInfoKHR RayTracingPipeline = {};
     RayTracingPipeline.sType = VK_STRUCTURE_TYPE_RAY_TRACING_PIPELINE_CREATE_INFO_KHR;
     RayTracingPipeline.stageCount = static_cast<uint32_t>(ShaderList.size());
@@ -333,7 +343,7 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
 
     raygenShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
     missShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
-    hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
+    hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 3, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }
 
 void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex)

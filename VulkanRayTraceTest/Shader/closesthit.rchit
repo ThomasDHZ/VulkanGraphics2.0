@@ -8,8 +8,7 @@
 #include "Material.glsl"
 
 layout(location = 0) rayPayloadInEXT vec3 hitValue;
-layout(location = 1) rayPayloadInEXT vec3 hitValue2;
-layout(location = 2) rayPayloadEXT bool shadowed;
+layout(location = 1) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
 layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
@@ -66,8 +65,8 @@ Vertex BuildVertexInfo()
 	vertex.tangent = v0.tangent * barycentricCoords.x + v1.tangent * barycentricCoords.y + v2.tangent * barycentricCoords.z;
 	vertex.BiTangant = v0.BiTangant * barycentricCoords.x + v1.BiTangant * barycentricCoords.y + v2.BiTangant * barycentricCoords.z;
 
-   // const vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z
-	//vertex.Color = vec4(color, 1.0f);
+    const vec3 color = v0.Color.xyz * barycentricCoords.x + v1.Color.xyz * barycentricCoords.y + v2.Color.xyz * barycentricCoords.z;
+	vertex.Color = vec4(color, 1.0f);
 
     return vertex;
 }
@@ -101,7 +100,7 @@ void main()
 	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 	shadowed = true;  
 	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 2);
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 1);
 	if (shadowed) {
 		hitValue *= 0.3;
 	}

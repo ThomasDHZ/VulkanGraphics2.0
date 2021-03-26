@@ -9,19 +9,16 @@ layout(binding = 2, set = 0) uniform CameraProperties
 {
 	mat4 viewInverse;
 	mat4 projInverse;
-    mat4 model;
-    mat4 view;
-    mat4 proj;
-    DirectionalLight dlight;
+	mat4 view;
+	mat4 proj;
+	DirectionalLight dlight;
 	vec3 viewPos;
 	PointLight plight;
-    float vertexSize;
-	mat4 PVM;
-    mat4 BoneTransform[100];
+	float timer;
+    int temp;
 } cam;
 
 layout(location = 0) rayPayloadEXT vec3 hitValue;
-layout(location = 1) rayPayloadEXT vec3 ShadowhitValue;
 
 void main() 
 {
