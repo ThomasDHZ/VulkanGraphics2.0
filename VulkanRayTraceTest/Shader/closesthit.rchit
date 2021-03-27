@@ -40,9 +40,9 @@ layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 Vertex BuildVertexInfo();
-vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, vec3 normal, vec3 viewDir);
-vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, DirectionalLight light, vec3 normal, vec3 viewDir);
+vec3 CalcPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, mat3 TBN, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
 void main()
@@ -55,17 +55,16 @@ void main()
     const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
     const mat3 TBN = transpose(mat3(T, B, N));
 
-    const vec3 TangentLightPos = TBN * ubo.dlight.direction;
     const vec3 TangentViewPos  = TBN * ubo.viewPos;
     const vec3 TangentFragPos  = TBN * vertex.pos;
     const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
    
-    hitValue = CalcDirLight(vertex, material, ubo.dlight, vertex.normal, viewDir);
+    hitValue = CalcDirLight(vertex, material, TBN, ubo.dlight, vertex.normal, viewDir);
     for(int x = 0; x < 5; x++)
     {
-        hitValue += CalcPointLight(vertex, material, ubo.plight[x], vertex.normal, vertex.pos, viewDir);   
+        hitValue += CalcPointLight(vertex, material, TBN, ubo.plight[x], vertex.normal, vertex.pos, viewDir);   
     }
-  //  hitValue +=  CalcSpotLight(vertex, material, ubo.sLight, vertex.normal, vertex.pos, viewDir);
+  //  hitValue +=  CalcSpotLight(vertex, material, TBN, ubo.sLight, vertex.normal, vertex.pos, viewDir);
 }
 
 Vertex BuildVertexInfo()
@@ -99,9 +98,10 @@ Vertex BuildVertexInfo()
     return vertex;
 }
 
-vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, vec3 normal, vec3 viewDir)
+vec3 CalcDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, DirectionalLight light, vec3 normal, vec3 viewDir)
 {
-    vec3 lightDir = normalize(-ubo.dlight.direction);
+    const vec3 TangentLightPos = TBN * light.direction;
+    vec3 lightDir = normalize(-TangentLightPos);
 
     float diff = max(dot(normal, lightDir), 0.0);
 
@@ -135,8 +135,9 @@ vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, 
     return result;
 }
 
-vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
+    const vec3 TangentLightPos = TBN * light.position;
     vec3 lightDir = normalize(light.position - fragPos);
 
     float diff = max(dot(normal, lightDir), 0.0);
@@ -177,8 +178,9 @@ vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec3
     return result;
 }
 
-vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, mat3 TBN, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
+    const vec3 TangentLightPos = TBN * light.position;
     vec3 lightDir = normalize(light.position - fragPos);
 
     float diff = max(dot(normal, lightDir), 0.0);

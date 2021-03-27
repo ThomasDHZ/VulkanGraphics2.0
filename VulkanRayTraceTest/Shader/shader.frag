@@ -65,7 +65,6 @@ void main()
 {
     const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
 
-    const vec3 TangentLightPos = TBN * scenedata.dlight.direction;
     const vec3 TangentViewPos  = TBN * scenedata.viewPos;
     const vec3 TangentFragPos  = TBN * FragPos;
 
@@ -89,7 +88,8 @@ void main()
 
 vec3 CalcDirLight(MaterialInfo material, DirectionalLight light, vec3 normal, vec3 viewDir)
 {
-    vec3 lightDir = normalize(-scenedata.dlight.direction);
+    const vec3 TangentLightPos = TBN * light.direction;
+    vec3 lightDir = normalize(-TangentLightPos);
 
     float diff = max(dot(normal, lightDir), 0.0);
 
@@ -114,6 +114,7 @@ vec3 CalcDirLight(MaterialInfo material, DirectionalLight light, vec3 normal, ve
 
 vec3 CalcPointLight(MaterialInfo material, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
+    const vec3 TangentLightPos = TBN * light.position;
     vec3 lightDir = normalize(light.position - fragPos);
 
     float diff = max(dot(normal, lightDir), 0.0);
@@ -144,6 +145,7 @@ vec3 CalcPointLight(MaterialInfo material, PointLight light, vec3 normal, vec3 f
 
 vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
+    const vec3 TangentLightPos = TBN * light.position;
     vec3 lightDir = normalize(light.position - fragPos);
 
     float diff = max(dot(normal, lightDir), 0.0);
