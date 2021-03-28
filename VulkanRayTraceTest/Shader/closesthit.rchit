@@ -41,7 +41,7 @@ layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 Vertex BuildVertexInfo();
 vec3 CalcDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, vec3 normal);
-vec3 CalcPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight light, vec3 normal);
 vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, mat3 TBN, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
@@ -63,10 +63,10 @@ void main()
     }
 
     hitValue = CalcDirLight(vertex, material, TBN, normal);
-//    for(int x = 0; x < 5; x++)
-//    {
-//        hitValue += CalcPointLight(vertex, material, TBN, ubo.plight[x], normal, vertex.pos, viewDir);   
-//    }
+    for(int x = 0; x < 5; x++)
+    {
+        hitValue += CalcPointLight(vertex, material, TBN, ubo.plight[x], normal);   
+    }
   //  hitValue +=  CalcSpotLight(vertex, material, TBN, ubo.sLight, normal, vertex.pos, viewDir);
 }
 
@@ -129,30 +129,30 @@ vec3 CalcDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, vec3 normal)
     
     vec3 result = vec3(ambient + diffuse + specular);
 
-//    float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
-//	if (shadowed) {
-//		result *= 0.3;
-//	}
+    float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
+	if (shadowed) {
+		result *= 0.3;
+	}
 
     return result;
 }
 
-vec3 CalcPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight light, vec3 normal)
 {
     const vec3 TangentLightPos = TBN * light.position;
-    vec3 lightDir = normalize(light.position - fragPos);
-
+    const vec3 TangentViewPos  = TBN * ubo.viewPos;
+    const vec3 TangentFragPos  = TBN * vertex.pos;  
+ 
+    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
     float diff = max(dot(normal, lightDir), 0.0);
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
-
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
     vec3 ambient = light.ambient * vertex.Color.rgb;
     vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
@@ -166,10 +166,13 @@ vec3 CalcPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight l
     {
         specular = light.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], vertex.uv));
     }
+
+    float distance = length(TangentLightPos - TangentFragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
-    
+
     vec3 result = (ambient + diffuse + specular);
 
     float tmin = 0.001;
