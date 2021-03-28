@@ -12,17 +12,26 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
     assetManager = AssetManager(engine);
 
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
 
-    assetManager.AddModel();
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[0]);
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
-    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+    //assetManager.AddModel();
+    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[0]);
+    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
+    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
+    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
+
+    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
+    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.SpecularMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/container2_specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
+
+    assetManager.AddModel(engine, "../Models/Crate.dae");
+    assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
+//    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
    /// assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
    // assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");

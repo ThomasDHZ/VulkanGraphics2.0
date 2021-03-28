@@ -1,0 +1,10 @@
+# MTL written from C:\Users\dotha\source\repos\VulkanGraphics\texture\Crate.obj
+newmtl Default
+Kd 0.48 0.48 0.48
+Ns 256
+d 1
+illum 2
+Ka 0 0 0
+Ks 0.2 0.2 0.2
+map_Kd C:\Users\dotha\source\repos\VulkanGraphics\texture\create_diffuseOriginal.bmp
+map_Ks C:\Users\dotha\source\repos\VulkanGraphics\texture\container2_specular.png
