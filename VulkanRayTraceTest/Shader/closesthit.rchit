@@ -50,22 +50,22 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
 void main()
 {
-    const Vertex vertex = BuildVertexInfo();
-    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+   const Vertex vertex = BuildVertexInfo();
+   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
-    const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-    const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-    const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-    const mat3 TBN = transpose(mat3(T, B, N));
+   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+   const mat3 TBN = transpose(mat3(T, B, N));
    
-       const vec3 TangentViewPos  = TBN * ubo.viewPos;
-    const vec3 TangentFragPos  = TBN * vertex.pos;  
-    const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+   const vec3 TangentViewPos  = TBN * ubo.viewPos;
+   const vec3 TangentFragPos  = TBN * vertex.pos;  
+   const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
    vec2 uv = vertex.uv;
 
-    vec3 normal = vertex.normal;
-    if(material.NormalMapID != 0)
-    {
+   vec3 normal = vertex.normal;
+   if(material.NormalMapID != 0)
+   {
         
         normal = texture(TextureMap[material.NormalMapID], uv).rgb;
         normal = normalize(normal * 2.0 - 1.0);
@@ -76,16 +76,16 @@ void main()
             hitValue += CalcNormalPointLight(vertex, material, TBN, ubo.plight[x], normal, uv);   
         }
       //  hitValue +=  CalcNormalSpotLight(vertex, material, TBN, ubo.sLight, normal, vertex.pos, viewDir, uv);
-    }
-    else
-    {
+   }
+   else
+   {
         hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
         for(int x = 0; x < 5; x++)
         {
             hitValue += CalcPointLight(vertex, material, ubo.plight[x], uv);   
         }
       //  hitValue +=  CalcSpotLight(vertex, material, TBN, ubo.sLight, normal, vertex.pos, viewDir, uv);
-    }
+   }
 }
 
 Vertex BuildVertexInfo()
@@ -126,11 +126,11 @@ vec3 CalcNormalDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, vec3 nor
     const vec3 TangentFragPos  = TBN * vertex.pos;  
     const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 
-    vec3 lightDir = normalize(-TangentLightPos);
-    float diff = max(dot(normal, lightDir), 0.0);
+    const vec3 lightDir = normalize(-TangentLightPos);
+    const float diff = max(dot(normal, lightDir), 0.0);
 
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
+    const vec3 halfwayDir = normalize(lightDir + viewDir);  
+    const float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = ubo.dlight.ambient * vertex.Color.rgb;
     vec3 diffuse = ubo.dlight.diffuse * diff * vertex.Color.rgb;
@@ -147,14 +147,14 @@ vec3 CalcNormalDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, vec3 nor
     
     vec3 result = vec3(ambient + diffuse + specular);
 
-//    float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
-//	if (shadowed) {
-//		result = ambient;
-//	}
+    float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
+	if (shadowed) {
+		result = ambient;
+	}
 
     return result;
 }
@@ -165,12 +165,12 @@ vec3 CalcNormalPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointL
     const vec3 TangentViewPos  = TBN * ubo.viewPos;
     const vec3 TangentFragPos  = TBN * vertex.pos;  
  
-    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+    const vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+    const float diff = max(dot(normal, lightDir), 0.0);
+    const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
+    const vec3 halfwayDir = normalize(lightDir + viewDir);  
+    const float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = light.ambient * vertex.Color.rgb;
     vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
@@ -192,15 +192,15 @@ vec3 CalcNormalPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointL
     specular *= attenuation;
 
     vec3 result = (ambient + diffuse + specular);
-//
-//    float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
-//	if (shadowed) {
-//		result = ambient;
-//	}
+
+    float tmin = 0.001;
+	float tmax = distance;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
+	if (shadowed) {
+		result = ambient;
+	}
 
     return result;
 }
@@ -208,19 +208,19 @@ vec3 CalcNormalPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointL
 vec3 CalcNormalSpotLight(Vertex vertex, MaterialInfo material, mat3 TBN, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 uv)
 {
     const vec3 TangentLightPos = TBN * light.position;
-    vec3 lightDir = normalize(light.position - fragPos);
+    const vec3 lightDir = normalize(light.position - fragPos);
 
-    float diff = max(dot(normal, lightDir), 0.0);
+    const float diff = max(dot(normal, lightDir), 0.0);
 
-    vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
+    const vec3 halfwayDir = normalize(lightDir + viewDir);  
+    const float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+    const float distance = length(light.position - fragPos);
+    const float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
-    float theta = dot(lightDir, normalize(-light.direction)); 
-    float epsilon = light.cutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    const float theta = dot(lightDir, normalize(-light.direction)); 
+    const float epsilon = light.cutOff - light.outerCutOff;
+    const float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
     vec3 ambient = light.ambient * vertex.Color.rgb;
     vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
@@ -240,27 +240,27 @@ vec3 CalcNormalSpotLight(Vertex vertex, MaterialInfo material, mat3 TBN, SpotLig
 
     vec3 result = (ambient + diffuse + specular);
 
-//    float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
-//	if (shadowed) {
-//			result *= 0.3f;
-//	}
+    float tmin = 0.001;
+	float tmax = distance;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
+	if (shadowed) {
+			result *= 0.3f;
+	}
 
     return result;
 }
 
 vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, vec2 uv)
 {
-    vec3 viewDir = normalize(ubo.viewPos - vertex.pos);
-    vec3 lightDir = normalize(-ubo.dlight.direction);
+    const vec3 viewDir = normalize(ubo.viewPos - vertex.pos);
+    const vec3 lightDir = normalize(-ubo.dlight.direction);
 
-    float diff = max(dot(vertex.normal, lightDir), 0.0);
+    const float diff = max(dot(vertex.normal, lightDir), 0.0);
 
-    vec3 reflectDir = reflect(-lightDir, vertex.normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    const vec3 reflectDir = reflect(-lightDir, vertex.normal);
+    const float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
 
     vec3 ambient = ubo.dlight.ambient * vertex.Color.rgb;
     vec3 diffuse = ubo.dlight.diffuse * diff * vertex.Color.rgb;
@@ -277,30 +277,30 @@ vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, 
 
     vec3 result = vec3(ambient + diffuse + specular);
 
-//    float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
-//	if (shadowed) {
-//		result *= 0.3f;
-//	}
+    float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
+	if (shadowed) {
+		result *= 0.3f;
+	}
 
     return result;
 }
 
 vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec2 uv)
 {
-    vec3 viewDir = normalize(ubo.viewPos - vertex.pos);
-    vec3 lightDir = normalize(light.position - vertex.pos);
+    const vec3 viewDir = normalize(ubo.viewPos - vertex.pos);
+    const vec3 lightDir = normalize(light.position - vertex.pos);
 
-    float diff = max(dot(vertex.normal, lightDir), 0.0);
+    const float diff = max(dot(vertex.normal, lightDir), 0.0);
 
-    vec3 reflectDir = reflect(-lightDir, vertex.normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    const vec3 reflectDir = reflect(-lightDir, vertex.normal);
+    const float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
 
-    float distance = length(light.position - vertex.pos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+    const float distance = length(light.position - vertex.pos);
+    const float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
     vec3 ambient = light.ambient * vertex.Color.rgb;
     vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
@@ -321,34 +321,34 @@ vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec2
 
     vec3 result = vec3(ambient + diffuse + specular);
 
-//    float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
-//	if (shadowed) {
-//		result *= 0.3f;
-//	}
+    float tmin = 0.001;
+	float tmax = distance;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
+	if (shadowed) {
+		result *= 0.3f;
+	}
 
     return result;
 }
 
 vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec2 uv)
 {
-    vec3 viewDir = normalize(ubo.viewPos - vertex.pos);
-    vec3 lightDir = normalize(light.position - vertex.pos);
+    const vec3 viewDir = normalize(ubo.viewPos - vertex.pos);
+    const vec3 lightDir = normalize(light.position - vertex.pos);
 
-    float diff = max(dot(vertex.normal, lightDir), 0.0);
+    const float diff = max(dot(vertex.normal, lightDir), 0.0);
 
-    vec3 reflectDir = reflect(-lightDir, vertex.normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+    const vec3 reflectDir = reflect(-lightDir, vertex.normal);
+    const float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
 
-    float distance = length(light.position - vertex.pos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+    const float distance = length(light.position - vertex.pos);
+    const float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
-    float theta = dot(lightDir, normalize(-light.direction)); 
-    float epsilon = light.cutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    const float theta = dot(lightDir, normalize(-light.direction)); 
+    const float epsilon = light.cutOff - light.outerCutOff;
+    const float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
     vec3 ambient = light.ambient * vertex.Color.rgb;
     vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
@@ -370,14 +370,14 @@ vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec2 u
 
     vec3 result = vec3(ambient + diffuse + specular);
 
-//    float tmin = 0.001;
-//	float tmax = 10000.0;
-//	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	shadowed = true;  
-//	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
-//	if (shadowed) {
-//		result *= 0.3f;
-//	}
+    float tmin = 0.001;
+	float tmax = distance;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 1);
+	if (shadowed) {
+		result *= 0.3f;
+	}
 
     return result;
 }
