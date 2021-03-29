@@ -56,8 +56,11 @@ layout(location = 4) in mat3 TBN;
 
 layout(location = 0) out vec4 outColor;
 
-vec3 CalcDirLight(MaterialInfo material, vec3 normal);
-vec3 CalcPointLight(MaterialInfo material, PointLight light, vec3 normal);
+vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal);
+vec3 CalcNormalPointLight(MaterialInfo material, PointLight light, vec3 normal);
+vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+vec3 CalcDirLight(MaterialInfo material);
+vec3 CalcPointLight(MaterialInfo material, PointLight light);
 vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
@@ -71,24 +74,34 @@ void main()
 	 discard;
    }
 
+    vec3 result = vec3(0.0f);
     vec3 normal = Normal;
-    if(material.AlphaMapID != 0)
+    if(material.NormalMapID != 0)
     {
         normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
+
+        result = CalcNormalDirLight(material, normal);
+        for(int x = 0; x < 5; x++)
+        {
+           result += CalcNormalPointLight(material, scenedata.plight[x], normal);   
+        }
+       // result +=  CalcNormalSpotLight( material, scenedata.sLight, Normal, Normal, viewDir);
     }
-   
-    vec3 result = CalcDirLight(material, normal);
-    for(int x = 0; x < 5; x++)
+    else
     {
-       result += CalcPointLight(material, scenedata.plight[x], normal);   
+        result = CalcDirLight(material);
+        for(int x = 0; x < 5; x++)
+        {
+           result += CalcPointLight(material, scenedata.plight[x]);   
+        }
+       // result +=  CalcNormalSpotLight( material, scenedata.sLight, Normal, Normal, viewDir);
     }
-   // result +=  CalcSpotLight( material, scenedata.sLight, Normal, Normal, viewDir);
 
     outColor = vec4(result, 1.0);
 }
 
-vec3 CalcDirLight(MaterialInfo material, vec3 normal)
+vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal)
 {
     const vec3 TangentLightPos = TBN * scenedata.dlight.direction;
     const vec3 TangentViewPos  = TBN * scenedata.viewPos;
@@ -117,13 +130,13 @@ vec3 CalcDirLight(MaterialInfo material, vec3 normal)
     return vec3(ambient + diffuse + specular);
 }
 
-vec3 CalcPointLight(MaterialInfo material, PointLight light, vec3 normal)
+vec3 CalcNormalPointLight(MaterialInfo material, PointLight light, vec3 normal)
 {
     const vec3 TangentLightPos = TBN * light.position;
     const vec3 TangentViewPos  = TBN * scenedata.viewPos;
     const vec3 TangentFragPos  = TBN * FragPos;  
  
-    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+    vec3 lightDir = normalize(-TangentLightPos);
     float diff = max(dot(normal, lightDir), 0.0);
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 
@@ -152,7 +165,7 @@ vec3 CalcPointLight(MaterialInfo material, PointLight light, vec3 normal)
     return (ambient + diffuse + specular);
 }
 
-vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     const vec3 TangentLightPos = TBN * light.position;
     vec3 lightDir = normalize(light.position - fragPos);
@@ -186,6 +199,98 @@ vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fra
     specular *= attenuation * intensity;
     return (ambient + diffuse + specular);
 }
+
+vec3 CalcDirLight(MaterialInfo material)
+{
+    vec3 viewDir = normalize(scenedata.viewPos - FragPos);
+    vec3 lightDir = normalize(-scenedata.dlight.direction);
+
+    float diff = max(dot(Normal, lightDir), 0.0);
+
+    vec3 reflectDir = reflect(-lightDir, Normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+
+    vec3 ambient = scenedata.dlight.ambient * Color.rgb;
+    vec3 diffuse = scenedata.dlight.diffuse * diff * Color.rgb;
+    vec3 specular = scenedata.dlight.specular * spec * material.Specular;
+    if(material.DiffuseMapID != 0)
+    {
+        ambient = scenedata.dlight.ambient * vec3(texture(TextureMap[material.DiffuseMapID], TexCoords));
+        diffuse = scenedata.dlight.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], TexCoords));
+    }
+    if(material.SpecularMapID != 0)
+    {
+        specular = scenedata.dlight.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], TexCoords));
+    }
+
+    return (ambient + diffuse + specular);
+}
+
+vec3 CalcPointLight(MaterialInfo material, PointLight light)
+{
+    vec3 viewDir = normalize(scenedata.viewPos - FragPos);
+    vec3 lightDir = normalize(light.position - FragPos);
+
+    float diff = max(dot(Normal, lightDir), 0.0);
+
+    vec3 reflectDir = reflect(-lightDir, Normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+
+    float distance = length(light.position - FragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+
+    vec3 ambient = light.ambient * Color.rgb;
+    vec3 diffuse = light.diffuse * diff * Color.rgb;
+    vec3 specular = light.specular * spec * material.Specular;
+    if(material.DiffuseMapID != 0)
+    {
+        ambient = light.ambient * vec3(texture(TextureMap[material.DiffuseMapID], TexCoords));
+        diffuse = light.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], TexCoords));
+    }
+    if(material.SpecularMapID != 0)
+    {
+        specular = light.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], TexCoords));
+    }
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
+    return (ambient + diffuse + specular);
+}
+
+vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
+{
+    vec3 lightDir = normalize(light.position - fragPos);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
+
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
+
+    float theta = dot(lightDir, normalize(-light.direction)); 
+    float epsilon = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
+    vec3 ambient = light.ambient * Color.rgb;
+    vec3 diffuse = light.diffuse * diff * Color.rgb;
+    vec3 specular = light.specular * spec * material.Specular;
+    if(material.DiffuseMapID != 0)
+    {
+        ambient = light.ambient * vec3(texture(TextureMap[material.DiffuseMapID], TexCoords));
+        diffuse = light.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], TexCoords));
+    }
+    if(material.SpecularMapID != 0)
+    {
+        specular = light.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], TexCoords));
+    }
+    ambient *= attenuation * intensity;
+    diffuse *= attenuation * intensity;
+    specular *= attenuation * intensity;
+    return (ambient + diffuse + specular);
+}
+
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 { 
