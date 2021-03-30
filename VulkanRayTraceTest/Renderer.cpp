@@ -12,14 +12,14 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
     assetManager = AssetManager(engine);
 
-    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    //material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.SpecularMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/container2_specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
+    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.SpecularMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/container2_specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
 
-    //assetManager.AddModel(engine, "../Models/Crate.dae");
-    //assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
+    assetManager.AddModel(engine, "../Models/Crate.dae");
+    assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
 
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
@@ -169,7 +169,6 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     assetManager.Update(engine);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
-    SceneData->UniformDataInfo.sLight.position = camera->GetPosition();
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
     SceneData->UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
@@ -186,11 +185,23 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
+    ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
     ImGui::Checkbox("AddMaterial", &AddMaterialFlag);
     ImGui::Checkbox("DeleteMaterial", &RemoveMaterialFlag);
 
+    ImGui::SliderFloat3("Position2", &SceneData->UniformDataInfo.sLight.position.x, 0.0f, 10.0f);
+    ImGui::SliderFloat3("Direction2", &SceneData->UniformDataInfo.sLight.direction.x, -1.0f, 1.0f);
+    ImGui::SliderFloat3("Ambient245", &SceneData->UniformDataInfo.sLight.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse245", &SceneData->UniformDataInfo.sLight.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare245", &SceneData->UniformDataInfo.sLight.specular.x, 0.0f, 1.0f);
+    ImGui::SliderFloat("constant45", &SceneData->UniformDataInfo.sLight.constant, 0.0f, 100.0f);
+    ImGui::SliderFloat("linear45", &SceneData->UniformDataInfo.sLight.linear, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic45", &SceneData->UniformDataInfo.sLight.quadratic, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic452", &SceneData->UniformDataInfo.sLight.cutOff, 0.0f, 100.0f);
+    ImGui::SliderFloat("quadratic453", &SceneData->UniformDataInfo.sLight.outerCutOff, 0.0f, 100.0f);
+
     ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 10);
-    ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1000.0f, 1000.0f);
+    ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
     ImGui::SliderFloat3("Ambient", &SceneData->UniformDataInfo.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Speculare", &SceneData->UniformDataInfo.dlight.specular.x, 0.0f, 1.0f);
@@ -263,15 +274,6 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat("constant4", &SceneData->UniformDataInfo.plight[4].constant, 0.0f, 100.0f);
     ImGui::SliderFloat("linear4", &SceneData->UniformDataInfo.plight[4].linear, 0.0f, 100.0f);
     ImGui::SliderFloat("quadratic4", &SceneData->UniformDataInfo.plight[4].quadratic, 0.0f, 100.0f);
-
-    ImGui::SliderFloat3("Ambient245", &SceneData->UniformDataInfo.sLight.ambient.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse245", &SceneData->UniformDataInfo.sLight.diffuse.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Speculare245", &SceneData->UniformDataInfo.sLight.specular.x, 0.0f, 1.0f);
-    ImGui::SliderFloat("constant45", &SceneData->UniformDataInfo.sLight.constant, 0.0f, 100.0f);
-    ImGui::SliderFloat("linear45", &SceneData->UniformDataInfo.sLight.linear, 0.0f, 100.0f);
-    ImGui::SliderFloat("quadratic45", &SceneData->UniformDataInfo.sLight.quadratic, 0.0f, 100.0f);
-    ImGui::SliderFloat("quadratic452", &SceneData->UniformDataInfo.sLight.cutOff, 0.0f, 100.0f);
-    ImGui::SliderFloat("quadratic453", &SceneData->UniformDataInfo.sLight.outerCutOff, 0.0f, 100.0f);
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)

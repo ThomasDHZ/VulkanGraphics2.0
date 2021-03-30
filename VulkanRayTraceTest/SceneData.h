@@ -42,6 +42,7 @@ struct SceneDataBuffer {
 	alignas(16) glm::mat4 proj;
 	alignas(16) glm::vec3 viewPos;
 	alignas(4)  float timer;
+	alignas(4)  int Shadowed = 1;
 	alignas(4)  int temp;
 };
 

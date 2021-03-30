@@ -16,6 +16,7 @@ layout(binding = 2, set = 0) uniform CameraProperties
 	mat4 proj;
     vec3 viewPos;
 	float timer;
+    int Shadowed;
     int temp;
 } cam;
 

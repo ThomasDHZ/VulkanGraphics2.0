@@ -23,6 +23,7 @@ layout(binding = 2) uniform UBO
 	mat4 proj;
     vec3 viewPos;
 	float timer;
+	int Shadowed;
     int temp;
 } ubo;
 layout(binding = 3) buffer MeshProperties 

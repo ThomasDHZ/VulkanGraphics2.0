@@ -31,6 +31,7 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 proj;
     vec3 viewPos;
 	float timer;
+    int Shadowed;
     int temp;
 } scenedata;
 
@@ -58,10 +59,10 @@ layout(location = 0) out vec4 outColor;
 
 vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv);
 vec3 CalcNormalPointLight(MaterialInfo material, PointLight light, vec3 normal, vec2 uv);
-vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 uv);
+vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec2 uv);
 vec3 CalcDirLight(MaterialInfo material, vec2 uv);
 vec3 CalcPointLight(MaterialInfo material, PointLight light, vec2 uv);
-vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 uv);
+vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec2 uv);
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
 void main() 
@@ -93,12 +94,12 @@ void main()
         normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
 
-        result = CalcNormalDirLight(material, normal, texCoords);
+       result = CalcNormalDirLight(material, normal, texCoords);
         for(int x = 0; x < 5; x++)
         {
-           result += CalcNormalPointLight(material, scenedata.plight[x], normal, texCoords);   
+          result += CalcNormalPointLight(material, scenedata.plight[x], normal, texCoords);   
         }
-       // result +=  CalcNormalSpotLight( material, scenedata.sLight, Normal, Normal, viewDir);
+        result +=  CalcNormalSpotLight( material, scenedata.sLight, normal, texCoords);
     }
     else
     {
@@ -107,7 +108,7 @@ void main()
         {
            result += CalcPointLight(material, scenedata.plight[x], texCoords);   
         }
-       // result +=  CalcNormalSpotLight( material, scenedata.sLight, Normal, Normal, viewDir);
+        result +=  CalcSpotLight( material, scenedata.sLight, texCoords);
     }
 
     outColor = vec4(result, 1.0);
@@ -177,17 +178,21 @@ vec3 CalcNormalPointLight(MaterialInfo material, PointLight light, vec3 normal, 
     return (ambient + diffuse + specular);
 }
 
-vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 uv)
+vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec2 uv)
 {
     const vec3 TangentLightPos = TBN * light.position;
-    vec3 lightDir = normalize(light.position - fragPos);
+    const vec3 TangentViewPos  = TBN * scenedata.viewPos;
+    const vec3 TangentFragPos  = TBN * FragPos;  
+    const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+
+    vec3 lightDir = normalize(light.position - FragPos);
 
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
-    float distance = length(light.position - fragPos);
+    float distance = length(light.position - TangentFragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
     float theta = dot(lightDir, normalize(-light.direction)); 
@@ -269,16 +274,17 @@ vec3 CalcPointLight(MaterialInfo material, PointLight light, vec2 uv)
     return (ambient + diffuse + specular);
 }
 
-vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec2 uv)
+vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec2 uv)
 {
-    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 viewDir = normalize(scenedata.viewPos - FragPos);
+    vec3 lightDir = normalize(light.position - FragPos);
 
-    float diff = max(dot(normal, lightDir), 0.0);
+    float diff = max(dot(Normal, lightDir), 0.0);
 
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, Normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
 
-    float distance = length(light.position - fragPos);
+    float distance = length(light.position - FragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
     float theta = dot(lightDir, normalize(-light.direction)); 
