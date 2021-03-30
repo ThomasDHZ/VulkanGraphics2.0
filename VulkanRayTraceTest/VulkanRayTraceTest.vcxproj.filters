@@ -227,6 +227,12 @@
     <None Include="Shader\anyhit1.rahit">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\FrameBuffer.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\FrameBuffer.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">

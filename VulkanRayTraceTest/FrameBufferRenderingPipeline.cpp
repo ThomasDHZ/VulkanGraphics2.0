@@ -16,8 +16,8 @@ FrameBufferRenderingPipeline::~FrameBufferRenderingPipeline()
 
 void FrameBufferRenderingPipeline::CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, VkDescriptorSetLayout layout)
 {
-	auto vertShaderCode = ReadShaderFile("Shader/FrameBufferShaderVert.spv");
-	auto fragShaderCode = ReadShaderFile("Shader/FrameBufferShaderFrag.spv");
+	auto vertShaderCode = ReadShaderFile("Shader/FrameBufferVert.spv");
+	auto fragShaderCode = ReadShaderFile("Shader/FrameBufferFrag.spv");
 
 	VkShaderModule FrameBufferVertShaderModule = CreateShaderModule(renderer, vertShaderCode);
 	VkShaderModule FrameBufferFragShaderModule = CreateShaderModule(renderer, fragShaderCode);

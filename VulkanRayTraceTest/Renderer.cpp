@@ -13,9 +13,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager = AssetManager(engine);
 
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/create_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.SpecularMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/container2_specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/bricks2.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/bricks2_normal.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/bricks2_disp.jpg", VK_FORMAT_R8G8B8A8_UNORM);
     uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
 
     assetManager.AddModel(engine, "../Models/Crate.dae");
@@ -32,7 +32,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
 
-    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+    //assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
     //assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
     //assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -67,7 +67,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-    SceneData->UniformDataInfo.dlight.direction = glm::vec4(28.572f, 1000.0f, 771.429f, 0.0f);
+    SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
     SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);
     SceneData->UniformDataInfo.dlight.specular = glm::vec4(1.0f);
@@ -211,6 +211,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
         auto a = std::to_string(y);
         ImGui::Checkbox(a.c_str(), &assetManager.meshManager.MeshList[y]->ShowMesh);
 
+        ImGui::SliderFloat(("Depth " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 1.0f);
         ImGui::SliderFloat2(("UV Offset " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
         ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshPosition.x, -10.0f, 10.0f);
         ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshRotation.x, 0.0f, 360.0f);

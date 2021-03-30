@@ -206,6 +206,8 @@
     <None Include="Shader\anyhit.rahit" />
     <None Include="Shader\anyhit1.rahit" />
     <None Include="Shader\closesthit.rchit" />
+    <None Include="Shader\FrameBuffer.frag" />
+    <None Include="Shader\FrameBuffer.vert" />
     <None Include="Shader\Material.glsl" />
     <None Include="Shader\Lighting.glsl" />
     <None Include="Shader\miss.rmiss" />

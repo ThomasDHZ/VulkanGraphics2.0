@@ -41,6 +41,9 @@ layout(binding = 3) buffer MeshProperties
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
     uint MaterialIndex;
+    float heightScale;
+	float minLayers;
+	float maxLayers;
 } meshProperties[];
 layout(binding = 4) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 5) buffer Indices { uint i[]; } indices[];
@@ -63,12 +66,12 @@ vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, ve
 vec3 CalcDirLight(MaterialInfo material, vec2 uv);
 vec3 CalcPointLight(MaterialInfo material, PointLight light, vec2 uv);
 vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec2 uv);
-vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
+vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
 void main() 
 {
     const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-     vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
+    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
 
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
    {
@@ -83,14 +86,14 @@ void main()
     vec3 normal = Normal;
     if(material.NormalMapID != 0)
     {
-//        if(material.DepthMapID != 0)
-//        {
-//            texCoords = ParallaxMapping(texCoords,  viewDir);       
-//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-//            {
-//              discard;
-//            }
-//        }
+        if(material.DepthMapID != 0)
+        {
+            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+            {
+              discard;
+            }
+        }
         normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
 
@@ -310,31 +313,31 @@ vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec2 uv)
 }
 
 
-vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
 { 
-    float heightScale = 0.1;
-    // number of depth layers
-    const float minLayers = 8;
-    const float maxLayers = 32;
+    const float heightScale = meshProperties[ConstMesh.MeshIndex].heightScale;
+    const float minLayers = meshProperties[ConstMesh.MeshIndex].minLayers;
+    const float maxLayers = meshProperties[ConstMesh.MeshIndex].maxLayers;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
     // calculate the size of each layer
     float layerDepth = 1.0 / numLayers;
     // depth of current layer
     float currentLayerDepth = 0.0;
     // the amount to shift the texture coordinates per layer (from vector P)
+    viewDir.y = -viewDir.y; 
     vec2 P = viewDir.xy / viewDir.z * heightScale; 
     vec2 deltaTexCoords = P / numLayers;
   
     // get initial values
     vec2  currentTexCoords     = texCoords;
-    float currentDepthMapValue = texture(TextureMap[3], currentTexCoords).r;
+    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
       
     while(currentLayerDepth < currentDepthMapValue)
     {
         // shift texture coordinates along direction of P
         currentTexCoords -= deltaTexCoords;
         // get depthmap value at current texture coordinates
-        currentDepthMapValue = texture(TextureMap[3], currentTexCoords).r;  
+        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;  
         // get depth of next layer
         currentLayerDepth += layerDepth;  
     }
@@ -344,7 +347,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 
     // get depth after and before collision for linear interpolation
     float afterDepth  = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(TextureMap[3], prevTexCoords).r - currentLayerDepth + layerDepth;
+    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
  
     // interpolation of texture coordinates
     float weight = afterDepth / (afterDepth - beforeDepth);
