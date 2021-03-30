@@ -13,9 +13,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager = AssetManager(engine);
 
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/bricks2.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/bricks2_normal.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/bricks2_disp.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
 
     assetManager.AddModel(engine, "../Models/Crate.dae");
@@ -52,7 +52,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
 
     RenderPass = MainRenderPass(engine);
-    //frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
+    //frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     
     SetUpDescriptorPool(engine);
@@ -140,6 +140,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
     RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+  // / //frameBufferRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
     vkDestroyImageView(engine.Device, RayRenderer.storageImage.view, nullptr);
@@ -184,6 +185,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 10);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
     ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
     ImGui::Checkbox("AddMaterial", &AddMaterialFlag);
@@ -200,7 +202,6 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat("quadratic452", &SceneData->UniformDataInfo.sLight.cutOff, 0.0f, 100.0f);
     ImGui::SliderFloat("quadratic453", &SceneData->UniformDataInfo.sLight.outerCutOff, 0.0f, 100.0f);
 
-    ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 10);
     ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
     ImGui::SliderFloat3("Ambient", &SceneData->UniformDataInfo.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
@@ -337,7 +338,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     vkCmdEndRenderPass(RasterCommandBuffer);
    // AnimationRenderer.Compute(engine, imageIndex);
-    //    frameBufferRenderPass.Draw(engine, commandBuffers[i], i);
+      //  frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
