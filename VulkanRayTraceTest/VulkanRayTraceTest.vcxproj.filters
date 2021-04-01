@@ -186,6 +186,9 @@
     <ClCompile Include="ForwardRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -228,6 +231,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\FrameBuffer.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\SkyBoxShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\SkyBoxShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -395,6 +404,9 @@
       <Filter>Header Files\TestObjects</Filter>
     </ClInclude>
     <ClInclude Include="ForwardRenderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

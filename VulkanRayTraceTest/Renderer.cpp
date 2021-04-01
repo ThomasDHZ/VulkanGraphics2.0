@@ -311,8 +311,6 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     engine.imagesInFlight[imageIndex] = engine.inFlightFences[currentFrame];
 
 
-
-
     /// <summary>
     /// Draw Area
     /// </summary>
@@ -346,12 +344,12 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     vkCmdEndRenderPass(RasterCommandBuffer);
    // AnimationRenderer.Compute(engine, imageIndex);
-     //  frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
+    //   frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 
-    RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets, imageIndex);
+   RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets, imageIndex);
 
     ///
     ///Draw area

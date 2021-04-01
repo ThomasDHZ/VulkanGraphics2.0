@@ -26,6 +26,16 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, AssetManager& assetMana
     topLevelAS = AccelerationStructure(engine);
     createTopLevelAccelerationStructure(engine, assetManager);
     createStorageImage(engine, storageImage);
+
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = 1;
+
+    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &RayTraceCommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
 }
 
 RayTraceRenderer::~RayTraceRenderer()
@@ -348,16 +358,6 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
 
 void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex)
 {
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.CommandPool;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 1;
-
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &RayTraceCommandBuffer) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
-    }
-
     VkCommandBufferBeginInfo cmdBufInfo{};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 

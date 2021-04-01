@@ -71,8 +71,8 @@ public:
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
-	void Update(VulkanEngine& engine, MaterialManager& materialManager);
-	void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager);
+	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager);
+	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager);
 	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
 	void Destory(VulkanEngine& engine);
 };
