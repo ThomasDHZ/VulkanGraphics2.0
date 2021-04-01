@@ -8,6 +8,16 @@
 #include "Lighting.glsl"
 #include "Material.glsl"
 
+struct RayHitInfo
+{
+	vec3 hitValue;
+		vec3 geoNormal;
+			float distance;
+	vec3 Origin;
+	vec3 Direction;
+	float Reflectiveness;
+};
+
 hitAttributeEXT vec2 attribs;
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
@@ -39,7 +49,7 @@ layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];
 
-layout(location = 0) rayPayloadEXT vec3 hitValue;
+layout(location = 0) rayPayloadEXT RayHitInfo rayHitInfo;
 
 Vertex BuildVertexInfo()
 {

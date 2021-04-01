@@ -25,7 +25,7 @@
 #include "RayTraceRenderer.h"
 #include "VulkanWindow.h"
 #include "VulkanEngine.h"
-#include "MainRenderPass.h"
+#include "ForwardRenderPass.h"
 #include "Renderer.h"
 
 class HelloTriangleApplication {

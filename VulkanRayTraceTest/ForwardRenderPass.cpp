@@ -1,10 +1,10 @@
-#include "MainRenderPass.h"
+#include "ForwardRenderPass.h"
 
-MainRenderPass::MainRenderPass()
+ForwardRenderPass::ForwardRenderPass()
 {
 }
 
-MainRenderPass::MainRenderPass(VulkanEngine& engine)
+ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine)
 {
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
@@ -12,11 +12,11 @@ MainRenderPass::MainRenderPass(VulkanEngine& engine)
     CreateRendererFramebuffers(engine);
 }
 
-MainRenderPass::~MainRenderPass()
+ForwardRenderPass::~ForwardRenderPass()
 {
 }
 
-void MainRenderPass::CreateRenderPass(VulkanEngine& engine)
+void ForwardRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
@@ -75,7 +75,7 @@ void MainRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void MainRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void ForwardRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
@@ -100,12 +100,12 @@ void MainRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void MainRenderPass::StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
+void ForwardRenderPass::StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
 {
     forwardRendereringPipeline = std::make_shared<ForwardRenderingPipeline>(engine, RenderPass, DescriptorLayout);
 }
 
-void MainRenderPass::UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
+void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
 {
     DepthTexture->RecreateRendererTexture(engine);
 
@@ -124,7 +124,7 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout
     CreateRendererFramebuffers(engine);
 }
 
-void MainRenderPass::Destroy(VulkanEngine& engine)
+void ForwardRenderPass::Destroy(VulkanEngine& engine)
 {
     DepthTexture->Delete(engine);
 

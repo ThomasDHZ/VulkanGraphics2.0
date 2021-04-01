@@ -32,7 +32,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
 
-    //assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
     //assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
     //assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -51,8 +51,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
 
-    RenderPass = MainRenderPass(engine);
-    //frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
+    RenderPass = ForwardRenderPass(engine);
+    frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     
     SetUpDescriptorPool(engine);
@@ -140,7 +140,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
     RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
-  // / //frameBufferRenderPass.UpdateSwapChain(engine);
+    frameBufferRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
     vkDestroyImageView(engine.Device, RayRenderer.storageImage.view, nullptr);
@@ -184,6 +184,14 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
+
+    for (int y = 0; y < assetManager.materialManager.MaterialList.size(); y++)
+    {
+        auto a = std::to_string(y);;
+
+        ImGui::SliderFloat(("Reflection  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    }
+
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 10);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
@@ -338,7 +346,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     vkCmdEndRenderPass(RasterCommandBuffer);
    // AnimationRenderer.Compute(engine, imageIndex);
-      //  frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
+     //  frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
@@ -449,6 +457,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
+    frameBufferRenderPass.Destroy(engine);
    // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);

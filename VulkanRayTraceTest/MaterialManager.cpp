@@ -53,7 +53,7 @@ std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescri
 	for (int x = 0; x < MaterialList.size(); x++)
 	{
 		VkDescriptorBufferInfo MaterialBufferInfo = {};
-		MaterialBufferInfo.buffer = MaterialList[x]->MaterialBuffer.Buffer;
+		MaterialBufferInfo.buffer = MaterialList[x]->GetMaterialBuffer();
 		MaterialBufferInfo.offset = 0;
 		MaterialBufferInfo.range = VK_WHOLE_SIZE;
 		MaterialBufferList.emplace_back(MaterialBufferInfo);

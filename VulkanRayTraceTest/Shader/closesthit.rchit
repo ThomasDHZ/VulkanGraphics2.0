@@ -2,12 +2,22 @@
 #extension GL_EXT_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
-
+#extension GL_EXT_debug_printf : enable
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
 
-layout(location = 0) rayPayloadInEXT vec3 hitValue;
+struct RayHitInfo
+{
+	vec3 hitValue;
+    	vec3 geoNormal;
+        	float distance;
+	vec3 Origin;
+	vec3 Direction;
+	float Reflectiveness;
+};
+
+layout(location = 0) rayPayloadInEXT RayHitInfo rayHitInfo;
 layout(location = 1) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
@@ -79,46 +89,54 @@ void main()
         normal = texture(TextureMap[material.NormalMapID], uv).rgb;
         normal = normalize(normal * 2.0 - 1.0);
 
-        hitValue = CalcNormalDirLight(vertex, material, TBN, normal, uv);
+        rayHitInfo.hitValue = CalcNormalDirLight(vertex, material, TBN, normal, uv);
         for(int x = 0; x < 5; x++)
         {
-           hitValue += CalcNormalPointLight(vertex, material, TBN, ubo.plight[x], normal, uv);   
+           rayHitInfo.hitValue += CalcNormalPointLight(vertex, material, TBN, ubo.plight[x], normal, uv);   
         }
-        hitValue +=  CalcNormalSpotLight(vertex, material, TBN, ubo.sLight, normal, uv);
+        rayHitInfo.hitValue +=  CalcNormalSpotLight(vertex, material, TBN, ubo.sLight, normal, uv);
    }
    else
    {
-        hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
+       rayHitInfo.hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
         for(int x = 0; x < 5; x++)
         {
-            hitValue += CalcPointLight(vertex, material, ubo.plight[x], uv);   
+            rayHitInfo.hitValue += CalcPointLight(vertex, material, ubo.plight[x], uv);   
         }
-        hitValue +=  CalcSpotLight(vertex, material, ubo.sLight, uv);
+       rayHitInfo.hitValue +=  CalcSpotLight(vertex, material, ubo.sLight, uv);
    }
+
+ 
+     vec3 origin = vertex.pos;
+    vec3 rayDir = reflect(gl_WorldRayDirectionEXT, normal);
+    rayHitInfo.Origin = origin;
+    rayHitInfo.Direction    = rayDir;
+    rayHitInfo.geoNormal = vertex.normal;
+   rayHitInfo.Reflectiveness = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material.Reflectivness;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
 {
-     if(ubo.Shadowed == 1)
-     {
-        float tmin = 0.001;
-	    float tmax = LightDistance;
-	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	    shadowed = true;  
-	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
-	    if (shadowed) 
-        {
-            LightResult *= 0.3f;
-	    }
-        else
-        {
+//     if(ubo.Shadowed == 1)
+//     {
+//        float tmin = 0.001;
+//	    float tmax = LightDistance;
+//	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+//	    shadowed = true;  
+//	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
+//	    if (shadowed) 
+//        {
+//            LightResult *= 0.3f;
+//	    }
+//        else
+//        {
+//           LightResult += LightSpecular;
+//        }
+//    }
+//    else
+//    {
            LightResult += LightSpecular;
-        }
-    }
-    else
-    {
-           LightResult += LightSpecular;
-    }
+//    }
     return LightResult;
 }
 

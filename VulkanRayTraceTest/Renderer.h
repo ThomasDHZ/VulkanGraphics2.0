@@ -2,7 +2,7 @@
 #include "VulkanEngine.h"
 #include "FrameBufferRenderPass.h"
 #include "InterfaceRenderPass.h"
-#include "MainRenderPass.h"
+#include "ForwardRenderPass.h"
 #include "TextureManager.h"
 #include "Model.h"
 #include "RayTraceRenderer.h"
@@ -26,9 +26,9 @@ private:
 	VkDescriptorSet descriptorSets;
 	VkCommandBuffer RasterCommandBuffer;
 
-	//FrameBufferRenderPass frameBufferRenderPass;
+	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
-	MainRenderPass RenderPass;
+	ForwardRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
 	//AnimatorCompute AnimationRenderer;
 

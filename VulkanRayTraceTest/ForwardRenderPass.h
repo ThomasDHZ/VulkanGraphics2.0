@@ -6,29 +6,16 @@
 #include "RenderedDepthTexture.h"
 #include "ForwardRenderingPipeline.h"
 
-enum RenderDrawFlags
-{
-	RenderNormally = 1 << 0,
-	RenderAnimated = 1 << 1,
-	RenderWireFrame = 1 << 2,
-	RenderWireFrameAnimated = 1 << 3,
-	RenderShadow = 1 << 4,
-	RenderShadowAnimated = 1 << 5,
-	RenderLightDebug = 1 << 6
-};
-
-class MainRenderPass
+class ForwardRenderPass
 {
 private:
-
-
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 
 public:
-	MainRenderPass();
-	MainRenderPass(VulkanEngine& engine);
-	~MainRenderPass();
+	ForwardRenderPass();
+	ForwardRenderPass(VulkanEngine& engine);
+	~ForwardRenderPass();
 
 	VkRenderPass RenderPass;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;

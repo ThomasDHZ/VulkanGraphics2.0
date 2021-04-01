@@ -8,7 +8,7 @@ struct MaterialTexture
 	glm::vec3 Diffuse = glm::vec3(0.6f);
 	glm::vec3 Specular = glm::vec3(1.0f);
 	float Shininess = 32;
-	float Reflectivness = 0;
+	float Reflectivness = 0.0f;
 
 	std::shared_ptr<Texture> DiffuseMap;
 	std::shared_ptr<Texture> SpecularMap;
@@ -25,7 +25,7 @@ struct MaterialData
 	alignas(16) glm::vec3 Diffuse = glm::vec3(0.6f);
 	alignas(16) glm::vec3 Specular = glm::vec3(1.0f);
 	alignas(4) float Shininess = 32;
-	alignas(4) float Reflectivness = 0;
+	alignas(4) float Reflectivness = 0.0f;
 
 	alignas(4) uint32_t DiffuseMapID = 0;
 	alignas(4) uint32_t SpecularMapID = 0;
@@ -56,14 +56,13 @@ struct MaterialData
 class Material
 {
 private:
-
+	MaterialData materialData;
+	VulkanBuffer MaterialBuffer;
 
 public:
 	std::string MaterialName;
 	uint32_t MaterialID = 0;
 	uint32_t MaterialBufferIndex = 0;
-	MaterialData materialData;
-	VulkanBuffer MaterialBuffer;
 	MaterialTexture materialTexture;
 
 	Material();
@@ -73,4 +72,6 @@ public:
 
 	void UpdateBufferIndexs(VulkanEngine& engine);
 	void Delete(VulkanEngine& engine);
+
+	VkBuffer GetMaterialBuffer() { return MaterialBuffer.Buffer; }
 };

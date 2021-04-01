@@ -1,7 +1,18 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
+#extension GL_EXT_debug_printf : enable
 
 #include "Lighting.glsl"
+
+struct RayHitInfo
+{
+	vec3 hitValue;
+	vec3 geoNormal;
+	float distance;
+	vec3 Origin;
+	vec3 Direction;
+	float Reflectiveness;
+};
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 1, set = 0, rgba8) uniform image2D image;
@@ -20,7 +31,7 @@ layout(binding = 2, set = 0) uniform CameraProperties
     int temp;
 } cam;
 
-layout(location = 0) rayPayloadEXT vec3 hitValue;
+layout(location = 0) rayPayloadEXT RayHitInfo rayHitInfo;
 
 void main() 
 {
@@ -35,9 +46,47 @@ void main()
 	float tmin = 0.001;
 	float tmax = 10000.0;
 
-    hitValue = vec3(0.0f);
+    rayHitInfo.hitValue = vec3(0.0f);
+	rayHitInfo.geoNormal = vec3(0.0f);
+	rayHitInfo.distance = 0.0f;
+	rayHitInfo.Origin = origin.xyz;
+	rayHitInfo.Direction = direction.xyz;
+    rayHitInfo.Reflectiveness = 0.0f;
 
-    traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+	vec3 finalColor = vec3(0.0f);
+	vec3 baseColor = vec3(0.0f);
+	vec3 baseColorMask = vec3(0.0f);
+	vec3 reflectMask = vec3(0.0f);
+	vec3 reflectColor = vec3(1.0f, 0.0f, 0.0f);
 
-	imageStore(image, ivec2(gl_LaunchIDEXT.xy), vec4(hitValue, 0.0));
+	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+	if(rayHitInfo.Reflectiveness == 0)
+	{
+		baseColor = rayHitInfo.hitValue;
+		baseColorMask = vec3(1.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		reflectMask = vec3(0.0f, 1.0f, 0.0f);
+	}
+
+	for (int i = 0; i < 3; i++) 
+	{
+		const vec4 hitPos = origin + direction * rayHitInfo.distance;
+		origin.xyz = hitPos.xyz + rayHitInfo.geoNormal * 0.001f;
+		direction.xyz = reflect(direction.xyz, rayHitInfo.geoNormal);
+	    traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+		if(reflectMask  == vec3(0.0f, 1.0f, 0.0f))
+		{
+			reflectColor = rayHitInfo.hitValue;
+			finalColor = mix(baseColor, reflectColor, rayHitInfo.Reflectiveness);
+		}
+	}
+
+	if(baseColorMask == vec3(1.0f, 0.0f, 0.0f))
+	{
+		finalColor = baseColor;
+	}
+
+	imageStore(image, ivec2(gl_LaunchIDEXT.xy), vec4(finalColor, 0.0));
 }

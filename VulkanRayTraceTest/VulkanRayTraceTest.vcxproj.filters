@@ -96,9 +96,6 @@
     <ClCompile Include="RenderedDepthTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicsPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -121,9 +118,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FrameBufferRenderingPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FrameBufferRenderPass.cpp">
@@ -188,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="Mario.cpp">
       <Filter>Source Files\TestObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardRenderPass.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -301,9 +298,6 @@
     <ClInclude Include="RenderedDepthTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MainRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GraphicsPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -332,9 +326,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBufferRenderingPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FrameBufferRenderPass.h">
@@ -402,6 +393,9 @@
     </ClInclude>
     <ClInclude Include="MegaMan.h">
       <Filter>Header Files\TestObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardRenderPass.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

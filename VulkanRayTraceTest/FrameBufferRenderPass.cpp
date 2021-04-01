@@ -9,7 +9,7 @@ FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, AssetManager&
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     CreateDescriptorSetLayout(engine, assetManager);
-    frameBufferPipeline = std::make_shared<FrameBufferRenderingPipeline>(engine, RenderPass, DescriptorLayout);
+    CreateShaderPipeLine(engine);
     CreateDescriptorPool(engine);
     CreateDescriptorSets(engine, assetManager, SceneData);
     mesh = Mesh(engine, FrameBufferVertices, FrameBufferIndices, 1);
@@ -154,16 +154,7 @@ void FrameBufferRenderPass::CreateShaderPipeLine(VulkanEngine& engine)
 void FrameBufferRenderPass::CreateDescriptorPool(VulkanEngine& engine)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
@@ -279,9 +270,9 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, VkCommandBuffer commandbu
         VkDeviceSize offsets[] = { 0 };
     
         vkCmdBeginRenderPass(commandbuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdBindPipeline(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, frameBufferPipeline->ShaderPipeline);
+        vkCmdBindPipeline(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipeline);
         vkCmdBindVertexBuffers(commandbuffer, 0, 1, vertexBuffers, offsets);
-        vkCmdBindDescriptorSets(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, frameBufferPipeline->ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
+        vkCmdBindDescriptorSets(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
         vkCmdBindIndexBuffer(commandbuffer, mesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
         vkCmdDrawIndexed(commandbuffer, static_cast<uint32_t>(mesh.IndexCount), 1, 0, 0, 0);
         vkCmdEndRenderPass(commandbuffer);
@@ -289,7 +280,7 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, VkCommandBuffer commandbu
 
 void FrameBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
-    frameBufferPipeline->UpdateGraphicsPipeLine(engine, RenderPass, DescriptorLayout);
+    UpdateGraphicsPipeLine(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -306,7 +297,19 @@ void FrameBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
 
 void FrameBufferRenderPass::Destroy(VulkanEngine& engine)
 {
-    frameBufferPipeline->Destroy(engine);
+    mesh.Destory(engine);
+
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(engine.Device, DescriptorLayout, nullptr);
+
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
+
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
