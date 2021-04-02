@@ -17,6 +17,11 @@ struct MaterialTexture
 	std::shared_ptr<Texture> AlphaMap;
 	std::shared_ptr<Texture> EmissionMap;
 	std::shared_ptr<Texture> ShadowMap;
+
+	std::shared_ptr<Texture> AlbedoMap;
+	std::shared_ptr<Texture> MatallicMap;
+	std::shared_ptr<Texture> RoughnessMap;
+	std::shared_ptr<Texture> AOMap;
 };
 
 struct MaterialData
@@ -35,6 +40,11 @@ struct MaterialData
 	alignas(4) uint32_t EmissionMapID = 0;
 	alignas(4) uint32_t ShadowMapID = 0;
 
+	alignas(4) uint32_t AlbedoMapID = 0;
+	alignas(4) uint32_t MatallicMapID = 0;
+	alignas(4) uint32_t RoughnessMapID = 0;
+	alignas(4) uint32_t AOMapID = 0;
+
 	void operator=(const MaterialTexture& materialTexture)
 	{
 		Ambient = materialTexture.Ambient;
@@ -50,6 +60,11 @@ struct MaterialData
 		AlphaMapID = materialTexture.AlphaMap->TextureBufferIndex;
 		EmissionMapID = materialTexture.EmissionMap->TextureBufferIndex;
 		ShadowMapID = materialTexture.ShadowMap->TextureBufferIndex;
+
+		AlbedoMapID = materialTexture.AlbedoMap->TextureBufferIndex;
+		MatallicMapID = materialTexture.MatallicMap->TextureBufferIndex;
+		RoughnessMapID = materialTexture.RoughnessMap->TextureBufferIndex;
+		AOMapID = materialTexture.AOMap->TextureBufferIndex;
 	}
 };
 

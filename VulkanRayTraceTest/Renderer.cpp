@@ -65,6 +65,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]->MeshList[0]);
     SetUpCommandBuffers(engine);
 
+  //  skybox = Skybox(engine, assetManager, RenderPass.RenderPass, SceneData);
+
+
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
     SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
@@ -143,15 +146,11 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     frameBufferRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
-    vkDestroyImageView(engine.Device, RayRenderer.storageImage.view, nullptr);
-    vkDestroyImage(engine.Device, RayRenderer.storageImage.image, nullptr);
-    vkFreeMemory(engine.Device, RayRenderer.storageImage.memory, nullptr);
-
-    RayRenderer.createStorageImage(engine, RayRenderer.storageImage);
+    RayRenderer.createStorageImage(engine);
     SetUpDescriptorPool(engine);
     SetUpDescriptorSets(engine);
 
-    RayRenderer.Resize(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, descriptorSets, 0);
+    RayRenderer.Resize(engine, assetManager, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, descriptorSets, 0);
 
     SetUpCommandBuffers(engine);
 }
@@ -168,6 +167,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     camera->Update(engine);
 
     assetManager.Update(engine);
+   // skybox.Update(engine, assetManager.materialManager);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
@@ -185,15 +185,15 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
 
-    for (int y = 0; y < assetManager.materialManager.MaterialList.size(); y++)
-    {
-        auto a = std::to_string(y);;
+    //for (int y = 0; y < assetManager.materialManager.MaterialList.size(); y++)
+    //{
+    //    auto a = std::to_string(y);;
 
-        ImGui::SliderFloat(("Reflection  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    }
+    //    ImGui::SliderFloat(("Reflection  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    //}
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 10);
+    ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 23);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
     ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
     ImGui::Checkbox("AddMaterial", &AddMaterialFlag);
@@ -337,6 +337,8 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(RasterCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+   // skybox.Draw(RasterCommandBuffer, renderPassInfo);
+
     vkCmdBindPipeline(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
     
@@ -344,12 +346,12 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     vkCmdEndRenderPass(RasterCommandBuffer);
    // AnimationRenderer.Compute(engine, imageIndex);
-    //   frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
+       frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 
-   RayRenderer.buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets, imageIndex);
+   RayRenderer.buildCommandBuffers(engine, assetManager, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets, imageIndex);
 
     ///
     ///Draw area
@@ -363,6 +365,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     if (RayTraceSwitch)
     {
         //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
+      //  CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
@@ -572,7 +575,7 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
 
     VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
-    VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage);
+    VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage->View);
     VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager.GetMeshPropertiesListDescriptors();
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager.GetVertexBufferListDescriptors();

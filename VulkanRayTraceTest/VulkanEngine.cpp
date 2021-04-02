@@ -709,10 +709,10 @@ VkWriteDescriptorSetAccelerationStructureKHR VulkanEngine::AddAcclerationStructu
 	return AccelerationDescriptorStructure;
 }
 
-VkDescriptorImageInfo VulkanEngine::AddRayTraceReturnImageDescriptor(VkImageLayout ImageLayout, StorageImage& texture)
+VkDescriptorImageInfo VulkanEngine::AddRayTraceReturnImageDescriptor(VkImageLayout ImageLayout, VkImageView& ImageView)
 {
 	VkDescriptorImageInfo RayTraceImageDescriptor{};
-	RayTraceImageDescriptor.imageView = texture.view;
+	RayTraceImageDescriptor.imageView = ImageView;
 	RayTraceImageDescriptor.imageLayout = ImageLayout;
 	return RayTraceImageDescriptor;
 }

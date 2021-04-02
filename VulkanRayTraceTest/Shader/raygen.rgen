@@ -79,7 +79,7 @@ void main()
 		if(reflectMask  == vec3(0.0f, 1.0f, 0.0f))
 		{
 			reflectColor = rayHitInfo.hitValue;
-			finalColor = mix(baseColor, reflectColor, rayHitInfo.Reflectiveness);
+			finalColor = baseColor + (reflectColor * rayHitInfo.Reflectiveness); 
 		}
 	}
 

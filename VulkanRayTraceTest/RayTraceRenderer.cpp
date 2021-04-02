@@ -25,7 +25,7 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, AssetManager& assetMana
 
     topLevelAS = AccelerationStructure(engine);
     createTopLevelAccelerationStructure(engine, assetManager);
-    createStorageImage(engine, storageImage);
+    createStorageImage(engine);
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -63,13 +63,7 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
         RayTracePipelineLayout = VK_NULL_HANDLE;
     }
     {
-        vkDestroyImage(engine.Device, storageImage.image, nullptr);
-        vkDestroyImageView(engine.Device, storageImage.view, nullptr);
-        vkFreeMemory(engine.Device, storageImage.memory, nullptr);
-
-        storageImage.image = VK_NULL_HANDLE;
-        storageImage.memory = VK_NULL_HANDLE;
-        storageImage.view = VK_NULL_HANDLE;
+        storageImage->Delete(engine);
     }
     {
         raygenShaderBindingTable.DestoryBuffer(engine.Device);
@@ -105,7 +99,7 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
         }
     }
 
-    VulkanBuffer instancesBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(VkAccelerationStructureInstanceKHR) * AccelerationStructureInstanceList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, AccelerationStructureInstanceList.data());
+     instancesBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(VkAccelerationStructureInstanceKHR) * AccelerationStructureInstanceList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, AccelerationStructureInstanceList.data());
 
     VkDeviceOrHostAddressConstKHR DeviceOrHostAddressConst = {};
     DeviceOrHostAddressConst.deviceAddress = engine.GetBufferDeviceAddress(instancesBuffer.Buffer);
@@ -169,99 +163,13 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
     instancesBuffer.DestoryBuffer(engine.Device);
 }
 
-void RayTraceRenderer::createStorageImage(VulkanEngine& engine, StorageImage& StoreImage)
+void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
 {
-    VkImageCreateInfo image = {};
-    image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    image.imageType = VK_IMAGE_TYPE_2D;
-    image.format = VK_FORMAT_B8G8R8A8_UNORM;
-    image.extent.width = engine.SwapChain.SwapChainResolution.width;
-    image.extent.height = engine.SwapChain.SwapChainResolution.height;
-    image.extent.depth = 1;
-    image.mipLevels = 1;
-    image.arrayLayers = 1;
-    image.samples = VK_SAMPLE_COUNT_1_BIT;
-    image.tiling = VK_IMAGE_TILING_OPTIMAL;
-    image.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
-    image.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    vkCreateImage(engine.Device, &image, nullptr, &StoreImage.image);
-
-    VkMemoryRequirements memReqs;
-    vkGetImageMemoryRequirements(engine.Device, StoreImage.image, &memReqs);
-    VkMemoryAllocateInfo memoryAllocateInfo{};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryAllocateInfo.allocationSize = memReqs.size;
-    memoryAllocateInfo.memoryTypeIndex = engine.FindMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    vkAllocateMemory(engine.Device, &memoryAllocateInfo, nullptr, &StoreImage.memory);
-    vkBindImageMemory(engine.Device, StoreImage.image, StoreImage.memory, 0);
-
-    VkImageViewCreateInfo colorImageView{};
-    colorImageView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    colorImageView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    colorImageView.format = VK_FORMAT_B8G8R8A8_UNORM;
-    colorImageView.subresourceRange = {};
-    colorImageView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    colorImageView.subresourceRange.baseMipLevel = 0;
-    colorImageView.subresourceRange.levelCount = 1;
-    colorImageView.subresourceRange.baseArrayLayer = 0;
-    colorImageView.subresourceRange.layerCount = 1;
-    colorImageView.image = StoreImage.image;
-    vkCreateImageView(engine.Device, &colorImageView, nullptr, &StoreImage.view);
-
-    VkCommandBuffer cmdBuffer = createCommandBuffer(engine, VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-    setImageLayout(cmdBuffer, StoreImage.image,
-        VK_IMAGE_LAYOUT_UNDEFINED,
-        VK_IMAGE_LAYOUT_GENERAL,
-        { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 });
-
-    vkEndCommandBuffer(cmdBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &cmdBuffer;
-
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-
-    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-
-    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, INT64_MAX);
-    vkDestroyFence(engine.Device, fence, nullptr);
-
-    vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
-}
-
-void RayTraceRenderer::setImageLayout(
-    VkCommandBuffer cmdbuffer,
-    VkImage image,
-    VkImageLayout oldImageLayout,
-    VkImageLayout newImageLayout,
-    VkImageSubresourceRange subresourceRange,
-    VkPipelineStageFlags srcStageMask,
-    VkPipelineStageFlags dstStageMask)
-{
-    VkImageMemoryBarrier imageMemoryBarrier{};
-    imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    imageMemoryBarrier.oldLayout = oldImageLayout;
-    imageMemoryBarrier.newLayout = newImageLayout;
-    imageMemoryBarrier.image = image;
-    imageMemoryBarrier.subresourceRange = subresourceRange;
-    imageMemoryBarrier.srcAccessMask = 0;
-
-    vkCmdPipelineBarrier(
-        cmdbuffer,
-        srcStageMask,
-        dstStageMask,
-        0,
-        0, nullptr,
-        0, nullptr,
-        1, &imageMemoryBarrier);
+    if(storageImage.get() != nullptr)
+    { 
+        storageImage->Delete(engine);
+    }
+    storageImage = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 }
 
 void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout)
@@ -356,7 +264,7 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 3, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }
 
-void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex)
+void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& assetManager, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo cmdBufInfo{};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -413,7 +321,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
     barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier2.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
     barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    barrier2.image = storageImage.image;
+    barrier2.image = storageImage->Image;
     barrier2.subresourceRange = subresourceRange;
     barrier2.srcAccessMask = 0;
     barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
@@ -426,7 +334,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
     copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
     copyRegion.dstOffset = { 0, 0, 0 };
     copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
-    vkCmdCopyImage(RayTraceCommandBuffer, storageImage.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+    vkCmdCopyImage(RayTraceCommandBuffer, storageImage->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 
     VkImageMemoryBarrier barrier3 = {};
@@ -444,7 +352,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
     barrier4.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier4.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
     barrier4.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-    barrier4.image = storageImage.image;
+    barrier4.image = storageImage->Image;
     barrier4.subresourceRange = subresourceRange;
     barrier4.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
     barrier4.dstAccessMask = 0;
@@ -453,30 +361,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, int swapChainFr
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
-void RayTraceRenderer::Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set, uint32_t imageIndex)
+void RayTraceRenderer::Resize(VulkanEngine& engine, AssetManager& assetManager, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set, uint32_t imageIndex)
 {
-    buildCommandBuffers(engine, swapChainFramebuffersSize, swapChainImages, set, imageIndex);
-}
-
-VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin)
-{
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = pool;
-    commandBufferAllocateInfo.level = level;
-    commandBufferAllocateInfo.commandBufferCount = 1;
-    VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
-    if (begin)
-    {
-        VkCommandBufferBeginInfo cmdBufferBeginInfo{};
-        cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    }
-    return cmdBuffer;
-}
-
-VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin)
-{
-    return createCommandBuffer(engine, level, engine.CommandPool, begin);
+    buildCommandBuffers(engine, assetManager, swapChainFramebuffersSize, swapChainImages, set, imageIndex);
 }

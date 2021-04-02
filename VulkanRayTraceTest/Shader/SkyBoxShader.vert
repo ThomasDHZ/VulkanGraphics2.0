@@ -33,6 +33,6 @@ layout(location = 0) out vec3 TexCoords;
 
 void main() {
 	TexCoords = aPos;
-	vec4 pos = ubo.proj * ubo.view * vec4(aPos, 1.0);
+	vec4 pos = ubo.proj * ubo.view * mat4(1.0f) * vec4(aPos, 1.0);
     gl_Position = pos.xyww;
 }

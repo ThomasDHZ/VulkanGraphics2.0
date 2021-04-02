@@ -224,7 +224,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	}
 }
 
-void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
+void Mesh::Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
 {
 	if (ShowMesh)
 	{
@@ -241,6 +241,24 @@ void Mesh::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline>
 		else
 		{
 			vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32); 
+			vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
+		}
+	}
+}
+
+void Mesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo)
+{
+	if (ShowMesh)
+	{
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
+		if (IndexCount == 0)
+		{
+			vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
+		}
+		else
+		{
+			vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 			vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
 		}
 	}

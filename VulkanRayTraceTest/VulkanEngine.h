@@ -26,13 +26,6 @@ struct DescriptorSetLayoutBindingInfo
 	uint32_t Count;
 };
 
-struct StorageImage {
-	VkDeviceMemory memory = VK_NULL_HANDLE;
-	VkImage image = VK_NULL_HANDLE;
-	VkImageView view = VK_NULL_HANDLE;
-	VkFormat format;
-};
-
 class VulkanEngine
 {
 private:
@@ -131,7 +124,7 @@ public:
 	VkWriteDescriptorSet AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo);
 	VkWriteDescriptorSet AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo);
 	VkWriteDescriptorSetAccelerationStructureKHR AddAcclerationStructureBinding(VkAccelerationStructureKHR& handle);
-	VkDescriptorImageInfo AddRayTraceReturnImageDescriptor(VkImageLayout ImageLayout, StorageImage& texture);
+	VkDescriptorImageInfo AddRayTraceReturnImageDescriptor(VkImageLayout ImageLayout, VkImageView& ImageView);
 	VkDescriptorImageInfo AddTextureDescriptor(VkImageView view, VkSampler sampler);
 
 	uint32_t GetAlignedSize(uint32_t value, uint32_t alignment);

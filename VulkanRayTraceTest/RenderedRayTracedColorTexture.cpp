@@ -1,10 +1,10 @@
 #include "RenderedRayTracedColorTexture.h"
 
-RenderedRayTracedColorTexture::RenderedRayTracedColorTexture() : Texture()
+RenderedRayTracedColorTexture::RenderedRayTracedColorTexture() : Texture2D()
 {
 }
 
-RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& renderer) : Texture(renderer, TextureType::vkRenderedTexture)
+RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& renderer) : Texture2D(0, TextureType::vkRenderedTexture)
 {
     CreateTextureImage(renderer);
     CreateTextureView(renderer);

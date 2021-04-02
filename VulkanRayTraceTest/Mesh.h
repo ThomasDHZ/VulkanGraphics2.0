@@ -31,7 +31,6 @@ public:
 	uint32_t MeshID = 0;
 	uint32_t MeshBufferIndex = 0;
 	uint32_t MaterialID = 0;
-	//uint32_t NodeID = 0;
 	uint32_t BoneCount = 0;
 	uint32_t VertexCount = 0;
 	uint32_t IndexCount = 0;
@@ -73,6 +72,7 @@ public:
 
 	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager);
 	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager);
-	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
-	void Destory(VulkanEngine& engine);
+	virtual void Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo);
+	virtual void Destory(VulkanEngine& engine);
 };

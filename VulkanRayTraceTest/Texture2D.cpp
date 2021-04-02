@@ -6,6 +6,10 @@ Texture2D::Texture2D() : Texture()
 {
 }
 
+Texture2D::Texture2D(uint32_t textureID, TextureType textureType) : Texture(textureID, textureType)
+{
+}
+
 Texture2D::Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(engine, TextureLocation, textureID, format, TextureType::vkTexture2D)
 {
 	CreateTextureView(engine, format);

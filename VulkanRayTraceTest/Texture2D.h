@@ -9,6 +9,7 @@ private:
     void CreateTextureSampler(VulkanEngine& engine);
 public:
     Texture2D();
+    Texture2D(uint32_t textureID, TextureType textureType);
     Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID);
     Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID);
     ~Texture2D();

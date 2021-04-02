@@ -4,22 +4,25 @@
 #include "Texture2D.h"
 #include "Texture3D.h"
 #include "CubeMapTexture.h"
+#include "RenderedRayTracedColorTexture.h"
 
 class TextureManager
 {
 private:
-	std::vector<std::shared_ptr<Texture2D>> TextureList;
-	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
 	CubeMapTexture CubeMap;
 
 	uint32_t IsTextureLoaded(std::string name);
 
 public:
+	std::vector<std::shared_ptr<Texture2D>> TextureList;
+	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
+
 	TextureManager();
 	TextureManager(VulkanEngine& engine);
 	~TextureManager();
 
 	std::shared_ptr<Texture2D> LoadTexture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
+	uint32_t LoadTexture2D(std::shared_ptr<RenderedRayTracedColorTexture> RenderedTexture);
 	uint32_t LoadTexture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format);
 	uint32_t Load3DTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
 	uint32_t LoadTexture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format);

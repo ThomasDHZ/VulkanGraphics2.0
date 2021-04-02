@@ -11,22 +11,21 @@ private:
 	VkDescriptorSetLayout DescriptorLayout;
 	VkDescriptorPool DescriptorPool;
 	VkDescriptorSet DescriptorSets;
-	VkRenderPass RenderPass;
 	VkPipelineLayout ShaderPipelineLayout;
 	VkPipeline ShaderPipeline;
 
-	void CreateRenderPass(VulkanEngine& engine);
-	void CreateRendererFramebuffers(VulkanEngine& engine);
 	void CreateDescriptorSetLayout(VulkanEngine& engine, AssetManager& assetManager);
-	void CreateShaderPipeLine(VulkanEngine& engine);
+	void CreateShaderPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass);
 	void CreateDescriptorPool(VulkanEngine& engine);
 	void CreateDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData);
 
 public:
 	Skybox();
-	Skybox(VulkanEngine& engine, AssetManager& assetManager);
+	Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData);
 	~Skybox();
 
-	void Update(VulkanEngine& engine, MaterialManager& materialManager);
+	void Update(VulkanEngine& engine, MaterialManager& materialManager) override;
+	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo) override;
+	void Destory(VulkanEngine& engine) override;
 };
 

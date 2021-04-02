@@ -9,6 +9,7 @@
 #include "OrthographicCamera.h"
 #include "AnimatorCompute.h"
 #include "AssetManager.h"
+#include "Skybox.h"
 
 
 class Renderer
@@ -45,6 +46,8 @@ private:
 	void SetUpDescriptorLayout(VulkanEngine& engine);
 	void SetUpDescriptorSets(VulkanEngine& engine);
 	void SetUpCommandBuffers(VulkanEngine& engine);
+
+	//Skybox skybox;
 
 public:
 	AssetManager assetManager;

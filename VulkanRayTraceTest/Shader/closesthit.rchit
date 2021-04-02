@@ -7,6 +7,8 @@
 #include "Lighting.glsl"
 #include "Material.glsl"
 
+const float PI = 3.14159265359;
+
 struct RayHitInfo
 {
 	vec3 hitValue;
@@ -55,6 +57,10 @@ layout(binding = 9) uniform sampler3D Texture3DMap[];
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
 Vertex BuildVertexInfo();
+float DistributionGGX(vec3 N, vec3 H, float roughness);
+float SchlickGGX(float NdotV, float roughness);
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
+vec3  FresnelSchlick(float cosTheta, vec3 F0);
 vec3 CalcNormalDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, vec3 normal, vec2 uv);
 vec3 CalcNormalPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointLight light, vec3 normal, vec2 uv);
 vec3 CalcNormalSpotLight(Vertex vertex, MaterialInfo material, mat3 TBN, SpotLight light, vec3 normal, vec2 uv);
@@ -62,6 +68,22 @@ vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, 
 vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec2 uv);
 vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec2 uv);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
+//vec3 getNormalFromMap(Vertex vertex, MaterialInfo material)
+//{
+////    vec3 tangentNormal = texture(TextureMap[material.NormalMapID], vertex.uv).rgb * 2.0f - 1.0f;
+////
+////    vec3 Q1  = dFdx(vertex.pos);
+////    vec3 Q2  = dFdy(vertex.pos);
+////    vec2 st1 = dFdx(vertex.uv);
+////    vec2 st2 = dFdy(vertex.uv);
+////
+////    vec3 N   = normalize(vertex.normal);
+////    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
+////    vec3 B  = -normalize(cross(N, T));
+////    mat3 TBN = mat3(T, B, N);
+//
+//    return normalize(TBN * tangentNormal);
+//}
 
 void main()
 {
@@ -117,26 +139,26 @@ void main()
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
 {
-//     if(ubo.Shadowed == 1)
-//     {
-//        float tmin = 0.001;
-//	    float tmax = LightDistance;
-//	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	    shadowed = true;  
-//	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
-//	    if (shadowed) 
-//        {
-//            LightResult *= 0.3f;
-//	    }
-//        else
-//        {
-//           LightResult += LightSpecular;
-//        }
-//    }
-//    else
-//    {
+     if(ubo.Shadowed == 1)
+     {
+        float tmin = 0.001;
+	    float tmax = LightDistance;
+	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	    shadowed = true;  
+	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
+	    if (shadowed) 
+        {
+            LightResult *= 0.3f;
+	    }
+        else
+        {
            LightResult += LightSpecular;
-//    }
+        }
+    }
+    else
+    {
+           LightResult += LightSpecular;
+    }
     return LightResult;
 }
 
@@ -422,4 +444,44 @@ vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
     vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
 
     return finalTexCoords;
+}
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+   float a = roughness*roughness;
+    float a2 = a*a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+
+    float nom   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / max(denom, 0.001);
+}
+
+float SchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = SchlickGGX(NdotV, roughness);
+    float ggx1 = SchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+
+vec3 FresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
