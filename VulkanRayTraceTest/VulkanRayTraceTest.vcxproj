@@ -156,6 +156,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="GBufferRenderPass.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
     <ClCompile Include="FrameBufferRenderPass.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
@@ -206,8 +207,12 @@
     <None Include="Shader\anyhit.rahit" />
     <None Include="Shader\anyhit1.rahit" />
     <None Include="Shader\closesthit.rchit" />
+    <None Include="Shader\DeferedShader.frag" />
+    <None Include="Shader\DeferedShader.vert" />
     <None Include="Shader\FrameBuffer.frag" />
     <None Include="Shader\FrameBuffer.vert" />
+    <None Include="Shader\GBuffer.frag" />
+    <None Include="Shader\GBuffer.vert" />
     <None Include="Shader\Material.glsl" />
     <None Include="Shader\Lighting.glsl" />
     <None Include="Shader\miss.rmiss" />
@@ -228,6 +233,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="GBufferRenderPass.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
     <ClInclude Include="FrameBufferRenderPass.h" />
     <ClInclude Include="GraphicsPipeline.h" />

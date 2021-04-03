@@ -63,8 +63,8 @@ public:
     void createStorageImage(VulkanEngine& engine);
     void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);
     void createShaderBindingTable(VulkanEngine& engine);
-    void buildCommandBuffers(VulkanEngine& engine, AssetManager& assetManager, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex);
-    void Resize(VulkanEngine& engine, AssetManager& assetManager, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set, uint32_t imageIndex);
+    void buildCommandBuffers(VulkanEngine& engine, AssetManager& assetManager, VkDescriptorSet& descriptorSet, uint32_t imageIndex);
+    void Resize(VulkanEngine& engine, AssetManager& assetManager, VkDescriptorSet& descriptorSet, uint32_t imageIndex);
     void Destory(VulkanEngine& engine);
 
     VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)

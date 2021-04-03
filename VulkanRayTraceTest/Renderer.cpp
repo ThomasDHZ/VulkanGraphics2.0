@@ -10,7 +10,13 @@ Renderer::Renderer()
 
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
+    RenderPass = ForwardRenderPass(engine);
+    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
+
     assetManager = AssetManager(engine);
+    SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
+
+    frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
 
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
     material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
@@ -37,7 +43,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
-    assetManager.textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
+
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -49,12 +55,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
 
-    SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
-
-    RenderPass = ForwardRenderPass(engine);
-    frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
-    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
-    
     SetUpDescriptorPool(engine);
     RayRenderer = RayTraceRenderer(engine, assetManager);
     SetUpDescriptorLayout(engine);
@@ -103,6 +103,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
     SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
+
+    ImGui_ImplVulkan_AddTexture(assetManager.textureManager.TextureList[4]->ImGuiDescriptorSet, assetManager.textureManager.TextureList[4]->Sampler, assetManager.textureManager.TextureList[4]->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 Renderer::~Renderer()
@@ -150,7 +152,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     SetUpDescriptorPool(engine);
     SetUpDescriptorSets(engine);
 
-    RayRenderer.Resize(engine, assetManager, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, descriptorSets, 0);
+    RayRenderer.Resize(engine, assetManager, descriptorSets, 0);
 
     SetUpCommandBuffers(engine);
 }
@@ -198,6 +200,12 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
     ImGui::Checkbox("AddMaterial", &AddMaterialFlag);
     ImGui::Checkbox("DeleteMaterial", &RemoveMaterialFlag);
+
+    ImGui::Image(assetManager.textureManager.TextureList[4]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 
     ImGui::SliderFloat3("Position2", &SceneData->UniformDataInfo.sLight.position.x, 0.0f, 10.0f);
     ImGui::SliderFloat3("Direction2", &SceneData->UniformDataInfo.sLight.direction.x, -1.0f, 1.0f);
@@ -351,7 +359,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         throw std::runtime_error("failed to record command buffer!");
     }
 
-   RayRenderer.buildCommandBuffers(engine, assetManager, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets, imageIndex);
+   RayRenderer.buildCommandBuffers(engine, assetManager, descriptorSets, imageIndex);
 
     ///
     ///Draw area
@@ -415,41 +423,6 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");
     }
-    
-    if (AddMaterialFlag == true)
-    {
-        vkDeviceWaitIdle(engine.Device);
-        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
-
-        stbi_set_flip_vertically_on_load(true);
-        std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, assetManager.textureManager);
-        //material2->materialTexture.DiffuseMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //material2->materialTexture.NormalMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //material2->materialTexture.DepthMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //material2->materialTexture.AlphaMap = modelRenderManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-        assetManager.materialManager.LoadMaterial(engine, "zdsf", material2);
-        stbi_set_flip_vertically_on_load(false);
- 
-        SetUpDescriptorPool(engine);
-        SetUpDescriptorLayout(engine);
-        SetUpDescriptorSets(engine);
-        AddMaterialFlag = false;
-    }
-
-    if (RemoveMaterialFlag == true)
-    {
-        vkDeviceWaitIdle(engine.Device);
-        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
-
-        assetManager.materialManager.DeleteMaterial(engine, assetManager.materialManager.MaterialList[SceneData->UniformDataInfo.temp]);
-
-        SetUpDescriptorPool(engine);
-        SetUpDescriptorLayout(engine);
-        SetUpDescriptorSets(engine);
-        RemoveMaterialFlag = false;
-    }
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
@@ -466,74 +439,6 @@ void Renderer::Destroy(VulkanEngine& engine)
 
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
-}
-
-std::vector<Vertex> Renderer::CalcVertex()
-{
-    glm::vec3 pos1(-1.0f, 1.0f, 0.0f);
-    glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
-    glm::vec3 pos3(1.0f, -1.0f, 0.0f);
-    glm::vec3 pos4(1.0f, 1.0f, 0.0f);
-    // texture coordinates
-    glm::vec2 uv1(0.0f, 1.0f);
-    glm::vec2 uv2(0.0f, 0.0f);
-    glm::vec2 uv3(1.0f, 0.0f);
-    glm::vec2 uv4(1.0f, 1.0f);
-    // normal vector
-    glm::vec3 nm(0.0f, 0.0f, 1.0f);
-
-    // calculate tangent/bitangent vectors of both triangles
-    glm::vec3 tangent1, bitangent1;
-    glm::vec3 tangent2, bitangent2;
-    // triangle 1
-    // ----------
-    glm::vec3 edge1 = pos2 - pos1;
-    glm::vec3 edge2 = pos3 - pos1;
-    glm::vec2 deltaUV1 = uv2 - uv1;
-    glm::vec2 deltaUV2 = uv3 - uv1;
-
-    float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-    tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-    tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-    tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-    tangent1 = glm::normalize(tangent1);
-
-    bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-    bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-    bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-    bitangent1 = glm::normalize(bitangent1);
-
-    // triangle 2
-    // ----------
-    edge1 = pos3 - pos1;
-    edge2 = pos4 - pos1;
-    deltaUV1 = uv3 - uv1;
-    deltaUV2 = uv4 - uv1;
-
-    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-    tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-    tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-    tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-    tangent2 = glm::normalize(tangent2);
-
-
-    bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-    bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-    bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-    bitangent2 = glm::normalize(bitangent2);
-
-    return {
-        // positions            // normal         // texcoords  // tangent                          // bitangent
-        {{pos1.x, pos1.y, pos1.z}, {0.0f}, {nm.x, nm.y, nm.z}, {0.0f}, {uv1.x, uv1.y}, {0.0f, 0.0f}, {tangent1.x, tangent1.y, tangent1.z}, {0.0f}, {bitangent1.x, bitangent1.y, bitangent1.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
-        {{pos2.x, pos2.y, pos2.z}, {0.0f}, {nm.x, nm.y, nm.z}, {0.0f }, {uv2.x, uv2.y}, { 0.0f, 0.0f }, {tangent1.x, tangent1.y, tangent1.z}, {0.0f}, {bitangent1.x, bitangent1.y, bitangent1.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
-        {{pos3.x, pos3.y, pos3.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv3.x, uv3.y}, { 0.0f, 0.0f }, {tangent1.x, tangent1.y, tangent1.z}, {0.0f}, {bitangent1.x, bitangent1.y, bitangent1.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
-
-        {{pos1.x, pos1.y, pos1.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv1.x, uv1.y}, { 0.0f, 0.0f }, {tangent2.x, tangent2.y, tangent2.z}, {0.0f}, {bitangent2.x, bitangent2.y, bitangent2.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
-        {{pos3.x, pos3.y, pos3.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv3.x, uv3.y}, { 0.0f, 0.0f }, {tangent2.x, tangent2.y, tangent2.z}, {0.0f}, {bitangent2.x, bitangent2.y, bitangent2.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
-        {{pos4.x, pos4.y, pos4.z}, {0.0f }, {nm.x, nm.y, nm.z}, {0.0f}, {uv4.x, uv4.y}, { 0.0f, 0.0f }, {tangent2.x, tangent2.y, tangent2.z}, {0.0f}, {bitangent2.x, bitangent2.y, bitangent2.z}, {0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}}
-    };
 }
 
 void Renderer::SetUpDescriptorPool(VulkanEngine& engine)

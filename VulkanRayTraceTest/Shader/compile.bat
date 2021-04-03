@@ -6,6 +6,10 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 shadow.rmiss -o shadow.rmiss.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe shader.vert -o vert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe shader.frag -o frag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.vert -o GBufferVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.frag -o GBufferFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DeferedShader.vert -o DeferedShaderVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DeferedShader.frag -o DeferedShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe FrameBuffer.vert -o FrameBufferVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe FrameBuffer.frag -o FrameBufferFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxShader.vert -o SkyBoxShaderVert.spv

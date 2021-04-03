@@ -264,7 +264,7 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 3, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }
 
-void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& assetManager, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set, uint32_t imageIndex)
+void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& assetManager, VkDescriptorSet& descriptorSet, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo cmdBufInfo{};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -294,7 +294,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& a
     VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 
     vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline);
-    vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &set, 0, 0);
+    vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &descriptorSet, 0, 0);
 
     engine.vkCmdTraceRaysKHR(
         RayTraceCommandBuffer,
@@ -310,7 +310,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& a
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    barrier.image = swapChainImages[imageIndex];
+    barrier.image = engine.SwapChain.GetSwapChainImages()[imageIndex];
     barrier.subresourceRange = subresourceRange;
     barrier.srcAccessMask = 0;
     barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -334,14 +334,14 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& a
     copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
     copyRegion.dstOffset = { 0, 0, 0 };
     copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
-    vkCmdCopyImage(RayTraceCommandBuffer, storageImage->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, swapChainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+    vkCmdCopyImage(RayTraceCommandBuffer, storageImage->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, engine.SwapChain.GetSwapChainImages()[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 
     VkImageMemoryBarrier barrier3 = {};
     barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
     barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    barrier3.image = swapChainImages[imageIndex];
+    barrier3.image = engine.SwapChain.GetSwapChainImages()[imageIndex];
     barrier3.subresourceRange = subresourceRange;
     barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     barrier3.dstAccessMask = 0;
@@ -361,7 +361,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& a
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
-void RayTraceRenderer::Resize(VulkanEngine& engine, AssetManager& assetManager, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set, uint32_t imageIndex)
+void RayTraceRenderer::Resize(VulkanEngine& engine, AssetManager& assetManager, VkDescriptorSet& descriptorSet, uint32_t imageIndex)
 {
-    buildCommandBuffers(engine, assetManager, swapChainFramebuffersSize, swapChainImages, set, imageIndex);
+    buildCommandBuffers(engine, assetManager, descriptorSet, imageIndex);
 }

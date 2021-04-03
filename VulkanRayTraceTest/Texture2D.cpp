@@ -14,12 +14,14 @@ Texture2D::Texture2D(VulkanEngine& engine, const std::string TextureLocation, Vk
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
+	ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID) : Texture (engine, width, height, PixelList, format, textureID, TextureType::vkTexture3D)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
+	ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 Texture2D::~Texture2D()
