@@ -16,7 +16,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager = AssetManager(engine);
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
 
-    frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
+    //frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
 
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
     material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
@@ -24,8 +24,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
 
-    assetManager.AddModel(engine, "../Models/Crate.dae");
-    assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
+    //assetManager.AddModel(engine, "../Models/Crate.dae");
+    //assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
 
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
@@ -38,7 +38,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
 
-    assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+  //  assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
     //assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
     //assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
     // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
@@ -56,11 +56,11 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
 
     SetUpDescriptorPool(engine);
-    RayRenderer = RayTraceRenderer(engine, assetManager);
+    //RayRenderer = RayTraceRenderer(engine, assetManager);
     SetUpDescriptorLayout(engine);
-    RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
+   // RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
     RenderPass.StartPipeline(engine, descriptorSetLayout);
-    RayRenderer.createShaderBindingTable(engine);
+   // RayRenderer.createShaderBindingTable(engine);
     SetUpDescriptorSets(engine);
     //AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]->MeshList[0]);
     SetUpCommandBuffers(engine);
@@ -103,8 +103,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
     SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
-
-    ImGui_ImplVulkan_AddTexture(assetManager.textureManager.TextureList[4]->ImGuiDescriptorSet, assetManager.textureManager.TextureList[4]->Sampler, assetManager.textureManager.TextureList[4]->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 Renderer::~Renderer()
@@ -145,14 +143,14 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
     RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
-    frameBufferRenderPass.UpdateSwapChain(engine);
+   // frameBufferRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
-    RayRenderer.createStorageImage(engine);
+    //RayRenderer.createStorageImage(engine);
     SetUpDescriptorPool(engine);
     SetUpDescriptorSets(engine);
 
-    RayRenderer.Resize(engine, assetManager, descriptorSets, 0);
+  //  RayRenderer.Resize(engine, assetManager, descriptorSets, 0);
 
     SetUpCommandBuffers(engine);
 }
@@ -170,7 +168,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
     assetManager.Update(engine);
    // skybox.Update(engine, assetManager.materialManager);
-    RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
+ //   RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -198,11 +196,17 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 23);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
     ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
+    ImGui::Checkbox("AddTexture", &AddTextureFlag);
+    ImGui::Checkbox("DeleteTexture", &RemoveTextureFlag);
     ImGui::Checkbox("AddMaterial", &AddMaterialFlag);
     ImGui::Checkbox("DeleteMaterial", &RemoveMaterialFlag);
 
-    ImGui::Image(assetManager.textureManager.TextureList[4]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    for (auto& material : assetManager.materialManager.MaterialList)
+    {
+        auto bufferIndex = std::to_string(material->MaterialBufferIndex);
+        ImGui::LabelText(bufferIndex.c_str(), "sd");
+    }
+      //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(assetManager.textureManager.TextureList[3]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
@@ -354,12 +358,12 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     vkCmdEndRenderPass(RasterCommandBuffer);
    // AnimationRenderer.Compute(engine, imageIndex);
-       frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
+      // frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 
-   RayRenderer.buildCommandBuffers(engine, assetManager, descriptorSets, imageIndex);
+  // RayRenderer.buildCommandBuffers(engine, assetManager, descriptorSets, imageIndex);
 
     ///
     ///Draw area
@@ -380,7 +384,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     else
     {
        // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
-        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
+       // CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
 
@@ -424,6 +428,72 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         throw std::runtime_error("failed to present swap chain image!");
     }
 
+    if (AddTextureFlag == true)
+    {
+        vkDeviceWaitIdle(engine.Device);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
+
+        assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+
+        SetUpDescriptorPool(engine);
+        SetUpDescriptorLayout(engine);
+        SetUpDescriptorSets(engine);
+        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        AddTextureFlag = false;
+    }
+
+    if (RemoveTextureFlag == true)
+    {
+        vkDeviceWaitIdle(engine.Device);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
+
+        assetManager.textureManager.DeleteTexture(engine, SceneData->UniformDataInfo.temp);
+
+        SetUpDescriptorPool(engine);
+        SetUpDescriptorLayout(engine);
+        SetUpDescriptorSets(engine);
+        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        RemoveTextureFlag = false;
+    }
+
+    if (AddMaterialFlag == true)
+    {
+        vkDeviceWaitIdle(engine.Device);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
+
+        stbi_set_flip_vertically_on_load(true);
+        std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
+        material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
+        assetManager.materialManager.LoadMaterial(engine, "zdsf", material);
+        stbi_set_flip_vertically_on_load(false);
+
+        SetUpDescriptorPool(engine);
+        SetUpDescriptorLayout(engine);
+        SetUpDescriptorSets(engine);
+        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        AddMaterialFlag = false;
+    }
+
+    if (RemoveMaterialFlag == true)
+    {
+        vkDeviceWaitIdle(engine.Device);
+        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
+        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
+
+        assetManager.materialManager.DeleteMaterial(engine, SceneData->UniformDataInfo.temp);
+
+        SetUpDescriptorPool(engine);
+        SetUpDescriptorLayout(engine);
+        SetUpDescriptorSets(engine);
+        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        RemoveMaterialFlag = false;
+    }
+
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
@@ -431,11 +501,11 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
-    frameBufferRenderPass.Destroy(engine);
+    //frameBufferRenderPass.Destroy(engine);
    // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
-    RayRenderer.Destory(engine);
+  //  RayRenderer.Destory(engine);
 
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
@@ -444,17 +514,17 @@ void Renderer::Destroy(VulkanEngine& engine)
 void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMaterialDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.GetTextureBufferDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.Get3DTextureBufferDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
@@ -479,8 +549,8 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 {
     descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
 
-    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
-    VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage->View);
+   // VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
+   // VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage->View);
     VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager.GetMeshPropertiesListDescriptors();
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager.GetVertexBufferListDescriptors();
@@ -492,8 +562,8 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     VkDescriptorImageInfo CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(engine.AddAccelerationBuffer(0, descriptorSets, AccelerationDescriptorStructure));
-    DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, descriptorSets, RayTraceImageDescriptor));
+  //  DescriptorList.emplace_back(engine.AddAccelerationBuffer(0, descriptorSets, AccelerationDescriptorStructure));
+  //  DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, descriptorSets, RayTraceImageDescriptor));
     DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshPropertyDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorList.emplace_back(engine.AddBufferDescriptorSet(4, descriptorSets, VertexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));

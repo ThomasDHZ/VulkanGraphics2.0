@@ -17,7 +17,7 @@ public:
 
 	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
 	void UpdateBufferIndex(VulkanEngine& engine);
-	void DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Material> material);
+	void DeleteMaterial(VulkanEngine& engine, uint32_t DeleteMaterialBufferIndex);
 	void Destory(VulkanEngine& engine);
 
 	uint32_t LoadMaterial(VulkanEngine& engine, std::string MaterialName, std::shared_ptr<Material> material);

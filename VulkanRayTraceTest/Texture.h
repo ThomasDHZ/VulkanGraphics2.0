@@ -17,7 +17,6 @@ private:
 
 protected:
 
-
     void KTXTransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
     void KTXCopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
     void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
@@ -57,6 +56,7 @@ public:
     Texture(VulkanEngine& engine, TextureType textureType);
     ~Texture();
 
+    void UpdateTextureIndex(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
     virtual void Delete(VulkanEngine& engine);
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }

@@ -71,6 +71,18 @@ void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[
 	CubeMap = CubeMapTexture(engine, CubeMapFiles, 0);
 }
 
+void TextureManager::DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex)
+{
+	auto texture = GetTextureByBufferIndex(TextureBufferIndex);
+	texture->Delete(engine);
+	TextureList.erase(TextureList.begin() + TextureBufferIndex);
+
+	for(int x = 0; x < TextureList.size(); x++)
+	{
+		TextureList[x]->TextureBufferIndex = x;
+	}
+}
+
 void TextureManager::UnloadAllTextures(VulkanEngine& engine)
 {
 	for (auto& texture : TextureList)
@@ -93,6 +105,16 @@ void TextureManager::Destory(VulkanEngine& engine)
 {
 	UnloadAllTextures(engine);
 	UnloadCubeMap(engine);
+}
+
+
+void TextureManager::UpdateTexture2DBufferIndex(VulkanEngine& engine)
+{
+	for (int x = 0; x < TextureList.size(); x++)
+	{
+//		TextureList[x]->TextureBufferIndex = x;
+	//	TextureList[x]->UpdateTexture2DBufferIndexs(engine);
+	}
 }
 
 uint32_t TextureManager::IsTextureLoaded(std::string name)

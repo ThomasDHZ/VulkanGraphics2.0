@@ -36,7 +36,7 @@ private:
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 	void CreateDescriptorSetLayout(VulkanEngine& engine, AssetManager& assetManager);
 	void CreateShaderPipeLine(VulkanEngine& engine);
-	void CreateDescriptorPool(VulkanEngine& engine);
+	void CreateDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
 	void CreateDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData);
 
 	void UpdateGraphicsPipeLine(VulkanEngine& engine);

@@ -10,7 +10,7 @@ FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, AssetManager&
     CreateRendererFramebuffers(engine);
     CreateDescriptorSetLayout(engine, assetManager);
     CreateShaderPipeLine(engine);
-    CreateDescriptorPool(engine);
+    CreateDescriptorPool(engine, assetManager);
     CreateDescriptorSets(engine, assetManager, SceneData);
     mesh = Mesh(engine, FrameBufferVertices, FrameBufferIndices, 1);
 }
@@ -151,11 +151,11 @@ void FrameBufferRenderPass::CreateShaderPipeLine(VulkanEngine& engine)
     }
 }
 
-void FrameBufferRenderPass::CreateDescriptorPool(VulkanEngine& engine)
+void FrameBufferRenderPass::CreateDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.GetTextureBufferDescriptorCount()));
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 

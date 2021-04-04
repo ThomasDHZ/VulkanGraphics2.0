@@ -454,6 +454,11 @@ void Texture::UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, Vk
 		1, &imageMemoryBarrier);
 }
 
+void Texture::UpdateTextureIndex(VulkanEngine& engine, uint32_t NewTextureBufferIndex)
+{
+	TextureBufferIndex = NewTextureBufferIndex;
+}
+
 void Texture::Delete(VulkanEngine& engine)
 {
 	vkDestroyImageView(engine.Device, View, nullptr);

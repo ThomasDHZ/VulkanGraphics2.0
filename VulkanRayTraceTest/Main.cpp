@@ -41,7 +41,6 @@ private:
     VulkanEngine engine;
     Renderer renderer;
 
-
     void initVulkan() 
     {
         window = VulkanWindow(1280, 720, "VulkanEngine");

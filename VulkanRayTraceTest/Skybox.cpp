@@ -76,7 +76,7 @@ Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& R
 
     CreateDescriptorSetLayout(engine, assetManager);
     CreateShaderPipeLine(engine, RenderPass);
-    CreateDescriptorPool(engine);
+    CreateDescriptorPool(engine, assetManager);
     CreateDescriptorSets(engine, assetManager, SceneData);
 }
 
@@ -216,11 +216,11 @@ void Skybox::CreateShaderPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass
     }
 }
 
-void Skybox::CreateDescriptorPool(VulkanEngine& engine)
+void Skybox::CreateDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.GetTextureBufferDescriptorCount()));
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 

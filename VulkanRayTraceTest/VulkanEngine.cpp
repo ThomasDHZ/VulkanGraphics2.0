@@ -215,9 +215,6 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
 	BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
 
-	VkPhysicalDeviceDescriptorIndexingFeatures IndexFeatures{};
-	IndexFeatures.runtimeDescriptorArray = VK_TRUE;
-
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
 	RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 	RayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
@@ -231,6 +228,9 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	VkPhysicalDeviceDescriptorIndexingFeatures PhysicalDeviceDescriptorIndexingFeatures{};
 	PhysicalDeviceDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
 	PhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+	PhysicalDeviceDescriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+	PhysicalDeviceDescriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+	PhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
 	PhysicalDeviceDescriptorIndexingFeatures.pNext = &AccelerationStructureFeatures;
 
 	VkPhysicalDeviceRayTracingPipelinePropertiesKHR RayTracingPipelineProperties = {};
@@ -545,11 +545,11 @@ VkPipelineShaderStageCreateInfo VulkanEngine::CreateShader(const std::string& fi
 	return vertShaderStageInfo;
 }
 
-VkDescriptorPoolSize VulkanEngine::AddDsecriptorPoolBinding(VkDescriptorType descriptorType)
+VkDescriptorPoolSize VulkanEngine::AddDsecriptorPoolBinding(VkDescriptorType descriptorType, uint32_t descriptorCount)
 {
 	VkDescriptorPoolSize DescriptorPoolBinding = {};
 	DescriptorPoolBinding.type = descriptorType;
-	DescriptorPoolBinding.descriptorCount = 100;
+	DescriptorPoolBinding.descriptorCount = descriptorCount;
 
 	return DescriptorPoolBinding;
 }
@@ -599,13 +599,52 @@ VkDescriptorSetLayout VulkanEngine::CreateDescriptorSetLayout(std::vector<Descri
 	return descriptorSet;
 }
 
+VkDescriptorSetLayout VulkanEngine::CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo, VkDescriptorSetLayoutBindingFlagsCreateInfoEXT& DescriptorSetLayoutBindingFlags)
+{
+	std::vector<VkDescriptorSetLayoutBinding> LayoutBindingList = {};
+
+	for (auto Binding : LayoutBindingInfo)
+	{
+		VkDescriptorSetLayoutBinding LayoutBinding = {};
+		LayoutBinding.binding = Binding.Binding;
+		LayoutBinding.descriptorCount = Binding.Count;
+		LayoutBinding.descriptorType = Binding.DescriptorType;
+		LayoutBinding.pImmutableSamplers = nullptr;
+		LayoutBinding.stageFlags = Binding.StageFlags;
+
+		LayoutBindingList.emplace_back(LayoutBinding);
+	}
+
+	VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutInfo.bindingCount = static_cast<uint32_t>(LayoutBindingList.size());
+	layoutInfo.pBindings = LayoutBindingList.data();
+	layoutInfo.pNext = &DescriptorSetLayoutBindingFlags;
+
+	VkDescriptorSetLayout descriptorSet;
+	if (vkCreateDescriptorSetLayout(Device, &layoutInfo, nullptr, &descriptorSet) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create descriptor set layout!");
+	}
+
+	return descriptorSet;
+}
+
 VkDescriptorSet VulkanEngine::CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout)
 {
+
+	uint32_t variableDescCounts[] = { 1, 1, 1, 300, 300, 300, 300, 300, 3000, 400, 400, 1 };
+
+	VkDescriptorSetVariableDescriptorCountAllocateInfoEXT VariableDescriptorCountAllocateInfo{};
+	VariableDescriptorCountAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
+	VariableDescriptorCountAllocateInfo.descriptorSetCount = 1;
+	VariableDescriptorCountAllocateInfo.pDescriptorCounts = variableDescCounts;
+
 	VkDescriptorSetAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = descriptorPool;
 	allocInfo.descriptorSetCount = 1;
 	allocInfo.pSetLayouts = &layout;
+	allocInfo.pNext = &VariableDescriptorCountAllocateInfo;
 
 	VkDescriptorSet DescriptorSets;
 	if (vkAllocateDescriptorSets(Device, &allocInfo, &DescriptorSets) != VK_SUCCESS) {

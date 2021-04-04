@@ -85,12 +85,11 @@ void MaterialManager::UpdateBufferIndex(VulkanEngine& engine)
 	}
 }
 
-void MaterialManager::DeleteMaterial(VulkanEngine& engine, std::shared_ptr<Material> material)
+void MaterialManager::DeleteMaterial(VulkanEngine& engine, uint32_t DeleteMaterialBufferIndex)
 {
-	const int index = material->MaterialBufferIndex - 1;
-
+	auto material = GetMaterial(DeleteMaterialBufferIndex);
 	material->Delete(engine);
-	MaterialList.erase(MaterialList.begin() + index);
+	MaterialList.erase(MaterialList.begin() + DeleteMaterialBufferIndex);
 
 	UpdateBufferIndex(engine);
 }

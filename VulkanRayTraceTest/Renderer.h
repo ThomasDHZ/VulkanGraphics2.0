@@ -15,6 +15,8 @@
 class Renderer
 {
 private:
+	bool AddTextureFlag = false;
+	bool RemoveTextureFlag = false;
 	bool AddMaterialFlag = false;
 	bool RemoveMaterialFlag = false;
 
@@ -27,10 +29,10 @@ private:
 	VkDescriptorSet descriptorSets;
 	VkCommandBuffer RasterCommandBuffer;
 
-	FrameBufferRenderPass frameBufferRenderPass;
+	//FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
-	RayTraceRenderer RayRenderer;
+	//RayTraceRenderer RayRenderer;
 	//AnimatorCompute AnimationRenderer;
 
 	size_t currentFrame = 0;
