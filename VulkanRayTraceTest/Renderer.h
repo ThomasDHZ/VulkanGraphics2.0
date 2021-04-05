@@ -10,6 +10,7 @@
 #include "AnimatorCompute.h"
 #include "AssetManager.h"
 #include "Skybox.h"
+#include "GBufferRenderPass.h"
 
 
 class Renderer
@@ -24,13 +25,14 @@ private:
 	Keyboard keyboard;
 	Mouse mouse;
 
-
 	VkCommandBuffer RasterCommandBuffer;
 
 	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
+	GBufferRenderPass gBufferRenderPass;
 	RayTraceRenderer RayRenderer;
+
 	//AnimatorCompute AnimationRenderer;
 
 	size_t currentFrame = 0;
@@ -42,9 +44,6 @@ private:
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
 	std::vector<Model> RenderModel;
 
-	void SetUpDescriptorPool(VulkanEngine& engine);
-	void SetUpDescriptorLayout(VulkanEngine& engine);
-	void SetUpDescriptorSets(VulkanEngine& engine);
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 	//Skybox skybox;

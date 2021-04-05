@@ -1,3 +1,5 @@
+#include "..\VulkanRayTraceTest\GBufferRenderPass.h"
+#include "..\VulkanRayTraceTest\GBufferRenderPass.h"
 #include "GBufferRenderPass.h"
 
 #include <stdexcept>
@@ -7,6 +9,10 @@
 #include "BaseMesh.h"
 
 GBufferRenderPass::GBufferRenderPass()
+{
+}
+
+GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
 }
 
@@ -368,6 +374,10 @@ void GBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
+}
+
+void GBufferRenderPass::UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
+{
 }
 
 void GBufferRenderPass::Destroy(VulkanEngine& engine)

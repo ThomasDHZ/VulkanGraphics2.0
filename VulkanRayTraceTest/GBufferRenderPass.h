@@ -1,28 +1,40 @@
 #pragma once
 #include "VulkanEngine.h"
-#include "ForwardRenderingPipeline.h"
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
+#include "RenderedGBufferAlbedoTexture.h"
+#include "RenderedGBufferNormalTexture.h"
+#include "RenderedGBufferPositionTexture.h"
+#include "AssetManager.h"
+
 class GBufferRenderPass
 {
 private:
+	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
+	void SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager);
+	void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void SetUpShaderPipeLine(VulkanEngine& renderer);
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
-	void CreatePipeline(VulkanEngine& engine);
 public:
 	GBufferRenderPass();
-	GBufferRenderPass(VulkanEngine& engine);
+	GBufferRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	~GBufferRenderPass();
 
 	VkRenderPass RenderPass;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	std::shared_ptr<RenderedColorTexture> GPositionTexture;
-	std::shared_ptr<RenderedColorTexture> GAlbedoTexture;
-	std::shared_ptr<RenderedColorTexture> GNormalTexture;
+	std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
+	std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
+	std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;
 	std::shared_ptr<RenderedColorTexture> GBloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
-	void StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
+	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
+	VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
+	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
+	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
+	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
+
 	void UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
 	void Destroy(VulkanEngine& engine);
 

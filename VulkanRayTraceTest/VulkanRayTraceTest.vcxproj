@@ -185,6 +185,9 @@
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
+    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp" />
+    <ClCompile Include="RenderedGBufferNormalTexture.cpp" />
+    <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SceneRenderingPipeline.cpp" />
@@ -263,6 +266,9 @@
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
+    <ClInclude Include="RenderedGBufferAlbedoTexture.h" />
+    <ClInclude Include="RenderedGBufferNormalTexture.h" />
+    <ClInclude Include="RenderedGBufferPositionTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SceneData.h" />

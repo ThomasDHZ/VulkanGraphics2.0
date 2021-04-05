@@ -15,6 +15,7 @@ private:
 	void SetUpShaderPipeLine(VulkanEngine& renderer);
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
+	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
 	ForwardRenderPass();
@@ -30,8 +31,10 @@ public:
 	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
 	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
 	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
+	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer);
 	void Destroy(VulkanEngine& engine);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }

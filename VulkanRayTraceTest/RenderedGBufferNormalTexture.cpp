@@ -1,61 +1,60 @@
-#include "RenderedDepthTexture.h"
+#include "RenderedGBufferNormalTexture.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
-RenderedDepthTexture::RenderedDepthTexture() : Texture()
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture() : Texture()
 {
 }
 
-RenderedDepthTexture::RenderedDepthTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    // ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedDepthTexture::~RenderedDepthTexture()
+RenderedGBufferNormalTexture::~RenderedGBufferNormalTexture()
 {
 }
 
-void RenderedDepthTexture::CreateTextureImage(VulkanEngine& engine)
+void RenderedGBufferNormalTexture::CreateTextureImage(VulkanEngine& engine)
 {
-    VkImageCreateInfo TextureInfo{};
+    VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
+    TextureInfo.format = VK_FORMAT_R16G16B16A16_SFLOAT;
     TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
     TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
-    TextureInfo.format = VK_FORMAT_D32_SFLOAT;
-    TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    TextureInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
     Texture::CreateTextureImage(engine, TextureInfo);
 }
 
-void RenderedDepthTexture::CreateTextureView(VulkanEngine& engine)
+void RenderedGBufferNormalTexture::CreateTextureView(VulkanEngine& engine)
 {
-    VkImageViewCreateInfo TextureImageViewInfo{};
+    VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    TextureImageViewInfo.image = Image;
     TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    TextureImageViewInfo.format = VK_FORMAT_D32_SFLOAT;
-    TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    TextureImageViewInfo.format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    TextureImageViewInfo.subresourceRange = {};
+    TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
     TextureImageViewInfo.subresourceRange.levelCount = 1;
     TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
     TextureImageViewInfo.subresourceRange.layerCount = 1;
+    TextureImageViewInfo.image = Image;
 
     if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
         throw std::runtime_error("Failed to create Image View.");
     }
 }
 
-void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& engine)
+void RenderedGBufferNormalTexture::CreateTextureSampler(VulkanEngine& engine)
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -77,7 +76,7 @@ void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& engine)
     }
 }
 
-void RenderedDepthTexture::RecreateRendererTexture(VulkanEngine& engine)
+void RenderedGBufferNormalTexture::RecreateRendererTexture(VulkanEngine& engine)
 {
     Texture::Delete(engine);
     CreateTextureImage(engine);

@@ -189,6 +189,15 @@
     <ClCompile Include="GBufferRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderedGBufferPositionTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferNormalTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -419,6 +428,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GBufferRenderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferAlbedoTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferNormalTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferPositionTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

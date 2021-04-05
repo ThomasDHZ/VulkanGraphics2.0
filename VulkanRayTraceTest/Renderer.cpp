@@ -27,6 +27,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     RenderPass = ForwardRenderPass(engine, assetManager, SceneData);
     interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
+  //  gBufferRenderPass = GBufferRenderPass(engine, assetManager, SceneData);
 
     SetUpCommandBuffers(engine);
   //  skybox = Skybox(engine, assetManager, RenderPass.RenderPass, SceneData);
@@ -302,7 +303,6 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         throw std::runtime_error("failed to acquire swap chain image!");
     }
 
-    interfaceRenderPass.Draw(engine, imageIndex);
     Update(engine, window, imageIndex);
 
     if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
@@ -315,45 +315,10 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// <summary>
     /// Draw Area
     /// </summary>
-
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    if (vkBeginCommandBuffer(RasterCommandBuffer, &beginInfo) != VK_SUCCESS) {
-        throw std::runtime_error("failed to begin recording command buffer!");
-    }
-
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = RenderPass.RenderPass;
-    renderPassInfo.framebuffer = RenderPass.SwapChainFramebuffers[imageIndex];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
-
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].depthStencil = { 1.0f, 0 };
-
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
-
-    vkCmdBeginRenderPass(RasterCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-   // skybox.Draw(RasterCommandBuffer, renderPassInfo);
-
-    vkCmdBindPipeline(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.ShaderPipeline);
-    vkCmdBindDescriptorSets(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.ShaderPipelineLayout, 0, 1, &RenderPass.DescriptorSets, 0, nullptr);
-    
-    assetManager.Draw(RasterCommandBuffer, RenderPass.ShaderPipelineLayout);
-
-    vkCmdEndRenderPass(RasterCommandBuffer);
-   // AnimationRenderer.Compute(engine, imageIndex);
-   // frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
-    if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
-        throw std::runtime_error("failed to record command buffer!");
-    }
-
+   RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer);
+  // frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
    RayRenderer.buildCommandBuffers(engine, assetManager, imageIndex);
-
+   interfaceRenderPass.Draw(engine, imageIndex);
     ///
     ///Draw area
     /// 
@@ -470,77 +435,8 @@ void Renderer::Destroy(VulkanEngine& engine)
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
-   // AnimationRenderer.Destroy(engine);
+    // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
-   RayRenderer.Destory(engine);
+    RayRenderer.Destory(engine);
 }
-
-void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
-{
- /*   std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMeshDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager.GetMaterialDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.GetTextureBufferDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.Get3DTextureBufferDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);*/
-}
-
-void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
-{
-    //std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMaterialDescriptorCount() });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, assetManager.GetTextureBufferDescriptorCount() });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, assetManager.Get3DTextureBufferDescriptorCount() });
-    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
-    //descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
-}
-
-void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
-{
-  //  descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
-
-  // // VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
-  // // VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage->View);
-  //  VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
-  //  std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager.GetMeshPropertiesListDescriptors();
-  //  std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager.GetVertexBufferListDescriptors();
-  //  std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager.GetIndexBufferListDescriptors();
-  //  std::vector<VkDescriptorBufferInfo> TransformBufferList = assetManager.GetTransformBufferListDescriptors();
-  //  std::vector<VkDescriptorBufferInfo> MaterialBufferList = assetManager.GetMaterialBufferListDescriptor();
-  //  std::vector<VkDescriptorImageInfo> TextureBufferInfo = assetManager.GetTextureBufferListDescriptor();
-  //  std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = assetManager.Get3DTextureBufferListDescriptor();
-  //  VkDescriptorImageInfo CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
-
-  //  std::vector<VkWriteDescriptorSet> DescriptorList;
-  ////  DescriptorList.emplace_back(engine.AddAccelerationBuffer(0, descriptorSets, AccelerationDescriptorStructure));
-  ////  DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, descriptorSets, RayTraceImageDescriptor));
-  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshPropertyDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(4, descriptorSets, VertexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(5, descriptorSets, IndexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(6, descriptorSets, TransformBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(7, descriptorSets, MaterialBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-  //  DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, descriptorSets, TextureBufferInfo));
-  //  DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, descriptorSets, Texture3DBufferInfo));
-  //  DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, descriptorSets, CubeMapImage));
-
-  //  vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
-}
-
-
-

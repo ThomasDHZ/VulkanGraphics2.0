@@ -1,16 +1,16 @@
 #pragma once
 #include "Texture.h"
 
-class RenderedColorTexture : public Texture
+class RenderedGBufferAlbedoTexture : public Texture
 {
 private:
     void CreateTextureImage(VulkanEngine& engine);
     void CreateTextureView(VulkanEngine& engine);
     void CreateTextureSampler(VulkanEngine& engine);
 public:
-    RenderedColorTexture();
-    RenderedColorTexture(VulkanEngine& engine);
-    ~RenderedColorTexture();
+    RenderedGBufferAlbedoTexture();
+    RenderedGBufferAlbedoTexture(VulkanEngine& engine);
+    ~RenderedGBufferAlbedoTexture();
 
     void RecreateRendererTexture(VulkanEngine& engine);
 };

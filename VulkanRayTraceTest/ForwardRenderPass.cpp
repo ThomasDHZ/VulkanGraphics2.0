@@ -15,6 +15,7 @@ ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, AssetManager& assetMa
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine);
     SetUpDescriptorSets(engine, assetManager, sceneData);
+    SetUpCommandBuffers(engine);
 }
 
 ForwardRenderPass::~ForwardRenderPass()
@@ -186,7 +187,7 @@ void ForwardRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
 
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = 2;
+    pipelineInfo.stageCount = static_cast<uint32_t>(PipelineShaderStageList.size());
     pipelineInfo.pStages = PipelineShaderStageList.data();
     pipelineInfo.pVertexInputState = &vertexInputInfo;
     pipelineInfo.pInputAssemblyState = &inputAssembly;
@@ -294,6 +295,19 @@ void ForwardRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
+void ForwardRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+{
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = 1;
+
+    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
+}
+
 void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
     DepthTexture->RecreateRendererTexture(engine);
@@ -324,6 +338,44 @@ void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine);
     SetUpDescriptorSets(engine, assetManager, sceneData);
+    SetUpCommandBuffers(engine);
+}
+
+void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer)
+{
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = RenderPass;
+    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipeline);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
+
+    assetManager.Draw(commandBuffer, ShaderPipelineLayout);
+
+    vkCmdEndRenderPass(commandBuffer);
+    // AnimationRenderer.Compute(engine, imageIndex);
+    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
+    }
+
 }
 
 void ForwardRenderPass::Destroy(VulkanEngine& engine)
