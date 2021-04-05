@@ -24,15 +24,13 @@ private:
 	Keyboard keyboard;
 	Mouse mouse;
 
-	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSetLayout descriptorSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet descriptorSets;
+
 	VkCommandBuffer RasterCommandBuffer;
 
-	//FrameBufferRenderPass frameBufferRenderPass;
+	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
-	//RayTraceRenderer RayRenderer;
+	RayTraceRenderer RayRenderer;
 	//AnimatorCompute AnimationRenderer;
 
 	size_t currentFrame = 0;

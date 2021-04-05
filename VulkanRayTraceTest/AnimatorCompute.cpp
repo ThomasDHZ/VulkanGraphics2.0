@@ -1,6 +1,7 @@
 #include "AnimatorCompute.h"
 
 #include "Vertex.h"
+#include "GraphicsPipeline.h"
 
 AnimatorCompute::AnimatorCompute()
 {

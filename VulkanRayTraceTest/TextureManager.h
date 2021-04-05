@@ -11,7 +11,6 @@ class TextureManager
 private:
 	CubeMapTexture CubeMap;
 
-	void UpdateTexture2DBufferIndexs(VulkanEngine& engine);
 	void UpdateTexture2DBufferIndex(VulkanEngine& engine);
 	uint32_t IsTextureLoaded(std::string name);
 

@@ -108,15 +108,6 @@ void TextureManager::Destory(VulkanEngine& engine)
 }
 
 
-void TextureManager::UpdateTexture2DBufferIndex(VulkanEngine& engine)
-{
-	for (int x = 0; x < TextureList.size(); x++)
-	{
-//		TextureList[x]->TextureBufferIndex = x;
-	//	TextureList[x]->UpdateTexture2DBufferIndexs(engine);
-	}
-}
-
 uint32_t TextureManager::IsTextureLoaded(std::string name)
 {
 	uint32_t textureID = -1;

@@ -4,26 +4,34 @@
 #include <array>
 #include "VulkanEngine.h"
 #include "RenderedDepthTexture.h"
-#include "ForwardRenderingPipeline.h"
+#include "AssetManager.h"
 
 class ForwardRenderPass
 {
 private:
+	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
+	void SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager);
+	void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void SetUpShaderPipeLine(VulkanEngine& renderer);
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 
 public:
 	ForwardRenderPass();
-	ForwardRenderPass(VulkanEngine& engine);
+	ForwardRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	~ForwardRenderPass();
 
 	VkRenderPass RenderPass;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
-	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
 
-	void StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
-	void UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
+	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
+	VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
+	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
+	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
+	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
+
+	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	void Destroy(VulkanEngine& engine);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }

@@ -10,13 +10,28 @@ Renderer::Renderer()
 
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
-    RenderPass = ForwardRenderPass(engine);
-    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
-
     assetManager = AssetManager(engine);
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
 
-    //frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
+    std::string CubeMapFiles[6];
+    CubeMapFiles[0] = "../texture/skybox/right.jpg";
+    CubeMapFiles[1] = "../texture/skybox/left.jpg";
+    CubeMapFiles[2] = "../texture/skybox/top.jpg";
+    CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
+    CubeMapFiles[4] = "../texture/skybox/back.jpg";
+    CubeMapFiles[5] = "../texture/skybox/front.jpg";
+
+    assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
+
+    RenderPass = ForwardRenderPass(engine, assetManager, SceneData);
+    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
+    frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
+
+    SetUpCommandBuffers(engine);
+  //  skybox = Skybox(engine, assetManager, RenderPass.RenderPass, SceneData);
+
+    camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
     material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
@@ -38,37 +53,14 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
 
-  //  assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
-    //assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
-    //assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
-    // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
+    //  assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+      //assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+      //assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
+      // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
 
-
-    std::string CubeMapFiles[6];
-    CubeMapFiles[0] = "../texture/skybox/right.jpg";
-    CubeMapFiles[1] = "../texture/skybox/left.jpg";
-    CubeMapFiles[2] = "../texture/skybox/top.jpg";
-    CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
-    CubeMapFiles[4] = "../texture/skybox/back.jpg";
-    CubeMapFiles[5] = "../texture/skybox/front.jpg";
-
-    assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
-
-    SetUpDescriptorPool(engine);
-    //RayRenderer = RayTraceRenderer(engine, assetManager);
-    SetUpDescriptorLayout(engine);
-   // RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
-    RenderPass.StartPipeline(engine, descriptorSetLayout);
-   // RayRenderer.createShaderBindingTable(engine);
-    SetUpDescriptorSets(engine);
-    //AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]->MeshList[0]);
-    SetUpCommandBuffers(engine);
-
-  //  skybox = Skybox(engine, assetManager, RenderPass.RenderPass, SceneData);
-
-
-    camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
+      RayRenderer = RayTraceRenderer(engine, assetManager, SceneData);
+      //AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]->MeshList[0]);
 
     SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
@@ -103,6 +95,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
     SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
+
+    RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
 }
 
 Renderer::~Renderer()
@@ -139,18 +133,13 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     }
 
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
-    vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
-    RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
-   // frameBufferRenderPass.UpdateSwapChain(engine);
+    RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    frameBufferRenderPass.UpdateSwapChain(engine);
     interfaceRenderPass.UpdateSwapChain(engine);
 
-    //RayRenderer.createStorageImage(engine);
-    SetUpDescriptorPool(engine);
-    SetUpDescriptorSets(engine);
-
-  //  RayRenderer.Resize(engine, assetManager, descriptorSets, 0);
+   RayRenderer.Resize(engine, assetManager, SceneData, 0);
 
     SetUpCommandBuffers(engine);
 }
@@ -168,7 +157,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
     assetManager.Update(engine);
    // skybox.Update(engine, assetManager.materialManager);
- //   RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
+    RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -351,19 +340,19 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     vkCmdBeginRenderPass(RasterCommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
    // skybox.Draw(RasterCommandBuffer, renderPassInfo);
 
-    vkCmdBindPipeline(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.forwardRendereringPipeline->ShaderPipelineLayout, 0, 1, &descriptorSets, 0, nullptr);
+    vkCmdBindPipeline(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.ShaderPipeline);
+    vkCmdBindDescriptorSets(RasterCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RenderPass.ShaderPipelineLayout, 0, 1, &RenderPass.DescriptorSets, 0, nullptr);
     
-    assetManager.Draw(RasterCommandBuffer, RenderPass.forwardRendereringPipeline);
+    assetManager.Draw(RasterCommandBuffer, RenderPass.ShaderPipelineLayout);
 
     vkCmdEndRenderPass(RasterCommandBuffer);
    // AnimationRenderer.Compute(engine, imageIndex);
-      // frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
+   // frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
     if (vkEndCommandBuffer(RasterCommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 
-  // RayRenderer.buildCommandBuffers(engine, assetManager, descriptorSets, imageIndex);
+   RayRenderer.buildCommandBuffers(engine, assetManager, imageIndex);
 
     ///
     ///Draw area
@@ -384,7 +373,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     else
     {
        // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
-       // CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
+        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
 
@@ -431,38 +420,25 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     if (AddTextureFlag == true)
     {
         vkDeviceWaitIdle(engine.Device);
-        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
-
         assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
 
-        SetUpDescriptorPool(engine);
-        SetUpDescriptorLayout(engine);
-        SetUpDescriptorSets(engine);
-        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        UpdateSwapChain(engine, window);
         AddTextureFlag = false;
     }
 
     if (RemoveTextureFlag == true)
     {
         vkDeviceWaitIdle(engine.Device);
-        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
 
         assetManager.textureManager.DeleteTexture(engine, SceneData->UniformDataInfo.temp);
 
-        SetUpDescriptorPool(engine);
-        SetUpDescriptorLayout(engine);
-        SetUpDescriptorSets(engine);
-        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        UpdateSwapChain(engine, window);
         RemoveTextureFlag = false;
     }
 
     if (AddMaterialFlag == true)
     {
         vkDeviceWaitIdle(engine.Device);
-        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
 
         stbi_set_flip_vertically_on_load(true);
         std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
@@ -472,25 +448,17 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         assetManager.materialManager.LoadMaterial(engine, "zdsf", material);
         stbi_set_flip_vertically_on_load(false);
 
-        SetUpDescriptorPool(engine);
-        SetUpDescriptorLayout(engine);
-        SetUpDescriptorSets(engine);
-        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        UpdateSwapChain(engine, window);
         AddMaterialFlag = false;
     }
 
     if (RemoveMaterialFlag == true)
     {
         vkDeviceWaitIdle(engine.Device);
-        vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
 
         assetManager.materialManager.DeleteMaterial(engine, SceneData->UniformDataInfo.temp);
 
-        SetUpDescriptorPool(engine);
-        SetUpDescriptorLayout(engine);
-        SetUpDescriptorSets(engine);
-        RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
+        UpdateSwapChain(engine, window);
         RemoveMaterialFlag = false;
     }
 
@@ -501,19 +469,16 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
-    //frameBufferRenderPass.Destroy(engine);
+    frameBufferRenderPass.Destroy(engine);
    // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
-  //  RayRenderer.Destory(engine);
-
-    vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, descriptorSetLayout, nullptr);
+   RayRenderer.Destory(engine);
 }
 
 void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
 {
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
+ /*   std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
@@ -525,56 +490,56 @@ void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.GetTextureBufferDescriptorCount()));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager.Get3DTextureBufferDescriptorCount()));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
+    descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);*/
 }
 
 void Renderer::SetUpDescriptorLayout(VulkanEngine& engine)
 {
-    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMaterialDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, assetManager.GetTextureBufferDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, assetManager.Get3DTextureBufferDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
-    descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
+    //std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMeshDescriptorCount() });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager.GetMaterialDescriptorCount() });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, assetManager.GetTextureBufferDescriptorCount() });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, assetManager.Get3DTextureBufferDescriptorCount() });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
+    //descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
 void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
 {
-    descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
+  //  descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
 
-   // VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
-   // VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage->View);
-    VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
-    std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager.GetMeshPropertiesListDescriptors();
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager.GetVertexBufferListDescriptors();
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager.GetIndexBufferListDescriptors();
-    std::vector<VkDescriptorBufferInfo> TransformBufferList = assetManager.GetTransformBufferListDescriptors();
-    std::vector<VkDescriptorBufferInfo> MaterialBufferList = assetManager.GetMaterialBufferListDescriptor();
-    std::vector<VkDescriptorImageInfo> TextureBufferInfo = assetManager.GetTextureBufferListDescriptor();
-    std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = assetManager.Get3DTextureBufferListDescriptor();
-    VkDescriptorImageInfo CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
+  // // VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(RayRenderer.topLevelAS.handle);
+  // // VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayRenderer.storageImage->View);
+  //  VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
+  //  std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager.GetMeshPropertiesListDescriptors();
+  //  std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager.GetVertexBufferListDescriptors();
+  //  std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager.GetIndexBufferListDescriptors();
+  //  std::vector<VkDescriptorBufferInfo> TransformBufferList = assetManager.GetTransformBufferListDescriptors();
+  //  std::vector<VkDescriptorBufferInfo> MaterialBufferList = assetManager.GetMaterialBufferListDescriptor();
+  //  std::vector<VkDescriptorImageInfo> TextureBufferInfo = assetManager.GetTextureBufferListDescriptor();
+  //  std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = assetManager.Get3DTextureBufferListDescriptor();
+  //  VkDescriptorImageInfo CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
 
-    std::vector<VkWriteDescriptorSet> DescriptorList;
-  //  DescriptorList.emplace_back(engine.AddAccelerationBuffer(0, descriptorSets, AccelerationDescriptorStructure));
-  //  DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, descriptorSets, RayTraceImageDescriptor));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshPropertyDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(4, descriptorSets, VertexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(5, descriptorSets, IndexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(6, descriptorSets, TransformBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(7, descriptorSets, MaterialBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, descriptorSets, TextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, descriptorSets, Texture3DBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, descriptorSets, CubeMapImage));
+  //  std::vector<VkWriteDescriptorSet> DescriptorList;
+  ////  DescriptorList.emplace_back(engine.AddAccelerationBuffer(0, descriptorSets, AccelerationDescriptorStructure));
+  ////  DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, descriptorSets, RayTraceImageDescriptor));
+  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, descriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshPropertyDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(4, descriptorSets, VertexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(5, descriptorSets, IndexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(6, descriptorSets, TransformBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+  //  DescriptorList.emplace_back(engine.AddBufferDescriptorSet(7, descriptorSets, MaterialBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+  //  DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, descriptorSets, TextureBufferInfo));
+  //  DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, descriptorSets, Texture3DBufferInfo));
+  //  DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, descriptorSets, CubeMapImage));
 
-    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+  //  vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
 

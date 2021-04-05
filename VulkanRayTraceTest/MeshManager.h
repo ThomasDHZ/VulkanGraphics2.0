@@ -17,7 +17,7 @@ public:
 	void AddMesh(std::shared_ptr<Mesh> mesh);
 	void Update(VulkanEngine& engine, MaterialManager& materialManager);
 	void UpdateBufferIndex(VulkanEngine& engine);
-	void Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
+	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Destroy(VulkanEngine& engine);
 		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();

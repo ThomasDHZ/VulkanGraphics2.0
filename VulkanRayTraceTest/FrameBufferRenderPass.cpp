@@ -302,8 +302,8 @@ void FrameBufferRenderPass::Destroy(VulkanEngine& engine)
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, DescriptorLayout, nullptr);
 
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
+    DescriptorPool = VK_NULL_HANDLE;
+    DescriptorLayout = VK_NULL_HANDLE;
 
     vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);

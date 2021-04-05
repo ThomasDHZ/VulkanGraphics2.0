@@ -21,7 +21,6 @@ public:
 	std::shared_ptr<RenderedColorTexture> GNormalTexture;
 	std::shared_ptr<RenderedColorTexture> GBloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
-	std::shared_ptr<ForwardRenderingPipeline> forwardRendereringPipeline;
 
 	void StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
 	void UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);

@@ -32,11 +32,11 @@ void MeshManager::UpdateBufferIndex(VulkanEngine& engine)
 	}
 }
 
-void MeshManager::Draw(VkCommandBuffer& commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
+void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh->Draw(commandBuffer, pipeline);
+		mesh->Draw(commandBuffer, layout);
 	}
 }
 
