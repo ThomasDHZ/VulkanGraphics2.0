@@ -10,7 +10,6 @@ RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& rende
     CreateTextureView(renderer);
     CreateTextureSampler(renderer);
     SendTextureToGPU(renderer);
-    //  ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedRayTracedColorTexture::~RenderedRayTracedColorTexture()
@@ -30,7 +29,7 @@ void RenderedRayTracedColorTexture::CreateTextureImage(VulkanEngine& renderer)
     TextureInfo.arrayLayers = 1;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_STORAGE_BIT;
+    TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     Texture::CreateTextureImage(renderer, TextureInfo);
@@ -119,5 +118,4 @@ void RenderedRayTracedColorTexture::RecreateRendererTexture(VulkanEngine& render
     CreateTextureImage(renderer);
     CreateTextureView(renderer);
     CreateTextureSampler(renderer);
-  //  ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

@@ -12,7 +12,6 @@ FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, AssetManager&
     CreateShaderPipeLine(engine);
     CreateDescriptorPool(engine, assetManager);
     CreateDescriptorSets(engine, assetManager, SceneData);
-    mesh = Mesh(engine, FrameBufferVertices, FrameBufferIndices, 1);
 }
 
 FrameBufferRenderPass::~FrameBufferRenderPass()
@@ -42,15 +41,9 @@ void FrameBufferRenderPass::CreateShaderPipeLine(VulkanEngine& engine)
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/FrameBufferVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/FrameBufferFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
-    auto bindingDescription = Vertex::GetBindingDescription();
-    auto attributeDescriptions = Vertex::GetAttributeDescriptions();
-
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 1;
-    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    vertexInputInfo.vertexBindingDescriptionCount = 0;
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -273,15 +266,11 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, VkCommandBuffer commandbu
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    VkBuffer vertexBuffers[] = { mesh.VertexBuffer.Buffer };
-    VkDeviceSize offsets[] = { 0 };
 
     vkCmdBeginRenderPass(commandbuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipeline);
-    vkCmdBindVertexBuffers(commandbuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindDescriptorSets(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
-    vkCmdBindIndexBuffer(commandbuffer, mesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-    vkCmdDrawIndexed(commandbuffer, static_cast<uint32_t>(mesh.IndexCount), 1, 0, 0, 0);
+   vkCmdBindDescriptorSets(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
+    vkCmdDraw(commandbuffer, 6, 1, 0, 0);
     vkCmdEndRenderPass(commandbuffer);
 
     if (vkEndCommandBuffer(commandbuffer) != VK_SUCCESS) {
@@ -289,9 +278,21 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, VkCommandBuffer commandbu
     }
 }
 
-void FrameBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
+void FrameBufferRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData)
 {
     UpdateGraphicsPipeLine(engine);
+
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(engine.Device, DescriptorLayout, nullptr);
+
+    DescriptorPool = VK_NULL_HANDLE;
+    DescriptorLayout = VK_NULL_HANDLE;
+
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -304,12 +305,14 @@ void FrameBufferRenderPass::UpdateSwapChain(VulkanEngine& engine)
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
+    CreateDescriptorSetLayout(engine, assetManager);
+    CreateShaderPipeLine(engine);
+    CreateDescriptorPool(engine, assetManager);
+    CreateDescriptorSets(engine, assetManager, SceneData);
 }
 
 void FrameBufferRenderPass::Destroy(VulkanEngine& engine)
 {
-    mesh.Destory(engine);
-
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, DescriptorLayout, nullptr);
 

@@ -10,19 +10,20 @@ Renderer::Renderer()
 
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
+    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     assetManager = AssetManager(engine);
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
+    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
 
     assetManager.AddModel();
     assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[0]);
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
+    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
+    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
+    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
 
     assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
 
@@ -37,7 +38,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
 
     RenderPass = ForwardRenderPass(engine, assetManager, SceneData);
-    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     gBufferRenderPass = GBufferRenderPass(engine, assetManager, SceneData);
 
@@ -46,11 +46,11 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
-    uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
+    //material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
 
     //assetManager.AddModel(engine, "../Models/Crate.dae");
     //assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
@@ -99,17 +99,18 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
 
     
-    //auto a =    assetManager.textureManager.LoadTexture2D(gBufferRenderPass.GPositionTexture);
+   // auto a =    assetManager.textureManager.LoadTexture2D(gBufferRenderPass.GPositionTexture);
 //auto b = assetManager.textureManager.LoadTexture2D(gBufferRenderPass.GNormalTexture);
 //auto c = assetManager.textureManager.LoadTexture2D(gBufferRenderPass.GAlbedoTexture);
 //auto d = assetManager.textureManager.LoadTexture2D(gBufferRenderPass.GBloomTexture);
 //auto e = assetManager.textureManager.LoadTexture2D(gBufferRenderPass.DepthTexture);
+//auto f = assetManager.textureManager.LoadTexture2D(RayRenderer.storageImage);
     RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
 
-    ImGui_ImplVulkan_AddTexture(assetManager.textureManager.TextureList[0]->ImGuiDescriptorSet, assetManager.textureManager.TextureList[0]->Sampler, assetManager.textureManager.TextureList[0]->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GBloomTexture->ImGuiDescriptorSet, gBufferRenderPass.GBloomTexture->Sampler, gBufferRenderPass.GBloomTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, gBufferRenderPass.GNormalTexture->Sampler, gBufferRenderPass.GNormalTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, gBufferRenderPass.GPositionTexture->Sampler, gBufferRenderPass.GPositionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(assetManager.textureManager.TextureList[0]->ImGuiDescriptorSet, assetManager.textureManager.TextureList[0]->Sampler, assetManager.textureManager.TextureList[0]->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GBloomTexture->ImGuiDescriptorSet, gBufferRenderPass.GBloomTexture->Sampler, gBufferRenderPass.GBloomTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, gBufferRenderPass.GNormalTexture->Sampler, gBufferRenderPass.GNormalTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, gBufferRenderPass.GPositionTexture->Sampler, gBufferRenderPass.GPositionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
    // ImGui_ImplVulkan_AddTexture(RayRenderer.storageImage->ImGuiDescriptorSet, RayRenderer.storageImage->Sampler, RayRenderer.storageImage->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
@@ -149,9 +150,9 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
-    RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    frameBufferRenderPass.UpdateSwapChain(engine);
     gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
 
    RayRenderer.Resize(engine, assetManager, SceneData, 0);
@@ -197,7 +198,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     //}
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 28);
+    ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 31);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
     ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
     ImGui::Checkbox("AddTexture", &AddTextureFlag);
@@ -206,16 +207,16 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Checkbox("DeleteMaterial", &RemoveMaterialFlag);
 
    // ImGui::Image(RayRenderer.storageImage->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(gBufferRenderPass.GBloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
- /*   for (auto& texture : assetManager.textureManager.TextureList)
+    //ImGui::Image(gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(gBufferRenderPass.GBloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    for (auto& texture : assetManager.textureManager.TextureList)
     {
         auto bufferIndex = std::to_string(texture->TextureBufferIndex);
         ImGui::LabelText(bufferIndex.c_str(), "sd");
         ImGui::Image(texture->ImGuiDescriptorSet, ImVec2(512, 512));
-    }*/
+    }
 
     ImGui::SliderFloat3("Position2", &SceneData->UniformDataInfo.sLight.position.x, 0.0f, 10.0f);
     ImGui::SliderFloat3("Direction2", &SceneData->UniformDataInfo.sLight.direction.x, -1.0f, 1.0f);
@@ -332,8 +333,8 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// Draw Area
     /// </summary>
    gBufferRenderPass.Draw(engine, assetManager, imageIndex);
-   RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer);
-   //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
+  // RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer);
+   frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
    RayRenderer.buildCommandBuffers(engine, assetManager, imageIndex);
    interfaceRenderPass.Draw(engine, imageIndex);
     ///
@@ -348,7 +349,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     if (RayTraceSwitch)
     {
         //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
-       // CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
+        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
         CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);

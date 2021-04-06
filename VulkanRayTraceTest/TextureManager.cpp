@@ -1,4 +1,5 @@
 #include "TextureManager.h"
+#include "ImGui/imgui_impl_vulkan.h"
 
 TextureManager::TextureManager()
 {
@@ -25,6 +26,8 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(VulkanEngine& engine, c
 		unsigned int TextureID = TextureList.size();
 		std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format, TextureID));
 		TextureList.emplace_back(texture);
+
+		ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	//}
 	return texture;
 }
@@ -33,6 +36,7 @@ uint32_t TextureManager::LoadTexture2D(VulkanEngine& engine, unsigned int width,
 {
 	unsigned int TextureID = TextureList.size();
 	TextureList.emplace_back(std::make_shared<Texture2D>(Texture2D(engine, width, height, PixelList, format, TextureID)));
+	ImGui_ImplVulkan_AddTexture(TextureList.back()->ImGuiDescriptorSet, TextureList.back()->Sampler, TextureList.back()->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	return TextureID;
 }
 
@@ -40,6 +44,8 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 {
 	unsigned int TextureID = TextureList.size();
 	TextureList.emplace_back(RenderedTexture);
+	TextureList.back()->TextureBufferIndex = TextureList.size();
+	ImGui_ImplVulkan_AddTexture(TextureList.back()->ImGuiDescriptorSet, TextureList.back()->Sampler, TextureList.back()->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	return TextureID;
 }
 

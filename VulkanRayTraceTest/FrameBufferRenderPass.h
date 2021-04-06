@@ -11,20 +11,6 @@
 class FrameBufferRenderPass
 {
 private:
-
-	std::vector<Vertex> FrameBufferVertices =
-	{
-	    {{ 0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {1.0f,  0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-		{{ 1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-		{{ 1.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, -1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-		{{ 0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {1.0f, -1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
-	};
-
-	std::vector<uint32_t> FrameBufferIndices = {
-	   0, 1, 3, 1, 2, 3
-	};
-
-	Mesh mesh;
 	VkDescriptorSetLayout DescriptorLayout;
 	VkDescriptorPool DescriptorPool;
 	VkDescriptorSet DescriptorSets;
@@ -49,7 +35,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	void Draw(VulkanEngine& engine, VkCommandBuffer commandbuffer, uint32_t index);
-	void UpdateSwapChain(VulkanEngine& engine);
+	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData);
 	void Destroy(VulkanEngine& engine);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }

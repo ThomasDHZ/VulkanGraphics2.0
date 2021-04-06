@@ -10,7 +10,6 @@ RenderedGBufferPositionTexture::RenderedGBufferPositionTexture(VulkanEngine& eng
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedGBufferPositionTexture::~RenderedGBufferPositionTexture()
@@ -82,5 +81,4 @@ void RenderedGBufferPositionTexture::RecreateRendererTexture(VulkanEngine& engin
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
