@@ -243,10 +243,6 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
 
 void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
 {
-    if(storageImage.get() != nullptr)
-    { 
-        storageImage->Delete(engine);
-    }
     storageImage = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 }
 

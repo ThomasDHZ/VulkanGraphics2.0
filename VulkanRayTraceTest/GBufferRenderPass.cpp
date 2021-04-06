@@ -441,3 +441,68 @@ void GBufferRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
         throw std::runtime_error("failed to record command buffer!");
     }
 }
+
+void GBufferRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+{
+    GPositionTexture->RecreateRendererTexture(engine);
+    GNormalTexture->RecreateRendererTexture(engine);
+    GAlbedoTexture->RecreateRendererTexture(engine);
+    GBloomTexture->RecreateRendererTexture(engine);
+    DepthTexture->RecreateRendererTexture(engine);
+
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
+    DescriptorPool = VK_NULL_HANDLE;
+    DescriptorSetLayout = VK_NULL_HANDLE;
+
+    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    RenderPass = VK_NULL_HANDLE;
+
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
+
+    for (auto& framebuffer : SwapChainFramebuffers)
+    {
+        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        framebuffer = VK_NULL_HANDLE;
+    }
+
+    CreateRenderPass(engine);
+    CreateRendererFramebuffers(engine);
+    SetUpDescriptorPool(engine, assetManager);
+    SetUpDescriptorLayout(engine, assetManager);
+    SetUpShaderPipeLine(engine);
+    SetUpDescriptorSets(engine, assetManager, sceneData);
+    SetUpCommandBuffers(engine);
+}
+
+void GBufferRenderPass::Destroy(VulkanEngine& engine)
+{
+    GPositionTexture->Delete(engine);
+    GNormalTexture->Delete(engine);
+    GAlbedoTexture->Delete(engine);
+    GBloomTexture->Delete(engine);
+    DepthTexture->Delete(engine);
+
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
+
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
+    DescriptorPool = VK_NULL_HANDLE;
+    DescriptorSetLayout = VK_NULL_HANDLE;
+
+    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    RenderPass = VK_NULL_HANDLE;
+
+    for (auto& framebuffer : SwapChainFramebuffers)
+    {
+        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        framebuffer = VK_NULL_HANDLE;
+    }
+}

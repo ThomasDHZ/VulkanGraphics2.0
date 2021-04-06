@@ -110,7 +110,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GBloomTexture->ImGuiDescriptorSet, gBufferRenderPass.GBloomTexture->Sampler, gBufferRenderPass.GBloomTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, gBufferRenderPass.GNormalTexture->Sampler, gBufferRenderPass.GNormalTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, gBufferRenderPass.GPositionTexture->Sampler, gBufferRenderPass.GPositionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    ImGui_ImplVulkan_AddTexture(RayRenderer.storageImage->ImGuiDescriptorSet, RayRenderer.storageImage->Sampler, RayRenderer.storageImage->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   // ImGui_ImplVulkan_AddTexture(RayRenderer.storageImage->ImGuiDescriptorSet, RayRenderer.storageImage->Sampler, RayRenderer.storageImage->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 Renderer::~Renderer()
@@ -151,6 +151,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
     RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     frameBufferRenderPass.UpdateSwapChain(engine);
+    gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
 
    RayRenderer.Resize(engine, assetManager, SceneData, 0);
@@ -452,6 +453,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
+    gBufferRenderPass.Destroy(engine);
     // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);

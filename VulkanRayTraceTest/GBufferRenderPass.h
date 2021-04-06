@@ -38,23 +38,9 @@ public:
 	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout);
+	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }
 };
-
-//class GBufferPipeline : public GraphicsPipeline
-//{
-//private:
-//	void CreateDescriptorSetLayout(VulkanEngine& renderer);
-//	void CreateShaderPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags);
-//public:
-//	GBufferPipeline();
-//	GBufferPipeline(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags);
-//	~GBufferPipeline();
-//
-//	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, int PipelineBitFlags);
-//};
-//
