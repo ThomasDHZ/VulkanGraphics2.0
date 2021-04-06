@@ -36,7 +36,7 @@ uint32_t TextureManager::LoadTexture2D(VulkanEngine& engine, unsigned int width,
 	return TextureID;
 }
 
-uint32_t TextureManager::LoadTexture2D(std::shared_ptr<RenderedRayTracedColorTexture> RenderedTexture)
+uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 {
 	unsigned int TextureID = TextureList.size();
 	TextureList.emplace_back(RenderedTexture);
@@ -123,7 +123,7 @@ uint32_t TextureManager::IsTextureLoaded(std::string name)
 	return textureID;
 }
 
-std::shared_ptr<Texture2D> TextureManager::GetTextureByName(const std::string TextureName)
+std::shared_ptr<Texture> TextureManager::GetTextureByName(const std::string TextureName)
 {
 	for (auto texture : TextureList)
 	{

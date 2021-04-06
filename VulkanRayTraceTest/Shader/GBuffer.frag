@@ -62,15 +62,23 @@ layout(location = 0) out vec4 GPosition;
 layout(location = 1) out vec4 GAlebdo;
 layout(location = 2) out vec4 GNormal;
 layout(location = 3) out vec4 GBloom;
+layout(location = 4) out vec4 GDepth;
 
 void main() 
 {
+
 	const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
     const vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
+
+	   if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
+   {
+	 discard;
+   }
 
 	GPosition = vec4(FragPos, 1.0f);
     GAlebdo.rgb = texture(TextureMap[material.DiffuseMapID], texCoords).rgb;
     GAlebdo.a = texture(TextureMap[material.SpecularMapID], texCoords).r;
 	GNormal = vec4(normalize(Normal), 1.0f);
 	GBloom = vec4(0.0f);
+	GDepth = vec4(0.0f);
 }

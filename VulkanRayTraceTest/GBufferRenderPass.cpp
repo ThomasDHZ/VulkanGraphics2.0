@@ -1,4 +1,5 @@
 #include "GBufferRenderPass.h"
+#include "GraphicsPipeline.h"
 
 GBufferRenderPass::GBufferRenderPass()
 {
@@ -18,6 +19,7 @@ GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, AssetManager& assetMa
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine);
     SetUpDescriptorSets(engine, assetManager, sceneData);
+    SetUpCommandBuffers(engine);
 }
 
 GBufferRenderPass::~GBufferRenderPass()
@@ -207,9 +209,16 @@ void GBufferRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
    colorBlending.blendConstants[2] = 0.0f;
    colorBlending.blendConstants[3] = 0.0f;
 
+   VkPushConstantRange pushConstantRange{};
+   pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+   pushConstantRange.offset = 0;
+   pushConstantRange.size = sizeof(ConstMeshInfo);
+
    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
    pipelineLayoutInfo.setLayoutCount = 1;
+   pipelineLayoutInfo.pushConstantRangeCount = 1;
+   pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
    pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 
    if (vkCreatePipelineLayout(engine.Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS) {
@@ -306,6 +315,7 @@ void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     ColorRefsList.emplace_back(VkAttachmentReference{ 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     ColorRefsList.emplace_back(VkAttachmentReference{ 3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    ColorRefsList.emplace_back(VkAttachmentReference{ 3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     VkAttachmentReference depthReference = { 4, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
@@ -353,6 +363,8 @@ void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
 
 void GBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
+    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
@@ -375,5 +387,57 @@ void GBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
+    }
+}
+
+void GBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+{
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = 1;
+
+    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
+}
+
+void GBufferRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
+{
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    if (vkBeginCommandBuffer(CommandBuffer, &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = RenderPass;
+    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+
+    std::array<VkClearValue, 5> clearValues{};
+    clearValues[0].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 0.0f, 1.0f, 0.0f, 1.0f };
+    clearValues[2].color = { 0.0f, 0.0f, 1.0f, 1.0f };
+    clearValues[3].color = { 0.0f, 1.0f, 1.0f, 1.0f };
+    clearValues[4].depthStencil = { 1.0f, 0 };
+
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
+
+    assetManager.Draw(CommandBuffer, ShaderPipelineLayout);
+
+    vkCmdEndRenderPass(CommandBuffer);
+    // AnimationRenderer.Compute(engine, imageIndex);
+    if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
     }
 }
