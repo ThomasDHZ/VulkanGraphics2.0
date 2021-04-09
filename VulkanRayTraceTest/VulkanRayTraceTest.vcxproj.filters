@@ -248,16 +248,16 @@
     <None Include="Shader\SkyBoxShader.vert">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\DeferedShader.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\DeferedShader.vert">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\GBuffer.frag">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\GBuffer.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\DeferedShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\DeferedShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

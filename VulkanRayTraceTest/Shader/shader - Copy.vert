@@ -56,7 +56,12 @@ layout(location = 4) out mat3 TBN;
 
 void main() 
 {
-   FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
+//if(gl_VertexIndex == 0)
+//{
+//    debugPrintfEXT("Temp: %i \n", ubo.temp);
+//}
+//
+    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
 	Color = aColor;

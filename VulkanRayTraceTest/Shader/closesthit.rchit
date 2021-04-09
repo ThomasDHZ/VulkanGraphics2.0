@@ -9,17 +9,15 @@
 
 const float PI = 3.14159265359;
 
-struct RayHitInfo
-{
-	vec3 hitValue;
-    	vec3 geoNormal;
-        	float distance;
-	vec3 Origin;
-	vec3 Direction;
-	float Reflectiveness;
+struct RayPayload {
+	vec3 color;
+	float distance;
+	vec3 normal;
+	float reflector;
+    float materialreflection;
 };
 
-layout(location = 0) rayPayloadInEXT RayHitInfo rayHitInfo;
+layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
 layout(location = 1) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
@@ -37,6 +35,7 @@ layout(binding = 2) uniform UBO
 	float timer;
     int Shadowed;
     int temp;
+    float temp2;
 } ubo;
 layout(binding = 3) buffer MeshProperties 
 {
@@ -90,51 +89,23 @@ void main()
    const Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
-   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-   const mat3 TBN = transpose(mat3(T, B, N));
-   
-   const vec3 TangentViewPos  = TBN * ubo.viewPos;
-   const vec3 TangentFragPos  = TBN * vertex.pos;  
-   const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-   vec2 uv = vertex.uv;
-
-   vec3 result = vec3(0.0f);
-   vec3 normal = vertex.normal;
-   if(material.NormalMapID != 0)
-   {
-        if(material.DepthMapID != 0)
-        {
-            uv = ParallaxMapping(material, uv,  viewDir);       
-        }
-        normal = texture(TextureMap[material.NormalMapID], uv).rgb;
-        normal = normalize(normal * 2.0 - 1.0);
-
-        rayHitInfo.hitValue = CalcNormalDirLight(vertex, material, TBN, normal, uv);
-        for(int x = 0; x < 5; x++)
-        {
-           rayHitInfo.hitValue += CalcNormalPointLight(vertex, material, TBN, ubo.plight[x], normal, uv);   
-        }
-        rayHitInfo.hitValue +=  CalcNormalSpotLight(vertex, material, TBN, ubo.sLight, normal, uv);
-   }
-   else
-   {
-       rayHitInfo.hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
-        for(int x = 0; x < 5; x++)
-        {
-            rayHitInfo.hitValue += CalcPointLight(vertex, material, ubo.plight[x], uv);   
-        }
-       rayHitInfo.hitValue +=  CalcSpotLight(vertex, material, ubo.sLight, uv);
-   }
-
- 
-     vec3 origin = vertex.pos;
-    vec3 rayDir = reflect(gl_WorldRayDirectionEXT, normal);
-    rayHitInfo.Origin = origin;
-    rayHitInfo.Direction    = rayDir;
-    rayHitInfo.geoNormal = vertex.normal;
-   rayHitInfo.Reflectiveness = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material.Reflectivness;
+	vec3 lightVector = normalize(ubo.dlight.direction);
+	float dot_product = max(dot(lightVector, vertex.normal), 0.6);
+	rayPayload.color = material.Diffuse * vec3(dot_product);
+	rayPayload.distance = gl_RayTmaxEXT;
+	rayPayload.normal = vertex.normal;
+	rayPayload.reflector = ((material.Diffuse.r == 1.0f) && (material.Diffuse.g == 1.0f) && (material.Diffuse.b == 1.0f)) ? 1.0f : 0.0f; 
+    rayPayload.materialreflection = 1.0f;
+    	// Shadow casting
+	float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 1);
+	if (shadowed) {
+		rayPayload.color *= 0.3;
+	}
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

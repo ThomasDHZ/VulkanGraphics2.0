@@ -10,12 +10,11 @@
 
 struct RayHitInfo
 {
-	vec3 hitValue;
-		vec3 geoNormal;
-			float distance;
-	vec3 Origin;
-	vec3 Direction;
-	float Reflectiveness;
+	vec3 color;
+	float distance;
+	vec3 normal;
+	float reflector;
+    float materialreflection;
 };
 
 hitAttributeEXT vec2 attribs;

@@ -190,12 +190,12 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.Normal = glm::vec3{ mesh->mNormals[x].x, mesh->mNormals[x].y, mesh->mNormals[x].z };
 
 	
-		//if(mesh->mColors[x])
-		//{
-		//	vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
-		//}
-		//else
-		//{
+	/*	if(mesh->mColors[x])
+		{
+			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
+		}
+		else
+		{*/
 			vertex.Color = glm::vec4{ 0.6f, 0.6f, 0.6f, 1.0f };
 		//}
 		if (mesh->mTangents)

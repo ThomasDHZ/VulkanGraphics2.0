@@ -44,6 +44,7 @@ struct SceneDataBuffer {
 	alignas(4)  float timer;
 	alignas(4)  int Shadowed = 1;
 	alignas(4)  int temp = 0;
+	alignas(4)  float temp2 = 1.0f;
 };
 
 struct MeshProperties
