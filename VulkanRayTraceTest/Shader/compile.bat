@@ -1,4 +1,5 @@
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbrClosesthit.rchit -o pbrClosesthit.rchit.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 anyhit.rahit -o anyhit.rahit.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 anyhit1.rahit -o anyhit1.rahit.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 raygen.rgen -o raygen.rgen.spv

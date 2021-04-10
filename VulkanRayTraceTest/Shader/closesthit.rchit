@@ -14,7 +14,7 @@ struct RayPayload {
 	float distance;
 	vec3 normal;
 	float reflector;
-    float materialreflection;
+	float materialreflection;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
@@ -91,21 +91,20 @@ void main()
 
 	vec3 lightVector = normalize(ubo.dlight.direction);
 	float dot_product = max(dot(lightVector, vertex.normal), 0.6);
-	rayPayload.color = material.Diffuse * vec3(dot_product);
+
+	rayPayload.color = CalcDirLight(vertex, material, ubo.dlight, vertex.uv);
 	rayPayload.distance = gl_RayTmaxEXT;
 	rayPayload.normal = vertex.normal;
-	rayPayload.reflector = ((material.Diffuse.r == 1.0f) && (material.Diffuse.g == 1.0f) && (material.Diffuse.b == 1.0f)) ? 1.0f : 0.0f; 
-    rayPayload.materialreflection = 1.0f;
-    	// Shadow casting
-	float tmin = 0.001;
-	float tmax = 10000.0;
-	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	shadowed = true;  
-	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
-	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightVector, tmax, 1);
-	if (shadowed) {
-		rayPayload.color *= 0.3;
-	}
+    if((material.Diffuse.r == 1.0f) && (material.Diffuse.g == 1.0f) && (material.Diffuse.b == 1.0f) ||
+       (material.Diffuse.r == 0.0f) && (material.Diffuse.g == 0.0f) && (material.Diffuse.b == 0.0f))
+	{
+        rayPayload.reflector = 1.0f; 
+    }
+    else
+    {
+        rayPayload.reflector = 0.0f; 
+    }
+    rayPayload.materialreflection = 0.2543333f;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
@@ -177,8 +176,8 @@ vec3 CalcNormalDirLight(Vertex vertex, MaterialInfo material, mat3 TBN, vec3 nor
     const vec3 halfwayDir = normalize(lightDir + viewDir);  
     const float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
-    vec3 ambient = ubo.dlight.ambient * vertex.Color.rgb;
-    vec3 diffuse = ubo.dlight.diffuse * diff * vertex.Color.rgb;
+    vec3 ambient = ubo.dlight.ambient * material.Diffuse.rgb;
+    vec3 diffuse = ubo.dlight.diffuse * diff * material.Diffuse.rgb;
     vec3 specular = ubo.dlight.specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {
@@ -208,8 +207,8 @@ vec3 CalcNormalPointLight(Vertex vertex, MaterialInfo material, mat3 TBN, PointL
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
-    vec3 ambient = light.ambient * vertex.Color.rgb;
-    vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
+    vec3 ambient = light.ambient * material.Diffuse.rgb;
+    vec3 diffuse = light.diffuse * diff * material.Diffuse.rgb;
     vec3 specular = light.specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {
@@ -253,8 +252,8 @@ vec3 CalcNormalSpotLight(Vertex vertex, MaterialInfo material, mat3 TBN, SpotLig
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-    vec3 ambient = light.ambient * vertex.Color.rgb;
-    vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
+    vec3 ambient = light.ambient * material.Diffuse.rgb;
+    vec3 diffuse = light.diffuse * diff * material.Diffuse.rgb;
     vec3 specular = light.specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {
@@ -284,8 +283,8 @@ vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, 
     const vec3 reflectDir = reflect(-lightDir, vertex.normal);
     const float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
 
-    vec3 ambient = ubo.dlight.ambient * vertex.Color.rgb;
-    vec3 diffuse = ubo.dlight.diffuse * diff * vertex.Color.rgb;
+    vec3 ambient = ubo.dlight.ambient * material.Diffuse.rgb;
+    vec3 diffuse = ubo.dlight.diffuse * diff * material.Diffuse.rgb;
     vec3 specular = ubo.dlight.specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {
@@ -315,8 +314,8 @@ vec3 CalcPointLight(Vertex vertex, MaterialInfo material, PointLight light, vec2
     float distance = length(light.position - vertex.pos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
-    vec3 ambient = light.ambient * vertex.Color.rgb;
-    vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
+    vec3 ambient = light.ambient * material.Diffuse.rgb;
+    vec3 diffuse = light.diffuse * diff * material.Diffuse.rgb;
     vec3 specular = light.specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {
@@ -353,8 +352,8 @@ vec3 CalcSpotLight(Vertex vertex, MaterialInfo material, SpotLight light, vec2 u
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-    vec3 ambient = light.ambient * vertex.Color.rgb;
-    vec3 diffuse = light.diffuse * diff * vertex.Color.rgb;
+    vec3 ambient = light.ambient * material.Diffuse.rgb;
+    vec3 diffuse = light.diffuse * diff * material.Diffuse.rgb;
     vec3 specular = light.specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {

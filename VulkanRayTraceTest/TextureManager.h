@@ -28,8 +28,8 @@ public:
 	uint32_t Load3DTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
 	uint32_t LoadTexture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format);
 	void DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex);
-	void LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles);
-	void LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6]);
+	void LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat);
+	void LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat);
 	void UnloadAllTextures(VulkanEngine& engine);
 	void UnloadCubeMap(VulkanEngine& engine);
 	void Destory(VulkanEngine& engine);

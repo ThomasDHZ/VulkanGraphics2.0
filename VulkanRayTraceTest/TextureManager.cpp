@@ -67,14 +67,14 @@ uint32_t TextureManager::LoadTexture3D(VulkanEngine& engine, int width, int heig
 	return TextureID;
 }
 
-void TextureManager::LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles)
+void TextureManager::LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	CubeMap = CubeMapTexture(engine, CubeMapFiles, 0);
+	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat, 0);
 }
 
-void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6])
+void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	CubeMap = CubeMapTexture(engine, CubeMapFiles, 0);
+	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat, 0);
 }
 
 void TextureManager::DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex)

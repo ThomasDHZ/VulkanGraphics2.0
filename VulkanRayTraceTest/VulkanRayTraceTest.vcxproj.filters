@@ -260,6 +260,9 @@
     <None Include="Shader\DeferedShader.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\pbrClosesthit.rchit">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">

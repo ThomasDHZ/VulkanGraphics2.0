@@ -14,6 +14,10 @@ struct MaterialInfo
 	uint EmissionMapID;
 	uint ShadowMapID;
 
+	vec3 Albedo;
+	float Matallic;
+	float Roughness;
+	float AmbientOcclusion;
 	uint AlbedoMapID;
 	uint MatallicMapID;
 	uint RoughnessMapID;

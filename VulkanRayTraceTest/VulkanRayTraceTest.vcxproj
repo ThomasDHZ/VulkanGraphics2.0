@@ -218,6 +218,7 @@
     <None Include="Shader\Material.glsl" />
     <None Include="Shader\Lighting.glsl" />
     <None Include="Shader\miss.rmiss" />
+    <None Include="Shader\pbrClosesthit.rchit" />
     <None Include="Shader\raygen.rgen" />
     <None Include="Shader\shader.frag" />
     <None Include="Shader\shader.vert" />

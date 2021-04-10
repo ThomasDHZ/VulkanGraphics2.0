@@ -43,7 +43,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     CubeMapFiles[4] = "../texture/skybox/back.jpg";
     CubeMapFiles[5] = "../texture/skybox/front.jpg";
 
-    assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles);
+    assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_SRGB);
 
     RenderPass = ForwardRenderPass(engine, assetManager, SceneData);
     frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
@@ -195,8 +195,12 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     for (int y = 0; y < assetManager.materialManager.MaterialList.size(); y++)
     {
         auto a = std::to_string(y);;
-
-        ImGui::SliderFloat(("Reflection  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Reflectivness, 0.0f, 1.0f);
+        ImGui::Text(("Material  " + std::to_string(y)).c_str());
+        ImGui::SliderFloat3(("Albedo  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Albedo.x, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Roughness  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Roughness, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Metallic  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Matallic, 0.0f, 1.0f);
+        ImGui::SliderFloat(("AO  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.AmbientOcclusion, 0.0f, 1.0f);
+       
     }
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

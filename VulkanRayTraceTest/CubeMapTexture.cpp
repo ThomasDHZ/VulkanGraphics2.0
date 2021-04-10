@@ -6,14 +6,14 @@ CubeMapTexture::CubeMapTexture() : Texture()
 {
 }
 
-CubeMapTexture::CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat, unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
 {
-	LoadTexture(engine, CubeMapFiles);
-	CreateTextureView(engine);
+	LoadTexture(engine, CubeMapFiles, textureFormat);
+	CreateTextureView(engine, textureFormat);
 	CreateTextureSampler(engine);
 }
 
-CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat, unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
 {
 	CubeMapLayout cubeMapfiles;
 	cubeMapfiles.Left = CubeMapFiles[0];
@@ -23,8 +23,8 @@ CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6]
 	cubeMapfiles.Front = CubeMapFiles[4];
 	cubeMapfiles.Back = CubeMapFiles[5];
 
-	LoadTexture(engine, cubeMapfiles);
-	CreateTextureView(engine);
+	LoadTexture(engine, cubeMapfiles, textureFormat);
+	CreateTextureView(engine, textureFormat);
 	CreateTextureSampler(engine);
 }
 
@@ -32,7 +32,7 @@ CubeMapTexture::~CubeMapTexture()
 {
 }
 
-void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles)
+void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
 	std::vector<unsigned char*> textureData;
 	int texChannels;
@@ -67,7 +67,7 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 	TextureInfo.mipLevels = 1;
 	TextureInfo.arrayLayers = 6;
 	TextureInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-	TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	TextureInfo.format = textureFormat;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -87,12 +87,12 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 	}
 }
 
-void CubeMapTexture::CreateTextureView(VulkanEngine& engine)
+void CubeMapTexture::CreateTextureView(VulkanEngine& engine, VkFormat textureFormat)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	TextureImageViewInfo.image = Image;
-	TextureImageViewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+	TextureImageViewInfo.format = textureFormat;
 	TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
 	TextureImageViewInfo.subresourceRange.levelCount = 1;

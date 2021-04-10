@@ -18,6 +18,12 @@ struct MaterialTexture
 	std::shared_ptr<Texture> EmissionMap;
 	std::shared_ptr<Texture> ShadowMap;
 
+	//PBR
+	glm::vec3 Albedo = glm::vec3(0.128, 0.136f, 1.0f);
+	float Matallic = .582f;
+	float Roughness = 1.0f;
+	float AmbientOcclusion = 0.187f;
+
 	std::shared_ptr<Texture> AlbedoMap;
 	std::shared_ptr<Texture> MatallicMap;
 	std::shared_ptr<Texture> RoughnessMap;
@@ -40,6 +46,13 @@ struct MaterialData
 	alignas(4) uint32_t EmissionMapID = 0;
 	alignas(4) uint32_t ShadowMapID = 0;
 
+
+	//PBR
+	alignas(16) glm::vec3 Albedo = glm::vec3(0.5, 0.0f, 0.0f);
+	alignas(4) float Matallic = .75f;
+	alignas(4) float Roughness = .5f;
+	alignas(4) float AmbientOcclusion = 1.0f;
+
 	alignas(4) uint32_t AlbedoMapID = 0;
 	alignas(4) uint32_t MatallicMapID = 0;
 	alignas(4) uint32_t RoughnessMapID = 0;
@@ -61,6 +74,11 @@ struct MaterialData
 		EmissionMapID = materialTexture.EmissionMap->TextureBufferIndex;
 		ShadowMapID = materialTexture.ShadowMap->TextureBufferIndex;
 
+
+		Albedo = materialTexture.Albedo;
+		Matallic = materialTexture.Matallic;
+		Roughness = materialTexture.Roughness;
+		AmbientOcclusion = materialTexture.AmbientOcclusion;
 		AlbedoMapID = materialTexture.AlbedoMap->TextureBufferIndex;
 		MatallicMapID = materialTexture.MatallicMap->TextureBufferIndex;
 		RoughnessMapID = materialTexture.RoughnessMap->TextureBufferIndex;

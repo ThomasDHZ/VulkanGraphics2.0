@@ -50,35 +50,39 @@ void main()
 	vec3 color = vec3(0.0);
 	vec3 baseColor = vec3(0.0);
 	vec3 reflectmask = vec3(0.0f);
-	float reflectionAmount = 1.0f;
-	for (int i = 0; i < 20; i++) {
+	float reflectionAmount = 0.0f;
+	for (int x = 0; x < 20; x++) 
+	{
 		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 		vec3 hitColor = rayPayload.color;
-		if(i == 0)
+		reflectionAmount = rayPayload.materialreflection;
+
+		if(x == 0)
 		{
 			baseColor = hitColor;
 		}
-		     if (rayPayload.reflector == 1.0f) {
 
-				const vec4 hitPos = origin + direction * rayPayload.distance;
-				origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
-				direction.xyz = reflect(direction.xyz, rayPayload.normal);
-				reflectmask = vec3(1.0f, 0.0f, 0.0f);
-			} 
-			else 
+		if (rayPayload.reflector == 1.0f) 
+		{
+			const vec4 hitPos = origin + direction * rayPayload.distance;
+			origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
+			direction.xyz = reflect(direction.xyz, rayPayload.normal);
+			reflectmask = vec3(1.0f, 0.0f, 0.0f);
+		} 
+		else 
+		{
+			if(reflectmask == vec3(1.0f, 0.0f, 0.0f))
 			{
-				if(reflectmask == vec3(1.0f, 0.0f, 0.0f) )
-				{
-					color = mix(baseColor, hitColor, cam.temp2); 
-				}
-				else
-				{
-					color = baseColor;
-				}
-				break;
+				color = mix(baseColor, hitColor, cam.temp2); 
 			}
+			else
+			{
+				color = baseColor;
+			}
+			break;
+		}
 	}
-
+	color = pow(color, vec3(1.0/2.2));
 	imageStore(image, ivec2(gl_LaunchIDEXT.xy), vec4(color, 0.0));
 
 }
