@@ -9,10 +9,7 @@
 
 struct RayPayload {
 	vec3 color;
-	float distance;
-	vec3 normal;
-	float reflector;
-	float materialreflection;
+	uint reflectCount;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
@@ -64,13 +61,21 @@ void main()
 {
    const Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-   const vec3 albedo = material.Albedo;
-   const float metallic = material.Matallic;
-   const float roughness = material.Roughness;
-   const float ao = material.AmbientOcclusion;
+   
+   vec3 baseColor = vec3(0.0f);
+   const vec3 albedo = texture(TextureMap[2], vertex.uv).rgb;
+   vec3 tangentNormal = texture(TextureMap[3], vertex.uv).xyz * 2.0 - 1.0;
+   const float metallic = texture(TextureMap[6], vertex.uv).r;
+   const float roughness = texture(TextureMap[4], vertex.uv).r;
+   const float ao = texture(TextureMap[5], vertex.uv).r;
 
-   vec3 N = normalize(vertex.normal);
-   vec3 V = normalize(ubo.viewPos - vertex.pos);
+   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+   const vec3 Nvec3 = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+   const mat3 TBN = transpose(mat3(T, B, Nvec3));
+
+   vec3 N = normalize(TBN * vertex.normal);
+   vec3 V = normalize(TBN * ubo.viewPos - vertex.pos);
 
    vec3 F0 = vec3(0.04f);
    F0 = mix(F0, albedo, metallic);
@@ -78,10 +83,10 @@ void main()
    vec3 Lo = vec3(0.0);
    for(int i = 0; i < 4; ++i) 
    {
-        vec3 L = normalize(ubo.plight[i].position - vertex.pos);
+        vec3 L = normalize(TBN * ubo.plight[i].position - vertex.pos);
         vec3 H = normalize(V + L);
 
-        float distance = length(ubo.plight[i].position - vertex.pos);
+        float distance = length(TBN * ubo.plight[i].position - vertex.pos);
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = ubo.plight[i].diffuse * attenuation;
 
@@ -101,21 +106,37 @@ void main()
    }
 
    vec3 ambient = vec3(0.03) * albedo * ao;
-   vec3 color = ambient + Lo;
+   baseColor = ambient + Lo;
 
-	rayPayload.color = color;
-	rayPayload.distance = gl_RayTmaxEXT;
-	rayPayload.normal = vertex.normal;
-    if((material.Diffuse.r == 1.0f) && (material.Diffuse.g == 1.0f) && (material.Diffuse.b == 1.0f) ||
-       (material.Diffuse.r == 0.0f) && (material.Diffuse.g == 0.0f) && (material.Diffuse.b == 0.0f))
-	{
-        rayPayload.reflector = 1.0f; 
+   vec3 color = vec3(0.0f);
+    if(metallic > 0.0f &&
+       rayPayload.reflectCount != 10)
+      {
+        vec3 origin   = vertex.pos;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
+
+        rayPayload.reflectCount++;
+        traceRayEXT(topLevelAS,         // acceleration structure
+                gl_RayFlagsNoneEXT,  // rayFlags
+                0xFF,               // cullMask
+                0,                  // sbtRecordOffset
+                0,                  // sbtRecordStride
+                0,                  // missIndex
+                origin,             // ray origin
+                0.1,                // ray min range
+                rayDir,             // ray direction
+                100000.0,           // ray max range
+                0                   // payload (location = 0)
+        );
+        vec3 hitColor = rayPayload.color;
+		color = mix(baseColor, hitColor, metallic); 
     }
     else
-    {
-        rayPayload.reflector = 0.0f; 
-    }
-    rayPayload.materialreflection = 0.2543333f;
+	{
+	    color = baseColor;
+	}
+
+	rayPayload.color = color;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

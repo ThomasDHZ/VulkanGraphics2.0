@@ -25,15 +25,16 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
     
-    //assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
+  //  assetManager.AddModel(engine, "../Models/vulkanscene_shadow.obj");
     //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    //material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.AlbedoMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    //material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.RoughnessMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.AOMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.MatallicMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
     //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
 
     assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
-
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -47,7 +48,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     RenderPass = ForwardRenderPass(engine, assetManager, SceneData);
     frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
-    gBufferRenderPass = GBufferRenderPass(engine, assetManager, SceneData);
+    //gBufferRenderPass = GBufferRenderPass(engine, assetManager, SceneData);
 
     SetUpCommandBuffers(engine);
   //  skybox = Skybox(engine, assetManager, RenderPass.RenderPass, SceneData);
@@ -152,7 +153,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
-    gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    //gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
@@ -196,10 +197,10 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     {
         auto a = std::to_string(y);;
         ImGui::Text(("Material  " + std::to_string(y)).c_str());
-        ImGui::SliderFloat3(("Albedo  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Albedo.x, 0.0f, 1.0f);
-        ImGui::SliderFloat(("Roughness  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Roughness, 0.0f, 1.0f);
-        ImGui::SliderFloat(("Metallic  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Matallic, 0.0f, 1.0f);
-        ImGui::SliderFloat(("AO  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.AmbientOcclusion, 0.0f, 1.0f);
+      //  ImGui::SliderFloat3(("Albedo  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Albedo.x, 0.0f, 1.0f);
+        //ImGui::SliderFloat(("Roughness  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Roughness, 0.0f, 1.0f);
+        //ImGui::SliderFloat(("Metallic  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Matallic, 0.0f, 1.0f);
+        ImGui::SliderFloat(("AO  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Reflectivness, 0.0f, 1.0f);
        
     }
 
@@ -338,7 +339,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// <summary>
     /// Draw Area
     /// </summary>
-   gBufferRenderPass.Draw(engine, assetManager, imageIndex);
+   //gBufferRenderPass.Draw(engine, assetManager, imageIndex);
    RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
    RayRenderer.buildCommandBuffers(engine, assetManager, imageIndex);
@@ -461,7 +462,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
-    gBufferRenderPass.Destroy(engine);
+    //gBufferRenderPass.Destroy(engine);
     // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);

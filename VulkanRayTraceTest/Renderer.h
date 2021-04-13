@@ -30,7 +30,7 @@ private:
 	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
-	GBufferRenderPass gBufferRenderPass;
+	//GBufferRenderPass gBufferRenderPass;
 	RayTraceRenderer RayRenderer;
 
 	//AnimatorCompute AnimationRenderer;

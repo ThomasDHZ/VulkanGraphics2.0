@@ -12,6 +12,23 @@ TextureManager::TextureManager(VulkanEngine& engine)
 	
 	LoadTexture2D(engine, "../texture/AlphaDefault.png", VK_FORMAT_R8G8B8A8_UNORM);
 	TextureList[1]->FileName = "DefaultAlphaTexture";
+
+	auto ab = LoadTexture2D(engine, "../texture/pbr/gold/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+	TextureList[2]->FileName = "AlbedoTexture";
+	
+	auto ac = LoadTexture2D(engine, "../texture/pbr/gold/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+	TextureList[3]->FileName = "NormalTexture";
+	
+	auto ad = LoadTexture2D(engine, "../texture/pbr/gold/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+	TextureList[4]->FileName = "RoughnessTexture";
+	
+	auto ae = LoadTexture2D(engine, "../texture/pbr/gold/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+	TextureList[5]->FileName = "AOTexture";
+
+	auto af = LoadTexture2D(engine, "../texture/pbr/gold/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+	TextureList[6]->FileName = "Metallic";
+
+	int a = 34;
 }
 
 TextureManager::~TextureManager()
