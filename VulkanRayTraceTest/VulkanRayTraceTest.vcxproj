@@ -156,7 +156,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
-    <ClCompile Include="GBufferRenderPass.cpp" />
+    <ClCompile Include="DeferredRenderPass.cpp" />
     <ClCompile Include="FrameBufferRenderPass.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -198,6 +198,7 @@
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Texture2D.cpp" />
+    <ClCompile Include="TextureRenderPass.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
@@ -225,6 +226,8 @@
     <None Include="Shader\shadow.rmiss" />
     <None Include="Shader\SkyBoxShader.frag" />
     <None Include="Shader\SkyBoxShader.vert" />
+    <None Include="Shader\TextureShader.frag" />
+    <None Include="Shader\TextureShader.vert" />
     <None Include="Shader\Vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
@@ -236,7 +239,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
-    <ClInclude Include="GBufferRenderPass.h" />
+    <ClInclude Include="DeferredRenderPass.h" />
     <ClInclude Include="FrameBufferRenderPass.h" />
     <ClInclude Include="GraphicsPipeline.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -281,6 +284,7 @@
     <ClInclude Include="Texture3D.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texture2D.h" />
+    <ClInclude Include="TextureRenderPass.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebugger.h" />

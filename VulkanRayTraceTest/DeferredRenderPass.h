@@ -7,7 +7,7 @@
 #include "RenderedGBufferPositionTexture.h"
 #include "AssetManager.h"
 
-class GBufferRenderPass
+class DeferredRenderPass
 {
 private:
 	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
@@ -19,20 +19,20 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	GBufferRenderPass();
-	GBufferRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-	~GBufferRenderPass();
+	DeferredRenderPass();
+	DeferredRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	~DeferredRenderPass();
 
 	struct GBufferPass
 	{
-		VkRenderPass RenderPass;
-		std::vector<VkFramebuffer> SwapChainFramebuffers;
 		std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
 		std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
 		std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;
 		std::shared_ptr<RenderedColorTexture> GBloomTexture;
 		std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
+		std::vector<VkFramebuffer> SwapChainFramebuffers;
+		VkRenderPass RenderPass = VK_NULL_HANDLE;
 		VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
 		VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
 		VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
@@ -40,10 +40,11 @@ public:
 		VkPipeline ShaderPipeline = VK_NULL_HANDLE;
 	} gBufferRenderPass;
 
-	struct DeferredRenderPass
+	struct DeferredPass
 	{
-		VkRenderPass RenderPass;
 		std::vector<VkFramebuffer> SwapChainFramebuffers;
+
+		VkRenderPass RenderPass = VK_NULL_HANDLE;
 		VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
 		VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
 		VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;

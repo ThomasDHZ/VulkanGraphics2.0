@@ -48,6 +48,7 @@ layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
+layout(binding = 10) uniform samplerCube CubeMap;
 
 const float PI = 3.14159265359;
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
@@ -62,7 +63,6 @@ void main()
    const Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
    
-   vec3 baseColor = vec3(0.0f);
    const vec3 albedo = texture(TextureMap[2], vertex.uv).rgb;
    vec3 tangentNormal = texture(TextureMap[3], vertex.uv).xyz * 2.0 - 1.0;
    const float metallic = texture(TextureMap[6], vertex.uv).r;
@@ -76,6 +76,7 @@ void main()
 
    vec3 N = normalize(TBN * vertex.normal);
    vec3 V = normalize(TBN * ubo.viewPos - vertex.pos);
+   vec3 R = reflect(-V, N); 
 
    vec3 F0 = vec3(0.04f);
    F0 = mix(F0, albedo, metallic);
@@ -105,36 +106,14 @@ void main()
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
    }
 
-   vec3 ambient = vec3(0.03) * albedo * ao;
-   baseColor = ambient + Lo;
-
-   vec3 color = vec3(0.0f);
-    if(metallic > 0.0f &&
-       rayPayload.reflectCount != 10)
-      {
-        vec3 origin   = vertex.pos;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
-
-        rayPayload.reflectCount++;
-        traceRayEXT(topLevelAS,         // acceleration structure
-                gl_RayFlagsNoneEXT,  // rayFlags
-                0xFF,               // cullMask
-                0,                  // sbtRecordOffset
-                0,                  // sbtRecordStride
-                0,                  // missIndex
-                origin,             // ray origin
-                0.1,                // ray min range
-                rayDir,             // ray direction
-                100000.0,           // ray max range
-                0                   // payload (location = 0)
-        );
-        vec3 hitColor = rayPayload.color;
-		color = mix(baseColor, hitColor, metallic); 
-    }
-    else
-	{
-	    color = baseColor;
-	}
+    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    vec3 irradiance = texture(CubeMap, N).rgb;
+    vec3 diffuse      = irradiance * albedo;
+    vec3 ambient = (kD * diffuse) * ao;
+ 
+    vec3 color = ambient + Lo;
 
 	rayPayload.color = color;
 }

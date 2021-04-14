@@ -59,6 +59,7 @@ layout(location = 3) in vec3 Normal;
 layout(location = 4) in mat3 TBN;
 
 layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outBloom;
 
 vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv);
 vec3 CalcNormalPointLight(MaterialInfo material, PointLight light, vec3 normal, vec2 uv);
@@ -115,6 +116,7 @@ void main()
     }
 
     outColor = vec4(result, 1.0);
+    outBloom = vec4(0.0f);
 }
 
 vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv)

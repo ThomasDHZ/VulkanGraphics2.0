@@ -74,8 +74,20 @@ public:
 		VulkanBufferData.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
+	UniformData(VulkanEngine& engine, T UniformData)
+	{
+		VulkanBufferData.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		Update(engine);
+	}
+
 	void Update(VulkanEngine& engine)
 	{
+		VulkanBufferData.CopyBufferToMemory(engine.Device, &UniformDataInfo, sizeof(T));
+	}
+
+	void Update(VulkanEngine& engine, T UniformData)
+	{
+		UniformDataInfo = UniformData;
 		VulkanBufferData.CopyBufferToMemory(engine.Device, &UniformDataInfo, sizeof(T));
 	}
 

@@ -51,10 +51,11 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //gBufferRenderPass = GBufferRenderPass(engine, assetManager, SceneData);
 
     SetUpCommandBuffers(engine);
+    WaterRenderPass = TextureRenderPass(engine, assetManager, SceneData);
   //  skybox = Skybox(engine, assetManager, RenderPass.RenderPass, SceneData);
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
-
+    camera2 = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
     //assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
 
@@ -113,8 +114,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //ImGui_ImplVulkan_AddTexture(assetManager.textureManager.TextureList[0]->ImGuiDescriptorSet, assetManager.textureManager.TextureList[0]->Sampler, assetManager.textureManager.TextureList[0]->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     //ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GBloomTexture->ImGuiDescriptorSet, gBufferRenderPass.GBloomTexture->Sampler, gBufferRenderPass.GBloomTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     //ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, gBufferRenderPass.GNormalTexture->Sampler, gBufferRenderPass.GNormalTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    //ImGui_ImplVulkan_AddTexture(gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, gBufferRenderPass.GPositionTexture->Sampler, gBufferRenderPass.GPositionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   // ImGui_ImplVulkan_AddTexture(RayRenderer.storageImage->ImGuiDescriptorSet, RayRenderer.storageImage->Sampler, RayRenderer.storageImage->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(WaterRenderPass.RenderedTexture->ImGuiDescriptorSet, WaterRenderPass.RenderedTexture->Sampler, WaterRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   ///./ ImGui_ImplVulkan_AddTexture(RayRenderer.storageImage->ImGuiDescriptorSet, RayRenderer.storageImage->Sampler, RayRenderer.storageImage->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 Renderer::~Renderer()
@@ -157,7 +158,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
-
+    WaterRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
    RayRenderer.Resize(engine, assetManager, SceneData, 0);
 
     SetUpCommandBuffers(engine);
@@ -173,6 +174,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     keyboard.Update(window.GetWindowPtr(), camera);
     mouse.Update(window.GetWindowPtr(), camera);
     camera->Update(engine);
+    camera2->Update(engine);
 
     assetManager.Update(engine);
    // skybox.Update(engine, assetManager.materialManager);
@@ -188,6 +190,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->UniformDataInfo.timer = engine.VulkanTimer();
     SceneData->Update(engine);
+    WaterRenderPass.Update(engine, assetManager, *SceneData.get(), camera2);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -214,7 +217,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     //ImGui::Checkbox("DeleteMaterial", &RemoveMaterialFlag);
 
    // ImGui::Image(RayRenderer.storageImage->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    //ImGui::Image(gBufferRenderPass.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(WaterRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(gBufferRenderPass.GBloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
@@ -341,6 +344,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// </summary>
    //gBufferRenderPass.Draw(engine, assetManager, imageIndex);
    RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer);
+   WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
    RayRenderer.buildCommandBuffers(engine, assetManager, imageIndex);
    interfaceRenderPass.Draw(engine, imageIndex);
@@ -359,6 +363,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
        // CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
        // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
+        CommandBufferSubmitList.emplace_back(WaterRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
@@ -462,6 +467,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
     frameBufferRenderPass.Destroy(engine);
+    WaterRenderPass.Destroy(engine);
     //gBufferRenderPass.Destroy(engine);
     // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);

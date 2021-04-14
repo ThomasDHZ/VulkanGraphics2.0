@@ -1,11 +1,11 @@
-#include "GBufferRenderPass.h"
+#include "DeferredRenderPass.h"
 #include "GraphicsPipeline.h"
 
-GBufferRenderPass::GBufferRenderPass()
+DeferredRenderPass::DeferredRenderPass()
 {
 }
 
-GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+DeferredRenderPass::DeferredRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
     //GBuffer
     {
@@ -25,11 +25,11 @@ GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, AssetManager& assetMa
     SetUpCommandBuffers(engine);
 }
 
-GBufferRenderPass::~GBufferRenderPass()
+DeferredRenderPass::~DeferredRenderPass()
 {
 }
 
-void GBufferRenderPass::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
+void DeferredRenderPass::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
 {
     //gbuffer
     {
@@ -56,7 +56,7 @@ void GBufferRenderPass::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& 
     }
 }
 
-void GBufferRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
+void DeferredRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
 {
     //gbuffer
     {
@@ -92,7 +92,7 @@ void GBufferRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager
     }
 }
 
-void GBufferRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void DeferredRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
     //gbuffer
     {
@@ -159,7 +159,7 @@ void GBufferRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& 
     }
 }
 
-void GBufferRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
+void DeferredRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
 {
     //gbuffer
     {
@@ -433,7 +433,7 @@ void GBufferRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
     }
 }
 
-void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
+void DeferredRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     //gbuffer
     {
@@ -588,7 +588,7 @@ void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void GBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void DeferredRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     //gbuffer
     {
@@ -643,7 +643,7 @@ void GBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void GBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void DeferredRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -656,7 +656,7 @@ void GBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void GBufferRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
+void DeferredRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -717,7 +717,7 @@ void GBufferRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     }
 }
 
-void GBufferRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void DeferredRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
     {
         gBufferRenderPass.GPositionTexture->RecreateRendererTexture(engine);
@@ -770,7 +770,7 @@ void GBufferRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
     SetUpCommandBuffers(engine);
 }
 
-void GBufferRenderPass::Destroy(VulkanEngine& engine)
+void DeferredRenderPass::Destroy(VulkanEngine& engine)
 {
     {
         gBufferRenderPass.GPositionTexture->Delete(engine);

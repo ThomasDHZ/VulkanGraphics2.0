@@ -10,7 +10,8 @@
 #include "AnimatorCompute.h"
 #include "AssetManager.h"
 #include "Skybox.h"
-#include "GBufferRenderPass.h"
+#include "DeferredRenderPass.h"
+#include "TextureRenderPass.h"
 
 
 class Renderer
@@ -22,6 +23,7 @@ private:
 	bool RemoveMaterialFlag = false;
 
 	std::shared_ptr<PerspectiveCamera> camera;
+	std::shared_ptr<PerspectiveCamera> camera2;
 	Keyboard keyboard;
 	Mouse mouse;
 
@@ -31,6 +33,7 @@ private:
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
 	//GBufferRenderPass gBufferRenderPass;
+	TextureRenderPass WaterRenderPass;
 	RayTraceRenderer RayRenderer;
 
 	//AnimatorCompute AnimationRenderer;

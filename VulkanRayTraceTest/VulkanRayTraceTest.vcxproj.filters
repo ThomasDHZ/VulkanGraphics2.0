@@ -31,6 +31,12 @@
     <Filter Include="Header Files\TestObjects">
       <UniqueIdentifier>{6123e118-c992-4532-b7ec-e02a0c50e701}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\RenderPass">
+      <UniqueIdentifier>{9da7dad6-cc08-4000-b2bc-45968eadf98a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RenderPass">
+      <UniqueIdentifier>{ed5b7d68-00bc-4130-b09e-953dad6ef74f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -52,9 +58,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="InterfaceRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -96,9 +99,6 @@
     <ClCompile Include="RenderedDepthTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,9 +115,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FrameBufferRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
@@ -180,13 +177,7 @@
     <ClCompile Include="Mario.cpp">
       <Filter>Source Files\TestObjects</Filter>
     </ClCompile>
-    <ClCompile Include="ForwardRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Skybox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GBufferRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderedGBufferPositionTexture.cpp">
@@ -197,6 +188,24 @@
     </ClCompile>
     <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsPipeline.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="InterfaceRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -263,6 +272,12 @@
     <None Include="Shader\pbrClosesthit.rchit">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\TextureShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\TextureShader.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">
@@ -281,9 +296,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PerspectiveCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InterfaceRenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
@@ -331,9 +343,6 @@
     <ClInclude Include="RenderedDepthTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -356,9 +365,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBufferRenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
@@ -424,13 +430,7 @@
     <ClInclude Include="MegaMan.h">
       <Filter>Header Files\TestObjects</Filter>
     </ClInclude>
-    <ClInclude Include="ForwardRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Skybox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GBufferRenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderedGBufferAlbedoTexture.h">
@@ -441,6 +441,24 @@
     </ClInclude>
     <ClInclude Include="RenderedGBufferPositionTexture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsPipeline.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="InterfaceRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
