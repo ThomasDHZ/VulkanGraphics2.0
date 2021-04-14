@@ -12,6 +12,7 @@
 #include "Skybox.h"
 #include "DeferredRenderPass.h"
 #include "TextureRenderPass.h"
+#include "WaterRenderPass.h"
 
 
 class Renderer
@@ -32,8 +33,9 @@ private:
 	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
+	WaterRenderPass waterRenderPass;
 	//GBufferRenderPass gBufferRenderPass;
-	TextureRenderPass WaterRenderPass;
+	//TextureRenderPass textureRenderPass;
 	RayTraceRenderer RayRenderer;
 
 	//AnimatorCompute AnimationRenderer;

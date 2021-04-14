@@ -25,14 +25,14 @@ protected:
     glm::mat4 ViewMatrix;
     glm::vec2 ViewScreenSize;
 
-    glm::vec3 Position;
-
     float Zoom;
     float MovementSpeed = 5.0f;
 
 public:
     Camera();
     ~Camera();
+
+    glm::vec3 Position;
 
     virtual void Update();
     virtual void UpdateScreenSize(int NewWidth, int NewHeight);

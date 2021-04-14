@@ -4,7 +4,7 @@
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
 
-class TextureRenderPass
+class WaterRenderPass
 {
 private:
 	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
@@ -16,14 +16,15 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	TextureRenderPass();
-	TextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-	~TextureRenderPass();
+	WaterRenderPass();
+	WaterRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	~WaterRenderPass();
 
+	std::shared_ptr<PerspectiveCamera> ReflectionCam;
 	SceneDataUniformBuffer sceneData;
 
-	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<RenderedColorTexture> BloomTexture;
+	std::shared_ptr<RenderedColorTexture> ReflectionTexture;
+	std::shared_ptr<RenderedColorTexture> RefractionTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
@@ -35,9 +36,8 @@ public:
 	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
+	void Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData);
 	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 };
-

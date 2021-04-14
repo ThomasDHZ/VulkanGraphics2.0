@@ -204,6 +204,7 @@
     <ClCompile Include="VulkanEngine.cpp" />
     <ClCompile Include="VulkanSwapChain.cpp" />
     <ClCompile Include="VulkanWindow.cpp" />
+    <ClCompile Include="WaterRenderPass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\animate.comp" />
@@ -229,6 +230,8 @@
     <None Include="Shader\TextureShader.frag" />
     <None Include="Shader\TextureShader.vert" />
     <None Include="Shader\Vertex.glsl" />
+    <None Include="Shader\WaterShader.frag" />
+    <None Include="Shader\WaterShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
@@ -291,6 +294,7 @@
     <ClInclude Include="VulkanEngine.h" />
     <ClInclude Include="VulkanSwapChain.h" />
     <ClInclude Include="VulkanWindow.h" />
+    <ClInclude Include="WaterRenderPass.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
