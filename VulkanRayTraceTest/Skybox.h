@@ -18,6 +18,7 @@ public:
 	~Skybox();
 
 	void Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera);
+	void UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass);
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo) override;
 	void Destory(VulkanEngine& engine) override;
 };

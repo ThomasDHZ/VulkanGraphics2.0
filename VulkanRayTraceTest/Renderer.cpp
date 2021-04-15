@@ -158,6 +158,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
     //gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    skybox.UpdateGraphicsPipeLine(engine, RenderPass.RenderPass);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
     //waterRenderPass.UpdateSwapChain(engine, assetManager, SceneData);

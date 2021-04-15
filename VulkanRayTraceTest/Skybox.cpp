@@ -82,6 +82,11 @@ Skybox::~Skybox()
 {
 }
 
+void Skybox::UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass)
+{
+	SkyboxRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+}
+
 void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera)
 {
     MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
@@ -112,7 +117,6 @@ void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std:
 
 void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo)
 {
-
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &SkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
     Mesh::Draw(commandBuffer, renderPassInfo);
