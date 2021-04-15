@@ -219,3 +219,14 @@ void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer,
 
 	SetUpShaderPipeLine(renderer, renderPass);
 }
+
+void DebugLightRenderingPipeline::Destroy(VulkanEngine& engine)
+{
+	vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+	vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+	vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+
+	ShaderPipeline = VK_NULL_HANDLE;
+	ShaderPipelineLayout = VK_NULL_HANDLE;
+	DescriptorPool = VK_NULL_HANDLE;
+}

@@ -111,7 +111,7 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_NONE;
+    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -191,4 +191,15 @@ void SkyBoxRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, con
     ShaderPipelineLayout = VK_NULL_HANDLE;
 
     SetUpShaderPipeLine(renderer, renderPass);
+}
+
+void SkyBoxRenderingPipeline::Destroy(VulkanEngine& engine)
+{
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
+    DescriptorPool = VK_NULL_HANDLE;
 }

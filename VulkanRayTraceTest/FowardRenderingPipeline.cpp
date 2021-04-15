@@ -217,3 +217,14 @@ void FowardRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, con
 
 	SetUpShaderPipeLine(renderer, renderPass);
 }
+
+void FowardRenderingPipeline::Destroy(VulkanEngine& engine)
+{
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
+    DescriptorPool = VK_NULL_HANDLE;
+}

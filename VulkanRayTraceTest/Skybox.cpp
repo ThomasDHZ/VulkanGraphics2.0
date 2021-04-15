@@ -100,11 +100,11 @@ void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std:
     TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
     MeshProperties.Update(engine);
 
-    SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
-    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
+    SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
+    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
     SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.view = glm::mat4(glm::mat3(camera->GetViewMatrix()));
-    SkyUniformBuffer->UniformDataInfo.proj = camera->GetProjectionMatrix();
+    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
     SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SkyUniformBuffer->Update(engine);
@@ -120,8 +120,7 @@ void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderP
 
 void Skybox::Destory(VulkanEngine& engine)
 {
-    Mesh::Destory(engine);
-
     SkyUniformBuffer->Destroy(engine);
-   // SkyboxRenderingPipeline->
+	SkyboxRenderingPipeline->Destroy(engine);
+	Mesh::Destory(engine);
 }

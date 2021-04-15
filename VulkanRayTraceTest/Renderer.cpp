@@ -482,5 +482,6 @@ void Renderer::Destroy(VulkanEngine& engine)
     // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
+    skybox.Destory(engine);
   //  RayRenderer.Destory(engine);
 }

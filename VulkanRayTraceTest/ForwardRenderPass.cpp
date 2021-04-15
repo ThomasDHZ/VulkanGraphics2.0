@@ -123,21 +123,10 @@ void ForwardRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 
 void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
-   /* DepthTexture->RecreateRendererTexture(engine);
-
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-    DescriptorPool = VK_NULL_HANDLE;
-    DescriptorSetLayout = VK_NULL_HANDLE;
+    DepthTexture->RecreateRendererTexture(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
-
-    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
@@ -147,11 +136,9 @@ void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine);
-    SetUpDescriptorSets(engine, assetManager, sceneData);
-    SetUpCommandBuffers(engine);*/
+    DebugLightPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    ForwardRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    SetUpCommandBuffers(engine);
 }
 
 void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer, Skybox& skybox)
@@ -194,17 +181,10 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
 
 void ForwardRenderPass::Destroy(VulkanEngine& engine)
 {
- /*   DepthTexture->Delete(engine);
+    DepthTexture->Delete(engine);
 
-    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
-
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-    DescriptorPool = VK_NULL_HANDLE;
-    DescriptorSetLayout = VK_NULL_HANDLE;
+    DebugLightPipeline->Destroy(engine);
+    ForwardRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -213,5 +193,5 @@ void ForwardRenderPass::Destroy(VulkanEngine& engine)
     {
         vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
-    }*/
+    }
 }

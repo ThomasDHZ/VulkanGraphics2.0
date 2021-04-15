@@ -21,4 +21,5 @@ public:
 	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
 
 	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	void Destroy(VulkanEngine& engine);
 };

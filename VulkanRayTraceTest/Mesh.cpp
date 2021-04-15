@@ -272,5 +272,9 @@ void Mesh::Destory(VulkanEngine& engine)
 	TransformBuffer.DestoryBuffer(engine.Device);
 	TransformInverseBuffer.DestoryBuffer(engine.Device);
 	MeshProperties.Destroy(engine);
-	BottomLevelAccelerationBuffer.Destroy(engine);
+
+	if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
+	{
+		BottomLevelAccelerationBuffer.Destroy(engine);
+	}
 }

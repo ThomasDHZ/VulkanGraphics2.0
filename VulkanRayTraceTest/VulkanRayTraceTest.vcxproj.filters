@@ -37,6 +37,12 @@
     <Filter Include="Header Files\RenderPass">
       <UniqueIdentifier>{ed5b7d68-00bc-4130-b09e-953dad6ef74f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Pipelines">
+      <UniqueIdentifier>{4fc861c6-3621-4024-b919-d0e3ff7c1b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Pipelines">
+      <UniqueIdentifier>{80d00cfa-c1d6-47a9-848e-bc7969b7f86a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -211,13 +217,13 @@
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="DebugLightRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
     <ClCompile Include="FowardRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
     <ClCompile Include="SkyBoxRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -488,13 +494,13 @@
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="DebugLightRenderingPipeline.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="FowardRenderingPipeline.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="SkyBoxRenderingPipeline.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
