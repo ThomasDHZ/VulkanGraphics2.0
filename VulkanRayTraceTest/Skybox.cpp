@@ -110,15 +110,24 @@ void Skybox::CreateShaderPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
-    auto bindingDescription = Vertex::GetBindingDescription();
-    auto attributeDescriptions = Vertex::GetAttributeDescriptions();
+    VkPipelineVertexInputStateCreateInfo SkyBoxvertexInputInfo = {};
+    SkyBoxvertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
-    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 1;
-    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    auto SkyBoxbindingDescription = Vertex::GetBindingDescription();
+    auto SkyBoxattributeDescriptions = Vertex::GetAttributeDescriptions();
+
+    SkyBoxvertexInputInfo.vertexBindingDescriptionCount = 1;
+    SkyBoxvertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(SkyBoxattributeDescriptions.size());
+    SkyBoxvertexInputInfo.pVertexBindingDescriptions = &SkyBoxbindingDescription;
+    SkyBoxvertexInputInfo.pVertexAttributeDescriptions = SkyBoxattributeDescriptions.data();
+
+    VkPipelineDepthStencilStateCreateInfo SkyBoxdepthStencil = {};
+    SkyBoxdepthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    SkyBoxdepthStencil.depthTestEnable = VK_TRUE;
+    SkyBoxdepthStencil.depthWriteEnable = VK_TRUE;
+    SkyBoxdepthStencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+    SkyBoxdepthStencil.depthBoundsTestEnable = VK_FALSE;
+    SkyBoxdepthStencil.stencilTestEnable = VK_FALSE;
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -159,56 +168,51 @@ void Skybox::CreateShaderPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass
     multisampling.sampleShadingEnable = VK_FALSE;
     multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-    VkPipelineDepthStencilStateCreateInfo depthStencil = {};
-    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depthStencil.depthTestEnable = VK_TRUE;
-    depthStencil.depthWriteEnable = VK_TRUE;
-    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
-    depthStencil.depthBoundsTestEnable = VK_FALSE;
-    depthStencil.stencilTestEnable = VK_FALSE;
-
     VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
     colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     colorBlendAttachment.blendEnable = VK_FALSE;
 
-    VkPipelineColorBlendStateCreateInfo ColorBlending = {};
-    ColorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    ColorBlending.logicOpEnable = VK_FALSE;
-    ColorBlending.logicOp = VK_LOGIC_OP_COPY;
-    ColorBlending.attachmentCount = 1;
-    ColorBlending.pAttachments = &colorBlendAttachment;
-    ColorBlending.blendConstants[0] = 0.0f;
-    ColorBlending.blendConstants[1] = 0.0f;
-    ColorBlending.blendConstants[2] = 0.0f;
-    ColorBlending.blendConstants[3] = 0.0f;
+    int ColorAttachmentCount = 1;
+    std::vector<VkPipelineColorBlendAttachmentState> ColorAttachmentList(ColorAttachmentCount, colorBlendAttachment);
 
-    VkPipelineLayoutCreateInfo PipelineLayoutInfo = {};
-    PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    PipelineLayoutInfo.setLayoutCount = 1;
-    PipelineLayoutInfo.pSetLayouts = &DescriptorLayout;
+    VkPipelineColorBlendStateCreateInfo colorBlending = {};
+    colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    colorBlending.logicOpEnable = VK_FALSE;
+    colorBlending.logicOp = VK_LOGIC_OP_COPY;
+    colorBlending.attachmentCount = static_cast<uint32_t>(ColorAttachmentList.size());
+    colorBlending.pAttachments = ColorAttachmentList.data();
+    colorBlending.blendConstants[0] = 0.0f;
+    colorBlending.blendConstants[1] = 0.0f;
+    colorBlending.blendConstants[2] = 0.0f;
+    colorBlending.blendConstants[3] = 0.0f;
 
-    if (vkCreatePipelineLayout(engine.Device, &PipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
+    VkPipelineLayoutCreateInfo SkyBoxpipelineLayoutInfo = {};
+    SkyBoxpipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    SkyBoxpipelineLayoutInfo.setLayoutCount = 1;
+    SkyBoxpipelineLayoutInfo.pSetLayouts = &DescriptorLayout;
+
+    if (vkCreatePipelineLayout(engine.Device, &SkyBoxpipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create FrameBuffer Pipeline Layout.");
     }
 
-    VkGraphicsPipelineCreateInfo PipelineInfo = {};
-    PipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    PipelineInfo.stageCount = static_cast<uint32_t>(PipelineShaderStageList.size());
-    PipelineInfo.pStages = PipelineShaderStageList.data();
-    PipelineInfo.pVertexInputState = &vertexInputInfo;
-    PipelineInfo.pInputAssemblyState = &inputAssembly;
-    PipelineInfo.pViewportState = &viewportState;
-    PipelineInfo.pRasterizationState = &rasterizer;
-    PipelineInfo.pMultisampleState = &multisampling;
-    PipelineInfo.pDepthStencilState = &depthStencil;
-    PipelineInfo.pColorBlendState = &ColorBlending;
-    PipelineInfo.layout = ShaderPipelineLayout;
-    PipelineInfo.renderPass = RenderPass;
-    PipelineInfo.subpass = 0;
-    PipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    VkGraphicsPipelineCreateInfo SkyBoxpipelineInfo = {};
+    SkyBoxpipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    SkyBoxpipelineInfo.stageCount = static_cast<uint32_t>(PipelineShaderStageList.size());
+    SkyBoxpipelineInfo.pStages = PipelineShaderStageList.data();
+    SkyBoxpipelineInfo.pVertexInputState = &SkyBoxvertexInputInfo;
+    SkyBoxpipelineInfo.pInputAssemblyState = &inputAssembly;
+    SkyBoxpipelineInfo.pViewportState = &viewportState;
+    SkyBoxpipelineInfo.pRasterizationState = &rasterizer;
+    SkyBoxpipelineInfo.pMultisampleState = &multisampling;
+    SkyBoxpipelineInfo.pDepthStencilState = &SkyBoxdepthStencil;
+    SkyBoxpipelineInfo.pColorBlendState = &colorBlending;
+    SkyBoxpipelineInfo.layout = ShaderPipelineLayout;
+    SkyBoxpipelineInfo.renderPass = RenderPass;
+    SkyBoxpipelineInfo.subpass = 0;
+    SkyBoxpipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(engine.Device, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS)
+    if (vkCreateGraphicsPipelines(engine.Device, VK_NULL_HANDLE, 1, &SkyBoxpipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create FrameBuffer Pipeline.");
     }

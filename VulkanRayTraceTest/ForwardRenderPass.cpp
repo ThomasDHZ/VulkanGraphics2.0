@@ -130,7 +130,7 @@ void ForwardRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_NONE;
+    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
@@ -177,12 +177,12 @@ void ForwardRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-    pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 
     if (vkCreatePipelineLayout(engine.Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create forward rendering layout.");
+        throw std::runtime_error("failed to create pipeline layout!");
     }
 
     VkGraphicsPipelineCreateInfo pipelineInfo{};
@@ -202,7 +202,7 @@ void ForwardRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
     if (vkCreateGraphicsPipelines(engine.Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create forward rendering pipeline.");
+        throw std::runtime_error("failed to create graphics pipeline!");
     }
 
     for (auto& shader : PipelineShaderStageList)
@@ -250,10 +250,10 @@ void ForwardRenderPass::CreateRenderPass(VulkanEngine& engine)
     VkSubpassDependency dependency{};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
     dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependency.srcAccessMask = 0;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
     std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
     VkRenderPassCreateInfo renderPassInfo{};
@@ -366,12 +366,10 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    //skybox.Draw(commandBuffer, renderPassInfo);
-
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
     assetManager.Draw(commandBuffer, ShaderPipelineLayout);
-
+    skybox.Draw(commandBuffer, renderPassInfo);
 
     vkCmdEndRenderPass(commandBuffer);
     // AnimationRenderer.Compute(engine, imageIndex);
