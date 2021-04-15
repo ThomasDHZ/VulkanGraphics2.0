@@ -47,6 +47,15 @@ struct SceneDataBuffer {
 	alignas(4)  float temp2 = 1.0f;
 };
 
+struct SkyboxUniformBuffer
+{
+	alignas(16) glm::mat4 viewInverse;
+	alignas(16) glm::mat4 projInverse;
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
+	alignas(16) glm::vec3 viewPos;
+};
+
 struct MeshProperties
 {
 	alignas(16) glm::mat4 ModelTransform;

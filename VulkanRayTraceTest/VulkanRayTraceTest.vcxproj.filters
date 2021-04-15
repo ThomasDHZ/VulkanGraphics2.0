@@ -210,6 +210,15 @@
     <ClCompile Include="WaterRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="DebugLightRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FowardRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxRenderingPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -285,6 +294,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\WaterShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\LightDebug.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\LightDebug.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -471,6 +486,15 @@
     </ClInclude>
     <ClInclude Include="WaterRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugLightRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FowardRenderingPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxRenderingPipeline.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
