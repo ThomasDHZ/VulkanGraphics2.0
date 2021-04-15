@@ -4,7 +4,7 @@ Skybox::Skybox() : Mesh()
 {
 }
 
-Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData) : Mesh()
+Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass) : Mesh()
 {
 	const std::vector<Vertex> SkyBoxVertices =
 	{
@@ -74,10 +74,13 @@ Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& R
     TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
     TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 
+    SkyUniformBuffer = UniformData<SkyboxUniformBuffer>(engine);
+
     CreateDescriptorSetLayout(engine, assetManager);
     CreateShaderPipeLine(engine, RenderPass);
     CreateDescriptorPool(engine, assetManager);
-    CreateDescriptorSets(engine, assetManager, SceneData);
+    CreateDescriptorSets(engine, assetManager);
+
 }
 
 Skybox::~Skybox()
@@ -224,11 +227,11 @@ void Skybox::CreateDescriptorPool(VulkanEngine& engine, AssetManager& assetManag
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
-void Skybox::CreateDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData)
+void Skybox::CreateDescriptorSets(VulkanEngine& engine, AssetManager& assetManager)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorLayout);
 
-    VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SceneData->VulkanBufferData);
+    VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(SkyUniformBuffer.VulkanBufferData);
     VkDescriptorImageInfo TextureBufferInfo = assetManager.textureManager.GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
@@ -237,7 +240,7 @@ void Skybox::CreateDescriptorSets(VulkanEngine& engine, AssetManager& assetManag
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager)
+void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera)
 {
     MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
 
@@ -252,9 +255,17 @@ void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager)
     glm::mat4 FinalTransform = MeshTransform;
     glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 
-
     TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
     MeshProperties.Update(engine);
+
+    SkyUniformBuffer.UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
+    SkyUniformBuffer.UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
+    SkyUniformBuffer.UniformDataInfo.projInverse[1][1] *= -1;
+    SkyUniformBuffer.UniformDataInfo.view = glm::mat4(glm::mat3(camera->GetViewMatrix()));
+    SkyUniformBuffer.UniformDataInfo.proj = camera->GetProjectionMatrix();
+    SkyUniformBuffer.UniformDataInfo.proj[1][1] *= -1;
+    SkyUniformBuffer.UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+    SkyUniformBuffer.Update(engine);
 }
 
 void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo)
@@ -268,6 +279,8 @@ void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderP
 void Skybox::Destory(VulkanEngine& engine)
 {
     Mesh::Destory(engine);
+
+    SkyUniformBuffer.Destroy(engine);
 
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, DescriptorLayout, nullptr);

@@ -7,17 +7,11 @@
 
 layout(binding = 2) uniform UniformBufferObject 
 {
-	DirectionalLight dlight;
-	PointLight plight[5];
-	SpotLight sLight;
     mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
     vec3 viewPos;
-	float timer;
-	int Shadowed;
-    int temp;
 } ubo;
 
 layout (location = 0) in vec3 aPos;
@@ -34,5 +28,5 @@ layout(location = 0) out vec3 TexCoords;
 void main() {
 	TexCoords = aPos;
 	vec4 pos = ubo.proj * ubo.view * mat4(1.0f) * vec4(aPos, 1.0);
-    gl_Position = pos.xyww;
+    gl_Position = ubo.proj * ubo.view * mat4(1.0f) * vec4(aPos, 1.0);
 }

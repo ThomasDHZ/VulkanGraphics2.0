@@ -30,13 +30,13 @@ private:
 
 	VkCommandBuffer RasterCommandBuffer;
 
-	FrameBufferRenderPass frameBufferRenderPass;
+	//FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
-	WaterRenderPass waterRenderPass;
+	//WaterRenderPass waterRenderPass;
 	//GBufferRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
-	RayTraceRenderer RayRenderer;
+	//RayTraceRenderer RayRenderer;
 
 	//AnimatorCompute AnimationRenderer;
 
@@ -51,7 +51,7 @@ private:
 
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
-	//Skybox skybox;
+	Skybox skybox;
 
 public:
 	AssetManager assetManager;

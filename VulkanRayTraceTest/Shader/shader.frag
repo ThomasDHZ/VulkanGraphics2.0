@@ -51,6 +51,7 @@ layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
+layout(binding = 10) uniform samplerCube CubeMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
