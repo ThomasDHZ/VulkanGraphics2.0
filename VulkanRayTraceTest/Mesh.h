@@ -10,6 +10,14 @@
 #include "MaterialManager.h"
 #include "bone.h"
 
+enum MeshDrawFlags
+{
+	Mesh_Draw_All = 0x00,
+	Mesh_Skip_Forward_Renderer = 0x01,
+	Mesh_Skip_RayTrace_Renderer = 0x02,
+	Mesh_Skip_Water_Renderer = 0x04,
+};
+
 class Mesh
 {
 private:
@@ -26,6 +34,7 @@ private:
 	}
 
 public:
+	MeshDrawFlags DrawFlags = Mesh_Draw_All;
 	uint32_t ParentModelID = 0;
 	uint32_t MeshID = 0;
 	uint32_t MeshBufferIndex = 0;
@@ -62,16 +71,16 @@ public:
 	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
 
 	Mesh();
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t MaterialID);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t MaterialID, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	~Mesh();
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
 	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager);
 	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager);
-	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
-	virtual void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID);
 	virtual void Destory(VulkanEngine& engine);
 };

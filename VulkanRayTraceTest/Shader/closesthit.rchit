@@ -88,20 +88,20 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
 
         rayHitInfo.hitValue = CalcNormalDirLight(vertex, material, TBN, normal, uv);
-//        for(int x = 0; x < 5; x++)
-//        {
-//           rayHitInfo.hitValue += CalcNormalPointLight(vertex, material, TBN, ubo.plight[x], normal, uv);   
-//        }
-//        rayHitInfo.hitValue +=  CalcNormalSpotLight(vertex, material, TBN, ubo.sLight, normal, uv);
+        for(int x = 0; x < 5; x++)
+        {
+           rayHitInfo.hitValue += CalcNormalPointLight(vertex, material, TBN, ubo.plight[x], normal, uv);   
+        }
+        rayHitInfo.hitValue +=  CalcNormalSpotLight(vertex, material, TBN, ubo.sLight, normal, uv);
    }
    else
    {
        rayHitInfo.hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
-//        for(int x = 0; x < 5; x++)
-//        {
-//            rayHitInfo.hitValue += CalcPointLight(vertex, material, ubo.plight[x], uv);   
-//        }
-//       rayHitInfo.hitValue +=  CalcSpotLight(vertex, material, ubo.sLight, uv);
+        for(int x = 0; x < 5; x++)
+        {
+            rayHitInfo.hitValue += CalcPointLight(vertex, material, ubo.plight[x], uv);   
+        }
+       rayHitInfo.hitValue +=  CalcSpotLight(vertex, material, ubo.sLight, uv);
    }
 }
 
@@ -109,19 +109,19 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
 {
      if(ubo.Shadowed == 1)
      {
-//        float tmin = 0.001;
-//	    float tmax = LightDistance;
-//	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-//	    shadowed = true;  
-//	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
-//	    if (shadowed) 
-//        {
-//            LightResult *= 0.3f;
-//	    }
-//        else
-//        {
+        float tmin = 0.001;
+	    float tmax = LightDistance;
+	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	    shadowed = true;  
+	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
+	    if (shadowed) 
+        {
+            LightResult *= 0.3f;
+	    }
+        else
+        {
            LightResult += LightSpecular;
-//        }
+        }
     }
     else
     {
@@ -295,7 +295,7 @@ vec3 CalcDirLight(Vertex vertex, MaterialInfo material, DirectionalLight light, 
     }
 
     vec3 result = vec3(ambient + diffuse + specular);
-   // result = RTXShadow(result, specular, lightDir, 10000.0f);
+    result = RTXShadow(result, specular, lightDir, 10000.0f);
     return result;
 }
 

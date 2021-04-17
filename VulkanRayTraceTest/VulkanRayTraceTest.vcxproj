@@ -208,6 +208,8 @@
     <ClCompile Include="VulkanSwapChain.cpp" />
     <ClCompile Include="VulkanWindow.cpp" />
     <ClCompile Include="WaterRenderPass.cpp" />
+    <ClCompile Include="WaterSurfaceMesh.cpp" />
+    <ClCompile Include="WaterSurfacePipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\animate.comp" />
@@ -235,8 +237,10 @@
     <None Include="Shader\TextureShader.frag" />
     <None Include="Shader\TextureShader.vert" />
     <None Include="Shader\Vertex.glsl" />
-    <None Include="Shader\WaterShader.frag" />
-    <None Include="Shader\WaterShader.vert" />
+    <None Include="Shader\WaterRenderToTextureShader.frag" />
+    <None Include="Shader\WaterRenderToTextureShader.vert" />
+    <None Include="Shader\WaterSurfaceShader.frag" />
+    <None Include="Shader\WaterSurfaceShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
@@ -303,6 +307,8 @@
     <ClInclude Include="VulkanSwapChain.h" />
     <ClInclude Include="VulkanWindow.h" />
     <ClInclude Include="WaterRenderPass.h" />
+    <ClInclude Include="WaterSurfaceMesh.h" />
+    <ClInclude Include="WaterSurfacePipeline.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

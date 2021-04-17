@@ -1,11 +1,11 @@
 #include "WaterRenderPass.h"
 #include "GraphicsPipeline.h"
 
-WaterRenderPass::WaterRenderPass()
+WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass()
 {
 }
 
-WaterRenderPass::WaterRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
     sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
     ReflectionCam = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -23,11 +23,11 @@ WaterRenderPass::WaterRenderPass(VulkanEngine& engine, AssetManager& assetManage
     SetUpCommandBuffers(engine);
 }
 
-WaterRenderPass::~WaterRenderPass()
+WaterRenderToTextureRenderPass::~WaterRenderToTextureRenderPass()
 {
 }
 
-void WaterRenderPass::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
+void WaterRenderToTextureRenderPass::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
@@ -44,7 +44,7 @@ void WaterRenderPass::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& as
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
-void WaterRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
+void WaterRenderToTextureRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -61,7 +61,7 @@ void WaterRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& 
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void WaterRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer sceneData)
+void WaterRenderToTextureRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer sceneData)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     sceneData.Update(engine);
@@ -90,11 +90,11 @@ void WaterRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& as
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void WaterRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
+void WaterRenderToTextureRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/WaterShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/WaterShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/WaterRenderToTextureShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/WaterRenderToTextureShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -137,7 +137,7 @@ void WaterRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -226,7 +226,7 @@ void WaterRenderPass::SetUpShaderPipeLine(VulkanEngine& engine)
     }
 }
 
-void WaterRenderPass::CreateRenderPass(VulkanEngine& engine)
+void WaterRenderToTextureRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -311,7 +311,7 @@ void WaterRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void WaterRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void WaterRenderToTextureRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
@@ -338,7 +338,7 @@ void WaterRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void WaterRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void WaterRenderToTextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -351,7 +351,7 @@ void WaterRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void WaterRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
+void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -379,7 +379,7 @@ void WaterRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uin
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
 
-    assetManager.Draw(CommandBuffer, ShaderPipelineLayout);
+    assetManager.Draw(CommandBuffer, renderPassInfo, ShaderPipelineLayout, RendererID);
 
     vkCmdEndRenderPass(CommandBuffer);
 
@@ -388,7 +388,7 @@ void WaterRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uin
     }
 }
 
-void WaterRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneDataptr)
+void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneDataptr)
 {
     ReflectionCam->Update(engine);
     copysceneDataptr.UniformDataInfo.sLight.direction = ReflectionCam->GetFront();
@@ -403,7 +403,7 @@ void WaterRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, S
     sceneData.Update(engine, copysceneDataptr.UniformDataInfo);
 }
 
-void WaterRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+void WaterRenderToTextureRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
     ReflectionTexture->RecreateRendererTexture(engine);
     RefractionTexture->RecreateRendererTexture(engine);
@@ -438,7 +438,7 @@ void WaterRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetM
     SetUpCommandBuffers(engine);
 }
 
-void WaterRenderPass::Destroy(VulkanEngine& engine)
+void WaterRenderToTextureRenderPass::Destroy(VulkanEngine& engine)
 {
     ReflectionTexture->Delete(engine);
     RefractionTexture->Delete(engine);

@@ -5,12 +5,13 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
 {
 	std::vector<uint32_t> indices{};
 
 	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	DrawFlags = MeshDrawFlags;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -23,10 +24,11 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList)
 	SetUpMesh(engine, VertexList, indices);
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags)
 {
 	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	DrawFlags = MeshDrawFlags;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -39,10 +41,11 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	SetUpMesh(engine, VertexList, IndexList);
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID, MeshDrawFlags MeshDrawFlags)
 {
 	MeshID = engine.GenerateID();
 	MaterialID = materialID;
+	DrawFlags = MeshDrawFlags;
 
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 
@@ -225,9 +228,13 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	}
 }
 
-void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
+void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID)
 {
-	if (ShowMesh)
+	if (RenderPassID::Water_Renderer == RendererID && MeshDrawFlags::Mesh_Skip_Water_Renderer == DrawFlags)
+	{
+	
+	}
+	else if (ShowMesh)
 	{
 		ConstMeshInfo meshInfo;
 		meshInfo.MeshIndex = MeshBufferIndex;
@@ -247,9 +254,13 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 	}
 }
 
-void Mesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo)
+void Mesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID)
 {
-	if (ShowMesh)
+	if (RenderPassID::Water_Renderer == RendererID && MeshDrawFlags::Mesh_Skip_Water_Renderer == DrawFlags)
+	{
+
+	}
+	else if (ShowMesh)
 	{
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);

@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 
+
 class MeshManager
 {
 private: 
@@ -17,7 +18,7 @@ public:
 	void AddMesh(std::shared_ptr<Mesh> mesh);
 	void Update(VulkanEngine& engine, MaterialManager& materialManager);
 	void UpdateBufferIndex(VulkanEngine& engine);
-	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
+	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID);
 	void Destroy(VulkanEngine& engine);
 		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();

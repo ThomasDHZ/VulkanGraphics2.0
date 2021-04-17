@@ -6,27 +6,27 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, MeshManager& meshManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
 {
 	ModelID = engine.GenerateID();
-	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, 0));
+	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, 0, DrawFlags));
 	meshManager.MeshList.back()->ParentModelID = ModelID;
 	meshManager.MeshList.back()->VertexList = VertexList;
 	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
 	MeshList.emplace_back(meshManager.MeshList.back());
 }
 
-Model::Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID, MeshDrawFlags DrawFlags)
 {
 	ModelID = engine.GenerateID();
-	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, materialID));
+	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, materialID, DrawFlags));
 	meshManager.MeshList.back()->ParentModelID = ModelID;
 	meshManager.MeshList.back()->VertexList = VertexList;
 	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
 	MeshList.emplace_back(meshManager.MeshList.back());
 }
 
-Model::Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags)
 {
 	ModelID = engine.GenerateID();
 	Assimp::Importer ModelImporter;
@@ -41,7 +41,7 @@ Model::Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& ma
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(engine, meshManager, materiallManager, textureManager, FilePath, Scene->mRootNode, Scene);
+	LoadMesh(engine, meshManager, materiallManager, textureManager, FilePath, Scene->mRootNode, Scene, DrawFlags);
 
 	LoadMeshTransform(0, ModelTransform);
 
@@ -142,7 +142,7 @@ void Model::LoadBones(VulkanEngine& engine, const aiNode* RootNode, const aiMesh
 	}
 }
 
-void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -157,7 +157,7 @@ void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialMan
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
-		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, materialID));
+		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, materialID, DrawFlags));
 		meshManager.MeshList.back()->ParentModelID = ModelID;
 		meshManager.MeshList.back()->VertexList = vertices;
 		meshManager.MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
@@ -175,7 +175,7 @@ void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialMan
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(engine, meshManager, materialManager, textureManager, FilePath, node->mChildren[i], scene);
+		LoadMesh(engine, meshManager, materialManager, textureManager, FilePath, node->mChildren[i], scene, DrawFlags);
 	}
 }
 

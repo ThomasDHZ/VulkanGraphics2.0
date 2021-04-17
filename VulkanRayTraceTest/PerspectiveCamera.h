@@ -13,13 +13,13 @@ private:
     glm::vec3 Right;
     glm::vec3 WorldUp;
 
-    float Yaw;
-    float Pitch;
-
     float MovementSpeed;
     float MouseSensitivity;
 
 public:
+
+    float Yaw;
+    float Pitch;
 
     PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position);
     PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw);

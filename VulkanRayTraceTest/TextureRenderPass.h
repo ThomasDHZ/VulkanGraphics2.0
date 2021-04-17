@@ -20,6 +20,7 @@ public:
 	TextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	~TextureRenderPass();
 
+	RenderPassID RendererID = Texture_Renderer;
 	SceneDataUniformBuffer sceneData;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;

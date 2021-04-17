@@ -18,6 +18,17 @@
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
+enum RenderPassID
+{
+	Forward_Renderer,
+	RayTrace_Renderer,
+	Interface_Renderer,
+	FrameBuffer_Renderer,
+    Deferred_Renderer,
+	Texture_Renderer,
+	Water_Renderer
+};
+
 struct DescriptorSetLayoutBindingInfo
 {
 	uint32_t Binding;

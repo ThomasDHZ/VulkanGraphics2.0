@@ -14,7 +14,7 @@ ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, AssetManager& assetMa
 
     DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(engine, assetManager, sceneData, RenderPass));
     ForwardRenderingPipeline = std::make_shared<FowardRenderingPipeline>(FowardRenderingPipeline(engine, assetManager, sceneData, RenderPass));
-   // SkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, sceneData, RenderPass));
+    //WaterSurfaceRenderingPipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(engine, assetManager, sceneData, RenderPass));
 
     SetUpCommandBuffers(engine);
 }
@@ -168,8 +168,8 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &ForwardRenderingPipeline->DescriptorSets, 0, nullptr);
-    assetManager.Draw(commandBuffer, ForwardRenderingPipeline->ShaderPipelineLayout);
-    skybox.Draw(commandBuffer, renderPassInfo);
+    assetManager.Draw(commandBuffer, renderPassInfo, ForwardRenderingPipeline->ShaderPipelineLayout, RendererID);
+    skybox.Draw(commandBuffer, renderPassInfo, RendererID);
 
     vkCmdEndRenderPass(commandBuffer);
     // AnimationRenderer.Compute(engine, imageIndex);

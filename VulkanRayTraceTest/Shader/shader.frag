@@ -99,22 +99,22 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
 
        result = CalcNormalDirLight(material, normal, texCoords);
-//        for(int x = 0; x < 5; x++)
-//        {
-//          result += CalcNormalPointLight(material, scenedata.plight[x], normal, texCoords);   
-//        }
-//        result +=  CalcNormalSpotLight( material, scenedata.sLight, normal, texCoords);
+        for(int x = 0; x < 5; x++)
+        {
+          result += CalcNormalPointLight(material, scenedata.plight[x], normal, texCoords);   
+        }
+        result +=  CalcNormalSpotLight( material, scenedata.sLight, normal, texCoords);
     }
     else
     {
         result = CalcDirLight(material, texCoords);
-//        for(int x = 0; x < 5; x++)
-//        {
-//           result += CalcPointLight(material, scenedata.plight[x], texCoords);   
-//        }
-//        result +=  CalcSpotLight( material, scenedata.sLight, texCoords);
+        for(int x = 0; x < 5; x++)
+        {
+           result += CalcPointLight(material, scenedata.plight[x], texCoords);   
+        }
+        result +=  CalcSpotLight( material, scenedata.sLight, texCoords);
     }
-
+    	result = pow(result, vec3(1.0/2.2));
     outColor = vec4(result, 1.0);
 }
 

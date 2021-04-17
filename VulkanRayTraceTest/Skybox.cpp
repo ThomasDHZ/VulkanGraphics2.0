@@ -115,11 +115,11 @@ void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std:
     SkyUniformBuffer->Update(engine);
 }
 
-void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo)
+void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID)
 {
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &SkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
-    Mesh::Draw(commandBuffer, renderPassInfo);
+    Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
 }
 
 void Skybox::Destory(VulkanEngine& engine)

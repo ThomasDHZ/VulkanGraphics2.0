@@ -47,7 +47,7 @@ void main()
     }
        result +=  CalcSpotLight(scenedata.sLight, TexCoords);
 
-    outColor = vec4(result, 1.0);
+    outColor = vec4(1.0f, 0.0f, 0.0f, 1.0);
 }
 
 vec3 CalcDirLight(vec2 uv)

@@ -1,4 +1,5 @@
 #include "MeshManager.h"
+#include "WaterSurfaceMesh.h"
 
 MeshManager::MeshManager()
 {
@@ -32,12 +33,20 @@ void MeshManager::UpdateBufferIndex(VulkanEngine& engine)
 	}
 }
 
-void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
+void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID)
 {
-	for (auto& mesh : MeshList)
-	{
-		mesh->Draw(commandBuffer, layout);
-	}
+    for (auto& mesh : MeshList)
+    {
+        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
+        {
+            mesh->Draw(commandBuffer, layout, RendererID);
+        }
+        else if(mesh->DrawFlags == MeshDrawFlags::Mesh_Skip_Water_Renderer)
+        {
+            auto water = static_cast<WaterSurfaceMesh*>(mesh.get());
+            water->Draw(commandBuffer, renderPassInfo, RendererID, 1);
+        }
+    }
 }
 
 void MeshManager::Destroy(VulkanEngine& engine)

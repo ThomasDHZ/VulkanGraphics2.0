@@ -225,6 +225,12 @@
     <ClCompile Include="SkyBoxRenderingPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="WaterSurfacePipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterSurfaceMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -296,16 +302,22 @@
     <None Include="Shader\TextureShader.vert">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\WaterShader.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\WaterShader.vert">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\LightDebug.frag">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\LightDebug.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\WaterSurfaceShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\WaterSurfaceShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\WaterRenderToTextureShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\WaterRenderToTextureShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -501,6 +513,12 @@
     </ClInclude>
     <ClInclude Include="SkyBoxRenderingPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterSurfacePipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterSurfaceMesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

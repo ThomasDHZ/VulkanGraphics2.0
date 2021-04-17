@@ -23,6 +23,7 @@ public:
 	DeferredRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	~DeferredRenderPass();
 
+	RenderPassID RendererID = Deferred_Renderer;
 	struct GBufferPass
 	{
 		std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;

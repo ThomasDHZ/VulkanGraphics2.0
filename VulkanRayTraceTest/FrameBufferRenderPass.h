@@ -32,6 +32,7 @@ public:
 	FrameBufferRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData);
 	~FrameBufferRenderPass();
 
+	RenderPassID RendererID = FrameBuffer_Renderer;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	void Draw(VulkanEngine& engine, VkCommandBuffer commandbuffer, uint32_t index);

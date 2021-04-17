@@ -378,7 +378,7 @@ void TextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ShaderPipelineLayout, 0, 1, &DescriptorSets, 0, nullptr);
 
-    assetManager.Draw(CommandBuffer, ShaderPipelineLayout);
+    assetManager.Draw(CommandBuffer, renderPassInfo, ShaderPipelineLayout, RendererID);
 
     vkCmdEndRenderPass(CommandBuffer);
 

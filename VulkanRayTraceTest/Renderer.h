@@ -13,7 +13,7 @@
 #include "DeferredRenderPass.h"
 #include "TextureRenderPass.h"
 #include "WaterRenderPass.h"
-
+#include "WaterSurfaceMesh.h"
 
 class Renderer
 {
@@ -30,13 +30,13 @@ private:
 
 	VkCommandBuffer RasterCommandBuffer;
 
-	//FrameBufferRenderPass frameBufferRenderPass;
+	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass RenderPass;
-	//WaterRenderPass waterRenderPass;
-	//GBufferRenderPass gBufferRenderPass;
+	WaterRenderToTextureRenderPass waterRenderPass;
+	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
-	//RayTraceRenderer RayRenderer;
+	RayTraceRenderer RayRenderer;
 
 	//AnimatorCompute AnimationRenderer;
 

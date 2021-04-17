@@ -4,7 +4,7 @@
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
 
-class WaterRenderPass
+class WaterRenderToTextureRenderPass
 {
 private:
 	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
@@ -16,10 +16,11 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	WaterRenderPass();
-	WaterRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-	~WaterRenderPass();
+	WaterRenderToTextureRenderPass();
+	WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	~WaterRenderToTextureRenderPass();
 
+	RenderPassID RendererID = Water_Renderer;
 	std::shared_ptr<PerspectiveCamera> ReflectionCam;
 	SceneDataUniformBuffer sceneData;
 
