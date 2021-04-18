@@ -1,6 +1,5 @@
 #include "MeshManager.h"
 #include "WaterSurfaceMesh.h"
-#include "Skybox.h"
 
 MeshManager::MeshManager()
 {
@@ -15,18 +14,13 @@ void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 	MeshList.emplace_back(mesh);
 }
 
-void MeshManager::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera)
+void MeshManager::Update(VulkanEngine& engine, MaterialManager& materialManager)
 {
     for (auto& mesh : MeshList)
     {
         if (mesh->ParentModelID == 0)
         {
-            switch (mesh->MeshFlag)
-            {
-                case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, materialManager); break;
-                case MeshTypeFlag::Mesh_Type_SkyBox: static_cast<Skybox*>(mesh.get())->Update(engine, materialManager, camera); break;
-            }
-           
+            mesh->Update(engine, materialManager);
         }
     }
 }
@@ -39,15 +33,18 @@ void MeshManager::UpdateBufferIndex(VulkanEngine& engine)
 	}
 }
 
-void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID)
+void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID)
 {
     for (auto& mesh : MeshList)
     {
-        switch (mesh->MeshFlag)
+        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
         {
-            case MeshTypeFlag::Mesh_Type_Normal: mesh->Draw(commandBuffer, layout, RendererID); break;
-            case MeshTypeFlag::Mesh_Type_Water: mesh->Draw(commandBuffer, layout, RendererID); break;
-            case MeshTypeFlag::Mesh_Type_SkyBox: static_cast<Skybox*>(mesh.get())->Draw(commandBuffer, RendererID); break;
+            mesh->Draw(commandBuffer, layout, RendererID);
+        }
+        else if(mesh->DrawFlags == MeshDrawFlags::Mesh_Skip_Water_Renderer)
+        {
+            auto water = static_cast<WaterSurfaceMesh*>(mesh.get());
+            water->Draw(commandBuffer, renderPassInfo, RendererID, 1);
         }
     }
 }

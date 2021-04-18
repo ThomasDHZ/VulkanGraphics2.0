@@ -2,11 +2,11 @@
 #include "Vertex.h"
 #include "GraphicsPipeline.h"
 
-DebugLightRenderingPipeline::DebugLightRenderingPipeline()
+DebugLightRenderingPipeline::DebugLightRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-DebugLightRenderingPipeline::DebugLightRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass)
+DebugLightRenderingPipeline::DebugLightRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
 	SetUpDescriptorPool(engine, assetManager);
 	SetUpDescriptorLayout(engine, assetManager);
@@ -209,26 +209,8 @@ void DebugLightRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, cons
 	}
 }
 
-void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
-	vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
-	vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
-
-	ShaderPipeline = VK_NULL_HANDLE;
-	ShaderPipelineLayout = VK_NULL_HANDLE;
-
-	SetUpShaderPipeLine(renderer, renderPass);
-}
-
-void DebugLightRenderingPipeline::Destroy(VulkanEngine& engine)
-{
-	vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-	vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-	vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-	vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-
-	ShaderPipeline = VK_NULL_HANDLE;
-	ShaderPipelineLayout = VK_NULL_HANDLE;
-	DescriptorPool = VK_NULL_HANDLE;
-	DescriptorSetLayout = VK_NULL_HANDLE;
+	GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+	SetUpShaderPipeLine(engine, renderPass);
 }

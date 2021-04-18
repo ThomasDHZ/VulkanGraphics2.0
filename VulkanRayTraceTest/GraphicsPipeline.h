@@ -18,22 +18,19 @@ struct ConstMeshInfo
 class GraphicsPipeline
 {
 protected:
-	std::vector<char> ReadShaderFile(const std::string& filename);
-	VkShaderModule CreateShaderModule(VulkanEngine& renderer, const std::vector<char>& code);
 
-	void CreatePipeLineLayout(VulkanEngine& renderer, VkPipelineLayoutCreateInfo PipelineLayoutInfo);
-	void CreatePipeLine(VulkanEngine& renderer, VkGraphicsPipelineCreateInfo PipeLineInfo);
 
 public:
-	VkPipelineLayout ShaderPipelineLayout;
-	VkPipeline ShaderPipeline;
+	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
+	VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
+	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
+	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
+	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
 
 	GraphicsPipeline();
 	GraphicsPipeline(VulkanEngine& renderer);
 	~GraphicsPipeline();
 
-	void UpdateSwapChain(VulkanEngine& renderer);
-	void Destroy(VulkanEngine& renderer);
-
-	VkDescriptorSetLayout CreateDescriptorSetLayout(VulkanEngine& renderer, std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo);
+	virtual void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	virtual void Destroy(VulkanEngine& engine);
 };

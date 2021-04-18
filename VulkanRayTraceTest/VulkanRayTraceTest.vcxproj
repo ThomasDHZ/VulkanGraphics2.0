@@ -192,8 +192,6 @@
     <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="SceneRenderingPipeline.cpp" />
-    <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -290,8 +288,6 @@
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SceneData.h" />
-    <ClInclude Include="SceneRenderingPipeline.h" />
-    <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxRenderingPipeline.h" />
     <ClInclude Include="Sprite.h" />

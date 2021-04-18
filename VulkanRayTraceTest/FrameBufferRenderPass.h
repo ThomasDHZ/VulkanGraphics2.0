@@ -11,12 +11,12 @@
 class FrameBufferRenderPass
 {
 private:
-	VkDescriptorSetLayout DescriptorLayout = VK_NULL_HANDLE;
-	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
-	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
+	VkDescriptorSetLayout DescriptorLayout;
+	VkDescriptorPool DescriptorPool;
+	VkDescriptorSet DescriptorSets;
+	VkRenderPass RenderPass;
+	VkPipelineLayout ShaderPipelineLayout;
+	VkPipeline ShaderPipeline;
 
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);

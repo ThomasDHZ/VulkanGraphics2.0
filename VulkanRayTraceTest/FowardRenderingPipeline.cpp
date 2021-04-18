@@ -1,12 +1,11 @@
 #include "FowardRenderingPipeline.h"
 #include "Vertex.h"
-#include "GraphicsPipeline.h"
 
-FowardRenderingPipeline::FowardRenderingPipeline()
+FowardRenderingPipeline::FowardRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-FowardRenderingPipeline::FowardRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass)
+FowardRenderingPipeline::FowardRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
 	SetUpDescriptorPool(engine, assetManager);
 	SetUpDescriptorLayout(engine, assetManager);
@@ -207,26 +206,8 @@ void FowardRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     }
 }
 
-void FowardRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void FowardRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
-	vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
-	vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
-
-	ShaderPipeline = VK_NULL_HANDLE;
-	ShaderPipelineLayout = VK_NULL_HANDLE;
-
-	SetUpShaderPipeLine(renderer, renderPass);
-}
-
-void FowardRenderingPipeline::Destroy(VulkanEngine& engine)
-{
-    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
-    DescriptorPool = VK_NULL_HANDLE;
-    DescriptorSetLayout = VK_NULL_HANDLE;
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+	SetUpShaderPipeLine(engine, renderPass);
 }

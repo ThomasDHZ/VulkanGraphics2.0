@@ -51,6 +51,8 @@ private:
 
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
+	Skybox skybox;
+
 public:
 	AssetManager assetManager;
 

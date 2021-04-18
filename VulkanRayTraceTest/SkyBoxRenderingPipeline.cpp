@@ -1,12 +1,11 @@
 #include "SkyBoxRenderingPipeline.h"
 #include "Vertex.h"
-#include "GraphicsPipeline.h"
 
-SkyBoxRenderingPipeline::SkyBoxRenderingPipeline()
+SkyBoxRenderingPipeline::SkyBoxRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-SkyBoxRenderingPipeline::SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass)
+SkyBoxRenderingPipeline::SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -182,26 +181,8 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     }
 }
 
-void SkyBoxRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void SkyBoxRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
-    vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
-
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
-
-    SetUpShaderPipeLine(renderer, renderPass);
-}
-
-void SkyBoxRenderingPipeline::Destroy(VulkanEngine& engine)
-{
-    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
-    DescriptorPool = VK_NULL_HANDLE;
-    DescriptorSetLayout = VK_NULL_HANDLE;
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    SetUpShaderPipeLine(engine, renderPass);
 }

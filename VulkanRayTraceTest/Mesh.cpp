@@ -254,7 +254,7 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderP
 	}
 }
 
-void Mesh::Draw(VkCommandBuffer& commandBuffer, RenderPassID RendererID)
+void Mesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID)
 {
 	if (RenderPassID::Water_Renderer == RendererID && MeshDrawFlags::Mesh_Skip_Water_Renderer == DrawFlags)
 	{

@@ -19,7 +19,7 @@ public:
 
 	void Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera);
 	void UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass);
-	void Draw(VkCommandBuffer& commandBuffer, RenderPassID RendererID); 
+	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID) override;
 	void Destory(VulkanEngine& engine) override;
 };
 

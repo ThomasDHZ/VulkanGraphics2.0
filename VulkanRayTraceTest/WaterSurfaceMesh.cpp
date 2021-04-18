@@ -23,7 +23,6 @@ WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetMana
 	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 	DrawFlags = MeshDrawFlags::Mesh_Skip_Water_Renderer;
-	MeshFlag = Mesh_Type_Water;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -65,11 +64,11 @@ void WaterSurfaceMesh::Update(VulkanEngine& engine, MaterialManager& materialMan
 	MeshProperties.Update(engine);
 }
 
-void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, RenderPassID RendererID)
+void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a)
 {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, waterSurfacePipeline->ShaderPipeline);
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, waterSurfacePipeline->ShaderPipelineLayout, 0, 1, &waterSurfacePipeline->DescriptorSets, 0, nullptr);
-	Mesh::Draw(commandBuffer, RendererID);
+	Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
 }
 
 void WaterSurfaceMesh::Destory(VulkanEngine& engine)

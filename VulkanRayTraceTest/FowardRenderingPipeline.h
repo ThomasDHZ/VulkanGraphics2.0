@@ -1,7 +1,9 @@
 #pragma once
 #include "VulkanEngine.h"
 #include "AssetManager.h"
-class FowardRenderingPipeline
+#include "GraphicsPipeline.h"
+
+class FowardRenderingPipeline : public GraphicsPipeline
 {
 private:
 	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
@@ -13,12 +15,5 @@ public:
 	FowardRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass);
 	~FowardRenderingPipeline();
 
-	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
-	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
-
-	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
-	void Destroy(VulkanEngine& engine);
+	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass) override;
 };

@@ -34,19 +34,19 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
     modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, materialID)));
 }
 
-void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<PerspectiveCamera> camera)
+void AssetManager::Update(VulkanEngine& engine)
 {
     materialManager.UpdateBufferIndex(engine);
 
-    meshManager.Update(engine, materialManager, camera);
+    meshManager.Update(engine, materialManager);
     meshManager.UpdateBufferIndex(engine);
 
     modelManager.Update(engine, materialManager);
 }
 
-void AssetManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID)
+void AssetManager::Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID)
 {
-   meshManager.Draw(commandBuffer, layout, RendererID);
+   meshManager.Draw(commandBuffer, renderPassInfo, layout, renderPassID);
 }
 
 void AssetManager::Delete(VulkanEngine& engine)

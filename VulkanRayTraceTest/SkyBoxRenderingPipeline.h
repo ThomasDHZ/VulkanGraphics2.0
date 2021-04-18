@@ -1,8 +1,9 @@
 #pragma once
 #include "VulkanEngine.h"
 #include "AssetManager.h"
+#include "GraphicsPipeline.h"
 
-class SkyBoxRenderingPipeline
+class SkyBoxRenderingPipeline : public GraphicsPipeline
 {
 private:
 	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
@@ -14,12 +15,5 @@ public:
 	SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass);
 	~SkyBoxRenderingPipeline();
 
-	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
-	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
-
-	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
-	void Destroy(VulkanEngine& engine);
+	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass) override;
 };

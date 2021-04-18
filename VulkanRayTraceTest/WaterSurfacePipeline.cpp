@@ -1,12 +1,11 @@
 #include "WaterSurfacePipeline.h"
 #include "Vertex.h"
-#include "GraphicsPipeline.h"
 
-WaterSurfacePipeline::WaterSurfacePipeline()
+WaterSurfacePipeline::WaterSurfacePipeline() : GraphicsPipeline()
 {
 }
 
-WaterSurfacePipeline::WaterSurfacePipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture)
+WaterSurfacePipeline::WaterSurfacePipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -210,26 +209,8 @@ void WaterSurfacePipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRen
     }
 }
 
-void WaterSurfacePipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void WaterSurfacePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
-    vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
-
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
-
-    SetUpShaderPipeLine(renderer, renderPass);
-}
-
-void WaterSurfacePipeline::Destroy(VulkanEngine& engine)
-{
-    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-
-    ShaderPipeline = VK_NULL_HANDLE;
-    ShaderPipelineLayout = VK_NULL_HANDLE;
-    DescriptorPool = VK_NULL_HANDLE;
-    DescriptorSetLayout = VK_NULL_HANDLE;
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    SetUpShaderPipeLine(engine, renderPass);
 }

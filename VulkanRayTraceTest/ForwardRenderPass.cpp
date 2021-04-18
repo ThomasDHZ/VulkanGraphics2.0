@@ -141,7 +141,7 @@ void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
     SetUpCommandBuffers(engine);
 }
 
-void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer)
+void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer, Skybox& skybox)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -168,7 +168,8 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &ForwardRenderingPipeline->DescriptorSets, 0, nullptr);
-    assetManager.Draw(commandBuffer, ForwardRenderingPipeline->ShaderPipelineLayout, RendererID);
+    assetManager.Draw(commandBuffer, renderPassInfo, ForwardRenderingPipeline->ShaderPipelineLayout, RendererID);
+    skybox.Draw(commandBuffer, renderPassInfo, RendererID);
 
     vkCmdEndRenderPass(commandBuffer);
     // AnimationRenderer.Compute(engine, imageIndex);

@@ -18,13 +18,6 @@ enum MeshDrawFlags
 	Mesh_Skip_Water_Renderer = 0x04,
 };
 
-enum MeshTypeFlag
-{
-	Mesh_Type_Normal = 0x00,
-	Mesh_Type_Water = 0x01,
-	Mesh_Type_SkyBox = 0x02
-};
-
 class Mesh
 {
 private:
@@ -42,7 +35,6 @@ private:
 
 public:
 	MeshDrawFlags DrawFlags = Mesh_Draw_All;
-	MeshTypeFlag MeshFlag = Mesh_Type_Normal;
 	uint32_t ParentModelID = 0;
 	uint32_t MeshID = 0;
 	uint32_t MeshBufferIndex = 0;
@@ -89,6 +81,6 @@ public:
 	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager);
 	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID);
-	virtual void Draw(VkCommandBuffer& commandBuffer, RenderPassID RendererID);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID);
 	virtual void Destory(VulkanEngine& engine);
 };
