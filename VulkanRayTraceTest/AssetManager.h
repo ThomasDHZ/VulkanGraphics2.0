@@ -25,7 +25,7 @@ public:
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID);
 
 	void Update(VulkanEngine& engine);
-	void Draw(VkCommandBuffer commandBuffer, VkPipelineLayout layout);
+	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID);
 	void Delete(VulkanEngine& engine);
 
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors() { return meshManager.GetVertexBufferListDescriptors(); }

@@ -44,9 +44,9 @@ void AssetManager::Update(VulkanEngine& engine)
     modelManager.Update(engine, materialManager);
 }
 
-void AssetManager::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout layout)
+void AssetManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID)
 {
-   meshManager.Draw(commandBuffer, layout);
+   meshManager.Draw(commandBuffer, renderPassInfo, layout, RendererID);
 }
 
 void AssetManager::Delete(VulkanEngine& engine)
