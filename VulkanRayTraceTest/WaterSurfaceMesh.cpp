@@ -40,9 +40,9 @@ WaterSurfaceMesh::~WaterSurfaceMesh()
 {
 }
 
-void WaterSurfaceMesh::UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass)
+void WaterSurfaceMesh::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture)
 {
-	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, SceneData, RenderPass, reflecttexture);
 }
 
 void WaterSurfaceMesh::Update(VulkanEngine& engine, MaterialManager& materialManager)

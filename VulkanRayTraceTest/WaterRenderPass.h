@@ -3,6 +3,7 @@
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
+#include "RenderWaterTexturePipeline.h"
 
 class WaterRenderToTextureRenderPass
 {
@@ -20,21 +21,18 @@ public:
 	WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	~WaterRenderToTextureRenderPass();
 
-	RenderPassID RendererID = Water_Renderer;
+	static constexpr RenderPassID RendererID = Water_Renderer;
+
 	std::shared_ptr<PerspectiveCamera> ReflectionCam;
 	SceneDataUniformBuffer sceneData;
 
 	std::shared_ptr<RenderedColorTexture> ReflectionTexture;
 	std::shared_ptr<RenderedColorTexture> RefractionTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
+	std::shared_ptr<RenderWaterTexturePipeline> WaterTexturePipeline;
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
-	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData);

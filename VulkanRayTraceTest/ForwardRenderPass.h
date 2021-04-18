@@ -22,7 +22,7 @@ public:
 	ForwardRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	~ForwardRenderPass();
 
-	RenderPassID RendererID = Forward_Renderer;
+	static constexpr RenderPassID RendererID = Forward_Renderer;
 
 	VkRenderPass RenderPass;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;

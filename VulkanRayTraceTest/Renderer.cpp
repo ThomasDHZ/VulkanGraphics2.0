@@ -164,6 +164,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
     waterRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, RenderPass.RenderPass, SceneData, waterRenderPass.ReflectionTexture);
    // textureRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
    RayRenderer.Resize(engine, assetManager, SceneData, 0);
 

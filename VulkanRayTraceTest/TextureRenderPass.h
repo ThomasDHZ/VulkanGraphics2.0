@@ -3,14 +3,11 @@
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
+#include "RenderTexturePipeline.h"
 
 class TextureRenderPass
 {
 private:
-	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
-	void SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager);
-	void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer sceneData);
-	void SetUpShaderPipeLine(VulkanEngine& renderer);
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 	void SetUpCommandBuffers(VulkanEngine& engine);
@@ -20,20 +17,16 @@ public:
 	TextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	~TextureRenderPass();
 
-	RenderPassID RendererID = Texture_Renderer;
+	static constexpr RenderPassID RendererID = Texture_Renderer;
 	SceneDataUniformBuffer sceneData;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
+	std::shared_ptr<RenderTexturePipeline> TexturePipeline;
 
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-	VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
-	VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
-	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
+	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);

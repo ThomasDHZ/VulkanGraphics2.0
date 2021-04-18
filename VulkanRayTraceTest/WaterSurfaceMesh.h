@@ -15,7 +15,7 @@ public:
 	~WaterSurfaceMesh();
 
 	void Update(VulkanEngine& engine, MaterialManager& materialManager) override;
-	void UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass);
+	void UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture);
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a);
 	void Destory(VulkanEngine& engine) override;
 };
