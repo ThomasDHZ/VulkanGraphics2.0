@@ -53,6 +53,8 @@ Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& R
 
 	MeshID = engine.GenerateID();
 	MaterialID = 0;
+	DrawFlags = Mesh_Draw_All;
+	MeshFlag = Mesh_Type_SkyBox;
 
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 	ParentModelID = 0;
@@ -115,11 +117,11 @@ void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std:
     SkyUniformBuffer->Update(engine);
 }
 
-void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID)
+void Skybox::Draw(VkCommandBuffer& commandBuffer, RenderPassID RendererID)
 {
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &SkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
-    Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
+    Mesh::Draw(commandBuffer, RendererID);
 }
 
 void Skybox::Destory(VulkanEngine& engine)

@@ -2,7 +2,7 @@
 #include "Mesh.h"
 #include <vector>
 #include <memory>
-
+#include "PerspectiveCamera.h"
 
 class MeshManager
 {
@@ -16,9 +16,9 @@ public:
 	~MeshManager();
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
-	void Update(VulkanEngine& engine, MaterialManager& materialManager);
+	void Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera);
 	void UpdateBufferIndex(VulkanEngine& engine);
-	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID);
+	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID);
 	void Destroy(VulkanEngine& engine);
 		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();

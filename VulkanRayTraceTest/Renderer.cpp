@@ -61,7 +61,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     waterRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
     //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);
     //textureRenderPass = TextureRenderPass(engine, assetManager, SceneData);
-    skybox = Skybox(engine, assetManager, RenderPass.RenderPass);
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
     camera2 = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -76,6 +75,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
       RayRenderer = RayTraceRenderer(engine, assetManager, SceneData);
       assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, RenderPass.RenderPass, SceneData, waterRenderPass.RefractionTexture)));
+      assetManager.meshManager.AddMesh(std::make_shared<Skybox>(Skybox(engine, assetManager, RenderPass.RenderPass)));
       //AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]->MeshList[0]);
 
     SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
@@ -160,7 +160,6 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
    // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    skybox.UpdateGraphicsPipeLine(engine, RenderPass.RenderPass);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
     waterRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
@@ -182,8 +181,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     camera->Update(engine);
     camera2->Update(engine);
 
-    assetManager.Update(engine);
-    skybox.Update(engine, assetManager.materialManager, camera);
+    assetManager.Update(engine, camera);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
@@ -356,7 +354,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// </summary>
   // gBufferRenderPass.Draw(engine, assetManager, imageIndex);
     waterRenderPass.Draw(engine, assetManager, imageIndex);
-   RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
+   RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
    RayRenderer.buildCommandBuffers(engine, assetManager, imageIndex);
@@ -442,6 +440,5 @@ void Renderer::Destroy(VulkanEngine& engine)
     // AnimationRenderer.Destroy(engine);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
-    skybox.Destory(engine);
     RayRenderer.Destory(engine);
 }

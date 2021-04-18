@@ -687,7 +687,7 @@ void DeferredRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, 
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferRenderPass.ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferRenderPass.ShaderPipelineLayout, 0, 1, &gBufferRenderPass.DescriptorSets, 0, nullptr);
 
-        assetManager.Draw(CommandBuffer, renderPassInfo, gBufferRenderPass.ShaderPipelineLayout, RendererID);
+        assetManager.Draw(CommandBuffer, gBufferRenderPass.ShaderPipelineLayout, RendererID);
 
         vkCmdEndRenderPass(CommandBuffer);
     }

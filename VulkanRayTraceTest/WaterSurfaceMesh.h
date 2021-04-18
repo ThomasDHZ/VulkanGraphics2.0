@@ -16,6 +16,6 @@ public:
 
 	void Update(VulkanEngine& engine, MaterialManager& materialManager) override;
 	void UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass);
-	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a);
+	void Draw(VkCommandBuffer& commandBuffer, RenderPassID RendererID);
 	void Destory(VulkanEngine& engine) override;
 };
