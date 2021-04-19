@@ -5,11 +5,11 @@ SkyBoxRenderingPipeline::SkyBoxRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-SkyBoxRenderingPipeline::SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
+SkyBoxRenderingPipeline::SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass, RenderPassID RendererID) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
+    SetUpShaderPipeLine(engine, renderPass, RendererID);
     SetUpDescriptorSets(engine, assetManager, sceneData);
 }
 
@@ -55,11 +55,18 @@ void SkyBoxRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, AssetMan
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass, RenderPassID RendererID)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    if (RendererID == RenderPassID::Water_Renderer)
+    {
+        PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag2.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    }
+    else
+    {
+        PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    }
 
     VkPipelineVertexInputStateCreateInfo SkyBoxvertexInputInfo = {};
     SkyBoxvertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -124,6 +131,10 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     colorBlendAttachment.blendEnable = VK_FALSE;
 
     int ColorAttachmentCount = 1;
+    if (RendererID == RenderPassID::Water_Renderer)
+    {
+        ColorAttachmentCount = 2;
+    }
     std::vector<VkPipelineColorBlendAttachmentState> ColorAttachmentList(ColorAttachmentCount, colorBlendAttachment);
 
     VkPipelineColorBlendStateCreateInfo colorBlending = {};
@@ -181,8 +192,8 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     }
 }
 
-void SkyBoxRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void SkyBoxRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass, RenderPassID RendererID)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
-    SetUpShaderPipeLine(engine, renderPass);
+    SetUpShaderPipeLine(engine, renderPass, RendererID);
 }

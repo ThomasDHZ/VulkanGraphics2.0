@@ -237,6 +237,7 @@
     <None Include="Shader\shadow.rmiss" />
     <None Include="Shader\SkyBoxShader.frag" />
     <None Include="Shader\SkyBoxShader.vert" />
+    <None Include="Shader\SkyBoxShader2.frag" />
     <None Include="Shader\TextureShader.frag" />
     <None Include="Shader\TextureShader.vert" />
     <None Include="Shader\Vertex.glsl" />

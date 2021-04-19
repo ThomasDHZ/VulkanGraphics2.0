@@ -169,7 +169,7 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &ForwardRenderingPipeline->DescriptorSets, 0, nullptr);
     assetManager.Draw(commandBuffer, renderPassInfo, ForwardRenderingPipeline->ShaderPipelineLayout, RendererID);
-    skybox.Draw(commandBuffer, renderPassInfo, RendererID);
+    //skybox.Draw(commandBuffer, renderPassInfo, RendererID);
 
     vkCmdEndRenderPass(commandBuffer);
     // AnimationRenderer.Compute(engine, imageIndex);

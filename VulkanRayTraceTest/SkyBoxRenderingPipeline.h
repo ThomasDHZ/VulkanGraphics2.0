@@ -9,11 +9,11 @@ private:
 	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
 	void SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager);
 	void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData);
-	void SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass);
+	void SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass, RenderPassID RendererID);
 public:
 	SkyBoxRenderingPipeline();
-	SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass);
+	SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass, RenderPassID RendererID);
 	~SkyBoxRenderingPipeline();
 
-	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass) override;
+	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass, RenderPassID RendererID);
 };

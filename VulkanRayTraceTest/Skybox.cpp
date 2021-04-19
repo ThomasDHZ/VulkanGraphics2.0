@@ -75,7 +75,7 @@ Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& R
     TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
-    SkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
+    SkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass, RenderPassID::Forward_Renderer));
 }
 
 Skybox::~Skybox()
@@ -84,7 +84,7 @@ Skybox::~Skybox()
 
 void Skybox::UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass)
 {
-	SkyboxRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+	SkyboxRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderPassID::Forward_Renderer);
 }
 
 void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera)
@@ -120,6 +120,11 @@ void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderP
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &SkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
     Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
+}
+
+void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a)
+{
+	Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
 }
 
 void Skybox::Destory(VulkanEngine& engine)

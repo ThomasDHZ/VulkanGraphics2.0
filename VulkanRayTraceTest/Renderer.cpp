@@ -199,7 +199,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->Update(engine);
 
    // WaterRenderPass.Update(engine, assetManager, *SceneData.get(), camera2);
-    waterRenderPass.Update(engine, assetManager, *SceneData.get());
+    waterRenderPass.Update(engine, assetManager, *SceneData.get(), camera);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -218,7 +218,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     //ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 55);
-    //ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
+    ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
     ////ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
     ////ImGui::Checkbox("AddTexture", &AddTextureFlag);
     ////ImGui::Checkbox("DeleteTexture", &RemoveTextureFlag);
@@ -356,7 +356,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// Draw Area
     /// </summary>
   // gBufferRenderPass.Draw(engine, assetManager, imageIndex);
-    waterRenderPass.Draw(engine, assetManager, imageIndex);
+    waterRenderPass.Draw(engine, assetManager, imageIndex, skybox);
    RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);

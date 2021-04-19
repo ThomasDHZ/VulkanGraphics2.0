@@ -14,9 +14,12 @@ WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& eng
     RefractionTexture = std::make_shared<RenderedColorTexture>(engine);
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
+    SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
+
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     WaterTexturePipeline = std::make_shared<RenderWaterTexturePipeline>(RenderWaterTexturePipeline(engine, assetManager, sceneDataptr, RenderPass));
+    WaterSkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass, RendererID));
     SetUpCommandBuffers(engine);
 }
 
@@ -149,7 +152,7 @@ void WaterRenderToTextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
+void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox skybox)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -179,6 +182,9 @@ void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& as
 
     assetManager.Draw(CommandBuffer, renderPassInfo, WaterTexturePipeline->ShaderPipelineLayout, RendererID);
 
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &WaterSkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
+    skybox.Draw(CommandBuffer, renderPassInfo, RendererID, 1);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
@@ -186,7 +192,7 @@ void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& as
     }
 }
 
-void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneDataptr)
+void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
 {
     ReflectionCam->Update(engine);
     copysceneDataptr.UniformDataInfo.sLight.direction = ReflectionCam->GetFront();
@@ -199,6 +205,15 @@ void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, AssetManager& 
     copysceneDataptr.UniformDataInfo.viewPos = glm::vec4(ReflectionCam->GetPosition(), 0.0f);
 
     sceneData.Update(engine, copysceneDataptr.UniformDataInfo);
+
+    SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
+    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
+    SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
+    SkyUniformBuffer->UniformDataInfo.view = glm::mat4(glm::mat3(camera->GetViewMatrix()));
+    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
+    SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
+    SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+    SkyUniformBuffer->Update(engine);
 }
 
 void WaterRenderToTextureRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
