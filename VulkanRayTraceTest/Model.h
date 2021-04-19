@@ -42,6 +42,9 @@ private:
 	glm::mat4 GlobalInverseTransformMatrix;
 	AnimationPlayer3D AnimationPlayer;
 	AnimatorCompute AnimationRenderer;
+
+	bool AnimatedModel = false;
+
 public:
 	uint32_t ModelID = 0;
 
@@ -63,7 +66,9 @@ public:
 	~Model();
 
 	void Update(VulkanEngine& engine, MaterialManager& materialManager);
+	void AddToCMDBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
 	void AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh);
+	void Destory(VulkanEngine& engine);
 
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix);
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix);

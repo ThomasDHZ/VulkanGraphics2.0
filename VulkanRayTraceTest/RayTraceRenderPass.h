@@ -29,7 +29,7 @@
 #include "AccelerationStructure.h"
 #include "AssetManager.h"
 
-class RayTraceRenderer
+class RayTraceRenderPass
 {
 private:
     VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
@@ -62,15 +62,15 @@ public:
     std::shared_ptr<RenderedRayTracedColorTexture> storageImage;
     VkCommandBuffer RayTraceCommandBuffer;
 
-    RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-    ~RayTraceRenderer();
+    RayTraceRenderPass();
+    RayTraceRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+    ~RayTraceRenderPass();
 
     void createTopLevelAccelerationStructure(VulkanEngine& engine, AssetManager& assetManager);
     void createStorageImage(VulkanEngine& engine);
     void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
-    void buildCommandBuffers(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
+    void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
     void Resize(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, uint32_t imageIndex);
     void Destory(VulkanEngine& engine);
 

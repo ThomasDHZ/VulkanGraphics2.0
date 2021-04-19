@@ -42,7 +42,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
-    assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
+   // assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
+    assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -54,14 +55,14 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_SRGB);
 
-    RenderPass = ForwardRenderPass(engine, assetManager, SceneData);
+    forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData);
     SetUpCommandBuffers(engine);
 
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     waterRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
     //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);
     //textureRenderPass = TextureRenderPass(engine, assetManager, SceneData);
-    skybox = Skybox(engine, assetManager, RenderPass.RenderPass);
+    skybox = Skybox(engine, assetManager, forwardRenderPass.RenderPass);
 
     camera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
     camera2 = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -69,14 +70,14 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //assetManager.modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
 
 
-      //assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+      
       //assetManager.AddModel(engine, "../Models/cyborg/cyborg.obj");
       // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
 
-      RayRenderer = RayTraceRenderer(engine, assetManager, SceneData);
-      assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, RenderPass.RenderPass, SceneData, waterRenderPass.RefractionTexture)));
-      //AnimationRenderer = AnimatorCompute(engine, assetManager.modelManager.ModelList[2]->MeshList[0]);
+      RayRenderer = RayTraceRenderPass(engine, assetManager, SceneData);
+      assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterRenderPass.RefractionTexture)));
+      
 
     SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
@@ -114,7 +115,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     assetManager.textureManager.LoadTexture2D(waterRenderPass.ReflectionTexture);
     assetManager.textureManager.LoadTexture2D(waterRenderPass.RefractionTexture);
-    RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
 
 
     //ImGui_ImplVulkan_AddTexture(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, waterRenderPass.ReflectionTexture->Sampler, waterRenderPass.ReflectionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -159,12 +160,12 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
    // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    RenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    skybox.UpdateGraphicsPipeLine(engine, RenderPass.RenderPass);
+    forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    skybox.UpdateGraphicsPipeLine(engine, forwardRenderPass.RenderPass);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
     waterRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, RenderPass.RenderPass, SceneData, waterRenderPass.ReflectionTexture);
+    static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterRenderPass.ReflectionTexture);
    // textureRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
    RayRenderer.Resize(engine, assetManager, SceneData, 0);
 
@@ -204,128 +205,14 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
-
-    //for (int y = 0; y < assetManager.materialManager.MaterialList.size(); y++)
-    //{
-    //    auto a = std::to_string(y);;
-    //    ImGui::Text(("Material  " + std::to_string(y)).c_str());
-    //  //  ImGui::SliderFloat3(("Albedo  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Albedo.x, 0.0f, 1.0f);
-    //    //ImGui::SliderFloat(("Roughness  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Roughness, 0.0f, 1.0f);
-    //    //ImGui::SliderFloat(("Metallic  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Matallic, 0.0f, 1.0f);
-    //    ImGui::SliderFloat(("AO  " + std::to_string(y)).c_str(), &assetManager.materialManager.MaterialList[y]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //   
-    //}
-
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    //ImGui::SliderInt("TextureIndex", &SceneData->UniformDataInfo.temp, 0, 55);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
-    ////ImGui::SliderInt("Shadow", &SceneData->UniformDataInfo.Shadowed, 0, 1);
-    ////ImGui::Checkbox("AddTexture", &AddTextureFlag);
-    ////ImGui::Checkbox("DeleteTexture", &RemoveTextureFlag);
-    ////ImGui::Checkbox("AddMaterial", &AddMaterialFlag);
-    ////ImGui::Checkbox("DeleteMaterial", &RemoveMaterialFlag);
 
-    //ImGui::Image(RayRenderer.storageImage->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::SliderFloat3("ReflectCamPos", &waterRenderPass.ReflectionCam->Position.x, -10.0f, 10.0f);
     ImGui::SliderFloat("Pitch", &waterRenderPass.ReflectionCam->Pitch, -180.0f, 180.0f);
     ImGui::SliderFloat("Yaw", &waterRenderPass.ReflectionCam->Yaw, -180.0f, 180.0f);
     ImGui::Image(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ////ImGui::Image(gBufferRenderPass.gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ////ImGui::Image(gBufferRenderPass.gBufferRenderPass.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ////ImGui::Image(gBufferRenderPass.gBufferRenderPass.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    //for (auto& texture : assetManager.textureManager.TextureList)
-    //{
-    //    auto bufferIndex = std::to_string(texture->TextureBufferIndex);
-    //    ImGui::LabelText(bufferIndex.c_str(), "sd");
-    //    ImGui::Image(texture->ImGuiDescriptorSet, ImVec2(512, 512));
-    //}
-
-    ////ImGui::SliderFloat3("Position2", &SceneData->UniformDataInfo.sLight.position.x, 0.0f, 10.0f);
-    ////ImGui::SliderFloat3("Direction2", &SceneData->UniformDataInfo.sLight.direction.x, -1.0f, 1.0f);
-    ////ImGui::SliderFloat3("Ambient245", &SceneData->UniformDataInfo.sLight.ambient.x, 0.0f, 1.0f);
-    ////ImGui::SliderFloat3("Diffuse245", &SceneData->UniformDataInfo.sLight.diffuse.x, 0.0f, 1.0f);
-    ////ImGui::SliderFloat3("Speculare245", &SceneData->UniformDataInfo.sLight.specular.x, 0.0f, 1.0f);
-    ////ImGui::SliderFloat("constant45", &SceneData->UniformDataInfo.sLight.constant, 0.0f, 100.0f);
-    ////ImGui::SliderFloat("linear45", &SceneData->UniformDataInfo.sLight.linear, 0.0f, 100.0f);
-    ////ImGui::SliderFloat("quadratic45", &SceneData->UniformDataInfo.sLight.quadratic, 0.0f, 100.0f);
-    ////ImGui::SliderFloat("quadratic452", &SceneData->UniformDataInfo.sLight.cutOff, 0.0f, 100.0f);
-    ////ImGui::SliderFloat("quadratic453", &SceneData->UniformDataInfo.sLight.outerCutOff, 0.0f, 100.0f);
-
-    //ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
-    //ImGui::SliderFloat3("Ambient", &SceneData->UniformDataInfo.dlight.ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare", &SceneData->UniformDataInfo.dlight.specular.x, 0.0f, 1.0f);
-
-    //for (int y = 0; y < assetManager.meshManager.MeshList.size(); y++)
-    //{
-    //    auto a = std::to_string(y);
-    //    ImGui::Checkbox(a.c_str(), &assetManager.meshManager.MeshList[y]->ShowMesh);
-
-    //    ImGui::SliderFloat(("Depth " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 1.0f);
-    //    ImGui::SliderFloat2(("UV Offset " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-    //    ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshPosition.x, -10.0f, 10.0f);
-    //    ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
-    //    ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshScale.x, 0.0f, 1.0f);
-    //}
-
-    ////for (int x = 0; x < assetManager.modelManager.ModelList.size(); x++)
-    ////{
-    ////    ImGui::SliderFloat3(("Model Transformx" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelPosition.x, -10.0f, 10.0f);
-    ////    ImGui::SliderFloat3(("Model Rotatex" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelRotation.x, 0.0f, 360.0f);
-    ////    ImGui::SliderFloat3(("Model Scalex" + std::to_string(x)).c_str(), &assetManager.modelManager.ModelList[x]->ModelScale.x, 0.0f, 1.0f);
-
-    ////    for (int y = 0; y < assetManager.modelManager.ModelList[x]->MeshList.size(); y++)
-    ////    {
-    ////        auto a = std::to_string(x + y);
-    ////        ImGui::Checkbox(a.c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->ShowMesh);
-
-    ////        ImGui::SliderFloat2(("UV Offset " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-    ////        ImGui::SliderFloat3(("Transform " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshPosition.x, -10.0f, 10.0f);
-    ////        ImGui::SliderFloat3(("Rotate " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
-    ////        ImGui::SliderFloat3(("Scale " + std::to_string(x + y)).c_str(), &assetManager.modelManager.ModelList[x]->MeshList[y]->MeshScale.x, 0.0f, 1.0f);
-    ////    }
-    ////}
-
-    //ImGui::SliderFloat3("Pos20", &SceneData->UniformDataInfo.plight[0].position.x, -10.0f, 10.0f);
-    //ImGui::SliderFloat3("Ambient20", &SceneData->UniformDataInfo.plight[0].ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse20", &SceneData->UniformDataInfo.plight[0].diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare20", &SceneData->UniformDataInfo.plight[0].specular.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat("constant0", &SceneData->UniformDataInfo.plight[0].constant, 0.0f, 100.0f);
-    //ImGui::SliderFloat("linear0", &SceneData->UniformDataInfo.plight[0].linear, 0.0f, 100.0f);
-    //ImGui::SliderFloat("quadratic0", &SceneData->UniformDataInfo.plight[0].quadratic, 0.0f, 100.0f);
-
-    //ImGui::SliderFloat3("Pos21", &SceneData->UniformDataInfo.plight[1].position.x, -10.0f, 10.0f);
-    //ImGui::SliderFloat3("Ambient21", &SceneData->UniformDataInfo.plight[1].ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse21", &SceneData->UniformDataInfo.plight[1].diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare21", &SceneData->UniformDataInfo.plight[1].specular.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat("constant1", &SceneData->UniformDataInfo.plight[1].constant, 0.0f, 100.0f);
-    //ImGui::SliderFloat("linear1", &SceneData->UniformDataInfo.plight[1].linear, 0.0f, 100.0f);
-    //ImGui::SliderFloat("quadratic1", &SceneData->UniformDataInfo.plight[1].quadratic, 0.0f, 100.0f);
-
-    //ImGui::SliderFloat3("Pos22", &SceneData->UniformDataInfo.plight[2].position.x, -10.0f, 10.0f);
-    //ImGui::SliderFloat3("Ambient22", &SceneData->UniformDataInfo.plight[2].ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse22", &SceneData->UniformDataInfo.plight[2].diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare22", &SceneData->UniformDataInfo.plight[2].specular.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat("constant2", &SceneData->UniformDataInfo.plight[2].constant, 0.0f, 100.0f);
-    //ImGui::SliderFloat("linear2", &SceneData->UniformDataInfo.plight[2].linear, 0.0f, 100.0f);
-    //ImGui::SliderFloat("quadratic2", &SceneData->UniformDataInfo.plight[2].quadratic, 0.0f, 100.0f);
-
-    //ImGui::SliderFloat3("Pos23", &SceneData->UniformDataInfo.plight[3].position.x, -10.0f, 10.0f);
-    //ImGui::SliderFloat3("Ambient23", &SceneData->UniformDataInfo.plight[3].ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse23", &SceneData->UniformDataInfo.plight[3].diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare23", &SceneData->UniformDataInfo.plight[3].specular.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat("constant3", &SceneData->UniformDataInfo.plight[3].constant, 0.0f, 100.0f);
-    //ImGui::SliderFloat("linear3", &SceneData->UniformDataInfo.plight[3].linear, 0.0f, 100.0f);
-    //ImGui::SliderFloat("quadratic3", &SceneData->UniformDataInfo.plight[3].quadratic, 0.0f, 100.0f);
-
-    //ImGui::SliderFloat3("Pos24", &SceneData->UniformDataInfo.plight[4].position.x, -10.0f, 10.0f);
-    //ImGui::SliderFloat3("Ambient24", &SceneData->UniformDataInfo.plight[4].ambient.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Diffuse24", &SceneData->UniformDataInfo.plight[4].diffuse.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat3("Speculare24", &SceneData->UniformDataInfo.plight[4].specular.x, 0.0f, 1.0f);
-    //ImGui::SliderFloat("constant4", &SceneData->UniformDataInfo.plight[4].constant, 0.0f, 100.0f);
-    //ImGui::SliderFloat("linear4", &SceneData->UniformDataInfo.plight[4].linear, 0.0f, 100.0f);
-    //ImGui::SliderFloat("quadratic4", &SceneData->UniformDataInfo.plight[4].quadratic, 0.0f, 100.0f);
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
@@ -357,10 +244,10 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// </summary>
   // gBufferRenderPass.Draw(engine, assetManager, imageIndex);
     waterRenderPass.Draw(engine, assetManager, imageIndex, skybox);
-   RenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
+    forwardRenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
-   RayRenderer.buildCommandBuffers(engine, assetManager, imageIndex);
+   RayRenderer.Draw(engine, assetManager, imageIndex);
    interfaceRenderPass.Draw(engine, imageIndex);
     ///
     ///Draw area
@@ -369,15 +256,16 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     VkSemaphore waitSemaphores[] = { engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
-    std::vector<VkCommandBuffer> CommandBufferSubmitList;
-
+    for (auto& model : assetManager.modelManager.ModelList)
+    {
+        model->AddToCMDBuffer(engine, CommandBufferSubmitList, imageIndex);
+    }
     if (RayTraceSwitch)
     {
-        //CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
        // CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
        // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
-        CommandBufferSubmitList.emplace_back(waterRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
+        CommandBufferSubmitList.emplace_back(waterRenderPass.CommandBuffer);
         //CommandBufferSubmitList.emplace_back(WaterRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
@@ -430,18 +318,23 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    CommandBufferSubmitList.clear();
 }
 
 void Renderer::Destroy(VulkanEngine& engine)
 {
+    for (auto& model : assetManager.modelManager.ModelList)
+    {
+        model->Destory(engine);
+    }
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
    // frameBufferRenderPass.Destroy(engine);
     waterRenderPass.Destroy(engine);
     //WaterRenderPass.Destroy(engine);
     //gBufferRenderPass.Destroy(engine);
-    // AnimationRenderer.Destroy(engine);
-    RenderPass.Destroy(engine);
+    //AnimationRenderer.Destroy(engine);
+    forwardRenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     skybox.Destory(engine);
     RayRenderer.Destory(engine);

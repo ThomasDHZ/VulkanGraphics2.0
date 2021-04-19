@@ -7,18 +7,19 @@ WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass()
 
 WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
-    sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
+
     ReflectionCam = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
 
     ReflectionTexture = std::make_shared<RenderedColorTexture>(engine);
     RefractionTexture = std::make_shared<RenderedColorTexture>(engine);
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
+    SceneDataBuffer = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    WaterTexturePipeline = std::make_shared<RenderWaterTexturePipeline>(RenderWaterTexturePipeline(engine, assetManager, sceneDataptr, RenderPass));
+    WaterTexturePipeline = std::make_shared<RenderWaterTexturePipeline>(RenderWaterTexturePipeline(engine, assetManager, SceneDataBuffer, RenderPass));
     WaterSkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass, RendererID));
     SetUpCommandBuffers(engine);
 }
@@ -204,7 +205,7 @@ void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, AssetManager& 
     copysceneDataptr.UniformDataInfo.proj[1][1] *= -1;
     copysceneDataptr.UniformDataInfo.viewPos = glm::vec4(ReflectionCam->GetPosition(), 0.0f);
 
-    sceneData.Update(engine, copysceneDataptr.UniformDataInfo);
+    SceneDataBuffer->Update(engine, copysceneDataptr.UniformDataInfo);
 
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
     SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
@@ -243,7 +244,7 @@ void WaterRenderToTextureRenderPass::Destroy(VulkanEngine& engine)
     RefractionTexture->Delete(engine);
     DepthTexture->Delete(engine);
 
-    sceneData.Destroy(engine);
+    SceneDataBuffer->Destroy(engine);
     WaterTexturePipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);

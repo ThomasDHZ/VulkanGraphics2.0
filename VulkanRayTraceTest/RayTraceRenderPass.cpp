@@ -1,15 +1,15 @@
-#include "RayTraceRenderer.h"
+#include "RayTraceRenderPass.h"
 #include <stdexcept>
 #include <chrono>
 #include <iostream>
 #include <stb_image.h>
 #include "SceneData.h"
 
-RayTraceRenderer::RayTraceRenderer()
+RayTraceRenderPass::RayTraceRenderPass()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+RayTraceRenderPass::RayTraceRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 deviceProperties2{};
@@ -42,12 +42,12 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, AssetManager& assetMana
     }
 }
 
-RayTraceRenderer::~RayTraceRenderer()
+RayTraceRenderPass::~RayTraceRenderPass()
 {
    
 }
 
-void RayTraceRenderer::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
+void RayTraceRenderPass::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
@@ -64,7 +64,7 @@ void RayTraceRenderer::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& a
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
-void RayTraceRenderer::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
+void RayTraceRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -81,7 +81,7 @@ void RayTraceRenderer::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager&
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void RayTraceRenderer::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
       DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -114,7 +114,7 @@ void RayTraceRenderer::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& a
 }
 
 
-void RayTraceRenderer::Destory(VulkanEngine& engine)
+void RayTraceRenderPass::Destory(VulkanEngine& engine)
 {
     {
         vkFreeMemory(engine.Device, topLevelAS.AccelerationBuffer.BufferMemory, nullptr);
@@ -150,7 +150,7 @@ void RayTraceRenderer::Destory(VulkanEngine& engine)
     }
 }
 
-void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine, AssetManager& assetManager)
+void RayTraceRenderPass::createTopLevelAccelerationStructure(VulkanEngine& engine, AssetManager& assetManager)
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
@@ -241,12 +241,12 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
     instancesBuffer.DestoryBuffer(engine.Device);
 }
 
-void RayTraceRenderer::createStorageImage(VulkanEngine& engine)
+void RayTraceRenderPass::createStorageImage(VulkanEngine& engine)
 {
     storageImage = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 }
 
-void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
+void RayTraceRenderPass::createRayTracingPipeline(VulkanEngine& engine)
 {
     std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
 
@@ -324,7 +324,7 @@ void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
     }
 }
 
-void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
+void RayTraceRenderPass::createShaderBindingTable(VulkanEngine& engine) {
     const uint32_t handleSize = rayTracingPipelineProperties.shaderGroupHandleSize;
     const uint32_t handleSizeAligned = engine.GetAlignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
     const uint32_t groupCount = static_cast<uint32_t>(RayTraceShaders.size());
@@ -338,7 +338,7 @@ void RayTraceRenderer::createShaderBindingTable(VulkanEngine& engine) {
     hitShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 3, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }
 
-void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
+void RayTraceRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo cmdBufInfo{};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -435,7 +435,7 @@ void RayTraceRenderer::buildCommandBuffers(VulkanEngine& engine, AssetManager& a
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
-void RayTraceRenderer::Resize(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, uint32_t imageIndex)
+void RayTraceRenderPass::Resize(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, uint32_t imageIndex)
 {
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
@@ -454,5 +454,5 @@ void RayTraceRenderer::Resize(VulkanEngine& engine, AssetManager& assetManager, 
     SetUpDescriptorLayout(engine, assetManager);
     createRayTracingPipeline(engine);
     SetUpDescriptorSets(engine, assetManager, sceneData);
-    buildCommandBuffers(engine, assetManager, imageIndex);
+    Draw(engine, assetManager, imageIndex);
 }

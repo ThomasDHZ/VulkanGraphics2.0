@@ -43,11 +43,11 @@ void AnimatorCompute::SetUpDescriptorPool(VulkanEngine& engine)
 
 void AnimatorCompute::SetUpDescriptorLayout(VulkanEngine& engine)
 {
-		std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-		LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-		LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-		LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-		descriptorLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
+	std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
+	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
+	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
+	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
+	descriptorLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 	
 void AnimatorCompute::SetUpDescriptorSets(VulkanEngine& engine)

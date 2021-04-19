@@ -22,7 +22,7 @@
 #include <optional>
 #include <set>
 #include "InterfaceRenderPass.h"
-#include "RayTraceRenderer.h"
+#include "RayTraceRenderPass.h"
 #include "VulkanWindow.h"
 #include "VulkanEngine.h"
 #include "ForwardRenderPass.h"

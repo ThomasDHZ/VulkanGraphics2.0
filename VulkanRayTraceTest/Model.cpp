@@ -47,7 +47,9 @@ Model::Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& ma
 
 	if (AnimationList.size() > 0)
 	{
+		AnimatedModel = true;
 		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
+		AnimationRenderer = AnimatorCompute(engine, MeshList[0]);
 	}
 
 	ModelTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
@@ -392,10 +394,27 @@ void Model::Update(VulkanEngine& engine, MaterialManager& materialManager)
 	}
 }
 
+void Model::AddToCMDBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+{
+	if (AnimatedModel)
+	{
+		AnimationRenderer.Compute(engine, imageIndex);
+		CMDBufferList.emplace_back(AnimationRenderer.commandBuffer);
+	}
+}
+
 void Model::AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh)
 {
 	mesh->ParentModelID = ModelID;
 	MeshList.emplace_back(mesh);
+}
+
+void Model::Destory(VulkanEngine& engine)
+{
+	if (AnimatedModel)
+	{
+		AnimationRenderer.Destroy(engine);
+	}
 }
 
 glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)

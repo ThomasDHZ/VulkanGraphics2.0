@@ -5,7 +5,7 @@
 #include "ForwardRenderPass.h"
 #include "TextureManager.h"
 #include "Model.h"
-#include "RayTraceRenderer.h"
+#include "RayTraceRenderPass.h"
 #include "OrthographicCamera.h"
 #include "AnimatorCompute.h"
 #include "AssetManager.h"
@@ -32,11 +32,11 @@ private:
 
 	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
-	ForwardRenderPass RenderPass;
+	ForwardRenderPass forwardRenderPass;
 	WaterRenderToTextureRenderPass waterRenderPass;
 	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
-	RayTraceRenderer RayRenderer;
+	RayTraceRenderPass RayRenderer;
 
 	//AnimatorCompute AnimationRenderer;
 
@@ -52,6 +52,7 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 	Skybox skybox;
+	std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
 public:
 	AssetManager assetManager;

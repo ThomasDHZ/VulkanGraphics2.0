@@ -152,6 +152,7 @@
     <ClCompile Include="Animation3D.cpp" />
     <ClCompile Include="AnimationPlayer3D.cpp" />
     <ClCompile Include="AnimatorCompute.cpp" />
+    <ClCompile Include="BaseRenderPass.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
@@ -187,7 +188,7 @@
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="RayTraceRenderer.cpp" />
+    <ClCompile Include="RayTraceRenderPass.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
     <ClCompile Include="RenderedGBufferAlbedoTexture.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="Animation3D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />
     <ClInclude Include="AnimatorCompute.h" />
+    <ClInclude Include="BaseRenderPass.h" />
     <ClInclude Include="bone.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapTexture.h" />
@@ -288,7 +290,7 @@
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Pixel.h" />
-    <ClInclude Include="RayTraceRenderer.h" />
+    <ClInclude Include="RayTraceRenderPass.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
     <ClInclude Include="RenderedGBufferAlbedoTexture.h" />

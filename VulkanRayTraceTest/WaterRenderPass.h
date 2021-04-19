@@ -21,14 +21,16 @@ public:
 	static constexpr RenderPassID RendererID = Water_Renderer;
 
 	std::shared_ptr<PerspectiveCamera> ReflectionCam;
-	SceneDataUniformBuffer sceneData;
+
+	std::shared_ptr<SceneDataUniformBuffer> SceneDataBuffer;
+	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 
 	std::shared_ptr<RenderedColorTexture> ReflectionTexture;
 	std::shared_ptr<RenderedColorTexture> RefractionTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 	std::shared_ptr<RenderWaterTexturePipeline> WaterTexturePipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> WaterSkyboxRenderingPipeline;
-	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
+
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkRenderPass RenderPass = VK_NULL_HANDLE;

@@ -1,11 +1,11 @@
 #include "ForwardRenderPass.h"
 #include "GraphicsPipeline.h"
 
-ForwardRenderPass::ForwardRenderPass()
+ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()
 {
 }
 
-ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData) : BaseRenderPass()
 {
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
@@ -169,10 +169,9 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &ForwardRenderingPipeline->DescriptorSets, 0, nullptr);
     assetManager.Draw(commandBuffer, renderPassInfo, ForwardRenderingPipeline->ShaderPipelineLayout, RendererID);
-    //skybox.Draw(commandBuffer, renderPassInfo, RendererID);
+    skybox.Draw(commandBuffer, renderPassInfo, RendererID);
 
     vkCmdEndRenderPass(commandBuffer);
-    // AnimationRenderer.Compute(engine, imageIndex);
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
@@ -186,12 +185,40 @@ void ForwardRenderPass::Destroy(VulkanEngine& engine)
     DebugLightPipeline->Destroy(engine);
     ForwardRenderingPipeline->Destroy(engine);
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
+    BaseRenderPass::Destroy(engine);
+}
 
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
+void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer)
+{
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = RenderPass;
+    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.renderArea.offset = { 0, 0 };
+    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].depthStencil = { 1.0f, 0 };
+
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ForwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &ForwardRenderingPipeline->DescriptorSets, 0, nullptr);
+    assetManager.Draw(commandBuffer, renderPassInfo, ForwardRenderingPipeline->ShaderPipelineLayout, RendererID);
+
+    vkCmdEndRenderPass(commandBuffer);
+    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
     }
 }
