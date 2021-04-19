@@ -50,11 +50,13 @@ layout(binding = 5) buffer Indices { uint i[]; } indices[];
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D ReflectMap;
-layout(binding = 9) uniform sampler3D Texture3DMap[];
+layout(binding = 9) uniform sampler2D RefractMap;
+layout(binding = 10) uniform sampler2D DUDVMap;
+layout(binding = 11) uniform sampler2D NormalMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
-layout(location = 2) in vec4 Color;
+layout(location = 2) in vec4 ClipSpace;
 layout(location = 3) in vec3 Normal;
 layout(location = 4) in mat3 TBN;
 
@@ -63,7 +65,33 @@ layout(location = 0) out vec4 outColor;
 void main() 
 {
     const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
+	const float tile = 6.0f;
+	const float waveStrength = 0.02f;
+	const float waveSpeed = 0.03f;
 
-    outColor = vec4(vec3(texture(ReflectMap, texCoords)), 1.0);
+	float waveMovement = 0.0f;
+	waveMovement += waveSpeed * scenedata.timer;
+
+	vec2 uv = ((ClipSpace.xy/ClipSpace.w)/2.0f)+0.5f;
+	vec2 reflectUV = vec2(uv.x, -uv.y);
+	vec2 refractUV = vec2(uv);
+
+	vec2 distortion = (texture(DUDVMap, vec2(TexCoords.x + waveMovement, TexCoords.y)).rg * 2.0f - 1.0f) * waveStrength; 
+	vec2 distortion2 = (texture(DUDVMap, vec2(TexCoords.x + waveMovement, TexCoords.y + waveMovement)).rg * 2.0f - 1.0f) * waveStrength; 
+	vec2 totalDistorion = distortion + distortion2;
+
+	reflectUV += totalDistorion;
+	reflectUV.x = clamp(reflectUV.x, 0.001f, 0.999f);
+	reflectUV.y = clamp(reflectUV.y, -0.001f, -0.999f);
+
+	refractUV += distortion;
+	refractUV = clamp(refractUV, 0.001f, 0.999f);
+	
+	vec4 reflectColor = texture(ReflectMap, reflectUV);
+	vec4 refractColor = texture(RefractMap, refractUV);
+
+	vec3 finalColor = mix(reflectColor, refractColor, 0.5f).rgb;
+	finalColor = mix(finalColor, vec3(0.0f, 0.3f, 0.6f), 0.3f);
+
+    outColor = vec4(finalColor, 1.0);
 }

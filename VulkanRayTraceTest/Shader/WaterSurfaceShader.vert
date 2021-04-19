@@ -50,7 +50,7 @@ layout (location = 7) in vec4 BoneWeights;
 
 layout(location = 0) out vec3 FragPos;
 layout(location = 1) out vec2 TexCoords;
-layout(location = 2) out vec4 Color;
+layout(location = 2) out vec4 ClipSpace;
 layout(location = 3) out vec3 Normal;
 layout(location = 4) out mat3 TBN;
 
@@ -59,12 +59,12 @@ void main()
     FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
-	Color = aColor;
+	ClipSpace = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 
     vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aTangent));
     vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aBitangent));
     vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * aNormal);
     TBN = transpose(mat3(T, B, N));
 
-    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
+    gl_Position = ClipSpace;
 }

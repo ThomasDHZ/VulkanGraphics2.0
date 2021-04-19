@@ -59,14 +59,7 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    if (RendererID == RenderPassID::Water_Renderer)
-    {
-        PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag2.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
-    }
-    else
-    {
-        PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
-    }
+    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo SkyBoxvertexInputInfo = {};
     SkyBoxvertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -131,10 +124,6 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     colorBlendAttachment.blendEnable = VK_FALSE;
 
     int ColorAttachmentCount = 1;
-    if (RendererID == RenderPassID::Water_Renderer)
-    {
-        ColorAttachmentCount = 2;
-    }
     std::vector<VkPipelineColorBlendAttachmentState> ColorAttachmentList(ColorAttachmentCount, colorBlendAttachment);
 
     VkPipelineColorBlendStateCreateInfo colorBlending = {};

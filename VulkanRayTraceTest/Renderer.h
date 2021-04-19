@@ -33,7 +33,8 @@ private:
 	FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass forwardRenderPass;
-	WaterRenderToTextureRenderPass waterRenderPass;
+	WaterRenderToTextureRenderPass waterReflectionRenderPass;
+	WaterRenderToTextureRenderPass waterRefractionRenderPass;
 	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
 	RayTraceRenderPass RayRenderer;

@@ -4,14 +4,14 @@ WaterSurfaceMesh::WaterSurfaceMesh() : Mesh()
 {
 }
 
-WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture) : Mesh()
+WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture, std::shared_ptr<Texture> refractiontexture) : Mesh()
 {
 	std::vector<Vertex> WaterVertices =
 	{
 		{{ 0.0f, 0.0f, 0.0f }, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, { 1.0f, 1.0f }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-		{{ 1.0f, 0.0f, 0.0f }, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-		{{ 1.0f, 1.0f, 0.0f }, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
-		{{ 0.0f, 1.0f, 0.0f }, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
+		{{ 5.0f, 0.0f, 0.0f }, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, { 0.0f, 1.0f }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+		{{ 5.0f, 5.0f, 0.0f }, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, { 0.0f, 0.0f }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}},
+		{{ 0.0f, 5.0f, 0.0f }, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, { 1.0f, 0.0f }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f, 1.0f}, {0, 0, 1, 0}, {0.0f, 0.0f, 1.0f, 0.0f}}
 	};
 
 	std::vector<uint32_t> WaterIndices =
@@ -33,16 +33,17 @@ WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetMana
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, WaterVertices, WaterIndices);
-	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(engine, assetManager, SceneData, RenderPass, reflecttexture));
+
+	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(engine, assetManager, SceneData, RenderPass, reflecttexture, refractiontexture));
 }
 
 WaterSurfaceMesh::~WaterSurfaceMesh()
 {
 }
 
-void WaterSurfaceMesh::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture)
+void WaterSurfaceMesh::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture, std::shared_ptr<Texture> refractiontexture)
 {
-	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, SceneData, RenderPass, reflecttexture);
+	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, SceneData, RenderPass, reflecttexture, refractiontexture);
 }
 
 void WaterSurfaceMesh::Update(VulkanEngine& engine, MaterialManager& materialManager)

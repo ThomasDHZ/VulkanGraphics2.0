@@ -59,7 +59,6 @@ layout(location = 3) in vec3 Normal;
 layout(location = 4) in mat3 TBN;
 
 layout(location = 0) out vec4 ReflectionTexture;
-layout(location = 1) out vec4 RefractionTexture;
 
 vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv);
 vec3 CalcNormalPointLight(MaterialInfo material, PointLight light, vec3 normal, vec2 uv);
@@ -116,7 +115,6 @@ void main()
     }
 
     ReflectionTexture = vec4(result, 1.0);
-    RefractionTexture = vec4(result/2, 1.0);
 }
 
 vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv)
