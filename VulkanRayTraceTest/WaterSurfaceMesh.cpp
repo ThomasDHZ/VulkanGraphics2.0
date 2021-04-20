@@ -4,7 +4,7 @@ WaterSurfaceMesh::WaterSurfaceMesh() : Mesh()
 {
 }
 
-WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture, std::shared_ptr<Texture> refractiontexture) : Mesh()
+WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData) : Mesh()
 {
 	std::vector<Vertex> WaterVertices =
 	{
@@ -23,6 +23,7 @@ WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetMana
 	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 	DrawFlags = MeshDrawFlags::Mesh_Skip_Water_Renderer;
+	MeshType = MeshTypeFlag::Mesh_Type_Water;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -34,21 +35,33 @@ WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetMana
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, WaterVertices, WaterIndices);
 
-	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(engine, assetManager, SceneData, RenderPass, reflecttexture, refractiontexture));
+	waterReflectionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
+	waterRefractionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
+
+	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(engine, assetManager, SceneData, RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture));
 }
 
 WaterSurfaceMesh::~WaterSurfaceMesh()
 {
 }
 
-void WaterSurfaceMesh::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<Texture> reflecttexture, std::shared_ptr<Texture> refractiontexture)
+void WaterSurfaceMesh::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData)
 {
-	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, SceneData, RenderPass, reflecttexture, refractiontexture);
+	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, SceneData, RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
 }
 
-void WaterSurfaceMesh::Update(VulkanEngine& engine, MaterialManager& materialManager)
+void WaterSurfaceMesh::DrawWaterTexture(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox skybox)
 {
-	MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
+	waterReflectionRenderPass.Draw(engine, assetManager, imageIndex, skybox);
+	waterRefractionRenderPass.Draw(engine, assetManager, imageIndex, skybox);
+}
+
+void WaterSurfaceMesh::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera)
+{
+	waterReflectionRenderPass.Update(engine, assetManager, copysceneData, camera);
+	waterRefractionRenderPass.Update(engine, assetManager, copysceneData, camera);
+
+	MeshProperties.UniformDataInfo.MaterialIndex = assetManager.materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
@@ -65,6 +78,12 @@ void WaterSurfaceMesh::Update(VulkanEngine& engine, MaterialManager& materialMan
 	MeshProperties.Update(engine);
 }
 
+void WaterSurfaceMesh::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+{
+	waterReflectionRenderPass.UpdateSwapChain(engine, assetManager, sceneData);
+	waterRefractionRenderPass.UpdateSwapChain(engine, assetManager, sceneData);
+}
+
 void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a)
 {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, waterSurfacePipeline->ShaderPipeline);
@@ -72,8 +91,16 @@ void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInf
 	Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
 }
 
+void WaterSurfaceMesh::SubmitToCMDBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+{
+	CMDBufferList.emplace_back(waterReflectionRenderPass.CommandBuffer);
+	CMDBufferList.emplace_back(waterRefractionRenderPass.CommandBuffer);
+}
+
 void WaterSurfaceMesh::Destory(VulkanEngine& engine)
 {
 	waterSurfacePipeline->Destroy(engine);
+	waterReflectionRenderPass.Destroy(engine);
+	waterRefractionRenderPass.Destroy(engine);
 	Mesh::Destory(engine);
 }

@@ -17,7 +17,11 @@ enum MeshDrawFlags
 	Mesh_Skip_RayTrace_Renderer = 0x02,
 	Mesh_Skip_Water_Renderer = 0x04,
 };
-
+enum MeshTypeFlag
+{
+	Mesh_Type_Normal = 0x00,
+	Mesh_Type_Water = 0x01
+};
 class Mesh
 {
 private:
@@ -35,6 +39,7 @@ private:
 
 public:
 	MeshDrawFlags DrawFlags = Mesh_Draw_All;
+	MeshTypeFlag MeshType = Mesh_Type_Normal;
 	uint32_t ParentModelID = 0;
 	uint32_t MeshID = 0;
 	uint32_t MeshBufferIndex = 0;

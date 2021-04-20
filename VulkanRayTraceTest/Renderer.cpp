@@ -59,8 +59,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SetUpCommandBuffers(engine);
 
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
-    waterReflectionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
-    waterRefractionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
     //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);
     //textureRenderPass = TextureRenderPass(engine, assetManager, SceneData);
     skybox = Skybox(engine, assetManager, forwardRenderPass.RenderPass);
@@ -77,7 +75,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
 
     //  RayRenderer = RayTraceRenderPass(engine, assetManager, SceneData);
-     // assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture)));
+      assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, forwardRenderPass.RenderPass, SceneData)));
       
 
     SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
@@ -165,8 +163,13 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     skybox.UpdateGraphicsPipeLine(engine, forwardRenderPass.RenderPass);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
-    waterReflectionRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    waterRefractionRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    for (auto& mesh : assetManager.meshManager.MeshList)
+    {
+        if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
+        {
+            static_cast<WaterSurfaceMesh*>(mesh.get())->UpdateSwapChain(engine, assetManager, SceneData);
+        }
+    }
    // static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
    // textureRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
   // RayRenderer.Resize(engine, assetManager, SceneData, 0);
@@ -202,8 +205,13 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->Update(engine);
 
    // WaterRenderPass.Update(engine, assetManager, *SceneData.get(), camera2);
-    waterReflectionRenderPass.Update(engine, assetManager, *SceneData.get(), camera);
-    waterRefractionRenderPass.Update(engine, assetManager, *SceneData.get(), camera);
+    for (auto& mesh : assetManager.meshManager.MeshList)
+    {
+        if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
+        {
+            static_cast<WaterSurfaceMesh*>(mesh.get())->Update(engine, assetManager, *SceneData.get(), camera);
+        }
+    }
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -250,8 +258,13 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// Draw Area
     /// </summary>
   // gBufferRenderPass.Draw(engine, assetManager, imageIndex);
-    waterReflectionRenderPass.Draw(engine, assetManager, imageIndex, skybox);
-    waterRefractionRenderPass.Draw(engine, assetManager, imageIndex, skybox);
+    for (auto& mesh : assetManager.meshManager.MeshList)
+    {
+        if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
+        {
+            static_cast<WaterSurfaceMesh*>(mesh.get())->DrawWaterTexture(engine, assetManager, imageIndex, skybox);
+        }
+    }
     forwardRenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
@@ -273,8 +286,13 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
        // CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
        // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
-        CommandBufferSubmitList.emplace_back(waterReflectionRenderPass.CommandBuffer);
-        CommandBufferSubmitList.emplace_back(waterRefractionRenderPass.CommandBuffer);
+        for (auto& mesh : assetManager.meshManager.MeshList)
+        {
+            if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
+            {
+                static_cast<WaterSurfaceMesh*>(mesh.get())->SubmitToCMDBuffer(engine, CommandBufferSubmitList, imageIndex);
+            }
+        }
     }
     else
     {
@@ -335,8 +353,6 @@ void Renderer::Destroy(VulkanEngine& engine)
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
    // frameBufferRenderPass.Destroy(engine);
-    waterReflectionRenderPass.Destroy(engine);
-    waterRefractionRenderPass.Destroy(engine);
     //WaterRenderPass.Destroy(engine);
     //gBufferRenderPass.Destroy(engine);
     //AnimationRenderer.Destroy(engine);

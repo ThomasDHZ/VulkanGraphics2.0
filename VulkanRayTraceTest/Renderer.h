@@ -12,7 +12,6 @@
 #include "Skybox.h"
 #include "DeferredRenderPass.h"
 #include "TextureRenderPass.h"
-#include "WaterRenderPass.h"
 #include "WaterSurfaceMesh.h"
 
 class Renderer
@@ -26,15 +25,11 @@ private:
 	VkCommandBuffer RasterCommandBuffer;
 
 	//FrameBufferRenderPass frameBufferRenderPass;
-	WaterRenderToTextureRenderPass waterReflectionRenderPass;
-	WaterRenderToTextureRenderPass waterRefractionRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass forwardRenderPass;
 	//RayTraceRenderPass RayRenderer;
 	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
-
-	//AnimatorCompute AnimationRenderer;
 
 	size_t currentFrame = 0;
 
