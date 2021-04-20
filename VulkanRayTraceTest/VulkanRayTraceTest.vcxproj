@@ -160,7 +160,7 @@
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="DeferredPipeline.cpp" />
     <ClCompile Include="DeferredRenderPass.cpp" />
-    <ClCompile Include="FowardRenderingPipeline.cpp" />
+    <ClCompile Include="ForwardRenderingPipeline.cpp" />
     <ClCompile Include="FrameBufferPipeline.cpp" />
     <ClCompile Include="FrameBufferRenderPass.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
@@ -260,7 +260,7 @@
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="DeferredPipeline.h" />
     <ClInclude Include="DeferredRenderPass.h" />
-    <ClInclude Include="FowardRenderingPipeline.h" />
+    <ClInclude Include="ForwardRenderingPipeline.h" />
     <ClInclude Include="FrameBufferPipeline.h" />
     <ClInclude Include="FrameBufferRenderPass.h" />
     <ClInclude Include="GBufferPipeline.h" />

@@ -159,9 +159,6 @@
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ForwardRenderPass.cpp">
-      <Filter>Source Files\RenderPass</Filter>
-    </ClCompile>
     <ClCompile Include="FrameBufferRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
@@ -178,9 +175,6 @@
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="DebugLightRenderingPipeline.cpp">
-      <Filter>Source Files\Pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="FowardRenderingPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
     <ClCompile Include="SkyBoxRenderingPipeline.cpp">
@@ -248,6 +242,12 @@
     </ClCompile>
     <ClCompile Include="BaseRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="ForwardRenderingPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -463,9 +463,6 @@
     <ClInclude Include="Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ForwardRenderPass.h">
-      <Filter>Header Files\RenderPass</Filter>
-    </ClInclude>
     <ClInclude Include="FrameBufferRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
@@ -482,9 +479,6 @@
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="DebugLightRenderingPipeline.h">
-      <Filter>Header Files\Pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="FowardRenderingPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="SkyBoxRenderingPipeline.h">
@@ -552,6 +546,12 @@
     </ClInclude>
     <ClInclude Include="BaseRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="ForwardRenderingPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

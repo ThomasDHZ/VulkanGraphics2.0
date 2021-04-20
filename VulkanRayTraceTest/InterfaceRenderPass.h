@@ -28,7 +28,7 @@ public:
 	~InterfaceRenderPass();
 
 	RenderPassID RendererID = Interface_Renderer;
-	std::vector<VkCommandBuffer> ImGuiCommandBuffers;
+	VkCommandBuffer ImGuiCommandBuffers;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	void Draw(VulkanEngine& engine, int frame);

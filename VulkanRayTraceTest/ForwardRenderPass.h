@@ -7,9 +7,8 @@
 #include "AssetManager.h"
 #include "Skybox.h"
 #include "DebugLightRenderingPipeline.h"
-#include "FowardRenderingPipeline.h"
+#include "ForwardRenderingPipeline.h"
 #include "SkyBoxRenderingPipeline.h"
-#include "WaterSurfacePipeline.h"
 #include "BaseRenderPass.h"
 
 class ForwardRenderPass : public BaseRenderPass
@@ -27,15 +26,11 @@ public:
 
 	static constexpr RenderPassID RendererID = Forward_Renderer;
 
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<DebugLightRenderingPipeline> DebugLightPipeline;
-	std::shared_ptr<FowardRenderingPipeline> ForwardRenderingPipeline;
-	std::shared_ptr<WaterSurfacePipeline> WaterSurfaceRenderingPipeline;
+	std::shared_ptr<ForwardRenderingPipeline> forwardRenderingPipeline;
+	std::shared_ptr<SkyBoxRenderingPipeline> SkyBoxRenderingPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer, Skybox& skybox);

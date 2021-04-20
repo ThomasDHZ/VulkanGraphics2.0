@@ -66,7 +66,7 @@ public:
 	~Model();
 
 	void Update(VulkanEngine& engine, MaterialManager& materialManager);
-	void AddToCMDBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
+	void SubmitToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
 	void AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh);
 	void Destory(VulkanEngine& engine);
 

@@ -27,6 +27,7 @@ public:
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
+
 	std::shared_ptr<RenderWaterTexturePipeline> WaterTexturePipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> WaterSkyboxRenderingPipeline;
 

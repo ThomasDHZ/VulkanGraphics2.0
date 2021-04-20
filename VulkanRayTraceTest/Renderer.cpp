@@ -76,8 +76,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
       // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
 
-      RayRenderer = RayTraceRenderPass(engine, assetManager, SceneData);
-      assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture)));
+    //  RayRenderer = RayTraceRenderPass(engine, assetManager, SceneData);
+     // assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture)));
       
 
     SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
@@ -114,13 +114,13 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
 
-    assetManager.textureManager.LoadTexture2D(waterReflectionRenderPass.RenderedTexture);
-    assetManager.textureManager.LoadTexture2D(waterRefractionRenderPass.RenderedTexture);
+    //assetManager.textureManager.LoadTexture2D(waterReflectionRenderPass.RenderedTexture);
+    //assetManager.textureManager.LoadTexture2D(waterRefractionRenderPass.RenderedTexture);
     forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
 
 
     //ImGui_ImplVulkan_AddTexture(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, waterRenderPass.ReflectionTexture->Sampler, waterRenderPass.ReflectionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    //ImGui_ImplVulkan_AddTexture(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, waterRenderPass.RefractionTexture->Sampler, waterRenderPass.RefractionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //mGui_ImplVulkan_AddTexture(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, waterRenderPass.RefractionTexture->Sampler, waterRenderPass.RefractionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
    ///./ ImGui_ImplVulkan_AddTexture(RayRenderer.storageImage->ImGuiDescriptorSet, RayRenderer.storageImage->Sampler, RayRenderer.storageImage->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
@@ -167,9 +167,9 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass.UpdateSwapChain(engine);
     waterReflectionRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     waterRefractionRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
+   // static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
    // textureRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-   RayRenderer.Resize(engine, assetManager, SceneData, 0);
+  // RayRenderer.Resize(engine, assetManager, SceneData, 0);
 
     SetUpCommandBuffers(engine);
 }
@@ -188,7 +188,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
     assetManager.Update(engine);
     skybox.Update(engine, assetManager.materialManager, camera);
-    RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
+   // RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -211,16 +211,15 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
-    ImGui::SliderFloat3("ReflectCamPos", &waterReflectionRenderPass.TextureCamera->Position.x, -10.0f, 10.0f);
-    ImGui::SliderFloat("ReflectPitch", &waterReflectionRenderPass.TextureCamera->Pitch, -180.0f, 180.0f);
-    ImGui::SliderFloat("ReflectYaw", &waterReflectionRenderPass.TextureCamera->Yaw, -180.0f, 180.0f);
-    ImGui::Image(waterReflectionRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+   // ImGui::SliderFloat3("ReflectCamPos", &waterReflectionRenderPass.TextureCamera->Position.x, -10.0f, 10.0f);
+   // ImGui::SliderFloat("ReflectPitch", &waterReflectionRenderPass.TextureCamera->Pitch, -180.0f, 180.0f);
+   // ImGui::SliderFloat("ReflectYaw", &waterReflectionRenderPass.TextureCamera->Yaw, -180.0f, 180.0f);
+   //// ImGui::Image(waterReflectionRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 
-    ImGui::SliderFloat3("RefractionCamPos", &waterRefractionRenderPass.TextureCamera->Position.x, -10.0f, 10.0f);
-    ImGui::SliderFloat("RefractionPitch", &waterRefractionRenderPass.TextureCamera->Pitch, -180.0f, 180.0f);
-    ImGui::SliderFloat("RefractionYaw", &waterRefractionRenderPass.TextureCamera->Yaw, -180.0f, 180.0f);
-    ImGui::Image(waterRefractionRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-   // ImGui::Image(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+   // ImGui::SliderFloat3("RefractionCamPos", &waterRefractionRenderPass.TextureCamera->Position.x, -10.0f, 10.0f);
+   // ImGui::SliderFloat("RefractionPitch", &waterRefractionRenderPass.TextureCamera->Pitch, -180.0f, 180.0f);
+   // ImGui::SliderFloat("RefractionYaw", &waterRefractionRenderPass.TextureCamera->Yaw, -180.0f, 180.0f);
+   // ImGui::Image(waterRefractionRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
@@ -256,7 +255,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     forwardRenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
-   RayRenderer.Draw(engine, assetManager, imageIndex);
+  // RayRenderer.Draw(engine, assetManager, imageIndex);
    interfaceRenderPass.Draw(engine, imageIndex);
     ///
     ///Draw area
@@ -267,7 +266,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     for (auto& model : assetManager.modelManager.ModelList)
     {
-        model->AddToCMDBuffer(engine, CommandBufferSubmitList, imageIndex);
+        model->SubmitToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
     }
     if (RayTraceSwitch)
     {
@@ -276,16 +275,12 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
         CommandBufferSubmitList.emplace_back(waterReflectionRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(waterRefractionRenderPass.CommandBuffer);
-        //CommandBufferSubmitList.emplace_back(WaterRenderPass.CommandBuffer);
-        CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
     }
     else
     {
-       // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
-       // CommandBufferSubmitList.emplace_back(AnimationRenderer.commandBuffer);
-        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
-        CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[imageIndex]);
+        //CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
     }
+    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -348,5 +343,5 @@ void Renderer::Destroy(VulkanEngine& engine)
     forwardRenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     skybox.Destory(engine);
-    RayRenderer.Destory(engine);
+    //RayRenderer.Destory(engine);
 }

@@ -394,7 +394,7 @@ void Model::Update(VulkanEngine& engine, MaterialManager& materialManager)
 	}
 }
 
-void Model::AddToCMDBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+void Model::SubmitToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
 {
 	if (AnimatedModel)
 	{

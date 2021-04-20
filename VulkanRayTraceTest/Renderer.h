@@ -18,11 +18,6 @@
 class Renderer
 {
 private:
-	bool AddTextureFlag = false;
-	bool RemoveTextureFlag = false;
-	bool AddMaterialFlag = false;
-	bool RemoveMaterialFlag = false;
-
 	std::shared_ptr<PerspectiveCamera> camera;
 	std::shared_ptr<PerspectiveCamera> camera2;
 	Keyboard keyboard;
@@ -30,14 +25,14 @@ private:
 
 	VkCommandBuffer RasterCommandBuffer;
 
-	FrameBufferRenderPass frameBufferRenderPass;
-	InterfaceRenderPass interfaceRenderPass;
-	ForwardRenderPass forwardRenderPass;
+	//FrameBufferRenderPass frameBufferRenderPass;
 	WaterRenderToTextureRenderPass waterReflectionRenderPass;
 	WaterRenderToTextureRenderPass waterRefractionRenderPass;
+	InterfaceRenderPass interfaceRenderPass;
+	ForwardRenderPass forwardRenderPass;
+	//RayTraceRenderPass RayRenderer;
 	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
-	RayTraceRenderPass RayRenderer;
 
 	//AnimatorCompute AnimationRenderer;
 

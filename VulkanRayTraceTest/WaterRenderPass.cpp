@@ -228,7 +228,10 @@ void WaterRenderToTextureRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
 
     SceneDataBuffer->Destroy(engine);
+    SkyUniformBuffer->Destroy(engine);
+
     WaterTexturePipeline->Destroy(engine);
+    WaterSkyboxRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
