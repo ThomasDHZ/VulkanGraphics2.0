@@ -10,6 +10,7 @@
 #include "ForwardRenderingPipeline.h"
 #include "SkyBoxRenderingPipeline.h"
 #include "BaseRenderPass.h"
+#include "PBRPipeline.h"
 
 class ForwardRenderPass : public BaseRenderPass
 {
@@ -30,6 +31,7 @@ public:
 
 	std::shared_ptr<DebugLightRenderingPipeline> DebugLightPipeline;
 	std::shared_ptr<ForwardRenderingPipeline> forwardRenderingPipeline;
+	std::shared_ptr<PBRPipeline> pbrRenderingPipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> SkyBoxRenderingPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);

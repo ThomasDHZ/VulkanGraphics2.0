@@ -70,23 +70,53 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 
 void main() 
 {
-    const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
+   const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
+   vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
 
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
    {
 	 discard;
    }
+   
+   vec3 albedo     = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
+   float metallic  = texture(TextureMap[material.MatallicMapID], texCoords).r;
+   float roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
+   float ao        = texture(TextureMap[material.AOMapID], texCoords).r;
+
+   vec3 N = getNormalFromMap(material, texCoords);
+   vec3 V = normalize(scenedata.viewPos - FragPos);
+
+   vec3 F0 = vec3(0.04); 
+   F0 = mix(F0, albedo, metallic);
+
+vec3 Lo = vec3(0.0);
     
-    const vec3 TangentViewPos  = TBN * scenedata.viewPos;
-    const vec3 TangentFragPos  = TBN * FragPos;  
-    const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+       vec3 L = normalize(-scenedata.dlight.direction);
+       vec3 H = normalize(V + L);
 
-    vec3 result = vec3(0.0f);
-    vec3 normal = Normal;
+       vec3 radiance = scenedata.dlight.diffuse;
 
-    result = pow(result, vec3(1.0/2.2));
-    outColor = vec4(result, 1.0);
+        float NDF = DistributionGGX(N, H, roughness);   
+        float G   = GeometrySmith(N, V, L, roughness);      
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+           
+        vec3 nominator    = NDF * G * F; 
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
+        vec3 specular = nominator / denominator;
+
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;	  
+
+        float NdotL = max(dot(N, L), 0.0);        
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+      
+
+   vec3 ambient = vec3(0.03) * albedo * ao;
+   vec3 color = ambient + Lo;
+
+   vec3 result = pow(color, vec3(1.0/2.2));
+   outColor = vec4(result, 1.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)

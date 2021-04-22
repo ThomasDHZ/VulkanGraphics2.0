@@ -255,6 +255,9 @@
     <ClCompile Include="TerrainMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PBRPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -345,6 +348,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\SkyBoxShader2.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\PBRShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\PBRShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -564,6 +573,9 @@
     </ClInclude>
     <ClInclude Include="TerrainMesh.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

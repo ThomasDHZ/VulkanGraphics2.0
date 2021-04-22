@@ -13,6 +13,7 @@ ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, AssetManager& assetMa
     CreateRendererFramebuffers(engine);
     DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(engine, assetManager, sceneData, RenderPass));
     forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(engine, assetManager, sceneData, RenderPass));
+    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(engine, assetManager, sceneData, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -135,6 +136,7 @@ void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
     CreateRendererFramebuffers(engine);
     DebugLightPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
@@ -163,9 +165,9 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &forwardRenderingPipeline->DescriptorSets, 0, nullptr);
-    assetManager.Draw(commandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, RendererID);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
+    assetManager.Draw(commandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, RendererID);
     skybox.Draw(commandBuffer, renderPassInfo, RendererID);
 
     vkCmdEndRenderPass(commandBuffer);
@@ -180,6 +182,7 @@ void ForwardRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
     DebugLightPipeline->Destroy(engine);
     forwardRenderingPipeline->Destroy(engine);
+    pbrRenderingPipeline->Destroy(engine);
 
     BaseRenderPass::Destroy(engine);
 }
@@ -209,9 +212,9 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &forwardRenderingPipeline->DescriptorSets, 0, nullptr);
-    assetManager.Draw(commandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, RendererID);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
+    assetManager.Draw(commandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, RendererID);
 
     vkCmdEndRenderPass(commandBuffer);
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {

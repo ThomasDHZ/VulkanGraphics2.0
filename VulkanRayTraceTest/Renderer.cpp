@@ -35,14 +35,15 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
-    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    //material->materialTexture.AlbedoMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-    //material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.RoughnessMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.AOMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.MatallicMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    //assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
+    assetManager.AddModel(engine, "../Models/Sphere.obj");
+    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
+    material->materialTexture.AlbedoMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.RoughnessMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.AOMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.MatallicMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
    // assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
  /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
@@ -61,16 +62,16 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
 
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/perlin_noise.png")));
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    //material->materialTexture.AlbedoMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    //material->materialTexture.RoughnessMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.AOMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_nor_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.Shininess = 255.0f;
-    uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    assetManager.meshManager.MeshList.back()->MaterialID = MaterialID;
+    std::shared_ptr<Material> material1 = std::make_shared<Material>(engine, assetManager.textureManager);
+    material1->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material1->materialTexture.AlbedoMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material1->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material1->materialTexture.RoughnessMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material1->materialTexture.MatallicMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material1->materialTexture.AOMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material1->materialTexture.Shininess = 16.0f;
+    uint32_t MaterialID1 = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material1);
+    assetManager.meshManager.MeshList.back()->MaterialID = MaterialID1;
 
     forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData);
     SetUpCommandBuffers(engine);
@@ -237,9 +238,23 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
     ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
-    ImGui::SliderFloat3("Ambient", &SceneData->UniformDataInfo.dlight.ambient.x, 0.0f, 1.0f);
     ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
-    ImGui::SliderFloat3("Speculare", &SceneData->UniformDataInfo.dlight.specular.x, 0.0f, 1.0f);
+
+    ImGui::SliderFloat3("Pos20", &SceneData->UniformDataInfo.plight[0].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Diffuse20", &SceneData->UniformDataInfo.plight[0].diffuse.x, 0.0f, 1.0f);
+
+    ImGui::SliderFloat3("Pos21", &SceneData->UniformDataInfo.plight[1].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Diffuse21", &SceneData->UniformDataInfo.plight[1].diffuse.x, 0.0f, 1.0f);
+
+    ImGui::SliderFloat3("Pos22", &SceneData->UniformDataInfo.plight[2].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Diffuse22", &SceneData->UniformDataInfo.plight[2].diffuse.x, 0.0f, 1.0f);
+
+    ImGui::SliderFloat3("Pos23", &SceneData->UniformDataInfo.plight[3].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Diffuse23", &SceneData->UniformDataInfo.plight[3].diffuse.x, 0.0f, 1.0f);
+
+    ImGui::SliderFloat3("Pos24", &SceneData->UniformDataInfo.plight[4].position.x, -10.0f, 10.0f);
+    ImGui::SliderFloat3("Speculare24", &SceneData->UniformDataInfo.plight[4].specular.x, 0.0f, 1.0f);
+
 
     for (int y = 0; y < assetManager.meshManager.MeshList.size(); y++)
   {

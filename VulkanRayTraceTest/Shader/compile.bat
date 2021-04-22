@@ -7,6 +7,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 shadow.rmiss -o shadow.rmiss.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe shader.vert -o vert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe shader.frag -o frag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRShader.vert -o PBRvert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRShader.frag -o PBRfrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe TextureShader.vert -o TextureShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe TextureShader.frag -o TextureShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe WaterRenderToTextureShader.vert -o WaterRenderToTextureShaderVert.spv
