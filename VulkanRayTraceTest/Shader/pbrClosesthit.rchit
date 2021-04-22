@@ -48,7 +48,6 @@ layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
-layout(binding = 10) uniform samplerCube CubeMap;
 
 const float PI = 3.14159265359;
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
@@ -106,12 +105,7 @@ void main()
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
    }
 
-    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	  
-    vec3 irradiance = texture(CubeMap, N).rgb;
-    vec3 diffuse      = irradiance * albedo;
-    vec3 ambient = (kD * diffuse) * ao;
+    vec3 ambient = vec3(0.03) * albedo * ao;
  
     vec3 color = ambient + Lo;
 
