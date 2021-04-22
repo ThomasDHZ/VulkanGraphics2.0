@@ -27,7 +27,7 @@ private:
 	//FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass forwardRenderPass;
-	//RayTraceRenderPass RayRenderer;
+	RayTraceRenderPass RayRenderer;
 	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
 

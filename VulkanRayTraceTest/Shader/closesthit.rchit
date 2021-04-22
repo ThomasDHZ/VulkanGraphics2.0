@@ -66,43 +66,8 @@ void main()
    const Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
-   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-   const mat3 TBN = transpose(mat3(T, B, N));
-   
-   const vec3 TangentViewPos  = TBN * ubo.viewPos;
-   const vec3 TangentFragPos  = TBN * vertex.pos;  
-   const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
    vec2 uv = vertex.uv;
-
-   vec3 result = vec3(0.0f);
-   vec3 normal = vertex.normal;
-   if(material.NormalMapID != 0)
-   {
-        if(material.DepthMapID != 0)
-        {
-            uv = ParallaxMapping(material, uv,  viewDir);       
-        }
-        normal = texture(TextureMap[material.NormalMapID], uv).rgb;
-        normal = normalize(normal * 2.0 - 1.0);
-
-        rayHitInfo.hitValue = CalcNormalDirLight(vertex, material, TBN, normal, uv);
-        for(int x = 0; x < 5; x++)
-        {
-           rayHitInfo.hitValue += CalcNormalPointLight(vertex, material, TBN, ubo.plight[x], normal, uv);   
-        }
-        rayHitInfo.hitValue +=  CalcNormalSpotLight(vertex, material, TBN, ubo.sLight, normal, uv);
-   }
-   else
-   {
-       rayHitInfo.hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
-        for(int x = 0; x < 5; x++)
-        {
-            rayHitInfo.hitValue += CalcPointLight(vertex, material, ubo.plight[x], uv);   
-        }
-       rayHitInfo.hitValue +=  CalcSpotLight(vertex, material, ubo.sLight, uv);
-   }
+    rayHitInfo.hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

@@ -85,36 +85,9 @@ void main()
 
     vec3 result = vec3(0.0f);
     vec3 normal = Normal;
-    if(material.NormalMapID != 0)
-    {
-        if(material.DepthMapID != 0)
-        {
-            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
-            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-            {
-              discard;
-            }
-        }
-        normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
-        normal = normalize(normal * 2.0 - 1.0);
 
-       result = CalcNormalDirLight(material, normal, texCoords);
-        for(int x = 0; x < 5; x++)
-        {
-          result += CalcNormalPointLight(material, scenedata.plight[x], normal, texCoords);   
-        }
-        result +=  CalcNormalSpotLight( material, scenedata.sLight, normal, texCoords);
-    }
-    else
-    {
-        result = CalcDirLight(material, texCoords);
-        for(int x = 0; x < 5; x++)
-        {
-           result += CalcPointLight(material, scenedata.plight[x], texCoords);   
-        }
-        result +=  CalcSpotLight( material, scenedata.sLight, texCoords);
-    }
-    	result = pow(result, vec3(1.0/2.2));
+    result = CalcDirLight(material, texCoords);
+    result = pow(result, vec3(1.0/2.2));
     outColor = vec4(result, 1.0);
 }
 

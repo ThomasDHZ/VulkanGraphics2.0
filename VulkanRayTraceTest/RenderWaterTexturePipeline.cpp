@@ -5,7 +5,7 @@ RenderWaterTexturePipeline::RenderWaterTexturePipeline() : GraphicsPipeline()
 {
 }
 
-RenderWaterTexturePipeline::RenderWaterTexturePipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
+RenderWaterTexturePipeline::RenderWaterTexturePipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -80,7 +80,7 @@ void RenderWaterTexturePipeline::SetUpDescriptorSets(VulkanEngine& engine, Asset
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void RenderWaterTexturePipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void RenderWaterTexturePipeline::SetUpShaderPipeLine(VulkanEngine& engine, VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/WaterRenderToTextureShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -207,8 +207,11 @@ void RenderWaterTexturePipeline::SetUpShaderPipeLine(VulkanEngine& engine, const
     }
 }
 
-void RenderWaterTexturePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void RenderWaterTexturePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    SetUpDescriptorPool(engine, assetManager);
+    SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
+    SetUpDescriptorSets(engine, assetManager, sceneData);
 }

@@ -218,7 +218,7 @@ void WaterRenderToTextureRenderPass::UpdateSwapChain(VulkanEngine& engine, Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    WaterTexturePipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    WaterTexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneDataptr, RenderPass);
     SetUpCommandBuffers(engine);
 }
 

@@ -218,6 +218,16 @@ void WaterSurfacePipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRen
 
 void WaterSurfacePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
 {
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
+    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
+
+    ShaderPipeline = VK_NULL_HANDLE;
+    ShaderPipelineLayout = VK_NULL_HANDLE;
+    DescriptorPool = VK_NULL_HANDLE;
+    DescriptorSetLayout = VK_NULL_HANDLE;
+
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);

@@ -165,6 +165,7 @@
     <ClCompile Include="FrameBufferRenderPass.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
+    <ClCompile Include="HeightMapTexture.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="TerrainMesh.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="TextureManager.cpp" />
@@ -265,6 +267,7 @@
     <ClInclude Include="FrameBufferRenderPass.h" />
     <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="GraphicsPipeline.h" />
+    <ClInclude Include="HeightMapTexture.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_glfw.h" />
@@ -304,6 +307,7 @@
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxRenderingPipeline.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="TerrainMesh.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Texture3D.h" />
     <ClInclude Include="TextureManager.h" />

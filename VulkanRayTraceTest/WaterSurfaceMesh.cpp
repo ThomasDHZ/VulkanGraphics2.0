@@ -45,11 +45,6 @@ WaterSurfaceMesh::~WaterSurfaceMesh()
 {
 }
 
-void WaterSurfaceMesh::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData)
-{
-	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, SceneData, RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
-}
-
 void WaterSurfaceMesh::DrawWaterTexture(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox skybox)
 {
 	waterReflectionRenderPass.Draw(engine, assetManager, imageIndex, skybox);
@@ -78,10 +73,11 @@ void WaterSurfaceMesh::Update(VulkanEngine& engine, AssetManager& assetManager, 
 	MeshProperties.Update(engine);
 }
 
-void WaterSurfaceMesh::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void WaterSurfaceMesh::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
 	waterReflectionRenderPass.UpdateSwapChain(engine, assetManager, sceneData);
 	waterRefractionRenderPass.UpdateSwapChain(engine, assetManager, sceneData);
+	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
 }
 
 void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a)

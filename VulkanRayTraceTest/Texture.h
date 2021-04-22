@@ -8,6 +8,7 @@ enum TextureType
     vkTexture2D,
     vkTexture3D,
     vkTextureCube,
+    vkHeightMap,
     vkRenderedTexture
 };
 
@@ -16,7 +17,6 @@ class Texture
 private:
 
 protected:
-
     void KTXTransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
     void KTXCopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
     void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);

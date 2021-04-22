@@ -3,6 +3,8 @@
 #include "Sprite.h"
 #include "MegaMan.h"
 #include "Mario.h"
+#include "TerrainMesh.h"
+
 
 Renderer::Renderer()
 {
@@ -43,7 +45,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
    // assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
-    assetManager.AddModel(engine, "../Models/TestAnimModel/model.dae");
+ /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
+    assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/
 
     std::string CubeMapFiles[6];
     CubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -55,6 +58,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_SRGB);
 
+
+
+    assetManager.meshManager.MeshList.emplace_back(std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/Terrain1.bmp")));
     forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData);
     SetUpCommandBuffers(engine);
 
@@ -74,7 +80,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
       // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
 
-    //  RayRenderer = RayTraceRenderPass(engine, assetManager, SceneData);
+      RayRenderer = RayTraceRenderPass(engine, assetManager, SceneData);
       assetManager.meshManager.AddMesh(std::make_shared<WaterSurfaceMesh>(WaterSurfaceMesh(engine, assetManager, forwardRenderPass.RenderPass, SceneData)));
       
 
@@ -167,12 +173,12 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     {
         if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
         {
-            static_cast<WaterSurfaceMesh*>(mesh.get())->UpdateSwapChain(engine, assetManager, SceneData);
+            static_cast<WaterSurfaceMesh*>(mesh.get())->UpdateSwapChain(engine, assetManager, forwardRenderPass.RenderPass, SceneData);
         }
     }
    // static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
    // textureRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-  // RayRenderer.Resize(engine, assetManager, SceneData, 0);
+   RayRenderer.Resize(engine, assetManager, SceneData, 0);
 
     SetUpCommandBuffers(engine);
 }
@@ -191,7 +197,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
     assetManager.Update(engine);
     skybox.Update(engine, assetManager.materialManager, camera);
-   // RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
+    RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -218,6 +224,23 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
+
+    ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
+    ImGui::SliderFloat3("Ambient", &SceneData->UniformDataInfo.dlight.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse", &SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("Speculare", &SceneData->UniformDataInfo.dlight.specular.x, 0.0f, 1.0f);
+
+    for (int y = 0; y < assetManager.meshManager.MeshList.size(); y++)
+  {
+      auto a = std::to_string(y);
+      ImGui::Checkbox(a.c_str(), &assetManager.meshManager.MeshList[y]->ShowMesh);
+
+      ImGui::SliderFloat(("Depth " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 1.0f);
+      ImGui::SliderFloat2(("UV Offset " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+      ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshPosition.x, -1000.0f, 1000.0f);
+      ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
+      ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshScale.x, 0.0f, 3.0f);
+  }
 
    // ImGui::SliderFloat3("ReflectCamPos", &waterReflectionRenderPass.TextureCamera->Position.x, -10.0f, 10.0f);
    // ImGui::SliderFloat("ReflectPitch", &waterReflectionRenderPass.TextureCamera->Pitch, -180.0f, 180.0f);
@@ -268,7 +291,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     forwardRenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
-  // RayRenderer.Draw(engine, assetManager, imageIndex);
+   RayRenderer.Draw(engine, assetManager, imageIndex);
    interfaceRenderPass.Draw(engine, imageIndex);
     ///
     ///Draw area
@@ -296,7 +319,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
     else
     {
-        //CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
+        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
     }
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
 
@@ -359,5 +382,5 @@ void Renderer::Destroy(VulkanEngine& engine)
     forwardRenderPass.Destroy(engine);
     SceneData->Destroy(engine);
     skybox.Destory(engine);
-    //RayRenderer.Destory(engine);
+    RayRenderer.Destory(engine);
 }

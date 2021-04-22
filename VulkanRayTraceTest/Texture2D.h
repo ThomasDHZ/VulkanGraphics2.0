@@ -4,7 +4,7 @@
 
 class Texture2D : public Texture
 {
-private:
+protected:
     void CreateTextureView(VulkanEngine& engine, VkFormat format);
     void CreateTextureSampler(VulkanEngine& engine);
 public:
