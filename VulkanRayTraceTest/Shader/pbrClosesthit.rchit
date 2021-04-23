@@ -56,31 +56,25 @@ float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
+vec3 getNormalFromMap(Vertex vertex, MaterialInfo material);
 
 void main()
 {
    const Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
-   vec3 albedo     = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
+  vec3 albedo     = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
    float metallic  = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
    float roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
    float ao        = texture(TextureMap[material.AOMapID], vertex.uv).r;
 
-   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-   const vec3 Nvec3 = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-   const mat3 TBN = transpose(mat3(T, B, Nvec3));
-
-  vec3 tangentNormal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz * 2.0 - 1.0;
-  tangentNormal = tangentNormal * TBN;
-   vec3 N = tangentNormal;
+   vec3 N = getNormalFromMap(vertex, material);
    vec3 V = normalize(ubo.viewPos - vertex.pos);
 
    vec3 F0 = vec3(0.04); 
    F0 = mix(F0, albedo, metallic);
 
-    vec3 Lo = vec3(0.0);
+vec3 Lo = vec3(0.0);
     
        vec3 L = normalize(-ubo.dlight.direction);
        vec3 H = normalize(V + L);
@@ -100,7 +94,7 @@ void main()
         kD *= 1.0 - metallic;	  
 
         float NdotL = max(dot(N, L), 0.0);        
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
       
 
    vec3 ambient = vec3(0.03) * albedo * ao;
@@ -203,4 +197,16 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}
+
+vec3 getNormalFromMap(Vertex vertex, MaterialInfo material)
+{
+   const vec3 tangentNormal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz * 2.0 - 1.0;
+
+   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * tangentNormal);
+   const vec3 B = normalize(cross(N, T));
+   const mat3 TBN = mat3(T, B, N);
+
+   return normalize(TBN * tangentNormal);
 }
