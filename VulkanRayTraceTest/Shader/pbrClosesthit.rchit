@@ -61,55 +61,52 @@ void main()
 {
    const Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-   
-   const vec3 albedo = texture(TextureMap[2], vertex.uv).rgb;
-   vec3 tangentNormal = texture(TextureMap[3], vertex.uv).xyz * 2.0 - 1.0;
-   const float metallic = texture(TextureMap[6], vertex.uv).r;
-   const float roughness = texture(TextureMap[4], vertex.uv).r;
-   const float ao = texture(TextureMap[5], vertex.uv).r;
+
+   vec3 albedo     = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
+   float metallic  = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
+   float roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
+   float ao        = texture(TextureMap[material.AOMapID], vertex.uv).r;
 
    const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
    const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
    const vec3 Nvec3 = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
    const mat3 TBN = transpose(mat3(T, B, Nvec3));
 
-   vec3 N = normalize(TBN * vertex.normal);
-   vec3 V = normalize(TBN * ubo.viewPos - vertex.pos);
-   vec3 R = reflect(-V, N); 
+  vec3 tangentNormal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz * 2.0 - 1.0;
+  tangentNormal = tangentNormal * TBN;
+   vec3 N = tangentNormal;
+   vec3 V = normalize(ubo.viewPos - vertex.pos);
 
-   vec3 F0 = vec3(0.04f);
+   vec3 F0 = vec3(0.04); 
    F0 = mix(F0, albedo, metallic);
 
-   vec3 Lo = vec3(0.0);
-   for(int i = 0; i < 4; ++i) 
-   {
-        vec3 L = normalize(TBN * ubo.plight[i].position - vertex.pos);
-        vec3 H = normalize(V + L);
+    vec3 Lo = vec3(0.0);
+    
+       vec3 L = normalize(-ubo.dlight.direction);
+       vec3 H = normalize(V + L);
 
-        float distance = length(TBN * ubo.plight[i].position - vertex.pos);
-        float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = ubo.plight[i].diffuse * attenuation;
+       vec3 radiance = ubo.dlight.diffuse;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);      
-        vec3 F    = fresnelSchlick(clamp(dot(H, V), 0.0, 1.0), F0);
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
            
         vec3 nominator    = NDF * G * F; 
-        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
-        vec3 specular = nominator / max(denominator, 0.001); 
-        
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
+        vec3 specular = nominator / denominator;
+
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;
-        float NdotL = max(dot(N, L), 0.0);
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
-   }
+        kD *= 1.0 - metallic;	  
 
-    vec3 ambient = vec3(0.03) * albedo * ao;
- 
-    vec3 color = ambient + Lo;
+        float NdotL = max(dot(N, L), 0.0);        
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  
+      
 
-	rayPayload.color = color;
+   vec3 ambient = vec3(0.03) * albedo * ao;
+   vec3 color = ambient + Lo;
+
+   rayPayload.color = color;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
