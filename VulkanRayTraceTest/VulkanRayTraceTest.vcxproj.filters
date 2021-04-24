@@ -258,6 +258,15 @@
     <ClCompile Include="PBRPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="PBRIrradiancePipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyboxTextureRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedCubeMapTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -347,13 +356,16 @@
     <None Include="Shader\WaterRenderToTextureShader.vert">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\SkyBoxShader2.frag">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\PBRShader.frag">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\PBRShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\PBRIrradianceSkybox.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\PBRIrradianceSkybox.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -576,6 +588,15 @@
     </ClInclude>
     <ClInclude Include="PBRPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRIrradiancePipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyboxTextureRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedCubeMapTexture.h">
+      <Filter>Header Files\Texture</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

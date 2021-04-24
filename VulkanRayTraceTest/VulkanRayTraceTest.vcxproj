@@ -187,11 +187,13 @@
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
+    <ClCompile Include="PBRIrradiancePipeline.cpp" />
     <ClCompile Include="PBRPipeline.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
+    <ClCompile Include="RenderedCubeMapTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
     <ClCompile Include="RenderedGBufferAlbedoTexture.cpp" />
     <ClCompile Include="RenderedGBufferNormalTexture.cpp" />
@@ -202,6 +204,7 @@
     <ClCompile Include="RenderWaterTexturePipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
+    <ClCompile Include="SkyboxTextureRenderPass.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="TerrainMesh.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -235,6 +238,8 @@
     <None Include="Shader\Lighting.glsl" />
     <None Include="Shader\miss.rmiss" />
     <None Include="Shader\pbrClosesthit.rchit" />
+    <None Include="Shader\PBRIrradianceSkybox.frag" />
+    <None Include="Shader\PBRIrradianceSkybox.vert" />
     <None Include="Shader\PBRShader.frag" />
     <None Include="Shader\PBRShader.vert" />
     <None Include="Shader\raygen.rgen" />
@@ -243,7 +248,6 @@
     <None Include="Shader\shadow.rmiss" />
     <None Include="Shader\SkyBoxShader.frag" />
     <None Include="Shader\SkyBoxShader.vert" />
-    <None Include="Shader\SkyBoxShader2.frag" />
     <None Include="Shader\TextureShader.frag" />
     <None Include="Shader\TextureShader.vert" />
     <None Include="Shader\Vertex.glsl" />
@@ -293,12 +297,14 @@
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrthographicCamera.h" />
+    <ClInclude Include="PBRIrradiancePipeline.h" />
     <ClInclude Include="PBRPipeline.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="RayTraceRenderPass.h" />
     <ClInclude Include="RenderedColorTexture.h" />
+    <ClInclude Include="RenderedCubeMapTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
     <ClInclude Include="RenderedGBufferAlbedoTexture.h" />
     <ClInclude Include="RenderedGBufferNormalTexture.h" />
@@ -310,6 +316,7 @@
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxRenderingPipeline.h" />
+    <ClInclude Include="SkyboxTextureRenderPass.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="TerrainMesh.h" />
     <ClInclude Include="Texture.h" />
