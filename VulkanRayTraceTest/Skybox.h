@@ -17,7 +17,7 @@ public:
 	Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass);
 	~Skybox();
 
-	void Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera);
+	void Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera, int imageView);
 	void UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass);
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID) override;
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a);

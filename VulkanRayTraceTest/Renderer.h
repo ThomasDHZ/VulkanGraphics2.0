@@ -17,6 +17,7 @@
 class Renderer
 {
 private:
+	int imageview = 0;
 	std::shared_ptr<PerspectiveCamera> camera;
 	std::shared_ptr<PerspectiveCamera> camera2;
 	Keyboard keyboard;
