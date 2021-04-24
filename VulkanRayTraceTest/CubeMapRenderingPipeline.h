@@ -3,7 +3,7 @@
 #include "AssetManager.h"
 #include "GraphicsPipeline.h"
 
-class SkyBoxRenderingPipeline : public GraphicsPipeline
+class CubeMapRenderingPipeline : public GraphicsPipeline
 {
 private:
 	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
@@ -11,9 +11,9 @@ private:
 	void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData);
 	void SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass);
 public:
-	SkyBoxRenderingPipeline();
-	SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass);
-	~SkyBoxRenderingPipeline();
+	CubeMapRenderingPipeline();
+	CubeMapRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass);
+	~CubeMapRenderingPipeline();
 
 	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
 };

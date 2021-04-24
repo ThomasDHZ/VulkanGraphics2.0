@@ -1,11 +1,11 @@
-#include "SkyBoxRenderingPipeline.h"
+#include "CubeMapRenderingPipeline.h"
 #include "Vertex.h"
 
-SkyBoxRenderingPipeline::SkyBoxRenderingPipeline() : GraphicsPipeline()
+CubeMapRenderingPipeline::CubeMapRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-SkyBoxRenderingPipeline::SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
+CubeMapRenderingPipeline::CubeMapRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -13,11 +13,11 @@ SkyBoxRenderingPipeline::SkyBoxRenderingPipeline(VulkanEngine& engine, AssetMana
     SetUpDescriptorSets(engine, assetManager, sceneData);
 }
 
-SkyBoxRenderingPipeline::~SkyBoxRenderingPipeline()
+CubeMapRenderingPipeline::~CubeMapRenderingPipeline()
 {
 }
 
-void SkyBoxRenderingPipeline::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
+void CubeMapRenderingPipeline::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
@@ -25,7 +25,7 @@ void SkyBoxRenderingPipeline::SetUpDescriptorPool(VulkanEngine& engine, AssetMan
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
-void SkyBoxRenderingPipeline::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
+void CubeMapRenderingPipeline::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -42,7 +42,7 @@ void SkyBoxRenderingPipeline::SetUpDescriptorLayout(VulkanEngine& engine, AssetM
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void SkyBoxRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData)
+void CubeMapRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -55,7 +55,7 @@ void SkyBoxRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, AssetMan
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void CubeMapRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -142,6 +142,17 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     pushConstantRange.offset = 0;
     pushConstantRange.size = sizeof(ConstMeshInfo);
 
+    std::vector<VkDynamicState> DynamicStateSettings = 
+    { 
+        VK_DYNAMIC_STATE_VIEWPORT, 
+        VK_DYNAMIC_STATE_SCISSOR 
+    };
+
+    VkPipelineDynamicStateCreateInfo PipelineDynamicStateInfo{};
+    PipelineDynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    PipelineDynamicStateInfo.pDynamicStates = DynamicStateSettings.data();
+    PipelineDynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(DynamicStateSettings.size());
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
@@ -164,6 +175,7 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     SkyBoxpipelineInfo.pRasterizationState = &rasterizer;
     SkyBoxpipelineInfo.pMultisampleState = &multisampling;
     SkyBoxpipelineInfo.pDepthStencilState = &SkyBoxdepthStencil;
+    SkyBoxpipelineInfo.pDynamicState = &PipelineDynamicStateInfo;
     SkyBoxpipelineInfo.pColorBlendState = &colorBlending;
     SkyBoxpipelineInfo.layout = ShaderPipelineLayout;
     SkyBoxpipelineInfo.renderPass = renderPass;
@@ -181,7 +193,7 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
     }
 }
 
-void SkyBoxRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void CubeMapRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpShaderPipeLine(engine, renderPass);

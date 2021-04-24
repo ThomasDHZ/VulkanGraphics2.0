@@ -155,6 +155,7 @@
     <ClCompile Include="BaseRenderPass.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="CubeMapRenderingPipeline.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
@@ -264,6 +265,7 @@
     <ClInclude Include="BaseRenderPass.h" />
     <ClInclude Include="bone.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubeMapRenderingPipeline.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />

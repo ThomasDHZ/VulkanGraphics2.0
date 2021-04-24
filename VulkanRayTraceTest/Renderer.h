@@ -39,6 +39,7 @@ private:
 	bool framebufferResized = false;
 
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
+	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 	std::vector<Model> RenderModel;
 
 	void SetUpCommandBuffers(VulkanEngine& engine);

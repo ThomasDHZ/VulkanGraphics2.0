@@ -267,6 +267,9 @@
     <ClCompile Include="RenderedCubeMapTexture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMapRenderingPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -597,6 +600,9 @@
     </ClInclude>
     <ClInclude Include="RenderedCubeMapTexture.h">
       <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMapRenderingPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

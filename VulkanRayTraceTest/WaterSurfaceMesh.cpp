@@ -4,7 +4,7 @@ WaterSurfaceMesh::WaterSurfaceMesh() : Mesh()
 {
 }
 
-WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData) : Mesh()
+WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer) : Mesh()
 {
 	std::vector<Vertex> WaterVertices =
 	{
@@ -35,8 +35,8 @@ WaterSurfaceMesh::WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetMana
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, WaterVertices, WaterIndices);
 
-	waterReflectionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
-	waterRefractionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData);
+	waterReflectionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
+	waterRefractionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
 
 	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(engine, assetManager, SceneData, RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture));
 }

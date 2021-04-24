@@ -22,7 +22,7 @@ private:
 
 public:
 	ForwardRenderPass();
-	ForwardRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	ForwardRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	~ForwardRenderPass();
 
 	static constexpr RenderPassID RendererID = Forward_Renderer;
@@ -32,7 +32,8 @@ public:
 	std::shared_ptr<DebugLightRenderingPipeline> DebugLightPipeline;
 	std::shared_ptr<ForwardRenderingPipeline> forwardRenderingPipeline;
 	std::shared_ptr<PBRPipeline> pbrRenderingPipeline;
-	std::shared_ptr<SkyBoxRenderingPipeline> SkyBoxRenderingPipeline;
+	std::shared_ptr<SkyBoxRenderingPipeline> skyBoxRenderingPipeline;
+	std::shared_ptr<CubeMapRenderingPipeline> cubeMapRenderingPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer, Skybox& skybox);

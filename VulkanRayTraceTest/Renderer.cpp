@@ -15,6 +15,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     assetManager = AssetManager(engine);
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
+    SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
+
     assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
@@ -74,7 +76,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //uint32_t MaterialID1 = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material1);
     //assetManager.meshManager.MeshList.back()->MaterialID = MaterialID1;
 
-    forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData);
+    forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
     SetUpCommandBuffers(engine);
 
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
@@ -179,7 +181,6 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
    // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    skybox.UpdateGraphicsPipeLine(engine, forwardRenderPass.RenderPass);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
     for (auto& mesh : assetManager.meshManager.MeshList)
@@ -222,6 +223,27 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SceneData->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SceneData->UniformDataInfo.timer = engine.VulkanTimer();
     SceneData->Update(engine);
+    
+    std::vector<glm::mat4> SkyboxViews =
+    {
+        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+        glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+    };
+
+    SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
+    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
+    SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
+    //SkyUniformBuffer->UniformDataInfo.view = glm::mat4(glm::mat3(camera->GetViewMatrix()));
+    //SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
+     SkyUniformBuffer->UniformDataInfo.view = SkyboxViews[imageview];
+     SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
+    SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
+    SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+    SkyUniformBuffer->Update(engine);
 
    // WaterRenderPass.Update(engine, assetManager, *SceneData.get(), camera2);
     for (auto& mesh : assetManager.meshManager.MeshList)

@@ -15,7 +15,7 @@ class WaterSurfaceMesh : public Mesh
 
 public:
 	WaterSurfaceMesh();
-	WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData);
+	WaterSurfaceMesh(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> SceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	~WaterSurfaceMesh();
 
 	void Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);

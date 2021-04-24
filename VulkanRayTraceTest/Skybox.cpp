@@ -73,18 +73,10 @@ Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& R
     VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
     TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
     TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
-
-    SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
-    SkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass, RenderPassID::Forward_Renderer));
 }
 
 Skybox::~Skybox()
 {
-}
-
-void Skybox::UpdateGraphicsPipeLine(VulkanEngine& engine, VkRenderPass& RenderPass)
-{
-	SkyboxRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass, RenderPassID::Forward_Renderer);
 }
 
 void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera, int imageView)
@@ -104,42 +96,9 @@ void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std:
 
     TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
     MeshProperties.Update(engine);
-
-	std::vector<glm::mat4> SkyboxViews =
-	{
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-		glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
-	};
-
-    SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
-    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
-    SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
-    SkyUniformBuffer->UniformDataInfo.view = SkyboxViews[imageView];
-    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
-    SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
-    SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SkyUniformBuffer->Update(engine);
-}
-
-void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID)
-{
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, SkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &SkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
-    Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
-}
-
-void Skybox::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a)
-{
-	Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
 }
 
 void Skybox::Destory(VulkanEngine& engine)
 {
-    SkyUniformBuffer->Destroy(engine);
-	SkyboxRenderingPipeline->Destroy(engine);
 	Mesh::Destory(engine);
 }

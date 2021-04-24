@@ -15,7 +15,7 @@ private:
 
 public:
 	WaterRenderToTextureRenderPass();
-	WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	~WaterRenderToTextureRenderPass();
 
 	static constexpr RenderPassID RendererID = Water_Renderer;
@@ -30,7 +30,6 @@ public:
 
 	std::shared_ptr<RenderWaterTexturePipeline> WaterTexturePipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> WaterSkyboxRenderingPipeline;
-
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkRenderPass RenderPass = VK_NULL_HANDLE;

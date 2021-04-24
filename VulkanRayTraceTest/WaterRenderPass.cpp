@@ -5,7 +5,7 @@ WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass()
 {
 }
 
-WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
 
     TextureCamera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -19,7 +19,7 @@ WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& eng
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     WaterTexturePipeline = std::make_shared<RenderWaterTexturePipeline>(RenderWaterTexturePipeline(engine, assetManager, SceneDataBuffer, RenderPass));
-    WaterSkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass, RendererID));
+    WaterSkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -170,7 +170,7 @@ void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& as
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &WaterSkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
-    skybox.Draw(CommandBuffer, renderPassInfo, RendererID, 1);
+    skybox.Draw(CommandBuffer, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, RendererID);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
