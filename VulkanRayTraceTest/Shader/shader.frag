@@ -87,14 +87,14 @@ void main()
     vec3 normal = Normal;
     if(material.NormalMapID != 0)
     {
-        if(material.DepthMapID != 0)
-        {
-            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
-            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-            {
-              discard;
-            }
-        }
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
         normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
 
