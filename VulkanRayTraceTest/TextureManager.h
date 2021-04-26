@@ -32,7 +32,10 @@ public:
 	void LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat);
 	void UnloadAllTextures(VulkanEngine& engine);
 	void UnloadCubeMap(VulkanEngine& engine);
+	void Update(VulkanEngine& engine);
 	void Destory(VulkanEngine& engine);
+
+
 
 	std::shared_ptr<Texture> GetTextureByName(const std::string TextureName);
 	std::shared_ptr<Texture3D> Get3DTextureByName(const std::string TextureName);

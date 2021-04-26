@@ -130,6 +130,14 @@ void TextureManager::Destory(VulkanEngine& engine)
 	UnloadCubeMap(engine);
 }
 
+void TextureManager::Update(VulkanEngine& engine)
+{
+	for (int x = 0; x < TextureList.size(); x++)
+	{
+		TextureList[x]->UpdateTextureIndex(engine, x);
+	}
+}
+
 
 uint32_t TextureManager::IsTextureLoaded(std::string name)
 {

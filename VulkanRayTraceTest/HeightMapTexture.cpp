@@ -11,7 +11,7 @@ HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string Textu
 	Height = 0;
 	Depth = 1;
 	TextureID = textureID;
-	TextureBufferIndex = textureID;
+	TextureBufferIndex = 0;
 	TypeOfTexture = vkHeightMap;
 	FileName = TextureLocation;
 	TextureFormat = VK_FORMAT_R8G8B8A8_UNORM;

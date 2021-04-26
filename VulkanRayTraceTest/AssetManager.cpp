@@ -37,7 +37,7 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
 void AssetManager::Update(VulkanEngine& engine)
 {
     materialManager.UpdateBufferIndex(engine);
-
+    textureManager.Update(engine);
     meshManager.Update(engine, materialManager);
     meshManager.UpdateBufferIndex(engine);
 

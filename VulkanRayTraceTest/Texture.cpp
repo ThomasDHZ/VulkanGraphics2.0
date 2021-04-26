@@ -13,19 +13,20 @@ Texture::Texture()
 	Width = 0;
 	Height = 0;
 	Depth = 0;
+	TextureBufferIndex = 0;
 }
 
 Texture::Texture(uint32_t textureID, TextureType textureType)
 {
 	TextureID = textureID;
-	TextureBufferIndex = textureID;
+	TextureBufferIndex = 0;
 	TypeOfTexture = textureType;
 }
 
 Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType)
 {
-	TextureID = textureID;
-	TextureBufferIndex = textureID;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
 	Width = width;
 	Height = height;
 	Depth = 1;
@@ -35,8 +36,8 @@ Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, 
 
 Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType)
 {
-	TextureID = textureID;
-	TextureBufferIndex = textureID;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
 	Width = width;
 	Height = height;
 	Depth = depth;
@@ -50,8 +51,8 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, uint32_t tex
 	Width = 0;
 	Height = 0;
 	Depth = 1;
-	TextureID = textureID;
-	TextureBufferIndex = textureID;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 	TextureFormat = format;
@@ -64,6 +65,8 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat for
 	Width = 0;
 	Height = 0;
 	Depth = 1;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
 	TypeOfTexture = textureType;
 	FileName = TextureLocation;
 	TextureFormat = format;
@@ -76,13 +79,15 @@ Texture::Texture(VulkanEngine& engine, uint32_t textureID, TextureType textureTy
 	Width = 0;
 	Height = 0;
 	Depth = 1;
-	TextureID = textureID;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
 	TypeOfTexture = textureType;
 }
 
 Texture::Texture(VulkanEngine& engine, TextureType textureType)
 {
 	TypeOfTexture = textureType;
+	TextureBufferIndex = 0;
 }
 
 Texture::~Texture()
