@@ -7,6 +7,7 @@ ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()
 
 ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer) : BaseRenderPass()
 {
+    storageImage = std::make_shared<RenderedColorTexture>(engine);
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
@@ -15,7 +16,6 @@ ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, AssetManager& assetMa
     forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(engine, assetManager, sceneData, RenderPass));
     pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(engine, assetManager, sceneData, RenderPass));
     skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
-    cubeMapRenderingPipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
 
     SetUpCommandBuffers(engine);
 }
@@ -141,7 +141,6 @@ void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
     forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
-    cubeMapRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
@@ -174,22 +173,8 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
     assetManager.Draw(commandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, RendererID);
 
-    VkViewport viewport{};
-    viewport.width = 512.0f;
-    viewport.height = 512.0f;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-    vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-
-    VkRect2D rect2D{};
-    rect2D.extent.width = 512.0f;
-    rect2D.extent.height = 512.0f;
-    rect2D.offset.x = 0.0f;
-    rect2D.offset.y = 0.0f;
-    vkCmdSetScissor(commandBuffer, 0, 1, &rect2D);
-
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cubeMapRenderingPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, cubeMapRenderingPipeline->ShaderPipelineLayout, 0, 1, &cubeMapRenderingPipeline->DescriptorSets, 0, nullptr);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
     skybox.Draw(commandBuffer, renderPassInfo, RendererID);
 
     vkCmdEndRenderPass(commandBuffer);
@@ -206,7 +191,6 @@ void ForwardRenderPass::Destroy(VulkanEngine& engine)
     forwardRenderingPipeline->Destroy(engine);
     pbrRenderingPipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);
-    cubeMapRenderingPipeline->Destroy(engine);
     BaseRenderPass::Destroy(engine);
 }
 

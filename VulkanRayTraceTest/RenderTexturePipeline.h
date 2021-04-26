@@ -1,3 +1,4 @@
+#pragma once
 #include "GraphicsPipeline.h"
 #include "AssetManager.h"
 

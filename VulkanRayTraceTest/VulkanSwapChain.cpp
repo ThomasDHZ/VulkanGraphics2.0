@@ -116,7 +116,7 @@ void VulkanSwapChain::SetUpSwapChain(GLFWwindow* window, const VkDevice& device,
 	SwapChainCreateInfo.imageColorSpace = SwapChainImageFormat.colorSpace;
 	SwapChainCreateInfo.imageExtent = SwapChainResolution;
 	SwapChainCreateInfo.imageArrayLayers = 1;
-	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	SwapChainCreateInfo.preTransform = SwapChainCapabilities.currentTransform;
 	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	SwapChainCreateInfo.presentMode = SwapChainPresentMode;

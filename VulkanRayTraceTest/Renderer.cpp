@@ -77,6 +77,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //assetManager.meshManager.MeshList.back()->MaterialID = MaterialID1;
 
     forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
+    cubeMapRenderer = CubeMapRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
     SetUpCommandBuffers(engine);
 
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
@@ -135,12 +136,12 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     //assetManager.textureManager.LoadTexture2D(waterReflectionRenderPass.RenderedTexture);
     //assetManager.textureManager.LoadTexture2D(waterRefractionRenderPass.RenderedTexture);
-    forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
 
 
     //ImGui_ImplVulkan_AddTexture(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, waterRenderPass.ReflectionTexture->Sampler, waterRenderPass.ReflectionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     //mGui_ImplVulkan_AddTexture(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, waterRenderPass.RefractionTexture->Sampler, waterRenderPass.RefractionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   ///./ ImGui_ImplVulkan_AddTexture(RayRenderer.storageImage->ImGuiDescriptorSet, RayRenderer.storageImage->Sampler, RayRenderer.storageImage->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   ImGui_ImplVulkan_AddTexture(cubeMapRenderer.CopyTexture->ImGuiDescriptorSet, cubeMapRenderer.CopyTexture->Sampler, cubeMapRenderer.CopyTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 Renderer::~Renderer()
@@ -181,6 +182,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
    // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    cubeMapRenderer.UpdateSwapChain(engine);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
     for (auto& mesh : assetManager.meshManager.MeshList)
@@ -210,7 +212,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     camera2->Update(engine);
 
     assetManager.Update(engine);
-    skybox.Update(engine, assetManager.materialManager, camera, imageview);
+    skybox.Update(engine, assetManager.materialManager);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
@@ -259,6 +261,9 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("ImageView", &imageview, 0, 5);
+    ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(cubeMapRenderer.CopyTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 
     ImGui::SliderFloat3("Pos", &SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
@@ -339,6 +344,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         }
     }
     forwardRenderPass.Draw(engine, assetManager, imageIndex, RasterCommandBuffer, skybox);
+    cubeMapRenderer.Draw(engine, assetManager, imageIndex, skybox);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
    RayRenderer.Draw(engine, assetManager, imageIndex);
@@ -359,6 +365,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
        // CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
        // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(RasterCommandBuffer);
+        CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
         for (auto& mesh : assetManager.meshManager.MeshList)
         {
             if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)

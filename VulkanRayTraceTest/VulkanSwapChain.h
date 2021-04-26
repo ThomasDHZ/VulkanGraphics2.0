@@ -11,8 +11,6 @@ private:
 	uint32_t PresentModeCount;
 	uint32_t SwapChainImageCount;
 
-	
-
 	VkSurfaceFormatKHR SwapChainImageFormat;
 	VkPresentModeKHR SwapChainPresentMode;
 
@@ -24,9 +22,6 @@ private:
 	std::vector<VkPresentModeKHR> CompatiblePresentModesList;
 
 	VkSwapchainKHR Swapchain;
-
-
-
 
 	VkSurfaceFormatKHR FindSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR FindSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);

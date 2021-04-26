@@ -78,27 +78,3 @@ Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& R
 Skybox::~Skybox()
 {
 }
-
-void Skybox::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera, int imageView)
-{
-    MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
-
-    MeshTransform = glm::mat4(1.0f);
-    MeshTransform = glm::translate(MeshTransform, MeshPosition);
-    MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    MeshTransform = glm::scale(MeshTransform, MeshScale);
-
-    MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
-    glm::mat4 FinalTransform = MeshTransform;
-    glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
-
-    TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
-    MeshProperties.Update(engine);
-}
-
-void Skybox::Destory(VulkanEngine& engine)
-{
-	Mesh::Destory(engine);
-}

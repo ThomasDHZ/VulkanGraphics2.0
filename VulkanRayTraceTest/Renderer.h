@@ -13,6 +13,7 @@
 #include "DeferredRenderPass.h"
 #include "TextureRenderPass.h"
 #include "WaterSurfaceMesh.h"
+#include "CubeMapRenderPass.h"
 
 class Renderer
 {
@@ -29,6 +30,7 @@ private:
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass forwardRenderPass;
 	RayTraceRenderPass RayRenderer;
+	CubeMapRenderPass cubeMapRenderer;
 	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
 

@@ -13,8 +13,5 @@ public:
 	Skybox();
 	Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass);
 	~Skybox();
-
-	void Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera, int imageView);
-	void Destory(VulkanEngine& engine) override;
 };
 
