@@ -58,8 +58,8 @@ void CubeMapRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, AssetMa
 void CubeMapRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyBoxShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyboxTextureRendererVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyboxTextureRendererFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo SkyBoxvertexInputInfo = {};
     SkyBoxvertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -140,7 +140,7 @@ void CubeMapRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const V
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(ConstMeshInfo);
+    pushConstantRange.size = sizeof(ConstSkyBoxView);
 
     std::vector<VkDynamicState> DynamicStateSettings = 
     { 

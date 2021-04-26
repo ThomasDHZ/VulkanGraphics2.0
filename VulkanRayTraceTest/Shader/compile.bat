@@ -25,6 +25,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe FrameBuffer.vert -o FrameBufferVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe FrameBuffer.frag -o FrameBufferFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxShader.vert -o SkyBoxShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxShader.frag -o SkyBoxShaderFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyboxTextureRenderer.vert -o SkyboxTextureRendererVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyboxTextureRenderer.frag -o SkyboxTextureRendererFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRIrradianceSkybox.vert -o PBRIrradianceSkyboxShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRIrradianceSkybox.frag -o PBRIrradianceSkyboxShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe animate.comp -o animate.spv

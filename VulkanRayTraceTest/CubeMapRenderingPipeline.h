@@ -3,6 +3,12 @@
 #include "AssetManager.h"
 #include "GraphicsPipeline.h"
 
+struct ConstSkyBoxView
+{
+	alignas(16) glm::mat4 view;
+	alignas(16) glm::mat4 proj;
+};
+
 class CubeMapRenderingPipeline : public GraphicsPipeline
 {
 private:

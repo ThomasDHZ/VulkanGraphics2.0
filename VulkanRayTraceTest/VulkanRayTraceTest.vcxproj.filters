@@ -374,6 +374,12 @@
     <None Include="Shader\PBRIrradianceSkybox.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\SkyboxTextureRenderer.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\SkyboxTextureRenderer.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">
