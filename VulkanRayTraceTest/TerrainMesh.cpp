@@ -29,7 +29,7 @@ TerrainMesh::~TerrainMesh()
 
 void TerrainMesh::BuildTerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation)
 {
-	HeightMap = HeightMapTexture(engine, HeightMapLocation, 0);
+	HeightMap = HeightMapTexture(engine, HeightMapLocation);
 	const uint32_t Width = HeightMap.Width;
 	const uint32_t Height = HeightMap.Height;
 

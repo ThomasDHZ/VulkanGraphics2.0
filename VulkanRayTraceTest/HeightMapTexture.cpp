@@ -5,12 +5,12 @@ HeightMapTexture::HeightMapTexture() : Texture2D()
 {
 }
 
-HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string TextureLocation, unsigned int textureID) : Texture2D(engine, TextureLocation, VK_FORMAT_R8G8B8A8_UNORM, textureID)
+HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string TextureLocation) : Texture2D(engine, TextureLocation, VK_FORMAT_R8G8B8A8_UNORM)
 {
 	Width = 0;
 	Height = 0;
 	Depth = 1;
-	TextureID = textureID;
+	TextureID = engine.GenerateID();
 	TextureBufferIndex = 0;
 	TypeOfTexture = vkHeightMap;
 	FileName = TextureLocation;
@@ -21,7 +21,7 @@ HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string Textu
 	CreateTextureSampler(engine);
 }
 
-HeightMapTexture::HeightMapTexture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, unsigned int textureID) : Texture2D(engine, width, height, PixelList, VK_FORMAT_R8G8B8A8_UNORM, textureID)
+HeightMapTexture::HeightMapTexture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList) : Texture2D(engine, width, height, PixelList, VK_FORMAT_R8G8B8A8_UNORM)
 {
 }
 

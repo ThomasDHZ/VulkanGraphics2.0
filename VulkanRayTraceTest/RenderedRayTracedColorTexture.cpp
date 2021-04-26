@@ -4,12 +4,12 @@ RenderedRayTracedColorTexture::RenderedRayTracedColorTexture() : Texture2D()
 {
 }
 
-RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& renderer) : Texture2D(0, TextureType::vkRenderedTexture)
+RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& engine) : Texture2D(engine, TextureType::vkRenderedTexture)
 {
-    CreateTextureImage(renderer);
-    CreateTextureView(renderer);
-    CreateTextureSampler(renderer);
-    SendTextureToGPU(renderer);
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+    SendTextureToGPU(engine);
 }
 
 RenderedRayTracedColorTexture::~RenderedRayTracedColorTexture()

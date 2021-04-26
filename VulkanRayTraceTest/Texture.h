@@ -48,13 +48,10 @@ public:
     int Depth;
 
     Texture();
-    Texture(uint32_t textureID, TextureType textureType);
-    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType);
-    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, uint32_t textureID, TextureType textureType);
-    Texture(VulkanEngine& engine, std::string TextureLocation, uint32_t textureID, VkFormat format, TextureType textureType);
-    Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType);
-    Texture(VulkanEngine& engine, uint32_t textureID, TextureType textureType);
     Texture(VulkanEngine& engine, TextureType textureType);
+    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
+    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
+    Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType);
     ~Texture();
 
     void UpdateTextureIndex(VulkanEngine& engine, uint32_t NewTextureBufferIndex);

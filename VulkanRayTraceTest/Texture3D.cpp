@@ -6,14 +6,14 @@ Texture3D::Texture3D() : Texture()
 {
 }
 
-Texture3D::Texture3D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(textureID, vkTexture3D)
+Texture3D::Texture3D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(engine, vkTexture3D)
 {
 	LoadDDSTexture(engine, TextureLocation, format);
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
 }
 
-Texture3D::Texture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID) : Texture(engine, width, height, depth, PixelList, format, textureID, vkTexture3D)
+Texture3D::Texture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format) : Texture(engine, width, height, depth, PixelList, format, vkTexture3D)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);

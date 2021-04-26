@@ -19,7 +19,7 @@ private:
 	void CreateTextureSampler(VulkanEngine& engine);
 public:
 	CubeMapTexture();
-	CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat, unsigned int TextureID);
-	CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat, unsigned int TextureID);
+	CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat);
+	CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat);
 	~CubeMapTexture();
 };

@@ -37,24 +37,17 @@ TextureManager::~TextureManager()
 
 std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format)
 {
-	//uint32_t TextureID = IsTextureLoaded(TextureLocation);
-	//if (TextureID == -1)
-	//{
-		unsigned int TextureID = TextureList.size();
-		std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format, TextureID));
-		TextureList.emplace_back(texture);
-
-		ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-	//}
+	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format));
+	TextureList.emplace_back(texture);
+	ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	return texture;
 }
 
 uint32_t TextureManager::LoadTexture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
 {
-	unsigned int TextureID = TextureList.size();
-	TextureList.emplace_back(std::make_shared<Texture2D>(Texture2D(engine, width, height, PixelList, format, TextureID)));
+	TextureList.emplace_back(std::make_shared<Texture2D>(Texture2D(engine, width, height, PixelList, format)));
 	ImGui_ImplVulkan_AddTexture(TextureList.back()->ImGuiDescriptorSet, TextureList.back()->Sampler, TextureList.back()->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-	return TextureID;
+	return TextureList.back()->TextureID;
 }
 
 uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
@@ -80,18 +73,18 @@ uint32_t TextureManager::Load3DTexture(VulkanEngine& engine, const std::string T
 uint32_t TextureManager::LoadTexture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format)
 {
 	unsigned int TextureID = Texture3DList.size();
-	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, width, height, depth, PixelList, format, TextureID)));
+	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, width, height, depth, PixelList, format)));
 	return TextureID;
 }
 
 void TextureManager::LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat, 0);
+	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat);
 }
 
 void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat, 0);
+	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat);
 }
 
 void TextureManager::DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex)

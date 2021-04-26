@@ -6,14 +6,14 @@ CubeMapTexture::CubeMapTexture() : Texture()
 {
 }
 
-CubeMapTexture::CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat, unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
 {
 	LoadTexture(engine, CubeMapFiles, textureFormat);
 	CreateTextureView(engine, textureFormat);
 	CreateTextureSampler(engine);
 }
 
-CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat, unsigned int TextureID) : Texture(engine, TextureID, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
 {
 	CubeMapLayout cubeMapfiles;
 	cubeMapfiles.Left = CubeMapFiles[0];

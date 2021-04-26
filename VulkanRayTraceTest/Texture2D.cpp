@@ -6,17 +6,17 @@ Texture2D::Texture2D() : Texture()
 {
 }
 
-Texture2D::Texture2D(uint32_t textureID, TextureType textureType) : Texture(textureID, textureType)
+Texture2D::Texture2D(VulkanEngine& engine, TextureType textureType) : Texture(engine, textureType)
 {
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(engine, TextureLocation, textureID, format, TextureType::vkTexture2D)
+Texture2D::Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format) : Texture(engine, TextureLocation, format, TextureType::vkTexture2D)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, unsigned int textureID) : Texture (engine, width, height, PixelList, format, textureID, TextureType::vkTexture3D)
+Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format) : Texture (engine, width, height, PixelList, format, TextureType::vkTexture3D)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
