@@ -39,7 +39,7 @@ void AssetManager::Update(VulkanEngine& engine)
     materialManager.UpdateBufferIndex(engine);
     textureManager.Update(engine);
     meshManager.Update(engine, materialManager);
-    meshManager.UpdateBufferIndex(engine);
+
 
     modelManager.Update(engine, materialManager);
 }

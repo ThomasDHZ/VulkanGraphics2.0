@@ -17,8 +17,6 @@ class Texture
 private:
 
 protected:
-    void KTXTransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void KTXCopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
     void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
     void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
 
@@ -54,7 +52,7 @@ public:
     Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType);
     ~Texture();
 
-    void UpdateTextureIndex(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
+    void Update(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
     void UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     virtual void Delete(VulkanEngine& engine);
     VkImageView GetTextureView() { return View; }

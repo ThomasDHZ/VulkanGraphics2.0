@@ -127,7 +127,7 @@ void TextureManager::Update(VulkanEngine& engine)
 {
 	for (int x = 0; x < TextureList.size(); x++)
 	{
-		TextureList[x]->UpdateTextureIndex(engine, x);
+		TextureList[x]->Update(engine, x);
 	}
 }
 

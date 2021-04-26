@@ -23,6 +23,7 @@ void MeshManager::Update(VulkanEngine& engine, MaterialManager& materialManager)
             mesh->Update(engine, materialManager);
         }
     }
+    UpdateBufferIndex(engine);
 }
 
 void MeshManager::UpdateBufferIndex(VulkanEngine& engine)
