@@ -28,7 +28,7 @@ protected:
     virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTexture3D(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
-    void UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+   
 public:
     VkImage Image = VK_NULL_HANDLE;
     VkImageView View = VK_NULL_HANDLE;
@@ -41,6 +41,7 @@ public:
     uint32_t TextureBufferIndex = 0;
     std::string FileName;
     TextureType TypeOfTexture;
+    VkImageLayout ImageLayout;
 
     int Width;
     int Height;
@@ -57,6 +58,7 @@ public:
     ~Texture();
 
     void UpdateTextureIndex(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
+    void UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     virtual void Delete(VulkanEngine& engine);
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }

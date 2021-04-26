@@ -24,12 +24,7 @@ public:
 	SceneDataUniformBuffer sceneData;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<RenderedColorTexture> CopyTexture;
-	std::shared_ptr<RenderedColorTexture> CopyTexture2;
-	std::shared_ptr<RenderedColorTexture> CopyTexture3;
-	std::shared_ptr<RenderedColorTexture> CopyTexture4;
-	std::shared_ptr<RenderedColorTexture> CopyTexture5;
-	std::shared_ptr<RenderedColorTexture> CopyTexture6;
+	std::vector<std::shared_ptr<RenderedColorTexture>> CopyTextureList;
 
 	std::shared_ptr<CubeMapRenderingPipeline> CubeMapTexturePipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> skyBoxRenderingPipeline;

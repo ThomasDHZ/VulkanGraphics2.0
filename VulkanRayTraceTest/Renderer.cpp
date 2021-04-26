@@ -141,7 +141,10 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //ImGui_ImplVulkan_AddTexture(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, waterRenderPass.ReflectionTexture->Sampler, waterRenderPass.ReflectionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     //mGui_ImplVulkan_AddTexture(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, waterRenderPass.RefractionTexture->Sampler, waterRenderPass.RefractionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
    ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   ImGui_ImplVulkan_AddTexture(cubeMapRenderer.CopyTexture->ImGuiDescriptorSet, cubeMapRenderer.CopyTexture->Sampler, cubeMapRenderer.CopyTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   for (auto& texture : cubeMapRenderer.CopyTextureList)
+   {
+       ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   }
 }
 
 Renderer::~Renderer()
@@ -250,7 +253,10 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("ImageView", &imageview, 0, 5);
     ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(cubeMapRenderer.CopyTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    for (auto& texture : cubeMapRenderer.CopyTextureList)
+    {
+        ImGui::Image(texture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    }
 
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 

@@ -7,6 +7,7 @@ RenderedColorTexture::RenderedColorTexture() : Texture()
 
 RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
 {
+    
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
@@ -21,7 +22,7 @@ void RenderedColorTexture::CreateTextureImage(VulkanEngine& engine)
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
-    TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+    TextureInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
     TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
     TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
@@ -30,7 +31,7 @@ void RenderedColorTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 
     Texture::CreateTextureImage(engine, TextureInfo);
 }
@@ -40,7 +41,7 @@ void RenderedColorTexture::CreateTextureView(VulkanEngine& engine)
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    TextureImageViewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
+    TextureImageViewInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
     TextureImageViewInfo.subresourceRange = {};
     TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     TextureImageViewInfo.subresourceRange.baseMipLevel = 0;

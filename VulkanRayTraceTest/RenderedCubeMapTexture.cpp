@@ -29,7 +29,7 @@ void RenderedCubeMapTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 

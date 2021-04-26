@@ -10,7 +10,7 @@ CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetMa
     sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
 
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
-    CopyTexture = std::make_shared<RenderedColorTexture>(engine);
+    CopyTextureList.resize(6, std::make_shared<RenderedColorTexture>(engine));
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -165,74 +165,77 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    ConstSkyBoxView skyboxView;
-    skyboxView.view = SkyboxViews[1];
-    skyboxView.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
-    skyboxView.proj[1][1] *= -1;
+    VkImageSubresourceRange subresourceRange{};
+    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    subresourceRange.baseMipLevel = 0;
+    subresourceRange.levelCount = 1;
+    subresourceRange.layerCount = 1;
 
-    vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-    vkCmdSetScissor(CommandBuffer, 0, 1, &rect2D);
-    vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, CubeMapTexturePipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, CubeMapTexturePipeline->ShaderPipelineLayout, 0, 1, &CubeMapTexturePipeline->DescriptorSets, 0, nullptr);
-    vkCmdPushConstants(CommandBuffer, CubeMapTexturePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &skyboxView);
-    skybox.Draw(CommandBuffer, renderPassInfo, RendererID);
-    vkCmdEndRenderPass(CommandBuffer);
+    for (int x = 0; x < 6; x++)
+    {
+        ConstSkyBoxView skyboxView;
+        skyboxView.view = SkyboxViews[x];
+        skyboxView.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
+        skyboxView.proj[1][1] *= -1;
 
-    //VkImageSubresourceRange subresourceRange{};
-    //subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    //subresourceRange.baseMipLevel = 0;
-    //subresourceRange.levelCount = 1;
-    //subresourceRange.layerCount = 1;
+        vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
+        vkCmdSetScissor(CommandBuffer, 0, 1, &rect2D);
+        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, CubeMapTexturePipeline->ShaderPipeline);
+        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, CubeMapTexturePipeline->ShaderPipelineLayout, 0, 1, &CubeMapTexturePipeline->DescriptorSets, 0, nullptr);
+        vkCmdPushConstants(CommandBuffer, CubeMapTexturePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &skyboxView);
+        vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        skybox.Draw(CommandBuffer, renderPassInfo, RendererID);
+        vkCmdEndRenderPass(CommandBuffer);
 
-    //VkImageMemoryBarrier MemoryBarrior{};
-    //MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    //MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    //MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    //MemoryBarrior.image = RenderedTexture->Image;
-    //MemoryBarrior.subresourceRange = subresourceRange;
-    //MemoryBarrior.srcAccessMask = 0;
-    //MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    //vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
+      
+/*        VkImageMemoryBarrier MemoryBarrior{};
+        MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        MemoryBarrior.image = RenderedTexture->Image;
+        MemoryBarrior.subresourceRange = subresourceRange;
+        MemoryBarrior.srcAccessMask = 0;
+        MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
 
-    //VkImageMemoryBarrier barrier2 = {};
-    //barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    //barrier2.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    //barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    //barrier2.image = CopyTexture->Image;
-    //barrier2.subresourceRange = subresourceRange;
-    //barrier2.srcAccessMask = 0;
-    //barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-    //vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
+        VkImageMemoryBarrier barrier2 = {};
+        barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier2.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier2.image = CopyTextureList[x]->Image;
+        barrier2.subresourceRange = subresourceRange;
+        barrier2.srcAccessMask = 0;
+        barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
 
-    //VkImageCopy copyRegion{};
-    //copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-    //copyRegion.srcOffset = { 0, 0, 0 };
-    //copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-    //copyRegion.dstOffset = { 0, 0, 0 };
-    //copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
-    //vkCmdCopyImage(CommandBuffer, engine.SwapChain.SwapChainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, CopyTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+        VkImageCopy copyRegion{};
+        copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+        copyRegion.srcOffset = { 0, 0, 0 };
+        copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+        copyRegion.dstOffset = { 0, 0, 0 };
+        copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
+        vkCmdCopyImage(CommandBuffer, RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, CopyTextureList[x]->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
-    //VkImageMemoryBarrier barrier3 = {};
-    //barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    //barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    //barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    //barrier3.image = CopyTexture->Image;
-    //barrier3.subresourceRange = subresourceRange;
-    //barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    //barrier3.dstAccessMask = 0;
-    //vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
+        VkImageMemoryBarrier barrier3 = {};
+        barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        barrier3.image = CopyTextureList[x]->Image;
+        barrier3.subresourceRange = subresourceRange;
+        barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier3.dstAccessMask = 0;
+        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
 
-    //VkImageMemoryBarrier ReturnMemoryBarrior{};
-    //ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    //ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    //ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    //ReturnMemoryBarrior.image = RenderedTexture->Image;
-    //ReturnMemoryBarrior.subresourceRange = subresourceRange;
-    //ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    //ReturnMemoryBarrior.dstAccessMask = 0;
-    //vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
-
+        VkImageMemoryBarrier ReturnMemoryBarrior{};
+        ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        ReturnMemoryBarrior.image = RenderedTexture->Image;
+        ReturnMemoryBarrior.subresourceRange = subresourceRange;
+        ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        ReturnMemoryBarrior.dstAccessMask = 0;
+        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
+  */  }
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
