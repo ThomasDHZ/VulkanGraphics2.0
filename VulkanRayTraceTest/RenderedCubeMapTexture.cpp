@@ -4,7 +4,24 @@ RenderedCubeMapTexture::RenderedCubeMapTexture() : Texture()
 {
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
+RenderedCubeMapTexture::RenderedCubeMapTexture(VulkanEngine& engine, VkImageLayout imageLayout) : Texture(engine, TextureType::vkRenderedTexture, imageLayout)
+{
+    Width = engine.SwapChain.GetSwapChainResolution().width;
+    Height = engine.SwapChain.GetSwapChainResolution().height;
+
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+}
+
+RenderedCubeMapTexture::RenderedCubeMapTexture(VulkanEngine& engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedCubeMap, imageLayout)
+{
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+}
+
+RenderedCubeMapTexture::RenderedCubeMapTexture(VulkanEngine& engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedCubeMap, imageLayout)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -29,7 +46,7 @@ void RenderedCubeMapTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT ;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 

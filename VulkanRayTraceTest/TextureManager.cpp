@@ -131,7 +131,6 @@ void TextureManager::Update(VulkanEngine& engine)
 	}
 }
 
-
 uint32_t TextureManager::IsTextureLoaded(std::string name)
 {
 	uint32_t textureID = -1;

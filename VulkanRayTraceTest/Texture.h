@@ -9,7 +9,8 @@ enum TextureType
     vkTexture3D,
     vkTextureCube,
     vkHeightMap,
-    vkRenderedTexture
+    vkRenderedTexture,
+    vkRenderedCubeMap
 };
 
 class Texture
@@ -46,14 +47,20 @@ public:
     int Depth;
 
     Texture();
-    Texture(VulkanEngine& engine, TextureType textureType);
-    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
-    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
-    Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType);
+    Texture(VulkanEngine& engine, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, glm::vec2& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, glm::vec3& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, unsigned int depth, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, glm::vec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
     ~Texture();
 
     void Update(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
-    void UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout newImageLayout);
     virtual void Delete(VulkanEngine& engine);
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }

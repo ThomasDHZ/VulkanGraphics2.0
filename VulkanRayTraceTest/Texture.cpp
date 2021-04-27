@@ -16,31 +16,102 @@ Texture::Texture()
 	TextureBufferIndex = 0;
 }
 
-Texture::Texture(VulkanEngine& engine, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, TextureType textureType, VkImageLayout imageLayout)
 {
 	Width = 0;
 	Height = 0;
 	Depth = 1;
 	TextureID = engine.GenerateID();
 	TextureBufferIndex = 0;
-	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	ImageLayout = imageLayout;
 	TypeOfTexture = textureType;
 }
 
-Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, glm::vec2& TextureResolution, TextureType textureType, VkImageLayout imageLayout)
+{
+	Width = TextureResolution.x;
+	Height = TextureResolution.y;
+	Depth = 1;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+}
+
+Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, TextureType textureType, VkImageLayout imageLayout)
+{
+	Width = width;
+	Height = height;
+	Depth = 1;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+}
+
+Texture::Texture(VulkanEngine& engine, glm::vec3& TextureResolution, TextureType textureType, VkImageLayout imageLayout)
+{
+	Width = TextureResolution.x;
+	Height = TextureResolution.y;
+	Depth = TextureResolution.z;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+}
+
+Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, unsigned int depth, TextureType textureType, VkImageLayout imageLayout)
+{
+	Width = width;
+	Height = height;
+	Depth = depth;
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+}
+
+Texture::Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+{
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	Width = TextureResolution.x;
+	Height = TextureResolution.y;
+	Depth = 1;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+
+	CreateTexture(engine, PixelList, format);
+}
+
+Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
 {
 	TextureID = engine.GenerateID();
 	TextureBufferIndex = 0;
 	Width = width;
 	Height = height;
 	Depth = 1;
-	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	ImageLayout = imageLayout;
 	TypeOfTexture = textureType;
 
 	CreateTexture(engine, PixelList, format);
 }
 
-Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, glm::vec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+{
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	Width = TextureResolution.x;
+	Height = TextureResolution.y;
+	Depth = TextureResolution.z;
+	TextureFormat = format;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+
+	CreateTexture3D(engine, PixelList, format);
+}
+
+Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
 {
 	TextureID = engine.GenerateID();
 	TextureBufferIndex = 0;
@@ -48,13 +119,13 @@ Texture::Texture(VulkanEngine& engine, int width, int height, int depth, std::ve
 	Height = height;
 	Depth = depth;
 	TextureFormat = format;
-	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	ImageLayout = imageLayout;
 	TypeOfTexture = textureType;
 
 	CreateTexture3D(engine, PixelList, format);
 }
 
-Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType)
+Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
 {
 	Width = 0;
 	Height = 0;
@@ -63,7 +134,7 @@ Texture::Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat for
 	TextureBufferIndex = 0;
 	FileName = TextureLocation;
 	TextureFormat = format;
-	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	ImageLayout = imageLayout;
 	TypeOfTexture = textureType;
 
 	LoadTexture(engine, TextureLocation, format);
@@ -90,7 +161,8 @@ void Texture::TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayou
 	barrier.subresourceRange.baseArrayLayer = 0;
 
 	if (TypeOfTexture == TextureType::vkTexture2D ||
-		TypeOfTexture == TextureType::vkTexture3D)
+		TypeOfTexture == TextureType::vkTexture3D ||
+		TypeOfTexture == TextureType::vkHeightMap)
 	{
 		barrier.subresourceRange.layerCount = 1;
 	}
@@ -144,7 +216,8 @@ void Texture::CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer)
 	region.imageExtent.depth = Depth;
 
 	if (TypeOfTexture == TextureType::vkTexture2D ||
-		TypeOfTexture == TextureType::vkTexture3D)
+		TypeOfTexture == TextureType::vkTexture3D ||
+		TypeOfTexture == TextureType::vkHeightMap)
 	{
 		region.imageSubresource.layerCount = 1;
 	}
@@ -228,7 +301,7 @@ void Texture::LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, 
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	Texture::CreateTextureImage(engine, TextureInfo);
+	CreateTextureImage(engine, TextureInfo);
 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
@@ -261,7 +334,7 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	Texture::CreateTextureImage(engine, TextureInfo);
+	CreateTextureImage(engine, TextureInfo);
 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
@@ -354,26 +427,21 @@ void Texture::CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo Texture
 	vkBindImageMemory(engine.Device, Image, Memory, 0);
 }
 
-void Texture::UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout)
+void Texture::UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout newImageLayout)
 {
+	const VkImageLayout OldImageLayout = ImageLayout;
+	ImageLayout = newImageLayout;
+
 	VkImageMemoryBarrier imageMemoryBarrier{};
 	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	imageMemoryBarrier.oldLayout = oldImageLayout;
-	imageMemoryBarrier.newLayout = newImageLayout;
+	imageMemoryBarrier.oldLayout = OldImageLayout;
+	imageMemoryBarrier.newLayout = ImageLayout;
 	imageMemoryBarrier.image = Image;
 	imageMemoryBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 	imageMemoryBarrier.srcAccessMask = 0;
-
-	vkCmdPipelineBarrier(
-		buffer,
-		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-		VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-		0,
-		0, nullptr,
-		0, nullptr,
-		1, &imageMemoryBarrier);
+	vkCmdPipelineBarrier(buffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 }
 
 void Texture::Update(VulkanEngine& engine, uint32_t NewTextureBufferIndex)

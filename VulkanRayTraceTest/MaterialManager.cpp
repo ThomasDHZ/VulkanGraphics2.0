@@ -76,7 +76,7 @@ uint32_t MaterialManager::GetMaterialBufferIDByMaterialID(uint32_t MaterialID)
 	return BufferIndex;
 }
 
-void MaterialManager::UpdateBufferIndex(VulkanEngine& engine)
+void MaterialManager::Update(VulkanEngine& engine)
 {
 	for(int x = 0; x < MaterialList.size(); x++)
 	{
@@ -91,7 +91,7 @@ void MaterialManager::DeleteMaterial(VulkanEngine& engine, uint32_t DeleteMateri
 	material->Delete(engine);
 	MaterialList.erase(MaterialList.begin() + DeleteMaterialBufferIndex);
 
-	UpdateBufferIndex(engine);
+	Update(engine);
 }
 
 void MaterialManager::Destory(VulkanEngine& engine)

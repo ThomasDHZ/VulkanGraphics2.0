@@ -5,7 +5,24 @@ RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture() : Texture()
 {
 }
 
-RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
+RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(VulkanEngine& engine, VkImageLayout imageLayout) : Texture(engine, TextureType::vkRenderedTexture, imageLayout)
+{
+    Width = engine.SwapChain.GetSwapChainResolution().width;
+    Height = engine.SwapChain.GetSwapChainResolution().height;
+
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+}
+
+RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(VulkanEngine& engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, imageLayout)
+{
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+}
+
+RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(VulkanEngine& engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedTexture, imageLayout)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -27,6 +44,7 @@ void RenderedGBufferAlbedoTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
+    TextureInfo.initialLayout = ImageLayout;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;

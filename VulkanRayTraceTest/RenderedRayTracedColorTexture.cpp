@@ -90,7 +90,7 @@ void RenderedRayTracedColorTexture::SendTextureToGPU(VulkanEngine& engine)
     cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
     vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    UpdateColorFormat(engine, cmdBuffer, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+    UpdateImageLayout(engine, cmdBuffer, VK_IMAGE_LAYOUT_GENERAL);
     vkEndCommandBuffer(cmdBuffer);
 
     VkSubmitInfo submitInfo{};

@@ -9,7 +9,9 @@ private:
     void CreateTextureSampler(VulkanEngine& engine);
 public:
     RenderedColorTexture();
-    RenderedColorTexture(VulkanEngine& engine);
+    RenderedColorTexture(VulkanEngine& engine, VkImageLayout ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    RenderedColorTexture(VulkanEngine& engine, glm::vec2& TextureResolution, VkImageLayout ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    RenderedColorTexture(VulkanEngine& engine, int width, int Height, VkImageLayout ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
     ~RenderedColorTexture();
 
     void RecreateRendererTexture(VulkanEngine& engine);

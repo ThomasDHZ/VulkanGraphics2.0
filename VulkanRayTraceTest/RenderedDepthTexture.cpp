@@ -5,7 +5,24 @@ RenderedDepthTexture::RenderedDepthTexture() : Texture()
 {
 }
 
-RenderedDepthTexture::RenderedDepthTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture)
+RenderedDepthTexture::RenderedDepthTexture(VulkanEngine& engine, VkImageLayout imageLayout) : Texture(engine, TextureType::vkRenderedTexture, imageLayout)
+{
+    Width = engine.SwapChain.GetSwapChainResolution().width;
+    Height = engine.SwapChain.GetSwapChainResolution().height;
+
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+}
+
+RenderedDepthTexture::RenderedDepthTexture(VulkanEngine& engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, imageLayout)
+{
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+}
+
+RenderedDepthTexture::RenderedDepthTexture(VulkanEngine& engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedTexture, imageLayout)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -28,7 +45,7 @@ void RenderedDepthTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.arrayLayers = 1;
     TextureInfo.format = VK_FORMAT_D32_SFLOAT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    TextureInfo.initialLayout = ImageLayout;
     TextureInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;

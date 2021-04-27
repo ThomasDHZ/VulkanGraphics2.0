@@ -16,7 +16,7 @@ public:
 	~MaterialManager();
 
 	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
-	void UpdateBufferIndex(VulkanEngine& engine);
+	void Update(VulkanEngine& engine);
 	void DeleteMaterial(VulkanEngine& engine, uint32_t DeleteMaterialBufferIndex);
 	void Destory(VulkanEngine& engine);
 
