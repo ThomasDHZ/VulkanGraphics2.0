@@ -8,27 +8,10 @@ TextureManager::TextureManager()
 TextureManager::TextureManager(VulkanEngine& engine)
 {
 	LoadTexture2D(engine, "../texture/DefaultTexture.png", VK_FORMAT_R8G8B8A8_UNORM);
-	TextureList[0]->FileName = "DefaultTexture";
+	TextureList.back()->FileName = "DefaultTexture";
 	
 	LoadTexture2D(engine, "../texture/AlphaDefault.png", VK_FORMAT_R8G8B8A8_UNORM);
-	TextureList[1]->FileName = "DefaultAlphaTexture";
-
-	//auto ab = LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-	//TextureList[2]->FileName = "AlbedoTexture";
-	//
-	//auto ac = LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-	//TextureList[3]->FileName = "NormalTexture";
-	//
-	//auto ad = LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-	//TextureList[4]->FileName = "RoughnessTexture";
-	//
-	//auto ae = LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-	//TextureList[5]->FileName = "AOTexture";
-
-	//auto af = LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-	//TextureList[6]->FileName = "Metallic";
-
-	//int a = 34;
+	TextureList.back()->FileName = "DefaultAlphaTexture";
 }
 
 TextureManager::~TextureManager()
@@ -61,13 +44,8 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 
 uint32_t TextureManager::Load3DTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format)
 {
-	//uint32_t TextureID = IsTextureLoaded(TextureLocation);
-	//if (TextureID == -1)
-	//{
-	unsigned int TextureID = TextureList.size();
-	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, TextureLocation, format, TextureID)));
-	//}
-	return TextureID;
+	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, TextureLocation, format)));
+	return Texture3DList.back()->TextureID;
 }
 
 uint32_t TextureManager::LoadTexture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format)

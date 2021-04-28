@@ -6,7 +6,7 @@ Texture3D::Texture3D() : Texture()
 {
 }
 
-Texture3D::Texture3D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID) : Texture(engine, vkTexture3D)
+Texture3D::Texture3D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format) : Texture(engine, vkTexture3D)
 {
 	LoadDDSTexture(engine, TextureLocation, format);
 	CreateTextureView(engine, format);

@@ -78,7 +78,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     assetManager.meshManager.MeshList.back()->MaterialID = MaterialID1;
 
     forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
-    cubeMapRenderer = CubeMapRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
+    cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f, SceneData, SkyUniformBuffer);
     SetUpCommandBuffers(engine);
 
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
@@ -253,11 +253,14 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("ImageView", &imageview, 0, 5);
-    //ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    //for (auto& texture : cubeMapRenderer.CopyTextureList)
-    //{
-    //    ImGui::Image(texture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    //}
+
+    ImGui::LabelText("Orginal View", "Orginal View");
+    ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    for (int x  = 0; x < 6; x++)
+    {
+        ImGui::LabelText(("Copy texture " + std::to_string(x + 1)).c_str(), ("Copy texture " + std::to_string(x + 1)).c_str());
+        ImGui::Image(cubeMapRenderer.CopyTextureList[x]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    }
 
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
 

@@ -17,11 +17,13 @@ private:
 
 public:
 	CubeMapRenderPass();
-	CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
+	CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t CubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	~CubeMapRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
 	SceneDataUniformBuffer sceneData;
+
+	uint32_t CubeMapSize;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::vector<std::shared_ptr<RenderedColorTexture>> CopyTextureList;
@@ -33,7 +35,6 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
 	void UpdateSwapChain(VulkanEngine& engine);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox);
 	void Destroy(VulkanEngine& engine);

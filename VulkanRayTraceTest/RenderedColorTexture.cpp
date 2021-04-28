@@ -5,7 +5,7 @@ RenderedColorTexture::RenderedColorTexture() : Texture()
 {
 }
 
-RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, VkImageLayout imageLayout) : Texture(engine, TextureType::vkRenderedTexture, imageLayout)
+RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine) : Texture(engine, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
 {
     Width = engine.SwapChain.GetSwapChainResolution().width;
     Height = engine.SwapChain.GetSwapChainResolution().height;
@@ -15,14 +15,14 @@ RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, VkImageLayout i
     CreateTextureSampler(engine);
 }
 
-RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, imageLayout)
+RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, glm::vec2 TextureResolution) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
 }
 
-RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedTexture, imageLayout)
+RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, int width, int height) : Texture(engine, width, height, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -39,12 +39,12 @@ void RenderedColorTexture::CreateTextureImage(VulkanEngine& engine)
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
     TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
-    TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
-    TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
+    TextureInfo.extent.width = Width;
+    TextureInfo.extent.height = Height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
-    TextureInfo.initialLayout = ImageLayout;
+    TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;

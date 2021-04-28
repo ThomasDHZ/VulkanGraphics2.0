@@ -5,12 +5,14 @@ CubeMapRenderPass::CubeMapRenderPass()
 {
 }
 
-CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
     sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
 
-    RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
-    CopyTextureList.resize(6, std::make_shared<RenderedColorTexture>(engine));
+    CubeMapSize = cubeMapSize;
+
+    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, glm::vec2(CubeMapSize)));
+    CopyTextureList.resize(6, std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, glm::vec2(CubeMapSize, CubeMapSize))));
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -54,7 +56,7 @@ void CubeMapRenderPass::CreateRenderPass(VulkanEngine& engine)
     FirstDependency.srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
     FirstDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     FirstDependency.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    FirstDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    FirstDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     FirstDependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
     DependencyList.emplace_back(FirstDependency);
 
@@ -63,7 +65,7 @@ void CubeMapRenderPass::CreateRenderPass(VulkanEngine& engine)
     SecondDependency.dstSubpass = VK_SUBPASS_EXTERNAL;
     SecondDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     SecondDependency.dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-    SecondDependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    SecondDependency.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     SecondDependency.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
     SecondDependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
     DependencyList.emplace_back(SecondDependency);
@@ -97,8 +99,8 @@ void CubeMapRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine.SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine.SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = CubeMapSize;
+        frameBufferCreateInfo.height = CubeMapSize;
         frameBufferCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(engine.Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
@@ -130,12 +132,16 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    VkExtent2D rectextent;
+    rectextent.width = CubeMapSize;
+    rectextent.height = CubeMapSize;
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = rectextent;
 
     std::array<VkClearValue, 1> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -144,14 +150,14 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     renderPassInfo.pClearValues = clearValues.data();
 
     VkViewport viewport{};
-    viewport.width = 512.0f;
-    viewport.height = 512.0f;
+    viewport.width = CubeMapSize;
+    viewport.height = CubeMapSize;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D rect2D{};
-    rect2D.extent.width = 512.0f;
-    rect2D.extent.height = 512.0f;
+    rect2D.extent.width = CubeMapSize;
+    rect2D.extent.height = CubeMapSize;
     rect2D.offset.x = 0.0f;
     rect2D.offset.y = 0.0f;
 
@@ -164,12 +170,6 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
-
-    VkImageSubresourceRange subresourceRange{};
-    subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    subresourceRange.baseMipLevel = 0;
-    subresourceRange.levelCount = 1;
-    subresourceRange.layerCount = 1;
 
     for (int x = 0; x < 6; x++)
     {
@@ -186,74 +186,12 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
         vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         skybox.Draw(CommandBuffer, renderPassInfo, RendererID);
         vkCmdEndRenderPass(CommandBuffer);
-
-      
-/*        VkImageMemoryBarrier MemoryBarrior{};
-        MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        MemoryBarrior.image = RenderedTexture->Image;
-        MemoryBarrior.subresourceRange = subresourceRange;
-        MemoryBarrior.srcAccessMask = 0;
-        MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
-
-        VkImageMemoryBarrier barrier2 = {};
-        barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier2.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier2.image = CopyTextureList[x]->Image;
-        barrier2.subresourceRange = subresourceRange;
-        barrier2.srcAccessMask = 0;
-        barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
-
-        VkImageCopy copyRegion{};
-        copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-        copyRegion.srcOffset = { 0, 0, 0 };
-        copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-        copyRegion.dstOffset = { 0, 0, 0 };
-        copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
-        vkCmdCopyImage(CommandBuffer, RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, CopyTextureList[x]->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-
-        VkImageMemoryBarrier barrier3 = {};
-        barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        barrier3.image = CopyTextureList[x]->Image;
-        barrier3.subresourceRange = subresourceRange;
-        barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        barrier3.dstAccessMask = 0;
-        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
-
-        VkImageMemoryBarrier ReturnMemoryBarrior{};
-        ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        ReturnMemoryBarrior.image = RenderedTexture->Image;
-        ReturnMemoryBarrior.subresourceRange = subresourceRange;
-        ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        ReturnMemoryBarrior.dstAccessMask = 0;
-        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
-  */  }
+        Texture::CopyTexture(engine, CommandBuffer, RenderedTexture, CopyTextureList[x]);
+   }
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-}
-
-void CubeMapRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
-{
-    copysceneDataptr.UniformDataInfo.sLight.direction = camera->GetFront();
-    copysceneDataptr.UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
-    copysceneDataptr.UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
-    copysceneDataptr.UniformDataInfo.projInverse[1][1] *= -1;
-    copysceneDataptr.UniformDataInfo.view = camera->GetViewMatrix();
-    copysceneDataptr.UniformDataInfo.proj = camera->GetProjectionMatrix();
-    copysceneDataptr.UniformDataInfo.proj[1][1] *= -1;
-    copysceneDataptr.UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-
-    sceneData.Update(engine, copysceneDataptr.UniformDataInfo);
 }
 
 void CubeMapRenderPass::UpdateSwapChain(VulkanEngine& engine)

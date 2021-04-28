@@ -440,7 +440,16 @@ void Texture::UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer buffer, Vk
 	imageMemoryBarrier.newLayout = ImageLayout;
 	imageMemoryBarrier.image = Image;
 	imageMemoryBarrier.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-	imageMemoryBarrier.srcAccessMask = 0;
+	if(newImageLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+	{
+		imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		imageMemoryBarrier.dstAccessMask = 0;
+	}
+	else
+	{
+		imageMemoryBarrier.srcAccessMask = 0;
+		imageMemoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	}
 	vkCmdPipelineBarrier(buffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 }
 
@@ -460,4 +469,62 @@ void Texture::Delete(VulkanEngine& engine)
 	Image = VK_NULL_HANDLE;
 	Memory = VK_NULL_HANDLE;
 	Sampler = VK_NULL_HANDLE;
+}
+
+void Texture::CopyTexture(VulkanEngine& engine, VkCommandBuffer CommandBuffer, std::shared_ptr<Texture> SrcTexture, std::shared_ptr<Texture> DstTexture)
+{
+	VkImageSubresourceRange subresourceRange{};
+	subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	subresourceRange.baseMipLevel = 0;
+	subresourceRange.levelCount = 1;
+	subresourceRange.layerCount = 1;
+
+	VkImageMemoryBarrier MemoryBarrior{};
+	MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	MemoryBarrior.image = SrcTexture->Image;
+	MemoryBarrior.subresourceRange = subresourceRange;
+	MemoryBarrior.srcAccessMask = 0;
+	MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
+
+	VkImageMemoryBarrier barrier2 = {};
+	barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier2.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	barrier2.image = DstTexture->Image;
+	barrier2.subresourceRange = subresourceRange;
+	barrier2.srcAccessMask = 0;
+	barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
+
+	VkImageCopy copyRegion{};
+	copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+	copyRegion.srcOffset = { 0, 0, 0 };
+	copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+	copyRegion.dstOffset = { 0, 0, 0 };
+	copyRegion.extent = { (uint32_t)SrcTexture->Width, (uint32_t)SrcTexture->Height, 1 };
+	vkCmdCopyImage(CommandBuffer, SrcTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+	VkImageMemoryBarrier barrier3 = {};
+	barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+	barrier3.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	barrier3.image = DstTexture->Image;
+	barrier3.subresourceRange = subresourceRange;
+	barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	barrier3.dstAccessMask = 0;
+	vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
+
+	VkImageMemoryBarrier ReturnMemoryBarrior{};
+	ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	ReturnMemoryBarrior.image = SrcTexture->Image;
+	ReturnMemoryBarrior.subresourceRange = subresourceRange;
+	ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	ReturnMemoryBarrior.dstAccessMask = 0;
+	vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
+
 }

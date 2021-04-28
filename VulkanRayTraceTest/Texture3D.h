@@ -9,7 +9,7 @@ private:
     void CreateTextureSampler(VulkanEngine& engine);
 public:
     Texture3D();
-    Texture3D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format, unsigned int textureID);
+    Texture3D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
     Texture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format);
     ~Texture3D();
 };

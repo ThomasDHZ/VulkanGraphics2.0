@@ -64,4 +64,6 @@ public:
     virtual void Delete(VulkanEngine& engine);
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }
+
+    static void CopyTexture(VulkanEngine& engine, VkCommandBuffer CommandBuffer, std::shared_ptr<Texture> SrcTexture, std::shared_ptr<Texture> DstTexture);
 };
