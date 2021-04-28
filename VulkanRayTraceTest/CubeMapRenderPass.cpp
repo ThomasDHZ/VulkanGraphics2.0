@@ -10,7 +10,7 @@ CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetMa
     CubeMapSize = cubeMapSize;
 
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, glm::vec2(CubeMapSize)));
-    CopyTextureList.resize(6, std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, glm::vec2(CubeMapSize, CubeMapSize))));
+    CopyTextureList = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(engine, glm::vec2(CubeMapSize, CubeMapSize)));
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -169,6 +169,22 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
+    VkImageSubresourceRange SkyBoxSubresourceRange{};
+    SkyBoxSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    SkyBoxSubresourceRange.baseMipLevel = 0;
+    SkyBoxSubresourceRange.levelCount = 1;
+    SkyBoxSubresourceRange.layerCount = 6;
+
+    VkImageMemoryBarrier SkyBoxBarrierStart = {};
+    SkyBoxBarrierStart.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    SkyBoxBarrierStart.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    SkyBoxBarrierStart.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    SkyBoxBarrierStart.image = CopyTextureList->Image;
+    SkyBoxBarrierStart.subresourceRange = SkyBoxSubresourceRange;
+    SkyBoxBarrierStart.srcAccessMask = 0;
+    SkyBoxBarrierStart.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierStart);
+
     for (int x = 0; x < 6; x++)
     {
         ConstSkyBoxView skyboxView;
@@ -184,8 +200,61 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
         vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         skybox.Draw(CommandBuffer, renderPassInfo, RendererID);
         vkCmdEndRenderPass(CommandBuffer);
-        Texture::CopyTexture(engine, CommandBuffer, RenderedTexture, CopyTextureList[x]);
+
+        VkImageSubresourceRange ImageSubresourceRange{};
+        ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ImageSubresourceRange.baseMipLevel = 0;
+        ImageSubresourceRange.levelCount = 1;
+        ImageSubresourceRange.layerCount = 1;
+
+        VkImageMemoryBarrier MemoryBarrior{};
+        MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        MemoryBarrior.image = RenderedTexture->Image;
+        MemoryBarrior.subresourceRange = ImageSubresourceRange;
+        MemoryBarrior.srcAccessMask = 0;
+        MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
+
+        VkImageCopy copyRegion = {};
+        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.srcSubresource.baseArrayLayer = 0;
+        copyRegion.srcSubresource.mipLevel = 0;
+        copyRegion.srcSubresource.layerCount = 1;
+        copyRegion.srcOffset = { 0, 0, 0 };
+
+        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.dstSubresource.baseArrayLayer = x;
+        copyRegion.dstSubresource.mipLevel = 0;
+        copyRegion.dstSubresource.layerCount = 1;
+        copyRegion.dstOffset = { 0, 0, 0 };
+
+        copyRegion.extent.width = (uint32_t)RenderedTexture->Width;
+        copyRegion.extent.height = (uint32_t)RenderedTexture->Height;
+        copyRegion.extent.depth = 1;
+        vkCmdCopyImage(CommandBuffer, RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, CopyTextureList->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+        VkImageMemoryBarrier ReturnMemoryBarrior{};
+        ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        ReturnMemoryBarrior.image = RenderedTexture->Image;
+        ReturnMemoryBarrior.subresourceRange = ImageSubresourceRange;
+        ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        ReturnMemoryBarrior.dstAccessMask = 0;
+        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
    }
+
+    VkImageMemoryBarrier SkyBoxBarrierEnd = {};
+    SkyBoxBarrierEnd.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    SkyBoxBarrierEnd.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    SkyBoxBarrierEnd.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    SkyBoxBarrierEnd.image = CopyTextureList->Image;
+    SkyBoxBarrierEnd.subresourceRange = SkyBoxSubresourceRange;
+    SkyBoxBarrierEnd.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    SkyBoxBarrierEnd.dstAccessMask = 0;
+    vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierEnd);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -216,7 +285,7 @@ void CubeMapRenderPass::Destroy(VulkanEngine& engine)
     RenderedTexture->Delete(engine);
     for (int x = 0; x < 6; x++)
     {
-        CopyTextureList[x]->Delete(engine);
+        //CopyTextureList[x]->Delete(engine);
     }
 
     CubeMapTexturePipeline->Destroy(engine);

@@ -7,6 +7,7 @@
 #include "CubeMapRenderingPipeline.h"
 #include "SkyBoxRenderingPipeline.h"
 #include "Skybox.h"
+#include "RenderedCubeMapTexture.h"
 
 class CubeMapRenderPass
 {
@@ -25,7 +26,7 @@ public:
 	uint32_t CubeMapSize;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::vector<std::shared_ptr<RenderedColorTexture>> CopyTextureList;
+	std::shared_ptr<RenderedCubeMapTexture> CopyTextureList;
 
 	std::shared_ptr<CubeMapRenderingPipeline> CubeMapTexturePipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> skyBoxRenderingPipeline;

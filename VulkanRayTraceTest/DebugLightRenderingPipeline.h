@@ -15,5 +15,5 @@ public:
 	DebugLightRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass);
 	~DebugLightRenderingPipeline();
 
-	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass) override;
+	void UpdateGraphicsPipeLine(VulkanEngine& renderer, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass);
 };

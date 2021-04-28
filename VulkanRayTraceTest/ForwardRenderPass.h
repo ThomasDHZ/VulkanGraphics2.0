@@ -35,7 +35,7 @@ public:
 	std::shared_ptr<PBRPipeline> pbrRenderingPipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> skyBoxRenderingPipeline;
 
-	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine) override;

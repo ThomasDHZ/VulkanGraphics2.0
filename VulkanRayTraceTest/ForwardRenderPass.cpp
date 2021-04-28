@@ -121,7 +121,7 @@ void ForwardRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
     DepthTexture->RecreateRendererTexture(engine);
 
@@ -136,10 +136,10 @@ void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    DebugLightPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
-    forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
-    pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
+    forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
+    pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, SkyUniformBuffer, RenderPass);
     SetUpCommandBuffers(engine);
 }
 

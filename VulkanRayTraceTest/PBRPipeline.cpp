@@ -206,8 +206,11 @@ void PBRPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& 
     }
 }
 
-void PBRPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void PBRPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    SetUpDescriptorPool(engine, assetManager);
+    SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
+    SetUpDescriptorSets(engine, assetManager, sceneData);
 }

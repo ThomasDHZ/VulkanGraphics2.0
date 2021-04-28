@@ -499,12 +499,22 @@ void Texture::CopyTexture(VulkanEngine& engine, VkCommandBuffer CommandBuffer, s
 	barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 	vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
 
-	VkImageCopy copyRegion{};
-	copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+	VkImageCopy copyRegion = {};
+	copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	copyRegion.srcSubresource.baseArrayLayer = 0;
+	copyRegion.srcSubresource.mipLevel = 0;
+	copyRegion.srcSubresource.layerCount = 1;
 	copyRegion.srcOffset = { 0, 0, 0 };
-	copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
+
+	copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	copyRegion.dstSubresource.baseArrayLayer = 0;
+	copyRegion.dstSubresource.mipLevel = 0;
+	copyRegion.dstSubresource.layerCount = 1;
 	copyRegion.dstOffset = { 0, 0, 0 };
-	copyRegion.extent = { (uint32_t)SrcTexture->Width, (uint32_t)SrcTexture->Height, 1 };
+
+	copyRegion.extent.width = (uint32_t)SrcTexture->Width;
+	copyRegion.extent.height = (uint32_t)SrcTexture->Height;
+	copyRegion.extent.depth = 1;
 	vkCmdCopyImage(CommandBuffer, SrcTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DstTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
 	VkImageMemoryBarrier barrier3 = {};

@@ -61,7 +61,15 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     CubeMapFiles[4] = "../texture/skybox/back.jpg";
     CubeMapFiles[5] = "../texture/skybox/front.jpg";
 
-    assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_SRGB);
+    std::string CubeMapFiles2[6];
+    CubeMapFiles2[0] = "../texture/skybox/CosmicCoolCloudRight.png";
+    CubeMapFiles2[1] = "../texture/skybox/CosmicCoolCloudLeft.png";
+    CubeMapFiles2[2] = "../texture/skybox/CosmicCoolCloudFront.png";
+    CubeMapFiles2[3] = "../texture/skybox/CosmicCoolCloudBottom.png";
+    CubeMapFiles2[4] = "../texture/skybox/CosmicCoolCloudBack.png";
+    CubeMapFiles2[5] = "../texture/skybox/CosmicCoolCloudTop.png";
+
+    assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
 
 
 
@@ -141,10 +149,10 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //ImGui_ImplVulkan_AddTexture(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, waterRenderPass.ReflectionTexture->Sampler, waterRenderPass.ReflectionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     //mGui_ImplVulkan_AddTexture(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, waterRenderPass.RefractionTexture->Sampler, waterRenderPass.RefractionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
    ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   for (auto& texture : cubeMapRenderer.CopyTextureList)
-   {
-       ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   }
+   //for (auto& texture : cubeMapRenderer.CopyTextureList)
+   //{
+   //    ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   //}
 }
 
 Renderer::~Renderer()
@@ -154,6 +162,8 @@ Renderer::~Renderer()
 
 void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
+    assetManager.textureManager.LoadCubeMap(engine, cubeMapRenderer.CopyTextureList);
+
     int width = 0, height = 0;
     glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
     while (width == 0 || height == 0) {
@@ -171,7 +181,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
    // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData, SkyUniformBuffer);
     cubeMapRenderer.UpdateSwapChain(engine);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
@@ -242,8 +252,8 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     for (int x  = 0; x < 6; x++)
     {
-        ImGui::LabelText(("Copy texture " + std::to_string(x + 1)).c_str(), ("Copy texture " + std::to_string(x + 1)).c_str());
-        ImGui::Image(cubeMapRenderer.CopyTextureList[x]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+       /* ImGui::LabelText(("Copy texture " + std::to_string(x + 1)).c_str(), ("Copy texture " + std::to_string(x + 1)).c_str());
+        ImGui::Image(cubeMapRenderer.CopyTextureList[x]->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));*/
     }
 
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);

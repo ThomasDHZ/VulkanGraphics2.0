@@ -57,12 +57,17 @@ uint32_t TextureManager::LoadTexture3D(VulkanEngine& engine, int width, int heig
 
 void TextureManager::LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat);
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
 }
 
 void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	CubeMap = CubeMapTexture(engine, CubeMapFiles, textureFormat);
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
+}
+
+void TextureManager::LoadCubeMap(VulkanEngine& engine, std::shared_ptr<Texture> cubeMapTexture)
+{
+	CubeMap = cubeMapTexture;
 }
 
 void TextureManager::DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex)
@@ -92,7 +97,7 @@ void TextureManager::UnloadAllTextures(VulkanEngine& engine)
 
 void TextureManager::UnloadCubeMap(VulkanEngine& engine)
 {
-	CubeMap.Delete(engine);
+	CubeMap->Delete(engine);
 }
 
 void TextureManager::Destory(VulkanEngine& engine)
@@ -182,7 +187,7 @@ VkDescriptorImageInfo TextureManager::GetSkyBoxTextureBufferListDescriptor()
 {
 	VkDescriptorImageInfo DescriptorImage{};
 	DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	DescriptorImage.imageView = CubeMap.GetTextureView();
-	DescriptorImage.sampler = CubeMap.GetTextureSampler();
+	DescriptorImage.imageView = CubeMap->GetTextureView();
+	DescriptorImage.sampler = CubeMap->GetTextureSampler();
 	return DescriptorImage;
 }

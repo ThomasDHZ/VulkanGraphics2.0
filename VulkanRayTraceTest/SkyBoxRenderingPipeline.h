@@ -15,5 +15,5 @@ public:
 	SkyBoxRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass);
 	~SkyBoxRenderingPipeline();
 
-	void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	void UpdateGraphicsPipeLine(VulkanEngine& renderer, AssetManager& assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData, const VkRenderPass& renderPass);
 };
