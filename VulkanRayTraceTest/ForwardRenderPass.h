@@ -28,8 +28,6 @@ public:
 
 	static constexpr RenderPassID RendererID = Forward_Renderer;
 
-
-	std::shared_ptr<RenderedColorTexture> storageImage;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<DebugLightRenderingPipeline> DebugLightPipeline;
@@ -38,7 +36,7 @@ public:
 	std::shared_ptr<SkyBoxRenderingPipeline> skyBoxRenderingPipeline;
 
 	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer, Skybox& skybox);
-	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer);
+	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox);
+	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine) override;
 };

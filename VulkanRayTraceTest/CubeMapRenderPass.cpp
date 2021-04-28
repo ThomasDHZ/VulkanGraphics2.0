@@ -7,8 +7,6 @@ CubeMapRenderPass::CubeMapRenderPass()
 
 CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
-    sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
-
     CubeMapSize = cubeMapSize;
 
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, glm::vec2(CubeMapSize)));
@@ -216,9 +214,13 @@ void CubeMapRenderPass::UpdateSwapChain(VulkanEngine& engine)
 void CubeMapRenderPass::Destroy(VulkanEngine& engine)
 {
     RenderedTexture->Delete(engine);
+    for (int x = 0; x < 6; x++)
+    {
+        CopyTextureList[x]->Delete(engine);
+    }
 
-    sceneData.Destroy(engine);
     CubeMapTexturePipeline->Destroy(engine);
+    skyBoxRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

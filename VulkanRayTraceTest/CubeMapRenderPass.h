@@ -21,7 +21,6 @@ public:
 	~CubeMapRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
-	SceneDataUniformBuffer sceneData;
 
 	uint32_t CubeMapSize;
 

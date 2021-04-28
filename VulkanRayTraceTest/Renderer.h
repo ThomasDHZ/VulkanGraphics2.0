@@ -42,9 +42,8 @@ private:
 
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
 	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
-	std::vector<Model> RenderModel;
 
-	void SetUpCommandBuffers(VulkanEngine& engine);
+	////void SetUpCommandBuffers(VulkanEngine& engine);
 
 	Skybox skybox;
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;
