@@ -57,17 +57,17 @@ uint32_t TextureManager::LoadTexture3D(VulkanEngine& engine, int width, int heig
 
 void TextureManager::LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
+	CubeMapList.emplace_back(std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat)));
 }
 
 void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
+	CubeMapList.emplace_back(std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat)));
 }
 
 void TextureManager::LoadCubeMap(VulkanEngine& engine, std::shared_ptr<Texture> cubeMapTexture)
 {
-	CubeMap = cubeMapTexture;
+	CubeMapList.emplace_back(cubeMapTexture);
 }
 
 void TextureManager::DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex)
@@ -93,17 +93,16 @@ void TextureManager::UnloadAllTextures(VulkanEngine& engine)
 	{
 		texture->Delete(engine);
 	}
-}
 
-void TextureManager::UnloadCubeMap(VulkanEngine& engine)
-{
-	CubeMap->Delete(engine);
+	for (auto& texture : CubeMapList)
+	{
+		texture->Delete(engine);
+	}
 }
 
 void TextureManager::Destory(VulkanEngine& engine)
 {
 	UnloadAllTextures(engine);
-	UnloadCubeMap(engine);
 }
 
 void TextureManager::Update(VulkanEngine& engine)
@@ -111,6 +110,14 @@ void TextureManager::Update(VulkanEngine& engine)
 	for (int x = 0; x < TextureList.size(); x++)
 	{
 		TextureList[x]->Update(engine, x);
+	}
+	for (int x = 0; x < Texture3DList.size(); x++)
+	{
+		Texture3DList[x]->Update(engine, x);
+	}
+	for (int x = 0; x < CubeMapList.size(); x++)
+	{
+		CubeMapList[x]->Update(engine, x);
 	}
 }
 
@@ -183,11 +190,16 @@ std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescrip
 	return DescriptorImageList;
 }
 
-VkDescriptorImageInfo TextureManager::GetSkyBoxTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetSkyBoxTextureBufferListDescriptor()
 {
-	VkDescriptorImageInfo DescriptorImage{};
-	DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	DescriptorImage.imageView = CubeMap->GetTextureView();
-	DescriptorImage.sampler = CubeMap->GetTextureSampler();
-	return DescriptorImage;
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	for (auto texture : CubeMapList)
+	{
+		VkDescriptorImageInfo DescriptorImage{};
+		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		DescriptorImage.imageView = texture->GetTextureView();
+		DescriptorImage.sampler = texture->GetTextureSampler();
+		DescriptorImageList.emplace_back(DescriptorImage);
+	}
+	return DescriptorImageList;
 }

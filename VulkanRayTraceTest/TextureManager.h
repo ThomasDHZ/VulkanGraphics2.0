@@ -9,13 +9,12 @@
 class TextureManager
 {
 private:
-	void UpdateTexture2DBufferIndex(VulkanEngine& engine);
 	uint32_t IsTextureLoaded(std::string name);
 
 public:
 	std::vector<std::shared_ptr<Texture>> TextureList;
 	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
-	std::shared_ptr<Texture> CubeMap;
+	std::vector<std::shared_ptr<Texture>> CubeMapList;
 	TextureManager();
 	TextureManager(VulkanEngine& engine);
 	~TextureManager();
@@ -30,7 +29,6 @@ public:
 	void LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat);
 	void LoadCubeMap(VulkanEngine& engine, std::shared_ptr<Texture> cubeMapTexture);
 	void UnloadAllTextures(VulkanEngine& engine);
-	void UnloadCubeMap(VulkanEngine& engine);
 	void Update(VulkanEngine& engine);
 	void Destory(VulkanEngine& engine);
 
@@ -43,12 +41,13 @@ public:
 	std::shared_ptr<Texture> Get3DTexture(unsigned int TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
 	std::vector<std::shared_ptr<Texture>> GetTextureList() { return TextureList; }
 	std::vector<std::shared_ptr<Texture3D>> Get3DTextureList() { return Texture3DList; }
-    std::shared_ptr<Texture> GetCubeMapTexture() { return CubeMap; }
+	std::vector<std::shared_ptr<Texture>> GetCubeMapTextureList() { return CubeMapList; }
 
 	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
 	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
-	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  GetSkyBoxTextureBufferListDescriptor();
 
 	uint32_t GetTextureBufferDescriptorCount() { return TextureList.size(); }
-	uint32_t Get3DTextureBufferDescriptorCount() { return TextureList.size(); }
+	uint32_t Get3DTextureBufferDescriptorCount() { return Texture3DList.size(); }
+	uint32_t GetCubeMapTextureBufferDescriptorCount() { return CubeMapList.size(); }
 };

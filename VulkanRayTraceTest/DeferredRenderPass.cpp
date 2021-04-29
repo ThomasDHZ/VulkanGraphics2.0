@@ -106,7 +106,7 @@ void DeferredRenderPass::SetUpDescriptorSets(VulkanEngine& engine, AssetManager&
         std::vector<VkDescriptorBufferInfo> MaterialBufferList = assetManager.GetMaterialBufferListDescriptor();
         std::vector<VkDescriptorImageInfo> TextureBufferInfo = assetManager.GetTextureBufferListDescriptor();
         std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = assetManager.Get3DTextureBufferListDescriptor();
-        VkDescriptorImageInfo CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
+        std::vector<VkDescriptorImageInfo> CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
 
         std::vector<VkWriteDescriptorSet> DescriptorList;
         DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, gBufferRenderPass.DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));

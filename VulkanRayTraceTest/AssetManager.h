@@ -35,11 +35,12 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor() { return materialManager.GetMaterialBufferListDescriptor(); }
 	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor() { return textureManager.GetTextureBufferListDescriptor(); }
 	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor() { return textureManager.GetTextureBufferListDescriptor(); }
-	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor() { return textureManager.GetSkyBoxTextureBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  GetSkyBoxTextureBufferListDescriptor() { return textureManager.GetSkyBoxTextureBufferListDescriptor(); }
 
 	uint32_t GetMeshDescriptorCount() { return meshManager.GetMeshDescriptorCount(); }
 	uint32_t GetMaterialDescriptorCount() { return materialManager.GetMaterialDescriptorCount(); }
 	uint32_t GetTextureBufferDescriptorCount() { return textureManager.GetTextureBufferDescriptorCount(); }
 	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager.Get3DTextureBufferDescriptorCount(); }
+	uint32_t GetCubeMapBufferDescriptorCount() { return textureManager.GetCubeMapTextureBufferDescriptorCount(); }
 };
 
