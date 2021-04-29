@@ -37,8 +37,8 @@ void RenderedCubeMapTexture::CreateTextureImage(VulkanEngine& engine)
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
-    TextureInfo.extent.width = 2048;
-    TextureInfo.extent.height = 2048;
+    TextureInfo.extent.width = Width;
+    TextureInfo.extent.height = Height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 6;

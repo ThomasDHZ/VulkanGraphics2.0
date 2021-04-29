@@ -29,10 +29,9 @@ layout (location = 5) in vec4 aColor;
 layout (location = 6) in ivec4 BoneID;
 layout (location = 7) in vec4 BoneWeights;
 
-layout(location = 0) out vec3 TexCoords;
+layout(location = 0) out vec3 WorldPos;
 
 void main() {
-	TexCoords = aPos;
-	vec4 pos = Mesh.proj * Mesh.view * vec4(aPos, 1.0);
-    gl_Position = pos.xyww;
+	WorldPos = aPos;
+    gl_Position = Mesh.proj * Mesh.view * vec4(aPos, 1.0);
 }

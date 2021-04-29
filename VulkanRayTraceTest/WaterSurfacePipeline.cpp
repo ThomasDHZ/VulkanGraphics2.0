@@ -72,7 +72,7 @@ void WaterSurfacePipeline::SetUpDescriptorSets(VulkanEngine& engine, AssetManage
     RefractTextureImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     RefractTextureImage.imageView = refractionTexture->GetTextureView();
     RefractTextureImage.sampler = refractionTexture->GetTextureSampler();
-    std::vector<VkDescriptorImageInfo> CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorImageInfo CubeMapImage = assetManager.GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
