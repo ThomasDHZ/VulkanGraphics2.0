@@ -77,7 +77,7 @@ void main()
    {
 	 discard;
    }
-   
+
    vec3 albedo     = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
    float metallic  = texture(TextureMap[material.MatallicMapID], texCoords).r;
    float roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
@@ -85,12 +85,14 @@ void main()
 
    vec3 N = getNormalFromMap(material, texCoords);
    vec3 V = normalize(scenedata.viewPos - FragPos);
+   vec3 R = reflect(-V, N); 
 
-   vec3 F0 = vec3(0.04); 
-   F0 = mix(F0, albedo, metallic);
+    vec3 F0 = vec3(0.04); 
+    F0 = mix(F0, albedo, metallic);
 
-vec3 Lo = vec3(0.0);
-    
+    vec3 Lo = vec3(0.0);
+    for(int i = 0; i < 1; ++i) 
+    {
        vec3 L = normalize(-scenedata.dlight.direction);
        vec3 H = normalize(V + L);
 
@@ -109,14 +111,22 @@ vec3 Lo = vec3(0.0);
         kD *= 1.0 - metallic;	  
 
         float NdotL = max(dot(N, L), 0.0);        
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-      
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+    }   
+    
+    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    vec3 irradiance = texture(CubeMap, N).rgb;
+    vec3 diffuse      = irradiance * albedo;
+    vec3 ambient = (kD * diffuse) * ao;
+    
+    vec3 color = ambient + Lo;
 
-   vec3 ambient = vec3(0.03) * albedo * ao;
-   vec3 color = ambient + Lo;
+    color = color / (color + vec3(1.0));
+    color = pow(color, vec3(1.0/2.2)); 
 
-   vec3 result = pow(color, vec3(1.0/2.2));
-   outColor = vec4(result, 1.0);
+    outColor = vec4(color , 1.0);
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -130,7 +140,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
     denom = PI * denom * denom;
 
-    return nom / max(denom, 0.0000001);
+    return nom / denom;
 }
 
 float GeometrySchlickGGX(float NdotV, float roughness)
