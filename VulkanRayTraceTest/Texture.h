@@ -20,6 +20,7 @@ private:
 protected:
     void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
     void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
+    void GenerateMipmaps(VulkanEngine& engine, VkFormat imageFormat);
 
     virtual void LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
@@ -41,6 +42,7 @@ public:
     std::string FileName;
     TextureType TypeOfTexture;
     VkImageLayout ImageLayout;
+    uint32_t MipMapLevels = 1;
 
     int Width;
     int Height;
