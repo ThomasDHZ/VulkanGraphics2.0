@@ -19,47 +19,15 @@
 #include "Renderer.h"
 
 class Engine {
-public:
-    void run() {
-        initVulkan();
-        mainLoop();
-        cleanup();
-    }
-
 private:
     VulkanWindow window;
     VulkanEngine engine;
     Renderer renderer;
 
-    void initVulkan()
-    {
-        window = VulkanWindow(1280, 720, "VulkanEngine");
-        engine = VulkanEngine(window.GetWindowPtr());
-        renderer = Renderer(engine, window);
-    }
+public:
+    Engine();
+    Engine(unsigned int width, unsigned int height, const char* WindowName);
+    ~Engine();
 
-    void mainLoop() {
-        while (!glfwWindowShouldClose(window.GetWindowPtr())) {
-            glfwPollEvents();
-
-            ImGui_ImplVulkan_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-            {
-                renderer.GUIUpdate(engine);
-            }
-            ImGui::Render();
-
-            renderer.Draw(engine, window);
-        }
-
-        vkDeviceWaitIdle(engine.Device);
-    }
-
-    void cleanup()
-    {
-        renderer.Destroy(engine);
-        engine.Destroy();
-        window.Destroy();
-    }
+    void MainLoop();
 };

@@ -297,7 +297,7 @@ void Texture::LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, 
 	TextureInfo.format = format;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -332,7 +332,7 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 	TextureInfo.format = format;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -340,7 +340,7 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	//TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	StagingBuffer.DestoryBuffer(engine.Device);
 	stbi_image_free(pixels);
@@ -370,7 +370,7 @@ void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, Vk
 	TextureInfo.format = format;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -378,7 +378,7 @@ void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, Vk
 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	//TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	StagingBuffer.DestoryBuffer(engine.Device);
 
@@ -405,7 +405,7 @@ void Texture::CreateTexture3D(VulkanEngine& engine, std::vector<Pixel>& Pixels, 
 	TextureInfo.format = format;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 

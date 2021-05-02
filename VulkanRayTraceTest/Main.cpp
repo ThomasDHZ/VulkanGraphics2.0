@@ -12,10 +12,10 @@
 
 
 int main() {
-    Engine app;
+    Engine engine(1280, 720, "VulkanEngine");
 
     try {
-        app.run();
+        engine.MainLoop();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
