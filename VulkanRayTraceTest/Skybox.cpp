@@ -4,7 +4,7 @@ Skybox::Skybox() : Mesh()
 {
 }
 
-Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass) : Mesh()
+Skybox::Skybox(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, VkRenderPass& RenderPass) : Mesh()
 {
 	const std::vector<Vertex> SkyBoxVertices =
 	{
@@ -66,7 +66,7 @@ Skybox::Skybox(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& R
 	IndexCount = 0;
 	PrimitiveCount = 0;
 
-	MeshProperties.UniformDataInfo.MaterialIndex = assetManager.materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
+	MeshProperties.UniformDataInfo.MaterialIndex = assetManager->materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
 	MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
 	MeshProperties.Update(engine);
 

@@ -5,7 +5,7 @@ CubeMapRenderPass::CubeMapRenderPass()
 {
 }
 
-CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
     CubeMapSize = cubeMapSize;
 
@@ -120,7 +120,7 @@ void CubeMapRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox)
+void CubeMapRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, Skybox& skybox)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

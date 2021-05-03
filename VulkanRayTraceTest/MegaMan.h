@@ -10,7 +10,7 @@ public:
 	static constexpr glm::vec2 UVSize = glm::vec2(.05f, 1.0f);
 
 	MegaMan();
-	MegaMan(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Position);
+	MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
 	~MegaMan();
 };
 

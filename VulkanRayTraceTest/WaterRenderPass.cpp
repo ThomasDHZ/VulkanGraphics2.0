@@ -5,7 +5,7 @@ WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass()
 {
 }
 
-WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
 
     TextureCamera = std::make_shared<PerspectiveCamera>(glm::vec2(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -139,7 +139,7 @@ void WaterRenderToTextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox skybox)
+void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, Skybox skybox)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -166,7 +166,7 @@ void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& as
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterTexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterTexturePipeline->ShaderPipelineLayout, 0, 1, &WaterTexturePipeline->DescriptorSets, 0, nullptr);
 
-    assetManager.Draw(CommandBuffer, renderPassInfo, WaterTexturePipeline->ShaderPipelineLayout, RendererID);
+    assetManager->Draw(CommandBuffer, renderPassInfo, WaterTexturePipeline->ShaderPipelineLayout, RendererID);
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &WaterSkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
@@ -178,7 +178,7 @@ void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& as
     }
 }
 
-void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
+void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
 {
     TextureCamera->Update(engine);
     copysceneDataptr.UniformDataInfo.sLight.direction = TextureCamera->GetFront();
@@ -202,7 +202,7 @@ void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, AssetManager& 
     SkyUniformBuffer->Update(engine);
 }
 
-void WaterRenderToTextureRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+void WaterRenderToTextureRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
     RenderedTexture->RecreateRendererTexture(engine);
     DepthTexture->RecreateRendererTexture(engine);

@@ -53,9 +53,9 @@ private:
     VulkanBuffer missShaderBindingTable;
     VulkanBuffer hitShaderBindingTable;
 
-    void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
-    void SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager);
-    void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+    void SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+    void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+    void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 public:
 
     AccelerationStructure topLevelAS{};
@@ -63,15 +63,15 @@ public:
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderPass();
-    RayTraceRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+    RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
     ~RayTraceRenderPass();
 
-    void createTopLevelAccelerationStructure(VulkanEngine& engine, AssetManager& assetManager);
+    void createTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
     void createStorageImage(VulkanEngine& engine);
     void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
-    void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
-    void Resize(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, uint32_t imageIndex);
+    void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+    void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, uint32_t imageIndex);
     void Destory(VulkanEngine& engine);
 
     VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)

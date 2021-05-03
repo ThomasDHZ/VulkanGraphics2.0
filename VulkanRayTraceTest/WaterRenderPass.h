@@ -15,7 +15,7 @@ private:
 
 public:
 	WaterRenderToTextureRenderPass();
-	WaterRenderToTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
+	WaterRenderToTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	~WaterRenderToTextureRenderPass();
 
 	static constexpr RenderPassID RendererID = Water_Renderer;
@@ -35,8 +35,8 @@ public:
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
-	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox skybox);
+	void Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, Skybox skybox);
 	void Destroy(VulkanEngine& engine);
 };

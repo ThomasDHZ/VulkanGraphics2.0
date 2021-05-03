@@ -51,7 +51,7 @@ private:
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
 public:
-	AssetManager assetManager;
+	std::shared_ptr<AssetManager> assetManager;
 
 	Renderer();
 	Renderer(VulkanEngine& engine, VulkanWindow& window);

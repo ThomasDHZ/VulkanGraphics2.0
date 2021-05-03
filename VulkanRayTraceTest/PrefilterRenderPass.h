@@ -19,7 +19,7 @@ private:
 
 public:
 	PrefilterRenderPass();
-	PrefilterRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t CubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
+	PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t CubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	~PrefilterRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
@@ -36,7 +36,7 @@ public:
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(VulkanEngine& engine);
-	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox);
+	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, Skybox& skybox);
 	void Destroy(VulkanEngine& engine);
 };
 

@@ -4,15 +4,15 @@
 class RenderWaterTexturePipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
-	void SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager);
-	void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
 	void SetUpShaderPipeLine(VulkanEngine& engine, VkRenderPass& renderPass);
 public:
 	RenderWaterTexturePipeline();
-	RenderWaterTexturePipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, VkRenderPass& renderPass);
+	RenderWaterTexturePipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, VkRenderPass& renderPass);
 	~RenderWaterTexturePipeline();
 
-	void UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, VkRenderPass& renderPass);
+	void UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, VkRenderPass& renderPass);
 };
 

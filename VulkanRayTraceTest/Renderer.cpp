@@ -13,18 +13,18 @@ Renderer::Renderer()
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 {
     interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
-    assetManager = AssetManager(engine);
+    assetManager = std::make_shared<AssetManager>(AssetManager(engine));
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
 
-    assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
     //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
     //assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
 
-    assetManager.AddModel();
-    assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[0]);
+    assetManager->AddModel();
+    assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[0]);
     //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
     //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
@@ -37,17 +37,17 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
-    assetManager.AddModel(engine, "../Models/viking_room.obj");
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.AlbedoMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.RoughnessMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.AOMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.MatallicMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
-    uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
+    assetManager->AddModel(engine, "../Models/viking_room.obj");
+    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+    material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
+    uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
    // assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
  /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
@@ -69,7 +69,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     CubeMapFiles2[4] = "../texture/skybox/CosmicCoolCloudBack.png";
     CubeMapFiles2[5] = "../texture/skybox/CosmicCoolCloudTop.png";
 
-    assetManager.textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+    assetManager->textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
 
 
 
@@ -164,7 +164,7 @@ Renderer::~Renderer()
 
 void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
-    assetManager.textureManager.LoadCubeMap(engine, prefilterRenderPass.BlurredSkyBoxTexture);
+    assetManager->textureManager.LoadCubeMap(engine, prefilterRenderPass.BlurredSkyBoxTexture);
 
     int width = 0, height = 0;
     glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
@@ -188,7 +188,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     prefilterRenderPass.RebuildSwapChain(engine);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.RebuildSwapChain(engine);
-    for (auto& mesh : assetManager.meshManager.MeshList)
+    for (auto& mesh : assetManager->meshManager.MeshList)
     {
         if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
         {
@@ -197,7 +197,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     }
    // static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
    // textureRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-   RayRenderer.Resize(engine, assetManager, SceneData, 0);
+   RayRenderer.RebuildSwapChain(engine, assetManager, SceneData, 0);
 }
 
 void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -212,8 +212,8 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     camera->Update(engine);
     camera2->Update(engine);
 
-    assetManager.Update(engine);
-    skybox.Update(engine, assetManager.materialManager);
+    assetManager->Update(engine);
+    skybox.Update(engine, assetManager->materialManager);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
@@ -237,7 +237,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     SkyUniformBuffer->Update(engine);
 
    // WaterRenderPass.Update(engine, assetManager, *SceneData.get(), camera2);
-    for (auto& mesh : assetManager.meshManager.MeshList)
+    for (auto& mesh : assetManager->meshManager.MeshList)
     {
         if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
         {
@@ -282,16 +282,16 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat3("Speculare24", &SceneData->UniformDataInfo.plight[4].specular.x, 0.0f, 1.0f);
 
 
-    for (int y = 0; y < assetManager.meshManager.MeshList.size(); y++)
+    for (int y = 0; y < assetManager->meshManager.MeshList.size(); y++)
   {
       auto a = std::to_string(y);
-      ImGui::Checkbox(a.c_str(), &assetManager.meshManager.MeshList[y]->ShowMesh);
+      ImGui::Checkbox(a.c_str(), &assetManager->meshManager.MeshList[y]->ShowMesh);
 
-      ImGui::SliderFloat(("Depth " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 1.0f);
-      ImGui::SliderFloat2(("UV Offset " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-      ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshPosition.x, -1000.0f, 1000.0f);
-      ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
-      ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &assetManager.meshManager.MeshList[y]->MeshScale.x, 0.0f, 3.0f);
+      ImGui::SliderFloat(("Depth " + std::to_string(y)).c_str(), &assetManager->meshManager.MeshList[y]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 1.0f);
+      ImGui::SliderFloat2(("UV Offset " + std::to_string(y)).c_str(), &assetManager->meshManager.MeshList[y]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+      ImGui::SliderFloat3(("Transform " + std::to_string(y)).c_str(), &assetManager->meshManager.MeshList[y]->MeshPosition.x, -1000.0f, 1000.0f);
+      ImGui::SliderFloat3(("Rotate " + std::to_string(y)).c_str(), &assetManager->meshManager.MeshList[y]->MeshRotation.x, 0.0f, 360.0f);
+      ImGui::SliderFloat3(("Scale " + std::to_string(y)).c_str(), &assetManager->meshManager.MeshList[y]->MeshScale.x, 0.0f, 3.0f);
   }
 
    // ImGui::SliderFloat3("ReflectCamPos", &waterReflectionRenderPass.TextureCamera->Position.x, -10.0f, 10.0f);
@@ -333,7 +333,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// Draw Area
     /// </summary>
   // gBufferRenderPass.Draw(engine, assetManager, imageIndex);
-    for (auto& mesh : assetManager.meshManager.MeshList)
+    for (auto& mesh : assetManager->meshManager.MeshList)
     {
         if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
         {
@@ -354,18 +354,18 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     VkSemaphore waitSemaphores[] = { engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
-    for (auto& model : assetManager.modelManager.ModelList)
+    for (auto& model : assetManager->modelManager.ModelList)
     {
         model->SubmitToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
     }
     if (RayTraceSwitch)
     {
-        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
+        //CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
        // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(forwardRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
         CommandBufferSubmitList.emplace_back(prefilterRenderPass.CommandBuffer);
-        for (auto& mesh : assetManager.meshManager.MeshList)
+        for (auto& mesh : assetManager->meshManager.MeshList)
         {
             if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
             {
@@ -425,11 +425,11 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
 void Renderer::Destroy(VulkanEngine& engine)
 {
-    for (auto& model : assetManager.modelManager.ModelList)
+    for (auto& model : assetManager->modelManager.ModelList)
     {
         model->Destory(engine);
     }
-    assetManager.Delete(engine);
+    assetManager->Delete(engine);
     interfaceRenderPass.Destroy(engine);
     cubeMapRenderer.Destroy(engine);
     prefilterRenderPass.Destroy(engine);
