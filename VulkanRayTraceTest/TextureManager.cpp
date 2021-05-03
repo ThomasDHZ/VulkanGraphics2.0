@@ -65,6 +65,11 @@ void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[
 	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
 }
 
+void TextureManager::LoadCubeMap(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat)
+{
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapLocation, textureFormat));
+}
+
 void TextureManager::LoadCubeMap(VulkanEngine& engine, std::shared_ptr<Texture> cubeMapTexture)
 {
 	CubeMap = cubeMapTexture;

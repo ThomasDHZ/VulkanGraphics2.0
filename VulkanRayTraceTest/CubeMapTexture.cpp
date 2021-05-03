@@ -28,6 +28,13 @@ CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6]
 	CreateTextureSampler(engine);
 }
 
+CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat)
+{
+	LoadTexture(engine, CubeMapLocation, textureFormat);
+	CreateTextureView(engine, textureFormat);
+	CreateTextureSampler(engine);
+}
+
 CubeMapTexture::~CubeMapTexture()
 {
 }
@@ -57,6 +64,48 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 		memcpy(static_cast<char*>(data) + (x * layerSize), textureData[x], static_cast<size_t>(layerSize));
 	}
 	vkUnmapMemory(engine.Device, StagingBuffer.BufferMemory);
+
+	VkImageCreateInfo TextureInfo = {};
+	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	TextureInfo.imageType = VK_IMAGE_TYPE_2D;
+	TextureInfo.extent.width = Width;
+	TextureInfo.extent.height = Height;
+	TextureInfo.extent.depth = 1;
+	TextureInfo.mipLevels = 1;
+	TextureInfo.arrayLayers = 6;
+	TextureInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+	TextureInfo.format = textureFormat;
+	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	CreateTextureImage(engine, TextureInfo);
+
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(engine, StagingBuffer.Buffer);
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	StagingBuffer.DestoryBuffer(engine.Device);
+	for (auto texturedata : textureData)
+	{
+		stbi_image_free(texturedata);
+	}
+}
+
+void CubeMapTexture::LoadTexture(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat)
+{
+	std::vector<unsigned char*> textureData;
+	int texChannels;
+
+	auto data = stbi_load(CubeMapLocation.c_str(), &Width, &Height, &texChannels, STBI_rgb_alpha);
+
+	const VkDeviceSize imageSize = Width * Height * 4 * 6;
+	const VkDeviceSize layerSize = imageSize / 6;
+
+	VulkanBuffer StagingBuffer;
+	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, layerSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &data[0]);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

@@ -276,6 +276,12 @@
     <ClCompile Include="Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="brdfRenderingPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="PrefilterRenderingPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -381,6 +387,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\SkyboxTextureRenderer.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Prefilter.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Prefilter.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -621,6 +633,12 @@
     </ClInclude>
     <ClInclude Include="Engine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="brdfRenderingPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="PrefilterRenderingPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

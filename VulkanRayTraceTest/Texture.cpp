@@ -315,7 +315,7 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 	int ColorChannels;
 	stbi_uc* pixels = stbi_load(TextureLocation.c_str(), &Width, &Height, &ColorChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = Width * Height * 4;
-		MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
+	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
 
 
 	VulkanBuffer StagingBuffer;
@@ -340,13 +340,11 @@ void Texture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkF
 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
-	//TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	StagingBuffer.DestoryBuffer(engine.Device);
 	stbi_image_free(pixels);
 
-		GenerateMipmaps(engine, format);
-	
+	GenerateMipmaps(engine, format);
 }
 
 void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format)
@@ -378,13 +376,10 @@ void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, Vk
 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
-	//TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	StagingBuffer.DestoryBuffer(engine.Device);
 
-
-		GenerateMipmaps(engine, format);
-	
+	GenerateMipmaps(engine, format);
 }
 
 void Texture::CreateTexture3D(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format)

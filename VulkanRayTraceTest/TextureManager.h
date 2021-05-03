@@ -28,6 +28,7 @@ public:
 	void DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex);
 	void LoadCubeMap(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat);
 	void LoadCubeMap(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat);
+	void LoadCubeMap(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat);
 	void LoadCubeMap(VulkanEngine& engine, std::shared_ptr<Texture> cubeMapTexture);
 	void UnloadAllTextures(VulkanEngine& engine);
 	void UnloadCubeMap(VulkanEngine& engine);

@@ -1,19 +1,21 @@
 #pragma once
 #include "VulkanEngine.h"
 
-enum RendererType
-{
-	RT_ForwardRenderer,
-	RT_SceneRenderer,
-	RT_TextureRenderer,
-	RT_ShadowRenderer
-};
-
 struct ConstMeshInfo
 {
 	alignas(4) uint32_t MeshIndex;
 };
 
+struct PrefilterConst
+{
+	alignas(4) float MipLevel = 0;
+};
+
+struct ConstSkyBoxView
+{
+	alignas(16) glm::mat4 view = glm::mat4(1.0f);
+	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+};
 
 class GraphicsPipeline
 {
@@ -28,7 +30,6 @@ public:
 	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
 
 	GraphicsPipeline();
-	GraphicsPipeline(VulkanEngine& renderer);
 	~GraphicsPipeline();
 
 	virtual void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);

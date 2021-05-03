@@ -154,6 +154,7 @@
     <ClCompile Include="AnimatorCompute.cpp" />
     <ClCompile Include="BaseRenderPass.cpp" />
     <ClCompile Include="Bone.cpp" />
+    <ClCompile Include="brdfRenderingPipeline.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapRenderingPipeline.cpp" />
     <ClCompile Include="CubeMapRenderPass.cpp" />
@@ -194,6 +195,7 @@
     <ClCompile Include="PBRPipeline.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="PrefilterRenderingPipeline.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
@@ -245,6 +247,8 @@
     <None Include="Shader\PBRIrradianceSkybox.vert" />
     <None Include="Shader\PBRShader.frag" />
     <None Include="Shader\PBRShader.vert" />
+    <None Include="Shader\Prefilter.frag" />
+    <None Include="Shader\Prefilter.vert" />
     <None Include="Shader\raygen.rgen" />
     <None Include="Shader\shader.frag" />
     <None Include="Shader\shader.vert" />
@@ -268,6 +272,7 @@
     <ClInclude Include="AnimatorCompute.h" />
     <ClInclude Include="BaseRenderPass.h" />
     <ClInclude Include="bone.h" />
+    <ClInclude Include="brdfRenderingPipeline.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapRenderingPipeline.h" />
     <ClInclude Include="CubeMapRenderPass.h" />
@@ -310,6 +315,7 @@
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Pixel.h" />
+    <ClInclude Include="PrefilterRenderingPipeline.h" />
     <ClInclude Include="RayTraceRenderPass.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedCubeMapTexture.h" />

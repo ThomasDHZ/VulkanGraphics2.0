@@ -86,7 +86,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //assetManager.meshManager.MeshList.back()->MaterialID = MaterialID1;
 
     forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
-    cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f * 2, SceneData, SkyUniformBuffer);
+    cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f, SceneData, SkyUniformBuffer);
 
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);

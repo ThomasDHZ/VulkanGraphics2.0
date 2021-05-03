@@ -15,11 +15,13 @@ class CubeMapTexture : public Texture
 {
 private:
 	void LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat);
+	void LoadTexture(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat);
 	void CreateTextureView(VulkanEngine& engine, VkFormat textureFormat);
 	void CreateTextureSampler(VulkanEngine& engine);
 public:
 	CubeMapTexture();
 	CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat);
 	CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat);
+	CubeMapTexture(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat);
 	~CubeMapTexture();
 };
