@@ -15,21 +15,19 @@
 #include "WaterSurfaceMesh.h"
 #include "CubeMapRenderPass.h"
 #include "PrefilterRenderPass.h"
+#include "PBRRenderer.h"
 
 class Renderer
 {
 private:
 	int imageview = 0;
-	std::shared_ptr<PerspectiveCamera> camera;
-	std::shared_ptr<PerspectiveCamera> camera2;
 	Keyboard keyboard;
 	Mouse mouse;
-
-	VkCommandBuffer RasterCommandBuffer;
 
 	//FrameBufferRenderPass frameBufferRenderPass;
 	InterfaceRenderPass interfaceRenderPass;
 	ForwardRenderPass forwardRenderPass;
+	PBRRenderer pbrRenderer;
 	RayTraceRenderPass RayRenderer;
 	CubeMapRenderPass cubeMapRenderer;
 	PrefilterRenderPass prefilterRenderPass;
@@ -42,8 +40,6 @@ private:
 	bool UpdateRenderer = false;
 	bool framebufferResized = false;
 
-	std::shared_ptr<SceneDataUniformBuffer> SceneData;
-	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 
 	////void SetUpCommandBuffers(VulkanEngine& engine);
 
@@ -54,7 +50,7 @@ public:
 	std::shared_ptr<AssetManager> assetManager;
 
 	Renderer();
-	Renderer(VulkanEngine& engine, VulkanWindow& window);
+	Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPTR);
 	~Renderer();
 
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);

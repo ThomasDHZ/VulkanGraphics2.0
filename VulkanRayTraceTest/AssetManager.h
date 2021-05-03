@@ -9,7 +9,12 @@ class AssetManager
 {
 private:
 
+
 public:
+	std::shared_ptr<PerspectiveCamera> camera;
+	std::shared_ptr<SceneDataUniformBuffer> SceneData;
+	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
+
 	MaterialManager materialManager;
 	TextureManager textureManager;
 	MeshManager meshManager;

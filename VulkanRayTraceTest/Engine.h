@@ -11,11 +11,8 @@
 #include <array>
 #include <optional>
 #include <set>
-#include "InterfaceRenderPass.h"
-#include "RayTraceRenderPass.h"
 #include "VulkanWindow.h"
 #include "VulkanEngine.h"
-#include "ForwardRenderPass.h"
 #include "Renderer.h"
 
 class Engine {
@@ -23,6 +20,7 @@ private:
     VulkanWindow window;
     VulkanEngine engine;
     Renderer renderer;
+    std::shared_ptr<AssetManager> assetManager;
 
 public:
     Engine();
