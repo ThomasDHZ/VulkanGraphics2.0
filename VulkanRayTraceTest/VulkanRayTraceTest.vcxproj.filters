@@ -282,6 +282,9 @@
     <ClCompile Include="PrefilterRenderingPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="PrefilterRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -639,6 +642,9 @@
     </ClInclude>
     <ClInclude Include="PrefilterRenderingPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="PrefilterRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

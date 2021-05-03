@@ -50,6 +50,7 @@ void PrefilterRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, Asset
     VkDescriptorImageInfo TextureBufferInfo = assetManager.textureManager.GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, DescriptorSets, TextureBufferInfo));
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -57,8 +58,8 @@ void PrefilterRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, Asset
 void PrefilterRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyboxTextureRendererVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/SkyboxTextureRendererFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/PrefilterVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/PrefilterFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo SkyBoxvertexInputInfo = {};
     SkyBoxvertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -139,7 +140,7 @@ void PrefilterRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(ConstSkyBoxView);
+    pushConstantRange.size = sizeof(PrefilterConst);
 
     std::vector<VkDynamicState> DynamicStateSettings =
     {

@@ -87,7 +87,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     forwardRenderPass = ForwardRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
     cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f, SceneData, SkyUniformBuffer);
-
+    prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f, SceneData, SkyUniformBuffer);
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);
     //textureRenderPass = TextureRenderPass(engine, assetManager, SceneData);
@@ -149,6 +149,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
     //ImGui_ImplVulkan_AddTexture(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, waterRenderPass.ReflectionTexture->Sampler, waterRenderPass.ReflectionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     //mGui_ImplVulkan_AddTexture(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, waterRenderPass.RefractionTexture->Sampler, waterRenderPass.RefractionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
    ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   ImGui_ImplVulkan_AddTexture(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, prefilterRenderPass.RenderedTexture->Sampler, prefilterRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
    //for (auto& texture : cubeMapRenderer.CopyTextureList)
    //{
    //    ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -162,7 +164,7 @@ Renderer::~Renderer()
 
 void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
-    assetManager.textureManager.LoadCubeMap(engine, cubeMapRenderer.CopyTextureList);
+    assetManager.textureManager.LoadCubeMap(engine, prefilterRenderPass.BlurredSkyBoxTexture);
 
     int width = 0, height = 0;
     glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
@@ -183,6 +185,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
    // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData, SkyUniformBuffer);
     cubeMapRenderer.UpdateSwapChain(engine);
+    prefilterRenderPass.UpdateSwapChain(engine);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
     interfaceRenderPass.UpdateSwapChain(engine);
     for (auto& mesh : assetManager.meshManager.MeshList)
@@ -246,11 +249,12 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::SliderInt("temp", &SceneData->UniformDataInfo.temp, 0, 1);
     ImGui::SliderInt("ImageView", &imageview, 0, 5);
+    ImGui::SliderInt("PrefilterSameCount", &SceneData->UniformDataInfo.temp, 0, 1);
 
     ImGui::LabelText("Orginal View", "Orginal View");
     ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     for (int x  = 0; x < 6; x++)
     {
        /* ImGui::LabelText(("Copy texture " + std::to_string(x + 1)).c_str(), ("Copy texture " + std::to_string(x + 1)).c_str());
@@ -338,6 +342,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
     forwardRenderPass.Draw(engine, assetManager, imageIndex, skybox);
     cubeMapRenderer.Draw(engine, assetManager, imageIndex, skybox);
+    prefilterRenderPass.Draw(engine, assetManager, imageIndex, skybox);
    //WaterRenderPass.Draw(engine, assetManager, imageIndex);
    //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
    RayRenderer.Draw(engine, assetManager, imageIndex);
@@ -359,6 +364,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
        // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(forwardRenderPass.CommandBuffer);
         CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
+        CommandBufferSubmitList.emplace_back(prefilterRenderPass.CommandBuffer);
         for (auto& mesh : assetManager.meshManager.MeshList)
         {
             if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
@@ -426,6 +432,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     assetManager.Delete(engine);
     interfaceRenderPass.Destroy(engine);
     cubeMapRenderer.Destroy(engine);
+    prefilterRenderPass.Destroy(engine);
    // frameBufferRenderPass.Destroy(engine);
     //WaterRenderPass.Destroy(engine);
     //gBufferRenderPass.Destroy(engine);

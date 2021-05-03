@@ -11,15 +11,6 @@ layout(push_constant) uniform ConstSkyBoxView
 	mat4 proj;
 } Mesh;
 
-layout(binding = 2) uniform UniformBufferObject 
-{
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
-} ubo;
-
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;

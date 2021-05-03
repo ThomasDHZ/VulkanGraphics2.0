@@ -5,14 +5,14 @@
 #include "material.glsl"
 #include "vertex.glsl"
 
-layout(binding = 2) uniform UniformBufferObject 
+layout(push_constant) uniform ConstSkyBoxView
 {
-    mat4 viewInverse;
-	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
-    vec3 viewPos;
-} ubo;
+	float MipLevel;
+	uint SampleCount;
+	float FaceSize;
+} skybox;
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -27,6 +27,6 @@ layout(location = 0) out vec3 TexCoords;
 
 void main() {
 	TexCoords = aPos;
-	vec4 pos = ubo.proj * ubo.view * vec4(aPos, 1.0);
+	vec4 pos = skybox.proj * skybox.view * vec4(aPos, 1.0);
     gl_Position = pos.xyww;
 }

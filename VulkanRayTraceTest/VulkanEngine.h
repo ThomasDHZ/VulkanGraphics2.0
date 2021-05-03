@@ -27,6 +27,7 @@ enum RenderPassID
     Deferred_Renderer,
 	Texture_Renderer,
 	CubeTexture_Renderer,
+	Prefilter_Renderer,
 	Water_Renderer
 };
 

@@ -8,8 +8,9 @@
 #include "SkyBoxRenderingPipeline.h"
 #include "Skybox.h"
 #include "RenderedCubeMapTexture.h"
+#include "PrefilterRenderingPipeline.h"
 
-class CubeMapRenderPass
+class PrefilterRenderPass
 {
 private:
 	void CreateRenderPass(VulkanEngine& engine);
@@ -17,9 +18,9 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	CubeMapRenderPass();
-	CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t CubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
-	~CubeMapRenderPass();
+	PrefilterRenderPass();
+	PrefilterRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t CubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
+	~PrefilterRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
 
@@ -28,7 +29,7 @@ public:
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedCubeMapTexture> BlurredSkyBoxTexture;
 
-	std::shared_ptr<CubeMapRenderingPipeline> CubeMapTexturePipeline;
+	std::shared_ptr<PrefilterRenderingPipeline> prefilterRenderingPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;

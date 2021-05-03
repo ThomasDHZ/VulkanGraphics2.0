@@ -196,6 +196,7 @@
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="PrefilterRenderingPipeline.cpp" />
+    <ClCompile Include="PrefilterRenderPass.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="PrefilterRenderingPipeline.h" />
+    <ClInclude Include="PrefilterRenderPass.h" />
     <ClInclude Include="RayTraceRenderPass.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedCubeMapTexture.h" />

@@ -1,11 +1,11 @@
-#include "CubeMapRenderPass.h"
+#include "PrefilterRenderPass.h"
 #include "GraphicsPipeline.h"
 
-CubeMapRenderPass::CubeMapRenderPass()
+PrefilterRenderPass::PrefilterRenderPass()
 {
 }
 
-CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+PrefilterRenderPass::PrefilterRenderPass(VulkanEngine& engine, AssetManager& assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
     CubeMapSize = cubeMapSize;
 
@@ -14,15 +14,15 @@ CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, AssetManager& assetMa
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
+    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
-CubeMapRenderPass::~CubeMapRenderPass()
+PrefilterRenderPass::~PrefilterRenderPass()
 {
 }
 
-void CubeMapRenderPass::CreateRenderPass(VulkanEngine& engine)
+void PrefilterRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -82,7 +82,7 @@ void CubeMapRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void CubeMapRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void PrefilterRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
@@ -107,7 +107,7 @@ void CubeMapRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void CubeMapRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void PrefilterRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -120,7 +120,7 @@ void CubeMapRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox)
+void PrefilterRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -146,11 +146,7 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    VkViewport viewport{};
-    viewport.width = CubeMapSize;
-    viewport.height = CubeMapSize;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
+
 
     VkRect2D rect2D{};
     rect2D.extent.width = CubeMapSize;
@@ -184,67 +180,78 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     SkyBoxBarrierStart.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
     vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierStart);
 
-    for (int x = 0; x < 6; x++)
-    {
-        ConstSkyBoxView skyboxView;
-        skyboxView.view = SkyboxViews[x];
-        skyboxView.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
-        skyboxView.proj[1][1] *= -1;
+  /*  for (int m = 0; m < 9; m++)
+    {*/
+        VkViewport viewport{};
+        viewport.width = static_cast<float>(CubeMapSize * std::pow(0.5f, 0));
+        viewport.height = static_cast<float>(CubeMapSize * std::pow(0.5f, 0));
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
 
-        vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-        vkCmdSetScissor(CommandBuffer, 0, 1, &rect2D);
-        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, CubeMapTexturePipeline->ShaderPipeline);
-        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, CubeMapTexturePipeline->ShaderPipelineLayout, 0, 1, &CubeMapTexturePipeline->DescriptorSets, 0, nullptr);
-        vkCmdPushConstants(CommandBuffer, CubeMapTexturePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &skyboxView);
-        vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        skybox.Draw(CommandBuffer, renderPassInfo, RendererID);
-        vkCmdEndRenderPass(CommandBuffer);
+        for (int x = 0; x < 6; x++)
+        {
+            PrefilterConst prefilterConst;
+            prefilterConst.view = SkyboxViews[x];
+            prefilterConst.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
+            prefilterConst.proj[1][1] *= -1;
+            prefilterConst.MipLevel = 0;
+            prefilterConst.FaceSize = CubeMapSize;
+            prefilterConst.SampleCount = 1024;
 
-        VkImageSubresourceRange ImageSubresourceRange{};
-        ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        ImageSubresourceRange.baseMipLevel = 0;
-        ImageSubresourceRange.levelCount = 1;
-        ImageSubresourceRange.layerCount = 1;
+            vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
+            vkCmdSetScissor(CommandBuffer, 0, 1, &rect2D);
+            vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipeline);
+            vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipelineLayout, 0, 1, &prefilterRenderingPipeline->DescriptorSets, 0, nullptr);
+            vkCmdPushConstants(CommandBuffer, prefilterRenderingPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterConst), &prefilterConst);
+            vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+            skybox.Draw(CommandBuffer, renderPassInfo, RendererID);
+            vkCmdEndRenderPass(CommandBuffer);
 
-        VkImageMemoryBarrier MemoryBarrior{};
-        MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        MemoryBarrior.image = RenderedTexture->Image;
-        MemoryBarrior.subresourceRange = ImageSubresourceRange;
-        MemoryBarrior.srcAccessMask = 0;
-        MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
+            VkImageSubresourceRange ImageSubresourceRange{};
+            ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            ImageSubresourceRange.baseMipLevel = 0;
+            ImageSubresourceRange.levelCount = 1;
+            ImageSubresourceRange.layerCount = 1;
 
-        VkImageCopy copyRegion = {};
-        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        copyRegion.srcSubresource.baseArrayLayer = 0;
-        copyRegion.srcSubresource.mipLevel = 0;
-        copyRegion.srcSubresource.layerCount = 1;
-        copyRegion.srcOffset = { 0, 0, 0 };
+            VkImageMemoryBarrier MemoryBarrior{};
+            MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            MemoryBarrior.image = RenderedTexture->Image;
+            MemoryBarrior.subresourceRange = ImageSubresourceRange;
+            MemoryBarrior.srcAccessMask = 0;
+            MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
 
-        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        copyRegion.dstSubresource.baseArrayLayer = x;
-        copyRegion.dstSubresource.mipLevel = 0;
-        copyRegion.dstSubresource.layerCount = 1;
-        copyRegion.dstOffset = { 0, 0, 0 };
+            VkImageCopy copyRegion = {};
+            copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            copyRegion.srcSubresource.baseArrayLayer = 0;
+            copyRegion.srcSubresource.mipLevel = 0;
+            copyRegion.srcSubresource.layerCount = 1;
+            copyRegion.srcOffset = { 0, 0, 0 };
 
-        copyRegion.extent.width = (uint32_t)RenderedTexture->Width;
-        copyRegion.extent.height = (uint32_t)RenderedTexture->Height;
-        copyRegion.extent.depth = 1;
-        vkCmdCopyImage(CommandBuffer, RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, BlurredSkyBoxTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+            copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            copyRegion.dstSubresource.baseArrayLayer = x;
+            copyRegion.dstSubresource.mipLevel = 0;
+            copyRegion.dstSubresource.layerCount = 1;
+            copyRegion.dstOffset = { 0, 0, 0 };
 
-        VkImageMemoryBarrier ReturnMemoryBarrior{};
-        ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        ReturnMemoryBarrior.image = RenderedTexture->Image;
-        ReturnMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        ReturnMemoryBarrior.dstAccessMask = 0;
-        vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
-   }
+            copyRegion.extent.width = (uint32_t)RenderedTexture->Width;
+            copyRegion.extent.height = (uint32_t)RenderedTexture->Height;
+            copyRegion.extent.depth = 1;
+            vkCmdCopyImage(CommandBuffer, RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, BlurredSkyBoxTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
+            VkImageMemoryBarrier ReturnMemoryBarrior{};
+            ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            ReturnMemoryBarrior.image = RenderedTexture->Image;
+            ReturnMemoryBarrior.subresourceRange = ImageSubresourceRange;
+            ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            ReturnMemoryBarrior.dstAccessMask = 0;
+            vkCmdPipelineBarrier(CommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
+        }
+    //}
     VkImageMemoryBarrier SkyBoxBarrierEnd = {};
     SkyBoxBarrierEnd.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     SkyBoxBarrierEnd.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -260,7 +267,7 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     }
 }
 
-void CubeMapRenderPass::UpdateSwapChain(VulkanEngine& engine)
+void PrefilterRenderPass::UpdateSwapChain(VulkanEngine& engine)
 {
     RenderedTexture->RecreateRendererTexture(engine);
 
@@ -275,16 +282,16 @@ void CubeMapRenderPass::UpdateSwapChain(VulkanEngine& engine)
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    CubeMapTexturePipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    prefilterRenderingPipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
-void CubeMapRenderPass::Destroy(VulkanEngine& engine)
+void PrefilterRenderPass::Destroy(VulkanEngine& engine)
 {
     RenderedTexture->Delete(engine);
     BlurredSkyBoxTexture->Delete(engine);
 
-    CubeMapTexturePipeline->Destroy(engine);
+    prefilterRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
