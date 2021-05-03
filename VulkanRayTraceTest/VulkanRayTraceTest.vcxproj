@@ -152,9 +152,12 @@
     <ClCompile Include="Animation3D.cpp" />
     <ClCompile Include="AnimationPlayer3D.cpp" />
     <ClCompile Include="AnimatorCompute.cpp" />
+    <ClCompile Include="BaseRenderer.cpp" />
     <ClCompile Include="BaseRenderPass.cpp" />
+    <ClCompile Include="BlinnPhongRasterRenderer.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="brdfRenderingPipeline.cpp" />
+    <ClCompile Include="BRDFRenderPass.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CubeMapRenderingPipeline.cpp" />
     <ClCompile Include="CubeMapRenderPass.cpp" />
@@ -193,6 +196,7 @@
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PBRIrradiancePipeline.cpp" />
     <ClCompile Include="PBRPipeline.cpp" />
+    <ClCompile Include="PBRRenderer.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="PrefilterRenderingPipeline.cpp" />
@@ -231,6 +235,8 @@
     <None Include="Shader\animate.comp" />
     <None Include="Shader\anyhit.rahit" />
     <None Include="Shader\anyhit1.rahit" />
+    <None Include="Shader\BRDFRenderer.frag" />
+    <None Include="Shader\BRDFRenderer.vert" />
     <None Include="Shader\closesthit.rchit" />
     <None Include="Shader\DeferedShader.frag" />
     <None Include="Shader\DeferedShader.vert" />
@@ -271,9 +277,12 @@
     <ClInclude Include="Animation3D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />
     <ClInclude Include="AnimatorCompute.h" />
+    <ClInclude Include="BaseRenderer.h" />
     <ClInclude Include="BaseRenderPass.h" />
+    <ClInclude Include="BlinnPhongRasterRenderer.h" />
     <ClInclude Include="bone.h" />
     <ClInclude Include="brdfRenderingPipeline.h" />
+    <ClInclude Include="BRDFRenderPass.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CubeMapRenderingPipeline.h" />
     <ClInclude Include="CubeMapRenderPass.h" />
@@ -313,6 +322,7 @@
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="PBRIrradiancePipeline.h" />
     <ClInclude Include="PBRPipeline.h" />
+    <ClInclude Include="PBRRenderer.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Pixel.h" />

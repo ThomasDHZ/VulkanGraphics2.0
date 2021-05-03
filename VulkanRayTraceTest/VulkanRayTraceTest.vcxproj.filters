@@ -49,6 +49,12 @@
     <Filter Include="Header Files\Texture">
       <UniqueIdentifier>{dbd2c693-77c3-4b23-affd-6e344ac7418f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer">
+      <UniqueIdentifier>{fbedfdc5-7a03-4d2c-a521-56e88ac26f28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer">
+      <UniqueIdentifier>{cce7527b-db49-402b-927b-542603531c87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -285,6 +291,18 @@
     <ClCompile Include="PrefilterRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="BRDFRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnPhongRasterRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="PBRRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -396,6 +414,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\Prefilter.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\BRDFRenderer.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\BRDFRenderer.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -645,6 +669,18 @@
     </ClInclude>
     <ClInclude Include="PrefilterRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="BRDFRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongRasterRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
