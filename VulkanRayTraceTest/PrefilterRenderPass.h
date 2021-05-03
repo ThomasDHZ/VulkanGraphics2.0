@@ -35,7 +35,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void UpdateSwapChain(VulkanEngine& engine);
+	void RebuildSwapChain(VulkanEngine& engine);
 	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, Skybox& skybox);
 	void Destroy(VulkanEngine& engine);
 };

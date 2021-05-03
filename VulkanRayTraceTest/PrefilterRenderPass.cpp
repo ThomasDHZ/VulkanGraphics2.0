@@ -267,7 +267,7 @@ void PrefilterRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager,
     }
 }
 
-void PrefilterRenderPass::UpdateSwapChain(VulkanEngine& engine)
+void PrefilterRenderPass::RebuildSwapChain(VulkanEngine& engine)
 {
     RenderedTexture->RecreateRendererTexture(engine);
 

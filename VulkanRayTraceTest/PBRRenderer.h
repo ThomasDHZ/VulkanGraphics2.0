@@ -1,8 +1,15 @@
 #pragma once
 #include "BaseRenderer.h"
+#include "ForwardRenderPass.h"
+#include "CubeMapRenderPass.h"
+#include "PrefilterRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
+private:
+	ForwardRenderPass forwardRenderPass;
+	CubeMapRenderPass cubeMapRenderer;
+	PrefilterRenderPass prefilterRenderPass;
 public:
 	PBRRenderer();
 	PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);

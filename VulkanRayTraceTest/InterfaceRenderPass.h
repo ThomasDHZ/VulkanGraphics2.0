@@ -32,7 +32,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	void Draw(VulkanEngine& engine, int frame);
-	void UpdateSwapChain(VulkanEngine& engine);
+	void RebuildSwapChain(VulkanEngine& engine);
 	void Destroy(VulkanEngine& engine);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }

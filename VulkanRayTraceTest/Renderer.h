@@ -57,7 +57,7 @@ public:
 	Renderer(VulkanEngine& engine, VulkanWindow& window);
 	~Renderer();
 
-	void UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window);
+	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);
 	void Draw(VulkanEngine& engine, VulkanWindow& window);

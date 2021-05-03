@@ -40,7 +40,7 @@ public:
 	void SetUpSwapChainImageViews(const VkDevice& device);
 	void Destroy(VkDevice device);
 
-	void UpdateSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
+	void RebuildSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
 
 	std::vector<VkImage> SwapChainImages;
 	std::vector<VkImageView> SwapChainImageViews;

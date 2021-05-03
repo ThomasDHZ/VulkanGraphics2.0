@@ -121,7 +121,7 @@ void ForwardRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void ForwardRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
 {
     DepthTexture->RecreateRendererTexture(engine);
 

@@ -260,7 +260,7 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     }
 }
 
-void CubeMapRenderPass::UpdateSwapChain(VulkanEngine& engine)
+void CubeMapRenderPass::RebuildSwapChain(VulkanEngine& engine)
 {
     RenderedTexture->RecreateRendererTexture(engine);
 

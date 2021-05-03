@@ -162,7 +162,7 @@ Renderer::~Renderer()
 
 }
 
-void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
+void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
     assetManager.textureManager.LoadCubeMap(engine, prefilterRenderPass.BlurredSkyBoxTexture);
 
@@ -181,18 +181,18 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
 
-    engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
+    engine.SwapChain.RebuildSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
    // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    forwardRenderPass.UpdateSwapChain(engine, assetManager, SceneData, SkyUniformBuffer);
-    cubeMapRenderer.UpdateSwapChain(engine);
-    prefilterRenderPass.UpdateSwapChain(engine);
+    forwardRenderPass.RebuildSwapChain(engine, assetManager, SceneData, SkyUniformBuffer);
+    cubeMapRenderer.RebuildSwapChain(engine);
+    prefilterRenderPass.RebuildSwapChain(engine);
     //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    interfaceRenderPass.UpdateSwapChain(engine);
+    interfaceRenderPass.RebuildSwapChain(engine);
     for (auto& mesh : assetManager.meshManager.MeshList)
     {
         if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
         {
-            static_cast<WaterSurfaceMesh*>(mesh.get())->UpdateSwapChain(engine, assetManager, forwardRenderPass.RenderPass, SceneData);
+            static_cast<WaterSurfaceMesh*>(mesh.get())->RebuildSwapChain(engine, assetManager, forwardRenderPass.RenderPass, SceneData);
         }
     }
    // static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
@@ -204,7 +204,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 {
     if(UpdateRenderer)
     {
-        UpdateSwapChain(engine, window);
+        RebuildSwapChain(engine, window);
     }
 
     keyboard.Update(window.GetWindowPtr(), camera);
@@ -313,7 +313,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     VkResult result = vkAcquireNextImageKHR(engine.Device, engine.SwapChain.GetSwapChain(), UINT64_MAX, engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        UpdateSwapChain(engine, window);
+        RebuildSwapChain(engine, window);
         return;
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -413,7 +413,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
         framebufferResized = false;
-        UpdateSwapChain(engine, window);
+        RebuildSwapChain(engine, window);
     }
     else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");

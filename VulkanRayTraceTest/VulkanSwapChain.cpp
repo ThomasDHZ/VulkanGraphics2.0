@@ -180,7 +180,7 @@ void VulkanSwapChain::Destroy(VkDevice device)
 	Swapchain = VK_NULL_HANDLE;
 }
 
-void VulkanSwapChain::UpdateSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface)
+void VulkanSwapChain::RebuildSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface)
 {
 	SetUpSwapChain(window, device, physicalDevice, surface);
 	SetUpSwapChainImageViews(device);

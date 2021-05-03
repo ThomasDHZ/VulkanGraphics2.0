@@ -73,7 +73,7 @@ void WaterSurfaceMesh::Update(VulkanEngine& engine, AssetManager& assetManager, 
 	MeshProperties.Update(engine);
 }
 
-void WaterSurfaceMesh::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void WaterSurfaceMesh::RebuildSwapChain(VulkanEngine& engine, AssetManager& assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
 	waterReflectionRenderPass.UpdateSwapChain(engine, assetManager, sceneData);
 	waterRefractionRenderPass.UpdateSwapChain(engine, assetManager, sceneData);

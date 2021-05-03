@@ -1,11 +1,14 @@
 #pragma once
 #include "VulkanEngine.h"
 #include "AssetManager.h"
+#include "InterfaceRenderPass.h"
 
 class BaseRenderer
 {
 protected:
 	std::shared_ptr<AssetManager> assetManager;
+
+	InterfaceRenderPass interfaceRenderPass;
 public:
 	BaseRenderer();
 	BaseRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);

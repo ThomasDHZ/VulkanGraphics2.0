@@ -189,7 +189,7 @@ void InterfaceRenderPass::Draw(VulkanEngine& engine, int frame)
     }
 }
 
-void InterfaceRenderPass::UpdateSwapChain(VulkanEngine& engine)
+void InterfaceRenderPass::RebuildSwapChain(VulkanEngine& engine)
 {
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
