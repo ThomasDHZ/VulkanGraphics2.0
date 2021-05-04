@@ -214,7 +214,7 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
 	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
 	BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
-
+	
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
 	RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 	RayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
@@ -240,10 +240,15 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	RayTracinDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 	RayTracinDeviceProperties.pNext = &RayTracingPipelineProperties;
 
+	VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{};
+	physicalDeviceRobustness2FeaturesEXT.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
+	physicalDeviceRobustness2FeaturesEXT.nullDescriptor = VK_TRUE;
+	physicalDeviceRobustness2FeaturesEXT.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
+
 	VkPhysicalDeviceFeatures2 deviceFeatures2{};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	deviceFeatures2.features = deviceFeatures;
-	deviceFeatures2.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
+	deviceFeatures2.pNext = &physicalDeviceRobustness2FeaturesEXT;
 
 	VkDeviceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -632,7 +637,7 @@ VkDescriptorSetLayout VulkanEngine::CreateDescriptorSetLayout(std::vector<Descri
 VkDescriptorSet VulkanEngine::CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout)
 {
 
-	uint32_t variableDescCounts[] = { 1, 1, 1, 300, 300, 300, 300, 300, 3000, 400, 400, 1 };
+	uint32_t variableDescCounts[] = { 1 };
 
 	VkDescriptorSetVariableDescriptorCountAllocateInfoEXT VariableDescriptorCountAllocateInfo{};
 	VariableDescriptorCountAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;

@@ -3,18 +3,20 @@
 #include "ForwardRenderPass.h"
 #include "CubeMapRenderPass.h"
 #include "PrefilterRenderPass.h"
+#include "BRDFRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
 private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
+
 	CubeMapRenderPass cubeMapRenderer;
 	PrefilterRenderPass prefilterRenderPass;
+	BRDFRenderPass brdfRenderPass;
 public:
 	PBRRenderer();
 	PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
 	~PBRRenderer();
-
 
 	ForwardRenderPass forwardRenderPass;
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);

@@ -5,7 +5,7 @@ brdfRenderingPipeline::brdfRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-brdfRenderingPipeline::brdfRenderingPipeline(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
+brdfRenderingPipeline::brdfRenderingPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -17,19 +17,19 @@ brdfRenderingPipeline::~brdfRenderingPipeline()
 {
 }
 
-void brdfRenderingPipeline::SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager)
+void brdfRenderingPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
-void brdfRenderingPipeline::SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager)
+void brdfRenderingPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void brdfRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager)
+void brdfRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -164,7 +164,7 @@ void brdfRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRe
     }
 }
 
-void brdfRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass)
+void brdfRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpDescriptorPool(engine, assetManager);

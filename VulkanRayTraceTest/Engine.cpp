@@ -31,7 +31,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
-
+    assetManager->textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
     assetManager->AddModel(engine, "../Models/viking_room.obj");
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
     material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);

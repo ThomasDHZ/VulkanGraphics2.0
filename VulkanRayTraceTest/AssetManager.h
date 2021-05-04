@@ -40,7 +40,7 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors() { return meshManager.GetMeshPropertiesListDescriptors(); }
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor() { return materialManager.GetMaterialBufferListDescriptor(); }
 	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor() { return textureManager.GetTextureBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor() { return textureManager.GetTextureBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor() { return textureManager.Get3DTextureBufferListDescriptor(); }
 	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor() { return textureManager.GetSkyBoxTextureBufferListDescriptor(); }
 
 	uint32_t GetMeshDescriptorCount() { return meshManager.GetMeshDescriptorCount(); }

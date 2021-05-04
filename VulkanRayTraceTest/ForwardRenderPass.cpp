@@ -136,7 +136,7 @@ void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<A
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
+    //DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
     forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
     pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
     skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, SkyUniformBuffer, RenderPass);
@@ -199,7 +199,7 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
 void ForwardRenderPass::Destroy(VulkanEngine& engine)
 {
     DepthTexture->Delete(engine);
-    DebugLightPipeline->Destroy(engine);
+    //DebugLightPipeline->Destroy(engine);
     forwardRenderingPipeline->Destroy(engine);
     pbrRenderingPipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);
