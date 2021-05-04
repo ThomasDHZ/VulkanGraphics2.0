@@ -240,15 +240,10 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	RayTracinDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 	RayTracinDeviceProperties.pNext = &RayTracingPipelineProperties;
 
-	VkPhysicalDeviceRobustness2FeaturesEXT physicalDeviceRobustness2FeaturesEXT{};
-	physicalDeviceRobustness2FeaturesEXT.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
-	physicalDeviceRobustness2FeaturesEXT.nullDescriptor = VK_TRUE;
-	physicalDeviceRobustness2FeaturesEXT.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
-
 	VkPhysicalDeviceFeatures2 deviceFeatures2{};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	deviceFeatures2.features = deviceFeatures;
-	deviceFeatures2.pNext = &physicalDeviceRobustness2FeaturesEXT;
+	deviceFeatures2.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
 
 	VkDeviceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

@@ -59,7 +59,7 @@ VkResult VulkanBuffer::CreateBuffer(VkDevice& device, VkPhysicalDevice& physical
 	if (vkAllocateMemory(device, &allocInfo, nullptr, &BufferMemory) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to allocate buffer memory!");
 	}
-	//655392
+
 	if (BufferData != nullptr)
 	{
 		CopyBufferToMemory(device, BufferData, bufferSize);
