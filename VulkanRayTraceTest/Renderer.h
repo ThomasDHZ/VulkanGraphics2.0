@@ -21,17 +21,13 @@ class Renderer
 {
 private:
 	int imageview = 0;
-	Keyboard keyboard;
-	Mouse mouse;
+
 
 	//FrameBufferRenderPass frameBufferRenderPass;
-	InterfaceRenderPass interfaceRenderPass;
-	ForwardRenderPass forwardRenderPass;
+	//InterfaceRenderPass interfaceRenderPass;
+	//ForwardRenderPass forwardRenderPass;
 	PBRRenderer pbrRenderer;
 	RayTraceRenderPass RayRenderer;
-	CubeMapRenderPass cubeMapRenderer;
-	PrefilterRenderPass prefilterRenderPass;
-	//DeferredRenderPass gBufferRenderPass;
 	//TextureRenderPass textureRenderPass;
 
 	size_t currentFrame = 0;
@@ -39,9 +35,6 @@ private:
 	bool RayTraceSwitch = true;
 	bool UpdateRenderer = false;
 	bool framebufferResized = false;
-
-
-	////void SetUpCommandBuffers(VulkanEngine& engine);
 
 	Skybox skybox;
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;

@@ -40,12 +40,12 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
 
 void AssetManager::Update(VulkanEngine& engine)
 {
+    camera->Update(engine);
+
     materialManager.Update(engine);
     textureManager.Update(engine);
     meshManager.Update(engine, materialManager);
     modelManager.Update(engine, materialManager);
-
-    camera->Update(engine);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -75,6 +75,14 @@ void AssetManager::Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo ren
 
 void AssetManager::Delete(VulkanEngine& engine)
 {
+    for (auto& model : modelManager.ModelList)
+    {
+        model->Destory(engine);
+    }
+
+    SceneData->Destroy(engine);
+    SkyUniformBuffer->Destroy(engine);
+
     meshManager.Destroy(engine);
     textureManager.Destory(engine);
     materialManager.Destory(engine);

@@ -31,3 +31,8 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
 {
 }
+
+std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
+{
+	return std::vector<VkCommandBuffer>();
+}

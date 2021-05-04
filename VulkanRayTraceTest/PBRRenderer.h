@@ -7,7 +7,7 @@
 class PBRRenderer : public BaseRenderer
 {
 private:
-	ForwardRenderPass forwardRenderPass;
+	
 	CubeMapRenderPass cubeMapRenderer;
 	PrefilterRenderPass prefilterRenderPass;
 public:
@@ -15,10 +15,14 @@ public:
 	PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
 	~PBRRenderer();
 
-	void UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window);
+
+	ForwardRenderPass forwardRenderPass;
+	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);
-	void Draw(VulkanEngine& engine, VulkanWindow& window);
-	void Destroy(VulkanEngine& engine);;
+	void Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex, Skybox skybox);
+	void Destroy(VulkanEngine& engine);
+
+	 std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);
 };
 

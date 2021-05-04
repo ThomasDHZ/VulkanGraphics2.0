@@ -12,6 +12,8 @@ public:
 	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);
 	void Draw(VulkanEngine& engine, VulkanWindow& window);
-	void Destroy(VulkanEngine& engine);;
+	void Destroy(VulkanEngine& engine);
+
+	std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);
 };
 
