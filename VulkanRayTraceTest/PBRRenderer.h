@@ -7,7 +7,7 @@
 class PBRRenderer : public BaseRenderer
 {
 private:
-	
+	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
 	CubeMapRenderPass cubeMapRenderer;
 	PrefilterRenderPass prefilterRenderPass;
 public:

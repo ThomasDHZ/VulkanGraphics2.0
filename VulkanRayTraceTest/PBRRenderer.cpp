@@ -17,23 +17,6 @@ PBRRenderer::~PBRRenderer()
 
 void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
-    int width = 0, height = 0;
-    glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
-    while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
-        glfwWaitEvents();
-    }
-
-    vkDeviceWaitIdle(engine.Device);
-
-    for (auto imageView : engine.SwapChain.GetSwapChainImageViews()) {
-        vkDestroyImageView(engine.Device, imageView, nullptr);
-    }
-
-    vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
-
-    engine.SwapChain.RebuildSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
-
     forwardRenderPass.RebuildSwapChain(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
     cubeMapRenderer.RebuildSwapChain(engine);
     prefilterRenderPass.RebuildSwapChain(engine);
@@ -101,15 +84,10 @@ void PBRRenderer::GUIUpdate(VulkanEngine& engine)
 
 void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex, Skybox skybox)
 {
-    forwardRenderPass.Draw(engine, assetManager, imageIndex, skybox);
+    forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID, skybox);
     cubeMapRenderer.Draw(engine, assetManager, imageIndex, skybox);
     prefilterRenderPass.Draw(engine, assetManager, imageIndex, skybox);
     interfaceRenderPass.Draw(engine, imageIndex);
-
-    CommandBufferSubmitList.emplace_back(forwardRenderPass.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(prefilterRenderPass.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
 }
 
 void PBRRenderer::Destroy(VulkanEngine& engine)

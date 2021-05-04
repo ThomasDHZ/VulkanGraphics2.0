@@ -16,19 +16,16 @@
 #include "CubeMapRenderPass.h"
 #include "PrefilterRenderPass.h"
 #include "PBRRenderer.h"
+#include "BlinnPhongRasterRenderer.h"
 
 class Renderer
 {
 private:
 	int imageview = 0;
 
-
-	//FrameBufferRenderPass frameBufferRenderPass;
-	//InterfaceRenderPass interfaceRenderPass;
-	//ForwardRenderPass forwardRenderPass;
-	PBRRenderer pbrRenderer;
+	BlinnPhongRasterRenderer blinnPhongRenderer;
+	//PBRRenderer pbrRenderer;
 	RayTraceRenderPass RayRenderer;
-	//TextureRenderPass textureRenderPass;
 
 	size_t currentFrame = 0;
 

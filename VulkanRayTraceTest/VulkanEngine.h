@@ -30,6 +30,11 @@ enum RenderPassID
 	Prefilter_Renderer,
 	Water_Renderer
 };
+enum RendererID
+{
+	BlinnPhong_Raster_Renderer,
+	PBR_Raster_Renderer
+};
 
 struct DescriptorSetLayoutBindingInfo
 {

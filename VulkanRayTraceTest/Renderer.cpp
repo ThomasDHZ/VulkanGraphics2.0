@@ -15,12 +15,13 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
    // interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     assetManager = assetManagerPTR;
 
-    pbrRenderer = PBRRenderer(engine, window, assetManager);
+    blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
+    //pbrRenderer = PBRRenderer(engine, window, assetManager);
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);
     //textureRenderPass = TextureRenderPass(engine, assetManager, SceneData);
 
-    skybox = Skybox(engine, assetManager, pbrRenderer.forwardRenderPass.RenderPass);
+    skybox = Skybox(engine, assetManager, blinnPhongRenderer.forwardRenderPass.RenderPass);
     RayRenderer = RayTraceRenderPass(engine, assetManager, assetManager->SceneData);
 
 
@@ -80,8 +81,6 @@ Renderer::~Renderer()
 
 void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
-    //assetManager->textureManager.LoadCubeMap(engine, prefilterRenderPass.BlurredSkyBoxTexture);
-
     int width = 0, height = 0;
     glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
     while (width == 0 || height == 0) {
@@ -97,23 +96,10 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
 
-    pbrRenderer.RebuildSwapChain(engine, window);
-    //engine.SwapChain.RebuildSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
-   // gBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-  //  forwardRenderPass.RebuildSwapChain(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
-    //cubeMapRenderer.RebuildSwapChain(engine);
-    //prefilterRenderPass.RebuildSwapChain(engine);
-    //frameBufferRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
-    //interfaceRenderPass.RebuildSwapChain(engine);
-    //for (auto& mesh : assetManager->meshManager.MeshList)
-    //{
-    //    if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
-    //    {
-    //        static_cast<WaterSurfaceMesh*>(mesh.get())->RebuildSwapChain(engine, assetManager, pbrRenderer.forwardRenderPass.RenderPass, assetManager->SceneData);
-    //    }
-    //}
-   // static_cast<WaterSurfaceMesh*>(assetManager.meshManager.MeshList[14].get())->UpdateGraphicsPipeLine(engine, assetManager, forwardRenderPass.RenderPass, SceneData, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
-   // textureRenderPass.UpdateSwapChain(engine, assetManager, SceneData);
+    engine.SwapChain.RebuildSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
+
+    blinnPhongRenderer.RebuildSwapChain(engine, window);
+   //pbrRenderer.RebuildSwapChain(engine, window);
    RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
 }
 
@@ -142,7 +128,8 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
-    pbrRenderer.GUIUpdate(engine);
+    blinnPhongRenderer.GUIUpdate(engine);
+    //pbrRenderer.GUIUpdate(engine);
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
@@ -173,19 +160,9 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     /// Draw Area
     /// </summary>
   // gBufferRenderPass.Draw(engine, assetManager, imageIndex);
-    for (auto& mesh : assetManager->meshManager.MeshList)
-    {
-        if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
-        {
-            static_cast<WaterSurfaceMesh*>(mesh.get())->DrawWaterTexture(engine, assetManager, imageIndex, skybox);
-        }
-    }
-    pbrRenderer.Draw(engine, window, imageIndex, skybox);
-    //forwardRenderPass.Draw(engine, assetManager, imageIndex, skybox);
-    //cubeMapRenderer.Draw(engine, assetManager, imageIndex, skybox);
-    //prefilterRenderPass.Draw(engine, assetManager, imageIndex, skybox);
-   //WaterRenderPass.Draw(engine, assetManager, imageIndex);
-   //frameBufferRenderPass.Draw(engine, RasterCommandBuffer, imageIndex);
+   
+    blinnPhongRenderer.Draw(engine, window, imageIndex, skybox);
+   // pbrRenderer.Draw(engine, window, imageIndex, skybox);
    RayRenderer.Draw(engine, assetManager, imageIndex);
    
     ///
@@ -201,7 +178,8 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
     if (RayTraceSwitch)
     {
-        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        //pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
         //CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
        // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
    
@@ -270,7 +248,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     //WaterRenderPass.Destroy(engine);
     //gBufferRenderPass.Destroy(engine);
     //AnimationRenderer.Destroy(engine);
-    pbrRenderer.Destroy(engine);
+    //pbrRenderer.Destroy(engine);
     skybox.Destory(engine);
     RayRenderer.Destory(engine);
 }
