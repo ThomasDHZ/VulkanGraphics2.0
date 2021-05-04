@@ -23,55 +23,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
 
     skybox = Skybox(engine, assetManager, blinnPhongRenderer.forwardRenderPass.RenderPass);
     RayRenderer = RayTraceRenderPass(engine, assetManager, assetManager->SceneData);
-
-
-    assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
-    assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);
-    assetManager->SceneData->UniformDataInfo.dlight.specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[0].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[0].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[0].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[0].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[1].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[1].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[1].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[1].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[2].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[2].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[2].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[2].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[3].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[3].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[3].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[3].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[4].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[4].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[4].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[4].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
-    assetManager->SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
-    assetManager->SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
-
-    //assetManager.textureManager.LoadTexture2D(waterReflectionRenderPass.RenderedTexture);
-    //assetManager.textureManager.LoadTexture2D(waterRefractionRenderPass.RenderedTexture);
-
-
-    //ImGui_ImplVulkan_AddTexture(waterRenderPass.ReflectionTexture->ImGuiDescriptorSet, waterRenderPass.ReflectionTexture->Sampler, waterRenderPass.ReflectionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    //mGui_ImplVulkan_AddTexture(waterRenderPass.RefractionTexture->ImGuiDescriptorSet, waterRenderPass.RefractionTexture->Sampler, waterRenderPass.RefractionTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   //ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-  // ImGui_ImplVulkan_AddTexture(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, prefilterRenderPass.RenderedTexture->Sampler, prefilterRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-   //for (auto& texture : cubeMapRenderer.CopyTextureList)
-   //{
-   //    ImGui_ImplVulkan_AddTexture(texture->ImGuiDescriptorSet, texture->Sampler, texture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   //}
 }
 
 Renderer::~Renderer()
@@ -100,8 +51,8 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
-   pbrRenderer.RebuildSwapChain(engine, window);
-   RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
+    pbrRenderer.RebuildSwapChain(engine, window);
+    RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
 }
 
 void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -114,27 +65,21 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     assetManager->Update(engine);
     skybox.Update(engine, assetManager->materialManager);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
-
-   // WaterRenderPass.Update(engine, assetManager, *SceneData.get(), camera2);
-    //for (auto& mesh : assetManager->meshManager.MeshList)
-    //{
-    //    if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
-    //    {
-    //        static_cast<WaterSurfaceMesh*>(mesh.get())->Update(engine, assetManager, *assetManager->SceneData.get(), assetManager->camera);
-    //    }
-    //}
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
-    ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
     if (ActiveRenderer == 0)
     {
         blinnPhongRenderer.GUIUpdate(engine);
     }
-    else
+    else if (ActiveRenderer == 1)
+    {
+        pbrRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 2)
     {
         pbrRenderer.GUIUpdate(engine);
     }
@@ -170,25 +115,23 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     {
         model->SubmitToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
     }
-    if (RayTraceSwitch)
-    {
-        if (ActiveRenderer == 0)
-        {
-            blinnPhongRenderer.Draw(engine, window, imageIndex, skybox);
-            blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-        }
-        else
-        {
-             pbrRenderer.Draw(engine, window, imageIndex, skybox);
-            pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-        }
 
+    if (ActiveRenderer == 0)
+    {
+        blinnPhongRenderer.Draw(engine, window, imageIndex, skybox);
+        blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
-    else
+    else if (ActiveRenderer == 1)
+    {
+        pbrRenderer.Draw(engine, window, imageIndex, skybox);
+        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 2)
     {
         RayRenderer.Draw(engine, assetManager, imageIndex);
         CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
     }
+
     interfaceRenderPass.Draw(engine, imageIndex);
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
 
