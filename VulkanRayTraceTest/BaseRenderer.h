@@ -8,8 +8,6 @@ class BaseRenderer
 {
 protected:
 	std::shared_ptr<AssetManager> assetManager;
-	std::vector<VkCommandBuffer> CommandBufferSubmitList;
-	InterfaceRenderPass interfaceRenderPass;
 
 public:
 	BaseRenderer();

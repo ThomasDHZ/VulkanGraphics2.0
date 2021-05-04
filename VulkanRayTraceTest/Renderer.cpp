@@ -12,7 +12,7 @@ Renderer::Renderer()
 
 Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPTR)
 {
-   // interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
+    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
     assetManager = assetManagerPTR;
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
@@ -98,6 +98,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     engine.SwapChain.RebuildSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
 
+    interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
    //pbrRenderer.RebuildSwapChain(engine, window);
    RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
@@ -164,7 +165,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     blinnPhongRenderer.Draw(engine, window, imageIndex, skybox);
    // pbrRenderer.Draw(engine, window, imageIndex, skybox);
    RayRenderer.Draw(engine, assetManager, imageIndex);
-   
+   interfaceRenderPass.Draw(engine, imageIndex);
     ///
     ///Draw area
     /// 
@@ -195,7 +196,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     {
         CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
     }
-    
+    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

@@ -20,7 +20,6 @@ void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     forwardRenderPass.RebuildSwapChain(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
     cubeMapRenderer.RebuildSwapChain(engine);
     prefilterRenderPass.RebuildSwapChain(engine);
-    interfaceRenderPass.RebuildSwapChain(engine);
 }
 
 void PBRRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -87,12 +86,10 @@ void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imag
     forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID, skybox);
     cubeMapRenderer.Draw(engine, assetManager, imageIndex, skybox);
     prefilterRenderPass.Draw(engine, assetManager, imageIndex, skybox);
-    interfaceRenderPass.Draw(engine, imageIndex);
 }
 
 void PBRRenderer::Destroy(VulkanEngine& engine)
 {
-    interfaceRenderPass.Destroy(engine);
     cubeMapRenderer.Destroy(engine);
     prefilterRenderPass.Destroy(engine);
     forwardRenderPass.Destroy(engine);
@@ -103,6 +100,5 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
     CommandBufferSubmitList.emplace_back(forwardRenderPass.CommandBuffer);
     CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(prefilterRenderPass.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
     return CommandBufferSubmitList;
 }

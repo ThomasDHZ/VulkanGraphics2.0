@@ -26,6 +26,7 @@ private:
 	BlinnPhongRasterRenderer blinnPhongRenderer;
 	//PBRRenderer pbrRenderer;
 	RayTraceRenderPass RayRenderer;
+	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;
 

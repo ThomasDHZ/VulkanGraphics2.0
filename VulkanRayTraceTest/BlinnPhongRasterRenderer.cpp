@@ -16,7 +16,6 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
     forwardRenderPass.RebuildSwapChain(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
-    interfaceRenderPass.RebuildSwapChain(engine);
 }
 
 void BlinnPhongRasterRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -81,18 +80,15 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
 void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex, Skybox skybox)
 {
     forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID, skybox);
-    interfaceRenderPass.Draw(engine, imageIndex);
 }
 
 void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
 {
-    interfaceRenderPass.Destroy(engine);
     forwardRenderPass.Destroy(engine);
 }
 
 std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
 {
     CommandBufferSubmitList.emplace_back(forwardRenderPass.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
     return CommandBufferSubmitList;
 }
