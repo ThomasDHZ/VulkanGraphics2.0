@@ -22,9 +22,10 @@ class Renderer
 {
 private:
 	int imageview = 0;
+	int ActiveRenderer = 0;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	//PBRRenderer pbrRenderer;
+	PBRRenderer pbrRenderer;
 	RayTraceRenderPass RayRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 

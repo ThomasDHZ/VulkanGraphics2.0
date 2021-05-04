@@ -16,7 +16,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
     assetManager = assetManagerPTR;
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
-    //pbrRenderer = PBRRenderer(engine, window, assetManager);
+    pbrRenderer = PBRRenderer(engine, window, assetManager);
   //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
     //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);
     //textureRenderPass = TextureRenderPass(engine, assetManager, SceneData);
@@ -100,7 +100,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
-   //pbrRenderer.RebuildSwapChain(engine, window);
+   pbrRenderer.RebuildSwapChain(engine, window);
    RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
 }
 
@@ -128,9 +128,16 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     ImGui::Checkbox("RayTraceSwitch", &RayTraceSwitch);
-    blinnPhongRenderer.GUIUpdate(engine);
-    //pbrRenderer.GUIUpdate(engine);
+    if (ActiveRenderer == 0)
+    {
+        blinnPhongRenderer.GUIUpdate(engine);
+    }
+    else
+    {
+        pbrRenderer.GUIUpdate(engine);
+    }
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
@@ -156,20 +163,6 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     engine.imagesInFlight[imageIndex] = engine.inFlightFences[currentFrame];
 
-
-    /// <summary>
-    /// Draw Area
-    /// </summary>
-  // gBufferRenderPass.Draw(engine, assetManager, imageIndex);
-   
-    blinnPhongRenderer.Draw(engine, window, imageIndex, skybox);
-   // pbrRenderer.Draw(engine, window, imageIndex, skybox);
-   RayRenderer.Draw(engine, assetManager, imageIndex);
-   interfaceRenderPass.Draw(engine, imageIndex);
-    ///
-    ///Draw area
-    /// 
-
     VkSemaphore waitSemaphores[] = { engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
@@ -179,23 +172,24 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
     if (RayTraceSwitch)
     {
-        blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-        //pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-        //CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
-       // CommandBufferSubmitList.emplace_back(gBufferRenderPass.CommandBuffer);
-   
-        for (auto& mesh : assetManager->meshManager.MeshList)
+        if (ActiveRenderer == 0)
         {
-            if (mesh->MeshType == MeshTypeFlag::Mesh_Type_Water)
-            {
-                static_cast<WaterSurfaceMesh*>(mesh.get())->SubmitToCMDBuffer(engine, CommandBufferSubmitList, imageIndex);
-            }
+            blinnPhongRenderer.Draw(engine, window, imageIndex, skybox);
+            blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
         }
+        else
+        {
+             pbrRenderer.Draw(engine, window, imageIndex, skybox);
+            pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        }
+
     }
     else
     {
+        RayRenderer.Draw(engine, assetManager, imageIndex);
         CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
     }
+    interfaceRenderPass.Draw(engine, imageIndex);
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
 
     VkSubmitInfo submitInfo{};
@@ -244,12 +238,8 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
 void Renderer::Destroy(VulkanEngine& engine)
 {
-
-   // frameBufferRenderPass.Destroy(engine);
-    //WaterRenderPass.Destroy(engine);
-    //gBufferRenderPass.Destroy(engine);
-    //AnimationRenderer.Destroy(engine);
-    //pbrRenderer.Destroy(engine);
+    blinnPhongRenderer.Destroy(engine);
+    pbrRenderer.Destroy(engine);
     skybox.Destory(engine);
     RayRenderer.Destory(engine);
 }
