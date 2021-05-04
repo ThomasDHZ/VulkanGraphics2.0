@@ -9,6 +9,10 @@ PBRRenderer::PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared
     forwardRenderPass = ForwardRenderPass(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
     cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f, assetManager->SceneData, assetManager->SkyUniformBuffer);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f, assetManager->SceneData, assetManager->SkyUniformBuffer);
+
+    ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, prefilterRenderPass.RenderedTexture->Sampler, prefilterRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
 }
 
 PBRRenderer::~PBRRenderer()
@@ -28,6 +32,8 @@ void PBRRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t cu
 
 void PBRRenderer::GUIUpdate(VulkanEngine& engine)
 {
+    ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::SliderInt("PrefilterSameCount", &assetManager->SceneData->UniformDataInfo.temp, 0, 1);
 
     ImGui::LabelText("Orginal View", "Orginal View");
@@ -81,11 +87,11 @@ void PBRRenderer::GUIUpdate(VulkanEngine& engine)
     // ImGui::Image(waterRefractionRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex, Skybox skybox)
+void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
-    forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID, skybox);
-    cubeMapRenderer.Draw(engine, assetManager, imageIndex, skybox);
-    prefilterRenderPass.Draw(engine, assetManager, imageIndex, skybox);
+    forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID);
+    cubeMapRenderer.Draw(engine, assetManager, imageIndex);
+    prefilterRenderPass.Draw(engine, assetManager, imageIndex);
 }
 
 void PBRRenderer::Destroy(VulkanEngine& engine)

@@ -32,6 +32,8 @@ public:
 	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID);
 	void Delete(VulkanEngine& engine);
 
+	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);
+
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors() { return meshManager.GetVertexBufferListDescriptors(); }
 	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors() { return meshManager.GetIndexBufferListDescriptors(); }
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors() { return meshManager.GetTransformBufferListDescriptors(); }

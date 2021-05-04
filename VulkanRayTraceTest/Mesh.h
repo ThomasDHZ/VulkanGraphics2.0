@@ -16,11 +16,13 @@ enum MeshDrawFlags
 	Mesh_Skip_Forward_Renderer = 0x01,
 	Mesh_Skip_RayTrace_Renderer = 0x02,
 	Mesh_Skip_Water_Renderer = 0x04,
+	Mesh_SkyBox = 0x08,
 };
 enum MeshTypeFlag
 {
 	Mesh_Type_Normal = 0x00,
-	Mesh_Type_Water = 0x01
+	Mesh_Type_Water = 0x01,
+	Mesh_Type_SkyBox = 0x02
 };
 class Mesh
 {

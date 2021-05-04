@@ -77,9 +77,9 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
     // ImGui::Image(waterRefractionRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex, Skybox skybox)
+void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
-    forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID, skybox);
+    forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID);
 }
 
 void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)

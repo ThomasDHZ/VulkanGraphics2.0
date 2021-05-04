@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "MegaMan.h"
+#include "Skybox.h"
 
 Engine::Engine()
 {
@@ -42,7 +43,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
-
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
     // assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
      assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/

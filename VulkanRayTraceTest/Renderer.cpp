@@ -17,11 +17,6 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
     pbrRenderer = PBRRenderer(engine, window, assetManager);
-  //  frameBufferRenderPass = FrameBufferRenderPass(engine, assetManager, SceneData);
-    //gBufferRenderPass = DeferredRenderPass(engine, assetManager, SceneData);
-    //textureRenderPass = TextureRenderPass(engine, assetManager, SceneData);
-
-    skybox = Skybox(engine, assetManager, blinnPhongRenderer.forwardRenderPass.RenderPass);
     RayRenderer = RayTraceRenderPass(engine, assetManager, assetManager->SceneData);
 }
 
@@ -61,9 +56,10 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     {
         RebuildSwapChain(engine, window);
     }
+    keyboard.Update(window.GetWindowPtr(), assetManager->camera);
+    mouse.Update(window.GetWindowPtr(), assetManager->camera);
 
     assetManager->Update(engine);
-    skybox.Update(engine, assetManager->materialManager);
     RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 }
 
@@ -118,12 +114,12 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
     if (ActiveRenderer == 0)
     {
-        blinnPhongRenderer.Draw(engine, window, imageIndex, skybox);
+        blinnPhongRenderer.Draw(engine, window, imageIndex);
         blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 1)
     {
-        pbrRenderer.Draw(engine, window, imageIndex, skybox);
+        pbrRenderer.Draw(engine, window, imageIndex);
         pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 2)
@@ -183,6 +179,5 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     blinnPhongRenderer.Destroy(engine);
     pbrRenderer.Destroy(engine);
-    skybox.Destory(engine);
     RayRenderer.Destory(engine);
 }

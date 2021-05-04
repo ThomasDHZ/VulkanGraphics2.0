@@ -38,7 +38,11 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& re
 {
     for (auto& mesh : MeshList)
     {
-        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
+        if (mesh->DrawFlags == Mesh_SkyBox)
+        {
+
+        }
+        else if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
         {
             mesh->Draw(commandBuffer, layout, RendererID);
         }

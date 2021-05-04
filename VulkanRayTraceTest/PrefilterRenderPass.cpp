@@ -120,7 +120,7 @@ void PrefilterRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, Skybox& skybox)
+void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -194,7 +194,7 @@ void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManage
             prefilterConst.view = SkyboxViews[x];
             prefilterConst.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
             prefilterConst.proj[1][1] *= -1;
-            prefilterConst.MipLevel = 0;
+            prefilterConst.MipLevel = 3;
             prefilterConst.FaceSize = CubeMapSize;
             prefilterConst.SampleCount = 1024;
 
@@ -204,7 +204,7 @@ void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManage
             vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipelineLayout, 0, 1, &prefilterRenderingPipeline->DescriptorSets, 0, nullptr);
             vkCmdPushConstants(CommandBuffer, prefilterRenderingPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterConst), &prefilterConst);
             vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            skybox.Draw(CommandBuffer, renderPassInfo, RendererID);
+            static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer, renderPassInfo, RendererID);
             vkCmdEndRenderPass(CommandBuffer);
 
             VkImageSubresourceRange ImageSubresourceRange{};

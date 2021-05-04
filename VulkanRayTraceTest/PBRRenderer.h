@@ -20,7 +20,7 @@ public:
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);
-	void Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex, Skybox skybox);
+	void Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 
 	 std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);

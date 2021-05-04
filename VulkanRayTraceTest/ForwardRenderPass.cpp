@@ -143,69 +143,6 @@ void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<A
     SetUpCommandBuffers(engine);
 }
 
-void ForwardRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID, Skybox& skybox)
-{
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    if (vkBeginCommandBuffer(CommandBuffer, &beginInfo) != VK_SUCCESS) {
-        throw std::runtime_error("failed to begin recording command buffer!");
-    }
-
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
-
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].depthStencil = { 1.0f, 0 };
-
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
-
-    vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-    if (rendererID == RendererID::PBR_Raster_Renderer)
-    {
-        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipeline);
-        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
-        assetManager->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID);
-
-        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
-        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        skybox.Draw(CommandBuffer, renderPassInfo, rendererPassID);
-    }
-    else if (rendererID == RendererID::BlinnPhong_Raster_Renderer)
-    {
-        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipeline);
-        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &forwardRenderingPipeline->DescriptorSets, 0, nullptr);
-        assetManager->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID);
-
-        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
-        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        skybox.Draw(CommandBuffer, renderPassInfo, rendererPassID);
-    }
-
-    vkCmdEndRenderPass(CommandBuffer);
-    if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
-        throw std::runtime_error("failed to record command buffer!");
-    }
-
-}
-
-void ForwardRenderPass::Destroy(VulkanEngine& engine)
-{
-    DepthTexture->Delete(engine);
-    DebugLightPipeline->Destroy(engine);
-    forwardRenderingPipeline->Destroy(engine);
-    pbrRenderingPipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
-    BaseRenderPass::Destroy(engine);
-}
-
 void ForwardRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
@@ -236,16 +173,36 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
         assetManager->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID);
+
+        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
+        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
+        static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer, renderPassInfo, rendererPassID);
     }
     else if (rendererID == RendererID::BlinnPhong_Raster_Renderer)
     {
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &forwardRenderingPipeline->DescriptorSets, 0, nullptr);
         assetManager->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID);
+
+        vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
+        vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
+        static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer, renderPassInfo, rendererPassID);
     }
 
     vkCmdEndRenderPass(CommandBuffer);
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
+
 }
+
+void ForwardRenderPass::Destroy(VulkanEngine& engine)
+{
+    DepthTexture->Delete(engine);
+    DebugLightPipeline->Destroy(engine);
+    forwardRenderingPipeline->Destroy(engine);
+    pbrRenderingPipeline->Destroy(engine);
+    skyBoxRenderingPipeline->Destroy(engine);
+    BaseRenderPass::Destroy(engine);
+}
+

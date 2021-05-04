@@ -23,6 +23,8 @@ class Renderer
 private:
 	int imageview = 0;
 	int ActiveRenderer = 0;
+	Keyboard keyboard;
+	Mouse mouse;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
 	PBRRenderer pbrRenderer;
@@ -34,7 +36,6 @@ private:
 	bool UpdateRenderer = false;
 	bool framebufferResized = false;
 
-	Skybox skybox;
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
 public:

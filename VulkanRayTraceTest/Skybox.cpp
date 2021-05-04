@@ -4,7 +4,7 @@ Skybox::Skybox() : Mesh()
 {
 }
 
-Skybox::Skybox(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, VkRenderPass& RenderPass) : Mesh()
+Skybox::Skybox(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager) : Mesh()
 {
 	const std::vector<Vertex> SkyBoxVertices =
 	{
@@ -53,6 +53,8 @@ Skybox::Skybox(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager,
 
 	MeshID = engine.GenerateID();
 	MaterialID = 0;
+	DrawFlags = MeshDrawFlags::Mesh_SkyBox;
+	MeshType = MeshTypeFlag::Mesh_Type_SkyBox;
 
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 	ParentModelID = 0;

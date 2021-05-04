@@ -87,3 +87,16 @@ void AssetManager::Delete(VulkanEngine& engine)
     textureManager.Destory(engine);
     materialManager.Destory(engine);
 }
+
+std::vector<std::shared_ptr<Mesh>> AssetManager::GetMeshByType(MeshTypeFlag type)
+{
+    std::vector<std::shared_ptr<Mesh>> ReturnMeshs;
+    for (auto mesh : meshManager.MeshList)
+    {
+        if (mesh->MeshType == type)
+        {
+           ReturnMeshs.emplace_back(mesh);
+        }
+    }
+    return ReturnMeshs;
+}

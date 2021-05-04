@@ -11,7 +11,7 @@ class Skybox : public Mesh
 private:
 public:
 	Skybox();
-	Skybox(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, VkRenderPass& RenderPass);
+	Skybox(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	~Skybox();
 };
 
