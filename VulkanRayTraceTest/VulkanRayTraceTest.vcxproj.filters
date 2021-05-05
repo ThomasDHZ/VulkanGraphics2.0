@@ -228,12 +228,6 @@
     <ClCompile Include="RenderTexturePipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
-    <ClCompile Include="DeferredPipeline.cpp">
-      <Filter>Source Files\Pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="GBufferPipeline.cpp">
-      <Filter>Source Files\Pipelines</Filter>
-    </ClCompile>
     <ClCompile Include="AnimatorCompute.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
@@ -602,12 +596,6 @@
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="RenderTexturePipeline.h">
-      <Filter>Header Files\Pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="DeferredPipeline.h">
-      <Filter>Header Files\Pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="GBufferPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="AnimatorCompute.h">

@@ -15,7 +15,7 @@ TextureRenderPass::TextureRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<RenderTexturePipeline>(RenderTexturePipeline(engine, assetManager, sceneDataptr, RenderPass));
+    TexturePipeline = std::make_shared<RenderTexturePipeline>(RenderTexturePipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -216,7 +216,7 @@ void TextureRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<As
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneDataptr, RenderPass);
+    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 

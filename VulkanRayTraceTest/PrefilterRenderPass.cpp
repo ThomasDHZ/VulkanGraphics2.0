@@ -14,7 +14,7 @@ PrefilterRenderPass::PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<A
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
+    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 

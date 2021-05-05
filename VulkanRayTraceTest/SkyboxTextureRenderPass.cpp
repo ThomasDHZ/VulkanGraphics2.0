@@ -5,7 +5,7 @@ SkyboxTextureRenderPass::SkyboxTextureRenderPass()
 {
 }
 
-SkyboxTextureRenderPass::SkyboxTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera)
+SkyboxTextureRenderPass::SkyboxTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera)
 {
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
@@ -21,7 +21,7 @@ SkyboxTextureRenderPass::SkyboxTextureRenderPass(VulkanEngine& engine, AssetMana
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    pbrIrradiancePipeline = std::make_shared<PBRIrradiancePipeline>(PBRIrradiancePipeline(engine, assetManager, SkyUniformBuffer, RenderPass, RendererID));
+    pbrIrradiancePipeline = std::make_shared<PBRIrradiancePipeline>(PBRIrradiancePipeline(engine, assetManager, RenderPass, RendererID));
     SetUpCommandBuffers(engine);
 }
 
@@ -127,7 +127,7 @@ void SkyboxTextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void SkyboxTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
+void SkyboxTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -152,7 +152,7 @@ void SkyboxTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetMana
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipelineLayout, 0, 1, &pbrIrradiancePipeline->DescriptorSets, 0, nullptr);
 
-    assetManager.Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, RendererID);
+    assetManager->Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, RendererID);
 
     vkCmdEndRenderPass(CommandBuffer);
 
@@ -161,7 +161,7 @@ void SkyboxTextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetMana
     }
 }
 
-void SkyboxTextureRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManage)
+void SkyboxTextureRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage)
 {
     CubeMapTexture->RecreateRendererTexture(engine);
 

@@ -5,12 +5,12 @@ WaterSurfacePipeline::WaterSurfacePipeline() : GraphicsPipeline()
 {
 }
 
-WaterSurfacePipeline::WaterSurfacePipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture) : GraphicsPipeline()
+WaterSurfacePipeline::WaterSurfacePipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, sceneData, reflectionTexture, refractionTexture);
+    SetUpDescriptorSets(engine, assetManager, reflectionTexture, refractionTexture);
 }
 
 WaterSurfacePipeline::~WaterSurfacePipeline()
@@ -53,11 +53,11 @@ void WaterSurfacePipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shar
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void WaterSurfacePipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
+void WaterSurfacePipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(sceneData->VulkanBufferData);
+    VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager->GetMeshPropertiesListDescriptors();
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager->GetVertexBufferListDescriptors();
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager->GetIndexBufferListDescriptors();
@@ -216,7 +216,7 @@ void WaterSurfacePipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRen
     }
 }
 
-void WaterSurfacePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
+void WaterSurfacePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
 {
     vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
@@ -232,5 +232,5 @@ void WaterSurfacePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::sha
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, sceneData, reflectionTexture, refractionTexture);
+    SetUpDescriptorSets(engine, assetManager, reflectionTexture, refractionTexture);
 }

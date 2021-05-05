@@ -16,7 +16,7 @@ private:
 	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 public:
 	SkyboxTextureRenderPass();
-	SkyboxTextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera);
+	SkyboxTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera);
 	~SkyboxTextureRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
@@ -29,8 +29,8 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager);
-	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
+	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 };
 

@@ -6,12 +6,12 @@ DebugLightRenderingPipeline::DebugLightRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-DebugLightRenderingPipeline::DebugLightRenderingPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass) : GraphicsPipeline()
+DebugLightRenderingPipeline::DebugLightRenderingPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
 	SetUpDescriptorPool(engine, assetManager);
 	SetUpDescriptorLayout(engine, assetManager);
 	SetUpShaderPipeLine(engine, renderPass);
-	SetUpDescriptorSets(engine, assetManager, sceneData);
+	SetUpDescriptorSets(engine, assetManager);
 }
 
 DebugLightRenderingPipeline::~DebugLightRenderingPipeline()
@@ -52,11 +52,11 @@ void DebugLightRenderingPipeline::SetUpDescriptorLayout(VulkanEngine& engine, st
 	DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void DebugLightRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void DebugLightRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
 	DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-	VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(sceneData->VulkanBufferData);
+	VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
 	std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager->GetMeshPropertiesListDescriptors();
 	std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager->GetVertexBufferListDescriptors();
 	std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager->GetIndexBufferListDescriptors();
@@ -209,11 +209,11 @@ void DebugLightRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, cons
 	}
 }
 
-void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, const VkRenderPass& renderPass)
+void DebugLightRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
 	GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
 	SetUpDescriptorPool(engine, assetManager);
 	SetUpDescriptorLayout(engine, assetManager);
 	SetUpShaderPipeLine(engine, renderPass);
-	SetUpDescriptorSets(engine, assetManager, sceneData);
+	SetUpDescriptorSets(engine, assetManager);
 }

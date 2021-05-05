@@ -11,9 +11,9 @@ ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(engine, assetManager, sceneData, RenderPass));
-    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(engine, assetManager, sceneData, RenderPass));
-    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(engine, assetManager, sceneData, RenderPass));
+    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(engine, assetManager, RenderPass));
+    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(engine, assetManager, RenderPass));
+    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(engine, assetManager, RenderPass));
     skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
 
     SetUpCommandBuffers(engine);
@@ -136,9 +136,9 @@ void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<A
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
-    forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
-    pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
+    DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, SkyUniformBuffer, RenderPass);
     SetUpCommandBuffers(engine);
 }

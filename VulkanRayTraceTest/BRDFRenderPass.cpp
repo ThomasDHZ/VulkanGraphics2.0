@@ -15,7 +15,7 @@ BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManage
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, sceneDataptr, RenderPass));
+    TexturePipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -214,7 +214,7 @@ void BRDFRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneDataptr, RenderPass);
+    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
