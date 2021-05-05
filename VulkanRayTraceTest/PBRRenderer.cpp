@@ -9,10 +9,11 @@ PBRRenderer::PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared
     forwardRenderPass = ForwardRenderPass(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
     cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f, assetManager->SceneData, assetManager->SkyUniformBuffer);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f, assetManager->SceneData, assetManager->SkyUniformBuffer);
-   // brdfRenderPass = BRDFRenderPass(engine, assetManager);
+    brdfRenderPass = BRDFRenderPass(engine, assetManager, assetManager->SkyUniformBuffer);
 
-    //ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    //ImGui_ImplVulkan_AddTexture(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, prefilterRenderPass.RenderedTexture->Sampler, prefilterRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, prefilterRenderPass.RenderedTexture->Sampler, prefilterRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(brdfRenderPass.RenderedTexture->ImGuiDescriptorSet, brdfRenderPass.RenderedTexture->Sampler, brdfRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 }
 
@@ -25,6 +26,7 @@ void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     forwardRenderPass.RebuildSwapChain(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
     cubeMapRenderer.RebuildSwapChain(engine);
     prefilterRenderPass.RebuildSwapChain(engine);
+    brdfRenderPass.RebuildSwapChain(engine, assetManager);
 }
 
 void PBRRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -33,8 +35,9 @@ void PBRRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t cu
 
 void PBRRenderer::GUIUpdate(VulkanEngine& engine)
 {
-    //ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    //ImGui::Image(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(brdfRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::SliderInt("PrefilterSameCount", &assetManager->SceneData->UniformDataInfo.temp, 0, 1);
 
     ImGui::LabelText("Orginal View", "Orginal View");
@@ -93,6 +96,7 @@ void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imag
     forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID);
     cubeMapRenderer.Draw(engine, assetManager, imageIndex);
     prefilterRenderPass.Draw(engine, assetManager, imageIndex);
+    brdfRenderPass.Draw(engine, assetManager, imageIndex);
 }
 
 void PBRRenderer::Destroy(VulkanEngine& engine)
@@ -100,6 +104,7 @@ void PBRRenderer::Destroy(VulkanEngine& engine)
     cubeMapRenderer.Destroy(engine);
     prefilterRenderPass.Destroy(engine);
     forwardRenderPass.Destroy(engine);
+    brdfRenderPass.Destroy(engine);
 }
 
 std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
@@ -107,5 +112,6 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
     CommandBufferSubmitList.emplace_back(forwardRenderPass.CommandBuffer);
     CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(prefilterRenderPass.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(brdfRenderPass.CommandBuffer);
     return CommandBufferSubmitList;
 }

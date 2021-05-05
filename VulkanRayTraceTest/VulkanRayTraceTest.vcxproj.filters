@@ -108,9 +108,6 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -234,9 +231,6 @@
     <ClCompile Include="DeferredPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
-    <ClCompile Include="FrameBufferPipeline.cpp">
-      <Filter>Source Files\Pipelines</Filter>
-    </ClCompile>
     <ClCompile Include="GBufferPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
@@ -302,6 +296,9 @@
     </ClCompile>
     <ClCompile Include="BaseRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -484,9 +481,6 @@
     <ClInclude Include="SceneData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -613,9 +607,6 @@
     <ClInclude Include="DeferredPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
-    <ClInclude Include="FrameBufferPipeline.h">
-      <Filter>Header Files\Pipelines</Filter>
-    </ClInclude>
     <ClInclude Include="GBufferPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
@@ -681,6 +672,9 @@
     </ClInclude>
     <ClInclude Include="BaseRenderer.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Managers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

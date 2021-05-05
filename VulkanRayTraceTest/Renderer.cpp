@@ -46,7 +46,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
-    //pbrRenderer.RebuildSwapChain(engine, window);
+    pbrRenderer.RebuildSwapChain(engine, window);
     RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
 }
 

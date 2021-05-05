@@ -5,13 +5,13 @@ BRDFRenderPass::BRDFRenderPass()
 {
 }
 
-BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData)
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
+    TexturePipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, sceneData, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -35,6 +35,7 @@ void BRDFRenderPass::CreateRenderPass(VulkanEngine& engine)
     AttachmentDescriptionList.emplace_back(AlebdoAttachment);
 
     std::vector<VkAttachmentReference> ColorRefsList;
+    ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -125,25 +126,36 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    std::array<VkClearValue, 1> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
-
-    std::array<VkClearValue, 1> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    VkViewport viewport{};
+    viewport.width = RenderSize;
+    viewport.height = RenderSize;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D rect2D{};
+    rect2D.extent.width = RenderSize;
+    rect2D.extent.height = RenderSize;
+    rect2D.offset.x = 0.0f;
+    rect2D.offset.y = 0.0f;
+
+    vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
+    vkCmdSetScissor(CommandBuffer, 0, 1, &rect2D);
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
-
-    assetManager->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, RendererID);
-
+    vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
@@ -151,7 +163,7 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void BRDFRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine);
 
@@ -166,7 +178,7 @@ void BRDFRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    TexturePipeline->UpdateGraphicsPipeLine(engine, RenderPass);
     SetUpCommandBuffers(engine);
 }
 

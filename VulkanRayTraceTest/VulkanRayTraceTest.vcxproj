@@ -168,7 +168,6 @@
     <ClCompile Include="DeferredRenderPass.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="ForwardRenderingPipeline.cpp" />
-    <ClCompile Include="FrameBufferPipeline.cpp" />
     <ClCompile Include="FrameBufferRenderPass.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
@@ -293,7 +292,6 @@
     <ClInclude Include="DeferredRenderPass.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="ForwardRenderingPipeline.h" />
-    <ClInclude Include="FrameBufferPipeline.h" />
     <ClInclude Include="FrameBufferRenderPass.h" />
     <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="GraphicsPipeline.h" />

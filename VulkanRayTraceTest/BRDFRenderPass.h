@@ -12,10 +12,10 @@ private:
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 	void SetUpCommandBuffers(VulkanEngine& engine);
-
+	float RenderSize = 512.0f;
 public:
 	BRDFRenderPass();
-	BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData);
 	~BRDFRenderPass();
 
 	static constexpr RenderPassID RendererID = BRDF_Renderer;
@@ -27,7 +27,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 };
