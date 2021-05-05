@@ -5,7 +5,7 @@ TextureRenderPass::TextureRenderPass()
 {
 }
 
-TextureRenderPass::TextureRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+TextureRenderPass::TextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
     sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
 
@@ -148,7 +148,7 @@ void TextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void TextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex)
+void TextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -176,7 +176,7 @@ void TextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
 
-    assetManager.Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, RendererID);
+    assetManager->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, RendererID);
 
     vkCmdEndRenderPass(CommandBuffer);
 
@@ -185,7 +185,7 @@ void TextureRenderPass::Draw(VulkanEngine& engine, AssetManager& assetManager, u
     }
 }
 
-void TextureRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
+void TextureRenderPass::Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
 {
     copysceneDataptr.UniformDataInfo.sLight.direction = camera->GetFront();
     copysceneDataptr.UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
@@ -199,7 +199,7 @@ void TextureRenderPass::Update(VulkanEngine& engine, AssetManager& assetManager,
    sceneData.Update(engine, copysceneDataptr.UniformDataInfo);
 }
 
-void TextureRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+void TextureRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
     RenderedTexture->RecreateRendererTexture(engine);
     BloomTexture->RecreateRendererTexture(engine);
@@ -216,7 +216,7 @@ void TextureRenderPass::UpdateSwapChain(VulkanEngine& engine, AssetManager& asse
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneDataptr, RenderPass);
     SetUpCommandBuffers(engine);
 }
 

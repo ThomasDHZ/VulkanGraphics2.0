@@ -9,7 +9,7 @@ PBRRenderer::PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared
     forwardRenderPass = ForwardRenderPass(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
     cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f, assetManager->SceneData, assetManager->SkyUniformBuffer);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f, assetManager->SceneData, assetManager->SkyUniformBuffer);
-    brdfRenderPass = BRDFRenderPass(engine, assetManager, assetManager->SkyUniformBuffer);
+    brdfRenderPass = BRDFRenderPass(engine, assetManager, assetManager->SceneData);
 
     ImGui_ImplVulkan_AddTexture(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, cubeMapRenderer.RenderedTexture->Sampler, cubeMapRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     ImGui_ImplVulkan_AddTexture(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, prefilterRenderPass.RenderedTexture->Sampler, prefilterRenderPass.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -26,7 +26,7 @@ void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     forwardRenderPass.RebuildSwapChain(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
     cubeMapRenderer.RebuildSwapChain(engine);
     prefilterRenderPass.RebuildSwapChain(engine);
-    brdfRenderPass.RebuildSwapChain(engine, assetManager);
+    brdfRenderPass.UpdateSwapChain(engine, assetManager, assetManager->SceneData);
 }
 
 void PBRRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)

@@ -5,13 +5,17 @@ BRDFRenderPass::BRDFRenderPass()
 {
 }
 
-BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<UniformData<SkyboxUniformBuffer>> sceneData)
+BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
+    sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
+
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
+    BloomTexture = std::make_shared<RenderedColorTexture>(engine);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, sceneData, RenderPass));
+    TexturePipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, sceneDataptr, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -34,13 +38,38 @@ void BRDFRenderPass::CreateRenderPass(VulkanEngine& engine)
     AlebdoAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     AttachmentDescriptionList.emplace_back(AlebdoAttachment);
 
+    VkAttachmentDescription BloomAttachment = {};
+    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BloomAttachment);
+
+    VkAttachmentDescription DepthAttachment = {};
+    DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
+    DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    DepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    DepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    DepthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(DepthAttachment);
+
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    VkAttachmentReference depthReference = { 2, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDescription.colorAttachmentCount = static_cast<uint32_t>(ColorRefsList.size());
     subpassDescription.pColorAttachments = ColorRefsList.data();
+    subpassDescription.pDepthStencilAttachment = &depthReference;
 
     std::vector<VkSubpassDependency> DependencyList;
 
@@ -87,6 +116,8 @@ void BRDFRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(RenderedTexture->View);
+        AttachmentList.emplace_back(BloomTexture->View);
+        AttachmentList.emplace_back(DepthTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -126,32 +157,21 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
-    std::array<VkClearValue, 1> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+
+    std::array<VkClearValue, 3> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[2].depthStencil = { 1.0f, 0 };
+
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    VkViewport viewport{};
-    viewport.width = RenderSize;
-    viewport.height = RenderSize;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-
-    VkRect2D rect2D{};
-    rect2D.extent.width = RenderSize;
-    rect2D.extent.height = RenderSize;
-    rect2D.offset.x = 0.0f;
-    rect2D.offset.y = 0.0f;
-
-    vkCmdSetViewport(CommandBuffer, 0, 1, &viewport);
-    vkCmdSetScissor(CommandBuffer, 0, 1, &rect2D);
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
@@ -163,9 +183,25 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void BRDFRenderPass::Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
+{
+    copysceneDataptr.UniformDataInfo.sLight.direction = camera->GetFront();
+    copysceneDataptr.UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
+    copysceneDataptr.UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
+    copysceneDataptr.UniformDataInfo.projInverse[1][1] *= -1;
+    copysceneDataptr.UniformDataInfo.view = camera->GetViewMatrix();
+    copysceneDataptr.UniformDataInfo.proj = camera->GetProjectionMatrix();
+    copysceneDataptr.UniformDataInfo.proj[1][1] *= -1;
+    copysceneDataptr.UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+
+    sceneData.Update(engine, copysceneDataptr.UniformDataInfo);
+}
+
+void BRDFRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
     RenderedTexture->RecreateRendererTexture(engine);
+    BloomTexture->RecreateRendererTexture(engine);
+    DepthTexture->RecreateRendererTexture(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -178,13 +214,17 @@ void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneDataptr, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
 void BRDFRenderPass::Destroy(VulkanEngine& engine)
 {
     RenderedTexture->Delete(engine);
+    BloomTexture->Delete(engine);
+    DepthTexture->Delete(engine);
+
+    sceneData.Destroy(engine);
     TexturePipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);

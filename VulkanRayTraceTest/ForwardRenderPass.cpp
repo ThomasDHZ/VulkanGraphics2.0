@@ -136,7 +136,7 @@ void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<A
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    //DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
+    DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
     forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
     pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, sceneData, RenderPass);
     skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, SkyUniformBuffer, RenderPass);
