@@ -5,7 +5,7 @@ CubeMapRenderPass::CubeMapRenderPass()
 {
 }
 
-CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize)
 {
     CubeMapSize = cubeMapSize;
 
@@ -14,7 +14,7 @@ CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
+    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 

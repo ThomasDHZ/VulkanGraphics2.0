@@ -19,7 +19,7 @@ private:
 
 public:
 	PrefilterRenderPass();
-	PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t CubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
+	PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t CubeMapSize);
 	~PrefilterRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;

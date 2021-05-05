@@ -20,23 +20,23 @@ private:
 
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
-	void CreateDescriptorSetLayout(VulkanEngine& engine, AssetManager& assetManager);
+	void CreateDescriptorSetLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void CreateShaderPipeLine(VulkanEngine& engine);
-	void CreateDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
-	void CreateDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData);
+	void CreateDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void CreateDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 
 	void UpdateGraphicsPipeLine(VulkanEngine& engine);
 
 public:
 	FrameBufferRenderPass();
-	FrameBufferRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData);
+	FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	~FrameBufferRenderPass();
 
 	static constexpr RenderPassID RendererID = FrameBuffer_Renderer;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	void Draw(VulkanEngine& engine, VkCommandBuffer commandbuffer, uint32_t index);
-	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> SceneData);
+	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void Destroy(VulkanEngine& engine);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }

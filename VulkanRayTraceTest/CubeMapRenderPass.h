@@ -18,7 +18,7 @@ private:
 
 public:
 	CubeMapRenderPass();
-	CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t CubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
+	CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t CubeMapSize);
 	~CubeMapRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;

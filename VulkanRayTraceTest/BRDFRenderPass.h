@@ -15,7 +15,7 @@ private:
 
 public:
 	BRDFRenderPass();
-	BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	~BRDFRenderPass();
 
 	static constexpr RenderPassID RendererID = Texture_Renderer;
@@ -31,7 +31,7 @@ public:
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
-	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 };

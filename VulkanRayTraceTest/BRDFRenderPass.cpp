@@ -5,9 +5,9 @@ BRDFRenderPass::BRDFRenderPass()
 {
 }
 
-BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
-    sceneData = SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo);
+    sceneData = SceneDataUniformBuffer(engine, assetManager->SceneData->UniformDataInfo);
 
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
     BloomTexture = std::make_shared<RenderedColorTexture>(engine);
@@ -183,21 +183,7 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void BRDFRenderPass::Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
-{
-    copysceneDataptr.UniformDataInfo.sLight.direction = camera->GetFront();
-    copysceneDataptr.UniformDataInfo.viewInverse = glm::inverse(camera->GetViewMatrix());
-    copysceneDataptr.UniformDataInfo.projInverse = glm::inverse(camera->GetProjectionMatrix());
-    copysceneDataptr.UniformDataInfo.projInverse[1][1] *= -1;
-    copysceneDataptr.UniformDataInfo.view = camera->GetViewMatrix();
-    copysceneDataptr.UniformDataInfo.proj = camera->GetProjectionMatrix();
-    copysceneDataptr.UniformDataInfo.proj[1][1] *= -1;
-    copysceneDataptr.UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-
-    sceneData.Update(engine, copysceneDataptr.UniformDataInfo);
-}
-
-void BRDFRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
+void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine);
     BloomTexture->RecreateRendererTexture(engine);

@@ -5,7 +5,7 @@ PrefilterRenderPass::PrefilterRenderPass()
 {
 }
 
-PrefilterRenderPass::PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+PrefilterRenderPass::PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize)
 {
     CubeMapSize = cubeMapSize;
 

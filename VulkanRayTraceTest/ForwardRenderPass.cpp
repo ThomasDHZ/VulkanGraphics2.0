@@ -5,7 +5,7 @@ ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()
 {
 }
 
-ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer) : BaseRenderPass()
+ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager) : BaseRenderPass()
 {
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
@@ -14,7 +14,7 @@ ForwardRenderPass::ForwardRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
     DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(engine, assetManager, RenderPass));
     forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(engine, assetManager, RenderPass));
     pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(engine, assetManager, RenderPass));
-    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, SkyUniformBuffer, RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, RenderPass));
 
     SetUpCommandBuffers(engine);
 }
@@ -121,7 +121,7 @@ void ForwardRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     DepthTexture->RecreateRendererTexture(engine);
 
@@ -139,7 +139,7 @@ void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<A
     DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, SkyUniformBuffer, RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 

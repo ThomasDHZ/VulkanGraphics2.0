@@ -6,7 +6,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
-    forwardRenderPass = ForwardRenderPass(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
+    forwardRenderPass = ForwardRenderPass(engine, assetManager);
 }
 
 BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
@@ -15,7 +15,7 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 
 void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
-    forwardRenderPass.RebuildSwapChain(engine, assetManager, assetManager->SceneData, assetManager->SkyUniformBuffer);
+    forwardRenderPass.RebuildSwapChain(engine, assetManager);
 }
 
 void BlinnPhongRasterRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)

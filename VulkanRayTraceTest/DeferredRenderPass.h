@@ -10,9 +10,9 @@
 class DeferredRenderPass
 {
 private:
-	void SetUpDescriptorPool(VulkanEngine& engine, AssetManager& assetManager);
-	void SetUpDescriptorLayout(VulkanEngine& engine, AssetManager& assetManager);
-	void SetUpDescriptorSets(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	void SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void SetUpShaderPipeLine(VulkanEngine& renderer);
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
@@ -20,7 +20,7 @@ private:
 
 public:
 	DeferredRenderPass();
-	DeferredRenderPass(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+	DeferredRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	~DeferredRenderPass();
 
 	static constexpr RenderPassID RendererID = Deferred_Renderer;
@@ -55,7 +55,7 @@ public:
 
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-	void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 };
