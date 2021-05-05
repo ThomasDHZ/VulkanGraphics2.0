@@ -199,7 +199,7 @@ void ForwardRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
 void ForwardRenderPass::Destroy(VulkanEngine& engine)
 {
     DepthTexture->Delete(engine);
-    //DebugLightPipeline->Destroy(engine);
+    DebugLightPipeline->Destroy(engine);
     forwardRenderingPipeline->Destroy(engine);
     pbrRenderingPipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);

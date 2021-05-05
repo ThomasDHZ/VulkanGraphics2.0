@@ -46,7 +46,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
-    pbrRenderer.RebuildSwapChain(engine, window);
+    //pbrRenderer.RebuildSwapChain(engine, window);
     RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
 }
 
@@ -177,6 +177,7 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
 
 void Renderer::Destroy(VulkanEngine& engine)
 {
+    interfaceRenderPass.Destroy(engine);
     blinnPhongRenderer.Destroy(engine);
     pbrRenderer.Destroy(engine);
     RayRenderer.Destory(engine);

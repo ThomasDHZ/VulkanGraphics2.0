@@ -99,6 +99,7 @@ void TextureManager::UnloadAllTextures(VulkanEngine& engine)
 
 void TextureManager::UnloadCubeMap(VulkanEngine& engine)
 {
+	if(CubeMap != nullptr)
 	CubeMap->Delete(engine);
 }
 
