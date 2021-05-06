@@ -1,9 +1,12 @@
 #pragma once
 #include "BaseRenderer.h"
 #include "ForwardRenderPass.h"
+#include "FrameBufferTextureRenderPass.h"
 
 class BlinnPhongRasterRenderer : public BaseRenderer
 {
+private:
+	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
 public:
 	BlinnPhongRasterRenderer();
 	BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
