@@ -1,43 +1,27 @@
 #pragma once
-#include <vulkan/vulkan.h>
-#include <vector>
-#include <array>
-#include "VulkanEngine.h"
-#include "RenderedDepthTexture.h"
-#include "Vertex.h"
-#include "Mesh.h"
-#include "AssetManager.h"
+#include "FrameBufferPipeline.h"
 
 class FrameBufferRenderPass
 {
 private:
-	VkDescriptorSetLayout DescriptorLayout;
-	VkDescriptorPool DescriptorPool;
-	VkDescriptorSet DescriptorSets;
-	VkRenderPass RenderPass;
-	VkPipelineLayout ShaderPipelineLayout;
-	VkPipeline ShaderPipeline;
+	VkRenderPass RenderPass = VK_NULL_HANDLE;
+	std::vector<VkFramebuffer> SwapChainFramebuffers;
+	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
-	void CreateDescriptorSetLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void CreateShaderPipeLine(VulkanEngine& engine);
-	void CreateDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void CreateDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-
-	void UpdateGraphicsPipeLine(VulkanEngine& engine);
+	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
 	FrameBufferRenderPass();
 	FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	~FrameBufferRenderPass();
 
-	static constexpr RenderPassID RendererID = FrameBuffer_Renderer;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
+	static constexpr RenderPassID rendererPassID = Forward_Renderer;
 
+	std::shared_ptr<FrameBufferPipeline> frameBufferPipeline;
+
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void Draw(VulkanEngine& engine, VkCommandBuffer commandbuffer, uint32_t index);
-	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void Destroy(VulkanEngine& engine);
-
-	VkRenderPass GetRenderPass() { return RenderPass; }
 };

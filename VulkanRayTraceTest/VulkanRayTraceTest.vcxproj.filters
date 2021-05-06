@@ -294,6 +294,9 @@
     <ClCompile Include="FrameBufferTextureRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBufferPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -663,6 +666,9 @@
     </ClInclude>
     <ClInclude Include="FrameBufferTextureRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
