@@ -15,7 +15,7 @@ TextureRenderPass::TextureRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<RenderTexturePipeline>(RenderTexturePipeline(engine, assetManager, RenderPass));
+    TexturePipeline = std::make_shared<RenderFrameBufferTexturePipeline>(RenderFrameBufferTexturePipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 

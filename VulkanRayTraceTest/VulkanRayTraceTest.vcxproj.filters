@@ -225,9 +225,6 @@
     <ClCompile Include="RenderWaterTexturePipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTexturePipeline.cpp">
-      <Filter>Source Files\Pipelines</Filter>
-    </ClCompile>
     <ClCompile Include="AnimatorCompute.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
@@ -293,6 +290,9 @@
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderFrameBufferTexturePipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -595,9 +595,6 @@
     <ClInclude Include="RenderWaterTexturePipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTexturePipeline.h">
-      <Filter>Header Files\Pipelines</Filter>
-    </ClInclude>
     <ClInclude Include="AnimatorCompute.h">
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
@@ -663,6 +660,9 @@
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderFrameBufferTexturePipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,7 +3,6 @@
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
-#include "RenderTexturePipeline.h"
 #include "brdfRenderingPipeline.h"
 
 class BRDFRenderPass

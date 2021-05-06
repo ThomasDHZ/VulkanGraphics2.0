@@ -207,7 +207,7 @@
     <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RenderTexturePipeline.cpp" />
+    <ClCompile Include="RenderFrameBufferTexturePipeline.cpp" />
     <ClCompile Include="RenderWaterTexturePipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
@@ -331,7 +331,7 @@
     <ClInclude Include="RenderedGBufferPositionTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RenderTexturePipeline.h" />
+    <ClInclude Include="RenderFrameBufferTexturePipeline.h" />
     <ClInclude Include="RenderWaterTexturePipeline.h" />
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="Skybox.h" />

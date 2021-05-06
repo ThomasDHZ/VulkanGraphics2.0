@@ -3,7 +3,6 @@
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
-#include "RenderTexturePipeline.h"
 #include "CubeMapRenderingPipeline.h"
 #include "SkyBoxRenderingPipeline.h"
 #include "Skybox.h"

@@ -3,7 +3,7 @@
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
-#include "RenderTexturePipeline.h"
+#include "RenderFrameBufferTexturePipeline.h"
 
 class TextureRenderPass
 {
@@ -23,7 +23,7 @@ public:
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
-	std::shared_ptr<RenderTexturePipeline> TexturePipeline;
+	std::shared_ptr<RenderFrameBufferTexturePipeline> TexturePipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
