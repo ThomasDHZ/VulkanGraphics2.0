@@ -11,7 +11,6 @@
 #include "AssetManager.h"
 #include "Skybox.h"
 #include "DeferredRenderPass.h"
-#include "TextureRenderPass.h"
 #include "WaterSurfaceMesh.h"
 #include "CubeMapRenderPass.h"
 #include "PrefilterRenderPass.h"

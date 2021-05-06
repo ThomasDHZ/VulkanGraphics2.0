@@ -171,9 +171,6 @@
     <ClCompile Include="DeferredRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="TextureRenderPass.cpp">
-      <Filter>Source Files\RenderPass</Filter>
-    </ClCompile>
     <ClCompile Include="WaterRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
@@ -293,6 +290,9 @@
     </ClCompile>
     <ClCompile Include="RenderFrameBufferTexturePipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferTextureRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -541,9 +541,6 @@
     <ClInclude Include="DeferredRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="TextureRenderPass.h">
-      <Filter>Header Files\RenderPass</Filter>
-    </ClInclude>
     <ClInclude Include="WaterRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
@@ -663,6 +660,9 @@
     </ClInclude>
     <ClInclude Include="RenderFrameBufferTexturePipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferTextureRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
