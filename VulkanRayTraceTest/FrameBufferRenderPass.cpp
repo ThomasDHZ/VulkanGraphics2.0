@@ -4,11 +4,11 @@ FrameBufferRenderPass::FrameBufferRenderPass()
 {
 }
 
-FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture)
 {
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    frameBufferPipeline = std::make_shared<FrameBufferPipeline>(FrameBufferPipeline(engine, assetManager, RenderPass));
+    frameBufferPipeline = std::make_shared<FrameBufferPipeline>(FrameBufferPipeline(engine, assetManager, RenderPass, RenderedTexture, BloomTexture));
     SetUpCommandBuffers(engine);
 }
 
@@ -97,12 +97,12 @@ void FrameBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void FrameBufferRenderPass::Draw(VulkanEngine& engine, VkCommandBuffer commandbuffer, uint32_t index)
+void FrameBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t index)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    if (vkBeginCommandBuffer(commandbuffer, &beginInfo) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(CommandBuffer, &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
@@ -119,13 +119,13 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, VkCommandBuffer commandbu
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    vkCmdBeginRenderPass(commandbuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, frameBufferPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(commandbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, frameBufferPipeline->ShaderPipelineLayout, 0, 1, &frameBufferPipeline->DescriptorSets, 0, nullptr);
-    vkCmdDraw(commandbuffer, 6, 1, 0, 0);
-    vkCmdEndRenderPass(commandbuffer);
+    vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, frameBufferPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, frameBufferPipeline->ShaderPipelineLayout, 0, 1, &frameBufferPipeline->DescriptorSets, 0, nullptr);
+    vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
+    vkCmdEndRenderPass(CommandBuffer);
 
-    if (vkEndCommandBuffer(commandbuffer) != VK_SUCCESS) {
+    if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }

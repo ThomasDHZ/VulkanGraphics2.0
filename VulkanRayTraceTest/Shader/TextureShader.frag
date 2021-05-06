@@ -116,7 +116,7 @@ void main()
     }
 
     outColor = vec4(result, 1.0);
-    outBloom = vec4(0.0f);
+    outBloom = vec4(1.0f);
 }
 
 vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv)

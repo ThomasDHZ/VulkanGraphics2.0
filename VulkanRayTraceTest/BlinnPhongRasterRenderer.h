@@ -2,11 +2,14 @@
 #include "BaseRenderer.h"
 #include "ForwardRenderPass.h"
 #include "FrameBufferTextureRenderPass.h"
+#include "FrameBufferRenderPass.h"
 
 class BlinnPhongRasterRenderer : public BaseRenderer
 {
 private:
+	bool UseFrameBuffer = true;
 	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
+	FrameBufferRenderPass FrameBufferRenderer;
 public:
 	BlinnPhongRasterRenderer();
 	BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);

@@ -5,21 +5,8 @@
 
 #include "Lighting.glsl"
 
-layout(binding = 2) uniform UniformBufferObject {
-	DirectionalLight dlight;
-	PointLight plight[5];
-	SpotLight sLight;
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
-
-layout(binding = 8) uniform sampler2D TextureMap[];
+layout(binding = 0) uniform sampler2D FrameBufferTexture;
+layout(binding = 1) uniform sampler2D BloomTexture;
 
 layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
@@ -27,5 +14,5 @@ layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    outColor = vec4(texture(TextureMap[scenedata.temp], TexCoords));
+    outColor = vec4(texture(FrameBufferTexture, TexCoords));
 }
