@@ -22,12 +22,8 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     forwardRenderPass.RebuildSwapChain(engine, assetManager);
-}
-
-void BlinnPhongRasterRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
-{
 }
 
 void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)

@@ -11,8 +11,10 @@ layout(binding = 1) uniform sampler2D BloomTexture;
 layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
 
-
+const float Gamma = 2.2f;
 void main() 
 {
-    outColor = vec4(texture(FrameBufferTexture, TexCoords));
+    vec3 Color = texture(FrameBufferTexture, TexCoords).rgb;
+    vec3 result = pow(Color, vec3(1.0 / Gamma));
+    outColor = vec4(result, 1.0f);
 }

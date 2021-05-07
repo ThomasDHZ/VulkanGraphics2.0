@@ -19,7 +19,6 @@ public:
 
 	ForwardRenderPass forwardRenderPass;
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
-	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);
 	void Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);

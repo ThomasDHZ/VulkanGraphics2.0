@@ -16,8 +16,8 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
     assetManager = assetManagerPTR;
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
-    pbrRenderer = PBRRenderer(engine, window, assetManager);
-    RayRenderer = RayTraceRenderPass(engine, assetManager, assetManager->SceneData);
+    //pbrRenderer = PBRRenderer(engine, window, assetManager);
+   // RayRenderer = RayTraceRenderPass(engine, assetManager, assetManager->SceneData);
 }
 
 Renderer::~Renderer()
@@ -46,8 +46,8 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
-    pbrRenderer.RebuildSwapChain(engine, window);
-    RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
+    //pbrRenderer.RebuildSwapChain(engine, window);
+   // RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
 }
 
 void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -60,7 +60,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     mouse.Update(window.GetWindowPtr(), assetManager->camera);
 
     assetManager->Update(engine);
-    RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
+    //RayRenderer.createTopLevelAccelerationStructure(engine, assetManager);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -73,11 +73,11 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     }
     else if (ActiveRenderer == 1)
     {
-        pbrRenderer.GUIUpdate(engine);
+       // pbrRenderer.GUIUpdate(engine);
     }
     else if (ActiveRenderer == 2)
     {
-        pbrRenderer.GUIUpdate(engine);
+      //  pbrRenderer.GUIUpdate(engine);
     }
 }
 
@@ -119,13 +119,13 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
     else if (ActiveRenderer == 1)
     {
-        pbrRenderer.Draw(engine, window, imageIndex);
-        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+       // pbrRenderer.Draw(engine, window, imageIndex);
+      //  pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 2)
     {
-        RayRenderer.Draw(engine, assetManager, imageIndex);
-        CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
+     //   RayRenderer.Draw(engine, assetManager, imageIndex);
+     //   CommandBufferSubmitList.emplace_back(RayRenderer.RayTraceCommandBuffer);
     }
 
     interfaceRenderPass.Draw(engine, imageIndex);
@@ -179,6 +179,6 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     interfaceRenderPass.Destroy(engine);
     blinnPhongRenderer.Destroy(engine);
-    pbrRenderer.Destroy(engine);
-    RayRenderer.Destory(engine);
+    //pbrRenderer.Destroy(engine);
+    //RayRenderer.Destory(engine);
 }

@@ -95,6 +95,9 @@ void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& engine)
 
 void RenderedDepthTexture::RecreateRendererTexture(VulkanEngine& engine)
 {
+    Width = engine.SwapChain.GetSwapChainResolution().width;
+    Height = engine.SwapChain.GetSwapChainResolution().height;
+
     Texture::Delete(engine);
     CreateTextureImage(engine);
     CreateTextureView(engine);

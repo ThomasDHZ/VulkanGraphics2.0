@@ -17,10 +17,6 @@ void BaseRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
 }
 
-void BaseRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
-{
-}
-
 void BaseRenderer::GUIUpdate(VulkanEngine& engine)
 {
 }

@@ -26,8 +26,8 @@ private:
 	Mouse mouse;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	PBRRenderer pbrRenderer;
-	RayTraceRenderPass RayRenderer;
+	//PBRRenderer pbrRenderer;
+	//RayTraceRenderPass RayRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;

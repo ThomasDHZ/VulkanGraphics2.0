@@ -95,6 +95,9 @@ void RenderedGBufferPositionTexture::CreateTextureSampler(VulkanEngine& engine)
 
 void RenderedGBufferPositionTexture::RecreateRendererTexture(VulkanEngine& engine)
 {
+    Width = engine.SwapChain.GetSwapChainResolution().width;
+    Height = engine.SwapChain.GetSwapChainResolution().height;
+
     Texture::Delete(engine);
     CreateTextureImage(engine);
     CreateTextureView(engine);

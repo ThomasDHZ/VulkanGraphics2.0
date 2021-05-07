@@ -130,7 +130,7 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetMana
     }
 }
 
-void FrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void FrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture)
 {
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -143,7 +143,7 @@ void FrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_p
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, RenderedTexture, BloomTexture);
     SetUpCommandBuffers(engine);
 }
 

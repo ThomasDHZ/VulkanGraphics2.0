@@ -29,10 +29,6 @@ void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     brdfRenderPass.RebuildSwapChain(engine, assetManager);
 }
 
-void PBRRenderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
-{
-}
-
 void PBRRenderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));

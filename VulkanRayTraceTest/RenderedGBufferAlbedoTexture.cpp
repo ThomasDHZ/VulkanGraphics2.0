@@ -95,6 +95,9 @@ void RenderedGBufferAlbedoTexture::CreateTextureSampler(VulkanEngine& engine)
 
 void RenderedGBufferAlbedoTexture::RecreateRendererTexture(VulkanEngine& engine)
 {
+    Width = engine.SwapChain.GetSwapChainResolution().width;
+    Height = engine.SwapChain.GetSwapChainResolution().height;
+
     Texture::Delete(engine);
     CreateTextureImage(engine);
     CreateTextureView(engine);

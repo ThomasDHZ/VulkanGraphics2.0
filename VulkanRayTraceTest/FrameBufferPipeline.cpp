@@ -155,7 +155,11 @@ void FrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRend
     }
 }
 
-void FrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void FrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    SetUpDescriptorPool(engine, assetManager);
+    SetUpDescriptorLayout(engine, assetManager);
+    SetUpShaderPipeLine(engine, renderPass);
+    SetUpDescriptorSets(engine, assetManager, RenderedTexture, BloomTexture);
 }
