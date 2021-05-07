@@ -124,6 +124,10 @@ void ForwardRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 void ForwardRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     DepthTexture->RecreateRendererTexture(engine);
+    DebugLightPipeline->Destroy(engine);
+    forwardRenderingPipeline->Destroy(engine);
+    pbrRenderingPipeline->Destroy(engine);
+    skyBoxRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
