@@ -9,7 +9,7 @@ RayTraceRenderPass::RayTraceRenderPass()
 {
 
 }
-RayTraceRenderPass::RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+RayTraceRenderPass::RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 deviceProperties2{};
@@ -28,7 +28,7 @@ RayTraceRenderPass::RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<Ass
     createStorageImage(engine);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
-    SetUpDescriptorSets(engine, assetManager, sceneData);
+    SetUpDescriptorSets(engine, assetManager);
     createRayTracingPipeline(engine);
     createShaderBindingTable(engine);
     VkCommandBufferAllocateInfo allocInfo{};
@@ -81,13 +81,13 @@ void RayTraceRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, std::shared
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData)
+void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
       DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
       VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(topLevelAS.handle);
       VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, storageImage->View);
-      VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(sceneData->VulkanBufferData);
+      VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
       std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager->GetMeshPropertiesListDescriptors();
       std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager->GetVertexBufferListDescriptors();
       std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager->GetIndexBufferListDescriptors();
@@ -114,7 +114,7 @@ void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, std::shared_p
 }
 
 
-void RayTraceRenderPass::Destory(VulkanEngine& engine)
+void RayTraceRenderPass::Destroy(VulkanEngine& engine)
 {
     {
         vkFreeMemory(engine.Device, topLevelAS.AccelerationBuffer.BufferMemory, nullptr);
@@ -435,7 +435,7 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
-void RayTraceRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, uint32_t imageIndex)
+void RayTraceRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
@@ -453,6 +453,6 @@ void RayTraceRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     createRayTracingPipeline(engine);
-    SetUpDescriptorSets(engine, assetManager, sceneData);
+    SetUpDescriptorSets(engine, assetManager);
     Draw(engine, assetManager, imageIndex);
 }

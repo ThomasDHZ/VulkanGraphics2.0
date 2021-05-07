@@ -34,7 +34,9 @@ enum RenderPassID
 enum RendererID
 {
 	BlinnPhong_Raster_Renderer,
-	PBR_Raster_Renderer
+	PBR_Raster_Renderer,
+	BlinnPhong_RayTrace_Renderer,
+	PBR_RayTrace_Renderer
 };
 
 struct DescriptorSetLayoutBindingInfo

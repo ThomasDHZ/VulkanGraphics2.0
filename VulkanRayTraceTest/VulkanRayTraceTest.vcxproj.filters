@@ -300,6 +300,12 @@
     <ClCompile Include="RenderPBRFrameBufferTexturePipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="RayTracePBRRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTraceRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -681,6 +687,12 @@
     </ClInclude>
     <ClInclude Include="RenderPBRFrameBufferTexturePipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTraceRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracePBRRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

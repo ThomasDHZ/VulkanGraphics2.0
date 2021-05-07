@@ -55,7 +55,7 @@ private:
 
     void SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
     void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-    void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+    void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 public:
 
     AccelerationStructure topLevelAS{};
@@ -63,7 +63,7 @@ public:
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderPass();
-    RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData);
+    RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
     ~RayTraceRenderPass();
 
     void createTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
@@ -71,8 +71,8 @@ public:
     void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
     void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
-    void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, uint32_t imageIndex);
-    void Destory(VulkanEngine& engine);
+    void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+    void Destroy(VulkanEngine& engine);
 
     VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
     {

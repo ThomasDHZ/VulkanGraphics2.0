@@ -1,33 +1,23 @@
 #pragma once
 #include "VulkanEngine.h"
-#include "FrameBufferRenderPass.h"
-#include "InterfaceRenderPass.h"
-#include "ForwardRenderPass.h"
-#include "TextureManager.h"
-#include "Model.h"
-#include "RayTraceRenderPass.h"
-#include "OrthographicCamera.h"
-#include "AnimatorCompute.h"
-#include "AssetManager.h"
-#include "Skybox.h"
-#include "DeferredRenderPass.h"
-#include "WaterSurfaceMesh.h"
-#include "CubeMapRenderPass.h"
-#include "PrefilterRenderPass.h"
 #include "PBRRenderer.h"
 #include "BlinnPhongRasterRenderer.h"
+#include "RayTraceRenderer.h"
+#include "RayTracePBRRenderer.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
 class Renderer
 {
 private:
-	int imageview = 0;
 	int ActiveRenderer = 0;
 	Keyboard keyboard;
 	Mouse mouse;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
 	PBRRenderer pbrRenderer;
-	//RayTraceRenderPass RayRenderer;
+	RayTraceRenderer rayTraceRenderer;
+	RayTracePBRRenderer pbrRayTraceRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;
