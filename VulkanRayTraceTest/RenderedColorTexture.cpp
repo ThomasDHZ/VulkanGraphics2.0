@@ -13,6 +13,7 @@ RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine) : Texture(engin
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, glm::vec2 TextureResolution) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
@@ -20,6 +21,8 @@ RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, glm::vec2 Textu
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
 }
 
 RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, int width, int height) : Texture(engine, width, height, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
@@ -27,6 +30,8 @@ RenderedColorTexture::RenderedColorTexture(VulkanEngine& engine, int width, int 
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
 }
 
 RenderedColorTexture::~RenderedColorTexture()
@@ -102,4 +107,6 @@ void RenderedColorTexture::RecreateRendererTexture(VulkanEngine& engine)
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
+
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

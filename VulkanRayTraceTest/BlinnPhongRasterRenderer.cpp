@@ -9,10 +9,6 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanW
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
     FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     forwardRenderPass = ForwardRenderPass(engine, assetManager);
-
-
-    ImGui_ImplVulkan_AddTexture(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, FrameBufferTextureRenderer.RenderedTexture->Sampler, FrameBufferTextureRenderer.RenderedTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    ImGui_ImplVulkan_AddTexture(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, FrameBufferTextureRenderer.BloomTexture->Sampler, FrameBufferTextureRenderer.BloomTexture->View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
