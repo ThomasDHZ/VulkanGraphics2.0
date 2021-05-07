@@ -209,6 +209,7 @@
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderFrameBufferTexturePipeline.cpp" />
+    <ClCompile Include="RenderPBRFrameBufferTexturePipeline.cpp" />
     <ClCompile Include="RenderWaterTexturePipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
@@ -252,6 +253,8 @@
     <None Include="Shader\PBRIrradianceSkybox.vert" />
     <None Include="Shader\PBRShader.frag" />
     <None Include="Shader\PBRShader.vert" />
+    <None Include="Shader\PBRTextureRendererShader.frag" />
+    <None Include="Shader\PBRTextureRendererShader.vert" />
     <None Include="Shader\Prefilter.frag" />
     <None Include="Shader\Prefilter.vert" />
     <None Include="Shader\raygen.rgen" />
@@ -334,6 +337,7 @@
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderFrameBufferTexturePipeline.h" />
+    <ClInclude Include="RenderPBRFrameBufferTexturePipeline.h" />
     <ClInclude Include="RenderWaterTexturePipeline.h" />
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="Skybox.h" />

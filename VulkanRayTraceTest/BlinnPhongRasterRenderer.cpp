@@ -25,15 +25,18 @@ void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWind
 void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Checkbox("FrameBuffer", &UseFrameBuffer);
-    ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    if (UseFrameBuffer)
+    {
+        ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+        ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    }
 }
 
 void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
     if (UseFrameBuffer)
     {
-        FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
+        FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
         FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
     }
     else

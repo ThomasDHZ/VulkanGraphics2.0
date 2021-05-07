@@ -297,6 +297,9 @@
     <ClCompile Include="FrameBufferPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="RenderPBRFrameBufferTexturePipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -414,6 +417,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\BRDFRenderer.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\PBRTextureRendererShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\PBRTextureRendererShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -668,6 +677,9 @@
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="FrameBufferPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPBRFrameBufferTexturePipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>

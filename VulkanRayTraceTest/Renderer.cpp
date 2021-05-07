@@ -16,7 +16,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
     assetManager = assetManagerPTR;
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
-    //pbrRenderer = PBRRenderer(engine, window, assetManager);
+    pbrRenderer = PBRRenderer(engine, window, assetManager);
    // RayRenderer = RayTraceRenderPass(engine, assetManager, assetManager->SceneData);
 }
 
@@ -46,7 +46,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
-    //pbrRenderer.RebuildSwapChain(engine, window);
+    pbrRenderer.RebuildSwapChain(engine, window);
    // RayRenderer.RebuildSwapChain(engine, assetManager, assetManager->SceneData, 0);
 }
 
@@ -73,7 +73,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     }
     else if (ActiveRenderer == 1)
     {
-       // pbrRenderer.GUIUpdate(engine);
+        pbrRenderer.GUIUpdate(engine);
     }
     else if (ActiveRenderer == 2)
     {
@@ -119,8 +119,8 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     }
     else if (ActiveRenderer == 1)
     {
-       // pbrRenderer.Draw(engine, window, imageIndex);
-      //  pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        pbrRenderer.Draw(engine, window, imageIndex);
+        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 2)
     {
@@ -179,6 +179,6 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     interfaceRenderPass.Destroy(engine);
     blinnPhongRenderer.Destroy(engine);
-    //pbrRenderer.Destroy(engine);
+    pbrRenderer.Destroy(engine);
     //RayRenderer.Destory(engine);
 }

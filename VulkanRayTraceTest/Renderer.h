@@ -26,7 +26,7 @@ private:
 	Mouse mouse;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	//PBRRenderer pbrRenderer;
+	PBRRenderer pbrRenderer;
 	//RayTraceRenderPass RayRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 

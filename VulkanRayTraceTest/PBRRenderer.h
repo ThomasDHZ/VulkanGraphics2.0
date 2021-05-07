@@ -4,12 +4,17 @@
 #include "CubeMapRenderPass.h"
 #include "PrefilterRenderPass.h"
 #include "BRDFRenderPass.h"
+#include "FrameBufferTextureRenderPass.h"
+#include "FrameBufferRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
 private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
+	bool UseFrameBuffer = true;
 
+	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
+	FrameBufferRenderPass FrameBufferRenderer;
 	CubeMapRenderPass cubeMapRenderer;
 	PrefilterRenderPass prefilterRenderPass;
 	BRDFRenderPass brdfRenderPass;
