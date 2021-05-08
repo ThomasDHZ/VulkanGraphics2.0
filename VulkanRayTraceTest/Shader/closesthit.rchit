@@ -67,7 +67,7 @@ void main()
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
    vec2 uv = vertex.uv;
-    rayHitInfo.hitValue = CalcDirLight(vertex, material, ubo.dlight, uv);
+   rayHitInfo.hitValue = vec3(texture(TextureMap[material.DiffuseMapID], uv));
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

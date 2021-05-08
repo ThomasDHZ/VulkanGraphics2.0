@@ -22,7 +22,7 @@ void RayTracePBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& w
 
 void RayTracePBRRenderer::GUIUpdate(VulkanEngine& engine)
 {
-   // ImGui::Image(rayTraceRenderPass.RayTracedImage->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+   ImGui::Image(rayTraceRenderPass.RayTracedImage->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
 void RayTracePBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)

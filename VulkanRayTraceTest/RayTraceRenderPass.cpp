@@ -286,7 +286,7 @@ void RayTraceRenderPass::createRayTracingPipeline(VulkanEngine& engine)
     ShadowShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(ShadowShaderInfo);
 
-    ShaderList.emplace_back(engine.CreateShader("Shader/pbrclosesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
+    ShaderList.emplace_back(engine.CreateShader("Shader/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ClosestHitShaderInfo = {};
     ClosestHitShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     ClosestHitShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
@@ -347,7 +347,6 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
 
 
     vkBeginCommandBuffer(RayTraceCommandBuffer, &cmdBufInfo);
-
     const uint32_t handleSizeAligned = engine.GetAlignedSize(rayTracingPipelineProperties.shaderGroupHandleSize, rayTracingPipelineProperties.shaderGroupHandleAlignment);
 
     VkStridedDeviceAddressRegionKHR raygenShaderSbtEntry{};
@@ -369,16 +368,7 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
 
     vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline);
     vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipelineLayout, 0, 1, &DescriptorSets, 0, 0);
-
-    engine.vkCmdTraceRaysKHR(
-        RayTraceCommandBuffer,
-        &raygenShaderSbtEntry,
-        &missShaderSbtEntry,
-        &hitShaderSbtEntry,
-        &callableShaderSbtEntry,
-        engine.SwapChain.SwapChainResolution.width,
-        engine.SwapChain.SwapChainResolution.height,
-        1);
+    engine.vkCmdTraceRaysKHR(RayTraceCommandBuffer, &raygenShaderSbtEntry, &missShaderSbtEntry, &hitShaderSbtEntry, &callableShaderSbtEntry, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1);
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
