@@ -10,7 +10,7 @@ private:
 
 public:
 	FrameBufferRenderPass();
-	FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture);
+	FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
 	~FrameBufferRenderPass();
 
 	static constexpr RenderPassID rendererPassID = Forward_Renderer;
@@ -20,7 +20,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
 	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t index);
 	void Destroy(VulkanEngine& engine);
 };

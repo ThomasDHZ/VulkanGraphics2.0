@@ -1,4 +1,5 @@
 #include "RenderedRayTracedColorTexture.h"
+#include "ImGui/imgui_impl_vulkan.h"
 
 RenderedRayTracedColorTexture::RenderedRayTracedColorTexture() : Texture2D()
 {
@@ -10,6 +11,7 @@ RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& engin
     CreateTextureView(engine);
     CreateTextureSampler(engine);
     SendTextureToGPU(engine);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedRayTracedColorTexture::~RenderedRayTracedColorTexture()
@@ -118,4 +120,5 @@ void RenderedRayTracedColorTexture::RecreateRendererTexture(VulkanEngine& render
     CreateTextureImage(renderer);
     CreateTextureView(renderer);
     CreateTextureSampler(renderer);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

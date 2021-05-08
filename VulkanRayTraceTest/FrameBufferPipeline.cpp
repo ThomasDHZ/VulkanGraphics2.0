@@ -5,7 +5,7 @@ FrameBufferPipeline::FrameBufferPipeline() : GraphicsPipeline()
 {
 }
 
-FrameBufferPipeline::FrameBufferPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture) : GraphicsPipeline()
+FrameBufferPipeline::FrameBufferPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -33,7 +33,7 @@ void FrameBufferPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::share
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void FrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture)
+void FrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -155,7 +155,7 @@ void FrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRend
     }
 }
 
-void FrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture)
+void FrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpDescriptorPool(engine, assetManager);

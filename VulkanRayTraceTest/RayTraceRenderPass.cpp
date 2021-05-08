@@ -86,7 +86,7 @@ void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, std::shared_p
       DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
       VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(topLevelAS.handle);
-      VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, storageImage->View);
+      VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayTracedImage->View);
       VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
       std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager->GetMeshPropertiesListDescriptors();
       std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager->GetVertexBufferListDescriptors();
@@ -141,7 +141,7 @@ void RayTraceRenderPass::Destroy(VulkanEngine& engine)
         RayTracePipelineLayout = VK_NULL_HANDLE;
     }
     {
-        storageImage->Delete(engine);
+        RayTracedImage->Delete(engine);
     }
     {
         raygenShaderBindingTable.DestoryBuffer(engine.Device);
@@ -243,7 +243,7 @@ void RayTraceRenderPass::createTopLevelAccelerationStructure(VulkanEngine& engin
 
 void RayTraceRenderPass::createStorageImage(VulkanEngine& engine)
 {
-    storageImage = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
+    RayTracedImage = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 }
 
 void RayTraceRenderPass::createRayTracingPipeline(VulkanEngine& engine)
@@ -379,59 +379,6 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
         engine.SwapChain.SwapChainResolution.width,
         engine.SwapChain.SwapChainResolution.height,
         1);
-
-    VkImageMemoryBarrier barrier = {};
-    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    barrier.image = engine.SwapChain.GetSwapChainImages()[imageIndex];
-    barrier.subresourceRange = subresourceRange;
-    barrier.srcAccessMask = 0;
-    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
-
-    VkImageMemoryBarrier barrier2 = {};
-    barrier2.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier2.oldLayout = VK_IMAGE_LAYOUT_GENERAL;
-    barrier2.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    barrier2.image = storageImage->Image;
-    barrier2.subresourceRange = subresourceRange;
-    barrier2.srcAccessMask = 0;
-    barrier2.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-
-    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier2);
-
-    VkImageCopy copyRegion{};
-    copyRegion.srcSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-    copyRegion.srcOffset = { 0, 0, 0 };
-    copyRegion.dstSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1 };
-    copyRegion.dstOffset = { 0, 0, 0 };
-    copyRegion.extent = { engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1 };
-    vkCmdCopyImage(RayTraceCommandBuffer, storageImage->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, engine.SwapChain.GetSwapChainImages()[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-
-
-    VkImageMemoryBarrier barrier3 = {};
-    barrier3.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier3.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    barrier3.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    barrier3.image = engine.SwapChain.GetSwapChainImages()[imageIndex];
-    barrier3.subresourceRange = subresourceRange;
-    barrier3.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    barrier3.dstAccessMask = 0;
-
-    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier3);
-
-    VkImageMemoryBarrier barrier4 = {};
-    barrier4.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    barrier4.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-    barrier4.newLayout = VK_IMAGE_LAYOUT_GENERAL;
-    barrier4.image = storageImage->Image;
-    barrier4.subresourceRange = subresourceRange;
-    barrier4.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-    barrier4.dstAccessMask = 0;
-
-    vkCmdPipelineBarrier(RayTraceCommandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier4);
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 

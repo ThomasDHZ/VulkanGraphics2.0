@@ -4,7 +4,7 @@ FrameBufferRenderPass::FrameBufferRenderPass()
 {
 }
 
-FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture)
+FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -130,7 +130,7 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetMana
     }
 }
 
-void FrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedColorTexture> RenderedTexture, std::shared_ptr<RenderedColorTexture> BloomTexture)
+void FrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
     frameBufferPipeline->Destroy(engine);
 
