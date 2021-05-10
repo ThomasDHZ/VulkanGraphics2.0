@@ -315,6 +315,9 @@
     <ClCompile Include="HybridFrameBufferRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="GBufferPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -717,6 +720,9 @@
     </ClInclude>
     <ClInclude Include="HybridFrameBufferRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

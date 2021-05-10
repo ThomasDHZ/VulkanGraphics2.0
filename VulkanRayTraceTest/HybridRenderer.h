@@ -5,12 +5,13 @@
 #include "FrameBufferRenderPass.h"
 #include "RayTraceRenderPass.h"
 #include "HybridFrameBufferRenderPass.h"
+#include "DeferredRenderPass.h"
 
 class HybridRenderer : public BaseRenderer
 {
 private:
 	bool UseFrameBuffer = true;
-	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
+	GBufferRenderPass FrameBufferTextureRenderer;
 	HybridFrameBufferRenderPass FrameBufferRenderer;
 public:
 	HybridRenderer();

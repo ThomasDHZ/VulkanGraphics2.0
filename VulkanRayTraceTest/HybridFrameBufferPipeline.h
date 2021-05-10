@@ -4,6 +4,17 @@
 #include "GraphicsPipeline.h"
 #include "RenderedColorTexture.h"
 
+struct HybridFrameBufferTexture
+{
+	std::shared_ptr<Texture> AlbedoTexture;
+	std::shared_ptr<Texture> PositionTexture;
+	std::shared_ptr<Texture> NormalTexture;
+	std::shared_ptr<Texture> RTXShadowTexture;
+	std::shared_ptr<Texture> RTXReflectionTexture; 
+	std::shared_ptr<Texture> RTXSSA0Texture; 
+	std::shared_ptr<Texture> BloomTexture;
+};
+
 class HybridFrameBufferPipeline : public GraphicsPipeline
 {
 private:
@@ -12,6 +23,8 @@ private:
 	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture);
 	void SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass);
 public:
+
+
 	HybridFrameBufferPipeline();
 	HybridFrameBufferPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture);
 	~HybridFrameBufferPipeline();

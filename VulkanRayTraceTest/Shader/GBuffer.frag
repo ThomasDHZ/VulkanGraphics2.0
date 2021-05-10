@@ -97,8 +97,14 @@ void main()
 
 	GPosition = vec4(FragPos, 1.0f);
 
-    GAlebdo.rgb = texture(TextureMap[material.DiffuseMapID], texCoords).rgb;
-
+    if(material.DiffuseMapID != 0)
+    {
+        GAlebdo.rgba = texture(TextureMap[material.DiffuseMapID], texCoords).rgba;
+    }
+    else
+    {
+        GAlebdo.rgba = vec4(material.Diffuse, 1.0f);
+    }
 
 	GNormal = vec4(normal, 1.0f);
 	GBloom = vec4(0.0f);

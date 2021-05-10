@@ -6,53 +6,32 @@
 #include "RenderedGBufferNormalTexture.h"
 #include "RenderedGBufferPositionTexture.h"
 #include "AssetManager.h"
+#include "GBufferPipeline.h"
 
-class DeferredRenderPass
+class GBufferRenderPass
 {
 private:
-	void SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpShaderPipeLine(VulkanEngine& renderer);
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	DeferredRenderPass();
-	DeferredRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	~DeferredRenderPass();
+	GBufferRenderPass();
+	GBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	~GBufferRenderPass();
 
 	static constexpr RenderPassID RendererID = Deferred_Renderer;
-	struct GBufferPass
-	{
-		std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
-		std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
-		std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;
-		std::shared_ptr<RenderedColorTexture> GBloomTexture;
-		std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
-		std::vector<VkFramebuffer> SwapChainFramebuffers;
-		VkRenderPass RenderPass = VK_NULL_HANDLE;
-		VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-		VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
-		VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-		VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
-		VkPipeline ShaderPipeline = VK_NULL_HANDLE;
-	} gBufferRenderPass;
+	std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
+	std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
+	std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;
+	std::shared_ptr<RenderedColorTexture> GBloomTexture;
+	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
-	struct DeferredPass
-	{
-		std::vector<VkFramebuffer> SwapChainFramebuffers;
+	std::shared_ptr<GBufferPipeline> gBufferPipeline;
 
-		VkRenderPass RenderPass = VK_NULL_HANDLE;
-		VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-		VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
-		VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-		VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
-		VkPipeline ShaderPipeline = VK_NULL_HANDLE;
-	} deferredRenderPass;
-
+	std::vector<VkFramebuffer> SwapChainFramebuffers;
+	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
