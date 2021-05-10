@@ -1,6 +1,7 @@
 #pragma once
 #include "FrameBufferPipeline.h"
 #include "HybridFrameBufferPipeline.h"
+#include "RenderFrameBufferTexturePipeline.h"
 
 class HybridFrameBufferRenderPass
 {
@@ -16,7 +17,7 @@ public:
 
 	static constexpr RenderPassID rendererPassID = FrameBuffer_Renderer;
 
-	std::shared_ptr<HybridFrameBufferPipeline> frameBufferPipeline;
+	std::shared_ptr<FrameBufferPipeline> frameBufferPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
