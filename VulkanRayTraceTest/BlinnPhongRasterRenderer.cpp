@@ -47,7 +47,7 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, 
 
 void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
 {
-   FrameBufferTextureRenderer.Destroy(engine);
+    FrameBufferTextureRenderer.Destroy(engine);
     FrameBufferRenderer.Destroy(engine);
     forwardRenderPass.Destroy(engine);
 }

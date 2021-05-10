@@ -306,6 +306,15 @@
     <ClCompile Include="RayTraceRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="HybridRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="HybridFrameBufferPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="HybridFrameBufferRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -429,6 +438,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\PBRTextureRendererShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\HybridFrameBuffer.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\HybridFrameBuffer.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -693,6 +708,15 @@
     </ClInclude>
     <ClInclude Include="RayTracePBRRenderer.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="HybridRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="HybridFrameBufferPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="HybridFrameBufferRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

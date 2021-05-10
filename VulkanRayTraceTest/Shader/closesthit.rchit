@@ -67,7 +67,18 @@ void main()
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
    vec2 uv = vertex.uv;
-   rayHitInfo.hitValue = vec3(texture(TextureMap[material.DiffuseMapID], uv));
+   rayHitInfo.hitValue = vec3(0.0f, 0.0f, 0.0f);
+
+	float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+
+	shadowed = true;  
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, ubo.dlight.direction, tmax, 1);
+    if (shadowed) 
+    {
+		rayHitInfo.hitValue = vec3(1.0f, 0.0f, 0.0f);
+	}
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

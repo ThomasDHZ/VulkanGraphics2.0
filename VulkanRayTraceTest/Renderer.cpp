@@ -19,6 +19,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
     pbrRenderer = PBRRenderer(engine, window, assetManager);
     pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
     rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
+    hybridRenderer = HybridRenderer(engine, window, assetManager);
 }
 
 Renderer::~Renderer()
@@ -50,6 +51,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     pbrRenderer.RebuildSwapChain(engine, window);
     pbrRayTraceRenderer.RebuildSwapChain(engine, window);
     rayTraceRenderer.RebuildSwapChain(engine, window);
+    hybridRenderer.RebuildSwapChain(engine, window);
 }
 
 void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -64,6 +66,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     assetManager->Update(engine);
     rayTraceRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
     pbrRayTraceRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
+    hybridRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -82,9 +85,13 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     {
         rayTraceRenderer.GUIUpdate(engine);
     }
-    else if (ActiveRenderer == 2)
+    else if (ActiveRenderer == 3)
     {
         pbrRayTraceRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 4)
+    {
+        hybridRenderer.GUIUpdate(engine);
     }
 }
 
@@ -138,6 +145,11 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     {
         pbrRayTraceRenderer.Draw(engine, window, imageIndex);
         pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 4)
+    {
+        hybridRenderer.Draw(engine, window, imageIndex);
+        hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
 
     interfaceRenderPass.Draw(engine, imageIndex);

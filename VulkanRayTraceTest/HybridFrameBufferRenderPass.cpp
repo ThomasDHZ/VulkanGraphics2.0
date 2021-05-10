@@ -1,22 +1,22 @@
-#include "FrameBufferRenderPass.h"
+#include "HybridFrameBufferRenderPass.h"
 
-FrameBufferRenderPass::FrameBufferRenderPass()
+HybridFrameBufferRenderPass::HybridFrameBufferRenderPass()
 {
 }
 
-FrameBufferRenderPass::FrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
+HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture)
 {
     CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    frameBufferPipeline = std::make_shared<FrameBufferPipeline>(FrameBufferPipeline(engine, assetManager, RenderPass, RenderedTexture, BloomTexture));
+    CreateRendererFramebuffers(engine); 
+    frameBufferPipeline = std::make_shared<HybridFrameBufferPipeline>(HybridFrameBufferPipeline(engine, assetManager, RenderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture));
     SetUpCommandBuffers(engine);
 }
 
-FrameBufferRenderPass::~FrameBufferRenderPass()
+HybridFrameBufferRenderPass::~HybridFrameBufferRenderPass()
 {
 }
 
-void FrameBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
+void HybridFrameBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
@@ -60,7 +60,7 @@ void FrameBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void FrameBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void HybridFrameBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -73,7 +73,7 @@ void FrameBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void FrameBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void HybridFrameBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
@@ -97,7 +97,7 @@ void FrameBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void FrameBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t index, RendererID rendererID)
+void HybridFrameBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t index, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -130,7 +130,7 @@ void FrameBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetMana
     }
 }
 
-void FrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
+void HybridFrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture)
 {
     frameBufferPipeline->Destroy(engine);
 
@@ -145,11 +145,11 @@ void FrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_p
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, RenderedTexture, BloomTexture);
+    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture);
     SetUpCommandBuffers(engine);
 }
 
-void FrameBufferRenderPass::Destroy(VulkanEngine& engine)
+void HybridFrameBufferRenderPass::Destroy(VulkanEngine& engine)
 {
     frameBufferPipeline->Destroy(engine);
 

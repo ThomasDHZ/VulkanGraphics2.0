@@ -25,6 +25,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DeferedShader.vert -o DeferedShaderVert.s
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DeferedShader.frag -o DeferedShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe FrameBuffer.vert -o FrameBufferVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe FrameBuffer.frag -o FrameBufferFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe HybridFrameBuffer.vert -o HybridFrameBufferVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe HybridFrameBuffer.frag -o HybridFrameBufferFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxShader.vert -o SkyBoxShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxShader.frag -o SkyBoxShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyboxTextureRenderer.vert -o SkyboxTextureRendererVert.spv

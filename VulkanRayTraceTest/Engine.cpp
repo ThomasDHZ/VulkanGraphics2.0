@@ -83,7 +83,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 
 
-      assetManager->AddModel(engine, "../Models/TestAnimModel/model.dae");
+      assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
       // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);

@@ -171,6 +171,9 @@
     <ClCompile Include="FrameBufferRenderPass.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
     <ClCompile Include="HeightMapTexture.cpp" />
+    <ClCompile Include="HybridFrameBufferPipeline.cpp" />
+    <ClCompile Include="HybridFrameBufferRenderPass.cpp" />
+    <ClCompile Include="HybridRenderer.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
@@ -245,6 +248,8 @@
     <None Include="Shader\FrameBuffer.vert" />
     <None Include="Shader\GBuffer.frag" />
     <None Include="Shader\GBuffer.vert" />
+    <None Include="Shader\HybridFrameBuffer.frag" />
+    <None Include="Shader\HybridFrameBuffer.vert" />
     <None Include="Shader\LightDebug.frag" />
     <None Include="Shader\LightDebug.vert" />
     <None Include="Shader\Material.glsl" />
@@ -299,6 +304,9 @@
     <ClInclude Include="FrameBufferRenderPass.h" />
     <ClInclude Include="GraphicsPipeline.h" />
     <ClInclude Include="HeightMapTexture.h" />
+    <ClInclude Include="HybridFrameBufferPipeline.h" />
+    <ClInclude Include="HybridFrameBufferRenderPass.h" />
+    <ClInclude Include="HybridRenderer.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_glfw.h" />

@@ -73,7 +73,7 @@ void main()
 {
     const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
     vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
-
+    
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
    {
 	 discard;

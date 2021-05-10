@@ -22,7 +22,8 @@ void RayTraceRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& wind
 
 void RayTraceRenderer::GUIUpdate(VulkanEngine& engine)
 {
-    ImGui::Image(rayTraceRenderPass.RayTracedImage->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::SliderFloat3("DirectionalLight", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
+    //ImGui::Image(rayTraceRenderPass.RayTracedImage->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
 void RayTraceRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)

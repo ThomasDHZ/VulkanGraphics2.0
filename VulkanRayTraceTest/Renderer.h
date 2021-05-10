@@ -6,6 +6,7 @@
 #include "RayTracePBRRenderer.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "HybridRenderer.h"
 
 class Renderer
 {
@@ -18,6 +19,7 @@ private:
 	PBRRenderer pbrRenderer;
 	RayTraceRenderer rayTraceRenderer;
 	RayTracePBRRenderer pbrRayTraceRenderer;
+	HybridRenderer hybridRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;
