@@ -17,7 +17,7 @@ public:
 
 	static constexpr RenderPassID rendererPassID = FrameBuffer_Renderer;
 
-	std::shared_ptr<FrameBufferPipeline> frameBufferPipeline;
+	std::shared_ptr<HybridFrameBufferPipeline> frameBufferPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;

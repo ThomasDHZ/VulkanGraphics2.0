@@ -66,7 +66,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     assetManager->Update(engine);
     rayTraceRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
     pbrRayTraceRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
-   // hybridRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
+    hybridRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)

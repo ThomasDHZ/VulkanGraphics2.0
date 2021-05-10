@@ -18,6 +18,10 @@ const float Gamma = 2.2f;
 void main() 
 {
     vec3 Color = texture(FrameBufferTexture, TexCoords).rgb;
+    if(texture(RTXShadowTexture, TexCoords).rgb == vec3(1.0f, 0.0f, 0.0f))
+    {
+        Color *= vec3(0.3f);
+    }
     vec3 result = pow(Color, vec3(1.0 / Gamma));
     outColor = vec4(result, 1.0f);
 }

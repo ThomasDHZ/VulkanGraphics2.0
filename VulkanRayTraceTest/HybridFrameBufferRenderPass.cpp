@@ -8,7 +8,7 @@ HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(VulkanEngine& engine, s
 {
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine); 
-    frameBufferPipeline = std::make_shared<FrameBufferPipeline>(FrameBufferPipeline(engine, assetManager, RenderPass, RenderedTexture, BloomTexture));
+    frameBufferPipeline = std::make_shared<HybridFrameBufferPipeline>(HybridFrameBufferPipeline(engine, assetManager, RenderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture));
     SetUpCommandBuffers(engine);
 }
 
@@ -145,7 +145,7 @@ void HybridFrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::sh
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, RenderedTexture, BloomTexture);
+    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture);
     SetUpCommandBuffers(engine);
 }
 

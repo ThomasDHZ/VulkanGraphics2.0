@@ -4,13 +4,14 @@
 #include "FrameBufferTextureRenderPass.h"
 #include "FrameBufferRenderPass.h"
 #include "RayTraceRenderPass.h"
+#include "HybridFrameBufferRenderPass.h"
 
 class HybridRenderer : public BaseRenderer
 {
 private:
 	bool UseFrameBuffer = true;
 	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
-	FrameBufferRenderPass FrameBufferRenderer;
+	HybridFrameBufferRenderPass FrameBufferRenderer;
 public:
 	HybridRenderer();
 	HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
@@ -18,7 +19,7 @@ public:
 
 	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
 
-	ForwardRenderPass forwardRenderPass;
+	RayTraceRenderPass rayTraceRenderPass;
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void GUIUpdate(VulkanEngine& engine);
 	void Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex);
