@@ -8,7 +8,12 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
 {
     FrameBufferTextureRenderer = GBufferRenderPass(engine, assetManager);
     rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
-    FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.GAlbedoTexture, rayTraceRenderPass.RayTracedImage, FrameBufferTextureRenderer.GAlbedoTexture, FrameBufferTextureRenderer.GAlbedoTexture, FrameBufferTextureRenderer.GAlbedoTexture);
+
+    SSAOTextureList textures = {};
+    textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
+    textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    SSAORenderer = SSAORenderPass(engine, assetManager, textures);
+    FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.GAlbedoTexture, rayTraceRenderPass.ShadowTextureMask, rayTraceRenderPass.SkyboxTexture, FrameBufferTextureRenderer.GAlbedoTexture, FrameBufferTextureRenderer.GAlbedoTexture);
 }
 
 HybridRenderer::~HybridRenderer()
@@ -19,7 +24,12 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
 {
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GAlbedoTexture, rayTraceRenderPass.RayTracedImage, FrameBufferTextureRenderer.GAlbedoTexture, FrameBufferTextureRenderer.GAlbedoTexture, FrameBufferTextureRenderer.GAlbedoTexture);
+
+    SSAOTextureList textures = {};
+    textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
+    textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    SSAORenderer = SSAORenderPass(engine, assetManager, textures);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GAlbedoTexture, rayTraceRenderPass.ShadowTextureMask, rayTraceRenderPass.SkyboxTexture, FrameBufferTextureRenderer.GAlbedoTexture, FrameBufferTextureRenderer.GAlbedoTexture);
 
 }
 
@@ -30,6 +40,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Image(FrameBufferTextureRenderer.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GBloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(SSAORenderer.SSAOTexture->ImGuiDescriptorSet, ImVec2(180.0f * 4, 180.0f * 4));
     ImGui::Image(FrameBufferTextureRenderer.DepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
@@ -37,6 +48,7 @@ void HybridRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t i
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
     rayTraceRenderPass.Draw(engine, assetManager, imageIndex);
+    SSAORenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex, rendererID);
 }
 
@@ -51,6 +63,7 @@ std::vector<VkCommandBuffer> HybridRenderer::AddToCommandBufferSubmitList(std::v
 {
     CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(rayTraceRenderPass.RayTraceCommandBuffer);
+    CommandBufferSubmitList.emplace_back(SSAORenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
     return CommandBufferSubmitList;
 }

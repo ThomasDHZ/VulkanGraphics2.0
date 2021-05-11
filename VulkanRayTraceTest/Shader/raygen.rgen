@@ -5,12 +5,15 @@
 #include "Lighting.glsl"
 
 struct RayPayload {
-	vec3 color;
+	vec3 ShadowMask;
+	vec3 ReflectionColor;
+	vec3 SSAOColor;
+	vec3 SkyboxColor;
 	uint reflectCount;
 };
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 1, set = 0, rgba8) uniform image2D image;
+layout(binding = 1, set = 0, rgba8) uniform image2D ShadowTextureMask;
 layout(binding = 2, set = 0) uniform CameraProperties 
 {
 	DirectionalLight dlight;
@@ -26,6 +29,10 @@ layout(binding = 2, set = 0) uniform CameraProperties
     int temp;
 	float temp2;
 } cam;
+layout(binding = 11, set = 0, rgba8) uniform image2D ReflectionTexture;
+layout(binding = 12, set = 0, rgba8) uniform image2D SSAOTexture;
+layout(binding = 13, set = 0, rgba8) uniform image2D SkyboxTexture;
+
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 
 void main() 
@@ -43,8 +50,16 @@ void main()
 	float tmin = 0.001;
 	float tmax = 10000.0;
 
+	rayPayload.ShadowMask = vec3(0.0f, 0.0f, 0.0f);
+	rayPayload.ReflectionColor = vec3(0.0f, 0.0f, 0.0f);
+	rayPayload.SSAOColor = vec3(0.0f, 0.0f, 0.0f);
+	rayPayload.SkyboxColor = vec3(0.0f, 0.0f, 0.0f);
 	rayPayload.reflectCount = 0;
+
 	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 	
-	imageStore(image, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.color, 0.0));
+	imageStore(ShadowTextureMask, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.ShadowMask, 0.0));
+	imageStore(ReflectionTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(vec3(1.0f, 0.0f, 0.0f), 0.0));
+	imageStore(SSAOTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(vec3(0.0f, 1.0f, 0.0f), 0.0));
+	imageStore(SkyboxTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.SkyboxColor, 0.0));
 }

@@ -22,6 +22,10 @@ void main()
     {
         Color *= vec3(0.3f);
     }
+    if(texture(RTXReflectionTexture, TexCoords).rgb != vec3(0.0f))
+    {
+        Color = texture(RTXReflectionTexture, TexCoords).rgb;
+    }
     vec3 result = pow(Color, vec3(1.0 / Gamma));
-    outColor = vec4(result, 1.0f);
+    outColor = vec4(Color, 1.0f);
 }

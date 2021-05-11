@@ -21,6 +21,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe LightDebug.vert -o LightDebugShaderVert.s
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe LightDebug.frag -o LightDebugShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.vert -o GBufferVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.frag -o GBufferFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SSAOShader.vert -o SSAOShaderVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SSAOShader.frag -o SSAOShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DeferedShader.vert -o DeferedShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DeferedShader.frag -o DeferedShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe FrameBuffer.vert -o FrameBufferVert.spv

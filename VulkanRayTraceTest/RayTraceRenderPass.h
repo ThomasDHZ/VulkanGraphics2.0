@@ -59,7 +59,10 @@ private:
 public:
 
     AccelerationStructure topLevelAS{};
-    std::shared_ptr<RenderedRayTracedColorTexture> RayTracedImage;
+    std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask;
+    std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture;
+    std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture;
+    std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture;
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderPass();

@@ -62,6 +62,9 @@ void RayTraceRenderPass::SetUpDescriptorPool(VulkanEngine& engine, std::shared_p
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager->Get3DTextureBufferDescriptorCount()));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
@@ -79,6 +82,9 @@ void RayTraceRenderPass::SetUpDescriptorLayout(VulkanEngine& engine, std::shared
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, assetManager->GetTextureBufferDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, assetManager->Get3DTextureBufferDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 11, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 12, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 13, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
@@ -87,7 +93,11 @@ void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, std::shared_p
       DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
       VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine.AddAcclerationStructureBinding(topLevelAS.handle);
-      VkDescriptorImageInfo RayTraceImageDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayTracedImage->View);
+      VkDescriptorImageInfo ShadowTextureMaskDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, ShadowTextureMask->View);
+      VkDescriptorImageInfo ReflectionTextureDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, ReflectionTexture->View);
+      VkDescriptorImageInfo SSAOTexturDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, SSAOTexture->View);
+      VkDescriptorImageInfo SkyboxTextureDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, SkyboxTexture->View);
+
       VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
       std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager->GetMeshPropertiesListDescriptors();
       std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager->GetVertexBufferListDescriptors();
@@ -100,7 +110,7 @@ void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, std::shared_p
 
       std::vector<VkWriteDescriptorSet> DescriptorList;
       DescriptorList.emplace_back(engine.AddAccelerationBuffer(0, DescriptorSets, AccelerationDescriptorStructure));
-      DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, DescriptorSets, RayTraceImageDescriptor));
+      DescriptorList.emplace_back(engine.AddStorageImageBuffer(1, DescriptorSets, ShadowTextureMaskDescriptor));
       DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
       DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, DescriptorSets, MeshPropertyDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
       DescriptorList.emplace_back(engine.AddBufferDescriptorSet(4, DescriptorSets, VertexBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
@@ -110,6 +120,9 @@ void RayTraceRenderPass::SetUpDescriptorSets(VulkanEngine& engine, std::shared_p
       DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, DescriptorSets, TextureBufferInfo));
       DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, DescriptorSets, Texture3DBufferInfo));
       DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, DescriptorSets, CubeMapImage));
+      DescriptorList.emplace_back(engine.AddStorageImageBuffer(11, DescriptorSets, ReflectionTextureDescriptor));
+      DescriptorList.emplace_back(engine.AddStorageImageBuffer(12, DescriptorSets, SSAOTexturDescriptor));
+      DescriptorList.emplace_back(engine.AddStorageImageBuffer(13, DescriptorSets, SkyboxTextureDescriptor));
 
       vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -142,7 +155,10 @@ void RayTraceRenderPass::Destroy(VulkanEngine& engine)
         RayTracePipelineLayout = VK_NULL_HANDLE;
     }
     {
-        RayTracedImage->Delete(engine);
+        ShadowTextureMask->Delete(engine);
+        ReflectionTexture->Delete(engine);
+        SSAOTexture->Delete(engine);
+        SkyboxTexture->Delete(engine);
     }
     {
         raygenShaderBindingTable.DestoryBuffer(engine.Device);
@@ -244,7 +260,10 @@ void RayTraceRenderPass::createTopLevelAccelerationStructure(VulkanEngine& engin
 
 void RayTraceRenderPass::createStorageImage(VulkanEngine& engine)
 {
-    RayTracedImage = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
+    ShadowTextureMask = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
+    ReflectionTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
+    SSAOTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
+    SkyboxTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 }
 
 void RayTraceRenderPass::createRayTracingPipeline(VulkanEngine& engine)

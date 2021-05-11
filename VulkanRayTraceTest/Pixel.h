@@ -12,6 +12,19 @@ struct Pixel
 
     }
 
+    Pixel(byte Byte)
+    {
+        Red = Byte;
+        Green = Byte;
+        Blue = Byte;
+    }
+    Pixel(byte RedGreen, byte blue)
+    {
+        Red = RedGreen;
+        Green = RedGreen;
+        Blue = blue;
+    }
+
     Pixel(byte red, byte green, byte blue)
     {
         Red = red;

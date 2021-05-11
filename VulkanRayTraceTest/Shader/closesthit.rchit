@@ -10,7 +10,10 @@
 const float PI = 3.14159265359;
 
 struct RayPayload {
-	vec3 hitValue;
+	vec3 ShadowMask;
+	vec3 ReflectionColor;
+	vec3 SSAOColor;
+	vec3 SkyboxColor;
 	uint reflectCount;
 };
 
@@ -67,7 +70,7 @@ void main()
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
    vec2 uv = vertex.uv;
-   rayHitInfo.hitValue = vec3(0.0f, 0.0f, 0.0f);
+   rayHitInfo.ShadowMask = vec3(0.0f, 0.0f, 0.0f);
 
 	float tmin = 0.001;
 	float tmax = 10000.0;
@@ -77,7 +80,7 @@ void main()
 	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, ubo.dlight.direction, tmax, 1);
     if (shadowed) 
     {
-		rayHitInfo.hitValue = vec3(1.0f, 0.0f, 0.0f);
+		rayHitInfo.ShadowMask = vec3(1.0f, 0.0f, 0.0f);
 	}
 }
 

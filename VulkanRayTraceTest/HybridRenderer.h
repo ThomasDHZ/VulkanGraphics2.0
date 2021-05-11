@@ -6,19 +6,20 @@
 #include "RayTraceRenderPass.h"
 #include "HybridFrameBufferRenderPass.h"
 #include "DeferredRenderPass.h"
+#include "SSAORenderPass.h"
 
 class HybridRenderer : public BaseRenderer
 {
 private:
-	bool UseFrameBuffer = true;
 	GBufferRenderPass FrameBufferTextureRenderer;
 	HybridFrameBufferRenderPass FrameBufferRenderer;
+	SSAORenderPass SSAORenderer;
 public:
 	HybridRenderer();
 	HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
 	~HybridRenderer();
 
-	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
+	static constexpr RendererID rendererID = RendererID::Hybrid_Renderer;
 
 	RayTraceRenderPass rayTraceRenderPass;
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
