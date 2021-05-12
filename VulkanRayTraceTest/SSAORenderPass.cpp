@@ -141,14 +141,14 @@ void SSAORenderPass::GenerateKernal(VulkanEngine& engine, SSAOTextureList& textu
 
 void SSAORenderPass::GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList& textures)
 {
-    std::uniform_real_distribution <float> randomBits(0x00, 0xFF);
-    std::vector<Pixel> pixelList;
+    std::uniform_real_distribution <float> randomBits(0.0f, 1.0f);
+    std::vector<glm::vec4> pixelList;
     std::default_random_engine generator;
-    for (int x = 0; x < 15; x++)
+    for (int x = 0; x < (1024 * 1024) -1; x++)
     {
-        pixelList.emplace_back(Pixel(randomBits(generator) * 2.0 - 1.0, randomBits(generator) * 2.0 - 1.0, 0.0f));
+        pixelList.emplace_back(glm::vec4(randomBits(generator) * 2.0 - 1.0, randomBits(generator) * 2.0 - 1.0, 0.0f, 1.0f));
     }
-    textures.NoiseTexture = std::make_shared<Texture2D>(Texture2D(engine, 4, 4, pixelList, VK_FORMAT_R8G8B8A8_UNORM));
+    textures.NoiseTexture = std::make_shared<Texture2D>(Texture2D(engine, 1024, 1024, pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
 }
 
 float SSAORenderPass::Lerp(float a, float b, float f)

@@ -84,7 +84,7 @@ Texture::Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector
 	CreateTexture(engine, PixelList, format);
 }
 
-Texture::Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector<glm::vec3>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
 {
 	TextureID = engine.GenerateID();
 	TextureBufferIndex = 0;
@@ -110,7 +110,7 @@ Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, 
 	CreateTexture(engine, PixelList, format);
 }
 
-Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<glm::vec3>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
 {
 	TextureID = engine.GenerateID();
 	TextureBufferIndex = 0;
@@ -408,9 +408,9 @@ void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, Vk
 	GenerateMipmaps(engine, format);
 }
 
-void Texture::CreateTexture(VulkanEngine& engine, std::vector<glm::vec3>& Pixels, VkFormat format)
+void Texture::CreateTexture(VulkanEngine& engine, std::vector<glm::vec4>& Pixels, VkFormat format)
 {
-	VkDeviceSize imageSize = Width * Height * sizeof(glm::vec3);
+	VkDeviceSize imageSize = Width * Height * sizeof(glm::vec4);
 
 	VulkanBuffer StagingBuffer;
 	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);

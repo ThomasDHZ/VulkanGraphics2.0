@@ -22,7 +22,7 @@ Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int heig
 	CreateTextureSampler(engine);
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<glm::vec3>& PixelList, VkFormat format) : Texture(engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format) : Texture(engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
