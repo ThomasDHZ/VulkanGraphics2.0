@@ -25,7 +25,7 @@ layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    vec2 noiseScale = vec2(properties.TextureWidth/8.0, properties.TextureHeight/8.0); 
+    vec2 noiseScale = vec2(properties.TextureWidth/4.0, properties.TextureHeight/4.0); 
 // get input for SSAO algorithm
     vec3 fragPos = texture(GPositionTexture, TexCoords).xyz;
     vec3 normal = normalize(texture(GNormalTexture, TexCoords).rgb);
