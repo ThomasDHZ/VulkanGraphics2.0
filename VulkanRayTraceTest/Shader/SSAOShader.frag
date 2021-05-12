@@ -8,7 +8,7 @@
 layout(push_constant) uniform SSAOProperties
 {
     mat4 projection;
-    uint kernelSize;
+    int kernelSize;
     float radius;
     float bias;
     float TextureWidth;

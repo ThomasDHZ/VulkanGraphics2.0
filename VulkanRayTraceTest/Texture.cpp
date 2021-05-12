@@ -84,7 +84,33 @@ Texture::Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector
 	CreateTexture(engine, PixelList, format);
 }
 
+Texture::Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector<glm::vec3>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+{
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	Width = TextureResolution.x;
+	Height = TextureResolution.y;
+	Depth = 1;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+
+	CreateTexture(engine, PixelList, format);
+}
+
 Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+{
+	TextureID = engine.GenerateID();
+	TextureBufferIndex = 0;
+	Width = width;
+	Height = height;
+	Depth = 1;
+	ImageLayout = imageLayout;
+	TypeOfTexture = textureType;
+
+	CreateTexture(engine, PixelList, format);
+}
+
+Texture::Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<glm::vec3>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
 {
 	TextureID = engine.GenerateID();
 	TextureBufferIndex = 0;
@@ -356,6 +382,41 @@ void Texture::CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, Vk
 	
 		MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
 	
+
+	VkImageCreateInfo TextureInfo = {};
+	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+	TextureInfo.imageType = VK_IMAGE_TYPE_2D;
+	TextureInfo.extent.width = Width;
+	TextureInfo.extent.height = Height;
+	TextureInfo.extent.depth = Depth;
+	TextureInfo.mipLevels = MipMapLevels;
+	TextureInfo.arrayLayers = 1;
+	TextureInfo.format = format;
+	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+	Texture::CreateTextureImage(engine, TextureInfo);
+
+	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(engine, StagingBuffer.Buffer);
+
+	StagingBuffer.DestoryBuffer(engine.Device);
+
+	GenerateMipmaps(engine, format);
+}
+
+void Texture::CreateTexture(VulkanEngine& engine, std::vector<glm::vec3>& Pixels, VkFormat format)
+{
+	VkDeviceSize imageSize = Width * Height * sizeof(glm::vec3);
+
+	VulkanBuffer StagingBuffer;
+	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);
+
+	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
+
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

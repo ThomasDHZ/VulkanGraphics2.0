@@ -7,13 +7,18 @@
 #include "HybridFrameBufferRenderPass.h"
 #include "DeferredRenderPass.h"
 #include "SSAORenderPass.h"
+#include "SSAOBlurRenderPass.h"
 
 class HybridRenderer : public BaseRenderer
 {
 private:
+	int CurrentSSAOSampleRate;
 	GBufferRenderPass FrameBufferTextureRenderer;
 	HybridFrameBufferRenderPass FrameBufferRenderer;
 	SSAORenderPass SSAORenderer;
+	SSAOBlurRenderPass SSAOBlurRenderer;
+
+	bool ApplySSAO = true;
 public:
 	HybridRenderer();
 	HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);

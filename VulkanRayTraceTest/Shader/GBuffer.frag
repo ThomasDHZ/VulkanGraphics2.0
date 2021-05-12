@@ -107,7 +107,11 @@ void main()
     }
 
 	GNormal = vec4(normal, 1.0f);
-	GBloom = vec4(0.0f);
+	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    if(material.Diffuse == vec3(1.0f, 0.0f, 0.0f))
+    {
+    GBloom = vec4(material.Diffuse, 1.0f);
+    }
 }
 
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)

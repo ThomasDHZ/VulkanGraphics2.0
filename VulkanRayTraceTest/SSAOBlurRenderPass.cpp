@@ -1,28 +1,24 @@
-#include "SSAORenderPass.h"
-#include "GraphicsPipeline.h"
-#include <random>
+#include "SSAOBlurRenderPass.h"
 
-SSAORenderPass::SSAORenderPass()
+SSAOBlurRenderPass::SSAOBlurRenderPass()
 {
 }
 
-SSAORenderPass::SSAORenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+SSAOBlurRenderPass::SSAOBlurRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture)
 {
-    SSAOTexture = std::make_shared<RenderedColorTexture>(engine);
+    SSAOBlurTexture = std::make_shared<RenderedColorTexture>(engine);
 
-    GenerateKernal(engine, textures);
-    GenerateNoiseTexture(engine, textures);
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline = std::make_shared<SSAOPipeline>(SSAOPipeline(engine, assetManager, RenderPass, textures));
+    RasterSSAOPipeline = std::make_shared<SSAOBlurPipeline>(SSAOBlurPipeline(engine, assetManager, RenderPass, SSAOTexture));
     SetUpCommandBuffers(engine);
 }
 
-SSAORenderPass::~SSAORenderPass()
+SSAOBlurRenderPass::~SSAOBlurRenderPass()
 {
 }
 
-void SSAORenderPass::CreateRenderPass(VulkanEngine& engine)
+void SSAOBlurRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -82,14 +78,14 @@ void SSAORenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void SSAORenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void SSAOBlurRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(SSAOTexture->View);
+        AttachmentList.emplace_back(SSAOBlurTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -107,7 +103,7 @@ void SSAORenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void SSAORenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void SSAOBlurRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -120,52 +116,8 @@ void SSAORenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void SSAORenderPass::GenerateKernal(VulkanEngine& engine, SSAOTextureList& textures)
+void SSAOBlurRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
-    std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0);
-    std::default_random_engine generator;
-    for (unsigned int i = 0; i < KernalSampleSize; ++i)
-    {
-        glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
-        sample = glm::normalize(sample);
-        sample *= randomFloats(generator);
-        float scale = float(i) / KernalSampleSize;
-
-        scale = Lerp(0.1f, 1.0f, scale * scale);
-        sample *= scale;
-       
-        VulkanBuffer SampleBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample);
-        textures.KernalSampleBufferList.emplace_back(SampleBuffer);
-    }
-}
-
-void SSAORenderPass::GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList& textures)
-{
-    std::uniform_real_distribution <float> randomBits(0x00, 0xFF);
-    std::vector<Pixel> pixelList;
-    std::default_random_engine generator;
-    for (int x = 0; x < 15; x++)
-    {
-        pixelList.emplace_back(Pixel(randomBits(generator) * 2.0 - 1.0, randomBits(generator) * 2.0 - 1.0, 0.0f));
-    }
-    textures.NoiseTexture = std::make_shared<Texture2D>(Texture2D(engine, 4, 4, pixelList, VK_FORMAT_R8G8B8A8_UNORM));
-}
-
-float SSAORenderPass::Lerp(float a, float b, float f)
-{
-    return a + f * (b - a);
-}
-
-void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
-{
-    SSAOProperties sSAOProperties = {};
-    sSAOProperties.kernelSize = KernalSampleSize;
-    sSAOProperties.radius = radius;
-    sSAOProperties.bias = bias;
-    sSAOProperties.projection = assetManager->camera->GetProjectionMatrix();
-    sSAOProperties.TextureWidth = engine.SwapChain.SwapChainResolution.width;
-    sSAOProperties.TextureHeight = engine.SwapChain.SwapChainResolution.height;
-
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -186,7 +138,6 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdPushConstants(CommandBuffer, RasterSSAOPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SSAOProperties), &sSAOProperties);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RasterSSAOPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RasterSSAOPipeline->ShaderPipelineLayout, 0, 1, &RasterSSAOPipeline->DescriptorSets, 0, nullptr);
     vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
@@ -197,9 +148,9 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+void SSAOBlurRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture)
 {
-    SSAOTexture->RecreateRendererTexture(engine);
+    SSAOBlurTexture->RecreateRendererTexture(engine);
 
     RasterSSAOPipeline->Destroy(engine);
 
@@ -212,17 +163,15 @@ void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
         framebuffer = VK_NULL_HANDLE;
     }
 
-    GenerateKernal(engine, textures);
-    GenerateNoiseTexture(engine, textures);
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, textures);
+    RasterSSAOPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, SSAOTexture);
     SetUpCommandBuffers(engine);
 }
 
-void SSAORenderPass::Destroy(VulkanEngine& engine)
+void SSAOBlurRenderPass::Destroy(VulkanEngine& engine)
 {
-    SSAOTexture->Delete(engine);
+    SSAOBlurTexture->Delete(engine);
     RasterSSAOPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);

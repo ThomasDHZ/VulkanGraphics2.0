@@ -7,7 +7,7 @@
 struct SSAOProperties
 {
 	alignas(16) glm::mat4 projection;
-	alignas(4)  uint32_t kernelSize;
+	alignas(4)  int kernelSize;
 	alignas(4)  float radius;
 	alignas(4)  float bias;
 	alignas(4)  float TextureWidth;

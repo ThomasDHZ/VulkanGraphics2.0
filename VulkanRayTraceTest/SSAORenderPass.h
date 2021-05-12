@@ -8,7 +8,6 @@
 class SSAORenderPass
 {
 private:
-	uint32_t KernalSampleSize = 64;
 
 	void CreateRenderPass(VulkanEngine& engine);
 	void CreateRendererFramebuffers(VulkanEngine& engine);
@@ -24,7 +23,9 @@ public:
 	~SSAORenderPass();
 
 	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
-
+	int KernalSampleSize = 64;
+	float radius = 0.5f;
+	float bias = 0.25f;
 	std::shared_ptr<RenderedColorTexture> SSAOTexture;
 	std::shared_ptr<SSAOPipeline> RasterSSAOPipeline;
 

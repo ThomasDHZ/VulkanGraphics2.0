@@ -221,6 +221,8 @@
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
     <ClCompile Include="SkyboxTextureRenderPass.cpp" />
     <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="SSAOBlurPipeline.cpp" />
+    <ClCompile Include="SSAOBlurRenderPass.cpp" />
     <ClCompile Include="SSAOPipeline.cpp" />
     <ClCompile Include="SSAORenderPass.cpp" />
     <ClCompile Include="TerrainMesh.cpp" />
@@ -275,6 +277,8 @@
     <None Include="Shader\SkyBoxShader.vert" />
     <None Include="Shader\SkyboxTextureRenderer.frag" />
     <None Include="Shader\SkyboxTextureRenderer.vert" />
+    <None Include="Shader\SSAOBlurShader.frag" />
+    <None Include="Shader\SSAOBlurShader.vert" />
     <None Include="Shader\SSAOShader.frag" />
     <None Include="Shader\SSAOShader.vert" />
     <None Include="Shader\TextureShader.frag" />
@@ -362,6 +366,8 @@
     <ClInclude Include="SkyBoxRenderingPipeline.h" />
     <ClInclude Include="SkyboxTextureRenderPass.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="SSAOBlurPipeline.h" />
+    <ClInclude Include="SSAOBlurRenderPass.h" />
     <ClInclude Include="SSAOPipeline.h" />
     <ClInclude Include="SSAORenderPass.h" />
     <ClInclude Include="TerrainMesh.h" />
