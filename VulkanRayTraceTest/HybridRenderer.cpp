@@ -14,7 +14,18 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
     SSAORenderer = SSAORenderPass(engine, assetManager, textures);
     SSAOBlurRenderer = SSAOBlurRenderPass(engine, assetManager, SSAORenderer.SSAOTexture);
-    FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.GAlbedoTexture, rayTraceRenderPass.ShadowTextureMask, rayTraceRenderPass.SkyboxTexture, SSAOBlurRenderer.SSAOBlurTexture, FrameBufferTextureRenderer.GAlbedoTexture);
+
+
+    HybridFrameBufferTextures frameBufferTextures{};
+    frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;
+    frameBufferTextures.PositionTexture = FrameBufferTextureRenderer.GPositionTexture;
+    frameBufferTextures.NormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    frameBufferTextures.BloomTexture = FrameBufferTextureRenderer.GBloomTexture;
+    frameBufferTextures.SSA0Texture = SSAOBlurRenderer.SSAOBlurTexture;
+    frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
+    frameBufferTextures.ReflectionTexture = rayTraceRenderPass.ReflectionTexture;
+    frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.SkyboxTexture;
+    FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, frameBufferTextures);
 
     CurrentSSAOSampleRate = SSAORenderer.KernalSampleSize;
 }
@@ -33,17 +44,28 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
     SSAORenderer = SSAORenderPass(engine, assetManager, textures);
     SSAOBlurRenderer = SSAOBlurRenderPass(engine, assetManager, SSAORenderer.SSAOTexture);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GAlbedoTexture, rayTraceRenderPass.ShadowTextureMask, rayTraceRenderPass.SkyboxTexture, SSAOBlurRenderer.SSAOBlurTexture, FrameBufferTextureRenderer.GAlbedoTexture);
+
+    HybridFrameBufferTextures frameBufferTextures{};
+    frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;
+    frameBufferTextures.PositionTexture = FrameBufferTextureRenderer.GPositionTexture;
+    frameBufferTextures.NormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    frameBufferTextures.BloomTexture = FrameBufferTextureRenderer.GBloomTexture;
+    frameBufferTextures.SSA0Texture = SSAOBlurRenderer.SSAOBlurTexture;
+    frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
+    frameBufferTextures.ReflectionTexture = rayTraceRenderPass.ReflectionTexture;
+    frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.SkyboxTexture;
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, frameBufferTextures);
 
 }
 
 void HybridRenderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Checkbox("Apply SSAO", &ApplySSAO);
+    ImGui::SliderInt("Apply SSAO", &assetManager->SceneData->UniformDataInfo.temp, 0, 1);
     ImGui::SliderFloat3("DirectionalLight", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
     ImGui::SliderInt("SSAOSample", &SSAORenderer.KernalSampleSize, 0, 2550);
     ImGui::SliderFloat("SSAOBias", &SSAORenderer.bias, 0.0f, 100.0f);
-    ImGui::SliderFloat("SSAORadius", &SSAORenderer.radius, 0.0f, 100.0f);
+    ImGui::SliderFloat("SSAORadius", &SSAORenderer.radius, 0.0f, 1000.0f);
     ImGui::Image(FrameBufferTextureRenderer.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));

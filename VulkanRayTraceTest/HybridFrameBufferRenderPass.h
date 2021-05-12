@@ -12,7 +12,7 @@ private:
 
 public:
 	HybridFrameBufferRenderPass();
-	HybridFrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture);
+	HybridFrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures);
 	~HybridFrameBufferRenderPass();
 
 	static constexpr RenderPassID rendererPassID = FrameBuffer_Renderer;
@@ -23,7 +23,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures);
 	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t index, RendererID rendererID);
 	void Destroy(VulkanEngine& engine);
 };

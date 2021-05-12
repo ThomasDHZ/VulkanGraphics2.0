@@ -5,12 +5,12 @@ HybridFrameBufferPipeline::HybridFrameBufferPipeline() : GraphicsPipeline()
 {
 }
 
-HybridFrameBufferPipeline::HybridFrameBufferPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture) : GraphicsPipeline()
+HybridFrameBufferPipeline::HybridFrameBufferPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, renderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture);
+    SetUpDescriptorSets(engine, assetManager, renderPass, HybridTextures);
 }
 
 HybridFrameBufferPipeline::~HybridFrameBufferPipeline()
@@ -20,6 +20,9 @@ HybridFrameBufferPipeline::~HybridFrameBufferPipeline()
 void HybridFrameBufferPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
@@ -36,28 +39,37 @@ void HybridFrameBufferPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std:
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void HybridFrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture)
+void HybridFrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorImageInfo RenderedTextureBufferInfo = engine.AddTextureDescriptor(RenderedTexture->View, RenderedTexture->Sampler);
-    VkDescriptorImageInfo RTXShadowTextureBufferInfo = engine.AddTextureDescriptor(RTXShadowTexture->View, RTXShadowTexture->Sampler);
-    VkDescriptorImageInfo RTXReflectionTextureBufferInfo = engine.AddTextureDescriptor(RTXReflectionTexture->View, RTXReflectionTexture->Sampler);
-    VkDescriptorImageInfo RTXSSA0TextureBufferInfo = engine.AddTextureDescriptor(RTXSSA0Texture->View, RTXSSA0Texture->Sampler);
-    VkDescriptorImageInfo BloomTextureBufferInfo = engine.AddTextureDescriptor(BloomTexture->View, BloomTexture->Sampler);
+    VkDescriptorImageInfo PositionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.PositionTexture->View, HybridTextures.PositionTexture->Sampler);
+    VkDescriptorImageInfo AlebdoTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.AlebdoTexture->View, HybridTextures.AlebdoTexture->Sampler);
+    VkDescriptorImageInfo NormalTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.NormalTexture->View, HybridTextures.NormalTexture->Sampler);
+    VkDescriptorImageInfo ShadowTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ShadowTexture->View, HybridTextures.ShadowTexture->Sampler);
+    VkDescriptorImageInfo ReflectionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ReflectionTexture->View, HybridTextures.ReflectionTexture->Sampler);
+    VkDescriptorImageInfo SSAOTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.SSA0Texture->View, HybridTextures.SSA0Texture->Sampler);
+    VkDescriptorImageInfo SkyBoxTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.SkyBoxTexture->View, HybridTextures.SkyBoxTexture->Sampler);
+    VkDescriptorImageInfo BloomTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.BloomTexture->View, HybridTextures.BloomTexture->Sampler);
     VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, RenderedTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(1, DescriptorSets, RTXShadowTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(2, DescriptorSets, RTXReflectionTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, RTXSSA0TextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(4, DescriptorSets, BloomTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(5, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, PositionTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(1, DescriptorSets, AlebdoTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(2, DescriptorSets, NormalTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, ShadowTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(4, DescriptorSets, ShadowTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(5, DescriptorSets, SSAOTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(6, DescriptorSets, SkyBoxTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(7, DescriptorSets, BloomTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(8, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
@@ -170,11 +182,11 @@ void HybridFrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const 
     }
 }
 
-void HybridFrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture)
+void HybridFrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, renderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture);
+    SetUpDescriptorSets(engine, assetManager, renderPass, HybridTextures);
 }

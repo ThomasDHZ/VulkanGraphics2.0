@@ -24,25 +24,26 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
     //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
 
-    //assetManager.AddModel(engine, "../Models/Crate.dae");
-    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
-    //material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_diffuse.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.DepthMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //uint32_t MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    //assetManager.modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
+    //assetManager->AddModel(engine, "../Models/Crate.dae");
+    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+    //material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB);
+    //material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
+
     assetManager->textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
-    assetManager->AddModel(engine, "../Models/viking_room.obj");
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
-    material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
-    uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
+    //assetManager->AddModel(engine, "../Models/viking_room.obj");
+    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+    //material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
+    //material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    //material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
     // assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
@@ -84,7 +85,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 
       assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
-      // modelRenderManager.AddModel(engine, "../Models/Sponza/Sponza.obj");
+    //assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

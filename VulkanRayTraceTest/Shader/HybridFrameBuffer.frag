@@ -5,12 +5,15 @@
 
 #include "Lighting.glsl"
 
-layout(binding = 0) uniform sampler2D FrameBufferTexture;
-layout(binding = 1) uniform sampler2D RTXShadowTexture;
-layout(binding = 2) uniform sampler2D RTXReflectionTexture;
-layout(binding = 3) uniform sampler2D RTXSSA0Texture;
-layout(binding = 4) uniform sampler2D BloomTexture;
-layout(binding = 5) uniform UniformBufferObject {
+layout(binding = 0) uniform sampler2D GPositionTexture;
+layout(binding = 1) uniform sampler2D GAlebdoTexture;
+layout(binding = 2) uniform sampler2D GNormalTexture;
+layout(binding = 3) uniform sampler2D GShadowTexture;
+layout(binding = 4) uniform sampler2D GReflectionTexture;
+layout(binding = 5) uniform sampler2D GSSA0Texture;
+layout(binding = 6) uniform sampler2D GSkyBoxTexture;
+layout(binding = 7) uniform sampler2D GBloomTexture;
+layout(binding = 8) uniform UniformBufferObject {
 	DirectionalLight dlight;
 	PointLight plight[5];
 	SpotLight sLight;
@@ -30,24 +33,45 @@ layout(location = 0) out vec4 outColor;
 const float Gamma = 2.2f;
 void main() 
 {
-    vec3 Color = texture(FrameBufferTexture, TexCoords).rgb;
-    Color *= texture(RTXSSA0Texture, TexCoords).rgb;
+    vec3 Position = texture(GPositionTexture, TexCoords).rgb;
+    vec3 Alebdo = texture(GAlebdoTexture, TexCoords).rgb;
+    float Specular = texture(GAlebdoTexture, TexCoords).a;
+    vec3 Normal = texture(GNormalTexture, TexCoords).rgb;
+    vec3 Shadow = texture(GShadowTexture, TexCoords).rgb;
+    vec3 Reflection = texture(GReflectionTexture, TexCoords).rgb;
+    float SSAO = texture(GSSA0Texture, TexCoords).r;
+    vec3 SkyBox = texture(GSkyBoxTexture, TexCoords).rgb;
+    vec3 Bloom = texture(GBloomTexture, TexCoords).rgb;
 
-//    vec3 lightDir = normalize(-scenedata.dlight.direction);
-//    vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;
-//            // specular
-//            vec3 halfwayDir = normalize(lightDir + viewDir);  
-//            float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-//            vec3 specular = lights[i].Color * spec * Specular;
+    const vec3 viewDir = normalize(scenedata.viewPos - Position);
 
-    if(texture(RTXShadowTexture, TexCoords).rgb == vec3(1.0f, 0.0f, 0.0f))
+    const vec3 lightDir = normalize(-scenedata.dlight.direction);
+    const float diff = max(dot(Normal, lightDir), 0.0);
+
+    vec3 ambient = scenedata.dlight.ambient * Alebdo;
+    if(scenedata.temp == 1)
     {
-        Color *= vec3(0.3f);
+      ambient *= SSAO;
     }
-    if(texture(RTXReflectionTexture, TexCoords).rgb != vec3(0.0f))
+    vec3 diffuse = scenedata.dlight.diffuse * diff *  Alebdo * SSAO;
+    vec3 result = ambient + diffuse;
+
+    if(Shadow == vec3(1.0f, 0.0f, 0.0f))
     {
-        Color = texture(RTXReflectionTexture, TexCoords).rgb;
+        result *= vec3(0.3f);
     }
-    vec3 result = pow(Color, vec3(1.0 / Gamma));
-    outColor = vec4(Color, 1.0f);
+    else
+    {
+        const vec3 halfwayDir = normalize(lightDir + viewDir);  
+        const float spec = pow(max(dot(Normal, halfwayDir), 0.0), Specular);
+        vec3 specular = scenedata.dlight.specular * spec * Specular;
+       result += specular;
+    }
+
+    if(SkyBox != vec3(0.0f))
+    {
+        result = SkyBox;
+    }
+    vec3 finalResult = pow(result, vec3(1.0 / Gamma));
+    outColor = vec4(finalResult, 1.0f);
 }

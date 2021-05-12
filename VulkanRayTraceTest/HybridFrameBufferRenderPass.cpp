@@ -4,11 +4,11 @@ HybridFrameBufferRenderPass::HybridFrameBufferRenderPass()
 {
 }
 
-HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture)
+HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures)
 {
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine); 
-    frameBufferPipeline = std::make_shared<HybridFrameBufferPipeline>(HybridFrameBufferPipeline(engine, assetManager, RenderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture));
+    frameBufferPipeline = std::make_shared<HybridFrameBufferPipeline>(HybridFrameBufferPipeline(engine, assetManager, RenderPass, HybridTextures));
     SetUpCommandBuffers(engine);
 }
 
@@ -130,7 +130,7 @@ void HybridFrameBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<Ass
     }
 }
 
-void HybridFrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> RTXShadowTexture, std::shared_ptr<Texture> RTXReflectionTexture, std::shared_ptr<Texture> RTXSSA0Texture, std::shared_ptr<Texture> BloomTexture)
+void HybridFrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures)
 {
     frameBufferPipeline->Destroy(engine);
 
@@ -145,7 +145,7 @@ void HybridFrameBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::sh
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, RenderedTexture, RTXShadowTexture, RTXReflectionTexture, RTXSSA0Texture, BloomTexture);
+    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, HybridTextures);
     SetUpCommandBuffers(engine);
 }
 
