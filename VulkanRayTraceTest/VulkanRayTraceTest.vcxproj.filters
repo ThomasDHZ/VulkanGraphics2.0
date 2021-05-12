@@ -330,6 +330,9 @@
     <ClCompile Include="SSAOBlurPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -471,6 +474,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\SSAOBlurShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\SkyBoxFrameBufferShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\SkyBoxFrameBufferShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -758,6 +767,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SSAOBlurPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>

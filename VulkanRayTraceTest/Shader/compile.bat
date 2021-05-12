@@ -33,6 +33,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe HybridFrameBuffer.vert -o HybridFrameBuff
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe HybridFrameBuffer.frag -o HybridFrameBufferFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxShader.vert -o SkyBoxShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxShader.frag -o SkyBoxShaderFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxFrameBufferShader.vert -o SkyBoxFrameBufferShaderVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyBoxFrameBufferShader.frag -o SkyBoxFrameBufferShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyboxTextureRenderer.vert -o SkyboxTextureRendererVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SkyboxTextureRenderer.frag -o SkyboxTextureRendererFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe Prefilter.vert -o PrefilterVert.spv

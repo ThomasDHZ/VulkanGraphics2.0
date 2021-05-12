@@ -114,7 +114,6 @@ void main()
         }
         result +=  CalcSpotLight( material, scenedata.sLight, texCoords);
     }
-    	result = pow(result, vec3(1.0/2.2));
     outColor = vec4(result, 1.0);
 }
 

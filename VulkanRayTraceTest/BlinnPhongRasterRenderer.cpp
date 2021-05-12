@@ -6,7 +6,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
-   FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
+    FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
     FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     forwardRenderPass = ForwardRenderPass(engine, assetManager);
 }

@@ -218,6 +218,7 @@
     <ClCompile Include="RenderPBRFrameBufferTexturePipeline.cpp" />
     <ClCompile Include="RenderWaterTexturePipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp" />
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
     <ClCompile Include="SkyboxTextureRenderPass.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -273,6 +274,8 @@
     <None Include="Shader\shader.frag" />
     <None Include="Shader\shader.vert" />
     <None Include="Shader\shadow.rmiss" />
+    <None Include="Shader\SkyBoxFrameBufferShader.frag" />
+    <None Include="Shader\SkyBoxFrameBufferShader.vert" />
     <None Include="Shader\SkyBoxShader.frag" />
     <None Include="Shader\SkyBoxShader.vert" />
     <None Include="Shader\SkyboxTextureRenderer.frag" />
@@ -363,6 +366,7 @@
     <ClInclude Include="RenderWaterTexturePipeline.h" />
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h" />
     <ClInclude Include="SkyBoxRenderingPipeline.h" />
     <ClInclude Include="SkyboxTextureRenderPass.h" />
     <ClInclude Include="Sprite.h" />
