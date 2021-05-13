@@ -67,7 +67,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat3("DirectionalLight", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
     ImGui::SliderInt("SSAOSample", &SSAORenderer.KernalSampleSize, 0, 2550);
     ImGui::SliderFloat("SSAOBias", &SSAORenderer.bias, 0.0f, 100.0f);
-    ImGui::SliderFloat("SSAORadius", &SSAORenderer.radius, 0.0f, 1000.0f);
+    ImGui::SliderFloat("SSAORadius", &SSAORenderer.radius, 0.0f, 10000000.0f);
     ImGui::Image(FrameBufferTextureRenderer.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));

@@ -12,27 +12,52 @@ layout(binding = 0) uniform sampler2D BloomTexture;
 
 layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
+void main() {
+const float weights[] = float[](0.0024499299678342,
+									0.0043538453346397,
+									0.0073599963704157,
+									0.0118349786570722,
+									0.0181026699707781,
+									0.0263392293891488,
+									0.0364543006660986,
+									0.0479932050577658,
+									0.0601029809166942,
+									0.0715974486241365,
+									0.0811305381519717,
+									0.0874493212267511,
+									0.0896631113333857,
+									0.0874493212267511,
+									0.0811305381519717,
+									0.0715974486241365,
+									0.0601029809166942,
+									0.0479932050577658,
+									0.0364543006660986,
+									0.0263392293891488,
+									0.0181026699707781,
+									0.0118349786570722,
+									0.0073599963704157,
+									0.0043538453346397,
+									0.0024499299678342);
 
-const float weight[5] = float[] (0.2270270270, 0.1945945946, 0.1216216216, 0.0540540541, 0.0162162162);
-void main() 
-{
-    vec2 tex_offset = 1.0 / textureSize(BloomTexture, 0); // gets size of single texel
-     vec3 result = texture(BloomTexture, TexCoords).rgb * weight[0];
+	vec2 tex_offset = 1.0 / textureSize(BloomTexture, 0); // gets size of single texel
+     vec3 result = texture(BloomTexture, TexCoords).rgb * weights[0];
+
      if(BloomProperites.BloomPass == 0)
      {
-         for(int i = 1; i < 5; ++i)
+         for(int i = 1; i < weights.length(); ++i)
          {
-            result += texture(BloomTexture, TexCoords + vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
-            result += texture(BloomTexture, TexCoords - vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
+            result += texture(BloomTexture, TexCoords + vec2(tex_offset.x * i, 0.0)).rgb * weights[i];
+            result += texture(BloomTexture, TexCoords - vec2(tex_offset.x * i, 0.0)).rgb * weights[i];
          }
      }
      else
      {
-         for(int i = 1; i < 5; ++i)
+         for(int i = 1; i < weights.length(); ++i)
          {
-             result += texture(BloomTexture, TexCoords + vec2(0.0, tex_offset.y * i)).rgb * weight[i];
-             result += texture(BloomTexture, TexCoords - vec2(0.0, tex_offset.y * i)).rgb * weight[i];
+             result += texture(BloomTexture, TexCoords + vec2(0.0, tex_offset.y * i)).rgb * weights[i];
+             result += texture(BloomTexture, TexCoords - vec2(0.0, tex_offset.y * i)).rgb * weights[i];
          }
      }
-     outColor = vec4(1.0f, 0.0f, 0.0f, 1.0);
+
+    outColor = vec4(result, 1.0f);
 }

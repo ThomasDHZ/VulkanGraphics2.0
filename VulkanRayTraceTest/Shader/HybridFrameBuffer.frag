@@ -69,10 +69,9 @@ void main()
        result += specular;
     }
 
-    if(Bloom != vec3(0.0f, 0.0f, 0.0f))
-    {
-        result = Bloom;
-    }
+
+    result += Bloom;
+
 
     if(SkyBox != vec3(0.0f))
     {

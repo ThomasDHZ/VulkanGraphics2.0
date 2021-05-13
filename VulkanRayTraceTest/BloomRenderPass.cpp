@@ -1,6 +1,8 @@
 #include "BloomRenderPass.h"
 #include "GraphicsPipeline.h"
 
+#include "SSAOBlurRenderPass.h"
+
 BloomRenderPass::BloomRenderPass()
 {
 }
@@ -24,16 +26,16 @@ void BloomRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
-    VkAttachmentDescription BloomAttachment = {};
-    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(BloomAttachment);
+    VkAttachmentDescription SSAOAttachment = {};
+    SSAOAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    SSAOAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    SSAOAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    SSAOAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    SSAOAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    SSAOAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    SSAOAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    SSAOAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(SSAOAttachment);
 
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
@@ -127,31 +129,29 @@ void BloomRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> a
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    std::array<VkClearValue, 1> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
-
-    std::array<VkClearValue, 1> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
     ConstBloomProperites bloomProperites = {};
     bloomProperites.BloomPass = 0;
 
-  
-    //bloomProperites.BloomPass = 1;
-    //vkCmdPushConstants(CommandBuffer, BloomPipelinePass2->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
-    //vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass2->ShaderPipeline);
-    //vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass2->ShaderPipelineLayout, 0, 1, &BloomPipelinePass2->DescriptorSets, 0, nullptr);
-    //vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
-    //vkCmdEndRenderPass(CommandBuffer);
-    vkCmdPushConstants(CommandBuffer, BloomPipelinePass1->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdPushConstants(CommandBuffer, BloomPipelinePass2->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipelineLayout, 0, 1, &BloomPipelinePass1->DescriptorSets, 0, nullptr);
+    vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
+
+    bloomProperites.BloomPass = 1;
+    vkCmdPushConstants(CommandBuffer, BloomPipelinePass2->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipelineLayout, 0, 1, &BloomPipelinePass1->DescriptorSets, 0, nullptr);
     vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
@@ -188,13 +188,11 @@ void BloomRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Ass
 void BloomRenderPass::Destroy(VulkanEngine& engine)
 {
     BloomTexture->Delete(engine);
-
     BloomPipelinePass1->Destroy(engine);
     BloomPipelinePass2->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
-
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
