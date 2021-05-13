@@ -12,6 +12,8 @@ layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
 
 const float Gamma = 2.2f;
+const float Exposure = 1.0f;
+
 void main() 
 {
     vec3 Color = texture(FrameBufferTexture, TexCoords).rgb;
@@ -19,6 +21,8 @@ void main()
     {
         Color *= 0.3f;
     }
-    vec3 result = pow(Color, vec3(1.0 / Gamma));
+
+    vec3 result = vec3(1.0) - exp(-Color * Exposure);
+    result = pow(Color, vec3(1.0 / Gamma));
     outColor = vec4(result, 1.0f);
 }

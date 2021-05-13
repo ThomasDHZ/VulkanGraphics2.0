@@ -21,6 +21,11 @@ struct ConstSkyBoxView
 	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
 };
 
+struct ConstBloomProperites
+{
+	alignas(4) uint32_t BloomPass = 0;
+};
+
 class GraphicsPipeline
 {
 protected:

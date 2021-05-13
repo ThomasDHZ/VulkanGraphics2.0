@@ -155,6 +155,8 @@
     <ClCompile Include="BaseRenderer.cpp" />
     <ClCompile Include="BaseRenderPass.cpp" />
     <ClCompile Include="BlinnPhongRasterRenderer.cpp" />
+    <ClCompile Include="BloomPipeline.cpp" />
+    <ClCompile Include="BloomRenderPass.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="brdfRenderingPipeline.cpp" />
     <ClCompile Include="BRDFRenderPass.cpp" />
@@ -245,6 +247,8 @@
     <None Include="Shader\animate.comp" />
     <None Include="Shader\anyhit.rahit" />
     <None Include="Shader\anyhit1.rahit" />
+    <None Include="Shader\BloomShader.frag" />
+    <None Include="Shader\BloomShader.vert" />
     <None Include="Shader\BRDFRenderer.frag" />
     <None Include="Shader\BRDFRenderer.vert" />
     <None Include="Shader\closesthit.rchit" />
@@ -300,6 +304,8 @@
     <ClInclude Include="BaseRenderer.h" />
     <ClInclude Include="BaseRenderPass.h" />
     <ClInclude Include="BlinnPhongRasterRenderer.h" />
+    <ClInclude Include="BloomPipeline.h" />
+    <ClInclude Include="BloomRenderPass.h" />
     <ClInclude Include="bone.h" />
     <ClInclude Include="brdfRenderingPipeline.h" />
     <ClInclude Include="BRDFRenderPass.h" />

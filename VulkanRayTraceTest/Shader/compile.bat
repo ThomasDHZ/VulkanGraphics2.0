@@ -19,6 +19,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe WaterSurfaceShader.vert -o WaterSurfaceSh
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe WaterSurfaceShader.frag -o WaterSurfaceShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe LightDebug.vert -o LightDebugShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe LightDebug.frag -o LightDebugShaderFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BloomShader.vert -o BloomShaderVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BloomShader.frag -o BloomShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.vert -o GBufferVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.frag -o GBufferFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SSAOShader.vert -o SSAOShaderVert.spv

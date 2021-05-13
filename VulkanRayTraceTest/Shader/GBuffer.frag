@@ -108,7 +108,7 @@ void main()
 
 	GNormal = vec4(normal, 1.0f);
 	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    if(material.Diffuse == vec3(1.0f, 0.0f, 0.0f))
+    if(material.Diffuse.r >= 0.8f)
     {
     GBloom = vec4(material.Diffuse, 1.0f);
     }

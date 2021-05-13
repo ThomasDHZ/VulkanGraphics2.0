@@ -8,6 +8,7 @@
 #include "DeferredRenderPass.h"
 #include "SSAORenderPass.h"
 #include "SSAOBlurRenderPass.h"
+#include "BloomRenderPass.h"
 
 class HybridRenderer : public BaseRenderer
 {
@@ -17,6 +18,7 @@ private:
 	HybridFrameBufferRenderPass FrameBufferRenderer;
 	SSAORenderPass SSAORenderer;
 	SSAOBlurRenderPass SSAOBlurRenderer;
+	BloomRenderPass bloomRenderPass;
 
 	bool ApplySSAO = true;
 public:

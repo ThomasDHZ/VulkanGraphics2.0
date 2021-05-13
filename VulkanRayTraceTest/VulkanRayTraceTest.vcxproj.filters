@@ -333,6 +333,12 @@
     <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="BloomPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="BloomRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -480,6 +486,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\SkyBoxFrameBufferShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\BloomShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\BloomShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -771,6 +783,12 @@
     </ClInclude>
     <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="BloomPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="BloomRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -31,6 +31,7 @@ layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
 
 const float Gamma = 2.2f;
+const float Exposure = 1.0f;
 void main() 
 {
     vec3 Position = texture(GPositionTexture, TexCoords).rgb;
@@ -68,10 +69,17 @@ void main()
        result += specular;
     }
 
+    if(Bloom != vec3(0.0f, 0.0f, 0.0f))
+    {
+        result = Bloom;
+    }
+
     if(SkyBox != vec3(0.0f))
     {
         result = SkyBox;
     }
-    vec3 finalResult = pow(result, vec3(1.0 / Gamma));
+
+    vec3 finalResult = vec3(1.0) - exp(-result * Exposure);
+    finalResult = pow(result, vec3(1.0 / Gamma));
     outColor = vec4(finalResult, 1.0f);
 }
