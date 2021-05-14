@@ -1,8 +1,8 @@
 #pragma once
 #include "VulkanEngine.h"
-#include "RenderedDepthTexture.h"
-#include "RenderedColorTexture.h"
 #include "AssetManager.h"
+#include "RenderedColorTexture.h"
+#include "BloomPipeline.h"
 #include "brdfRenderingPipeline.h"
 
 class BRDFRenderPass
@@ -14,24 +14,20 @@ private:
 
 public:
 	BRDFRenderPass();
-	BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture);
 	~BRDFRenderPass();
 
-	static constexpr RenderPassID RendererID = Texture_Renderer;
-	SceneDataUniformBuffer sceneData;
+	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
 
-	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
-	std::shared_ptr<RenderedDepthTexture> DepthTexture;
-	std::shared_ptr<brdfRenderingPipeline> TexturePipeline;
+	std::shared_ptr<brdfRenderingPipeline> BloomPipelinePass1;
+	std::shared_ptr<brdfRenderingPipeline> BloomPipelinePass2;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage, std::shared_ptr<Texture> InputBloomTexture);
 	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 };
-

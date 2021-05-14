@@ -145,7 +145,7 @@ void BloomRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> a
     bloomProperites.BloomPass = 0;
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdPushConstants(CommandBuffer, BloomPipelinePass2->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
+    vkCmdPushConstants(CommandBuffer, BloomPipelinePass1->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipelineLayout, 0, 1, &BloomPipelinePass1->DescriptorSets, 0, nullptr);
     vkCmdDraw(CommandBuffer, 6, 1, 0, 0);

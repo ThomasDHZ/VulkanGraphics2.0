@@ -9,9 +9,9 @@ PBRRenderer::PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
     FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     forwardRenderPass = ForwardRenderPass(engine, assetManager);
-   cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f);
+    cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f);
-    brdfRenderPass = BRDFRenderPass(engine, assetManager);
+    brdfRenderPass = BRDFRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture);
 }
 
 PBRRenderer::~PBRRenderer()
@@ -25,7 +25,7 @@ void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     forwardRenderPass.RebuildSwapChain(engine, assetManager);
     cubeMapRenderer.RebuildSwapChain(engine);
     prefilterRenderPass.RebuildSwapChain(engine);
-    brdfRenderPass.RebuildSwapChain(engine, assetManager);
+    brdfRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture);
 }
 
 void PBRRenderer::GUIUpdate(VulkanEngine& engine)
@@ -38,7 +38,7 @@ void PBRRenderer::GUIUpdate(VulkanEngine& engine)
     }
     ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(brdfRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(brdfRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
 void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)

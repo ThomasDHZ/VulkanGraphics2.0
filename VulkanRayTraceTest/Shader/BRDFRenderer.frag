@@ -19,7 +19,7 @@ vec2 IntegrateBRDF(float NdotV, float roughness);
 void main() 
 {
     vec2 integratedBRDF = IntegrateBRDF(TexCoords.x, TexCoords.y);
-    outColor = vec4(vec3(integratedBRDF, 0.0f), 0.0f);
+    outColor = vec4(vec3(integratedBRDF, 0.0f), 1.0f);
 }
 
 // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html

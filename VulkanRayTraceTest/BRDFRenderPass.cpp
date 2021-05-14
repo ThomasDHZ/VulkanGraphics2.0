@@ -1,21 +1,20 @@
 #include "BRDFRenderPass.h"
 #include "GraphicsPipeline.h"
 
+#include "SSAOBlurRenderPass.h"
+
 BRDFRenderPass::BRDFRenderPass()
 {
 }
 
-BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
 {
-    sceneData = SceneDataUniformBuffer(engine, assetManager->SceneData->UniformDataInfo);
-
-    RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
     BloomTexture = std::make_shared<RenderedColorTexture>(engine);
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
+    BloomPipelinePass1 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass, InputBloomTexture));
+    BloomPipelinePass2 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass, BloomTexture));
     SetUpCommandBuffers(engine);
 }
 
@@ -27,49 +26,24 @@ void BRDFRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
-    VkAttachmentDescription AlebdoAttachment = {};
-    AlebdoAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    AlebdoAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    AlebdoAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    AlebdoAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    AlebdoAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    AlebdoAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    AlebdoAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    AlebdoAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(AlebdoAttachment);
-
-    VkAttachmentDescription BloomAttachment = {};
-    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(BloomAttachment);
-
-    VkAttachmentDescription DepthAttachment = {};
-    DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
-    DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    DepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    DepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    DepthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(DepthAttachment);
+    VkAttachmentDescription SSAOAttachment = {};
+    SSAOAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    SSAOAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    SSAOAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    SSAOAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    SSAOAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    SSAOAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    SSAOAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    SSAOAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(SSAOAttachment);
 
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-    ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-    VkAttachmentReference depthReference = { 2, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDescription.colorAttachmentCount = static_cast<uint32_t>(ColorRefsList.size());
     subpassDescription.pColorAttachments = ColorRefsList.data();
-    subpassDescription.pDepthStencilAttachment = &depthReference;
 
     std::vector<VkSubpassDependency> DependencyList;
 
@@ -115,9 +89,7 @@ void BRDFRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(RenderedTexture->View);
         AttachmentList.emplace_back(BloomTexture->View);
-        AttachmentList.emplace_back(DepthTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -157,24 +129,31 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    std::array<VkClearValue, 1> clearValues{};
+    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
-
-    std::array<VkClearValue, 3> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[2].depthStencil = { 1.0f, 0 };
-
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    ConstBloomProperites bloomProperites = {};
+    bloomProperites.BloomPass = 0;
+
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
+    vkCmdPushConstants(CommandBuffer, BloomPipelinePass1->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipelineLayout, 0, 1, &BloomPipelinePass1->DescriptorSets, 0, nullptr);
+    vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
+
+    bloomProperites.BloomPass = 1;
+    vkCmdPushConstants(CommandBuffer, BloomPipelinePass2->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipelineLayout, 0, 1, &BloomPipelinePass1->DescriptorSets, 0, nullptr);
     vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
     vkCmdEndRenderPass(CommandBuffer);
 
@@ -183,11 +162,12 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
     BloomTexture->RecreateRendererTexture(engine);
-    DepthTexture->RecreateRendererTexture(engine);
+
+    BloomPipelinePass1->Destroy(engine);
+    BloomPipelinePass2->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -200,22 +180,19 @@ void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    BloomPipelinePass1->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, InputBloomTexture);
+    BloomPipelinePass2->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, BloomTexture);
     SetUpCommandBuffers(engine);
 }
 
 void BRDFRenderPass::Destroy(VulkanEngine& engine)
 {
-    RenderedTexture->Delete(engine);
     BloomTexture->Delete(engine);
-    DepthTexture->Delete(engine);
-
-    sceneData.Destroy(engine);
-    TexturePipeline->Destroy(engine);
+    BloomPipelinePass1->Destroy(engine);
+    BloomPipelinePass2->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
-
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
