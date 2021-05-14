@@ -3,12 +3,14 @@
 #include "ForwardRenderPass.h"
 #include "FrameBufferTextureRenderPass.h"
 #include "FrameBufferRenderPass.h"
+#include "BloomRenderPass.h"
 
 class BlinnPhongRasterRenderer : public BaseRenderer
 {
 private:
 	bool UseFrameBuffer = true;
 	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
+	BloomRenderPass BloomRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
 public:
 	BlinnPhongRasterRenderer();

@@ -7,7 +7,8 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
-    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
+    BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
     forwardRenderPass = ForwardRenderPass(engine, assetManager);
 }
 
@@ -18,7 +19,8 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
+    BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
     forwardRenderPass.RebuildSwapChain(engine, assetManager);
 }
 
@@ -29,6 +31,7 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
     {
         ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
         ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+        ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     }
 }
 
@@ -37,6 +40,7 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, 
     if (UseFrameBuffer)
     {
         FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
+        BloomRenderer.Draw(engine, assetManager, imageIndex);
         FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
     }
     else
@@ -48,6 +52,7 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, 
 void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
 {
     FrameBufferTextureRenderer.Destroy(engine);
+    BloomRenderer.Destroy(engine);
     FrameBufferRenderer.Destroy(engine);
     forwardRenderPass.Destroy(engine);
 }
@@ -57,6 +62,7 @@ std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitL
     if (UseFrameBuffer)
     {
         CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
+        CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
         CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
     }
     else

@@ -69,7 +69,10 @@ void main()
        result += specular;
     }
 
-
+      if(Alebdo.r >= 0.8f)
+    {
+    result = Alebdo;
+    }
     result += Bloom;
 
 
