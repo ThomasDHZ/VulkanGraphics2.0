@@ -6,12 +6,12 @@ RenderPBRFrameBufferTexturePipeline::RenderPBRFrameBufferTexturePipeline() : Gra
 {
 }
 
-RenderPBRFrameBufferTexturePipeline::RenderPBRFrameBufferTexturePipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+RenderPBRFrameBufferTexturePipeline::RenderPBRFrameBufferTexturePipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorSets(engine, assetManager, irradianceMap, prefilterMap, brdfLUT);
 }
 
 RenderPBRFrameBufferTexturePipeline::~RenderPBRFrameBufferTexturePipeline()
@@ -32,6 +32,9 @@ void RenderPBRFrameBufferTexturePipeline::SetUpDescriptorPool(VulkanEngine& engi
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager->GetTextureBufferDescriptorCount()));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager->Get3DTextureBufferDescriptorCount()));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
@@ -49,10 +52,13 @@ void RenderPBRFrameBufferTexturePipeline::SetUpDescriptorLayout(VulkanEngine& en
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, assetManager->GetTextureBufferDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, assetManager->Get3DTextureBufferDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 11, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 12, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 13, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void RenderPBRFrameBufferTexturePipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void RenderPBRFrameBufferTexturePipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     assetManager->SceneData->Update(engine);
@@ -66,6 +72,9 @@ void RenderPBRFrameBufferTexturePipeline::SetUpDescriptorSets(VulkanEngine& engi
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = assetManager->GetTextureBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = assetManager->Get3DTextureBufferListDescriptor();
     VkDescriptorImageInfo CubeMapImage = assetManager->GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorImageInfo irradiancTextureBufferInfo = engine.AddTextureDescriptor(irradianceMap->View, irradianceMap->Sampler);
+    VkDescriptorImageInfo prefilterTextureBufferInfo = engine.AddTextureDescriptor(prefilterMap->View, prefilterMap->Sampler);
+    VkDescriptorImageInfo brdfLUTTextureBufferInfo = engine.AddTextureDescriptor(brdfLUT->View, brdfLUT->Sampler);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine.AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
@@ -77,6 +86,9 @@ void RenderPBRFrameBufferTexturePipeline::SetUpDescriptorSets(VulkanEngine& engi
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, DescriptorSets, TextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, DescriptorSets, Texture3DBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, DescriptorSets, CubeMapImage));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(11, DescriptorSets, irradiancTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(12, DescriptorSets, prefilterTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(13, DescriptorSets, brdfLUTTextureBufferInfo));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -128,7 +140,7 @@ void RenderPBRFrameBufferTexturePipeline::SetUpShaderPipeLine(VulkanEngine& engi
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -217,11 +229,11 @@ void RenderPBRFrameBufferTexturePipeline::SetUpShaderPipeLine(VulkanEngine& engi
     }
 }
 
-void RenderPBRFrameBufferTexturePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void RenderPBRFrameBufferTexturePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorSets(engine, assetManager, irradianceMap, prefilterMap, brdfLUT);
 }

@@ -5,12 +5,12 @@ BloomPipeline::BloomPipeline() : GraphicsPipeline()
 {
 }
 
-BloomPipeline::BloomPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture) : GraphicsPipeline()
+BloomPipeline::BloomPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> BloomTexture) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, SSAOTexture);
+    SetUpDescriptorSets(engine, assetManager, BloomTexture);
 }
 
 BloomPipeline::~BloomPipeline()
@@ -31,11 +31,11 @@ void BloomPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void BloomPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture)
+void BloomPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> BloomTexture)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorImageInfo RenderedTextureBufferInfo = engine.AddTextureDescriptor(SSAOTexture->View, SSAOTexture->Sampler);
+    VkDescriptorImageInfo RenderedTextureBufferInfo = engine.AddTextureDescriptor(BloomTexture->View, BloomTexture->Sampler);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, RenderedTextureBufferInfo));
@@ -158,11 +158,11 @@ void BloomPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass
     }
 }
 
-void BloomPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture)
+void BloomPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> BloomTexture)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, SSAOTexture);
+    SetUpDescriptorSets(engine, assetManager, BloomTexture);
 }

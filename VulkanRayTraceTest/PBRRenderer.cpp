@@ -6,12 +6,14 @@ PBRRenderer::PBRRenderer() : BaseRenderer()
 
 PBRRenderer::PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
-    FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
-    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     forwardRenderPass = ForwardRenderPass(engine, assetManager);
     cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f);
-    brdfRenderPass = BRDFRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture);
+    brdfRenderPass = BRDFRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
+    FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture, prefilterRenderPass.BlurredSkyBoxTexture, brdfRenderPass.BloomTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
+
+
 }
 
 PBRRenderer::~PBRRenderer()
@@ -20,17 +22,18 @@ PBRRenderer::~PBRRenderer()
 
 void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
-    FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     forwardRenderPass.RebuildSwapChain(engine, assetManager);
     cubeMapRenderer.RebuildSwapChain(engine);
     prefilterRenderPass.RebuildSwapChain(engine);
-    brdfRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture);
+    brdfRenderPass.RebuildSwapChain(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
+    FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
 }
 
 void PBRRenderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Checkbox("FrameBuffer", &UseFrameBuffer);
+    ImGui::SliderFloat3("DirectionalLight", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
     if (UseFrameBuffer)
     {
         ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));

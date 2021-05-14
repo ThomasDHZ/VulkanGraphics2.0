@@ -13,9 +13,25 @@ BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManage
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    BloomPipelinePass1 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass, InputBloomTexture));
-    BloomPipelinePass2 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass, BloomTexture));
+    BloomPipelinePass1 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
+    BloomPipelinePass2 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
+
+    Draw(engine, assetManager, 0);
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer;
+    // Create fence to ensure that the command buffer has finished executing
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    // Submit to the queue
+    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    // Wait for the fence to signal that command buffer has finished executing
+    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
 }
 
 BRDFRenderPass::~BRDFRenderPass()
@@ -180,8 +196,8 @@ void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    BloomPipelinePass1->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, InputBloomTexture);
-    BloomPipelinePass2->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, BloomTexture);
+    BloomPipelinePass1->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    BloomPipelinePass2->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 

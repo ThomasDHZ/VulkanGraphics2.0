@@ -16,6 +16,23 @@ CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
     CreateRendererFramebuffers(engine);
     CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
+
+    Draw(engine, assetManager, 0);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer;
+    // Create fence to ensure that the command buffer has finished executing
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    // Submit to the queue
+   vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    // Wait for the fence to signal that command buffer has finished executing
+   vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
 }
 
 CubeMapRenderPass::~CubeMapRenderPass()

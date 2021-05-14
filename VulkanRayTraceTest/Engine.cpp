@@ -37,12 +37,12 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager->AddModel(engine, "../Models/viking_room.obj");
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
     material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));

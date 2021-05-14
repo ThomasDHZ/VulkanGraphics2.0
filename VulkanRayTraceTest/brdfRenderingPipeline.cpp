@@ -5,12 +5,12 @@ brdfRenderingPipeline::brdfRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-brdfRenderingPipeline::brdfRenderingPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture) : GraphicsPipeline()
+brdfRenderingPipeline::brdfRenderingPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, SSAOTexture);
+    SetUpDescriptorSets(engine, assetManager);
 }
 
 brdfRenderingPipeline::~brdfRenderingPipeline()
@@ -31,14 +31,11 @@ void brdfRenderingPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::sha
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void brdfRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture)
+void brdfRenderingPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorImageInfo RenderedTextureBufferInfo = engine.AddTextureDescriptor(SSAOTexture->View, SSAOTexture->Sampler);
-
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, RenderedTextureBufferInfo));
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
@@ -158,11 +155,11 @@ void brdfRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRe
     }
 }
 
-void brdfRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture)
+void brdfRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, SSAOTexture);
+    SetUpDescriptorSets(engine, assetManager);
 }

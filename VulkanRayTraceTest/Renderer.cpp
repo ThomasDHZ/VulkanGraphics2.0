@@ -203,6 +203,7 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     interfaceRenderPass.Destroy(engine);
     blinnPhongRenderer.Destroy(engine);
+    hybridRenderer.Destroy(engine);
     pbrRenderer.Destroy(engine);
     rayTraceRenderer.Destroy(engine);
     pbrRayTraceRenderer.Destroy(engine);
