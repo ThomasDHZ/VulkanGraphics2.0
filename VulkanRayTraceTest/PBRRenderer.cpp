@@ -37,7 +37,7 @@ void PBRRenderer::GUIUpdate(VulkanEngine& engine)
     if (UseFrameBuffer)
     {
         ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-        ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+      //  ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     }
     ImGui::Image(cubeMapRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(prefilterRenderPass.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
@@ -46,9 +46,9 @@ void PBRRenderer::GUIUpdate(VulkanEngine& engine)
 
 void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
-     cubeMapRenderer.Draw(engine, assetManager, imageIndex);
- prefilterRenderPass.Draw(engine, assetManager, imageIndex);
-  brdfRenderPass.Draw(engine, assetManager, imageIndex);
+ //    cubeMapRenderer.Draw(engine, assetManager, imageIndex);
+ //prefilterRenderPass.Draw(engine, assetManager, imageIndex);
+ // brdfRenderPass.Draw(engine, assetManager, imageIndex);
     if (UseFrameBuffer)
     {
         FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
@@ -72,9 +72,9 @@ void PBRRenderer::Destroy(VulkanEngine& engine)
 
 std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
 {
-     CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
- CommandBufferSubmitList.emplace_back(prefilterRenderPass.CommandBuffer);
-  CommandBufferSubmitList.emplace_back(brdfRenderPass.CommandBuffer);
+ //    CommandBufferSubmitList.emplace_back(cubeMapRenderer.CommandBuffer);
+ //CommandBufferSubmitList.emplace_back(prefilterRenderPass.CommandBuffer);
+ // CommandBufferSubmitList.emplace_back(brdfRenderPass.CommandBuffer);
     if (UseFrameBuffer)
     {
         CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);

@@ -66,7 +66,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     CubeMapFiles2[4] = "../texture/skybox/CosmicCoolCloudBack.png";
     CubeMapFiles2[5] = "../texture/skybox/CosmicCoolCloudTop.png";
 
-    assetManager->textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+    assetManager->textureManager.LoadCubeMap(engine, CubeMapFiles2, VK_FORMAT_R8G8B8A8_UNORM);
 
 
 
