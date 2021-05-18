@@ -22,12 +22,13 @@ enum MeshTypeFlag
 {
 	Mesh_Type_Normal = 0x00,
 	Mesh_Type_Water = 0x01,
-	Mesh_Type_SkyBox = 0x02
+	Mesh_Type_SkyBox = 0x02,
+	Mesh_Type_Billboard = 0x04
 };
 class Mesh
 {
 private:
-
+protected:
 	void MeshBottomLevelAccelerationStructure(VulkanEngine& engine);
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
 	{
@@ -38,7 +39,6 @@ private:
 			matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
 		};
 	}
-
 public:
 	MeshDrawFlags DrawFlags = Mesh_Draw_All;
 	MeshTypeFlag MeshType = Mesh_Type_Normal;

@@ -1,4 +1,5 @@
 #include "BlinnPhongRasterRenderer.h"
+#include "BillboardMesh.h"
 
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 {
@@ -8,8 +9,8 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanW
 {
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
     BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
+    DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
-    forwardRenderPass = ForwardRenderPass(engine, assetManager);
 }
 
 BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
@@ -20,54 +21,41 @@ void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWind
 {
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
+    DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
-    forwardRenderPass.RebuildSwapChain(engine, assetManager);
 }
 
 void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
 {
-    ImGui::Checkbox("FrameBuffer", &UseFrameBuffer);
-    if (UseFrameBuffer)
-    {
-        ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-        ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-        ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    }
+    ImGui::SliderFloat3("a", &assetManager->meshManager.MeshList[1]->MeshRotation.x, 0.0f, 180.0f);
+    ImGui::SliderInt("Frame", &static_cast<BillboardMesh*>(assetManager->meshManager.MeshList[1].get())->animator.CurrentFrame, 0, 60);
+    ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
 void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
-    if (UseFrameBuffer)
-    {
-        FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
-        BloomRenderer.Draw(engine, assetManager, imageIndex);
-        FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
-    }
-    else
-    {
-        forwardRenderPass.Draw(engine, assetManager, imageIndex, rendererID);
-    }
+    FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
+    BloomRenderer.Draw(engine, assetManager, imageIndex);
+    DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
+    FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
 }
 
 void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
 {
     FrameBufferTextureRenderer.Destroy(engine);
     BloomRenderer.Destroy(engine);
-    FrameBufferRenderer.Destroy(engine);
-    forwardRenderPass.Destroy(engine);
+    DebugDepthRenderer.Destroy(engine);
+    FrameBufferRenderer.Destroy(engine);;
 }
 
 std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
 {
-    if (UseFrameBuffer)
-    {
-        CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
-        CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
-        CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
-    }
-    else
-    {
-         CommandBufferSubmitList.emplace_back(forwardRenderPass.CommandBuffer);
-    }
+    CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
     return CommandBufferSubmitList;
 }

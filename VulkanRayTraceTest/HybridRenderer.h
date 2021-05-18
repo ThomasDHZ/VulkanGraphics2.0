@@ -9,6 +9,7 @@
 #include "SSAORenderPass.h"
 #include "SSAOBlurRenderPass.h"
 #include "BloomRenderPass.h"
+#include "DepthDebugRenderPass.h"
 
 class HybridRenderer : public BaseRenderer
 {
@@ -16,6 +17,7 @@ private:
 	int CurrentSSAOSampleRate;
 	GBufferRenderPass FrameBufferTextureRenderer;
 	HybridFrameBufferRenderPass FrameBufferRenderer;
+	DepthDebugRenderPass DebugDepthRenderer;
 	SSAORenderPass SSAORenderer;
 	SSAOBlurRenderPass SSAOBlurRenderer;
 	BloomRenderPass bloomRenderPass;

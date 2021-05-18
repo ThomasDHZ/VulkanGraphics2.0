@@ -31,7 +31,8 @@ enum RenderPassID
 	CubeTexture_Renderer,
 	Prefilter_Renderer,
 	Water_Renderer,
-	Bloom_Renderer
+	Bloom_Renderer,
+	DebugDepth_Renderer
 };
 enum RendererID
 {

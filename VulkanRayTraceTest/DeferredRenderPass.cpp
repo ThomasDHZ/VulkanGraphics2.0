@@ -76,7 +76,7 @@ void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
     DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     DepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     DepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;

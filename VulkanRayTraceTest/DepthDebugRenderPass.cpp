@@ -1,27 +1,24 @@
-#include "BloomRenderPass.h"
-#include "GraphicsPipeline.h"
-#include "SSAOBlurRenderPass.h"
+#include "DepthDebugRenderPass.h"
 
-BloomRenderPass::BloomRenderPass()
+DepthDebugRenderPass::DepthDebugRenderPass()
 {
 }
 
-BloomRenderPass::BloomRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
+DepthDebugRenderPass::DepthDebugRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
 {
-    BloomTexture = std::make_shared<RenderedColorTexture>(engine);
+    DebugDepthTexture = std::make_shared<RenderedColorTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    BloomPipelinePass1 = std::make_shared<BloomPipeline>(BloomPipeline(engine, assetManager, RenderPass, InputBloomTexture));
-    BloomPipelinePass2 = std::make_shared<BloomPipeline>(BloomPipeline(engine, assetManager, RenderPass, BloomTexture));
+    DebugDepthPipeline = std::make_shared<DepthDebugPipeline>(DepthDebugPipeline(engine, assetManager, RenderPass, InputBloomTexture));
     SetUpCommandBuffers(engine);
 }
 
-BloomRenderPass::~BloomRenderPass()
+DepthDebugRenderPass::~DepthDebugRenderPass()
 {
 }
 
-void BloomRenderPass::CreateRenderPass(VulkanEngine& engine)
+void DepthDebugRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -81,14 +78,14 @@ void BloomRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void BloomRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void DepthDebugRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(BloomTexture->View);
+        AttachmentList.emplace_back(DebugDepthTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -106,7 +103,7 @@ void BloomRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void BloomRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void DepthDebugRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -119,7 +116,7 @@ void BloomRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void BloomRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void DepthDebugRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -140,33 +137,25 @@ void BloomRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> a
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    ConstBloomProperites bloomProperites = {};
-    bloomProperites.BloomPass = 0;
+    ConstDepthDebugProperites DepthDebugProperites = {};
+    DepthDebugProperites.NearPlain = 1.0f;
+    DepthDebugProperites.FarPlain = 7.5f;
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdPushConstants(CommandBuffer, BloomPipelinePass1->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipelineLayout, 0, 1, &BloomPipelinePass1->DescriptorSets, 0, nullptr);
+    vkCmdPushConstants(CommandBuffer, DebugDepthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstDepthDebugProperites), &DepthDebugProperites);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, DebugDepthPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, DebugDepthPipeline->ShaderPipelineLayout, 0, 1, &DebugDepthPipeline->DescriptorSets, 0, nullptr);
     vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
-
-    bloomProperites.BloomPass = 1;
-    vkCmdPushConstants(CommandBuffer, BloomPipelinePass2->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, BloomPipelinePass1->ShaderPipelineLayout, 0, 1, &BloomPipelinePass1->DescriptorSets, 0, nullptr);
-    vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
-    vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }
 
-void BloomRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
+void DepthDebugRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
 {
-    BloomTexture->RecreateRendererTexture(engine);
-
-    BloomPipelinePass1->Destroy(engine);
-    BloomPipelinePass2->Destroy(engine);
+    DebugDepthTexture->RecreateRendererTexture(engine);
+    DebugDepthPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -179,16 +168,14 @@ void BloomRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Ass
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    BloomPipelinePass1->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, InputBloomTexture);
-    BloomPipelinePass2->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, BloomTexture);
+    DebugDepthPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, InputBloomTexture);
     SetUpCommandBuffers(engine);
 }
 
-void BloomRenderPass::Destroy(VulkanEngine& engine)
+void DepthDebugRenderPass::Destroy(VulkanEngine& engine)
 {
-    BloomTexture->Delete(engine);
-    BloomPipelinePass1->Destroy(engine);
-    BloomPipelinePass2->Destroy(engine);
+    DebugDepthTexture->Delete(engine);
+    DebugDepthPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

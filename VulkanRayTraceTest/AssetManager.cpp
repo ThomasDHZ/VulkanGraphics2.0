@@ -44,7 +44,7 @@ void AssetManager::Update(VulkanEngine& engine)
 
     materialManager.Update(engine);
     textureManager.Update(engine);
-    meshManager.Update(engine, materialManager);
+    meshManager.Update(engine, materialManager, camera);
     modelManager.Update(engine, materialManager);
 
     SceneData->UniformDataInfo.sLight.direction = camera->GetFront();

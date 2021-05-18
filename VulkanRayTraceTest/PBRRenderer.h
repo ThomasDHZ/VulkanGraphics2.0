@@ -6,14 +6,15 @@
 #include "BRDFRenderPass.h"
 #include "FrameBufferTextureRenderPass.h"
 #include "FrameBufferRenderPass.h"
+#include "DepthDebugRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
 private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
-	bool UseFrameBuffer = true;
 
 	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
+	DepthDebugRenderPass DebugDepthRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
 	CubeMapRenderPass cubeMapRenderer;
 	PrefilterRenderPass prefilterRenderPass;
@@ -23,7 +24,6 @@ public:
 	PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
 	~PBRRenderer();
 
-	ForwardRenderPass forwardRenderPass;
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void GUIUpdate(VulkanEngine& engine);
 	void Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex);

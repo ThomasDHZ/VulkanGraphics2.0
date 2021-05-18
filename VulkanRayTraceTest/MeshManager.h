@@ -1,5 +1,6 @@
 #pragma once
 #include "Mesh.h"
+#include "PerspectiveCamera.h"
 #include <vector>
 #include <memory>
 
@@ -16,7 +17,7 @@ public:
 	~MeshManager();
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
-	void Update(VulkanEngine& engine, MaterialManager& materialManager);
+	void Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera);
 	void UpdateBufferIndex(VulkanEngine& engine);
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID);
 	void Destroy(VulkanEngine& engine);

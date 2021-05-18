@@ -339,6 +339,21 @@
     <ClCompile Include="BloomRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="BillboardMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animaton2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationPlayer2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthDebugPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthDebugRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -492,6 +507,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\BloomShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\DepthDebugShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\DepthDebugShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -788,6 +809,21 @@
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="BloomRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animaton2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationPlayer2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthDebugPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthDebugRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>

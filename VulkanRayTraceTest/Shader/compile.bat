@@ -45,5 +45,7 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRIrradianceSkybox.vert -o PBRIrradiance
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRIrradianceSkybox.frag -o PBRIrradianceSkyboxShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BRDFRenderer.vert -o BRDFRendererShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BRDFRenderer.frag -o BRDFRendererShaderFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DepthDebugShader.frag -o DepthDebugShaderFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DepthDebugShader.vert -o DepthDebugShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe animate.comp -o animate.spv
 pause
