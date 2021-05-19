@@ -162,7 +162,7 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     sSAOProperties.kernelSize = KernalSampleSize;
     sSAOProperties.radius = radius;
     sSAOProperties.bias = bias;
-    sSAOProperties.projection = assetManager->camera->GetProjectionMatrix();
+    sSAOProperties.projection = assetManager->ActiveCamera->GetProjectionMatrix();
     sSAOProperties.TextureWidth = engine.SwapChain.SwapChainResolution.width;
     sSAOProperties.TextureHeight = engine.SwapChain.SwapChainResolution.height;
 

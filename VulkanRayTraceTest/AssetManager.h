@@ -10,7 +10,7 @@ class AssetManager
 private:
 
 public:
-	std::shared_ptr<PerspectiveCamera> camera;
+	std::shared_ptr<Camera> ActiveCamera;
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
 	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 
@@ -18,6 +18,8 @@ public:
 	TextureManager textureManager;
 	MeshManager meshManager;
 	ModelManager modelManager;
+	std::vector<std::shared_ptr<Camera>> CameraList;
+	int cameraIndex = 0;
 
 	AssetManager();
 	AssetManager(VulkanEngine& engine);

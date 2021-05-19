@@ -5,6 +5,7 @@
 class OrthographicCamera : public Camera
 {
 public:
+
 	OrthographicCamera();
 	OrthographicCamera(float width, float height);
 	OrthographicCamera(float width, float height, float zoom);

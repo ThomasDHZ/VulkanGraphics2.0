@@ -11,6 +11,7 @@ OrthographicCamera::OrthographicCamera(float width, float height) : Camera()
 	Height = height;
 	Aspect = Width / Height;
 	Zoom = 1.0f;
+	cameraType = CameraType::Orthographic_Camera;
 
 	Position = glm::vec3(0.0f);
 	ViewScreenSize = glm::vec2(width, height);
@@ -24,6 +25,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize) : Camera()
 	Height = viewScreenSize.y;
 	Aspect = Width / Height;
 	Zoom = 1.0f;
+	cameraType = CameraType::Orthographic_Camera;
 
 	Position = glm::vec3(0.0f);
 	ViewScreenSize = viewScreenSize;
@@ -37,6 +39,7 @@ OrthographicCamera::OrthographicCamera(float width, float height, float zoom) : 
 	Height = height;
 	Aspect = Width / Height;
 	Zoom = zoom;
+	cameraType = CameraType::Orthographic_Camera;
 
 	Position = glm::vec3(0.0f);
 	ViewScreenSize = glm::vec2(width, height);
@@ -50,6 +53,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, float zoom) : C
 	Height = viewScreenSize.y;
 	Aspect = Width / Height;
 	Zoom = zoom;
+	cameraType = CameraType::Orthographic_Camera;
 
 	Position = glm::vec3(0.0f);
 	ViewScreenSize = viewScreenSize;
@@ -64,6 +68,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, glm::vec2 posit
 	Aspect = Width / Height;
 	Zoom = 1.0f;
 	Position = glm::vec3(position, 0.0f);
+	cameraType = CameraType::Orthographic_Camera;
 
 	ViewScreenSize = viewScreenSize;
 	ProjectionMatrix = glm::ortho(-Aspect * Zoom, Aspect * Zoom, -1.0f * Zoom, 1.0f * Zoom, -1.0f, 1.0f);
@@ -77,6 +82,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, glm::vec2 posit
 	Aspect = Width / Height;
 	Zoom = zoom;
 	Position = glm::vec3(position, 0.0f);;
+	cameraType = CameraType::Orthographic_Camera;
 
 	ViewScreenSize = viewScreenSize;
 	ProjectionMatrix = glm::ortho(-ViewScreenSize.x * Zoom, ViewScreenSize.x * Zoom, -ViewScreenSize.y * Zoom, ViewScreenSize.y * Zoom, -1.0f, 1.0f);
@@ -90,6 +96,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, glm::vec3 posit
 	Aspect = Width / Height;
 	Zoom = 1.0f;
 	Position = position;
+	cameraType = CameraType::Orthographic_Camera;
 
 	ViewScreenSize = viewScreenSize;
 	ProjectionMatrix = glm::ortho(-Aspect * Zoom, Aspect * Zoom, -1.0f * Zoom, 1.0f * Zoom, -1.0f, 1.0f);
@@ -103,6 +110,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, glm::vec3 posit
 	Aspect = Width / Height;
 	Zoom = zoom;
 	Position = position;
+	cameraType = CameraType::Orthographic_Camera;
 
 	ViewScreenSize = viewScreenSize;
 	ProjectionMatrix = glm::ortho(-ViewScreenSize.x * Zoom, ViewScreenSize.x * Zoom, -ViewScreenSize.y * Zoom, ViewScreenSize.y * Zoom, -1.0f, 1.0f);

@@ -15,7 +15,7 @@ void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 	MeshList.emplace_back(mesh);
 }
 
-void MeshManager::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<PerspectiveCamera> camera)
+void MeshManager::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
 {
     for (auto& mesh : MeshList)
     {

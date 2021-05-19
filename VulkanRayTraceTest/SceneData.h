@@ -1,7 +1,6 @@
 #pragma once
 #include "VulkanBuffer.h"
-
-struct DirectionalLight {
+struct DirectionalLightBuffer {
 	alignas(16) glm::vec3 direction;
 
 	alignas(16) glm::vec3 ambient;
@@ -9,7 +8,7 @@ struct DirectionalLight {
 	alignas(16) glm::vec3 specular;
 };
 
-struct PointLight {
+struct PointLightBuffer {
 	alignas(16) glm::vec3 position;
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
@@ -19,7 +18,7 @@ struct PointLight {
 	alignas(4) float quadratic = 0.032f;
 };
 
-struct SpotLight {
+struct SpotLightBuffer {
 	alignas(16) glm::vec3 position;
 	alignas(16) glm::vec3 direction;
 	alignas(16) glm::vec3 ambient;
@@ -32,10 +31,11 @@ struct SpotLight {
 	alignas(4) float linear = 0.09f;
 	alignas(4) float quadratic = 0.032f;
 };
+
 struct SceneDataBuffer {
-	DirectionalLight dlight;
-	PointLight plight[5];
-	SpotLight sLight;
+	DirectionalLightBuffer dlight;
+	PointLightBuffer plight[5];
+	SpotLightBuffer sLight;
 	alignas(16) glm::mat4 viewInverse;
 	alignas(16) glm::mat4 projInverse;
 	alignas(16) glm::mat4 view;

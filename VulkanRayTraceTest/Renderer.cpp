@@ -60,8 +60,8 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     {
         RebuildSwapChain(engine, window);
     }
-    keyboard.Update(window.GetWindowPtr(), assetManager->camera);
-    mouse.Update(window.GetWindowPtr(), assetManager->camera);
+    keyboard.Update(window.GetWindowPtr(), assetManager->ActiveCamera);
+    mouse.Update(window.GetWindowPtr(), assetManager->ActiveCamera);
 
     assetManager->Update(engine);
     rayTraceRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
@@ -73,6 +73,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
+    ImGui::SliderInt("Active Camera", &assetManager->cameraIndex, 0, assetManager->CameraList.size());
     if (ActiveRenderer == 0)
     {
         blinnPhongRenderer.GUIUpdate(engine);
