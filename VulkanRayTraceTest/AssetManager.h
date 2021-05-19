@@ -5,6 +5,7 @@
 #include "TextureManager.h"
 #include "MeshManager.h"
 #include "ModelManager.h"
+#include "LightManager.h"
 class AssetManager
 {
 private:
@@ -18,6 +19,8 @@ public:
 	TextureManager textureManager;
 	MeshManager meshManager;
 	ModelManager modelManager;
+	LightManager lightManager;
+
 	std::vector<std::shared_ptr<Camera>> CameraList;
 	int cameraIndex = 0;
 

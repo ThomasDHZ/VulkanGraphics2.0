@@ -7,9 +7,10 @@ class Light
 {
 private:
 protected:
-	UniformData<T> LightBuffer;
+
 
 public:
+	UniformData<T> LightBuffer;
 	Light()
 	{
 
@@ -35,4 +36,6 @@ public:
 	{
 		LightBuffer.Destroy(engine);
 	}
+
+	VkBuffer GetLightBuffer() { return LightBuffer.VulkanBufferData.Buffer; }
 };

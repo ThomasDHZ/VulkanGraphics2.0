@@ -6,6 +6,7 @@ private:
 public:
 	PointLight();
 	PointLight(VulkanEngine& engine);
+	PointLight(VulkanEngine& engine, PointLightBuffer light);
 	~PointLight();
 };
 

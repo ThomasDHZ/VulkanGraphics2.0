@@ -8,6 +8,12 @@ DirectionalLight::DirectionalLight(VulkanEngine& engine) : Light<DirectionalLigh
 {
 }
 
+DirectionalLight::DirectionalLight(VulkanEngine& engine, DirectionalLightBuffer light) : Light<DirectionalLightBuffer>(engine)
+{
+	LightBuffer.UniformDataInfo = light;
+	Update(engine);
+}
+
 DirectionalLight::~DirectionalLight()
 {
 }

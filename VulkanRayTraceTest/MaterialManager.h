@@ -5,7 +5,6 @@ class MaterialManager
 {
 private:
 
-
 	uint32_t IsMateralLoaded(std::string name);
 public:
 

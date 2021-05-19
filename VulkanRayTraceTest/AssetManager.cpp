@@ -8,6 +8,7 @@ AssetManager::AssetManager(VulkanEngine& engine)
 {
     textureManager = TextureManager(engine);
     materialManager = MaterialManager(engine, textureManager);
+    lightManager = LightManager(engine);
 
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
@@ -49,11 +50,16 @@ void AssetManager::Update(VulkanEngine& engine)
     textureManager.Update(engine);
     meshManager.Update(engine, materialManager, ActiveCamera);
     modelManager.Update(engine, materialManager);
+    lightManager.Update(engine);
 
     if (ActiveCamera->cameraType == CameraType::Perspective_Camera)
     {
         SceneData->UniformDataInfo.sLight.direction = static_cast<PerspectiveCamera*>(ActiveCamera.get())->GetFront();
     }
+
+    SceneData->UniformDataInfo.DirectionalLightCount = lightManager.GetDirectionalLightDescriptorCount();
+    SceneData->UniformDataInfo.PointLightCount = lightManager.GetPointLightDescriptorCount();
+    SceneData->UniformDataInfo.SpotLightCount = lightManager.GetSpotLightDescriptorCount();
     SceneData->UniformDataInfo.viewInverse = glm::inverse(ActiveCamera->GetViewMatrix());
     SceneData->UniformDataInfo.projInverse = glm::inverse(ActiveCamera->GetProjectionMatrix());
     SceneData->UniformDataInfo.projInverse[1][1] *= -1;
@@ -92,6 +98,7 @@ void AssetManager::Delete(VulkanEngine& engine)
     meshManager.Destroy(engine);
     textureManager.Destory(engine);
     materialManager.Destory(engine);
+    lightManager.Destory(engine);
 }
 
 std::vector<std::shared_ptr<Mesh>> AssetManager::GetMeshByType(MeshTypeFlag type)

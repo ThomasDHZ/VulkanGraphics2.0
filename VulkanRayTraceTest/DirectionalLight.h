@@ -7,6 +7,7 @@ private:
 public:
 	DirectionalLight();
 	DirectionalLight(VulkanEngine& engine);
+	DirectionalLight(VulkanEngine& engine, DirectionalLightBuffer light);
 	~DirectionalLight();
 };
 

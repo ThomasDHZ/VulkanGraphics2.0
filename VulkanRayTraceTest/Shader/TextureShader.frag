@@ -29,6 +29,9 @@ layout(binding = 2) uniform UniformBufferObject {
 	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
+    uint DirectionalLightCount;
+    uint PointLightCount;
+    uint SpotLightCount;
     vec3 viewPos;
 	float timer;
     int Shadowed;
@@ -45,6 +48,7 @@ layout(binding = 3) buffer MeshProperties
 	float minLayers;
 	float maxLayers;
 } meshProperties[];
+
 layout(binding = 4) buffer DirectionalLight2
 { 
     vec3 direction;
@@ -52,6 +56,7 @@ layout(binding = 4) buffer DirectionalLight2
     vec3 diffuse;
     vec3 specular;
 } DLight[];
+
 layout(binding = 5) buffer PointLight2
 { 
     vec3 position;
@@ -62,6 +67,7 @@ layout(binding = 5) buffer PointLight2
     float linear;
     float quadratic;
 } PLight[];
+
 layout(binding = 6) buffer SpotLight2
 { 
    vec3 position;
@@ -76,6 +82,7 @@ layout(binding = 6) buffer SpotLight2
    float linear;
    float quadratic;
 } SLight[];
+
 layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 8) uniform sampler2D TextureMap[];
 layout(binding = 9) uniform sampler3D Texture3DMap[];
@@ -89,10 +96,10 @@ layout(location = 4) in mat3 TBN;
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
 
-vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv);
+vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv, int index);
 vec3 CalcNormalPointLight(MaterialInfo material, PointLight light, vec3 normal, vec2 uv);
 vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, vec2 uv);
-vec3 CalcDirLight(MaterialInfo material, vec2 uv);
+vec3 CalcDirLight(MaterialInfo material, vec2 uv, int index);
 vec3 CalcPointLight(MaterialInfo material, PointLight light, vec2 uv);
 vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec2 uv);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
@@ -126,7 +133,10 @@ void main()
         normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
 
-       result = CalcNormalDirLight(material, normal, texCoords);
+        for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+        {
+            result += CalcNormalDirLight(material, normal, texCoords, x);
+        }
         for(int x = 0; x < 5; x++)
         {
           result += CalcNormalPointLight(material, scenedata.plight[x], normal, texCoords);   
@@ -135,7 +145,10 @@ void main()
     }
     else
     {
-        result = CalcDirLight(material, texCoords);
+         for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+        {
+            result += CalcDirLight(material, texCoords, x);
+        }
         for(int x = 0; x < 5; x++)
         {
            result += CalcPointLight(material, scenedata.plight[x], texCoords);   
@@ -162,9 +175,9 @@ void main()
 
 }
 
-vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv)
+vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv, int index)
 {
-    const vec3 TangentLightPos = TBN * scenedata.dlight.direction;
+    const vec3 TangentLightPos = TBN * DLight[index].direction;
     const vec3 TangentViewPos  = TBN * scenedata.viewPos;
     const vec3 TangentFragPos  = TBN * FragPos;  
     const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
@@ -175,17 +188,17 @@ vec3 CalcNormalDirLight(MaterialInfo material, vec3 normal, vec2 uv)
     const vec3 halfwayDir = normalize(lightDir + viewDir);  
     const float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
-    vec3 ambient = scenedata.dlight.ambient *  material.Diffuse.rgb;
-    vec3 diffuse = scenedata.dlight.diffuse * diff *  material.Diffuse.rgb;
-    vec3 specular = scenedata.dlight.specular * spec * material.Specular;
+    vec3 ambient = DLight[index].ambient *  material.Diffuse.rgb;
+    vec3 diffuse = DLight[index].diffuse * diff *  material.Diffuse.rgb;
+    vec3 specular = DLight[index].specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {
-        ambient = scenedata.dlight.ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
-        diffuse = scenedata.dlight.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        ambient = DLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        diffuse = DLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
     }
     if(material.SpecularMapID != 0)
     {
-        specular = scenedata.dlight.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+        specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
     
     return vec3(ambient + diffuse + specular);
@@ -265,27 +278,27 @@ vec3 CalcNormalSpotLight(MaterialInfo material, SpotLight light, vec3 normal, ve
     return (ambient + diffuse + specular);
 }
 
-vec3 CalcDirLight(MaterialInfo material, vec2 uv)
+vec3 CalcDirLight(MaterialInfo material, vec2 uv, int index)
 {
     vec3 viewDir = normalize(scenedata.viewPos - FragPos);
-    vec3 lightDir = normalize(-scenedata.dlight.direction);
+    vec3 lightDir = normalize(-DLight[index].direction);
 
     float diff = max(dot(Normal, lightDir), 0.0);
 
     vec3 reflectDir = reflect(-lightDir, Normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.Shininess);
 
-    vec3 ambient = scenedata.dlight.ambient *  material.Diffuse.rgb;
-    vec3 diffuse = scenedata.dlight.diffuse * diff *  material.Diffuse.rgb;
-    vec3 specular = scenedata.dlight.specular * spec * material.Specular;
+    vec3 ambient = DLight[index].ambient *  material.Diffuse.rgb;
+    vec3 diffuse = DLight[index].diffuse * diff *  material.Diffuse.rgb;
+    vec3 specular = DLight[index].specular * spec * material.Specular;
     if(material.DiffuseMapID != 0)
     {
-        ambient = scenedata.dlight.ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
-        diffuse = scenedata.dlight.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        ambient = DLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        diffuse = DLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
     }
     if(material.SpecularMapID != 0)
     {
-        specular = scenedata.dlight.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+        specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
     return (ambient + diffuse + specular);

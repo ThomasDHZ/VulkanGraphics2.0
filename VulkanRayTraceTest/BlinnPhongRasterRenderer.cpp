@@ -27,6 +27,9 @@ void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWind
 
 void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
 {
+    ImGui::SliderFloat3("dlight", &assetManager->lightManager.DirectionalLightList[0]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+    ImGui::SliderFloat3("dlight2", &assetManager->lightManager.DirectionalLightList[1]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+
     ImGui::SliderFloat3("a", &assetManager->meshManager.MeshList[1]->MeshRotation.x, 0.0f, 180.0f);
     ImGui::SliderInt("Frame", &static_cast<BillboardMesh*>(assetManager->meshManager.MeshList[1].get())->animator.CurrentFrame, 0, 60);
     ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
