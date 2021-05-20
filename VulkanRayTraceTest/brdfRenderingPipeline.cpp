@@ -157,7 +157,7 @@ void brdfRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRe
 
 void brdfRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

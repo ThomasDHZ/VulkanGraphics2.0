@@ -217,6 +217,7 @@
     <ClCompile Include="RayTracePBRRenderer.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
+    <ClCompile Include="RayTracingGraphicsPipeline.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
@@ -381,6 +382,7 @@
     <ClInclude Include="RayTracePBRRenderer.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RayTraceRenderPass.h" />
+    <ClInclude Include="RayTracingGraphicsPipeline.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedCubeMapTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />

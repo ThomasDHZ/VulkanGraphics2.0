@@ -183,7 +183,7 @@ void SkyBoxRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const Vk
 
 void SkyBoxRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

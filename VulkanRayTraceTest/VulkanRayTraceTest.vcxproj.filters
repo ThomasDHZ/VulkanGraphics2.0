@@ -369,6 +369,9 @@
     <ClCompile Include="RayTracedHybridPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="RayTracingGraphicsPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -857,6 +860,9 @@
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="RayTracedHybridPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracingGraphicsPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>

@@ -101,9 +101,9 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     mouse.Update(window.GetWindowPtr(), assetManager->ActiveCamera);
 
     assetManager->Update(engine);
-    rayTraceRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
-    pbrRayTraceRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
-    hybridRenderer.rayTraceRenderPass.createTopLevelAccelerationStructure(engine, assetManager);
+    rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+    pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+    hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
 
 }
 

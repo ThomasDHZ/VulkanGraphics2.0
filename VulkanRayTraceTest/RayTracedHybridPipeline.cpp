@@ -1,23 +1,11 @@
 #include "RayTracedHybridPipeline.h"
 
-RayTracedHybridPipeline::RayTracedHybridPipeline()
+RayTracedHybridPipeline::RayTracedHybridPipeline() : RayTracingGraphicsPipeline()
 {
 }
 
-RayTracedHybridPipeline::RayTracedHybridPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture, std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture)
+RayTracedHybridPipeline::RayTracedHybridPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture, std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture) : RayTracingGraphicsPipeline(engine)
 {
-    rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
-    VkPhysicalDeviceProperties2 deviceProperties2{};
-    deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-    deviceProperties2.pNext = &rayTracingPipelineProperties;
-    vkGetPhysicalDeviceProperties2(engine.PhysicalDevice, &deviceProperties2);
-
-    accelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-    VkPhysicalDeviceFeatures2 deviceFeatures2{};
-    deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    deviceFeatures2.pNext = &accelerationStructureFeatures;
-    vkGetPhysicalDeviceFeatures2(engine.PhysicalDevice, &deviceFeatures2);
-
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpDescriptorSets(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture);
@@ -29,48 +17,15 @@ RayTracedHybridPipeline::~RayTracedHybridPipeline()
 {
 }
 
-void RayTracedHybridPipeline::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture, std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture)
+void RayTracedHybridPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture, std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture)
 {
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-
-    DescriptorPool = VK_NULL_HANDLE;
-    DescriptorSetLayout = VK_NULL_HANDLE;
-
-    vkDestroyPipeline(engine.Device, RayTracePipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, RayTracePipelineLayout, nullptr);
-
-    RayTracePipeline = VK_NULL_HANDLE;
-    RayTracePipelineLayout = VK_NULL_HANDLE;
+    RayTracingGraphicsPipeline::UpdateGraphicsPipeLine(engine);
 
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpDescriptorSets(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture);
     SetUpPipeline(engine);
     SetUpShaderBindingTable(engine);
-}
-
-void RayTracedHybridPipeline::Destroy(VulkanEngine& engine)
-{
-    {
-        vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-        vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
-
-        DescriptorPool = VK_NULL_HANDLE;
-        DescriptorSetLayout = VK_NULL_HANDLE;
-    }
-    {
-        vkDestroyPipeline(engine.Device, RayTracePipeline, nullptr);
-        vkDestroyPipelineLayout(engine.Device, RayTracePipelineLayout, nullptr);
-
-        RayTracePipeline = VK_NULL_HANDLE;
-        RayTracePipelineLayout = VK_NULL_HANDLE;
-    }
-    {
-        raygenShaderBindingTable.DestoryBuffer(engine.Device);
-        missShaderBindingTable.DestoryBuffer(engine.Device);
-        hitShaderBindingTable.DestoryBuffer(engine.Device);
-    }
 }
 
 void RayTracedHybridPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
@@ -173,7 +128,7 @@ void RayTracedHybridPipeline::SetUpPipeline(VulkanEngine& engine)
     PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     PipelineLayoutCreateInfo.setLayoutCount = 1;
     PipelineLayoutCreateInfo.pSetLayouts = &DescriptorSetLayout;
-    vkCreatePipelineLayout(engine.Device, &PipelineLayoutCreateInfo, nullptr, &RayTracePipelineLayout);
+    vkCreatePipelineLayout(engine.Device, &PipelineLayoutCreateInfo, nullptr, &ShaderPipelineLayout);
 
     ShaderList.emplace_back(engine.CreateShader("Shader/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR RayGeneratorShaderInfo = {};
@@ -234,8 +189,8 @@ void RayTracedHybridPipeline::SetUpPipeline(VulkanEngine& engine)
     RayTracingPipeline.groupCount = static_cast<uint32_t>(RayTraceShaders.size());
     RayTracingPipeline.pGroups = RayTraceShaders.data();
     RayTracingPipeline.maxPipelineRayRecursionDepth = 1;
-    RayTracingPipeline.layout = RayTracePipelineLayout;
-    VkResult result = engine.vkCreateRayTracingPipelinesKHR(engine.Device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &RayTracePipeline);
+    RayTracingPipeline.layout = ShaderPipelineLayout;
+    VkResult result = engine.vkCreateRayTracingPipelinesKHR(engine.Device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &ShaderPipeline);
 
     for (auto shader : ShaderList)
     {
@@ -251,7 +206,7 @@ void RayTracedHybridPipeline::SetUpShaderBindingTable(VulkanEngine& engine)
     const uint32_t sbtSize = groupCount * handleSizeAligned;
 
     std::vector<uint8_t> shaderHandleStorage(sbtSize);
-    engine.vkGetRayTracingShaderGroupHandlesKHR(engine.Device, RayTracePipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
+    engine.vkGetRayTracingShaderGroupHandlesKHR(engine.Device, ShaderPipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
 
     raygenShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
     missShaderBindingTable.CreateBuffer(engine.Device, engine.PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);

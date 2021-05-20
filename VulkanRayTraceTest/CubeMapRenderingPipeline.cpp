@@ -195,6 +195,6 @@ void CubeMapRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const V
 
 void CubeMapRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpShaderPipeLine(engine, renderPass);
 }

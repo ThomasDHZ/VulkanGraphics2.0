@@ -160,7 +160,7 @@ void DepthDebugPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRende
 
 void DepthDebugPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> DepthTexture)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

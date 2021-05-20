@@ -10,10 +10,10 @@ GraphicsPipeline::~GraphicsPipeline()
 {
 }
 
-void GraphicsPipeline::UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass)
+void GraphicsPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine)
 {
-    vkDestroyPipeline(renderer.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(renderer.Device, ShaderPipelineLayout, nullptr);
+    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
 
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;

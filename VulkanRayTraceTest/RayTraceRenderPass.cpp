@@ -17,7 +17,7 @@ RayTraceRenderPass::RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<Ass
     SkyboxTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 
     topLevelAS = AccelerationStructure(engine);
-    createTopLevelAccelerationStructure(engine, assetManager);
+    SetUpTopLevelAccelerationStructure(engine, assetManager);
     RTHybridPipeline = std::make_shared<RayTracedHybridPipeline>(RayTracedHybridPipeline(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture));
 
     VkCommandBufferAllocateInfo allocInfo{};
@@ -35,8 +35,6 @@ RayTraceRenderPass::~RayTraceRenderPass()
 {
    
 }
-
-
 
 void RayTraceRenderPass::Destroy(VulkanEngine& engine)
 {
@@ -56,9 +54,10 @@ void RayTraceRenderPass::Destroy(VulkanEngine& engine)
         SSAOTexture->Delete(engine);
         SkyboxTexture->Delete(engine);
     }
+    RTHybridPipeline->Destroy(engine);
 }
 
-void RayTraceRenderPass::createTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
@@ -177,8 +176,8 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
 
     VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 
-    vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RTHybridPipeline->RayTracePipeline);
-    vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RTHybridPipeline->RayTracePipelineLayout, 0, 1, &RTHybridPipeline->DescriptorSets, 0, 0);
+    vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RTHybridPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RTHybridPipeline->ShaderPipelineLayout, 0, 1, &RTHybridPipeline->DescriptorSets, 0, 0);
     engine.vkCmdTraceRaysKHR(RayTraceCommandBuffer, &raygenShaderSbtEntry, &missShaderSbtEntry, &hitShaderSbtEntry, &callableShaderSbtEntry, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1);
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
@@ -190,6 +189,6 @@ void RayTraceRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<
     SSAOTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
     SkyboxTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 
-    RTHybridPipeline->RebuildSwapChain(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture);
+    RTHybridPipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture);
     Draw(engine, assetManager, imageIndex);
 }

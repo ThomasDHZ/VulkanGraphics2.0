@@ -208,7 +208,7 @@ void RenderWaterTexturePipeline::SetUpShaderPipeLine(VulkanEngine& engine, VkRen
 
 void RenderWaterTexturePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

@@ -195,6 +195,6 @@ void PrefilterRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const
 
 void PrefilterRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpShaderPipeLine(engine, renderPass);
 }

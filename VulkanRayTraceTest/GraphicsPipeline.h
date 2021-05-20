@@ -41,6 +41,6 @@ public:
 	GraphicsPipeline();
 	~GraphicsPipeline();
 
-	virtual void UpdateGraphicsPipeLine(VulkanEngine& renderer, const VkRenderPass& renderPass);
+	virtual void UpdateGraphicsPipeLine(VulkanEngine& engine);
 	virtual void Destroy(VulkanEngine& engine);
 };

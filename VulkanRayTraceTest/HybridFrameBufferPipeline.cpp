@@ -196,7 +196,7 @@ void HybridFrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const 
 
 void HybridFrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

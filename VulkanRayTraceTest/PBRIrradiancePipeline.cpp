@@ -183,6 +183,6 @@ void PBRIrradiancePipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRe
 
 void PBRIrradiancePipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass, RenderPassID RendererID)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine, renderPass);
+    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpShaderPipeLine(engine, renderPass, RendererID);
 }
