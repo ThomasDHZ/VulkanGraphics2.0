@@ -21,7 +21,7 @@ layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
 layout(location = 1) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
-layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
 	DirectionalLight dlight;
@@ -49,12 +49,48 @@ layout(binding = 3) buffer MeshProperties
 	float minLayers;
 	float maxLayers;
 } meshProperties[];
-layout(binding = 4, scalar) buffer Vertices { Vertex v[]; } vertices[];
-layout(binding = 5) buffer Indices { uint i[]; } indices[];
-layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 8) uniform sampler2D TextureMap[];
-layout(binding = 9) uniform sampler3D Texture3DMap[];
+
+layout(binding = 4) buffer DirectionalLight2
+{ 
+    vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+} DLight[];
+
+layout(binding = 5) buffer PointLight2
+{ 
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float constant;
+    float linear;
+    float quadratic;
+} PLight[];
+
+layout(binding = 6) buffer SpotLight2
+{ 
+   vec3 position;
+   vec3 direction;
+   vec3 ambient;
+   vec3 diffuse;
+   vec3 specular;
+
+   float cutOff;
+   float outerCutOff;
+   float constant;
+   float linear;
+   float quadratic;
+} SLight[];
+
+layout(binding = 7, scalar) buffer Vertices { Vertex v[]; } vertices[];
+layout(binding = 8) buffer Indices { uint i[]; } indices[];
+layout(binding = 9) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 11) uniform sampler2D TextureMap[];
+layout(binding = 12) uniform sampler3D Texture3DMap[];
+
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
 Vertex BuildVertexInfo();
@@ -79,7 +115,7 @@ void main()
 	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
 
 	shadowed = true;  
-	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, ubo.dlight.direction, tmax, 1);
+	traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, DLight[0].direction, tmax, 1);
     if (shadowed) 
     {
 		rayHitInfo.ShadowMask = vec3(1.0f, 0.0f, 0.0f);

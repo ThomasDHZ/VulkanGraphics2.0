@@ -31,9 +31,9 @@ layout(binding = 2, set = 0) uniform CameraProperties
     int Shadowed;
     int temp;
 } cam;
-layout(binding = 11, set = 0, rgba8) uniform image2D ReflectionTexture;
-layout(binding = 12, set = 0, rgba8) uniform image2D SSAOTexture;
-layout(binding = 13, set = 0, rgba8) uniform image2D SkyboxTexture;
+layout(binding = 14, set = 0, rgba8) uniform image2D ReflectionTexture;
+layout(binding = 15, set = 0, rgba8) uniform image2D SSAOTexture;
+layout(binding = 16, set = 0, rgba8) uniform image2D SkyboxTexture;
 
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 

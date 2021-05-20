@@ -11,7 +11,7 @@ struct RayHitInfo
 };
 
 layout(location = 0) rayPayloadInEXT RayHitInfo rayPayload;
-layout(binding = 10, set = 0) uniform samplerCube CubeMap;
+layout(binding = 13, set = 0) uniform samplerCube CubeMap;
 void main()
 {
 	rayPayload.SkyboxColor = texture(CubeMap, gl_WorldRayDirectionEXT).rgb;
