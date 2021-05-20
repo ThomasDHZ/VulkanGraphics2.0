@@ -12,14 +12,18 @@ class Renderer
 {
 private:
 	int ActiveRenderer = 0;
+	bool addlightflag = false;
+	bool deletelightflag = false;
+	bool addplightflag = false;
+	bool deleteplightflag = false;
 	Keyboard keyboard;
 	Mouse mouse;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	PBRRenderer pbrRenderer;
-	RayTraceRenderer rayTraceRenderer;
-	RayTracePBRRenderer pbrRayTraceRenderer;
-	HybridRenderer hybridRenderer;
+	//PBRRenderer pbrRenderer;
+	//RayTraceRenderer rayTraceRenderer;
+	//RayTracePBRRenderer pbrRayTraceRenderer;
+	//HybridRenderer hybridRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;

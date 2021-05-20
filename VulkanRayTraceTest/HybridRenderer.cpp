@@ -66,7 +66,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::Checkbox("Apply SSAO", &ApplySSAO);
     ImGui::SliderInt("Apply SSAO", &assetManager->SceneData->UniformDataInfo.temp, 0, 1);
-    ImGui::SliderFloat3("DirectionalLight", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
+   // ImGui::SliderFloat3("DirectionalLight", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
     ImGui::SliderInt("SSAOSample", &SSAORenderer.KernalSampleSize, 0, 2550);
     ImGui::SliderFloat("SSAOBias", &SSAORenderer.bias, 0.0f, 100.0f);
     ImGui::SliderFloat("SSAORadius", &SSAORenderer.radius, 0.0f, 10000000.0f);

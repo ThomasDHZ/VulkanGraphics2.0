@@ -54,7 +54,7 @@ void AssetManager::Update(VulkanEngine& engine)
 
     if (ActiveCamera->cameraType == CameraType::Perspective_Camera)
     {
-        SceneData->UniformDataInfo.sLight.direction = static_cast<PerspectiveCamera*>(ActiveCamera.get())->GetFront();
+       // SceneData->UniformDataInfo.sLight.direction = static_cast<PerspectiveCamera*>(ActiveCamera.get())->GetFront();
     }
 
     SceneData->UniformDataInfo.DirectionalLightCount = lightManager.GetDirectionalLightDescriptorCount();

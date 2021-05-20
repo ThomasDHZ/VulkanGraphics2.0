@@ -181,7 +181,7 @@ void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<
 void WaterRenderToTextureRenderPass::Update(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneDataptr, std::shared_ptr<PerspectiveCamera> camera)
 {
     TextureCamera->Update(engine);
-    copysceneDataptr.UniformDataInfo.sLight.direction = TextureCamera->GetFront();
+   // copysceneDataptr.UniformDataInfo.sLight.direction = TextureCamera->GetFront();
     copysceneDataptr.UniformDataInfo.viewInverse = glm::inverse(TextureCamera->GetViewMatrix());
     copysceneDataptr.UniformDataInfo.projInverse = glm::inverse(TextureCamera->GetProjectionMatrix());
     copysceneDataptr.UniformDataInfo.projInverse[1][1] *= -1;

@@ -2,7 +2,6 @@
 #include "VulkanBuffer.h"
 struct DirectionalLightBuffer {
 	alignas(16) glm::vec3 direction;
-
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
@@ -33,9 +32,6 @@ struct SpotLightBuffer {
 };
 
 struct SceneDataBuffer {
-	DirectionalLightBuffer dlight;
-	PointLightBuffer plight[5];
-	SpotLightBuffer sLight;
 	alignas(16) glm::mat4 viewInverse;
 	alignas(16) glm::mat4 projInverse;
 	alignas(16) glm::mat4 view;

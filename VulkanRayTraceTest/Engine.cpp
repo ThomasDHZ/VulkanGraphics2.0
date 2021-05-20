@@ -40,19 +40,19 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
     assetManager->textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
-    assetManager->AddModel(engine, "../Models/viking_room.obj");
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
-    material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //assetManager->AddModel(engine, "../Models/viking_room.obj");
+    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+    //material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
+    //material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    //material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/plastic/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
     //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
-    uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
+    //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
-    // assetManager.AddModel(engine, "../Models/RayReflectionTest.obj");
+     assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
      assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/
 
@@ -93,40 +93,6 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
    //   assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
   // assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
-
-    assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
-    assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);
-    assetManager->SceneData->UniformDataInfo.dlight.specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[0].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[0].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[0].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[0].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[1].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[1].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[1].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[1].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[2].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[2].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[2].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[2].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[3].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[3].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[3].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[3].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.plight[4].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-    assetManager->SceneData->UniformDataInfo.plight[4].ambient = glm::vec4(0.2f);
-    assetManager->SceneData->UniformDataInfo.plight[4].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-    assetManager->SceneData->UniformDataInfo.plight[4].specular = glm::vec4(1.0f);
-
-    assetManager->SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
-    assetManager->SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
-    assetManager->SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
 
     renderer = Renderer(engine, window, assetManager);
 }

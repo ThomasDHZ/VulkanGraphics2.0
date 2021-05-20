@@ -12,11 +12,10 @@ class LightManager
 	friend class SpotLight;
 private:
 
-	std::vector<std::shared_ptr<PointLight>> PointLightList;
-	std::vector<std::shared_ptr<SpotLight>> SpotLightList;
-
 public:
 	std::vector<std::shared_ptr<DirectionalLight>> DirectionalLightList;
+	std::vector<std::shared_ptr<PointLight>> PointLightList;
+	std::vector<std::shared_ptr<SpotLight>> SpotLightList;
 
 	LightManager();
 	LightManager(VulkanEngine& engine);

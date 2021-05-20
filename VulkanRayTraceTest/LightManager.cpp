@@ -13,6 +13,16 @@ LightManager::LightManager(VulkanEngine& engine)
 	dlight.specular = glm::vec4(1.0f);
 	AddDirectionalLight(engine, dlight);
 	AddDirectionalLight(engine, dlight);
+
+	PointLightBuffer plight = PointLightBuffer();
+	plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+	plight.ambient = glm::vec4(0.2f);
+	plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+	plight.specular = glm::vec4(1.0f);
+
+	AddPointLight(engine, plight);
+	AddPointLight(engine, plight);
+	AddSpotLight(engine, SpotLightBuffer());
 }
 
 LightManager::~LightManager()
@@ -72,16 +82,24 @@ void LightManager::AddSpotLight(VulkanEngine& engine, SpotLightBuffer light)
 void LightManager::DeleteDirectionalLight(VulkanEngine& engine, uint32_t LightBufferIndex)
 {
 	DirectionalLightList[LightBufferIndex]->Destroy(engine);
+	DirectionalLightList.erase(DirectionalLightList.begin() + LightBufferIndex);
+	Update(engine);
 }
 
 void LightManager::DeletePointLight(VulkanEngine& engine, uint32_t LightBufferIndex)
 {
 	PointLightList[LightBufferIndex]->Destroy(engine);
+	PointLightList.erase(PointLightList.begin() + LightBufferIndex);
+	Update(engine);
 }
 
 void LightManager::DeleteSpotLight(VulkanEngine& engine, uint32_t LightBufferIndex)
 {
 	SpotLightList[LightBufferIndex]->Destroy(engine);
+
+	SpotLightList[LightBufferIndex]->Destroy(engine);
+	SpotLightList.erase(SpotLightList.begin() + LightBufferIndex);
+	Update(engine);
 }
 
 std::vector<VkDescriptorBufferInfo> LightManager::GetDirectionalLightBufferListDescriptor()

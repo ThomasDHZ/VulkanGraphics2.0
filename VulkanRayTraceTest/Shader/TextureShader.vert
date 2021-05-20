@@ -15,14 +15,14 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 2) uniform UniformBufferObject 
 {
-	DirectionalLight dlight;
-	PointLight plight[5];
-	SpotLight sLight;
     mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
     vec3 viewPos;
+	uint DirectionalLightCount;
+    uint PointLightCount;
+    uint SpotLightCount;
 	float timer;
 	int Shadowed;
     int temp;
@@ -56,11 +56,11 @@ layout(location = 4) out mat3 TBN;
 
 void main() 
 {
-//if(gl_VertexIndex == 0)
-//{
-//    debugPrintfEXT("Temp: %i \n", ubo.temp);
-//}
-//
+//	if(gl_VertexIndex == 0)
+//	{
+//		debugPrintfEXT("Temp: %i \n", ubo.DirectionalLightCount);
+//	}
+
     FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
