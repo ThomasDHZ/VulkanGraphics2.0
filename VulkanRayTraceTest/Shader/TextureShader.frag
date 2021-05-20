@@ -21,7 +21,7 @@ struct VertexData
 	vec3 BiTangent;
 };
 
-layout(binding = 2) uniform UniformBufferObject 
+layout(binding = 0) uniform UniformBufferObject 
 {
     mat4 viewInverse;
 	mat4 projInverse;
@@ -36,7 +36,7 @@ layout(binding = 2) uniform UniformBufferObject
     int temp;
 } scenedata;
 
-layout(binding = 3) buffer MeshProperties 
+layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
@@ -47,7 +47,7 @@ layout(binding = 3) buffer MeshProperties
 	float maxLayers;
 } meshProperties[];
 
-layout(binding = 4) buffer DirectionalLight2
+layout(binding = 2) buffer DirectionalLight2
 { 
     vec3 direction;
     vec3 ambient;
@@ -55,7 +55,7 @@ layout(binding = 4) buffer DirectionalLight2
     vec3 specular;
 } DLight[];
 
-layout(binding = 5) buffer PointLight2
+layout(binding = 3) buffer PointLight2
 { 
     vec3 position;
     vec3 ambient;
@@ -66,7 +66,7 @@ layout(binding = 5) buffer PointLight2
     float quadratic;
 } PLight[];
 
-layout(binding = 6) buffer SpotLight2
+layout(binding = 4) buffer SpotLight2
 { 
    vec3 position;
    vec3 direction;
@@ -81,9 +81,10 @@ layout(binding = 6) buffer SpotLight2
    float quadratic;
 } SLight[];
 
-layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 8) uniform sampler2D TextureMap[];
-layout(binding = 9) uniform sampler3D Texture3DMap[];
+layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 7) uniform sampler2D TextureMap[];
+layout(binding = 8) uniform sampler3D Texture3DMap[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
