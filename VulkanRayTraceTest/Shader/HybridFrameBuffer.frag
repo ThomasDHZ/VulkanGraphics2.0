@@ -84,14 +84,18 @@ void main()
     const vec3 viewDir = normalize(scenedata.viewPos - Position);
 
     const vec3 lightDir = normalize(-DLight[0].direction);
+    const vec3 lightDir2 = normalize(-DLight[1].direction);
     const float diff = max(dot(Normal, lightDir), 0.0);
 
     vec3 ambient = DLight[0].ambient * Alebdo;
+    ambient += DLight[1].ambient * Alebdo;
     if(scenedata.temp == 1)
     {
       ambient *= SSAO;
     }
     vec3 diffuse = DLight[0].diffuse * diff *  Alebdo * SSAO;
+ diffuse += DLight[1].diffuse * diff *  Alebdo * SSAO;
+
     vec3 result = ambient + diffuse;
 
     if(Shadow == vec3(1.0f, 0.0f, 0.0f))
@@ -103,6 +107,10 @@ void main()
         const vec3 halfwayDir = normalize(lightDir + viewDir);  
         const float spec = pow(max(dot(Normal, halfwayDir), 0.0), Specular);
         vec3 specular = DLight[0].specular * spec * Specular;
+
+        const vec3 halfwayDir2 = normalize(lightDir2 + viewDir);  
+        const float spec2 = pow(max(dot(Normal, halfwayDir2), 0.0), Specular);
+        specular += DLight[1].specular * spec2 * Specular;
        result += specular;
     }
 //

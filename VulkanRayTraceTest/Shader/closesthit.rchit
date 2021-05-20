@@ -120,6 +120,13 @@ void main()
     {
 		rayHitInfo.ShadowMask = vec3(1.0f, 0.0f, 0.0f);
 	}
+
+    shadowed = true;  
+    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, DLight[1].direction, tmax, 1);
+    if (shadowed) 
+    {
+		rayHitInfo.ShadowMask = vec3(1.0f, 0.0f, 0.0f);
+	}
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
