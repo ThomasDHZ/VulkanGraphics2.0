@@ -21,8 +21,10 @@ struct VertexData
 	vec3 BiTangent;
 };
 
-layout(binding = 0) uniform UniformBufferObject 
-{
+layout(binding = 2) uniform UniformBufferObject {
+	DirectionalLight dlight;
+	PointLight plight[5];
+	SpotLight sLight;
     mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
@@ -36,7 +38,7 @@ layout(binding = 0) uniform UniformBufferObject
     int temp;
 } scenedata;
 
-layout(binding = 1) buffer MeshProperties 
+layout(binding = 3) buffer MeshProperties 
 {
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
@@ -46,49 +48,16 @@ layout(binding = 1) buffer MeshProperties
 	float minLayers;
 	float maxLayers;
 } meshProperties[];
-
-layout(binding = 2) buffer DirectionalLight2
-{ 
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-} DLight[];
-
-layout(binding = 3) buffer PointLight2
-{ 
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float constant;
-    float linear;
-    float quadratic;
-} PLight[];
-
-layout(binding = 4) buffer SpotLight2
-{ 
-   vec3 position;
-   vec3 direction;
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
-
-   float cutOff;
-   float outerCutOff;
-   float constant;
-   float linear;
-   float quadratic;
-} SLight[];
-
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 7) uniform sampler2D TextureMap[];
-layout(binding = 8) uniform sampler3D Texture3DMap[];
-layout(binding = 9) uniform samplerCube CubeMap;
-layout(binding = 10) uniform samplerCube irradianceMap;
-layout(binding = 11) uniform samplerCube prefilterMap;
-layout(binding = 12) uniform sampler2D brdfLUT;
+layout(binding = 4) buffer Vertices { Vertex v[]; } vertices[];
+layout(binding = 5) buffer Indices { uint i[]; } indices[];
+layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 7) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 8) uniform sampler2D TextureMap[];
+layout(binding = 9) uniform sampler3D Texture3DMap[];
+layout(binding = 10) uniform samplerCube CubeMap;
+layout(binding = 11) uniform samplerCube irradianceMap;
+layout(binding = 12) uniform samplerCube prefilterMap;
+layout(binding = 13) uniform sampler2D brdfLUT;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -190,13 +159,13 @@ void main()
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+    for(int i = 0; i < 1; ++i) 
     {
         // calculate per-light radiance
-       vec3 L = normalize(-DLight[x].direction);
+        vec3 L = normalize(-scenedata.dlight.direction);
        vec3 H = normalize(V + L);
 
-       vec3 radiance = DLight[x].diffuse;
+       vec3 radiance = scenedata.dlight.diffuse;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   

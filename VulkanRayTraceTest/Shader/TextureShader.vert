@@ -13,30 +13,34 @@ layout(push_constant) uniform MeshInfo
 	uint MeshIndex;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject 
+layout(binding = 2) uniform UniformBufferObject 
 {
+	DirectionalLight dlight;
+	PointLight plight[5];
+	SpotLight sLight;
     mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
 	mat4 proj;
     vec3 viewPos;
-	uint DirectionalLightCount;
+    uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
 	float timer;
-	int Shadowed;
+    int Shadowed;
     int temp;
 } ubo;
-layout(binding = 1) buffer MeshProperties 
+layout(binding = 3) buffer MeshProperties 
 {
 	mat4 ModelTransform;
 	mat4 BoneTransform[100];
 	vec2 UVOffset;
 	uint MaterialIndex;
 } meshProperties[];
-
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 4) buffer Vertices { Vertex v[]; } vertices[];
+layout(binding = 5) buffer Indices { uint i[]; } indices[];
+layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 7) buffer MaterialInfos2 { MaterialInfo material; } MaterialList[];
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;

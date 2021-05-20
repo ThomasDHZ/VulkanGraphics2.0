@@ -32,6 +32,9 @@ struct SpotLightBuffer {
 };
 
 struct SceneDataBuffer {
+	DirectionalLightBuffer dlight;
+	PointLightBuffer plight[5];
+	SpotLightBuffer sLight;
 	alignas(16) glm::mat4 viewInverse;
 	alignas(16) glm::mat4 projInverse;
 	alignas(16) glm::mat4 view;

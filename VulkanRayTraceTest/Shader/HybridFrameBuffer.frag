@@ -22,6 +22,9 @@ layout(binding = 8) uniform UniformBufferObject {
 	mat4 view;
 	mat4 proj;
     vec3 viewPos;
+    uint DirectionalLightCount;
+    uint PointLightCount;
+    uint SpotLightCount;
 	float timer;
     int Shadowed;
     int temp;

@@ -93,7 +93,39 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
    //   assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
   // assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
+    assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
+    assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
+    assetManager->SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);
+    assetManager->SceneData->UniformDataInfo.dlight.specular = glm::vec4(1.0f);
 
+    assetManager->SceneData->UniformDataInfo.plight[0].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    assetManager->SceneData->UniformDataInfo.plight[0].ambient = glm::vec4(0.2f);
+    assetManager->SceneData->UniformDataInfo.plight[0].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    assetManager->SceneData->UniformDataInfo.plight[0].specular = glm::vec4(1.0f);
+
+    assetManager->SceneData->UniformDataInfo.plight[1].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    assetManager->SceneData->UniformDataInfo.plight[1].ambient = glm::vec4(0.2f);
+    assetManager->SceneData->UniformDataInfo.plight[1].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    assetManager->SceneData->UniformDataInfo.plight[1].specular = glm::vec4(1.0f);
+
+    assetManager->SceneData->UniformDataInfo.plight[2].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    assetManager->SceneData->UniformDataInfo.plight[2].ambient = glm::vec4(0.2f);
+    assetManager->SceneData->UniformDataInfo.plight[2].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    assetManager->SceneData->UniformDataInfo.plight[2].specular = glm::vec4(1.0f);
+
+    assetManager->SceneData->UniformDataInfo.plight[3].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    assetManager->SceneData->UniformDataInfo.plight[3].ambient = glm::vec4(0.2f);
+    assetManager->SceneData->UniformDataInfo.plight[3].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    assetManager->SceneData->UniformDataInfo.plight[3].specular = glm::vec4(1.0f);
+
+    assetManager->SceneData->UniformDataInfo.plight[4].position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+    assetManager->SceneData->UniformDataInfo.plight[4].ambient = glm::vec4(0.2f);
+    assetManager->SceneData->UniformDataInfo.plight[4].diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+    assetManager->SceneData->UniformDataInfo.plight[4].specular = glm::vec4(1.0f);
+
+    assetManager->SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
+    assetManager->SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
+    assetManager->SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
     renderer = Renderer(engine, window, assetManager);
 }
 

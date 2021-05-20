@@ -27,10 +27,12 @@ layout(binding = 2) uniform UBO
 	mat4 view;
 	mat4 proj;
     vec3 viewPos;
+    uint DirectionalLightCount;
+    uint PointLightCount;
+    uint SpotLightCount;
 	float timer;
     int Shadowed;
     int temp;
-    float temp2;
 } ubo;
 layout(binding = 3) buffer MeshProperties 
 {

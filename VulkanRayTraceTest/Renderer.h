@@ -20,10 +20,10 @@ private:
 	Mouse mouse;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	//PBRRenderer pbrRenderer;
-	//RayTraceRenderer rayTraceRenderer;
-	//RayTracePBRRenderer pbrRayTraceRenderer;
-	//HybridRenderer hybridRenderer;
+	PBRRenderer pbrRenderer;
+	RayTraceRenderer rayTraceRenderer;
+	RayTracePBRRenderer pbrRayTraceRenderer;
+	HybridRenderer hybridRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;
