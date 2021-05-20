@@ -30,6 +30,40 @@ layout(binding = 8) uniform UniformBufferObject {
     int temp;
 } scenedata;
 
+layout(binding = 9) buffer DirectionalLight2
+{ 
+    vec3 direction;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+} DLight[];
+
+layout(binding = 10) buffer PointLight2
+{ 
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float constant;
+    float linear;
+    float quadratic;
+} PLight[];
+
+layout(binding = 11) buffer SpotLight2
+{ 
+   vec3 position;
+   vec3 direction;
+   vec3 ambient;
+   vec3 diffuse;
+   vec3 specular;
+
+   float cutOff;
+   float outerCutOff;
+   float constant;
+   float linear;
+   float quadratic;
+} SLight[];
+
 layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
 
