@@ -28,34 +28,13 @@
 #include "RenderedRayTracedColorTexture.h"
 #include "AccelerationStructure.h"
 #include "AssetManager.h"
+#include "RayTracedHybridPipeline.h"
 
 class RayTraceRenderPass
 {
 private:
-    VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;
-    VkDescriptorSetLayout DescriptorSetLayout = VK_NULL_HANDLE;
-    VkDescriptorSet DescriptorSets = VK_NULL_HANDLE;
-    VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
-    VkPipelineLayout      RayTracePipelineLayout = VK_NULL_HANDLE;
-
-    std::vector<VkShaderModule> shaderModules;
     VulkanBuffer instancesBuffer;
 
-    VkPhysicalDeviceBufferDeviceAddressFeatures enabledBufferDeviceAddresFeatures{};
-    VkPhysicalDeviceRayTracingPipelineFeaturesKHR enabledRayTracingPipelineFeatures{};
-    VkPhysicalDeviceAccelerationStructureFeaturesKHR enabledAccelerationStructureFeatures{};
-
-    VkPhysicalDeviceRayTracingPipelinePropertiesKHR  rayTracingPipelineProperties{};
-    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
-
-    std::vector<VkRayTracingShaderGroupCreateInfoKHR> RayTraceShaders{};
-    VulkanBuffer raygenShaderBindingTable;
-    VulkanBuffer missShaderBindingTable;
-    VulkanBuffer hitShaderBindingTable;
-
-    void SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-    void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-    void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 public:
 
     AccelerationStructure topLevelAS{};
@@ -63,6 +42,8 @@ public:
     std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture;
+
+    std::shared_ptr<RayTracedHybridPipeline> RTHybridPipeline;
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderPass();
@@ -70,9 +51,6 @@ public:
     ~RayTraceRenderPass();
 
     void createTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-    void createStorageImage(VulkanEngine& engine);
-    void createRayTracingPipeline(VulkanEngine& engine);
-    void createShaderBindingTable(VulkanEngine& engine);
     void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
     void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
     void Destroy(VulkanEngine& engine);
