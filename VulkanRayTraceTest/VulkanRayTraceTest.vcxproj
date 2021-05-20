@@ -213,6 +213,7 @@
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PrefilterRenderingPipeline.cpp" />
     <ClCompile Include="PrefilterRenderPass.cpp" />
+    <ClCompile Include="RayTracedHybridPipeline.cpp" />
     <ClCompile Include="RayTracePBRRenderer.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
@@ -376,6 +377,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="PrefilterRenderingPipeline.h" />
     <ClInclude Include="PrefilterRenderPass.h" />
+    <ClInclude Include="RayTracedHybridPipeline.h" />
     <ClInclude Include="RayTracePBRRenderer.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RayTraceRenderPass.h" />

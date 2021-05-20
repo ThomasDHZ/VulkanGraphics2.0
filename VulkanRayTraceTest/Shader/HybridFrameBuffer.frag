@@ -83,15 +83,15 @@ void main()
 
     const vec3 viewDir = normalize(scenedata.viewPos - Position);
 
-    const vec3 lightDir = normalize(-scenedata.dlight.direction);
+    const vec3 lightDir = normalize(-DLight[0].direction);
     const float diff = max(dot(Normal, lightDir), 0.0);
 
-    vec3 ambient = scenedata.dlight.ambient * Alebdo;
+    vec3 ambient = DLight[0].ambient * Alebdo;
     if(scenedata.temp == 1)
     {
       ambient *= SSAO;
     }
-    vec3 diffuse = scenedata.dlight.diffuse * diff *  Alebdo * SSAO;
+    vec3 diffuse = DLight[0].diffuse * diff *  Alebdo * SSAO;
     vec3 result = ambient + diffuse;
 
     if(Shadow == vec3(1.0f, 0.0f, 0.0f))
@@ -102,15 +102,15 @@ void main()
     {
         const vec3 halfwayDir = normalize(lightDir + viewDir);  
         const float spec = pow(max(dot(Normal, halfwayDir), 0.0), Specular);
-        vec3 specular = scenedata.dlight.specular * spec * Specular;
+        vec3 specular = DLight[0].specular * spec * Specular;
        result += specular;
     }
-
-      if(Alebdo.r >= 0.8f)
-    {
-    result = Alebdo;
-    }
-    result += Bloom;
+//
+//      if(Alebdo.r >= 0.8f)
+//    {
+//    result = Alebdo;
+//    }
+//    result += Bloom;
 
 
     if(SkyBox != vec3(0.0f))

@@ -366,6 +366,9 @@
     <ClCompile Include="LightManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="RayTracedHybridPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -852,6 +855,9 @@
     </ClInclude>
     <ClInclude Include="LightManager.h">
       <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracedHybridPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
