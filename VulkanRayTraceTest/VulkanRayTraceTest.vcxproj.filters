@@ -372,6 +372,12 @@
     <ClCompile Include="RayTracingGraphicsPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="RayTracedPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracedPBRPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\miss.rmiss">
@@ -531,6 +537,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\DepthDebugShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\hybridclosesthit.rchit">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\hybridraygen.rgen">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -863,6 +875,12 @@
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="RayTracingGraphicsPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracedPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracedPBRPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>

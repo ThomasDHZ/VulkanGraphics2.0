@@ -1,34 +1,8 @@
 #pragma once
-#include <vulkan/vulkan.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
-#include <algorithm>
-#include <chrono>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <cstdint>
-#include <array>
-#include <optional>
-#include "VulkanBuffer.h"
-#include <vector>
-#include "Model.h"
-#include "PerspectiveCamera.h"
-#include "Keyboard.h"
-#include "Mouse.h"
-#include "InterfaceRenderPass.h"
-#include "Texture2D.h"
-#include "CubeMapTexture.h"
-#include "TextureManager.h"
 #include "VulkanEngine.h"
-#include "RenderedColorTexture.h"
-#include "RenderedRayTracedColorTexture.h"
-#include "AccelerationStructure.h"
-#include "AssetManager.h"
 #include "RayTracedHybridPipeline.h"
+#include "RayTracedPipeline.h"
+#include "RayTracedPBRPipeline.h"
 
 class RayTraceRenderPass
 {
@@ -38,12 +12,16 @@ private:
 public:
 
     AccelerationStructure topLevelAS{};
+    std::shared_ptr<RenderedRayTracedColorTexture> RayTracedTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask;
     std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture;
 
+    std::shared_ptr<RayTracedPipeline> RTPipeline;
+    std::shared_ptr<RayTracedPBRPipeline> RTPBRPipeline;
     std::shared_ptr<RayTracedHybridPipeline> RTHybridPipeline;
+
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderPass();
@@ -51,7 +29,7 @@ public:
     ~RayTraceRenderPass();
 
     void SetUpTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-    void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+    void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID renderID);
     void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
     void Destroy(VulkanEngine& engine);
 

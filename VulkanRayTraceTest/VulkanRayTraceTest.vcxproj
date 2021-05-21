@@ -214,6 +214,8 @@
     <ClCompile Include="PrefilterRenderingPipeline.cpp" />
     <ClCompile Include="PrefilterRenderPass.cpp" />
     <ClCompile Include="RayTracedHybridPipeline.cpp" />
+    <ClCompile Include="RayTracedPBRPipeline.cpp" />
+    <ClCompile Include="RayTracedPipeline.cpp" />
     <ClCompile Include="RayTracePBRRenderer.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
@@ -271,8 +273,10 @@
     <None Include="Shader\FrameBuffer.vert" />
     <None Include="Shader\GBuffer.frag" />
     <None Include="Shader\GBuffer.vert" />
+    <None Include="Shader\hybridclosesthit.rchit" />
     <None Include="Shader\HybridFrameBuffer.frag" />
     <None Include="Shader\HybridFrameBuffer.vert" />
+    <None Include="Shader\hybridraygen.rgen" />
     <None Include="Shader\LightDebug.frag" />
     <None Include="Shader\LightDebug.vert" />
     <None Include="Shader\Material.glsl" />
@@ -379,6 +383,8 @@
     <ClInclude Include="PrefilterRenderingPipeline.h" />
     <ClInclude Include="PrefilterRenderPass.h" />
     <ClInclude Include="RayTracedHybridPipeline.h" />
+    <ClInclude Include="RayTracedPBRPipeline.h" />
+    <ClInclude Include="RayTracedPipeline.h" />
     <ClInclude Include="RayTracePBRRenderer.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RayTraceRenderPass.h" />

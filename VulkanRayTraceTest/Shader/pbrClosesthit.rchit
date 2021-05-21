@@ -8,7 +8,7 @@
 #include "Material.glsl"
 
 struct RayPayload {
-	vec3 color;
+	vec3 RayTracedTexture;
 	uint reflectCount;
 };
 
@@ -137,7 +137,7 @@ vec3 Lo = vec3(0.0);
    vec3 ambient = vec3(0.03) * albedo * ao;
    vec3 color = ambient + Lo;
 
-   rayPayload.color = color;
+   rayPayload.RayTracedTexture = color;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

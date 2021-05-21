@@ -134,7 +134,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
 void HybridRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
-    rayTraceRenderPass.Draw(engine, assetManager, imageIndex);
+    rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID);
     bloomRenderPass.Draw(engine, assetManager, imageIndex);
     DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     if (ApplySSAO)
