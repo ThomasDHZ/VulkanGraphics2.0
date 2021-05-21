@@ -7,7 +7,7 @@ RayTraceRenderer::RayTraceRenderer() : BaseRenderer()
 RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
-    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, rayTraceRenderPass.ShadowTextureMask, rayTraceRenderPass.ShadowTextureMask);
+    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
 RayTraceRenderer::~RayTraceRenderer()
@@ -17,7 +17,7 @@ RayTraceRenderer::~RayTraceRenderer()
 void RayTraceRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, rayTraceRenderPass.ShadowTextureMask, rayTraceRenderPass.ShadowTextureMask);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
 void RayTraceRenderer::GUIUpdate(VulkanEngine& engine)

@@ -10,11 +10,11 @@
 
 struct RayHitInfo
 {
-	vec3 ShadowMask;
-	vec3 ReflectionColor;
-	vec3 SSAOColor;
-	vec3 SkyboxColor;
-	uint reflectCount;
+	vec3 color;
+	float distance;
+	vec3 normal;
+	float reflector;
+    float materialreflection;
 };
 
 hitAttributeEXT vec2 attribs;

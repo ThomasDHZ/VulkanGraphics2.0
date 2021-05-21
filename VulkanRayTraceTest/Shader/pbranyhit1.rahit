@@ -10,11 +10,11 @@
 
 struct RayHitInfo
 {
-	vec3 color;
-	float distance;
-	vec3 normal;
-	float reflector;
-    float materialreflection;
+	vec3 ShadowMask;
+	vec3 ReflectionColor;
+	vec3 SSAOColor;
+	vec3 SkyboxColor;
+	uint reflectCount;
 };
 
 hitAttributeEXT vec2 attribs;
@@ -81,7 +81,6 @@ layout(binding = 6) buffer SpotLight2
    float linear;
    float quadratic;
 } SLight[];
-
 layout(binding = 7, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 8) buffer Indices { uint i[]; } indices[];
 layout(binding = 9) buffer Transform { mat4 Transform; } MeshTransform[];
@@ -89,7 +88,24 @@ layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialLis
 layout(binding = 11) uniform sampler2D TextureMap[];
 layout(binding = 12) uniform sampler3D Texture3DMap[];
 
-layout(location = 0) rayPayloadEXT RayHitInfo rayHitInfo;
+layout(location = 1) rayPayloadEXT RayHitInfo rayHitInfo;
+
+Vertex BuildVertexInfo();
+
+void main() 
+{
+   const Vertex vertex = BuildVertexInfo();
+   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+
+   if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
+   {
+	 ignoreIntersectionEXT;
+   }
+   else
+   {
+	return;
+   }
+}
 
 Vertex BuildVertexInfo()
 {
@@ -120,19 +136,4 @@ Vertex BuildVertexInfo()
 	vertex.Color = vec4(color, 1.0f);
 
     return vertex;
-}
-
-void main() 
-{
-   const Vertex vertex = BuildVertexInfo();
-   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-
-   if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
-   {
-	 ignoreIntersectionEXT;
-   }
-   else
-   {
-   	return;
-   }
 }

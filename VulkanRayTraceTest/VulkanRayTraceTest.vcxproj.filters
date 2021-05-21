@@ -55,6 +55,9 @@
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{cce7527b-db49-402b-927b-542603531c87}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\RaytracedShaders">
+      <UniqueIdentifier>{04593aa1-7f49-433c-8f05-06bd2a9896fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -380,15 +383,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shader\miss.rmiss">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\raygen.rgen">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\closesthit.rchit">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\shader.frag">
       <Filter>Shader</Filter>
     </None>
@@ -404,16 +398,7 @@
     <None Include="Shader\animate.comp">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\anyhit.rahit">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\shadow.rmiss">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Shader\Vertex.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\anyhit1.rahit">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\FrameBuffer.frag">
@@ -438,9 +423,6 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\DeferedShader.vert">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\pbrClosesthit.rchit">
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\TextureShader.frag">
@@ -539,11 +521,59 @@
     <None Include="Shader\DepthDebugShader.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\hybridanyhit.rahit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\hybridanyhit1.rahit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
     <None Include="Shader\hybridclosesthit.rchit">
-      <Filter>Shader</Filter>
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\hybridmiss.rmiss">
+      <Filter>Shader\RaytracedShaders</Filter>
     </None>
     <None Include="Shader\hybridraygen.rgen">
-      <Filter>Shader</Filter>
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\hybridshadow.rmiss">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\pbranyhit.rahit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\pbranyhit1.rahit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\pbrClosesthit.rchit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\pbrmiss.rmiss">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\pbrraygen.rgen">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\pbrshadow.rmiss">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\raygen.rgen">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\miss.rmiss">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\anyhit.rahit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\anyhit1.rahit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\closesthit.rchit">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\shadow.rmiss">
+      <Filter>Shader\RaytracedShaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -1,12 +1,21 @@
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv
-C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridclosesthit.rchit -o hybridclosesthit.rchit.spv
-C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbrClosesthit.rchit -o pbrClosesthit.rchit.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 anyhit.rahit -o anyhit.rahit.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 anyhit1.rahit -o anyhit1.rahit.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 raygen.rgen -o raygen.rgen.spv
-C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridraygen.rgen -o hybridraygen.rgen.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 miss.rmiss -o miss.rmiss.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 shadow.rmiss -o shadow.rmiss.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbrclosesthit.rchit -o pbrclosesthit.rchit.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbranyhit.rahit -o pbranyhit.rahit.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbranyhit1.rahit -o pbranyhit1.rahit.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbrraygen.rgen -o pbrraygen.rgen.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbrmiss.rmiss -o pbrmiss.rmiss.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 pbrshadow.rmiss -o pbrshadow.rmiss.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridclosesthit.rchit -o hybridclosesthit.rchit.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridanyhit.rahit -o hybridanyhit.rahit.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridanyhit1.rahit -o hybridanyhit1.rahit.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridraygen.rgen -o hybridraygen.rgen.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridmiss.rmiss -o hybridmiss.rmiss.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 hybridshadow.rmiss -o hybridshadow.rmiss.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe shader.vert -o vert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe shader.frag -o frag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRShader.vert -o PBRvert.spv
