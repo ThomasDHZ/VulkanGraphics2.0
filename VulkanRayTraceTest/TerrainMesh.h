@@ -13,5 +13,7 @@ public:
 	TerrainMesh();
 	TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation);
 	~TerrainMesh();
+
+	void Destory(VulkanEngine& engine) override;
 };
 

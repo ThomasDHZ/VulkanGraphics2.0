@@ -1,11 +1,11 @@
 #include "HeightMapTexture.h"
 #include <stb_image.h>
 
-HeightMapTexture::HeightMapTexture() : Texture2D()
+HeightMapTexture::HeightMapTexture() : Texture()
 {
 }
 
-HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string TextureLocation) : Texture2D(engine, TextureLocation, VK_FORMAT_R8G8B8A8_UNORM)
+HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string TextureLocation) : Texture()
 {
 	Width = 0;
 	Height = 0;
@@ -22,7 +22,7 @@ HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string Textu
 	CreateTextureSampler(engine);
 }
 
-HeightMapTexture::HeightMapTexture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList) : Texture2D(engine, width, height, PixelList, VK_FORMAT_R8G8B8A8_UNORM)
+HeightMapTexture::HeightMapTexture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList) : Texture()
 {
 }
 
@@ -67,6 +67,50 @@ void HeightMapTexture::LoadTexture(VulkanEngine& engine, std::string TextureLoca
 
 	StagingBuffer.DestoryBuffer(engine.Device);
 	stbi_image_free(pixels);
+}
+
+void HeightMapTexture::CreateTextureView(VulkanEngine& engine, VkFormat format)
+{
+	VkImageViewCreateInfo TextureImageViewInfo = {};
+	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	TextureImageViewInfo.format = format;
+	TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
+	TextureImageViewInfo.subresourceRange.levelCount = MipMapLevels;
+	TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
+	TextureImageViewInfo.subresourceRange.layerCount = 1;
+	TextureImageViewInfo.image = Image;
+
+	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+		throw std::runtime_error("Failed to create Image View.");
+	}
+}
+
+void HeightMapTexture::CreateTextureSampler(VulkanEngine& engine)
+{
+	VkSamplerCreateInfo TextureImageSamplerInfo = {};
+	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	TextureImageSamplerInfo.magFilter = VK_FILTER_NEAREST;
+	TextureImageSamplerInfo.minFilter = VK_FILTER_NEAREST;
+	TextureImageSamplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	TextureImageSamplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	TextureImageSamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
+	TextureImageSamplerInfo.maxAnisotropy = 16.0f;
+	TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	TextureImageSamplerInfo.unnormalizedCoordinates = VK_FALSE;
+	TextureImageSamplerInfo.compareEnable = VK_FALSE;
+	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	TextureImageSamplerInfo.minLod = 0;
+	TextureImageSamplerInfo.maxLod = static_cast<float>(MipMapLevels);
+	TextureImageSamplerInfo.mipLodBias = 0;
+
+	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	{
+		throw std::runtime_error("Failed to create Sampler.");
+	}
 }
 
 Pixel HeightMapTexture::GetPixel(uint32_t x, uint32_t y)

@@ -27,6 +27,12 @@ TerrainMesh::~TerrainMesh()
 {
 }
 
+void TerrainMesh::Destory(VulkanEngine& engine)
+{
+	HeightMap.Delete(engine);
+	Mesh::Destory(engine);
+}
+
 void TerrainMesh::BuildTerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation)
 {
 	HeightMap = HeightMapTexture(engine, HeightMapLocation);

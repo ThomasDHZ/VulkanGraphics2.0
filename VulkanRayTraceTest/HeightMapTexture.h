@@ -1,10 +1,11 @@
 #pragma once
 #include "Texture2D.h"
-class HeightMapTexture : public Texture2D
+class HeightMapTexture : public Texture
 {
 private:
     void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format) override;
-
+    void CreateTextureView(VulkanEngine& engine, VkFormat format);
+    void CreateTextureSampler(VulkanEngine& engine);
 public:
     std::vector<Pixel> HeightMap;
 
