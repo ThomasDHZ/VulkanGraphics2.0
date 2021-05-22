@@ -25,7 +25,6 @@ void RayTracedPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared
     SetUpDescriptorLayout(engine, assetManager);
     SetUpDescriptorSets(engine, assetManager, topLevelAS, RayTracedTexture);
     SetUpPipeline(engine);
-    SetUpShaderBindingTable(engine);
 }
 
 void RayTracedPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)

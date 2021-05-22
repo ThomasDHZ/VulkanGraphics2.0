@@ -113,6 +113,9 @@ void RenderedRayTracedColorTexture::SendTextureToGPU(VulkanEngine& engine)
     vkDestroyFence(engine.Device, fence, nullptr);
 
     vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
+
+
+    UpdateImageLayout(engine, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void RenderedRayTracedColorTexture::RecreateRendererTexture(VulkanEngine& renderer)

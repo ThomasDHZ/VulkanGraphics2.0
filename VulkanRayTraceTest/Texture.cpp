@@ -521,6 +521,38 @@ void Texture::UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer buffer, Vk
 	vkCmdPipelineBarrier(buffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 }
 
+void Texture::UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout)
+{
+	VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	VkImageMemoryBarrier barrier = {};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldImageLayout;
+	barrier.newLayout = newImageLayout;
+	barrier.image = Image;
+	barrier.subresourceRange = subresourceRange;
+	barrier.srcAccessMask = 0;
+	barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+	vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+}
+
+void Texture::UpdateImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout)
+{
+	VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+	VkImageMemoryBarrier barrier = {};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.oldLayout = oldImageLayout;
+	barrier.newLayout = newImageLayout;
+	barrier.image = Image;
+	barrier.subresourceRange = subresourceRange;
+	barrier.srcAccessMask = 0;
+	barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+	auto SingleCommand = engine.beginSingleTimeCommands();
+	vkCmdPipelineBarrier(SingleCommand, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+	engine.endSingleTimeCommands(SingleCommand);
+}
+
 void Texture::Update(VulkanEngine& engine, uint32_t NewTextureBufferIndex)
 {
 	TextureBufferIndex = NewTextureBufferIndex;

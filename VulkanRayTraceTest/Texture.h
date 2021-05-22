@@ -21,6 +21,7 @@ protected:
     void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
     void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
     void GenerateMipmaps(VulkanEngine& engine, VkFormat imageFormat);
+    void UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout newImageLayout);
 
     virtual void LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
@@ -65,7 +66,8 @@ public:
     ~Texture();
 
     void Update(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
-    void UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout newImageLayout);
+    void UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     virtual void Delete(VulkanEngine& engine);
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }
