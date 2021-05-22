@@ -23,7 +23,7 @@ private:
 	//PBRRenderer pbrRenderer;
 	RayTraceRenderer rayTraceRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;
-	//HybridRenderer hybridRenderer;
+	HybridRenderer hybridRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;

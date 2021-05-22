@@ -146,7 +146,7 @@ void DepthDebugRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManag
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, DebugDepthPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, DebugDepthPipeline->ShaderPipelineLayout, 0, 1, &DebugDepthPipeline->DescriptorSets, 0, nullptr);
     vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
-
+    vkCmdEndRenderPass(CommandBuffer);
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }

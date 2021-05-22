@@ -68,7 +68,7 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderInt("Frame", &static_cast<BillboardMesh*>(assetManager->meshManager.MeshList[1].get())->animator.CurrentFrame, 0, 60);
     ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-   // ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
@@ -76,7 +76,7 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, 
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
     BloomRenderer.Draw(engine, assetManager, imageIndex);
-    //DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
+    DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
 }
 
@@ -92,7 +92,7 @@ std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitL
 {
     CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
-    //CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
     return CommandBufferSubmitList;
 }

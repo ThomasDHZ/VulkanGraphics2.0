@@ -4,14 +4,14 @@
 class RenderedRayTracedColorTexture : public Texture2D
 {
 private:
-    void CreateTextureImage(VulkanEngine& renderer);
-    void CreateTextureView(VulkanEngine& renderer);
-    void CreateTextureSampler(VulkanEngine& renderer);
-    void SendTextureToGPU(VulkanEngine& renderer);
+    void CreateTextureImage(VulkanEngine& engine);
+    void CreateTextureView(VulkanEngine& engine);
+    void CreateTextureSampler(VulkanEngine& engine);
+    void SendTextureToGPU(VulkanEngine& engine);
 public:
     RenderedRayTracedColorTexture();
-    RenderedRayTracedColorTexture(VulkanEngine& renderer);
+    RenderedRayTracedColorTexture(VulkanEngine& engine);
     ~RenderedRayTracedColorTexture();
 
-    void RecreateRendererTexture(VulkanEngine& renderer);
+    void RecreateRendererTexture(VulkanEngine& engine);
 };

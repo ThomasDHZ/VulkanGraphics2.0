@@ -8,7 +8,7 @@ class RayTraceRenderPass
 {
 private:
     VulkanBuffer instancesBuffer;
-
+    void SetUpCommandBuffers(VulkanEngine& engine);
 public:
 
     AccelerationStructure topLevelAS{};
