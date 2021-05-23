@@ -17,7 +17,7 @@ private:
 	int CurrentSSAOSampleRate;
 	GBufferRenderPass FrameBufferTextureRenderer;
 	HybridFrameBufferRenderPass FrameBufferRenderer;
-	DepthDebugRenderPass DebugDepthRenderer;
+	//DepthDebugRenderPass DebugDepthRenderer;
 	SSAORenderPass SSAORenderer;
 	SSAOBlurRenderPass SSAOBlurRenderer;
 	BloomRenderPass bloomRenderPass;

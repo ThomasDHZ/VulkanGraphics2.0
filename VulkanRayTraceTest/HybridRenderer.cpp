@@ -9,14 +9,13 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     FrameBufferTextureRenderer = GBufferRenderPass(engine, assetManager);
     rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
     bloomRenderPass = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
-    DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
+   // DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
 
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
     textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
     SSAORenderer = SSAORenderPass(engine, assetManager, textures);
     SSAOBlurRenderer = SSAOBlurRenderPass(engine, assetManager, SSAORenderer.SSAOTexture);
-
 
     HybridFrameBufferTextures frameBufferTextures{};
     frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;
@@ -41,7 +40,7 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
     bloomRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
-    DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
+   // DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
 
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
@@ -113,7 +112,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Image(FrameBufferTextureRenderer.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GBloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(bloomRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    //ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     if (ApplySSAO)
     {
         ImGui::Image(SSAORenderer.SSAOTexture->ImGuiDescriptorSet, ImVec2(180.0f * 4, 180.0f * 4));
@@ -137,7 +136,7 @@ void HybridRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t i
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
     rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID);
     bloomRenderPass.Draw(engine, assetManager, imageIndex);
-    DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
+   // DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     if (ApplySSAO)
     {
         SSAORenderer.Draw(engine, assetManager, imageIndex);
@@ -151,7 +150,7 @@ void HybridRenderer::Destroy(VulkanEngine& engine)
     FrameBufferTextureRenderer.Destroy(engine);
     rayTraceRenderPass.Destroy(engine);
     bloomRenderPass.Destroy(engine);
-    DebugDepthRenderer.Destroy(engine);
+    //DebugDepthRenderer.Destroy(engine);
     SSAORenderer.Destroy(engine);
     SSAOBlurRenderer.Destroy(engine);
     FrameBufferRenderer.Destroy(engine);
@@ -162,7 +161,7 @@ std::vector<VkCommandBuffer> HybridRenderer::AddToCommandBufferSubmitList(std::v
     CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(rayTraceRenderPass.RayTraceCommandBuffer);
     CommandBufferSubmitList.emplace_back(bloomRenderPass.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
+   // CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
     if (ApplySSAO)
     {
         CommandBufferSubmitList.emplace_back(SSAORenderer.CommandBuffer);

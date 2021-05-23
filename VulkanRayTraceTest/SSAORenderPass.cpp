@@ -134,9 +134,10 @@ void SSAORenderPass::GenerateKernal(VulkanEngine& engine, SSAOTextureList& textu
         scale = Lerp(0.1f, 1.0f, scale * scale);
         sample *= scale;
        
-        VulkanBuffer SampleBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample);
-        textures.KernalSampleBufferList.emplace_back(SampleBuffer);
+        std::shared_ptr<VulkanBuffer> SampleBuffer = std::make_shared<VulkanBuffer>(VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample));
+        SamplePointBufferList.emplace_back(SampleBuffer);
     }
+    textures.KernalSampleBufferList = SamplePointBufferList;
 }
 
 void SSAORenderPass::GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList& textures)
@@ -148,7 +149,8 @@ void SSAORenderPass::GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList&
     {
         pixelList.emplace_back(glm::vec4(randomBits(generator) * 2.0 - 1.0, randomBits(generator) * 2.0 - 1.0, 0.0f, 1.0f));
     }
-    textures.NoiseTexture = std::make_shared<Texture2D>(Texture2D(engine, 4, 4, pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
+    NoiseTexture = std::make_shared<Texture2D>(Texture2D(engine, 4, 4, pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
+    textures.NoiseTexture = NoiseTexture;
 }
 
 float SSAORenderPass::Lerp(float a, float b, float f)
@@ -199,9 +201,14 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
 
 void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
 {
+    NoiseTexture->Update(engine, 0);
     SSAOTexture->RecreateRendererTexture(engine);
-
     RasterSSAOPipeline->Destroy(engine);
+
+    for (auto SamplePoint : SamplePointBufferList)
+    {
+        SamplePoint->DestoryBuffer(engine.Device);
+    }
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -222,8 +229,14 @@ void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
 
 void SSAORenderPass::Destroy(VulkanEngine& engine)
 {
+    NoiseTexture->Delete(engine);
     SSAOTexture->Delete(engine);
     RasterSSAOPipeline->Destroy(engine);
+
+    for (auto SamplePoint : SamplePointBufferList)
+    {
+        SamplePoint->DestoryBuffer(engine.Device);
+    }
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

@@ -4,6 +4,7 @@
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
 #include "SSAOPipeline.h"
+#include "SSAOBlurPipeline.h"
 
 class SSAORenderPass
 {
@@ -15,8 +16,9 @@ private:
 	void GenerateKernal(VulkanEngine& engine, SSAOTextureList& Textures);
 	void GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList& textures);
 	float Lerp(float a, float b, float f);
-	std::vector<VulkanBuffer> SamplePointBufferList;
 
+	std::vector<std::shared_ptr<VulkanBuffer>> SamplePointBufferList;
+	std::shared_ptr<Texture2D> NoiseTexture;
 public:
 	SSAORenderPass();
 	SSAORenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& Textures);

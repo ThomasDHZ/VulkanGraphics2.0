@@ -38,13 +38,13 @@ void SSAOPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<A
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, size });
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
-std::vector<VkDescriptorBufferInfo> SSAOPipeline::GetKernallBufferListDescriptor(std::vector<VulkanBuffer>& SamplePoints)
+std::vector<VkDescriptorBufferInfo> SSAOPipeline::GetKernallBufferListDescriptor(std::vector<std::shared_ptr<VulkanBuffer>> SamplePoints)
 {
     std::vector<VkDescriptorBufferInfo> SamplePointsBufferList{};
     for (int x = 0; x < SamplePoints.size(); x++)
     {
         VkDescriptorBufferInfo MaterialBufferInfo = {};
-        MaterialBufferInfo.buffer = SamplePoints[x].GetBuffer();
+        MaterialBufferInfo.buffer = SamplePoints[x]->GetBuffer();
         MaterialBufferInfo.offset = 0;
         MaterialBufferInfo.range = VK_WHOLE_SIZE;
         SamplePointsBufferList.emplace_back(MaterialBufferInfo);

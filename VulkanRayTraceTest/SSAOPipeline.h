@@ -19,7 +19,7 @@ struct SSAOTextureList
 	std::shared_ptr<Texture> GPositionTexture;
 	std::shared_ptr<Texture> GNormalTexture;
 	std::shared_ptr<Texture> NoiseTexture;
-	std::vector<VulkanBuffer> KernalSampleBufferList;
+	std::vector<std::shared_ptr<VulkanBuffer>> KernalSampleBufferList;
 };
 
 class SSAOPipeline : public GraphicsPipeline
@@ -29,7 +29,7 @@ private:
 	void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures);
 	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures);
 	void SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass);
-	std::vector<VkDescriptorBufferInfo> GetKernallBufferListDescriptor(std::vector<VulkanBuffer>& SamplePoints);
+	std::vector<VkDescriptorBufferInfo> GetKernallBufferListDescriptor(std::vector<std::shared_ptr<VulkanBuffer>> SamplePoints);
 public:
 	SSAOPipeline();
 	SSAOPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, SSAOTextureList& textures);
