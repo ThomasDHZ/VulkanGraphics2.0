@@ -66,11 +66,14 @@ public:
     ~Texture();
 
     void Update(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
+    void UpdateImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int facecount);
     void UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(VulkanEngine& engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void CopyTexture(VulkanEngine& engine, VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
+    void CopyTexture(VulkanEngine& engine, VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture, int FaceCopy);
     virtual void Delete(VulkanEngine& engine);
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }
-
-    static void CopyTexture(VulkanEngine& engine, VkCommandBuffer CommandBuffer, std::shared_ptr<Texture> SrcTexture, std::shared_ptr<Texture> DstTexture);
 };

@@ -16,7 +16,7 @@ CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
     CreateRendererFramebuffers(engine);
     CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
-
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw(engine, assetManager, 0);
 
     VkSubmitInfo submitInfo{};
