@@ -19,9 +19,8 @@ public:
 
 	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
 
-	std::shared_ptr<RenderedColorTexture> BloomTexture;
-	std::shared_ptr<brdfRenderingPipeline> BloomPipelinePass1;
-	std::shared_ptr<brdfRenderingPipeline> BloomPipelinePass2;
+	std::shared_ptr<RenderedColorTexture> BRDFTexture;
+	std::shared_ptr<brdfRenderingPipeline> BRDFPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;

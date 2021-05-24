@@ -205,6 +205,7 @@
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
+    <ClCompile Include="PBRFrameBufferTextureRenderPass.cpp" />
     <ClCompile Include="PBRIrradiancePipeline.cpp" />
     <ClCompile Include="PBRPipeline.cpp" />
     <ClCompile Include="PBRRenderer.cpp" />
@@ -382,6 +383,7 @@
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrthographicCamera.h" />
+    <ClInclude Include="PBRFrameBufferTextureRenderPass.h" />
     <ClInclude Include="PBRIrradiancePipeline.h" />
     <ClInclude Include="PBRPipeline.h" />
     <ClInclude Include="PBRRenderer.h" />

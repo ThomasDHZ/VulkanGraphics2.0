@@ -15,4 +15,5 @@ public:
     ~RenderedColorTexture();
 
     void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture(VulkanEngine& engine, glm::vec2 TextureResolution);
 };

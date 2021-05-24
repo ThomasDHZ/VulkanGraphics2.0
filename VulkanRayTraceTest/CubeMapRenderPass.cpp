@@ -277,7 +277,7 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
 
 void CubeMapRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
+    RenderedTexture->RecreateRendererTexture(engine, glm::vec2(CubeMapSize));
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

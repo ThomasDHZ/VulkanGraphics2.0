@@ -1,12 +1,11 @@
-#include "FrameBufferTextureRenderPass.h"
-#include "GraphicsPipeline.h"
+#include "PBRFrameBufferTextureRenderPass.h"
 #include "Skybox.h"
 
-FrameBufferTextureRenderPass::FrameBufferTextureRenderPass()
+PBRFrameBufferTextureRenderPass::PBRFrameBufferTextureRenderPass()
 {
 }
 
-FrameBufferTextureRenderPass::FrameBufferTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+PBRFrameBufferTextureRenderPass::PBRFrameBufferTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT)
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
     BloomTexture = std::make_shared<RenderedColorTexture>(engine);
@@ -14,16 +13,16 @@ FrameBufferTextureRenderPass::FrameBufferTextureRenderPass(VulkanEngine& engine,
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<RenderFrameBufferTexturePipeline>(RenderFrameBufferTexturePipeline(engine, assetManager, RenderPass));
+    PBRTexturePipeline = std::make_shared<RenderPBRFrameBufferTexturePipeline>(RenderPBRFrameBufferTexturePipeline(engine, assetManager, RenderPass, irradianceMap, prefilterMap, brdfLUT));
     skyBoxRenderingPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(SkyBoxFrameBufferRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
-FrameBufferTextureRenderPass::~FrameBufferTextureRenderPass()
+PBRFrameBufferTextureRenderPass::~PBRFrameBufferTextureRenderPass()
 {
 }
 
-void FrameBufferTextureRenderPass::CreateRenderPass(VulkanEngine& engine)
+void PBRFrameBufferTextureRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -108,7 +107,7 @@ void FrameBufferTextureRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void FrameBufferTextureRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void PBRFrameBufferTextureRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
@@ -135,7 +134,7 @@ void FrameBufferTextureRenderPass::CreateRendererFramebuffers(VulkanEngine& engi
     }
 }
 
-void FrameBufferTextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void PBRFrameBufferTextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -148,7 +147,7 @@ void FrameBufferTextureRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void FrameBufferTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
+void PBRFrameBufferTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -173,10 +172,9 @@ void FrameBufferTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<As
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, rendererPassID);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, PBRTexturePipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, PBRTexturePipeline->ShaderPipelineLayout, 0, 1, &PBRTexturePipeline->DescriptorSets, 0, nullptr);
+    assetManager->Draw(CommandBuffer, renderPassInfo, PBRTexturePipeline->ShaderPipelineLayout, rendererPassID);
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
@@ -188,13 +186,13 @@ void FrameBufferTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<As
     }
 }
 
-void FrameBufferTextureRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void PBRFrameBufferTextureRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT)
 {
     RenderedTexture->RecreateRendererTexture(engine);
     BloomTexture->RecreateRendererTexture(engine);
     DepthTexture->RecreateRendererTexture(engine);
 
-    TexturePipeline->Destroy(engine);
+    PBRTexturePipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
@@ -208,18 +206,43 @@ void FrameBufferTextureRenderPass::RebuildSwapChain(VulkanEngine& engine, std::s
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    PBRTexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, irradianceMap, prefilterMap, brdfLUT);
     skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
-void FrameBufferTextureRenderPass::Destroy(VulkanEngine& engine)
+void PBRFrameBufferTextureRenderPass::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT)
+{
+    RenderedTexture->RecreateRendererTexture(engine);
+    BloomTexture->RecreateRendererTexture(engine);
+    DepthTexture->RecreateRendererTexture(engine);
+
+    PBRTexturePipeline->Destroy(engine);
+    skyBoxRenderingPipeline->Destroy(engine);
+
+    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    RenderPass = VK_NULL_HANDLE;
+
+    for (auto& framebuffer : SwapChainFramebuffers)
+    {
+        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        framebuffer = VK_NULL_HANDLE;
+    }
+
+    CreateRenderPass(engine);
+    CreateRendererFramebuffers(engine);
+    PBRTexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, irradianceMap, prefilterMap, brdfLUT);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    SetUpCommandBuffers(engine);
+}
+
+void PBRFrameBufferTextureRenderPass::Destroy(VulkanEngine& engine)
 {
     RenderedTexture->Delete(engine);
     BloomTexture->Delete(engine);
     DepthTexture->Delete(engine);
 
-    TexturePipeline->Destroy(engine);
+    PBRTexturePipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);

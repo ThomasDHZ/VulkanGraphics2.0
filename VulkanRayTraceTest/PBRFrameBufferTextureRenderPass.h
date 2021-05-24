@@ -8,7 +8,7 @@
 #include "RenderPBRFrameBufferTexturePipeline.h"
 #include "SkyBoxFrameBufferRenderingPipeline.h"
 
-class FrameBufferTextureRenderPass
+class PBRFrameBufferTextureRenderPass
 {
 private:
 	void CreateRenderPass(VulkanEngine& engine);
@@ -16,24 +16,24 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	FrameBufferTextureRenderPass();
-	FrameBufferTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	~FrameBufferTextureRenderPass();
+	PBRFrameBufferTextureRenderPass();
+	PBRFrameBufferTextureRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT);
+	~PBRFrameBufferTextureRenderPass();
 
 	static constexpr RenderPassID rendererPassID = Texture_Renderer;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
-	std::shared_ptr<RenderFrameBufferTexturePipeline> TexturePipeline;
+	std::shared_ptr<RenderPBRFrameBufferTexturePipeline> PBRTexturePipeline;
 	std::shared_ptr<SkyBoxFrameBufferRenderingPipeline> skyBoxRenderingPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT);
+	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT);
 	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID);
 	void Destroy(VulkanEngine& engine);
 };

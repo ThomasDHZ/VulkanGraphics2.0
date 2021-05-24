@@ -16,4 +16,5 @@ public:
 	~PrefilterRenderingPipeline();
 
 	void UpdateGraphicsPipeLine(VulkanEngine& renderer, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass);
+	void RecreateRendererTexture(VulkanEngine& engine, glm::vec2 TextureResolution);
 };

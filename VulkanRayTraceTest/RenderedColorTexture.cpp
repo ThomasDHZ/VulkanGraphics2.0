@@ -110,3 +110,16 @@ void RenderedColorTexture::RecreateRendererTexture(VulkanEngine& engine)
 
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
+
+void RenderedColorTexture::RecreateRendererTexture(VulkanEngine& engine, glm::vec2 TextureResolution)
+{
+    Width = TextureResolution.x;
+    Height = TextureResolution.y;
+
+    Texture::Delete(engine);
+    CreateTextureImage(engine);
+    CreateTextureView(engine);
+    CreateTextureSampler(engine);
+
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
