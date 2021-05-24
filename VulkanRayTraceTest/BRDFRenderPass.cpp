@@ -16,22 +16,21 @@ BRDFRenderPass::BRDFRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManage
     BloomPipelinePass1 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
     BloomPipelinePass2 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
-
     Draw(engine, assetManager, 0);
+
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &CommandBuffer;
-    // Create fence to ensure that the command buffer has finished executing
+
     VkFenceCreateInfo fenceCreateInfo{};
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
     vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-    // Submit to the queue
     vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-    // Wait for the fence to signal that command buffer has finished executing
     vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(engine.Device, fence, nullptr);
 }
 
 BRDFRenderPass::~BRDFRenderPass()
@@ -180,25 +179,26 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
 
 void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
 {
-    BloomTexture->RecreateRendererTexture(engine);
-
-    BloomPipelinePass1->Destroy(engine);
-    BloomPipelinePass2->Destroy(engine);
-
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
-
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    BloomPipelinePass1->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    BloomPipelinePass2->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    BloomPipelinePass1 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
+    BloomPipelinePass2 = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
+    Draw(engine, assetManager, 0);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer;
+
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(engine.Device, fence, nullptr);
 }
 
 void BRDFRenderPass::Destroy(VulkanEngine& engine)

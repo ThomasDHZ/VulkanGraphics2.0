@@ -193,8 +193,11 @@ void CubeMapRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const V
     }
 }
 
-void CubeMapRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void CubeMapRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine);
+    SetUpDescriptorPool(engine, assetManager);
+    SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
+    SetUpDescriptorSets(engine, assetManager);
 }

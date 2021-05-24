@@ -23,16 +23,14 @@ CubeMapRenderPass::CubeMapRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &CommandBuffer;
-    // Create fence to ensure that the command buffer has finished executing
     VkFenceCreateInfo fenceCreateInfo{};
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
     vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-    // Submit to the queue
    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-    // Wait for the fence to signal that command buffer has finished executing
    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
+   vkDestroyFence(engine.Device, fence, nullptr);
 }
 
 CubeMapRenderPass::~CubeMapRenderPass()
@@ -277,7 +275,7 @@ void CubeMapRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
     }
 }
 
-void CubeMapRenderPass::RebuildSwapChain(VulkanEngine& engine)
+void CubeMapRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine);
 
@@ -292,8 +290,23 @@ void CubeMapRenderPass::RebuildSwapChain(VulkanEngine& engine)
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    CubeMapTexturePipeline->UpdateGraphicsPipeLine(engine, RenderPass);
+    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    Draw(engine, assetManager, 0);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer;
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(engine.Device, fence, nullptr);
 }
 
 void CubeMapRenderPass::Destroy(VulkanEngine& engine)

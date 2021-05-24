@@ -21,9 +21,9 @@ private:
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
 	PBRRenderer pbrRenderer;
-	RayTraceRenderer rayTraceRenderer;
-	RayTracePBRRenderer pbrRayTraceRenderer;
-	HybridRenderer hybridRenderer;
+	//RayTraceRenderer rayTraceRenderer;
+	//RayTracePBRRenderer pbrRayTraceRenderer;
+	//HybridRenderer hybridRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;

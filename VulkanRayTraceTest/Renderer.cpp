@@ -17,9 +17,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
     pbrRenderer = PBRRenderer(engine, window, assetManager);
-    pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
+  /*  pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
     rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
-    hybridRenderer = HybridRenderer(engine, window, assetManager);
+    hybridRenderer = HybridRenderer(engine, window, assetManager);*/
 }
 
 Renderer::~Renderer()
@@ -50,9 +50,9 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
     pbrRenderer.RebuildSwapChain(engine, window);
-    pbrRayTraceRenderer.RebuildSwapChain(engine, window);
-    rayTraceRenderer.RebuildSwapChain(engine, window);
-    hybridRenderer.RebuildSwapChain(engine, window);
+    //pbrRayTraceRenderer.RebuildSwapChain(engine, window);
+    //rayTraceRenderer.RebuildSwapChain(engine, window);
+    //hybridRenderer.RebuildSwapChain(engine, window);
 }
 
 void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -101,9 +101,9 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     mouse.Update(window.GetWindowPtr(), assetManager->ActiveCamera);
 
     assetManager->Update(engine);
-    rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+  /*  rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
     pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
-    hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+    hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);*/
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -123,18 +123,18 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     {
         pbrRenderer.GUIUpdate(engine);
     }
-    else if (ActiveRenderer == 2)
-    {
-        rayTraceRenderer.GUIUpdate(engine);
-    }
-    else if (ActiveRenderer == 3)
-    {
-        pbrRayTraceRenderer.GUIUpdate(engine);
-    }
-    else if (ActiveRenderer == 4)
-    {
-        hybridRenderer.GUIUpdate(engine);
-    }
+    //else if (ActiveRenderer == 2)
+    //{
+    //    rayTraceRenderer.GUIUpdate(engine);
+    //}
+    //else if (ActiveRenderer == 3)
+    //{
+    //    pbrRayTraceRenderer.GUIUpdate(engine);
+    //}
+    //else if (ActiveRenderer == 4)
+    //{
+    //    hybridRenderer.GUIUpdate(engine);
+    //}
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
@@ -178,21 +178,21 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         pbrRenderer.Draw(engine, window, imageIndex);
         pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
-    else if (ActiveRenderer == 2)
-    {
-        rayTraceRenderer.Draw(engine, window, imageIndex);
-        rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
-    else if (ActiveRenderer == 3)
-    {
-        pbrRayTraceRenderer.Draw(engine, window, imageIndex);
-        pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
-    else if (ActiveRenderer == 4)
-    {
-        hybridRenderer.Draw(engine, window, imageIndex);
-        hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
+    //else if (ActiveRenderer == 2)
+    //{
+    //    rayTraceRenderer.Draw(engine, window, imageIndex);
+    //    rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
+    //else if (ActiveRenderer == 3)
+    //{
+    //    pbrRayTraceRenderer.Draw(engine, window, imageIndex);
+    //    pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
+    //else if (ActiveRenderer == 4)
+    //{
+    //    hybridRenderer.Draw(engine, window, imageIndex);
+    //    hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
 
     interfaceRenderPass.Draw(engine, imageIndex);
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
@@ -245,8 +245,8 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     interfaceRenderPass.Destroy(engine);
     blinnPhongRenderer.Destroy(engine);
-    hybridRenderer.Destroy(engine);
     pbrRenderer.Destroy(engine);
-    rayTraceRenderer.Destroy(engine);
-    pbrRayTraceRenderer.Destroy(engine);
+    //hybridRenderer.Destroy(engine);
+    //rayTraceRenderer.Destroy(engine);
+    //pbrRayTraceRenderer.Destroy(engine);
 }

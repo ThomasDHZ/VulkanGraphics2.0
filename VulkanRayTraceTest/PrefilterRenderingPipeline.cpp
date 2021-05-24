@@ -193,8 +193,11 @@ void PrefilterRenderingPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const
     }
 }
 
-void PrefilterRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void PrefilterRenderingPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine);
+    SetUpDescriptorPool(engine, assetManager);
+    SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);
+    SetUpDescriptorSets(engine, assetManager);
 }

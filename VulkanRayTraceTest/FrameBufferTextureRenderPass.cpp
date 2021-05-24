@@ -276,7 +276,10 @@ void FrameBufferTextureRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
 
     TexturePipeline->Destroy(engine);
-   // PBRTexturePipeline->Destroy(engine);
+    if (PBRTexturePipeline.get() != nullptr)
+    {
+        PBRTexturePipeline->Destroy(engine);
+    }
     skyBoxRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
