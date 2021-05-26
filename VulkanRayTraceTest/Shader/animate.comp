@@ -43,9 +43,12 @@ layout(binding = 3) buffer MeshProperties
 
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 
-layout(push_constant) uniform ConstMeshProperties
+layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
 } ConstMesh;
 
 void main()

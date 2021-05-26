@@ -13,6 +13,7 @@ layout(push_constant) uniform MeshInfo
 	uint MeshIndex;
     mat4 proj;
     mat4 view;
+    vec3 CameraPos;
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject 

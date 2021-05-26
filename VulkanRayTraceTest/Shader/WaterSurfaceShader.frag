@@ -7,9 +7,12 @@
 #include "material.glsl"
 #include "vertex.glsl"
 
-layout(push_constant) uniform ConstMeshProperties
+layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
 } ConstMesh;
 
 struct VertexData
