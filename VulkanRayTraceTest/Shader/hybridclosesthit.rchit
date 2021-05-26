@@ -9,6 +9,13 @@
 
 const float PI = 3.14159265359;
 
+layout(push_constant) uniform RayTraceCamera
+{
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
+} Camera;
+
 struct RayPayload {
 	vec3 ShadowMask;
 	vec3 ReflectionColor;

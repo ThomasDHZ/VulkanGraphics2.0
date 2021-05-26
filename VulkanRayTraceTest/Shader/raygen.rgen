@@ -4,6 +4,13 @@
 
 #include "Lighting.glsl"
 
+layout(push_constant) uniform RayTraceCamera
+{
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
+} Camera;
+
 struct RayPayload {
 	vec3 RayTracedTexture;
 	uint reflectCount;
@@ -37,9 +44,9 @@ void main()
 	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
 	vec2 d = inUV * 2.0 - 1.0;
 
-	vec4 origin = cam.viewInverse * vec4(0,0,0,1);
-	vec4 target = cam.projInverse * vec4(d.x, d.y, 1, 1) ;
-	vec4 direction = cam.viewInverse*vec4(normalize(target.xyz / target.w), 0);
+	vec4 origin = Camera.view * vec4(0,0,0,1);
+	vec4 target = Camera.proj * vec4(d.x, d.y, 1, 1) ;
+	vec4 direction = Camera.view*vec4(normalize(target.xyz / target.w), 0);
 
 	uint rayFlags = gl_RayFlagsOpaqueEXT;
 	uint cullMask = 0xff;
