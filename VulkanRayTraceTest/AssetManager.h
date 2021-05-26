@@ -32,7 +32,7 @@ public:
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID);
 
 	void Update(VulkanEngine& engine);
-	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID, std::shared_ptr<Camera> CameraView);
+	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID);
 	void Delete(VulkanEngine& engine);
 
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);

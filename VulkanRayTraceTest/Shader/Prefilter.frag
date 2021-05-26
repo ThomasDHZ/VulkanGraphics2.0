@@ -9,8 +9,8 @@ layout(location = 0) out vec4 FragColor;
 
 layout(push_constant) uniform ConstSkyBoxView
 {
-	mat4 proj;
 	mat4 view;
+	mat4 proj;
 	float MipLevel;
     uint SampleCount;
     float FaceSize;

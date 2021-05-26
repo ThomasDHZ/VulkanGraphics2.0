@@ -11,9 +11,6 @@
 layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
-    mat4 proj;
-    mat4 view;
-    vec3 CameraPos;
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject 
@@ -54,5 +51,5 @@ layout (location = 7) in vec4 BoneWeights;
 
 void main() 
 {
-    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
+    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 }

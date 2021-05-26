@@ -228,16 +228,12 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	}
 }
 
-void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView)
+void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID)
 {
     if (ShowMesh)
 	{
 		ConstMeshInfo meshInfo;
 		meshInfo.MeshIndex = MeshBufferIndex;
-		meshInfo.CameraPos = CameraView->GetPosition();
-		meshInfo.view = CameraView->GetViewMatrix();
-		meshInfo.proj = CameraView->GetProjectionMatrix();
-		meshInfo.proj[1][1] *= -1;
 
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);

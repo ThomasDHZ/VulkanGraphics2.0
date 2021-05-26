@@ -27,7 +27,7 @@ void RayTracePBRRenderer::GUIUpdate(VulkanEngine& engine)
 
 void RayTracePBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
-    rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID, assetManager->cameraManager.ActiveCamera);
+    rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
 }
 
