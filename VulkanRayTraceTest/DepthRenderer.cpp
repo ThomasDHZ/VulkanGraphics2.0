@@ -141,7 +141,7 @@ void DepthRenderer::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> ass
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, depthPipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, renderPassInfo, depthPipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.CameraList[1]);
     vkCmdEndRenderPass(CommandBuffer);
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
