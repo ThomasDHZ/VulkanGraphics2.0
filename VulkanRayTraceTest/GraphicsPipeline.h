@@ -4,12 +4,14 @@
 struct ConstMeshInfo
 {
 	alignas(4) uint32_t MeshIndex;
+	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 };
 
 struct PrefilterConst
 {
-	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 	alignas(4) float MipLevel = 0.0f;
 	alignas(4) uint32_t SampleCount = 1024;
 	alignas(4) float FaceSize = 0.0f;
@@ -17,8 +19,8 @@ struct PrefilterConst
 
 struct ConstSkyBoxView
 {
-	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 };
 
 struct ConstBloomProperites

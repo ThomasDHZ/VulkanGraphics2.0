@@ -11,6 +11,8 @@
 layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
+    mat4 proj;
+    mat4 view;
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject 
