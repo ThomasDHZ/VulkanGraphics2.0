@@ -27,12 +27,12 @@ public:
 
 	}
 
-	void Update(VulkanEngine& engine)
+	virtual void Update(VulkanEngine& engine)
 	{
 		LightBuffer.Update(engine);
 	}
 
-	void Destroy(VulkanEngine& engine)
+	virtual void Destroy(VulkanEngine& engine)
 	{
 		LightBuffer.Destroy(engine);
 	}

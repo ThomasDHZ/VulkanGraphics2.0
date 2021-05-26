@@ -1,49 +1,46 @@
-#include "SSAORenderPass.h"
-#include "GraphicsPipeline.h"
-#include <random>
+#include "DepthRenderer.h"
 
-SSAORenderPass::SSAORenderPass()
+DepthRenderer::DepthRenderer()
 {
 }
 
-SSAORenderPass::SSAORenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+DepthRenderer::DepthRenderer(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
-    SSAOTexture = std::make_shared<RenderedColorTexture>(engine);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
-    GenerateKernal(engine, textures);
-    GenerateNoiseTexture(engine, textures);
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline = std::make_shared<SSAOPipeline>(SSAOPipeline(engine, assetManager, RenderPass, textures));
+    depthPipeline = std::make_shared<DepthPipeline>(DepthPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
-SSAORenderPass::~SSAORenderPass()
+DepthRenderer::~DepthRenderer()
 {
 }
 
-void SSAORenderPass::CreateRenderPass(VulkanEngine& engine)
+void DepthRenderer::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
-    VkAttachmentDescription SSAOAttachment = {};
-    SSAOAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    SSAOAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    SSAOAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    SSAOAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    SSAOAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    SSAOAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    SSAOAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    SSAOAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(SSAOAttachment);
+    VkAttachmentDescription DepthAttachment = {};
+    DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
+    DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    DepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    DepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    DepthAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(DepthAttachment);
 
     std::vector<VkAttachmentReference> ColorRefsList;
-    ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    VkAttachmentReference depthReference = { 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDescription.colorAttachmentCount = static_cast<uint32_t>(ColorRefsList.size());
     subpassDescription.pColorAttachments = ColorRefsList.data();
+    subpassDescription.pDepthStencilAttachment = &depthReference;
 
     std::vector<VkSubpassDependency> DependencyList;
 
@@ -82,14 +79,14 @@ void SSAORenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void SSAORenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void DepthRenderer::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
     for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(SSAOTexture->View);
+        AttachmentList.emplace_back(DepthTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -107,7 +104,7 @@ void SSAORenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void SSAORenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void DepthRenderer::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -120,54 +117,8 @@ void SSAORenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void SSAORenderPass::GenerateKernal(VulkanEngine& engine, SSAOTextureList& textures)
+void DepthRenderer::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
-    std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0);
-    std::default_random_engine generator;
-    for (unsigned int i = 0; i < KernalSampleSize; ++i)
-    {
-        glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
-        sample = glm::normalize(sample);
-        sample *= randomFloats(generator);
-        float scale = float(i) / KernalSampleSize;
-
-        scale = Lerp(0.1f, 1.0f, scale * scale);
-        sample *= scale;
-       
-        std::shared_ptr<VulkanBuffer> SampleBuffer = std::make_shared<VulkanBuffer>(VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample));
-        SamplePointBufferList.emplace_back(SampleBuffer);
-    }
-    textures.KernalSampleBufferList = SamplePointBufferList;
-}
-
-void SSAORenderPass::GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList& textures)
-{
-    std::uniform_real_distribution <float> randomBits(0.0f, 1.0f);
-    std::vector<glm::vec4> pixelList;
-    std::default_random_engine generator;
-    for (int x = 0; x < 15; x++)
-    {
-        pixelList.emplace_back(glm::vec4(randomBits(generator) * 2.0 - 1.0, randomBits(generator) * 2.0 - 1.0, 0.0f, 1.0f));
-    }
-    NoiseTexture = std::make_shared<Texture2D>(Texture2D(engine, 4, 4, pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
-    textures.NoiseTexture = NoiseTexture;
-}
-
-float SSAORenderPass::Lerp(float a, float b, float f)
-{
-    return a + f * (b - a);
-}
-
-void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
-{
-    SSAOProperties sSAOProperties = {};
-    sSAOProperties.kernelSize = KernalSampleSize;
-    sSAOProperties.radius = radius;
-    sSAOProperties.bias = bias;
-    sSAOProperties.projection = assetManager->cameraManager.ActiveCamera->GetProjectionMatrix();
-    sSAOProperties.TextureWidth = engine.SwapChain.SwapChainResolution.width;
-    sSAOProperties.TextureHeight = engine.SwapChain.SwapChainResolution.height;
-
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -176,7 +127,7 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 
     std::array<VkClearValue, 1> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[0].depthStencil = { 1.0f, 0 };
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -188,27 +139,19 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdPushConstants(CommandBuffer, RasterSSAOPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SSAOProperties), &sSAOProperties);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RasterSSAOPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, RasterSSAOPipeline->ShaderPipelineLayout, 0, 1, &RasterSSAOPipeline->DescriptorSets, 0, nullptr);
-    vkCmdDraw(CommandBuffer, 6, 1, 0, 0);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSets, 0, nullptr);
+    assetManager->Draw(CommandBuffer, renderPassInfo, depthPipeline->ShaderPipelineLayout, rendererPassID);
     vkCmdEndRenderPass(CommandBuffer);
-
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }
 
-void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+void DepthRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
-    NoiseTexture->Update(engine, 0);
-    SSAOTexture->RecreateRendererTexture(engine);
-    RasterSSAOPipeline->Destroy(engine);
-
-    for (auto SamplePoint : SamplePointBufferList)
-    {
-        SamplePoint->DestoryBuffer(engine.Device);
-    }
+    DepthTexture->RecreateRendererTexture(engine);
+    depthPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -219,24 +162,16 @@ void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
         framebuffer = VK_NULL_HANDLE;
     }
 
-    GenerateKernal(engine, textures);
-    GenerateNoiseTexture(engine, textures);
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, textures);
+    depthPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
-void SSAORenderPass::Destroy(VulkanEngine& engine)
+void DepthRenderer::Destroy(VulkanEngine& engine)
 {
-    NoiseTexture->Delete(engine);
-    SSAOTexture->Delete(engine);
-    RasterSSAOPipeline->Destroy(engine);
-
-    for (auto SamplePoint : SamplePointBufferList)
-    {
-        SamplePoint->DestoryBuffer(engine.Device);
-    }
+    DepthTexture->Delete(engine);
+    depthPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

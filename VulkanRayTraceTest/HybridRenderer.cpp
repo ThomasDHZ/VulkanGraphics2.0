@@ -37,16 +37,9 @@ HybridRenderer::~HybridRenderer()
 
 void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 {
-    FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
-    rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
-    bloomRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
-   // DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
     textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
-    SSAORenderer = SSAORenderPass(engine, assetManager, textures);
-    SSAOBlurRenderer = SSAOBlurRenderPass(engine, assetManager, SSAORenderer.SSAOTexture);
 
     HybridFrameBufferTextures frameBufferTextures{};
     frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;
@@ -57,8 +50,14 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
     frameBufferTextures.ReflectionTexture = rayTraceRenderPass.ReflectionTexture;
     frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.SkyboxTexture;
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, frameBufferTextures);
 
+    FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
+    rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
+    bloomRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
+   // DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
+    SSAORenderer.RebuildSwapChain(engine, assetManager, textures);
+    SSAOBlurRenderer.RebuildSwapChain(engine, assetManager, SSAORenderer.SSAOTexture);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, frameBufferTextures);
 }
 
 void HybridRenderer::GUIUpdate(VulkanEngine& engine)

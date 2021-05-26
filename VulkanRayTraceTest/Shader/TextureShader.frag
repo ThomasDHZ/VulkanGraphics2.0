@@ -88,6 +88,7 @@ layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
+layout(binding = 9) uniform sampler2D ShadowMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -105,6 +106,7 @@ vec3 CalcDirLight(MaterialInfo material, vec2 uv, int index);
 vec3 CalcPointLight(MaterialInfo material, vec2 uv, int index);
 vec3 CalcSpotLight(MaterialInfo material, SpotLight light, vec2 uv);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
+float ShadowCalculation(MaterialInfo material, vec4 fragPosLightSpace);
 
 void main() 
 {

@@ -32,6 +32,7 @@ enum RenderPassID
 	Prefilter_Renderer,
 	Water_Renderer,
 	Bloom_Renderer,
+	Depth_Renderer,
 	DebugDepth_Renderer
 };
 enum RendererID
@@ -40,7 +41,8 @@ enum RendererID
 	PBR_Raster_Renderer,
 	BlinnPhong_RayTrace_Renderer,
 	PBR_RayTrace_Renderer,
-	Hybrid_Renderer
+	Hybrid_Renderer,
+	LightPath_Renderer
 };
 
 struct DescriptorSetLayoutBindingInfo

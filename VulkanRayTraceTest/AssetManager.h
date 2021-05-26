@@ -6,23 +6,21 @@
 #include "MeshManager.h"
 #include "ModelManager.h"
 #include "LightManager.h"
+#include "CameraManager.h"
 class AssetManager
 {
 private:
 
 public:
-	std::shared_ptr<Camera> ActiveCamera;
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
 	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 
+	CameraManager cameraManager;
 	MaterialManager materialManager;
 	TextureManager textureManager;
 	MeshManager meshManager;
 	ModelManager modelManager;
 	LightManager lightManager;
-
-	std::vector<std::shared_ptr<Camera>> CameraList;
-	int cameraIndex = 0;
 
 	AssetManager();
 	AssetManager(VulkanEngine& engine);

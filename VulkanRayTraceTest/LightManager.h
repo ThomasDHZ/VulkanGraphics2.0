@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "VulkanEngine.h"
+#include "CameraManager.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
@@ -18,7 +19,7 @@ public:
 	std::vector<std::shared_ptr<SpotLight>> SpotLightList;
 
 	LightManager();
-	LightManager(VulkanEngine& engine);
+	LightManager(VulkanEngine& engine, CameraManager& cameraManager);
 	~LightManager();
 
 	void Update(VulkanEngine& engine);
@@ -26,7 +27,7 @@ public:
 
 
 	void AddDirectionalLight(VulkanEngine& engine, std::shared_ptr<DirectionalLight> light);
-	void AddDirectionalLight(VulkanEngine& engine, DirectionalLightBuffer light);
+	void AddDirectionalLight(VulkanEngine& engine, CameraManager& cameraManager, DirectionalLightBuffer light);
 	void AddPointLight(VulkanEngine& engine, std::shared_ptr<PointLight> light);
 	void AddPointLight(VulkanEngine& engine, PointLightBuffer light);
 	void AddSpotLight(VulkanEngine& engine, std::shared_ptr<SpotLight> light);

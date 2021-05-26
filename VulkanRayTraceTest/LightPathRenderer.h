@@ -5,22 +5,19 @@
 #include "FrameBufferRenderPass.h"
 #include "BloomRenderPass.h"
 #include "DepthDebugRenderPass.h"
-#include "LightPathRenderer.h"
+#include "DepthRenderer.h"
 
-class BlinnPhongRasterRenderer : public BaseRenderer
+class LightPathRenderer : public BaseRenderer
 {
 private:
-	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
-	BloomRenderPass BloomRenderer;
+	DepthRenderer lightRenderPass;
 	DepthDebugRenderPass DebugDepthRenderer;
-	FrameBufferRenderPass FrameBufferRenderer;
-	DepthRenderer lightPathRenderer;
 public:
-	BlinnPhongRasterRenderer();
-	BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
-	~BlinnPhongRasterRenderer();
+	LightPathRenderer();
+	LightPathRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
+	~LightPathRenderer();
 
-	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
+	static constexpr RendererID rendererID = RendererID::LightPath_Renderer;
 
 	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
 	void GUIUpdate(VulkanEngine& engine);

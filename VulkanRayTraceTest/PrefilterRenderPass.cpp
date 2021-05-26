@@ -286,6 +286,7 @@ void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManage
 void PrefilterRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine, glm::vec2(CubeMapSize));
+    prefilterRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

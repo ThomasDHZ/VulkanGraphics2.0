@@ -4,15 +4,15 @@ LightManager::LightManager()
 {
 }
 
-LightManager::LightManager(VulkanEngine& engine)
+LightManager::LightManager(VulkanEngine& engine, CameraManager& cameraManager)
 {
 	DirectionalLightBuffer dlight = DirectionalLightBuffer();
 	dlight.direction = glm::vec4(0.0f);
 	dlight.ambient = glm::vec4(0.2f);
 	dlight.diffuse = glm::vec4(0.5f);
 	dlight.specular = glm::vec4(1.0f);
-	AddDirectionalLight(engine, dlight);
-	AddDirectionalLight(engine, dlight);
+	AddDirectionalLight(engine, cameraManager, dlight);
+	AddDirectionalLight(engine, cameraManager, dlight);
 
 	PointLightBuffer plight = PointLightBuffer();
 	plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
@@ -54,9 +54,9 @@ void LightManager::AddDirectionalLight(VulkanEngine& engine, std::shared_ptr<Dir
 	DirectionalLightList.emplace_back(light);
 }
 
-void LightManager::AddDirectionalLight(VulkanEngine& engine, DirectionalLightBuffer light)
+void LightManager::AddDirectionalLight(VulkanEngine& engine, CameraManager& cameraManager, DirectionalLightBuffer light)
 {
-	DirectionalLightList.emplace_back(std::make_shared<DirectionalLight>(DirectionalLight(engine, light)));
+	DirectionalLightList.emplace_back(std::make_shared<DirectionalLight>(DirectionalLight(engine, cameraManager, light)));
 }
 
 void LightManager::AddPointLight(VulkanEngine& engine, std::shared_ptr<PointLight> light)

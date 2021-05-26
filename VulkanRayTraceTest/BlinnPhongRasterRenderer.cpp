@@ -11,6 +11,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, VulkanW
     BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
     DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
+    lightPathRenderer = DepthRenderer(engine, assetManager);
 }
 
 BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
@@ -23,6 +24,7 @@ void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWind
     BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
     DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
+    lightPathRenderer.RebuildSwapChain(engine, assetManager);
 }
 
 void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
@@ -68,7 +70,7 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderInt("Frame", &static_cast<BillboardMesh*>(assetManager->meshManager.MeshList[1].get())->animator.CurrentFrame, 0, 60);
     ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
-    ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(lightPathRenderer.DepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
@@ -78,6 +80,7 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, 
     BloomRenderer.Draw(engine, assetManager, imageIndex);
     DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
+    lightPathRenderer.Draw(engine, assetManager, imageIndex);
 }
 
 void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
@@ -85,7 +88,8 @@ void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
     FrameBufferTextureRenderer.Destroy(engine);
     BloomRenderer.Destroy(engine);
     DebugDepthRenderer.Destroy(engine);
-    FrameBufferRenderer.Destroy(engine);;
+    FrameBufferRenderer.Destroy(engine);
+    lightPathRenderer.Destroy(engine);
 }
 
 std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
@@ -94,5 +98,6 @@ std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitL
     CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(lightPathRenderer.CommandBuffer);
     return CommandBufferSubmitList;
 }

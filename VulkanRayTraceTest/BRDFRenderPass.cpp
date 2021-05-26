@@ -172,11 +172,21 @@ void BRDFRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
 
 void BRDFRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
 {
-    BRDFTexture = std::make_shared<RenderedColorTexture>(engine);
+    BRDFTexture->RecreateRendererTexture(engine);
+    BRDFPipeline->Destroy(engine);
+
+    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    RenderPass = VK_NULL_HANDLE;
+
+    for (auto& framebuffer : SwapChainFramebuffers)
+    {
+        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        framebuffer = VK_NULL_HANDLE;
+    }
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    BRDFPipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
+    BRDFPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
     Draw(engine, assetManager, 0);
 

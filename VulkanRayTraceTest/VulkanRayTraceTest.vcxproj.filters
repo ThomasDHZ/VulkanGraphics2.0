@@ -384,6 +384,21 @@
     <ClCompile Include="PBRFrameBufferTextureRenderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LightViewCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthRenderer.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="LightPathRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -577,6 +592,12 @@
     </None>
     <None Include="Shader\shadow.rmiss">
       <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\DepthShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\DepthShader.vert">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -918,6 +939,21 @@
     </ClInclude>
     <ClInclude Include="PBRFrameBufferTextureRenderPass.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightViewCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthRenderer.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="LightPathRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

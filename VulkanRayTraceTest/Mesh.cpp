@@ -230,11 +230,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 
 void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID)
 {
-	if (RenderPassID::Water_Renderer == RendererID && MeshDrawFlags::Mesh_Skip_Water_Renderer == DrawFlags)
-	{
-	
-	}
-	else if (ShowMesh)
+    if (ShowMesh)
 	{
 		ConstMeshInfo meshInfo;
 		meshInfo.MeshIndex = MeshBufferIndex;

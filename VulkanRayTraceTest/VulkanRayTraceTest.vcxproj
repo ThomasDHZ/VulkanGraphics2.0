@@ -164,6 +164,7 @@
     <ClCompile Include="brdfRenderingPipeline.cpp" />
     <ClCompile Include="BRDFRenderPass.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="CubeMapRenderingPipeline.cpp" />
     <ClCompile Include="CubeMapRenderPass.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
@@ -171,6 +172,8 @@
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="DepthDebugPipeline.cpp" />
     <ClCompile Include="DepthDebugRenderPass.cpp" />
+    <ClCompile Include="DepthPipeline.cpp" />
+    <ClCompile Include="DepthRenderer.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="GBufferPipeline.cpp" />
     <ClCompile Include="DeferredRenderPass.cpp" />
@@ -193,6 +196,8 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="LevelModel.cpp" />
     <ClCompile Include="LightManager.cpp" />
+    <ClCompile Include="LightPathRenderer.cpp" />
+    <ClCompile Include="LightViewCamera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ForwardRenderPass.cpp" />
     <ClCompile Include="Mario.cpp" />
@@ -270,6 +275,8 @@
     <None Include="Shader\DeferedShader.vert" />
     <None Include="Shader\DepthDebugShader.frag" />
     <None Include="Shader\DepthDebugShader.vert" />
+    <None Include="Shader\DepthShader.frag" />
+    <None Include="Shader\DepthShader.vert" />
     <None Include="Shader\FrameBuffer.frag" />
     <None Include="Shader\FrameBuffer.vert" />
     <None Include="Shader\GBuffer.frag" />
@@ -340,6 +347,7 @@
     <ClInclude Include="brdfRenderingPipeline.h" />
     <ClInclude Include="BRDFRenderPass.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraManager.h" />
     <ClInclude Include="CubeMapRenderingPipeline.h" />
     <ClInclude Include="CubeMapRenderPass.h" />
     <ClInclude Include="CubeMapTexture.h" />
@@ -347,6 +355,8 @@
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="DepthDebugPipeline.h" />
     <ClInclude Include="DepthDebugRenderPass.h" />
+    <ClInclude Include="DepthPipeline.h" />
+    <ClInclude Include="DepthRenderer.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GBufferPipeline.h" />
     <ClInclude Include="DeferredRenderPass.h" />
@@ -373,6 +383,8 @@
     <ClInclude Include="ForwardRenderPass.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightManager.h" />
+    <ClInclude Include="LightPathRenderer.h" />
+    <ClInclude Include="LightViewCamera.h" />
     <ClInclude Include="Mario.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
