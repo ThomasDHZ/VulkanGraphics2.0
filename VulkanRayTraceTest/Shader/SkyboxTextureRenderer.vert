@@ -7,8 +7,8 @@
 
 layout(push_constant) uniform ConstSkyBoxView
 {
-	mat4 view;
 	mat4 proj;
+	mat4 view;
 } Mesh;
 
 layout (location = 0) in vec3 aPos;

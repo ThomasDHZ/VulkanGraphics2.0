@@ -7,7 +7,7 @@ LightManager::LightManager()
 LightManager::LightManager(VulkanEngine& engine, CameraManager& cameraManager)
 {
 	DirectionalLightBuffer dlight = DirectionalLightBuffer();
-	dlight.direction = glm::vec4(0.0f);
+	dlight.direction = glm::vec4(1.0f);
 	dlight.ambient = glm::vec4(0.2f);
 	dlight.diffuse = glm::vec4(0.5f);
 	dlight.specular = glm::vec4(1.0f);

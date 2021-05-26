@@ -11,6 +11,9 @@
 layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject 
@@ -49,7 +52,28 @@ layout (location = 5) in vec4 aColor;
 layout (location = 6) in ivec4 BoneID;
 layout (location = 7) in vec4 BoneWeights;
 
+layout(location = 0) out vec3 FragPos;
+layout(location = 1) out vec2 TexCoords;
+layout(location = 2) out vec4 Color;
+layout(location = 3) out vec3 Normal;
+layout(location = 4) out mat3 TBN;
+
 void main() 
 {
-    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
+//	if(gl_VertexIndex == 0)
+//	{
+//		debugPrintfEXT("Temp: %i \n", ubo.DirectionalLightCount);
+//	}
+
+    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
+    TexCoords = aTexCoords;
+    Normal = aNormal;
+	Color = aColor;
+
+    vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aTangent));
+    vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(aBitangent));
+    vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * aNormal);
+    TBN = transpose(mat3(T, B, N));
+
+    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 }

@@ -115,10 +115,17 @@ void RayTracedPipeline::SetUpPipeline(VulkanEngine& engine)
 {
     std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
 
+    VkPushConstantRange pushConstantRange{};
+    pushConstantRange.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
+    pushConstantRange.offset = 0;
+    pushConstantRange.size = sizeof(RayTraceCamera);
+
     VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
     PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     PipelineLayoutCreateInfo.setLayoutCount = 1;
     PipelineLayoutCreateInfo.pSetLayouts = &DescriptorSetLayout;
+    PipelineLayoutCreateInfo.pushConstantRangeCount = 1;
+    PipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
     vkCreatePipelineLayout(engine.Device, &PipelineLayoutCreateInfo, nullptr, &ShaderPipelineLayout);
 
     ShaderList.emplace_back(engine.CreateShader("Shader/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));

@@ -77,9 +77,9 @@ void AssetManager::Update(VulkanEngine& engine)
     SkyUniformBuffer->Update(engine);
 }
 
-void AssetManager::Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID)
+void AssetManager::Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID, std::shared_ptr<Camera> CameraView)
 {
-   meshManager.Draw(commandBuffer, renderPassInfo, layout, renderPassID);
+   meshManager.Draw(commandBuffer, renderPassInfo, layout, renderPassID, CameraView);
 }
 
 void AssetManager::Delete(VulkanEngine& engine)

@@ -9,6 +9,7 @@
 #include "AccelerationStructure.h"
 #include "MaterialManager.h"
 #include "bone.h"
+#include "Camera.h"
 
 enum MeshDrawFlags
 {
@@ -87,7 +88,7 @@ public:
 
 	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager);
 	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager);
-	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID);
 	virtual void Destory(VulkanEngine& engine);
 };

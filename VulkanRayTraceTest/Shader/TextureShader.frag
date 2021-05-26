@@ -7,9 +7,12 @@
 #include "material.glsl"
 #include "vertex.glsl"
 
-layout(push_constant) uniform ConstMeshProperties
+layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
 } ConstMesh;
 
 struct VertexData
@@ -118,7 +121,7 @@ void main()
 	 discard;
    }
     
-    const vec3 TangentViewPos  = TBN * scenedata.viewPos;
+    const vec3 TangentViewPos  = TBN * ConstMesh.CameraPos;
     const vec3 TangentFragPos  = TBN * FragPos;  
     const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
 

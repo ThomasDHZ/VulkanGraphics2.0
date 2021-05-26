@@ -11,6 +11,9 @@
 layout(push_constant) uniform MeshInfo
 {
 	uint MeshIndex;
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject 
@@ -72,5 +75,5 @@ void main()
     vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * aNormal);
     TBN = transpose(mat3(T, B, N));
 
-    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
+    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 }

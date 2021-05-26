@@ -7,6 +7,13 @@
 #include "Lighting.glsl"
 #include "Material.glsl"
 
+layout(push_constant) uniform RayTraceCamera
+{
+    mat4 proj;
+    mat4 view;
+    vec3 CameraPos;
+} Camera;
+
 struct RayPayload {
 	vec3 RayTracedTexture;
 	uint reflectCount;
