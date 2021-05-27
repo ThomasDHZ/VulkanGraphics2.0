@@ -599,6 +599,12 @@
     <None Include="Shader\DepthShader.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\BlinePhongLighting.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\RTVertexBuilder.glsl">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">

@@ -266,6 +266,7 @@
     <None Include="Shader\animate.comp" />
     <None Include="Shader\anyhit.rahit" />
     <None Include="Shader\anyhit1.rahit" />
+    <None Include="Shader\BlinePhongLighting.glsl" />
     <None Include="Shader\BloomShader.frag" />
     <None Include="Shader\BloomShader.vert" />
     <None Include="Shader\BRDFRenderer.frag" />
@@ -309,6 +310,7 @@
     <None Include="Shader\Prefilter.frag" />
     <None Include="Shader\Prefilter.vert" />
     <None Include="Shader\raygen.rgen" />
+    <None Include="Shader\RTVertexBuilder.glsl" />
     <None Include="Shader\shader.frag" />
     <None Include="Shader\shader.vert" />
     <None Include="Shader\shadow.rmiss" />
