@@ -62,12 +62,15 @@ layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec4 Color;
 layout(location = 3) in vec3 Normal;
-layout(location = 4) in mat3 TBN;
+layout(location = 4) in vec4 Tangent;
+layout(location = 5) in vec4 BiTangent;
 
 layout(location = 0) out vec4 GPosition;
 layout(location = 1) out vec4 GAlebdo;
 layout(location = 2) out vec4 GNormal;
-layout(location = 3) out vec4 GBloom;
+layout(location = 3) out vec4 GTangent;
+layout(location = 4) out vec4 GBiTangent;
+layout(location = 5) out vec4 GBloom;
 
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
@@ -75,82 +78,31 @@ void main()
 {
 
    const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
-
-    const vec3 TangentViewPos  = TBN * scenedata.viewPos;
-    const vec3 TangentFragPos  = TBN * FragPos;  
-    const vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
+   vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
 
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
    {
 	 discard;
    }
 
-   vec3 normal = Normal;
-   if(material.NormalMapID != 0)
-    {
-        if(material.DepthMapID != 0)
-        {
-            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
-            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-            {
-              discard;
-            }
-        }
-        normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
-        normal = normalize(normal * 2.0 - 1.0);
-    }
-
 	GPosition = vec4(FragPos, 1.0f);
-
-    if(material.DiffuseMapID != 0)
+	if(material.DiffuseMapID != 0)
     {
-        GAlebdo.rgba = texture(TextureMap[material.DiffuseMapID], texCoords).rgba;
+        GAlebdo = texture(TextureMap[material.DiffuseMapID], texCoords).rgba;
     }
     else
     {
-        GAlebdo.rgba = vec4(material.Diffuse, 1.0f);
+        GAlebdo = vec4(material.Diffuse, 1.0f);
     }
-
-	GNormal = vec4(normal, 1.0f);
+	if(material.DiffuseMapID != 0)
+    {
+		GNormal = vec4(Normal, 1.0f);
+	}
+	else
+    {
+        GNormal = vec4(material.Diffuse, 1.0f);
+    }
+    GTangent = vec4(Tangent.rgb, 1.0f);
+    GBiTangent = vec4(BiTangent.rgb, 1.0f);
 	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    if(material.Diffuse.r >= 0.8f)
-    {
-    GBloom = vec4(material.Diffuse, 1.0f);
-    }
-}
-
-vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
-{ 
-    const float heightScale = meshProperties[ConstMesh.MeshIndex].heightScale;
-    const float minLayers = meshProperties[ConstMesh.MeshIndex].minLayers;
-    const float maxLayers = meshProperties[ConstMesh.MeshIndex].maxLayers;
-
-    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
-    float layerDepth = 1.0 / numLayers;
-    float currentLayerDepth = 0.0;
-
-    viewDir.y = -viewDir.y;
-    vec2 P = viewDir.xy / viewDir.z * heightScale;
-    vec2 deltaTexCoords = P / numLayers;
-
-    vec2  currentTexCoords = texCoords;
-    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
-
-    while (currentLayerDepth < currentDepthMapValue)
-    {
-        currentTexCoords -= deltaTexCoords;
-        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
-        currentLayerDepth += layerDepth;
-    }
-
-    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
-
-    float afterDepth = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
-
-    float weight = afterDepth / (afterDepth - beforeDepth);
-    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
-
-    return finalTexCoords;
 }

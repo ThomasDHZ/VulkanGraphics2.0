@@ -25,6 +25,8 @@ public:
 	std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
 	std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
 	std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;
+	std::shared_ptr<RenderedGBufferPositionTexture> GTangentTexture;
+	std::shared_ptr<RenderedGBufferPositionTexture> GBiTangentTexture;
 	std::shared_ptr<RenderedColorTexture> GBloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 

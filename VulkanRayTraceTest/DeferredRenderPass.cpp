@@ -12,6 +12,8 @@ GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
     GAlbedoTexture = std::make_shared<RenderedGBufferAlbedoTexture>(engine);
     GNormalTexture = std::make_shared<RenderedGBufferNormalTexture>(engine);
     GBloomTexture = std::make_shared<RenderedColorTexture>(engine);
+    GTangentTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
+    GBiTangentTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
@@ -61,6 +63,28 @@ void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     NormalAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     AttachmentDescriptionList.emplace_back(NormalAttachment);
 
+    VkAttachmentDescription TangentAttachment = {};
+    TangentAttachment.format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    TangentAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    TangentAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    TangentAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    TangentAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    TangentAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    TangentAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    TangentAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(TangentAttachment);
+
+    VkAttachmentDescription BiTangentAttachment = {};
+    BiTangentAttachment.format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    BiTangentAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    BiTangentAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    BiTangentAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BiTangentAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BiTangentAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BiTangentAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BiTangentAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BiTangentAttachment);
+
     VkAttachmentDescription BloomAttachment = {};
     BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
     BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -88,7 +112,9 @@ void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     ColorRefsList.emplace_back(VkAttachmentReference{ 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     ColorRefsList.emplace_back(VkAttachmentReference{ 3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-    VkAttachmentReference depthReference = { 4, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+    ColorRefsList.emplace_back(VkAttachmentReference{ 4, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    ColorRefsList.emplace_back(VkAttachmentReference{ 5, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    VkAttachmentReference depthReference = { 6, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -143,6 +169,8 @@ void GBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
         AttachmentList.emplace_back(GPositionTexture->View);
         AttachmentList.emplace_back(GAlbedoTexture->View);
         AttachmentList.emplace_back(GNormalTexture->View);
+        AttachmentList.emplace_back(GTangentTexture->View);
+        AttachmentList.emplace_back(GBiTangentTexture->View);
         AttachmentList.emplace_back(GBloomTexture->View);
         AttachmentList.emplace_back(DepthTexture->View);
 
@@ -191,12 +219,14 @@ void GBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
 
-    std::array<VkClearValue, 5> clearValues{};
+    std::array<VkClearValue, 7> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
     clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
     clearValues[2].color = { 0.0f, 0.0f, 0.0f, 1.0f };
     clearValues[3].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[4].depthStencil = { 1.0f, 0 };
+    clearValues[4].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[5].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[6].depthStencil = { 1.0f, 0 };
 
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();

@@ -126,7 +126,7 @@ void GBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPa
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -143,7 +143,7 @@ void GBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPa
     depthStencil.depthBoundsTestEnable = VK_FALSE;
     depthStencil.stencilTestEnable = VK_FALSE;
 
-    std::array<VkPipelineColorBlendAttachmentState, 4> ColorAttachment = {};
+    std::array<VkPipelineColorBlendAttachmentState, 6> ColorAttachment = {};
     ColorAttachment[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     ColorAttachment[0].blendEnable = VK_TRUE;
     ColorAttachment[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
@@ -179,6 +179,24 @@ void GBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPa
     ColorAttachment[3].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
     ColorAttachment[3].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
     ColorAttachment[3].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+
+    ColorAttachment[4].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    ColorAttachment[4].blendEnable = VK_TRUE;
+    ColorAttachment[4].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    ColorAttachment[4].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    ColorAttachment[4].colorBlendOp = VK_BLEND_OP_ADD;
+    ColorAttachment[4].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    ColorAttachment[4].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    ColorAttachment[4].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+
+    ColorAttachment[5].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    ColorAttachment[5].blendEnable = VK_TRUE;
+    ColorAttachment[5].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    ColorAttachment[5].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    ColorAttachment[5].colorBlendOp = VK_BLEND_OP_ADD;
+    ColorAttachment[5].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    ColorAttachment[5].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    ColorAttachment[5].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
 
     VkPipelineColorBlendStateCreateInfo colorBlending{};
     colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;

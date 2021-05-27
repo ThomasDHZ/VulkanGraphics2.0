@@ -19,7 +19,7 @@ void main()
     vec3 Color = texture(FrameBufferTexture, TexCoords).rgb;
     //Color += texture(BloomTexture, TexCoords).rgb;
 
-    vec3 result = vec3(1.0) - exp(-Color * Exposure);
-    result = pow(Color, vec3(1.0 / Gamma));
-    outColor = vec4(result, 1.0f);
+//    vec3 finalResult = vec3(1.0) - exp(-Color * Exposure);
+//    finalResult = pow(finalResult, vec3(1.0 / Gamma));
+    outColor = vec4(Color, 1.0f);
 }

@@ -21,6 +21,8 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;
     frameBufferTextures.PositionTexture = FrameBufferTextureRenderer.GPositionTexture;
     frameBufferTextures.NormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    frameBufferTextures.TangentTexture = FrameBufferTextureRenderer.GTangentTexture;
+    frameBufferTextures.BiTangentTexture = FrameBufferTextureRenderer.GBiTangentTexture;
     frameBufferTextures.BloomTexture = bloomRenderPass.BloomTexture;
     frameBufferTextures.SSA0Texture = SSAOBlurRenderer.SSAOBlurTexture;
     frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
@@ -109,6 +111,8 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Image(FrameBufferTextureRenderer.GPositionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GAlbedoTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GNormalTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(FrameBufferTextureRenderer.GTangentTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(FrameBufferTextureRenderer.GBiTangentTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GBloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(bloomRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));

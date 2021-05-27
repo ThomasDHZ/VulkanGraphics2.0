@@ -9,6 +9,8 @@ struct HybridFrameBufferTextures
 	std::shared_ptr<Texture> PositionTexture;
 	std::shared_ptr<Texture> AlebdoTexture;
 	std::shared_ptr<Texture> NormalTexture;
+	std::shared_ptr<Texture> TangentTexture;
+	std::shared_ptr<Texture> BiTangentTexture;
 	std::shared_ptr<Texture> ShadowTexture;
 	std::shared_ptr<Texture> ReflectionTexture; 
 	std::shared_ptr<Texture> SSA0Texture; 

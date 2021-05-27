@@ -27,6 +27,8 @@ void HybridFrameBufferPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::s
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetDirectionalLightDescriptorCount()));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetPointLightDescriptorCount()));
@@ -45,10 +47,12 @@ void HybridFrameBufferPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std:
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetDirectionalLightDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetPointLightDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 11, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetSpotLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 11, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetDirectionalLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 12, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetPointLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 13, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetSpotLightDescriptorCount() });
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
@@ -59,6 +63,8 @@ void HybridFrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::s
     VkDescriptorImageInfo PositionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.PositionTexture->View, HybridTextures.PositionTexture->Sampler);
     VkDescriptorImageInfo AlebdoTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.AlebdoTexture->View, HybridTextures.AlebdoTexture->Sampler);
     VkDescriptorImageInfo NormalTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.NormalTexture->View, HybridTextures.NormalTexture->Sampler);
+    VkDescriptorImageInfo TangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.TangentTexture->View, HybridTextures.TangentTexture->Sampler);
+    VkDescriptorImageInfo BiTangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.BiTangentTexture->View, HybridTextures.BiTangentTexture->Sampler);
     VkDescriptorImageInfo ShadowTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ShadowTexture->View, HybridTextures.ShadowTexture->Sampler);
     VkDescriptorImageInfo ReflectionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ReflectionTexture->View, HybridTextures.ReflectionTexture->Sampler);
     VkDescriptorImageInfo SSAOTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.SSA0Texture->View, HybridTextures.SSA0Texture->Sampler);
@@ -73,15 +79,17 @@ void HybridFrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::s
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, PositionTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(1, DescriptorSets, AlebdoTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(2, DescriptorSets, NormalTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, ShadowTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(4, DescriptorSets, ReflectionTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(5, DescriptorSets, SSAOTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(6, DescriptorSets, SkyBoxTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(7, DescriptorSets, BloomTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(8, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(9, DescriptorSets, DirectionalLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(10, DescriptorSets, PointLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(11, DescriptorSets, SpotLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, TangentTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(4, DescriptorSets, BiTangentTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(5, DescriptorSets, ShadowTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(6, DescriptorSets, ReflectionTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(7, DescriptorSets, SSAOTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, DescriptorSets, SkyBoxTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, DescriptorSets, BloomTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(10, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(11, DescriptorSets, DirectionalLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(12, DescriptorSets, PointLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(13, DescriptorSets, SpotLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
