@@ -31,7 +31,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
         specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
-    return vec3(specular);
+    return vec3(ambient + diffuse + specular);
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
@@ -51,7 +51,7 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + ViewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
 
     vec3 ambient = PLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = PLight[index].diffuse * diff * material.Diffuse.rgb;
