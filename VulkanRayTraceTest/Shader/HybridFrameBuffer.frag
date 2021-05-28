@@ -138,10 +138,10 @@ void main()
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
 
 
-     if(SkyBox != vec3(0.0f))
-    {
-        result = SkyBox;
-    }
+//     if(SkyBox != vec3(0.0f))
+//    {
+//        result = SkyBox;
+//    }
 
 //    vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
 //    finalResult = pow(finalResult, vec3(1.0 / Gamma));
@@ -150,7 +150,13 @@ void main()
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index)
 {
+   float SSAO = texture(GSSA0Texture, TexCoords).r;
    vec3 Alebdo = texture(GAlebdoTexture, TexCoords).rgb;
+   if(scenedata.temp == 1)
+   {
+     Alebdo *= SSAO;
+   }
+
    float Shiny = texture(GAlebdoTexture, TexCoords).a;
    vec3 Specular = texture(SpecularMapTexture, TexCoords).rgb;
 
@@ -172,7 +178,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index)
     const float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
 
     vec3 ambient = DLight[index].ambient * Alebdo.rgb;
-    vec3 diffuse = DLight[index].diffuse * diff * Alebdo.rgb;
+    vec3 diffuse = DLight[index].diffuse * diff * Alebdo.rgb ;
     vec3 specular = DLight[index].specular * spec * Specular.rgb;
 
     return vec3(ambient + diffuse + specular);

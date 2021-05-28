@@ -170,6 +170,7 @@
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
+    <ClCompile Include="DeferredSkyboxPipeline.cpp" />
     <ClCompile Include="DepthDebugPipeline.cpp" />
     <ClCompile Include="DepthDebugRenderPass.cpp" />
     <ClCompile Include="DepthPipeline.cpp" />
@@ -274,6 +275,8 @@
     <None Include="Shader\closesthit.rchit" />
     <None Include="Shader\DeferedShader.frag" />
     <None Include="Shader\DeferedShader.vert" />
+    <None Include="Shader\DeferredSkyBoxFrameBufferShader.frag" />
+    <None Include="Shader\DeferredSkyBoxFrameBufferShader.vert" />
     <None Include="Shader\DepthDebugShader.frag" />
     <None Include="Shader\DepthDebugShader.vert" />
     <None Include="Shader\DepthShader.frag" />
@@ -355,6 +358,7 @@
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
+    <ClInclude Include="DeferredSkyboxPipeline.h" />
     <ClInclude Include="DepthDebugPipeline.h" />
     <ClInclude Include="DepthDebugRenderPass.h" />
     <ClInclude Include="DepthPipeline.h" />

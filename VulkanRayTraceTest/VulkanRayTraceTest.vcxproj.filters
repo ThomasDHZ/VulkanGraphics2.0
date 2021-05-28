@@ -399,6 +399,9 @@
     <ClCompile Include="LightPathRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="DeferredSkyboxPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -604,6 +607,12 @@
     </None>
     <None Include="Shader\RTVertexBuilder.glsl">
       <Filter>Shader\RaytracedShaders</Filter>
+    </None>
+    <None Include="Shader\DeferredSkyBoxFrameBufferShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\DeferredSkyBoxFrameBufferShader.vert">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -960,6 +969,9 @@
     </ClInclude>
     <ClInclude Include="LightPathRenderer.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredSkyboxPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

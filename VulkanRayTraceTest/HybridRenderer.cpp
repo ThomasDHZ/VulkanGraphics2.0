@@ -27,7 +27,7 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     frameBufferTextures.SSA0Texture = SSAOBlurRenderer.SSAOBlurTexture;
     frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
     frameBufferTextures.ReflectionTexture = rayTraceRenderPass.ReflectionTexture;
-    frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.SkyboxTexture;
+    frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.ReflectionTexture;
     frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
     frameBufferTextures.SpecularMapTexture = FrameBufferTextureRenderer.SpecularMapTexture;
     FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, frameBufferTextures);
@@ -55,8 +55,9 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     frameBufferTextures.SSA0Texture = SSAOBlurRenderer.SSAOBlurTexture;
     frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
     frameBufferTextures.ReflectionTexture = rayTraceRenderPass.ReflectionTexture;
-    frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.SkyboxTexture;
+    frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.ReflectionTexture;
     frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
+    frameBufferTextures.SpecularMapTexture = FrameBufferTextureRenderer.SpecularMapTexture;
 
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);

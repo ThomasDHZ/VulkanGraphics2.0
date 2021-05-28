@@ -4,11 +4,11 @@ RayTracedHybridPipeline::RayTracedHybridPipeline() : RayTracingGraphicsPipeline(
 {
 }
 
-RayTracedHybridPipeline::RayTracedHybridPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture, std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture) : RayTracingGraphicsPipeline(engine)
+RayTracedHybridPipeline::RayTracedHybridPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture) : RayTracingGraphicsPipeline(engine)
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
-    SetUpDescriptorSets(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture);
+    SetUpDescriptorSets(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture);
     SetUpPipeline(engine);
     SetUpShaderBindingTable(engine);
 }
@@ -17,7 +17,7 @@ RayTracedHybridPipeline::~RayTracedHybridPipeline()
 {
 }
 
-void RayTracedHybridPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture, std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture)
+void RayTracedHybridPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture)
 {
     RayTracingGraphicsPipeline::UpdateGraphicsPipeLine(engine);
     raygenShaderBindingTable.DestoryBuffer(engine.Device);
@@ -26,7 +26,7 @@ void RayTracedHybridPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::
 
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
-    SetUpDescriptorSets(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture);
+    SetUpDescriptorSets(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture);
     SetUpPipeline(engine);
     SetUpShaderBindingTable(engine);
 }
@@ -78,7 +78,7 @@ void RayTracedHybridPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::s
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void RayTracedHybridPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture, std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture)
+void RayTracedHybridPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -86,7 +86,6 @@ void RayTracedHybridPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::sha
     VkDescriptorImageInfo ShadowTextureMaskDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, ShadowTextureMask->View);
     VkDescriptorImageInfo ReflectionTextureDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, ReflectionTexture->View);
     VkDescriptorImageInfo SSAOTexturDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, SSAOTexture->View);
-    VkDescriptorImageInfo SkyboxTextureDescriptor = engine.AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, SkyboxTexture->View);
     VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
 
     std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = assetManager->lightManager.GetDirectionalLightBufferListDescriptor();
@@ -118,7 +117,6 @@ void RayTracedHybridPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::sha
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(13, DescriptorSets, CubeMapImage));
     DescriptorList.emplace_back(engine.AddStorageImageBuffer(14, DescriptorSets, ReflectionTextureDescriptor));
     DescriptorList.emplace_back(engine.AddStorageImageBuffer(15, DescriptorSets, SSAOTexturDescriptor));
-    DescriptorList.emplace_back(engine.AddStorageImageBuffer(16, DescriptorSets, SkyboxTextureDescriptor));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }

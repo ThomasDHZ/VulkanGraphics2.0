@@ -15,13 +15,12 @@ RayTraceRenderPass::RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<Ass
     ShadowTextureMask = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
     ReflectionTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
     SSAOTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
-    SkyboxTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
 
     topLevelAS = AccelerationStructure(engine);
     SetUpTopLevelAccelerationStructure(engine, assetManager);
     RTPipeline = std::make_shared<RayTracedPipeline>(RayTracedPipeline(engine, assetManager, topLevelAS, RayTracedTexture));
     RTPBRPipeline = std::make_shared<RayTracedPBRPipeline>(RayTracedPBRPipeline(engine, assetManager, topLevelAS, RayTracedTexture));
-    RTHybridPipeline = std::make_shared<RayTracedHybridPipeline>(RayTracedHybridPipeline(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture));
+    RTHybridPipeline = std::make_shared<RayTracedHybridPipeline>(RayTracedHybridPipeline(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture));
     SetUpCommandBuffers(engine);
 }
 
@@ -183,12 +182,10 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
         ShadowTextureMask->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
         ReflectionTexture->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
         SSAOTexture->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
-        SkyboxTexture->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
         engine.vkCmdTraceRaysKHR(RayTraceCommandBuffer, &raygenShaderSbtEntry, &missShaderSbtEntry, &hitShaderSbtEntry, &callableShaderSbtEntry, engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height, 1);
         ShadowTextureMask->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         ReflectionTexture->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         SSAOTexture->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-        SkyboxTexture->UpdateImageLayout(engine, RayTraceCommandBuffer, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
     else
     {
@@ -205,11 +202,10 @@ void RayTraceRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<
     ShadowTextureMask->RecreateRendererTexture(engine);
     ReflectionTexture->RecreateRendererTexture(engine);
     SSAOTexture->RecreateRendererTexture(engine);
-    SkyboxTexture->RecreateRendererTexture(engine);
 
     RTPipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, RayTracedTexture);
     RTPBRPipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, RayTracedTexture);
-    RTHybridPipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture, SkyboxTexture);
+    RTHybridPipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, ShadowTextureMask, ReflectionTexture, SSAOTexture);
 }
 
 void RayTraceRenderPass::Destroy(VulkanEngine& engine)
@@ -229,7 +225,6 @@ void RayTraceRenderPass::Destroy(VulkanEngine& engine)
         ShadowTextureMask->Delete(engine);
         ReflectionTexture->Delete(engine);
         SSAOTexture->Delete(engine);
-        SkyboxTexture->Delete(engine);
     }
     RTPipeline->Destroy(engine);
     RTPBRPipeline->Destroy(engine);

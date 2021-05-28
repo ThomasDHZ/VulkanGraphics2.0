@@ -7,6 +7,7 @@
 #include "RenderedGBufferPositionTexture.h"
 #include "AssetManager.h"
 #include "GBufferPipeline.h"
+#include "DeferredSkyboxPipeline.h"
 
 class GBufferRenderPass
 {
@@ -21,6 +22,7 @@ public:
 	~GBufferRenderPass();
 
 	static constexpr RenderPassID RendererID = Deferred_Renderer;
+	static constexpr RenderPassID rendererPassID = Texture_Renderer;
 
 	std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
 	std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
@@ -33,6 +35,7 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<GBufferPipeline> gBufferPipeline;
+	std::shared_ptr<DeferredSkyboxPipeline> skyBoxRenderingPipeline;
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkRenderPass RenderPass = VK_NULL_HANDLE;

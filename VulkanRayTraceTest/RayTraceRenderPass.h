@@ -16,7 +16,6 @@ public:
     std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask;
     std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture;
-    std::shared_ptr<RenderedRayTracedColorTexture> SkyboxTexture;
 
     std::shared_ptr<RayTracedPipeline> RTPipeline;
     std::shared_ptr<RayTracedPBRPipeline> RTPBRPipeline;

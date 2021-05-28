@@ -1,5 +1,6 @@
 #include "DeferredRenderPass.h"
 #include "GraphicsPipeline.h"
+#include "Skybox.h"
 
 GBufferRenderPass::GBufferRenderPass()
 {
@@ -21,6 +22,7 @@ GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     gBufferPipeline = std::make_shared<GBufferPipeline>(GBufferPipeline(engine, assetManager, RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<DeferredSkyboxPipeline>(DeferredSkyboxPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -262,11 +264,14 @@ void GBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
+    static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer, renderPassInfo, rendererPassID);
+    
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipelineLayout, 0, 1, &gBufferPipeline->DescriptorSets, 0, nullptr);
     assetManager->Draw(CommandBuffer, renderPassInfo, gBufferPipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
     vkCmdEndRenderPass(CommandBuffer);
-
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -297,6 +302,7 @@ void GBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<A
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     gBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
@@ -314,6 +320,7 @@ void GBufferRenderPass::Destroy(VulkanEngine& engine)
     DepthTexture->Delete(engine);
 
     gBufferPipeline->Destroy(engine);
+    skyBoxRenderingPipeline->Destroy(engine);
     
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
