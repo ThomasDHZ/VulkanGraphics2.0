@@ -3,6 +3,7 @@
 #include "Skybox.h"
 #include "TerrainMesh.h"
 #include "BillboardMesh.h"
+#include "Mario.h"
 
 Engine::Engine()
 {
@@ -15,16 +16,16 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager = std::make_shared<AssetManager>(AssetManager(engine));
 
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
-    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
-    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
-    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
-    //assetManager.meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
+    //assetManager->meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
 
     assetManager->AddModel();
     assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[0]);
-    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[1]);
-    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[2]);
-    //assetManager.modelManager.ModelList.back()->AddMesh(engine, assetManager.meshManager.MeshList[3]);
+    assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[1]);
+    assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
+    assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
     std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, assetManager->textureManager);
     material2->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/FireBillboard.png", VK_FORMAT_R8G8B8A8_SRGB);
     material2->materialTexture.AlphaMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/FireBillboardAlpha.png", VK_FORMAT_R8G8B8A8_SRGB);
@@ -50,7 +51,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
-     assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
+     //assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
      assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/
 
@@ -74,22 +75,22 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 
 
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/perlin_noise.png")));
-    std::shared_ptr<Material> material1 = std::make_shared<Material>(engine, assetManager->textureManager);
-    material1->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    material1->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    material1->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material1->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material1->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_nor_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material1->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material1->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    uint32_t MaterialID1 = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material1);
-    assetManager->meshManager.MeshList.back()->MaterialID = MaterialID1;
-   // assetManager->modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
+   // assetManager->meshManager.MeshList.emplace_back(std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/perlin_noise.png")));
+   // std::shared_ptr<Material> material1 = std::make_shared<Material>(engine, assetManager->textureManager);
+   // material1->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+   // material1->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+   // material1->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+   // material1->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+   // material1->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_nor_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+   // material1->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+   // material1->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+   // uint32_t MaterialID1 = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material1);
+   // assetManager->meshManager.MeshList.back()->MaterialID = MaterialID1;
+   //// assetManager->modelManager.ModelList[0]->MeshList[0]->MaterialID = MaterialID;
 
 
 
-   //   assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
+      assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
   // assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

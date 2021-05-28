@@ -1,12 +1,12 @@
-#include "DeferredRenderPass.h"
+#include "GBufferRenderPass2.h"
 #include "GraphicsPipeline.h"
 #include "Skybox.h"
 
-GBufferRenderPass::GBufferRenderPass()
+GBufferRenderPass2::GBufferRenderPass2()
 {
 }
 
-GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+GBufferRenderPass2::GBufferRenderPass2(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
 
     GPositionTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
@@ -21,16 +21,16 @@ GBufferRenderPass::GBufferRenderPass(VulkanEngine& engine, std::shared_ptr<Asset
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    gBufferPipeline = std::make_shared<GBufferPipeline>(GBufferPipeline(engine, assetManager, RenderPass));
+    gBufferPipeline = std::make_shared<GBufferPipeline2>(GBufferPipeline2(engine, assetManager, RenderPass));
     skyBoxRenderingPipeline = std::make_shared<DeferredSkyboxPipeline>(DeferredSkyboxPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
-GBufferRenderPass::~GBufferRenderPass()
+GBufferRenderPass2::~GBufferRenderPass2()
 {
 }
 
-void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
+void GBufferRenderPass2::CreateRenderPass(VulkanEngine& engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -187,7 +187,7 @@ void GBufferRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void GBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void GBufferRenderPass2::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
@@ -220,7 +220,7 @@ void GBufferRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void GBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void GBufferRenderPass2::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -233,7 +233,7 @@ void GBufferRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void GBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void GBufferRenderPass2::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -267,7 +267,7 @@ void GBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
     static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer, renderPassInfo, rendererPassID);
-    
+
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipelineLayout, 0, 1, &gBufferPipeline->DescriptorSets, 0, nullptr);
     assetManager->Draw(CommandBuffer, renderPassInfo, gBufferPipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
@@ -278,7 +278,7 @@ void GBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
     }
 }
 
-void GBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void GBufferRenderPass2::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     GPositionTexture->RecreateRendererTexture(engine);
     GNormalTexture->RecreateRendererTexture(engine);
@@ -306,7 +306,7 @@ void GBufferRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<A
     SetUpCommandBuffers(engine);
 }
 
-void GBufferRenderPass::Destroy(VulkanEngine& engine)
+void GBufferRenderPass2::Destroy(VulkanEngine& engine)
 {
 
     GPositionTexture->Delete(engine);
@@ -321,7 +321,7 @@ void GBufferRenderPass::Destroy(VulkanEngine& engine)
 
     gBufferPipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);
-    
+
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 

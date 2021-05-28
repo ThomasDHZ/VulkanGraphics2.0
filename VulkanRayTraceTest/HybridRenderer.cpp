@@ -7,6 +7,7 @@ HybridRenderer::HybridRenderer() : BaseRenderer()
 HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     FrameBufferTextureRenderer = GBufferRenderPass(engine, assetManager);
+    FrameBufferTextureRenderer2 = GBufferRenderPass2(engine, assetManager);
     rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
     bloomRenderPass = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
@@ -30,6 +31,7 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.ReflectionTexture;
     frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
     frameBufferTextures.SpecularMapTexture = FrameBufferTextureRenderer.SpecularMapTexture;
+    frameBufferTextures.ReflectionMapTexture = FrameBufferTextureRenderer2.NormalMapTexture;
     FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, frameBufferTextures);
 
     CurrentSSAOSampleRate = SSAORenderer.KernalSampleSize;
@@ -58,7 +60,7 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.ReflectionTexture;
     frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
     frameBufferTextures.SpecularMapTexture = FrameBufferTextureRenderer.SpecularMapTexture;
-
+    frameBufferTextures.ReflectionMapTexture = FrameBufferTextureRenderer2.NormalMapTexture;
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
     bloomRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
@@ -70,7 +72,7 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
 
 void HybridRenderer::GUIUpdate(VulkanEngine& engine)
 {
-    ImGui::Image(rayTraceRenderPass.ReflectionTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(FrameBufferTextureRenderer2.NormalMapTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::LabelText("Directional Light", "Directional Light");
     for (int x = 0; x < assetManager->lightManager.DirectionalLightList.size(); x++)
     {
@@ -145,6 +147,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
 void HybridRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
+    FrameBufferTextureRenderer2.Draw(engine, assetManager, imageIndex);
     rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID, assetManager->cameraManager.ActiveCamera);
     bloomRenderPass.Draw(engine, assetManager, imageIndex);
    // DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
@@ -170,6 +173,7 @@ void HybridRenderer::Destroy(VulkanEngine& engine)
 std::vector<VkCommandBuffer> HybridRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
 {
     CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer2.CommandBuffer);
     CommandBufferSubmitList.emplace_back(rayTraceRenderPass.RayTraceCommandBuffer);
     CommandBufferSubmitList.emplace_back(bloomRenderPass.CommandBuffer);
    // CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);

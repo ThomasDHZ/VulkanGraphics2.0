@@ -87,6 +87,21 @@ void main()
    {
 	 discard;
    }
+    vec3 T = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(Tangent));
+    vec3 B = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(BiTangent));
+    vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    vec3 ViewPos  = ConstMesh.CameraPos;
+    vec3 FragPos2  = FragPos;
+    if(material.NormalMapID != 0)
+    {
+        ViewPos  = TBN * ConstMesh.CameraPos;
+        FragPos2  = TBN * FragPos;
+    }
+    vec3 I = normalize(FragPos2 - ViewPos);
+    vec3 R = reflect(I, normalize(Normal));
+    vec3 Reflection = texture(CubeMap, R).rgb;
 
 	GPosition = vec4(FragPos, 1.0f);
 	if(material.DiffuseMapID != 0)
@@ -99,19 +114,14 @@ void main()
         GAlebdo = vec4(material.Diffuse, 1.0f);
         GAlebdo.a = material.Shininess;
     }
-	GNormal = vec4(Normal, 1.0f);
+	GNormal = vec4(Normal, material.Reflectivness);
     GTangent = vec4(Tangent.rgb, 1.0f);
     GBiTangent = vec4(BiTangent.rgb, 1.0f);
 	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-    if(material.NormalMapID != 0)
-    {
-        NormalMap = vec4(texture(TextureMap[material.NormalMapID], texCoords).rgb, 1.0f);
-    }
-    else
-    {
-        NormalMap = vec4(texture(TextureMap[material.NormalMapID], texCoords).rgb, 0.0f);
-    } 
+
+        NormalMap = vec4(Reflection, material.Reflectivness);
+
 
     SpecularMap = vec4(material.Specular, 1.0f);
     if (material.SpecularMapID != 0)

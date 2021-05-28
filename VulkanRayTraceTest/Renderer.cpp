@@ -16,9 +16,9 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
     assetManager = assetManagerPTR;
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
-    pbrRenderer = PBRRenderer(engine, window, assetManager);
-    rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
-    pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
+    //pbrRenderer = PBRRenderer(engine, window, assetManager);
+    //rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
+    //pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
     hybridRenderer = HybridRenderer(engine, window, assetManager);
 }
 
@@ -49,9 +49,9 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
-    pbrRenderer.RebuildSwapChain(engine, window);
-    rayTraceRenderer.RebuildSwapChain(engine, window);
-    pbrRayTraceRenderer.RebuildSwapChain(engine, window);
+    //pbrRenderer.RebuildSwapChain(engine, window);
+    //rayTraceRenderer.RebuildSwapChain(engine, window);
+    //pbrRayTraceRenderer.RebuildSwapChain(engine, window);
     hybridRenderer.RebuildSwapChain(engine, window);
 }
 
@@ -101,8 +101,8 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
     mouse.Update(window.GetWindowPtr(), assetManager->cameraManager.ActiveCamera);
 
     assetManager->Update(engine);
-    rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
-    pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+   // rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+   // pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
     hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
 }
 
@@ -115,22 +115,27 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Checkbox("Deleteplightflag", &deleteplightflag);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     ImGui::SliderInt("Active Camera", &assetManager->cameraManager.cameraIndex, 0, assetManager->cameraManager.CameraList.size());
+    
+    for (auto& materal : assetManager->materialManager.MaterialList)
+    {
+        ImGui::SliderFloat("adsf", &materal->materialTexture.Reflectivness, 0.0f, 1.0f);
+    }
     if (ActiveRenderer == 0)
     {
         blinnPhongRenderer.GUIUpdate(engine);
     }
-    else if (ActiveRenderer == 1)
-    {
-        pbrRenderer.GUIUpdate(engine);
-    }
-    else if (ActiveRenderer == 2)
-    {
-        rayTraceRenderer.GUIUpdate(engine);
-    }
-    else if (ActiveRenderer == 3)
-    {
-        pbrRayTraceRenderer.GUIUpdate(engine);
-    }
+    //else if (ActiveRenderer == 1)
+    //{
+    //    pbrRenderer.GUIUpdate(engine);
+    //}
+    //else if (ActiveRenderer == 2)
+    //{
+    //    rayTraceRenderer.GUIUpdate(engine);
+    //}
+    //else if (ActiveRenderer == 3)
+    //{
+    //    pbrRayTraceRenderer.GUIUpdate(engine);
+    //}
     else if (ActiveRenderer == 4)
     {
         hybridRenderer.GUIUpdate(engine);
@@ -173,21 +178,21 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
         blinnPhongRenderer.Draw(engine, window, imageIndex);
         blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
-    else if (ActiveRenderer == 1)
-    {
-        pbrRenderer.Draw(engine, window, imageIndex);
-        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
-    else if (ActiveRenderer == 2)
-    {
-        rayTraceRenderer.Draw(engine, window, imageIndex);
-        rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
-    else if (ActiveRenderer == 3)
-    {
-        pbrRayTraceRenderer.Draw(engine, window, imageIndex);
-        pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
+    //else if (ActiveRenderer == 1)
+    //{
+    //    pbrRenderer.Draw(engine, window, imageIndex);
+    //    pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
+    //else if (ActiveRenderer == 2)
+    //{
+    //    rayTraceRenderer.Draw(engine, window, imageIndex);
+    //    rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
+    //else if (ActiveRenderer == 3)
+    //{
+    //    pbrRayTraceRenderer.Draw(engine, window, imageIndex);
+    //    pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
     else if (ActiveRenderer == 4)
     {
         hybridRenderer.Draw(engine, window, imageIndex);
@@ -245,8 +250,8 @@ void Renderer::Destroy(VulkanEngine& engine)
 {
     interfaceRenderPass.Destroy(engine);
     blinnPhongRenderer.Destroy(engine);
-    pbrRenderer.Destroy(engine);
-    rayTraceRenderer.Destroy(engine);
-    pbrRayTraceRenderer.Destroy(engine);
+    //pbrRenderer.Destroy(engine);
+    //rayTraceRenderer.Destroy(engine);
+    //pbrRayTraceRenderer.Destroy(engine);
     hybridRenderer.Destroy(engine);
 }

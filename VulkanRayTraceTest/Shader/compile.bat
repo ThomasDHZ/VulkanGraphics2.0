@@ -34,6 +34,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BloomShader.vert -o BloomShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BloomShader.frag -o BloomShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.vert -o GBufferVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer.frag -o GBufferFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer2.vert -o GBuffer2Vert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe GBuffer2.frag -o GBuffer2Frag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SSAOShader.vert -o SSAOShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SSAOShader.frag -o SSAOShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe SSAOBlurShader.vert -o SSAOBlurShaderVert.spv

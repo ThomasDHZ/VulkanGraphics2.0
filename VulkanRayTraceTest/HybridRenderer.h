@@ -5,17 +5,19 @@
 #include "FrameBufferRenderPass.h"
 #include "RayTraceRenderPass.h"
 #include "HybridFrameBufferRenderPass.h"
-#include "DeferredRenderPass.h"
+#include "GBufferRenderPass.h"
 #include "SSAORenderPass.h"
 #include "SSAOBlurRenderPass.h"
 #include "BloomRenderPass.h"
 #include "DepthDebugRenderPass.h"
+#include "GBufferRenderPass2.h"
 
 class HybridRenderer : public BaseRenderer
 {
 private:
 	int CurrentSSAOSampleRate;
 	GBufferRenderPass FrameBufferTextureRenderer;
+	GBufferRenderPass2 FrameBufferTextureRenderer2;
 	HybridFrameBufferRenderPass FrameBufferRenderer;
 	//DepthDebugRenderPass DebugDepthRenderer;
 	SSAORenderPass SSAORenderer;

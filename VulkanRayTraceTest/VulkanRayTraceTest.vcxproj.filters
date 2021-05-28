@@ -171,9 +171,6 @@
     <ClCompile Include="InterfaceRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="DeferredRenderPass.cpp">
-      <Filter>Source Files\RenderPass</Filter>
-    </ClCompile>
     <ClCompile Include="WaterRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
     </ClCompile>
@@ -402,6 +399,15 @@
     <ClCompile Include="DeferredSkyboxPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="GBufferPipeline2.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="GBufferRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="GBufferRenderPass2.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -614,6 +620,12 @@
     <None Include="Shader\DeferredSkyBoxFrameBufferShader.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\GBuffer2.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\GBuffer2.vert">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">
@@ -737,9 +749,6 @@
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="InterfaceRenderPass.h">
-      <Filter>Header Files\RenderPass</Filter>
-    </ClInclude>
-    <ClInclude Include="DeferredRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="WaterRenderPass.h">
@@ -972,6 +981,15 @@
     </ClInclude>
     <ClInclude Include="DeferredSkyboxPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferPipeline2.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="GBufferRenderPass2.h">
+      <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

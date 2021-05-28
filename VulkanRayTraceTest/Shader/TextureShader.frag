@@ -91,7 +91,7 @@ layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
-layout(binding = 9) uniform sampler2D ShadowMap;
+layout(binding = 9) uniform samplerCube CubeMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -149,7 +149,11 @@ void main()
 //     }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
 
-    outColor = vec4(result, 1.0f);
+    vec3 I = normalize(FragPos2 - ViewPos);
+    vec3 R = reflect(I, normalize(Normal));
+    vec3 Reflection = texture(CubeMap, R).rgb;
+    vec3 finalMix = mix(result, Reflection, material.Reflectivness);
+    outColor = vec4(finalMix, 1.0f);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     if(material.DiffuseMapID != 0)
     {

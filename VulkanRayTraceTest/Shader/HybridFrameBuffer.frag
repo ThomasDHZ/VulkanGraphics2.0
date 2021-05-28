@@ -24,7 +24,8 @@ layout(binding = 8) uniform sampler2D GSkyBoxTexture;
 layout(binding = 9) uniform sampler2D GBloomTexture;
 layout(binding = 10) uniform sampler2D NormalMapTexture;
 layout(binding = 11) uniform sampler2D SpecularMapTexture;
-layout(binding = 12) uniform UniformBufferObject {
+layout(binding = 12) uniform sampler2D ReflectionMapTexture;
+layout(binding = 13) uniform UniformBufferObject {
 	DirectionalLight dlight;
 	PointLight plight[5];
 	SpotLight sLight;
@@ -41,7 +42,7 @@ layout(binding = 12) uniform UniformBufferObject {
     int temp;
 } scenedata;
 
-layout(binding = 13) buffer DirectionalLight2
+layout(binding = 14) buffer DirectionalLight2
 { 
     vec3 direction;
     vec3 ambient;
@@ -49,7 +50,7 @@ layout(binding = 13) buffer DirectionalLight2
     vec3 specular;
 } DLight[];
 
-layout(binding = 14) buffer PointLight2
+layout(binding = 15) buffer PointLight2
 { 
     vec3 position;
     vec3 ambient;
@@ -60,7 +61,7 @@ layout(binding = 14) buffer PointLight2
     float quadratic;
 } PLight[];
 
-layout(binding = 15) buffer SpotLight2
+layout(binding = 16) buffer SpotLight2
 { 
    vec3 position;
    vec3 direction;
@@ -74,6 +75,7 @@ layout(binding = 15) buffer SpotLight2
    float linear;
    float quadratic;
 } SLight[];
+
 
 layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
@@ -94,7 +96,7 @@ void main()
     vec3 Tangent = texture(GTangentTexture, TexCoords).rgb;
     vec3 BiTangent = texture(GBiTangentTexture, TexCoords).rgb;
     vec3 Shadow = texture(GShadowTexture, TexCoords).rgb;
-    vec3 Reflection = texture(GReflectionTexture, TexCoords).rgb;
+    vec4 Reflection = texture(ReflectionMapTexture, TexCoords);
     float SSAO = texture(GSSA0Texture, TexCoords).r;
     vec3 SkyBox = texture(GSkyBoxTexture, TexCoords).rgb;
     vec3 Bloom = texture(GBloomTexture, TexCoords).rgb;
@@ -145,7 +147,10 @@ void main()
 
 //    vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
 //    finalResult = pow(finalResult, vec3(1.0 / Gamma));
-    outColor = vec4(result, 1.0f);
+
+    //Reflectivty is stored in alpha channel.
+    vec3 finalMix = mix(result, Reflection.rgb, Reflection.a);
+    outColor = vec4(finalMix, 1.0f);
 }
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index)
