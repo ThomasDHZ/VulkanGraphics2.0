@@ -28,6 +28,8 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
     frameBufferTextures.ReflectionTexture = rayTraceRenderPass.ReflectionTexture;
     frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.SkyboxTexture;
+    frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
+    frameBufferTextures.SpecularMapTexture = FrameBufferTextureRenderer.SpecularMapTexture;
     FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, frameBufferTextures);
 
     CurrentSSAOSampleRate = SSAORenderer.KernalSampleSize;
@@ -47,11 +49,14 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;
     frameBufferTextures.PositionTexture = FrameBufferTextureRenderer.GPositionTexture;
     frameBufferTextures.NormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    frameBufferTextures.TangentTexture = FrameBufferTextureRenderer.GTangentTexture;
+    frameBufferTextures.BiTangentTexture = FrameBufferTextureRenderer.GBiTangentTexture;
     frameBufferTextures.BloomTexture = bloomRenderPass.BloomTexture;
     frameBufferTextures.SSA0Texture = SSAOBlurRenderer.SSAOBlurTexture;
     frameBufferTextures.ShadowTexture = rayTraceRenderPass.ShadowTextureMask;
     frameBufferTextures.ReflectionTexture = rayTraceRenderPass.ReflectionTexture;
     frameBufferTextures.SkyBoxTexture = rayTraceRenderPass.SkyboxTexture;
+    frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
 
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
@@ -114,6 +119,8 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Image(FrameBufferTextureRenderer.GTangentTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GBiTangentTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.GBloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(FrameBufferTextureRenderer.NormalMapTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
+    ImGui::Image(FrameBufferTextureRenderer.SpecularMapTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(bloomRenderPass.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     //ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     if (ApplySSAO)

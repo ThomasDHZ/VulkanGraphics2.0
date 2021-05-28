@@ -16,6 +16,8 @@ struct HybridFrameBufferTextures
 	std::shared_ptr<Texture> SSA0Texture; 
 	std::shared_ptr<Texture> SkyBoxTexture;
 	std::shared_ptr<Texture> BloomTexture;
+	std::shared_ptr<Texture> NormalMapTexture;
+	std::shared_ptr<Texture> SpecularMapTexture;
 };
 
 class HybridFrameBufferPipeline : public GraphicsPipeline

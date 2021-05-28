@@ -71,6 +71,8 @@ layout(location = 2) out vec4 GNormal;
 layout(location = 3) out vec4 GTangent;
 layout(location = 4) out vec4 GBiTangent;
 layout(location = 5) out vec4 GBloom;
+layout(location = 6) out vec4 NormalMap;
+layout(location = 7) out vec4 SpecularMap;
 
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
@@ -88,21 +90,31 @@ void main()
 	GPosition = vec4(FragPos, 1.0f);
 	if(material.DiffuseMapID != 0)
     {
-        GAlebdo = texture(TextureMap[material.DiffuseMapID], texCoords).rgba;
+        GAlebdo.rgb = texture(TextureMap[material.DiffuseMapID], texCoords).rgb;
+        GAlebdo.a = material.Shininess;
     }
     else
     {
         GAlebdo = vec4(material.Diffuse, 1.0f);
+        GAlebdo.a = material.Shininess;
     }
-	if(material.DiffuseMapID != 0)
-    {
-		GNormal = vec4(Normal, 1.0f);
-	}
-	else
-    {
-        GNormal = vec4(material.Diffuse, 1.0f);
-    }
+	GNormal = vec4(Normal, 1.0f);
     GTangent = vec4(Tangent.rgb, 1.0f);
     GBiTangent = vec4(BiTangent.rgb, 1.0f);
 	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    if(material.NormalMapID != 0)
+    {
+        NormalMap = vec4(texture(TextureMap[material.NormalMapID], texCoords).rgb, 1.0f);
+    }
+    else
+    {
+        NormalMap = vec4(texture(TextureMap[material.NormalMapID], texCoords).rgb, 0.0f);
+    } 
+
+    SpecularMap = vec4(material.Specular, 1.0f);
+    if (material.SpecularMapID != 0)
+    {
+        SpecularMap =  vec4(texture(TextureMap[material.SpecularMapID], texCoords).rgb, 1.0f);
+    }
 }

@@ -28,6 +28,8 @@ public:
 	std::shared_ptr<RenderedGBufferPositionTexture> GTangentTexture;
 	std::shared_ptr<RenderedGBufferPositionTexture> GBiTangentTexture;
 	std::shared_ptr<RenderedColorTexture> GBloomTexture;
+	std::shared_ptr<RenderedColorTexture> NormalMapTexture;
+	std::shared_ptr<RenderedColorTexture> SpecularMapTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<GBufferPipeline> gBufferPipeline;

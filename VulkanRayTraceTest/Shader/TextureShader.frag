@@ -143,10 +143,10 @@ void main()
      {
         result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
      }
-     for(int x = 0; x < scenedata.PointLightCount; x++)
-     {
-        result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
-     }
+//     for(int x = 0; x < scenedata.PointLightCount; x++)
+//     {
+//        result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
+//     }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
 
     outColor = vec4(result, 1.0f);

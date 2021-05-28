@@ -143,60 +143,30 @@ void GBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPa
     depthStencil.depthBoundsTestEnable = VK_FALSE;
     depthStencil.stencilTestEnable = VK_FALSE;
 
-    std::array<VkPipelineColorBlendAttachmentState, 6> ColorAttachment = {};
+    std::array<VkPipelineColorBlendAttachmentState, 8> ColorAttachment = {};
     ColorAttachment[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    ColorAttachment[0].blendEnable = VK_TRUE;
-    ColorAttachment[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    ColorAttachment[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    ColorAttachment[0].colorBlendOp = VK_BLEND_OP_ADD;
-    ColorAttachment[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    ColorAttachment[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    ColorAttachment[0].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+    ColorAttachment[0].blendEnable = VK_FALSE;
 
     ColorAttachment[1].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    ColorAttachment[1].blendEnable = VK_TRUE;
-    ColorAttachment[1].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    ColorAttachment[1].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    ColorAttachment[1].colorBlendOp = VK_BLEND_OP_ADD;
-    ColorAttachment[1].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    ColorAttachment[1].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    ColorAttachment[1].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+    ColorAttachment[1].blendEnable = VK_FALSE;
 
     ColorAttachment[2].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    ColorAttachment[2].blendEnable = VK_TRUE;
-    ColorAttachment[2].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    ColorAttachment[2].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    ColorAttachment[2].colorBlendOp = VK_BLEND_OP_ADD;
-    ColorAttachment[2].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    ColorAttachment[2].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    ColorAttachment[2].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+    ColorAttachment[2].blendEnable = VK_FALSE;
 
     ColorAttachment[3].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    ColorAttachment[3].blendEnable = VK_TRUE;
-    ColorAttachment[3].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    ColorAttachment[3].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    ColorAttachment[3].colorBlendOp = VK_BLEND_OP_ADD;
-    ColorAttachment[3].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    ColorAttachment[3].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    ColorAttachment[3].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+    ColorAttachment[3].blendEnable = VK_FALSE;
 
     ColorAttachment[4].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    ColorAttachment[4].blendEnable = VK_TRUE;
-    ColorAttachment[4].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    ColorAttachment[4].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    ColorAttachment[4].colorBlendOp = VK_BLEND_OP_ADD;
-    ColorAttachment[4].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    ColorAttachment[4].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    ColorAttachment[4].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+    ColorAttachment[4].blendEnable = VK_FALSE;
 
     ColorAttachment[5].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    ColorAttachment[5].blendEnable = VK_TRUE;
-    ColorAttachment[5].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    ColorAttachment[5].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    ColorAttachment[5].colorBlendOp = VK_BLEND_OP_ADD;
-    ColorAttachment[5].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    ColorAttachment[5].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    ColorAttachment[5].alphaBlendOp = VK_BLEND_OP_SUBTRACT;
+    ColorAttachment[5].blendEnable = VK_FALSE;
+
+    ColorAttachment[6].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    ColorAttachment[6].blendEnable = VK_FALSE;
+
+    ColorAttachment[7].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    ColorAttachment[7].blendEnable = VK_FALSE;
 
     VkPipelineColorBlendStateCreateInfo colorBlending{};
     colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;

@@ -31,7 +31,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
         specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
-    return vec3(ambient + diffuse + specular);
+    return vec3(specular);
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)

@@ -22,7 +22,9 @@ layout(binding = 6) uniform sampler2D GReflectionTexture;
 layout(binding = 7) uniform sampler2D GSSA0Texture;
 layout(binding = 8) uniform sampler2D GSkyBoxTexture;
 layout(binding = 9) uniform sampler2D GBloomTexture;
-layout(binding = 10) uniform UniformBufferObject {
+layout(binding = 10) uniform sampler2D NormalMapTexture;
+layout(binding = 11) uniform sampler2D SpecularMapTexture;
+layout(binding = 12) uniform UniformBufferObject {
 	DirectionalLight dlight;
 	PointLight plight[5];
 	SpotLight sLight;
@@ -39,7 +41,7 @@ layout(binding = 10) uniform UniformBufferObject {
     int temp;
 } scenedata;
 
-layout(binding = 11) buffer DirectionalLight2
+layout(binding = 13) buffer DirectionalLight2
 { 
     vec3 direction;
     vec3 ambient;
@@ -47,7 +49,7 @@ layout(binding = 11) buffer DirectionalLight2
     vec3 specular;
 } DLight[];
 
-layout(binding = 12) buffer PointLight2
+layout(binding = 14) buffer PointLight2
 { 
     vec3 position;
     vec3 ambient;
@@ -58,7 +60,7 @@ layout(binding = 12) buffer PointLight2
     float quadratic;
 } PLight[];
 
-layout(binding = 13) buffer SpotLight2
+layout(binding = 15) buffer SpotLight2
 { 
    vec3 position;
    vec3 direction;
@@ -78,6 +80,7 @@ layout(location = 0) out vec4 outColor;
 
 const float Gamma = 2.2f;
 const float Exposure = 1.0f;
+mat3 TBN;
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index);
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, int index);
@@ -86,8 +89,8 @@ void main()
 {
     vec3 Position = texture(GPositionTexture, TexCoords).rgb;
     vec3 Alebdo = texture(GAlebdoTexture, TexCoords).rgb;
-    float Specular = texture(GAlebdoTexture, TexCoords).a;
-    vec3 Normal = texture(GNormalTexture, TexCoords).rgb;
+   vec3 Specular = texture(SpecularMapTexture, TexCoords).rgb;
+  //  vec3 Normal = texture(GNormalTexture, TexCoords).rgb;
     vec3 Tangent = texture(GTangentTexture, TexCoords).rgb;
     vec3 BiTangent = texture(GBiTangentTexture, TexCoords).rgb;
     vec3 Shadow = texture(GShadowTexture, TexCoords).rgb;
@@ -95,21 +98,24 @@ void main()
     float SSAO = texture(GSSA0Texture, TexCoords).r;
     vec3 SkyBox = texture(GSkyBoxTexture, TexCoords).rgb;
     vec3 Bloom = texture(GBloomTexture, TexCoords).rgb;
-
+    vec3 normal = texture(GNormalTexture, TexCoords).rgb;
    const vec3 T = normalize(Position.rgb * Tangent);
    const vec3 B = normalize(Position.rgb * BiTangent);
-   const vec3 N = normalize(Position.rgb * Normal);
+   const vec3 N = normalize(Position.rgb * normal);
    mat3 TBN = transpose(mat3(T, B, N));
 
     vec3 result = vec3(0.0f);
-    vec3 normal = Normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
     vec3 FragPos2  = Position;
-
+    if(texture(NormalMapTexture, TexCoords).a == 1.0f)
+    {
         ViewPos  = TBN * ConstMesh.CameraPos;
         FragPos2  = TBN * Position;
+    }
+    const vec3 viewDir = normalize(ViewPos - FragPos2);
 
-
+    if(texture(NormalMapTexture, TexCoords).a == 1.0f)
+    {
 //        if(material.DepthMapID != 0)
 //        {
 //            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
@@ -118,56 +124,52 @@ void main()
 //              discard;
 //            }
 //        }
-        Normal = normalize(Normal * 2.0 - 1.0);
-     
+        normal = texture(NormalMapTexture, TexCoords).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+     }
      for(int x = 0; x < scenedata.DirectionalLightCount; x++)
      {
-        result += CalcNormalDirLight(FragPos2, Normal, x);
+        result += CalcNormalDirLight(FragPos2, normal, x);
      }
 //     for(int x = 0; x < scenedata.PointLightCount; x++)
 //     {
 //        result += CalcNormalPointLight(FragPos2, Normal, x);   
 //     }
-//     result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
+     //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
 
-    vec3 finalResult = vec3(1.0) - exp(-result.rgb * Exposure);
-    finalResult = pow(finalResult, vec3(1.0 / Gamma));
-    outColor = vec4(finalResult, 1.0f);
+//    vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
+//    finalResult = pow(finalResult, vec3(1.0 / Gamma));
+    outColor = vec4(result, 1.0f);
 }
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index)
 {
-   vec3 Position = texture(GPositionTexture, TexCoords).rgb;
    vec3 Alebdo = texture(GAlebdoTexture, TexCoords).rgb;
-   vec3 Normal = texture(GNormalTexture, TexCoords).rgb;
-   vec3 Tangent = texture(GTangentTexture, TexCoords).rgb;
-   vec3 BiTangent = texture(GBiTangentTexture, TexCoords).rgb;
-   const vec3 T = normalize(Position.rgb * Tangent);
-   const vec3 B = normalize(Position.rgb * BiTangent);
-   const vec3 N = normalize(Position.rgb * Normal);
-   mat3 TBN = transpose(mat3(T, B, N));
+   float Shiny = texture(GAlebdoTexture, TexCoords).a;
+   vec3 Specular = texture(SpecularMapTexture, TexCoords).rgb;
 
     vec3 LightPos = DLight[index].direction;
     vec3 ViewPos = ConstMesh.CameraPos;
     vec3 FragPos2 = FragPos;
-
+    if(texture(NormalMapTexture, TexCoords).a == 1.0f)
+    {
         LightPos = TBN * DLight[index].direction;
         ViewPos = TBN * ConstMesh.CameraPos;
         FragPos2 = TBN * FragPos;
-    
+    }
     vec3 ViewDir = normalize(ViewPos - FragPos2);
 
     const vec3 lightDir = normalize(-LightPos);
     const float diff = max(dot(normal, lightDir), 0.0);
 
     const vec3 halfwayDir = normalize(lightDir + ViewDir);
-    const float spec = pow(max(dot(normal, halfwayDir), 0.0), .45f);
+    const float spec = pow(max(dot(normal, halfwayDir), 0.0), Shiny);
 
     vec3 ambient = DLight[index].ambient * Alebdo.rgb;
     vec3 diffuse = DLight[index].diffuse * diff * Alebdo.rgb;
-    vec3 specular = DLight[index].specular * spec * Alebdo.rgb;
+    vec3 specular = DLight[index].specular * spec * Specular.rgb;
 
-    return vec3(ambient + diffuse + specular);
+    return vec3(specular);
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, int index)
