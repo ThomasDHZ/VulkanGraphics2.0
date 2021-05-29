@@ -28,13 +28,15 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
     std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, assetManager->textureManager);
     material2->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/FireBillboard.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material2->materialTexture.AlphaMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/FireBillboardAlpha.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material2->materialTexture.AlphaMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/FireBillboardAlpha.png", VK_FORMAT_R8G8B8A8_UNORM);
     uint32_t MaterialID2 = assetManager->materialManager.LoadMaterial(engine, "FireMaterial", material2);
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<BillboardMesh>(BillboardMesh(engine, glm::vec2(3.0f), glm::vec2(1.0f), glm::vec3(2.0f), MaterialID2)));
 
     assetManager->AddModel(engine, "../Models/Crate.dae");
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
-    material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/window.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
     uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
@@ -90,7 +92,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 
 
-      assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
+    //  assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
   // assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

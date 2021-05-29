@@ -35,7 +35,6 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<GBufferPipeline> gBufferPipeline;
-	std::shared_ptr<DeferredSkyboxPipeline> skyBoxRenderingPipeline;
 
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkRenderPass RenderPass = VK_NULL_HANDLE;

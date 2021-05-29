@@ -68,7 +68,7 @@ layout(location = 5) in vec4 BiTangent;
 
 layout(location = 0) out vec4 GPosition;
 layout(location = 1) out vec4 GAlebdo;
-layout(location = 2) out vec4 GNormal;
+layout(location = 2) out vec4 GReflection;
 layout(location = 3) out vec4 GTangent;
 layout(location = 4) out vec4 GBiTangent;
 layout(location = 5) out vec4 GBloom;
@@ -92,15 +92,30 @@ void main()
     vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
+
+    vec3 normal = Normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
     vec3 FragPos2  = FragPos;
     if(material.NormalMapID != 0)
     {
         ViewPos  = TBN * ConstMesh.CameraPos;
         FragPos2  = TBN * FragPos;
-    }
+        const vec3 viewDir = normalize(ViewPos - FragPos2);
+
+        if(material.DepthMapID != 0)
+        {
+            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+            {
+              discard;
+            }
+        }
+        normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+     }
+
     vec3 I = normalize(FragPos2 - ViewPos);
-    vec3 R = reflect(I, normalize(Normal));
+    vec3 R = reflect(I, normalize(normal));
     vec3 Reflection = texture(CubeMap, R).rgb;
 
 	GPosition = vec4(FragPos, 1.0f);
@@ -114,7 +129,7 @@ void main()
         GAlebdo = vec4(material.Diffuse, 1.0f);
         GAlebdo.a = material.Shininess;
     }
-	GNormal = vec4(Normal, material.Reflectivness);
+	GReflection = vec4(Normal, material.Reflectivness);
     GTangent = vec4(Tangent.rgb, 1.0f);
     GBiTangent = vec4(BiTangent.rgb, 1.0f);
 	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -128,4 +143,47 @@ void main()
     {
         SpecularMap =  vec4(texture(TextureMap[material.SpecularMapID], texCoords).rgb, 1.0f);
     }
+}
+
+vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
+{
+    const float heightScale = meshProperties[ConstMesh.MeshIndex].heightScale;
+    const float minLayers = meshProperties[ConstMesh.MeshIndex].minLayers;
+    const float maxLayers = meshProperties[ConstMesh.MeshIndex].maxLayers;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
+    // calculate the size of each layer
+    float layerDepth = 1.0 / numLayers;
+    // depth of current layer
+    float currentLayerDepth = 0.0;
+    // the amount to shift the texture coordinates per layer (from vector P)
+    viewDir.y = -viewDir.y;
+    vec2 P = viewDir.xy / viewDir.z * heightScale;
+    vec2 deltaTexCoords = P / numLayers;
+
+    // get initial values
+    vec2  currentTexCoords = texCoords;
+    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
+
+    while (currentLayerDepth < currentDepthMapValue)
+    {
+        // shift texture coordinates along direction of P
+        currentTexCoords -= deltaTexCoords;
+        // get depthmap value at current texture coordinates
+        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
+        // get depth of next layer
+        currentLayerDepth += layerDepth;
+    }
+
+    // get texture coordinates before collision (reverse operations)
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    // get depth after and before collision for linear interpolation
+    float afterDepth = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
+
+    // interpolation of texture coordinates
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
 }

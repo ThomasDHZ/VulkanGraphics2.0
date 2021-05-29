@@ -17,12 +17,12 @@ layout(location = 7) out vec4 SpecularMap;
 void main() 
 {
     vec3 color = texture(CubeMap, TexCoords).rgb;
-    GPosition = vec4(0.0f);
+    GPosition = vec4(color, 1.0f);
     GSkyBox = vec4(color, 1.0f);
-    GNormal = vec4(0.0f);
-    GTangent = vec4(0.0f);
-    GBiTangent = vec4(0.0f);
-    GBloom = vec4(0.0f);
-    NormalMap = vec4(0.0f);
-    SpecularMap = vec4(0.0f);
+    GNormal = vec4(color, 1.0f);
+    GTangent = vec4(color, 1.0f);
+    GBiTangent = vec4(color, 1.0f);
+    GBloom = vec4(color, 1.0f);
+    NormalMap = vec4(color, 1.0f);
+    SpecularMap = vec4(color, 1.0f);
 }

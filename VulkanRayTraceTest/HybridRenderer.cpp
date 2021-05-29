@@ -15,6 +15,7 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
     textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    textures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
     SSAORenderer = SSAORenderPass(engine, assetManager, textures);
     SSAOBlurRenderer = SSAOBlurRenderPass(engine, assetManager, SSAORenderer.SSAOTexture);
 
@@ -46,6 +47,7 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
     textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
+    textures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
 
     HybridFrameBufferTextures frameBufferTextures{};
     frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;

@@ -18,6 +18,7 @@ struct SSAOTextureList
 {
 	std::shared_ptr<Texture> GPositionTexture;
 	std::shared_ptr<Texture> GNormalTexture;
+	std::shared_ptr<Texture> NormalMapTexture;
 	std::shared_ptr<Texture> NoiseTexture;
 	std::vector<std::shared_ptr<VulkanBuffer>> KernalSampleBufferList;
 };

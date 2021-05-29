@@ -24,6 +24,7 @@ void SSAOPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<Ass
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, size));
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
@@ -35,7 +36,8 @@ void SSAOPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<A
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, size });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, size });
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 std::vector<VkDescriptorBufferInfo> SSAOPipeline::GetKernallBufferListDescriptor(std::vector<std::shared_ptr<VulkanBuffer>> SamplePoints)
@@ -58,14 +60,16 @@ void SSAOPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<Ass
 
     VkDescriptorImageInfo GPositionTextureBufferInfo = engine.AddTextureDescriptor(textures.GPositionTexture->View, textures.GPositionTexture->Sampler);
     VkDescriptorImageInfo GNormalTextureBufferInfo = engine.AddTextureDescriptor(textures.GNormalTexture->View, textures.GNormalTexture->Sampler);
+    VkDescriptorImageInfo NormalMapTextureBufferInfo = engine.AddTextureDescriptor(textures.NormalMapTexture->View, textures.NormalMapTexture->Sampler);
     VkDescriptorImageInfo NoiseTextureBufferInfo = engine.AddTextureDescriptor(textures.NoiseTexture->View, textures.NoiseTexture->Sampler);
     std::vector<VkDescriptorBufferInfo> KernalBufferList = GetKernallBufferListDescriptor(textures.KernalSampleBufferList);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, GPositionTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(1, DescriptorSets, GNormalTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(2, DescriptorSets, NoiseTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, DescriptorSets, KernalBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(2, DescriptorSets, NormalMapTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, NoiseTextureBufferInfo));
+    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(4, DescriptorSets, KernalBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 

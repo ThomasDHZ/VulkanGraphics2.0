@@ -17,8 +17,9 @@ layout(push_constant) uniform SSAOProperties
 
 layout(binding = 0) uniform sampler2D GPositionTexture;
 layout(binding = 1) uniform sampler2D GNormalTexture;
-layout(binding = 2) uniform sampler2D NoiseTexture;
-layout(binding = 3) buffer SSAOSample { vec3 SSAOSample; } SSAOBuffer[];
+layout(binding = 2) uniform sampler2D NormalMapTexture;
+layout(binding = 3) uniform sampler2D NoiseTexture;
+layout(binding = 4) buffer SSAOSample { vec3 SSAOSample; } SSAOBuffer[];
 
 layout(location = 0) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
@@ -29,6 +30,20 @@ void main()
 // get input for SSAO algorithm
     vec3 fragPos = texture(GPositionTexture, TexCoords).xyz;
     vec3 normal = normalize(texture(GNormalTexture, TexCoords).rgb);
+    if(texture(NormalMapTexture, TexCoords).a == 1.0f)
+    {
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
+        normal = texture(NormalMapTexture, TexCoords).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+     }
+
     vec3 randomVec = normalize(texture(NoiseTexture, TexCoords * noiseScale).xyz);
     // create TBN change-of-basis matrix: from tangent-space to view-space
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
