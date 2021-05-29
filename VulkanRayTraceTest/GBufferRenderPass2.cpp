@@ -12,9 +12,9 @@ GBufferRenderPass2::GBufferRenderPass2(VulkanEngine& engine, std::shared_ptr<Ass
     GPositionTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
     GAlbedoTexture = std::make_shared<RenderedGBufferAlbedoTexture>(engine);
     GNormalTexture = std::make_shared<RenderedGBufferNormalTexture>(engine);
-    GTangentTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
-    GBiTangentTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
-    GBloomTexture = std::make_shared<RenderedColorTexture>(engine);
+    GTBN_TangentTexture = std::make_shared<RenderedGTBNTexture>(engine);
+    GTBN_BiTangentTexture = std::make_shared<RenderedGTBNTexture>(engine);
+    GTBN_NormalTexture = std::make_shared<RenderedGTBNTexture>(engine);
     NormalMapTexture = std::make_shared<RenderedColorTexture>(engine);
     SpecularMapTexture = std::make_shared<RenderedColorTexture>(engine);
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
@@ -68,7 +68,7 @@ void GBufferRenderPass2::CreateRenderPass(VulkanEngine& engine)
     AttachmentDescriptionList.emplace_back(NormalAttachment);
 
     VkAttachmentDescription TangentAttachment = {};
-    TangentAttachment.format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    TangentAttachment.format = VK_FORMAT_R32G32B32A32_SFLOAT;
     TangentAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     TangentAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     TangentAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -79,7 +79,7 @@ void GBufferRenderPass2::CreateRenderPass(VulkanEngine& engine)
     AttachmentDescriptionList.emplace_back(TangentAttachment);
 
     VkAttachmentDescription BiTangentAttachment = {};
-    BiTangentAttachment.format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    BiTangentAttachment.format = VK_FORMAT_R32G32B32A32_SFLOAT;
     BiTangentAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     BiTangentAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     BiTangentAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -90,7 +90,7 @@ void GBufferRenderPass2::CreateRenderPass(VulkanEngine& engine)
     AttachmentDescriptionList.emplace_back(BiTangentAttachment);
 
     VkAttachmentDescription BloomAttachment = {};
-    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomAttachment.format = VK_FORMAT_R32G32B32A32_SFLOAT;
     BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -197,9 +197,9 @@ void GBufferRenderPass2::CreateRendererFramebuffers(VulkanEngine& engine)
         AttachmentList.emplace_back(GPositionTexture->View);
         AttachmentList.emplace_back(GAlbedoTexture->View);
         AttachmentList.emplace_back(GNormalTexture->View);
-        AttachmentList.emplace_back(GTangentTexture->View);
-        AttachmentList.emplace_back(GBiTangentTexture->View);
-        AttachmentList.emplace_back(GBloomTexture->View);
+        AttachmentList.emplace_back(GTBN_TangentTexture->View);
+        AttachmentList.emplace_back(GTBN_BiTangentTexture->View);
+        AttachmentList.emplace_back(GTBN_NormalTexture->View);
         AttachmentList.emplace_back(NormalMapTexture->View);
         AttachmentList.emplace_back(SpecularMapTexture->View);
         AttachmentList.emplace_back(DepthTexture->View);
@@ -283,9 +283,9 @@ void GBufferRenderPass2::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<
     GPositionTexture->RecreateRendererTexture(engine);
     GNormalTexture->RecreateRendererTexture(engine);
     GAlbedoTexture->RecreateRendererTexture(engine);
-    GTangentTexture->RecreateRendererTexture(engine);
-    GBiTangentTexture->RecreateRendererTexture(engine);
-    GBloomTexture->RecreateRendererTexture(engine);
+    GTBN_TangentTexture->RecreateRendererTexture(engine);
+    GTBN_BiTangentTexture->RecreateRendererTexture(engine);
+    GTBN_NormalTexture->RecreateRendererTexture(engine);
     NormalMapTexture->RecreateRendererTexture(engine);
     SpecularMapTexture->RecreateRendererTexture(engine);
     DepthTexture->RecreateRendererTexture(engine);
@@ -312,9 +312,9 @@ void GBufferRenderPass2::Destroy(VulkanEngine& engine)
     GPositionTexture->Delete(engine);
     GNormalTexture->Delete(engine);
     GAlbedoTexture->Delete(engine);
-    GTangentTexture->Delete(engine);
-    GBiTangentTexture->Delete(engine);
-    GBloomTexture->Delete(engine);
+    GTBN_TangentTexture->Delete(engine);
+    GTBN_BiTangentTexture->Delete(engine);
+    GTBN_NormalTexture->Delete(engine);
     NormalMapTexture->Delete(engine);
     SpecularMapTexture->Delete(engine);
     DepthTexture->Delete(engine);

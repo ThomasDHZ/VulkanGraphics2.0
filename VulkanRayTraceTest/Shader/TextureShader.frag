@@ -97,12 +97,15 @@ layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec4 Color;
 layout(location = 3) in vec3 Normal;
-layout(location = 4) in mat3 TBN;
+layout(location = 4) in vec3 Tangent;
+layout(location = 5) in vec3 BiTangent;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
 
 MaterialInfo material;
+mat3 TBN;
+
 #include "BlinePhongLighting.glsl"
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 void main() 
@@ -115,6 +118,11 @@ void main()
 	 discard;
    }
     
+    vec3 T = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(Tangent));
+    vec3 B = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(BiTangent));
+    vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
+    TBN = transpose(mat3(T, B, N));
+
     vec3 result = vec3(0.0f);
     vec3 normal = Normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
@@ -128,14 +136,14 @@ void main()
 
     if(material.NormalMapID != 0)
     {
-        if(material.DepthMapID != 0)
-        {
-            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
-            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-            {
-              discard;
-            }
-        }
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
         normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
      }
@@ -149,11 +157,13 @@ void main()
 //     }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
 
+
     vec3 I = normalize(FragPos2 - ViewPos);
     vec3 R = reflect(I, normalize(normal));
     vec3 Reflection = texture(CubeMap, R).rgb;
-    vec3 finalMix = mix(result, Reflection, material.Reflectivness);
-    outColor = vec4(finalMix, 1.0f);
+  //  vec3 finalMix = mix(result, Reflection, material.Reflectivness);
+
+    outColor = vec4(result, 1.0f);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     if(material.DiffuseMapID != 0)
     {

@@ -25,7 +25,10 @@ layout(binding = 9) uniform sampler2D GBloomTexture;
 layout(binding = 10) uniform sampler2D NormalMapTexture;
 layout(binding = 11) uniform sampler2D SpecularMapTexture;
 layout(binding = 12) uniform sampler2D ReflectionMapTexture;
-layout(binding = 13) uniform UniformBufferObject {
+layout(binding = 13) uniform sampler2D GTBN_TangentTexture;
+layout(binding = 14) uniform sampler2D GTBN_BiTangentTexture;
+layout(binding = 15) uniform sampler2D GTBN_NormalTexture;
+layout(binding = 16) uniform UniformBufferObject {
 	DirectionalLight dlight;
 	PointLight plight[5];
 	SpotLight sLight;
@@ -42,7 +45,7 @@ layout(binding = 13) uniform UniformBufferObject {
     int temp;
 } scenedata;
 
-layout(binding = 14) buffer DirectionalLight2
+layout(binding = 17) buffer DirectionalLight2
 { 
     vec3 direction;
     vec3 ambient;
@@ -50,7 +53,7 @@ layout(binding = 14) buffer DirectionalLight2
     vec3 specular;
 } DLight[];
 
-layout(binding = 15) buffer PointLight2
+layout(binding = 18) buffer PointLight2
 { 
     vec3 position;
     vec3 ambient;
@@ -61,7 +64,7 @@ layout(binding = 15) buffer PointLight2
     float quadratic;
 } PLight[];
 
-layout(binding = 16) buffer SpotLight2
+layout(binding = 19) buffer SpotLight2
 { 
    vec3 position;
    vec3 direction;
@@ -101,17 +104,17 @@ void main()
     vec3 SkyBox = texture(GSkyBoxTexture, TexCoords).rgb;
     vec3 Bloom = texture(GBloomTexture, TexCoords).rgb;
     vec3 normal = texture(GNormalTexture, TexCoords).rgb;
-   const vec3 T = normalize(Position.rgb * Tangent);
-   const vec3 B = normalize(Position.rgb * BiTangent);
-   const vec3 N = normalize(Position.rgb * normal);
-   mat3 TBN = transpose(mat3(T, B, N));
+   const vec3 T = texture(GTBN_TangentTexture, TexCoords).rgb;
+   const vec3 B = texture(GTBN_BiTangentTexture, TexCoords).rgb;
+   const vec3 N = texture(GTBN_NormalTexture, TexCoords).rgb;
+   TBN = transpose(mat3(T, B, N));
 
     vec3 result = vec3(0.0f);
-    vec3 ViewPos  = ConstMesh.CameraPos;
+    vec3 ViewPos  = scenedata.viewPos;
     vec3 FragPos2  = Position;
     if(texture(NormalMapTexture, TexCoords).a == 1.0f)
     {
-        ViewPos  = TBN * ConstMesh.CameraPos;
+        ViewPos  = TBN * scenedata.viewPos;
         FragPos2  = TBN * Position;
     }
     const vec3 viewDir = normalize(ViewPos - FragPos2);
@@ -145,12 +148,12 @@ void main()
 //        result = SkyBox;
 //    }
 
-//    vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
-//    finalResult = pow(finalResult, vec3(1.0 / Gamma));
+ //   vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
+ //   finalResult = pow(finalResult, vec3(1.0 / Gamma));
 
     //Reflectivty is stored in alpha channel.
-    vec3 finalMix = mix(result, Reflection.rgb, Reflection.a);
-    outColor = vec4(finalMix, 1.0f);
+  //  vec3 finalMix = mix(result, Reflection.rgb, Reflection.a);
+    outColor = vec4(result, 1.0f);
 }
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index)
@@ -171,7 +174,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index)
     if(texture(NormalMapTexture, TexCoords).a == 1.0f)
     {
         LightPos = TBN * DLight[index].direction;
-        ViewPos = TBN * ConstMesh.CameraPos;
+        ViewPos = TBN * scenedata.viewPos;
         FragPos2 = TBN * FragPos;
     }
     vec3 ViewDir = normalize(ViewPos - FragPos2);

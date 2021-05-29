@@ -235,6 +235,7 @@
     <ClCompile Include="RenderedGBufferAlbedoTexture.cpp" />
     <ClCompile Include="RenderedGBufferNormalTexture.cpp" />
     <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
+    <ClCompile Include="RenderedGTBNTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderFrameBufferTexturePipeline.cpp" />
@@ -430,6 +431,7 @@
     <ClInclude Include="RenderedGBufferAlbedoTexture.h" />
     <ClInclude Include="RenderedGBufferNormalTexture.h" />
     <ClInclude Include="RenderedGBufferPositionTexture.h" />
+    <ClInclude Include="RenderedGTBNTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderFrameBufferTexturePipeline.h" />

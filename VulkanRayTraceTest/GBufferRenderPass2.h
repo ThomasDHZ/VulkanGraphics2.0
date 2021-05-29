@@ -9,6 +9,7 @@
 #include "GBufferPipeline.h"
 #include "DeferredSkyboxPipeline.h"
 #include "GBufferPipeline2.h"
+#include "RenderedGTBNTexture.h"
 
 class GBufferRenderPass2
 {
@@ -28,9 +29,9 @@ public:
 	std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
 	std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
 	std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;
-	std::shared_ptr<RenderedGBufferPositionTexture> GTangentTexture;
-	std::shared_ptr<RenderedGBufferPositionTexture> GBiTangentTexture;
-	std::shared_ptr<RenderedColorTexture> GBloomTexture;
+	std::shared_ptr<RenderedGTBNTexture> GTBN_TangentTexture;
+	std::shared_ptr<RenderedGTBNTexture> GTBN_BiTangentTexture;
+	std::shared_ptr<RenderedGTBNTexture> GTBN_NormalTexture;
 	std::shared_ptr<RenderedColorTexture> NormalMapTexture;
 	std::shared_ptr<RenderedColorTexture> SpecularMapTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;

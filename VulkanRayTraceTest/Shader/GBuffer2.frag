@@ -63,15 +63,15 @@ layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec4 Color;
 layout(location = 3) in vec3 Normal;
-layout(location = 4) in vec4 Tangent;
-layout(location = 5) in vec4 BiTangent;
+layout(location = 4) in vec3 Tangent;
+layout(location = 5) in vec3 BiTangent;
 
 layout(location = 0) out vec4 GPosition;
 layout(location = 1) out vec4 GAlebdo;
 layout(location = 2) out vec4 GReflection;
-layout(location = 3) out vec4 GTangent;
-layout(location = 4) out vec4 GBiTangent;
-layout(location = 5) out vec4 GBloom;
+layout(location = 3) out vec4 GTBN_Tangent;
+layout(location = 4) out vec4 GTBN_BiTangent;
+layout(location = 5) out vec4 GTBN_Normal;
 layout(location = 6) out vec4 NormalMap;
 layout(location = 7) out vec4 SpecularMap;
 
@@ -91,7 +91,9 @@ void main()
     vec3 B = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(BiTangent));
     vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
     mat3 TBN = transpose(mat3(T, B, N));
-
+    GTBN_Tangent = vec4(T, 1.0f);
+    GTBN_BiTangent = vec4(B, 1.0f);
+    GTBN_Normal = vec4(N, 1.0f);
 
     vec3 normal = Normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
@@ -102,14 +104,14 @@ void main()
         FragPos2  = TBN * FragPos;
         const vec3 viewDir = normalize(ViewPos - FragPos2);
 
-        if(material.DepthMapID != 0)
-        {
-            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
-            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
-            {
-              discard;
-            }
-        }
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
         normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
         normal = normalize(normal * 2.0 - 1.0);
      }
@@ -130,9 +132,6 @@ void main()
         GAlebdo.a = material.Shininess;
     }
 	GReflection = vec4(Normal, material.Reflectivness);
-    GTangent = vec4(Tangent.rgb, 1.0f);
-    GBiTangent = vec4(BiTangent.rgb, 1.0f);
-	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 
         NormalMap = vec4(Reflection, material.Reflectivness);

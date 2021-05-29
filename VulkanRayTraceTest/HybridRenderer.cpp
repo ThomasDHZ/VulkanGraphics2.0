@@ -33,6 +33,9 @@ HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::
     frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
     frameBufferTextures.SpecularMapTexture = FrameBufferTextureRenderer.SpecularMapTexture;
     frameBufferTextures.ReflectionMapTexture = FrameBufferTextureRenderer2.NormalMapTexture;
+    frameBufferTextures.TBNTangentTexture = FrameBufferTextureRenderer2.GTBN_TangentTexture;
+    frameBufferTextures.TBNBiTangentTexture = FrameBufferTextureRenderer2.GTBN_BiTangentTexture;
+    frameBufferTextures.TBNNormalMapTexture = FrameBufferTextureRenderer2.GTBN_NormalTexture;
     FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, frameBufferTextures);
 
     CurrentSSAOSampleRate = SSAORenderer.KernalSampleSize;
@@ -63,6 +66,9 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window
     frameBufferTextures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
     frameBufferTextures.SpecularMapTexture = FrameBufferTextureRenderer.SpecularMapTexture;
     frameBufferTextures.ReflectionMapTexture = FrameBufferTextureRenderer2.NormalMapTexture;
+    frameBufferTextures.TBNTangentTexture = FrameBufferTextureRenderer2.GTBN_TangentTexture;
+    frameBufferTextures.TBNBiTangentTexture = FrameBufferTextureRenderer2.GTBN_BiTangentTexture;
+    frameBufferTextures.TBNNormalMapTexture = FrameBufferTextureRenderer2.GTBN_NormalTexture;
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
     bloomRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);

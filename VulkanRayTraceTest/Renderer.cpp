@@ -115,11 +115,11 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Checkbox("Deleteplightflag", &deleteplightflag);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     ImGui::SliderInt("Active Camera", &assetManager->cameraManager.cameraIndex, 0, assetManager->cameraManager.CameraList.size());
-    
-    for (auto& materal : assetManager->materialManager.MaterialList)
-    {
-        ImGui::SliderFloat("adsf", &materal->materialTexture.Reflectivness, 0.0f, 1.0f);
-    }
+    //
+    //for (auto& materal : assetManager->materialManager.MaterialList)
+    //{
+    //    ImGui::SliderFloat("adsf", &materal->materialTexture.Reflectivness, 0.0f, 1.0f);
+    //}
     if (ActiveRenderer == 0)
     {
         blinnPhongRenderer.GUIUpdate(engine);

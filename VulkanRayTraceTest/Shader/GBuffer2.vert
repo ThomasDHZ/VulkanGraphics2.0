@@ -58,8 +58,8 @@ layout(location = 0) out vec3 FragPos;
 layout(location = 1) out vec2 TexCoords;
 layout(location = 2) out vec4 Color;
 layout(location = 3) out vec3 Normal;
-layout(location = 4) out vec4 Tangent;
-layout(location = 5) out vec4 BiTangent;
+layout(location = 4) out vec3 Tangent;
+layout(location = 5) out vec3 BiTangent;
 
 void main() 
 {
@@ -67,7 +67,7 @@ void main()
     TexCoords = aTexCoords;
 	Color = aColor;
 	Normal = aNormal;
-	Tangent = aTangent;
-	BiTangent = aBitangent;
+	Tangent = aTangent.rgb;
+	BiTangent = aBitangent.rgb;
     gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 }
