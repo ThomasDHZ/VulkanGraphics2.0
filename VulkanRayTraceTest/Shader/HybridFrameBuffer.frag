@@ -15,8 +15,8 @@ layout(push_constant) uniform MeshInfo
 layout(binding = 0) uniform sampler2D GPositionTexture;
 layout(binding = 1) uniform sampler2D GAlebdoTexture;
 layout(binding = 2) uniform sampler2D GNormalTexture;
-layout(binding = 3) uniform sampler2D GTangentTexture;
-layout(binding = 4) uniform sampler2D GBiTangentTexture;
+//layout(binding = 3) uniform sampler2D GTangentTexture;
+//layout(binding = 4) uniform sampler2D GBiTangentTexture;
 layout(binding = 5) uniform sampler2D GShadowTexture;
 layout(binding = 6) uniform sampler2D GReflectionTexture;
 layout(binding = 7) uniform sampler2D GSSA0Texture;
@@ -96,8 +96,6 @@ void main()
     vec3 Alebdo = texture(GAlebdoTexture, TexCoords).rgb;
    vec3 Specular = texture(SpecularMapTexture, TexCoords).rgb;
   //  vec3 Normal = texture(GNormalTexture, TexCoords).rgb;
-    vec3 Tangent = texture(GTangentTexture, TexCoords).rgb;
-    vec3 BiTangent = texture(GBiTangentTexture, TexCoords).rgb;
     vec3 Shadow = texture(GShadowTexture, TexCoords).rgb;
     vec4 Reflection = texture(ReflectionMapTexture, TexCoords);
     float SSAO = texture(GSSA0Texture, TexCoords).r;
@@ -148,11 +146,11 @@ void main()
 //        result = SkyBox;
 //    }
 
- //   vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
- //   finalResult = pow(finalResult, vec3(1.0 / Gamma));
+     result = mix(result, Reflection.rgb, Reflection.a);
+//    vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
+//    finalResult = pow(finalResult, vec3(1.0 / Gamma));
 
     //Reflectivty is stored in alpha channel.
-  //  vec3 finalMix = mix(result, Reflection.rgb, Reflection.a);
     outColor = vec4(result, 1.0f);
 }
 

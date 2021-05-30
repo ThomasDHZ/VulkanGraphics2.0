@@ -69,11 +69,9 @@ layout(location = 5) in vec4 BiTangent;
 layout(location = 0) out vec4 GPosition;
 layout(location = 1) out vec4 GAlebdo;
 layout(location = 2) out vec4 GNormal;
-layout(location = 3) out vec4 GTangent;
-layout(location = 4) out vec4 GBiTangent;
-layout(location = 5) out vec4 GBloom;
-layout(location = 6) out vec4 NormalMap;
-layout(location = 7) out vec4 SpecularMap;
+layout(location = 3) out vec4 GBloom;
+layout(location = 4) out vec4 NormalMap;
+layout(location = 5) out vec4 SpecularMap;
 
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
@@ -100,8 +98,6 @@ void main()
         GAlebdo.a = material.Shininess;
     }
 	GNormal = vec4(Normal, 1.0f);
-    GTangent = vec4(Tangent.rgb, 1.0f);
-    GBiTangent = vec4(BiTangent.rgb, 1.0f);
 	GBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     if(material.NormalMapID != 0)

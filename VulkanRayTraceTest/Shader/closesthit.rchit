@@ -141,11 +141,11 @@ void main()
      }
      for(int x = 0; x < scenedata.PointLightCount; x++)
      {
-        result += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+       // result += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
      }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
 
-	rayHitInfo.RayTracedTexture = result;
+	rayHitInfo.RayTracedTexture =  result;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

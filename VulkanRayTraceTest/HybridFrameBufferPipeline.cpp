@@ -48,8 +48,8 @@ void HybridFrameBufferPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std:
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
+    //LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -75,8 +75,8 @@ void HybridFrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::s
     VkDescriptorImageInfo PositionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.PositionTexture->View, HybridTextures.PositionTexture->Sampler);
     VkDescriptorImageInfo AlebdoTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.AlebdoTexture->View, HybridTextures.AlebdoTexture->Sampler);
     VkDescriptorImageInfo NormalTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.NormalTexture->View, HybridTextures.NormalTexture->Sampler);
-    VkDescriptorImageInfo TangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.TangentTexture->View, HybridTextures.TangentTexture->Sampler);
-    VkDescriptorImageInfo BiTangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.BiTangentTexture->View, HybridTextures.BiTangentTexture->Sampler);
+    //VkDescriptorImageInfo TangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.TangentTexture->View, HybridTextures.TangentTexture->Sampler);
+    //VkDescriptorImageInfo BiTangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.BiTangentTexture->View, HybridTextures.BiTangentTexture->Sampler);
     VkDescriptorImageInfo ShadowTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ShadowTexture->View, HybridTextures.ShadowTexture->Sampler);
     VkDescriptorImageInfo ReflectionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ReflectionTexture->View, HybridTextures.ReflectionTexture->Sampler);
     VkDescriptorImageInfo SSAOTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.SSA0Texture->View, HybridTextures.SSA0Texture->Sampler);
@@ -97,8 +97,8 @@ void HybridFrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::s
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, PositionTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(1, DescriptorSets, AlebdoTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(2, DescriptorSets, NormalTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, TangentTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(4, DescriptorSets, BiTangentTextureBufferInfo));
+    //DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, TangentTextureBufferInfo));
+    //DescriptorList.emplace_back(engine.AddTextureDescriptorSet(4, DescriptorSets, BiTangentTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(5, DescriptorSets, ShadowTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(6, DescriptorSets, ReflectionTextureBufferInfo));
     DescriptorList.emplace_back(engine.AddTextureDescriptorSet(7, DescriptorSets, SSAOTextureBufferInfo));
