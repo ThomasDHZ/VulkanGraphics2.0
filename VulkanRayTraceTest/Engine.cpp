@@ -53,7 +53,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
-     //assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
+     assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
      assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/
 
@@ -92,7 +92,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 
 
-      assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
+      //assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
   // assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

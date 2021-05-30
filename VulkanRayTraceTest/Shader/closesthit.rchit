@@ -15,8 +15,11 @@ layout(push_constant) uniform RayTraceCamera
 } ConstMesh;
 
 struct RayPayload {
-	vec3 RayTracedTexture;
-	uint reflectCount;
+	vec3 color;
+	float distance;
+	vec3 normal;
+	float reflector;
+	float materialreflection;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
@@ -145,7 +148,19 @@ void main()
      }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
 
-	rayHitInfo.RayTracedTexture =  result;
+    rayHitInfo.color = result;
+	rayHitInfo.distance = gl_RayTmaxEXT;
+	rayHitInfo.normal = vertex.normal;
+    if((material.Diffuse.r == 1.0f) && (material.Diffuse.g == 1.0f) && (material.Diffuse.b == 1.0f) ||
+       (material.Diffuse.r == 0.0f) && (material.Diffuse.g == 0.0f) && (material.Diffuse.b == 0.0f))
+	{
+        rayHitInfo.reflector = 1.0f; 
+    }
+    else
+    {
+        rayHitInfo.reflector = 0.0f; 
+    }
+    rayHitInfo.materialreflection = 0.2543333f;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
