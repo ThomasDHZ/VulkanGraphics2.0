@@ -3,6 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
+#extension GL_NV_ray_tracing : enable
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -18,7 +19,7 @@ struct RayPayload {
 	vec3 color;
 	float distance;
 	vec3 normal;
-	float reflector;
+    int reflectCount;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
@@ -114,6 +115,7 @@ void main()
    TBN = transpose(mat3(T, B, N));
 
     vec3 result = vec3(0.0f);
+    vec3 baseColor = vec3(0.0f);
     vec3 normal = vertex.normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
     vec3 FragPos  = vertex.pos;
@@ -139,25 +141,55 @@ void main()
      }
      for(int x = 0; x < scenedata.DirectionalLightCount; x++)
      {
-        result += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
+        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
      }
      for(int x = 0; x < scenedata.PointLightCount; x++)
      {
        // result += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
      }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
+       if(material.Reflectivness > 0.0f &&
+       rayHitInfo.reflectCount != 13)
+    {
+        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
 
-    rayHitInfo.color = result;
-	rayHitInfo.distance = gl_RayTmaxEXT;
-	rayHitInfo.normal = vertex.normal;
-    if((material.Diffuse.r == 1.0f) && (material.Diffuse.g == 1.0f) && (material.Diffuse.b == 1.0f))
-	{
-        rayHitInfo.reflector = 1.0f; 
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+		result = mix(baseColor, rayHitInfo.color, material.Reflectivness); 
     }
     else
-    {
-        rayHitInfo.reflector = 0.0f; 
-    }
+	{
+        result = baseColor;
+        rayHitInfo.reflectCount = 20;
+	}
+
+//    	for (int x = 0; x < 20; x++) 
+//	{
+//		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+//		if(x == 0)
+//		{
+//			BaseColor = rayPayload.color;
+//		}
+//		finalColor = mix(BaseColor, rayPayload.color, rayPayload.MaterialReflect);
+//		
+//
+//		if (rayPayload.reflector == 1.0f) 
+//		{
+//			const vec4 hitPos = origin + direction * rayPayload.distance;
+//			origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
+//			direction.xyz = reflect(direction.xyz, rayPayload.normal);
+//		} 
+//		else 
+//		{
+//			break;
+//		}
+//	}
+
+    rayHitInfo.color = result;
+	rayHitInfo.distance = gl_RayTmaxNV;
+	rayHitInfo.normal = vertex.normal;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)

@@ -15,11 +15,11 @@ struct RayPayload {
 	vec3 color;
 	float distance;
 	vec3 normal;
-	float reflector;
+    int reflectCount;
 };
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 1, set = 0, rgba8) uniform image2D ShadowTextureMask;
+layout(binding = 1, set = 0, rgba8) uniform image2D RayTracedTexture;
 layout(binding = 2, set = 0) uniform CameraProperties 
 {
 	DirectionalLight dlight;
@@ -59,25 +59,11 @@ void main()
 	float tmax = 10000.0;
 
 	rayPayload.color = vec3(0.0f);
-	vec3 ReflectMask = vec3(0.0f);
-	for (int x = 0; x < 20; x++) 
-	{
-		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
-		if (rayPayload.reflector == 1.0f) 
-		{
-			const vec4 hitPos = origin + direction * rayPayload.distance;
-			origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
-			direction.xyz = reflect(direction.xyz, rayPayload.normal);
-			ReflectMask = vec3(1.0f, 0.0f, 0.0f);
-		} 
-		else 
-		{
-			rayPayload.color = vec3(0.0f);
-			break;
-		}
-	}
-	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
-	
-	imageStore(ReflectionTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.color, 0.0));
+	rayPayload.reflectCount = 0;
 
+	vec3 BaseColor = vec3(0.0f);
+	vec3 finalColor = vec3(0.0f);
+	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+
+	imageStore(ReflectionTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.color, 0.0));
 }

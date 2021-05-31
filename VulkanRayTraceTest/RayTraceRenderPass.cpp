@@ -139,7 +139,7 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
     std::shared_ptr<RayTracingGraphicsPipeline> ActivePipeline;
     switch (renderID)
     {
-        case RendererID::BlinnPhong_RayTrace_Renderer: ActivePipeline = RTPipeline; break;
+        case RendererID::BlinnPhong_RayTrace_Renderer: ActivePipeline = RTHybridPipeline; break;
         case RendererID::PBR_RayTrace_Renderer: ActivePipeline = RTPBRPipeline; break;
         case RendererID::Hybrid_Renderer: ActivePipeline = RTHybridPipeline; break;
     }
