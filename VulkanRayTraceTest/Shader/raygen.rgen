@@ -16,6 +16,7 @@ struct RayPayload {
 	float distance;
 	vec3 normal;
 	float reflector;
+	float MaterialReflect;
 };
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
@@ -56,9 +57,10 @@ void main()
 	float tmax = 10000.0;
 
 	rayPayload.color = vec3(0.0f);
+	rayPayload.MaterialReflect = 0.0f;
+
 	vec3 BaseColor = vec3(0.0f);
 	vec3 finalColor = vec3(0.0f);
-	vec3 ReflectMask = vec3(0.0f);
 	for (int x = 0; x < 20; x++) 
 	{
 		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
@@ -66,8 +68,7 @@ void main()
 		{
 			BaseColor = rayPayload.color;
 		}
-		
-			finalColor = mix(BaseColor, rayPayload.color, 0.34f);
+		finalColor = mix(BaseColor, rayPayload.color, rayPayload.MaterialReflect);
 		
 
 		if (rayPayload.reflector == 1.0f) 
@@ -75,7 +76,6 @@ void main()
 			const vec4 hitPos = origin + direction * rayPayload.distance;
 			origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
 			direction.xyz = reflect(direction.xyz, rayPayload.normal);
-			ReflectMask = vec3(1.0f, 0.0f, 0.0f);
 		} 
 		else 
 		{
@@ -85,5 +85,4 @@ void main()
 	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 	
 	imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(finalColor, 0.0));
-
 }

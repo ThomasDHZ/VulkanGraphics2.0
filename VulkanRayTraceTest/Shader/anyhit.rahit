@@ -21,6 +21,7 @@ struct RayHitInfo
 	float distance;
 	vec3 normal;
 	float reflector;
+	float MaterialReflect;
 };
 
 hitAttributeEXT vec2 attribs;
