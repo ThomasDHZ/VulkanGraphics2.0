@@ -20,8 +20,7 @@ struct RayHitInfo
 	vec3 color;
 	float distance;
 	vec3 normal;
-	float reflector;
-	float MaterialReflect;
+    int reflectCount;
 };
 
 hitAttributeEXT vec2 attribs;
