@@ -14,6 +14,7 @@ public:
     AccelerationStructure topLevelAS{};
     std::shared_ptr<RenderedRayTracedColorTexture> RayTracedTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask;
+    std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTextureMask;
     std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture;
 

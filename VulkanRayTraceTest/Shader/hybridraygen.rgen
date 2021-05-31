@@ -12,11 +12,10 @@ layout(push_constant) uniform RayTraceCamera
 } Camera;
 
 struct RayPayload {
-	vec3 ShadowMask;
-	vec3 ReflectionColor;
-	vec3 SSAOColor;
-	vec3 SkyboxColor;
-	uint reflectCount;
+	vec3 color;
+	float distance;
+	vec3 normal;
+	float reflector;
 };
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
@@ -39,7 +38,8 @@ layout(binding = 2, set = 0) uniform CameraProperties
     int temp;
 } cam;
 layout(binding = 14, set = 0, rgba8) uniform image2D ReflectionTexture;
-layout(binding = 15, set = 0, rgba8) uniform image2D SSAOTexture;
+layout(binding = 15, set = 0, rgba8) uniform image2D ReflectionMaskTexture;
+layout(binding = 16, set = 0, rgba8) uniform image2D SSAOTexture;
 
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 
@@ -49,23 +49,35 @@ void main()
 	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
 	vec2 d = inUV * 2.0 - 1.0;
 
-	vec4 origin = cam.viewInverse * vec4(0,0,0,1);
-	vec4 target = cam.projInverse * vec4(d.x, d.y, 1, 1) ;
-	vec4 direction = cam.viewInverse*vec4(normalize(target.xyz / target.w), 0);
+	vec4 origin = Camera.view * vec4(0,0,0,1);
+	vec4 target = Camera.proj * vec4(d.x, d.y, 1, 1) ;
+	vec4 direction = Camera.view*vec4(normalize(target.xyz / target.w), 0);
 
 	uint rayFlags = gl_RayFlagsOpaqueEXT;
 	uint cullMask = 0xff;
 	float tmin = 0.001;
 	float tmax = 10000.0;
 
-	rayPayload.ShadowMask = vec3(0.0f, 0.0f, 0.0f);
-	rayPayload.ReflectionColor = vec3(0.0f, 0.0f, 0.0f);
-	rayPayload.SSAOColor = vec3(0.0f, 0.0f, 0.0f);
-	rayPayload.reflectCount = 0;
-
+	rayPayload.color = vec3(0.0f);
+	vec3 ReflectMask = vec3(0.0f);
+	for (int x = 0; x < 20; x++) 
+	{
+		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+		if (rayPayload.reflector == 1.0f) 
+		{
+			const vec4 hitPos = origin + direction * rayPayload.distance;
+			origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
+			direction.xyz = reflect(direction.xyz, rayPayload.normal);
+			ReflectMask = vec3(1.0f, 0.0f, 0.0f);
+		} 
+		else 
+		{
+			rayPayload.color = vec3(0.0f);
+			break;
+		}
+	}
 	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 	
-	imageStore(ShadowTextureMask, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.ShadowMask, 0.0));
-	imageStore(ReflectionTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(vec3(1.0f, 0.0f, 0.0f), 0.0));
-	imageStore(SSAOTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(vec3(0.0f, 1.0f, 0.0f), 0.0));
+	imageStore(ReflectionTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.color, 0.0));
+
 }

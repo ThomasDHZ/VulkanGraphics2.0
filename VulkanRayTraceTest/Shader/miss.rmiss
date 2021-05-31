@@ -14,7 +14,6 @@ struct RayHitInfo
 	float distance;
 	vec3 normal;
 	float reflector;
-	float materialreflection;
 };
 
 layout(location = 0) rayPayloadInEXT RayHitInfo rayPayload;
@@ -25,5 +24,4 @@ void main()
 	rayPayload.distance = -1.0f;
 	rayPayload.normal = vec3(0.0f);
 	rayPayload.reflector = 0.0f;
-	rayPayload.materialreflection = 0.0f;
 }

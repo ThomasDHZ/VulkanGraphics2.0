@@ -1,5 +1,6 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
+
 layout(push_constant) uniform RayTraceCamera
 {
     mat4 proj;
@@ -9,17 +10,18 @@ layout(push_constant) uniform RayTraceCamera
 
 struct RayHitInfo
 {
-	vec3 ShadowMask;
-	vec3 ReflectionColor;
-	vec3 SSAOColor;
-	vec3 SkyboxColor;
-	uint reflectCount;
+	vec3 color;
+	float distance;
+	vec3 normal;
+	float reflector;
 };
 
 layout(location = 0) rayPayloadInEXT RayHitInfo rayPayload;
 layout(binding = 13, set = 0) uniform samplerCube CubeMap;
 void main()
 {
-	rayPayload.SkyboxColor = texture(CubeMap, gl_WorldRayDirectionEXT).rgb;
-	rayPayload.reflectCount = 0;
+	rayPayload.color = texture(CubeMap, gl_WorldRayDirectionEXT).rgb;
+	rayPayload.distance = -1.0f;
+	rayPayload.normal = vec3(0.0f);
+	rayPayload.reflector = 0.0f;
 }

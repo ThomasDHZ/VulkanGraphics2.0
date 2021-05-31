@@ -98,6 +98,7 @@ void main()
   //  vec3 Normal = texture(GNormalTexture, TexCoords).rgb;
     vec3 Shadow = texture(GShadowTexture, TexCoords).rgb;
     vec4 Reflection = texture(ReflectionMapTexture, TexCoords);
+    vec4 RTReflection = texture(GReflectionTexture, TexCoords);
     float SSAO = texture(GSSA0Texture, TexCoords).r;
     vec3 SkyBox = texture(GSkyBoxTexture, TexCoords).rgb;
     vec3 Bloom = texture(GBloomTexture, TexCoords).rgb;
@@ -146,7 +147,7 @@ void main()
 //        result = SkyBox;
 //    }
 
-     result = mix(result, Reflection.rgb, Reflection.a);
+     result = mix(result, RTReflection.rgb, Reflection.a);
 //    vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
 //    finalResult = pow(finalResult, vec3(1.0 / Gamma));
 

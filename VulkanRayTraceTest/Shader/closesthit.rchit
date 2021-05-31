@@ -19,7 +19,6 @@ struct RayPayload {
 	float distance;
 	vec3 normal;
 	float reflector;
-	float materialreflection;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
@@ -160,7 +159,6 @@ void main()
     {
         rayHitInfo.reflector = 0.0f; 
     }
-    rayHitInfo.materialreflection = 0.2543333f;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
