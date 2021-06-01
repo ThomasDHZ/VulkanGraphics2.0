@@ -629,6 +629,9 @@
     <None Include="Shader\GBuffer2.vert">
       <Filter>Shader</Filter>
     </None>
+    <None Include="Shader\RTXRandom.glsl">
+      <Filter>Shader\RaytracedShaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">

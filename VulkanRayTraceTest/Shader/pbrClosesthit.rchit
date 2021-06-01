@@ -12,6 +12,7 @@ layout(push_constant) uniform RayTraceCamera
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
+    uint frame;
 } Camera;
 
 struct RayPayload {

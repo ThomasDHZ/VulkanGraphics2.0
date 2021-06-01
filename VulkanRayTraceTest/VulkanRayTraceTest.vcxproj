@@ -319,6 +319,7 @@
     <None Include="Shader\Prefilter.vert" />
     <None Include="Shader\raygen.rgen" />
     <None Include="Shader\RTVertexBuilder.glsl" />
+    <None Include="Shader\RTXRandom.glsl" />
     <None Include="Shader\shader.frag" />
     <None Include="Shader\shader.vert" />
     <None Include="Shader\shadow.rmiss" />

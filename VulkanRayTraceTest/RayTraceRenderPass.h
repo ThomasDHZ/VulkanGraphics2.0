@@ -9,6 +9,9 @@ class RayTraceRenderPass
 private:
     VulkanBuffer instancesBuffer;
     void SetUpCommandBuffers(VulkanEngine& engine);
+    uint32_t Frame = 0;
+    glm::mat4 LastCameraView = glm::mat4(1.0f);
+    glm::mat4 LastCameraProjection = glm::mat4(1.0f);
 public:
 
     AccelerationStructure topLevelAS{};

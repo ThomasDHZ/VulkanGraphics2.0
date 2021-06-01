@@ -139,7 +139,7 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
     std::shared_ptr<RayTracingGraphicsPipeline> ActivePipeline;
     switch (renderID)
     {
-        case RendererID::BlinnPhong_RayTrace_Renderer: ActivePipeline = RTHybridPipeline; break;
+        case RendererID::BlinnPhong_RayTrace_Renderer: ActivePipeline = RTPipeline; break;
         case RendererID::PBR_RayTrace_Renderer: ActivePipeline = RTPBRPipeline; break;
         case RendererID::Hybrid_Renderer: ActivePipeline = RTHybridPipeline; break;
     }
@@ -174,6 +174,19 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
     cameraInfo.proj[1][1] *= -1;
     cameraInfo.view = glm::inverse(ViewCamera->GetViewMatrix());
     cameraInfo.CameraPos = ViewCamera->GetPosition();
+    cameraInfo.frame = Frame++;
+
+    if (cameraInfo.proj != LastCameraProjection)
+    {
+        Frame = 0;
+    }
+    if (cameraInfo.view != LastCameraView)
+    {
+        Frame = 0;
+    }
+
+    LastCameraProjection = cameraInfo.proj;
+    LastCameraView = cameraInfo.view;
 
     vkCmdPushConstants(RayTraceCommandBuffer, ActivePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 0, sizeof(RayTraceCamera), &cameraInfo);
     vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, ActivePipeline->ShaderPipeline);

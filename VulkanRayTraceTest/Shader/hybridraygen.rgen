@@ -9,6 +9,7 @@ layout(push_constant) uniform RayTraceCamera
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
+    uint frame;
 } Camera;
 
 struct RayPayload {
@@ -64,6 +65,6 @@ void main()
 	vec3 BaseColor = vec3(0.0f);
 	vec3 finalColor = vec3(0.0f);
 	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
-
+   
 	imageStore(ReflectionTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.color, 0.0));
 }
