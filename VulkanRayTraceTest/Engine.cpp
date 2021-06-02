@@ -32,13 +32,15 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //uint32_t MaterialID2 = assetManager->materialManager.LoadMaterial(engine, "FireMaterial", material2);
     //assetManager->meshManager.MeshList.emplace_back(std::make_shared<BillboardMesh>(BillboardMesh(engine, glm::vec2(3.0f), glm::vec2(1.0f), glm::vec3(2.0f), MaterialID2)));
 
-    //assetManager->AddModel(engine, "../Models/Crate.dae");
-    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
-    //material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB);
-    //material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Brick_height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
+    assetManager->AddModel(engine, "../Models/Crate.dae");
+    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
 
     assetManager->textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
   // assetManager->AddModel(engine, "../Models/viking_room.obj");
@@ -53,7 +55,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
-     assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
+   //  assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
      assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/
 

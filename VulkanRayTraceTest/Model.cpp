@@ -314,7 +314,26 @@ uint32_t Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailMana
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
 	{
 		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-		ModelMaterial->materialTexture.DiffuseMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.DiffuseMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_SRGB);
+		ModelMaterial->materialTexture.AlbedoMap = ModelMaterial->materialTexture.DiffuseMap;
+	}
+
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_METALNESS); x++)
+	{
+		material->GetTexture(aiTextureType_METALNESS, x, &TextureLocation);
+		ModelMaterial->materialTexture.MatallicMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS); x++)
+	{
+		material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, x, &TextureLocation);
+		ModelMaterial->materialTexture.RoughnessMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION); x++)
+	{
+		material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, x, &TextureLocation);
+		ModelMaterial->materialTexture.AOMap = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
