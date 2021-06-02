@@ -164,7 +164,7 @@ void main()
 	{
         debugPrintfEXT("Temp: %f \n", result.r);
         result = baseColor;
-        rayHitInfo.reflectCount = 20;
+        rayHitInfo.reflectCount = 13;
 	}
 
 //    	for (int x = 0; x < 20; x++) 
