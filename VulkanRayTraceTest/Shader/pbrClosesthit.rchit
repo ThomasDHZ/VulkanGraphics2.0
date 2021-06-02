@@ -3,6 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
+#extension GL_NV_ray_tracing : enable
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -13,18 +14,20 @@ layout(push_constant) uniform RayTraceCamera
     mat4 view;
     vec3 CameraPos;
     uint frame;
-} Camera;
+} ConstMesh;
 
 struct RayPayload {
-	vec3 RayTracedTexture;
-	uint reflectCount;
+	vec3 color;
+	uint seed;
+	vec3 normal;
+    int reflectCount;
 };
 
-layout(location = 0) rayPayloadInEXT RayPayload rayPayload;
+layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
 layout(location = 1) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
-layout(binding = 0) uniform accelerationStructureEXT topLevelAS;
+layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
 	DirectionalLight dlight;
@@ -41,7 +44,7 @@ layout(binding = 2) uniform UBO
 	float timer;
     int Shadowed;
     int temp;
-} ubo;
+} scenedata;
 layout(binding = 3) buffer MeshProperties 
 {
 	mat4 ModelTransform;
@@ -94,9 +97,14 @@ layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialLis
 layout(binding = 11) uniform sampler2D TextureMap[];
 layout(binding = 12) uniform sampler3D Texture3DMap[];
 
+Vertex vertex;
+MaterialInfo material;
+mat3 TBN;
+
 const float PI = 3.14159265359;
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
 #include "RTVertexBuilder.glsl"
+#include "BlinePhongLighting.glsl"
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
@@ -105,52 +113,94 @@ vec3 getNormalFromMap(Vertex vertex, MaterialInfo material);
 
 void main()
 {
-   const Vertex vertex = BuildVertexInfo();
-   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+   vertex = BuildVertexInfo();
+   material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+   TBN = transpose(mat3(T, B, N));
 
-  vec3 albedo     = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
-   float metallic  = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
-   float roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
-   float ao        = texture(TextureMap[material.AOMapID], vertex.uv).r;
+    vec3 result = vec3(0.0f);
+    vec3 baseColor = vec3(0.0f);
+    vec3 normal = vertex.normal;
+    vec3 ViewPos  = ConstMesh.CameraPos;
+    vec3 FragPos  = vertex.pos;
+    if(material.NormalMapID != 0)
+    {
+        ViewPos  = TBN * ConstMesh.CameraPos;
+        FragPos  = TBN * vertex.pos;
+    }
+    const vec3 viewDir = normalize(ViewPos - FragPos);
 
-   vec3 N = getNormalFromMap(vertex, material);
-   vec3 V = normalize(ubo.viewPos - vertex.pos);
+    if(material.NormalMapID != 0)
+    {
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
+        normal = texture(TextureMap[material.NormalMapID], vertex.uv).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+     }
+     for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+     {
+        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
+     }
+     for(int x = 0; x < scenedata.PointLightCount; x++)
+     {
+       // result += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+     }
+     //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
+       if(material.Reflectivness > 0.0f &&
+       rayHitInfo.reflectCount != 13)
+    {
+        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
 
-   vec3 F0 = vec3(0.04); 
-   F0 = mix(F0, albedo, metallic);
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+		result = mix(baseColor, rayHitInfo.color, material.Reflectivness); 
+    }
+    else
+	{
+        debugPrintfEXT("Temp: %f \n", result.r);
+        result = baseColor;
+        rayHitInfo.reflectCount = 20;
+	}
 
-vec3 Lo = vec3(0.0);
-    
-       vec3 L = normalize(-ubo.dlight.direction);
-       vec3 H = normalize(V + L);
+//    	for (int x = 0; x < 20; x++) 
+//	{
+//		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+//		if(x == 0)
+//		{
+//			BaseColor = rayPayload.color;
+//		}
+//		finalColor = mix(BaseColor, rayPayload.color, rayPayload.MaterialReflect);
+//		
+//
+//		if (rayPayload.reflector == 1.0f) 
+//		{
+//			const vec4 hitPos = origin + direction * rayPayload.distance;
+//			origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
+//			direction.xyz = reflect(direction.xyz, rayPayload.normal);
+//		} 
+//		else 
+//		{
+//			break;
+//		}
+//	}
 
-       vec3 radiance = ubo.dlight.diffuse;
-
-        float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);      
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
-           
-        vec3 nominator    = NDF * G * F; 
-        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
-        vec3 specular = nominator / denominator;
-
-        vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;	  
-
-        float NdotL = max(dot(N, L), 0.0);        
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-      
-
-   vec3 ambient = vec3(0.03) * albedo * ao;
-   vec3 color = ambient + Lo;
-
-   rayPayload.RayTracedTexture = color;
+    rayHitInfo.color = result;
+	rayHitInfo.normal = vertex.normal;
 }
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
 {
-     if(ubo.Shadowed == 1)
+     if(scenedata.Shadowed == 1)
      {
         float tmin = 0.001;
 	    float tmax = LightDistance;
@@ -171,6 +221,41 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
            LightResult += LightSpecular;
     }
     return LightResult;
+}
+
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{ 
+    const float heightScale = meshProperties[gl_InstanceCustomIndexEXT].heightScale;
+    const float minLayers = meshProperties[gl_InstanceCustomIndexEXT].minLayers;
+    const float maxLayers = meshProperties[gl_InstanceCustomIndexEXT].maxLayers;
+
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+
+    viewDir.y = -viewDir.y; 
+    vec2 P = viewDir.xy / viewDir.z * heightScale; 
+    vec2 deltaTexCoords = P / numLayers;
+  
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
+      
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;  
+        currentLayerDepth += layerDepth;  
+    }
+    
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
+ 
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)

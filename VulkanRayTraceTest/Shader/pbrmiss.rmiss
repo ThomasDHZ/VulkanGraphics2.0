@@ -11,17 +11,16 @@ layout(push_constant) uniform RayTraceCamera
 
 struct RayHitInfo
 {
-	vec3 ShadowMask;
-	vec3 ReflectionColor;
-	vec3 SSAOColor;
-	vec3 SkyboxColor;
-	uint reflectCount;
+	vec3 color;
+	uint seed;
+	vec3 normal;
+    int reflectCount;
 };
 
 layout(location = 0) rayPayloadInEXT RayHitInfo rayPayload;
 layout(binding = 13, set = 0) uniform samplerCube CubeMap;
 void main()
 {
-	rayPayload.SkyboxColor = texture(CubeMap, gl_WorldRayDirectionEXT).rgb;
-	rayPayload.reflectCount = 0;
+	rayPayload.color = texture(CubeMap, gl_WorldRayDirectionEXT).rgb;
+	rayPayload.normal = vec3(0.0f);
 }

@@ -107,8 +107,8 @@ void main()
    {
 	 ignoreIntersectionEXT;
    }
-   else if(rnd(rayHitInfo.seed) > 0.7f)
-   {
-    ignoreIntersectionEXT;
-   }
+//   else if(rnd(rayHitInfo.seed) > 0.7f)
+//   {
+//    ignoreIntersectionEXT;
+//   }
 }
