@@ -18,7 +18,7 @@ layout(push_constant) uniform RayTraceCamera
 
 struct RayPayload {
 	vec3 color;
-	float distance;
+	uint seed;
 	vec3 normal;
     int reflectCount;
 };
@@ -162,6 +162,7 @@ void main()
     }
     else
 	{
+        debugPrintfEXT("Temp: %f \n", result.r);
         result = baseColor;
         rayHitInfo.reflectCount = 20;
 	}
@@ -189,7 +190,6 @@ void main()
 //	}
 
     rayHitInfo.color = result;
-	rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
 }
 

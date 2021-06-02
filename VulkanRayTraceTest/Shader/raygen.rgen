@@ -15,7 +15,7 @@ layout(push_constant) uniform RayTraceCamera
 
 struct RayPayload {
 	vec3 color;
-	float distance;
+	uint seed;
 	vec3 normal;
     int reflectCount;
 };
@@ -73,6 +73,7 @@ void main()
 		vec4 target = Camera.proj * vec4(d.x, d.y, 1, 1) ;
 		vec4 direction = Camera.view*vec4(normalize(target.xyz / target.w), 0);
 
+		rayPayload.seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, Camera.frame);
 		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 		HitValues += rayPayload.color;
 	}
