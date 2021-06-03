@@ -210,8 +210,15 @@ void main()
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
-   vec3 ambient = vec3(0.03f) * albedo * ao;
-   vec3 color = ambient + Lo;
+       vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    vec3 irradiance = texture(irradianceMap, N).rgb;
+    vec3 diffuse      = irradiance * albedo;
+    vec3 ambient = (kD * diffuse) * ao;
+    // vec3 ambient = vec3(0.002);
+    
+    vec3 color = ambient + Lo;
 
     outColor = vec4(color, 1.0f);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);

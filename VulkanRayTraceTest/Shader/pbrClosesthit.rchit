@@ -176,28 +176,26 @@ void main()
         float NdotL = max(dot(N, L), 0.0);  
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
-   
 
+    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	
+    
+    vec3 irradiance = vec3(0.0f);
+    if(metallic > 0.0f &&
+       rayHitInfo.reflectCount != 13)
+    {
+        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
 
-//          if(material.Reflectivness > 0.0f &&
-//       rayHitInfo.reflectCount != 13)
-//    {
-//        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
-//        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-//        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
-//
-//        rayHitInfo.reflectCount++;
-//        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-//		result = mix(baseColor, rayHitInfo.color, material.Reflectivness); 
-//    }
-//    else
-//	{
-//        debugPrintfEXT("Temp: %f \n", result.r);
-//        result = baseColor;
-//        rayHitInfo.reflectCount = 13;
-//	}
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+		irradiance = mix(irradiance, rayHitInfo.color, material.Reflectivness); 
+    }
 
-   vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 diffuse      = irradiance * albedo;
+    vec3 ambient = (kD * diffuse) * ao;
    vec3 color = ambient + Lo;
 
    rayHitInfo.color = color;
