@@ -104,6 +104,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 vec3 getNormalFromMap(Vertex vertex, MaterialInfo material);
 
 Vertex BuildVertexInfo()
@@ -178,19 +179,23 @@ void main()
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
-    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+    vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	
     
-    vec3 irradiance = vec3(0.0f);
-    if(metallic > 0.0f &&
-       rayHitInfo.reflectCount != 25)
+    vec3 irradiance = vec3(0.0f, 0.6f, 1.0f);
+    vec3 specular = vec3(0.0f);
+    if(rayHitInfo.reflectCount != 15)
     {
         float r1        = rnd(rayHitInfo.seed);
         float r2        = rnd(rayHitInfo.seed);
         float sq        = sqrt(1.0 - r2);
         float phi       = 2 * PI * r1;
-        vec3 newDirection = gl_WorldRayDirectionEXT * vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2));
+        vec3 newDirection = gl_WorldRayDirectionEXT;
+        if(roughness != 0.0f)
+        {
+            newDirection *= (1.0f - roughness) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
+        }
 
         vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
@@ -199,11 +204,12 @@ void main()
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
 
-		irradiance += mix(F0, rayHitInfo.color, metallic); 
+		specular = rayHitInfo.color; 
     }
+   irradiance = mix(F0, irradiance, metallic); 
 
-    vec3 diffuse      = irradiance * albedo;
-    vec3 ambient = (kD * diffuse) * ao;
+   vec3 diffuse      = irradiance * albedo;
+   vec3 ambient = (kD * diffuse + specular) * ao;
    vec3 color = ambient + Lo;
 
    rayHitInfo.color = color;
@@ -309,6 +315,11 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}  
 
 vec3 getNormalFromMap(Vertex vertex, MaterialInfo material)
 {
