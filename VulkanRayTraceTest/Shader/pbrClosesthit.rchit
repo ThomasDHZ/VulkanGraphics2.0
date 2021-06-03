@@ -181,9 +181,8 @@ void main()
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	
     
-    vec3 irradiance = vec3(0.0f);
-    if(metallic > 0.0f &&
-       rayHitInfo.reflectCount != 13)
+    vec3 irradiance = vec3(0.4f);
+    if(metallic > 0.0f)
     {
         vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
@@ -191,7 +190,8 @@ void main()
 
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-		irradiance = mix(irradiance, rayHitInfo.color, material.Reflectivness); 
+    
+		irradiance = rayHitInfo.color; 
     }
 
     vec3 diffuse      = irradiance * albedo;
