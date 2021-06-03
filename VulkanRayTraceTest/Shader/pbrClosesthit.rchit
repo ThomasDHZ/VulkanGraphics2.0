@@ -7,6 +7,7 @@
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
+#include "RTXRandom.glsl"
 
 layout(push_constant) uniform RayTraceCamera
 {
@@ -181,17 +182,24 @@ void main()
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	
     
-    vec3 irradiance = vec3(0.4f);
-    if(metallic > 0.0f)
+    vec3 irradiance = vec3(0.0f);
+    if(metallic > 0.0f &&
+       rayHitInfo.reflectCount != 25)
     {
+        float r1        = rnd(rayHitInfo.seed);
+        float r2        = rnd(rayHitInfo.seed);
+        float sq        = sqrt(1.0 - r2);
+        float phi       = 2 * PI * r1;
+        vec3 newDirection = gl_WorldRayDirectionEXT * vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2));
+
         vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
+        vec3 rayDir   = reflect(newDirection, vertex.normal);
 
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-    
-		irradiance = rayHitInfo.color; 
+
+		irradiance += mix(F0, rayHitInfo.color, metallic); 
     }
 
     vec3 diffuse      = irradiance * albedo;
