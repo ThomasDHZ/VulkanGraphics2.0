@@ -24,24 +24,14 @@ struct MaterialInfo
 	uint AOMapID;
 };
 
-struct Material
+struct PBRMaterial
 {
-	vec3 Ambient;
-	vec3 Diffuse;
-	vec3 Specular;
-	float Shininess;
-	float Reflectivness;
-
-	vec3 DiffuseMap;
-	vec3 SpecularMap;
-	vec3 NormalMap;
-	vec3 DepthMap;
-	vec3 AlphaMap;
-	vec3 EmissionMap;
-	vec3 ShadowMap;
-
-	vec3 AlbedoMap;
-	vec3 MatallicMap;
-	vec3 RoughnessMap;
-	vec3 AOMap;
+    vec3 Albedo;
+    vec3 Normal;
+    vec3 Depth;
+    vec3 Emission;
+    vec3 Alpha;
+    float Metallic;
+    float Roughness;
+    float AmbientOcclusion;
 };
