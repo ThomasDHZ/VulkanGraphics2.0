@@ -106,6 +106,46 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 vec3 getNormalFromMap(MaterialInfo material, Vertex vertex);
+vec3 Irradiate(Vertex vertex);
+
+// ----------------------------------------------------------------------------
+// http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
+// efficient VanDerCorpus calculation.
+float RadicalInverse_VdC(uint bits) 
+{
+     bits = (bits << 16u) | (bits >> 16u);
+     bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
+     bits = ((bits & 0x33333333u) << 2u) | ((bits & 0xCCCCCCCCu) >> 2u);
+     bits = ((bits & 0x0F0F0F0Fu) << 4u) | ((bits & 0xF0F0F0F0u) >> 4u);
+     bits = ((bits & 0x00FF00FFu) << 8u) | ((bits & 0xFF00FF00u) >> 8u);
+     return float(bits) * 2.3283064365386963e-10; // / 0x100000000
+}
+
+vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
+{
+	float a = roughness*roughness;
+	
+	float phi = 2.0 * PI * Xi.x;
+	float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y));
+	float sinTheta = sqrt(1.0 - cosTheta*cosTheta);
+	
+	vec3 H;
+	H.x = cos(phi) * sinTheta;
+	H.y = sin(phi) * sinTheta;
+	H.z = cosTheta;
+	
+	vec3 up          = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+	vec3 tangent   = normalize(cross(up, N));
+	vec3 bitangent = cross(N, tangent);
+	
+	vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;
+	return normalize(sampleVec);
+}
+
+vec2 Hammersley(uint i, uint N)
+{
+	return vec2(float(i)/float(N), RadicalInverse_VdC(i));
+}
 
 Vertex BuildVertexInfo()
 {
@@ -264,53 +304,40 @@ void main()
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	  
     
-     vec3 irradiance = vec3(0.0f);
-    if(rayHitInfo.reflectCount != 15)
-    {
-        float r1        = rnd(rayHitInfo.seed) * 2;
-        float r2        = rnd(rayHitInfo.seed) * 2;
-        float sq        = sqrt(1.0 - r2);
-        float phi       = 2 * PI * r1;
- 
-        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
-        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
-
-        rayHitInfo.reflectCount++;
-        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-		irradiance = rayHitInfo.color; 
-    }
-    //irradiance = irradiance * (1.0f / float(25.0f));
+    //vec3 irradiance = vec3(0.0f);
+    vec3 irradiance = Irradiate(vertex);
+    
     vec3 diffuse  = irradiance * albedo;
 
+//    float totalWeight = 0.0f;
 //    vec3 specular = vec3(0.0f);
-//    if(rayHitInfo.reflectCount != 5)
+//    if(rayHitInfo.reflectCount != 15)
 //    {
-//        float r1        = rnd(rayHitInfo.seed);
-//        float r2        = rnd(rayHitInfo.seed);
-//        float sq        = sqrt(1.0 - r2);
-//        float phi       = 2 * PI * r1;
-//        vec3 newDirection = gl_WorldRayDirectionEXT;
-//        if(roughness != 0.0f)
+//        vec2 Xi = Hammersley(rayHitInfo.reflectCount, 15);
+//        vec3 H = ImportanceSampleGGX(Xi, N, roughness);
+//        vec3 L  = normalize(2.0 * dot(V, H) * H - V);
+//
+//        float NdotL = max(dot(N, L), 0.0);
+//        if(NdotL > 0.0)
 //        {
-//            newDirection *= (1.0f - roughness) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
+//          vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+//          vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+//          vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal) * L;
+//
+//          rayHitInfo.reflectCount++;
+//          traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+//          specular =  rayHitInfo.color * NdotL; 
+//          totalWeight      += NdotL;
 //        }
-//
-//        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
-//        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-//        vec3 rayDir   = reflect(newDirection, vertex.normal);
-//
-//        rayHitInfo.reflectCount++;
-//        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-//
-//		specular += rayHitInfo.color; 
 //    }
-//    specular = specular * (1.0f / float(5.0f));
+//    specular = specular / totalWeight;
+//    vec2 brdf = vec2(max(dot(N, V), 0.0), roughness).rg;
+//    specular *= (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse ) * ao;
+   vec3 ambient = (kD * diffuse) * ao;
    vec3 color = ambient + Lo;
 
-   rayHitInfo.color = color;
+   rayHitInfo.color = irradiance;
    rayHitInfo.normal = vertex.normal;
 }
 
@@ -430,4 +457,26 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}
+
+vec3 Irradiate(Vertex vertex)
+{
+    vec3 irradiance = vec3(0.0f);
+    if(rayHitInfo.reflectCount != 15)
+    {
+        float r1        = rnd(rayHitInfo.seed);
+        float r2        = rnd(rayHitInfo.seed);
+        float sq        = sqrt(1.0 - r2);
+        float phi       = 2 * PI * r1;
+ 
+        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2))), vertex.normal);
+
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+		irradiance += rayHitInfo.color; 
+    }
+
+    return irradiance;
 }
