@@ -108,6 +108,10 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
+    ImGui::SliderFloat3("Pos", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
+    ImGui::SliderFloat3("Diffuse", &assetManager->SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
+
+
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::Checkbox("AddLight", &addlightflag);
     ImGui::Checkbox("Deletelightflag", &deletelightflag);

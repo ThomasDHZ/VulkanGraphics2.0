@@ -22,6 +22,17 @@ void RayTracePBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& w
 
 void RayTracePBRRenderer::GUIUpdate(VulkanEngine& engine)
 {
+    ImGui::LabelText("Material", "Material");
+    for (int x = 0; x < assetManager->materialManager.MaterialList.size(); x++)
+    {
+        ImGui::SliderFloat3(("Material Albedo " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Albedo.x, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Material Metallic " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Matallic, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Material Roughness " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Roughness, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Material AmbientOcclusion " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.AmbientOcclusion, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Material Alpha " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Alpha, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
+
     ImGui::LabelText("Directional Light", "Directional Light");
     for (int x = 0; x < assetManager->lightManager.DirectionalLightList.size(); x++)
     {

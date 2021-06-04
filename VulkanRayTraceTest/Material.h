@@ -19,10 +19,11 @@ struct MaterialTexture
 	std::shared_ptr<Texture> ShadowMap;
 
 	//PBR
-	glm::vec3 Albedo = glm::vec3(0.128, 0.136f, 1.0f);
-	float Matallic = .582f;
-	float Roughness = 1.0f;
-	float AmbientOcclusion = 0.187f;
+	glm::vec3 Albedo = glm::vec3(0.5, 0.0f, 0.0f);
+	float Matallic = .75f;
+	float Roughness = .5f;
+	float AmbientOcclusion = 1.0f;
+	float Alpha = 1.0f;
 
 	std::shared_ptr<Texture> AlbedoMap;
 	std::shared_ptr<Texture> MatallicMap;
@@ -52,6 +53,7 @@ struct MaterialData
 	alignas(4) float Matallic = .75f;
 	alignas(4) float Roughness = .5f;
 	alignas(4) float AmbientOcclusion = 1.0f;
+	alignas(4) float Alpha = 1.0f;
 
 	alignas(4) uint32_t AlbedoMapID = 0;
 	alignas(4) uint32_t MatallicMapID = 0;

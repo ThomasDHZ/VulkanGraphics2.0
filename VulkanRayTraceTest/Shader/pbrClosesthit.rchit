@@ -181,29 +181,56 @@ PBRMaterial BuildMaterialInfo(vec2 uv, MaterialInfo materialInfo)
         material.AmbientOcclusion = texture(TextureMap[materialInfo.AOMapID],uv).r;
     }
 
+    material.Alpha = materialInfo.Alpha;
+    if (materialInfo.AlphaMapID != 0)
+    {
+        material.Alpha = texture(TextureMap[materialInfo.AlphaMapID],uv).r;
+    }
+
     return material;
 }
 
 void main()
 {
    Vertex vertex = BuildVertexInfo();
-   MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-   PBRMaterial material2 = BuildMaterialInfo(vertex.uv, material);
+   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
-   vec3 albedo     = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
-   float metallic  = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
-   float roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
-   float ao        = texture(TextureMap[material.AOMapID], vertex.uv).r;
+   vec3 albedo     = material.Albedo;
+   if (material.AlbedoMapID != 0)
+   {
+        albedo = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
+   }
+   
+   float metallic  = material.Matallic;
+   if (material.AlbedoMapID != 0)
+   {
+        metallic = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
+   }
+   
+   float roughness = material.Roughness;
+   if (material.AlbedoMapID != 0)
+   {
+        roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
+   }
+   
+   float ao        = material.AmbientOcclusion;
+   if (material.AlbedoMapID != 0)
+   {
+        ao = texture(TextureMap[material.AOMapID], vertex.uv).r;
+   }
 
-   vec3 N = getNormalFromMap(vertex, material);
+   vec3 N = vertex.normal;
+   if(MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material.NormalMapID != 0)
+   {
+      N = getNormalFromMap(vertex, material);
+   }
    vec3 V = normalize(scenedata.viewPos - vertex.pos);
-   vec3 R = reflect(-V, N); 
 
-   vec3 F0 = vec3(0.04f);
-   vec3 Lo = vec3(0.0f);
+   vec3 F0 = vec3(0.04); 
    F0 = mix(F0, albedo, metallic);
 
-      for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+    vec3 Lo = vec3(0.0);
+    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
     {
         vec3 L = normalize(-DLight[x].direction);
         vec3 H = normalize(V + L);
@@ -211,55 +238,26 @@ void main()
         vec3 radiance = DLight[x].diffuse;
 
         float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);    
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);        
-        
-        vec3 nominator    = NDF * G * F;
-        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+        float G   = GeometrySmith(N, V, L, roughness);      
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+           
+        vec3 nominator    = NDF * G * F; 
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
         vec3 specular = nominator / denominator;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;	
-    
-        float NdotL = max(dot(N, L), 0.0);  
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+        kD *= 1.0 - metallic;	  
+
+        float NdotL = max(dot(N, L), 0.0);        
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
 
-    vec3 kS = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	
-    
-    vec3 irradiance = vec3(0.0f, 0.6f, 1.0f);
-    vec3 specular = vec3(0.0f);
-    if(rayHitInfo.reflectCount != 15)
-    {
-        float r1        = rnd(rayHitInfo.seed);
-        float r2        = rnd(rayHitInfo.seed);
-        float sq        = sqrt(1.0 - r2);
-        float phi       = 2 * PI * r1;
-        vec3 newDirection = gl_WorldRayDirectionEXT;
-        if(roughness != 0.0f)
-        {
-            newDirection *= (1.0f - roughness) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
-        }
+   vec3 ambient = vec3(0.03) * albedo * ao;
+   vec3 color = albedo + Lo;
 
-        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
-        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(newDirection, vertex.normal);
-
-        rayHitInfo.reflectCount++;
-        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-
-		specular = rayHitInfo.color; 
-    }
-   irradiance = mix(F0, irradiance, metallic); 
-
-   vec3 diffuse      = irradiance * albedo;
-   vec3 ambient = (kD * diffuse + specular) * ao;
-   vec3 color = ambient + Lo;
-
-   rayHitInfo.color = color;
+   vec3 result = pow(color, vec3(1.0/2.2));
+   rayHitInfo.color = result;
    rayHitInfo.normal = vertex.normal;
 }
 
@@ -334,9 +332,9 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     float denom = (NdotH2 * (a2 - 1.0) + 1.0);
     denom = PI * denom * denom;
 
-    return nom / max(denom, 0.0000001); // prevent divide by zero for roughness=0.0 and NdotH=1.0
+    return nom / denom;
 }
-
+// ----------------------------------------------------------------------------
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
     float r = (roughness + 1.0);
@@ -347,7 +345,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 
     return nom / denom;
 }
-
+// ----------------------------------------------------------------------------
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
     float NdotV = max(dot(N, V), 0.0);
@@ -357,16 +355,13 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
-
+// ----------------------------------------------------------------------------
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
+// ----------------------------------------------------------------------------
 
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
-}  
 
 vec3 getNormalFromMap(Vertex vertex, MaterialInfo material)
 {
@@ -375,7 +370,7 @@ vec3 getNormalFromMap(Vertex vertex, MaterialInfo material)
     vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-    vec3 normal = texture(TextureMap[material.NormalMapID], vertex.uv).rgb;
+     vec3 normal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz;
          normal = normalize(normal * 2.0 - 1.0);
     
     return TBN * normal;

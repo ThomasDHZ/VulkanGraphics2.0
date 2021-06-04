@@ -22,6 +22,7 @@ void RayTraceRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& wind
 
 void RayTraceRenderer::GUIUpdate(VulkanEngine& engine)
 {
+
     ImGui::Image(rayTraceRenderPass.RayTracedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::LabelText("Directional Light", "Directional Light");
     for (int x = 0; x < assetManager->lightManager.DirectionalLightList.size(); x++)

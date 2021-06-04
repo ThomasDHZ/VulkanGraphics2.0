@@ -113,12 +113,24 @@ vec3 getNormalFromMap(MaterialInfo material, vec2 uv)
     vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-    vec3 normal = texture(TextureMap[material.NormalMapID], uv).rgb;
+    vec3 normal = texture(TextureMap[material.NormalMapID], uv).xyz;
          normal = normalize(normal * 2.0 - 1.0);
     
     return TBN * normal;
+//    vec3 tangentNormal = texture(TextureMap[material.NormalMapID], uv).xyz * 2.0 - 1.0;
+//
+//    vec3 Q1  = dFdx(FragPos);
+//    vec3 Q2  = dFdy(FragPos);
+//    vec2 st1 = dFdx(TexCoords);
+//    vec2 st2 = dFdy(TexCoords);
+//
+//    vec3 N   = normalize(Normal);
+//    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
+//    vec3 B  = -normalize(cross(N, T));
+//    mat3 TBN = mat3(T, B, N);
+//
+//    return normalize(TBN * tangentNormal);
 }
-// ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -159,11 +171,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 // ----------------------------------------------------------------------------
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
-}  
-// ----------------------------------------------------------------------------
+
 void main()
 {		
    const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
@@ -174,20 +182,48 @@ void main()
 	 discard;
    }
   
-   vec3 albedo     = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
-   float metallic  = texture(TextureMap[material.MatallicMapID], texCoords).r;
-   float roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
-   float ao        = texture(TextureMap[material.AOMapID], texCoords).r;
 
-   vec3 N = getNormalFromMap(material, texCoords);
+   vec3 albedo     = material.Albedo;
+   if (material.AlbedoMapID != 0)
+   {
+        albedo = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
+   }
+   
+   float metallic  = material.Matallic;
+   if (material.AlbedoMapID != 0)
+   {
+        metallic = texture(TextureMap[material.MatallicMapID], texCoords).r;
+   }
+   
+   float roughness = material.Roughness;
+   if (material.AlbedoMapID != 0)
+   {
+        roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
+   }
+   
+   float ao        = material.AmbientOcclusion;
+   if (material.AlbedoMapID != 0)
+   {
+        ao = texture(TextureMap[material.AOMapID], texCoords).r;
+   }
+
+//   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
+//   float metallic  = 0.7f;
+//   float roughness = 1.0f;
+//   float ao        = 1.0f;
+
+   vec3 N = Normal;
+   if(material.NormalMapID != 0)
+   {
+      N = getNormalFromMap(material, texCoords);
+   }
    vec3 V = normalize(scenedata.viewPos - FragPos);
-   vec3 R = reflect(-V, N); 
 
-   vec3 F0 = vec3(0.04f);
-   vec3 Lo = vec3(0.0f);
+   vec3 F0 = vec3(0.04); 
    F0 = mix(F0, albedo, metallic);
 
-      for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+    vec3 Lo = vec3(0.0);
+    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
     {
         vec3 L = normalize(-DLight[x].direction);
         vec3 H = normalize(V + L);
@@ -195,31 +231,24 @@ void main()
         vec3 radiance = DLight[x].diffuse;
 
         float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);    
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0f), F0);        
-        
-        vec3 nominator    = NDF * G * F;
-        float denominator = 4 * max(dot(N, V), 0.0f) * max(dot(N, L), 0.0f) + 0.001f;
+        float G   = GeometrySmith(N, V, L, roughness);      
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+           
+        vec3 nominator    = NDF * G * F; 
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
         vec3 specular = nominator / denominator;
 
         vec3 kS = F;
-        vec3 kD = vec3(1.0f) - kS;
-        kD *= 1.0f - metallic;	
-    
-        float NdotL = max(dot(N, L), 0.0f);  
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;	  
+
+        float NdotL = max(dot(N, L), 0.0);        
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
 
-       vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	  
-    vec3 irradiance = texture(irradianceMap, N).rgb;
-    vec3 diffuse      = irradiance * albedo;
-    vec3 ambient = (kD * diffuse) * ao;
-    // vec3 ambient = vec3(0.002);
-    
-    vec3 color = ambient + Lo;
+   vec3 ambient = vec3(0.03) * albedo * ao;
+   vec3 color = ambient + Lo;
 
-    outColor = vec4(color, 1.0f);
-    outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+   vec3 result = pow(color, vec3(1.0/2.2));
+   outColor = vec4(result, 1.0);
 }

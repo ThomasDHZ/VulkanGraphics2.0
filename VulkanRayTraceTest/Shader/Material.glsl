@@ -18,6 +18,8 @@ struct MaterialInfo
 	float Matallic;
 	float Roughness;
 	float AmbientOcclusion;
+	float Alpha;
+
 	uint AlbedoMapID;
 	uint MatallicMapID;
 	uint RoughnessMapID;
@@ -30,8 +32,8 @@ struct PBRMaterial
     vec3 Normal;
     vec3 Depth;
     vec3 Emission;
-    vec3 Alpha;
     float Metallic;
     float Roughness;
     float AmbientOcclusion;
+	float Alpha;
 };
