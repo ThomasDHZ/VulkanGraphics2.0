@@ -195,35 +195,35 @@ void main()
    Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
-//   vec3 albedo     = material.Albedo;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        albedo = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
-//   }
-//   
-//   float metallic  = material.Matallic;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        metallic = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
-//   }
-//   
-//   float roughness = material.Roughness;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
-//   }
-//   
-//   float ao        = material.AmbientOcclusion;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        ao = texture(TextureMap[material.AOMapID], vertex.uv).r;
-//   }
-//
+   vec3 albedo     = material.Albedo;
+   if (material.AlbedoMapID != 0)
+   {
+        albedo = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
+   }
    
-   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
-   float metallic  = 0.7f;
-   float roughness = 1.0f;
-   float ao        = 1.0f;
+   float metallic  = material.Matallic;
+   if (material.AlbedoMapID != 0)
+   {
+        metallic = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
+   }
+   
+   float roughness = material.Roughness;
+   if (material.AlbedoMapID != 0)
+   {
+        roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
+   }
+   
+   float ao        = material.AmbientOcclusion;
+   if (material.AlbedoMapID != 0)
+   {
+        ao = texture(TextureMap[material.AOMapID], vertex.uv).r;
+   }
+
+   
+//   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
+//   float metallic  = 0.7f;
+//   float roughness = 1.0f;
+//   float ao        = 1.0f;
 
    vec3 N = vertex.normal;
    if(material.NormalMapID != 0)
@@ -262,8 +262,7 @@ void main()
    vec3 ambient = vec3(0.03) * albedo * ao;
    vec3 color = ambient + Lo;
 
-   vec3 result = pow(color, vec3(1.0/2.2));
-   rayHitInfo.color = result;
+   rayHitInfo.color = color;
    rayHitInfo.normal = vertex.normal;
 }
 

@@ -170,34 +170,34 @@ void main()
    }
   
 
-//   vec3 albedo     = material.Albedo;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        albedo = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
-//   }
-//   
-//   float metallic  = material.Matallic;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        metallic = texture(TextureMap[material.MatallicMapID], texCoords).r;
-//   }
-//   
-//   float roughness = material.Roughness;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
-//   }
-//   
-//   float ao        = material.AmbientOcclusion;
-//   if (material.AlbedoMapID != 0)
-//   {
-//        ao = texture(TextureMap[material.AOMapID], texCoords).r;
-//   }
+   vec3 albedo     = material.Albedo;
+   if (material.AlbedoMapID != 0)
+   {
+        albedo = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
+   }
+   
+   float metallic  = material.Matallic;
+   if (material.AlbedoMapID != 0)
+   {
+        metallic = texture(TextureMap[material.MatallicMapID], texCoords).r;
+   }
+   
+   float roughness = material.Roughness;
+   if (material.AlbedoMapID != 0)
+   {
+        roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
+   }
+   
+   float ao        = material.AmbientOcclusion;
+   if (material.AlbedoMapID != 0)
+   {
+        ao = texture(TextureMap[material.AOMapID], texCoords).r;
+   }
 
-   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
-   float metallic  = 0.7f;
-   float roughness = 1.0f;
-   float ao        = 1.0f;
+//   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
+//   float metallic  = 0.7f;
+//   float roughness = 1.0f;
+//   float ao        = 1.0f;
 
    vec3 N = Normal;
    if(material.NormalMapID != 0)
@@ -236,6 +236,5 @@ void main()
    vec3 ambient = vec3(0.03) * albedo * ao;
    vec3 color = ambient + Lo;
 
-   vec3 result = pow(color, vec3(1.0/2.2));
-   outColor = vec4(result, 1.0);
+   outColor = vec4(color, 1.0);
 }
