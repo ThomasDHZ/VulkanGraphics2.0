@@ -55,7 +55,7 @@ void main()
 	float tmin = 0.001f;
 	float tmax = 10000.0f;
 
-	for(int x = 0; x < 30; x++)
+	for(int x = 0; x < 10; x++)
 	{
 		float r1 = rnd(seed);
 		float r2 = rnd(seed);

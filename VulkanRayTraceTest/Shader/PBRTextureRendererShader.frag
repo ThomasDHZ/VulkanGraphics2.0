@@ -256,5 +256,5 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao;
    vec3 color = ambient + Lo;
 
-   outColor = vec4(color, 1.0);
+   outColor = vec4(irradiance, 1.0);
 }

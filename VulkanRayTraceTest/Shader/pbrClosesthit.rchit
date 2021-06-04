@@ -264,34 +264,50 @@ void main()
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	  
     
-    vec3 irradiance = vec3(0.0f, .1f, .3f);
-    vec3 diffuse      = irradiance * albedo;
-
-    vec3 specular = vec3(0.0f);
+     vec3 irradiance = vec3(0.0f);
     if(rayHitInfo.reflectCount != 15)
     {
-        float r1        = rnd(rayHitInfo.seed);
-        float r2        = rnd(rayHitInfo.seed);
+        float r1        = rnd(rayHitInfo.seed) * 2;
+        float r2        = rnd(rayHitInfo.seed) * 2;
         float sq        = sqrt(1.0 - r2);
         float phi       = 2 * PI * r1;
-        vec3 newDirection = gl_WorldRayDirectionEXT;
-        if(roughness != 0.0f)
-        {
-            newDirection *= (1.0f - roughness) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
-        }
-
+ 
         vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(newDirection, vertex.normal);
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
 
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-
-		specular += rayHitInfo.color; 
+		irradiance = rayHitInfo.color; 
     }
-    specular = specular * (1.0f / float(15.0f));
+    //irradiance = irradiance * (1.0f / float(25.0f));
+    vec3 diffuse  = irradiance * albedo;
 
-   vec3 ambient = (kD * diffuse + specular) * ao;
+//    vec3 specular = vec3(0.0f);
+//    if(rayHitInfo.reflectCount != 5)
+//    {
+//        float r1        = rnd(rayHitInfo.seed);
+//        float r2        = rnd(rayHitInfo.seed);
+//        float sq        = sqrt(1.0 - r2);
+//        float phi       = 2 * PI * r1;
+//        vec3 newDirection = gl_WorldRayDirectionEXT;
+//        if(roughness != 0.0f)
+//        {
+//            newDirection *= (1.0f - roughness) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
+//        }
+//
+//        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+//        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+//        vec3 rayDir   = reflect(newDirection, vertex.normal);
+//
+//        rayHitInfo.reflectCount++;
+//        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+//
+//		specular += rayHitInfo.color; 
+//    }
+//    specular = specular * (1.0f / float(5.0f));
+
+    vec3 ambient = (kD * diffuse ) * ao;
    vec3 color = ambient + Lo;
 
    rayHitInfo.color = color;
