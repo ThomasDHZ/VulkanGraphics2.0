@@ -258,8 +258,40 @@ void main()
         float NdotL = max(dot(N, L), 0.0);        
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
+   vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    
+    vec3 irradiance = vec3(0.0f, .1f, .3f);
+    vec3 diffuse      = irradiance * albedo;
 
-   vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 specular = vec3(0.0f);
+    if(rayHitInfo.reflectCount != 15)
+    {
+        float r1        = rnd(rayHitInfo.seed);
+        float r2        = rnd(rayHitInfo.seed);
+        float sq        = sqrt(1.0 - r2);
+        float phi       = 2 * PI * r1;
+        vec3 newDirection = gl_WorldRayDirectionEXT;
+        if(roughness != 0.0f)
+        {
+            newDirection *= (1.0f - roughness) * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2)));
+        }
+
+        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        vec3 rayDir   = reflect(newDirection, vertex.normal);
+
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+
+		specular += rayHitInfo.color; 
+    }
+    specular = specular * (1.0f / float(15.0f));
+
+   vec3 ambient = (kD * diffuse + specular) * ao;
    vec3 color = ambient + Lo;
 
    rayHitInfo.color = color;
@@ -338,6 +370,7 @@ vec3 getNormalFromMap(MaterialInfo material, Vertex vertex)
     
     return TBN * normal;
 }
+
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -351,7 +384,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 
     return nom / denom;
 }
-// ----------------------------------------------------------------------------
+
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
     float r = (roughness + 1.0);
@@ -362,7 +395,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 
     return nom / denom;
 }
-// ----------------------------------------------------------------------------
+
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
     float NdotV = max(dot(N, V), 0.0);
@@ -372,9 +405,13 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
-// ----------------------------------------------------------------------------
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}  
+
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
-// ----------------------------------------------------------------------------

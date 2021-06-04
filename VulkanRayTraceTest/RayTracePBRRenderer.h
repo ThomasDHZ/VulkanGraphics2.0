@@ -4,11 +4,13 @@
 #include "FrameBufferTextureRenderPass.h"
 #include "FrameBufferRenderPass.h"
 #include "RayTraceRenderPass.h"
+#include "SSAOBlurRenderPass.h"
 
 class RayTracePBRRenderer : public BaseRenderer
 {
 private:
 	FrameBufferRenderPass FrameBufferRenderer;
+	SSAOBlurRenderPass SSAOBlurRenderer;
 public:
 	RayTracePBRRenderer();
 	RayTracePBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
