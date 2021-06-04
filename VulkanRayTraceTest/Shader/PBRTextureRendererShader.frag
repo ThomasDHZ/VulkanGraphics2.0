@@ -117,19 +117,6 @@ vec3 getNormalFromMap(MaterialInfo material, vec2 uv)
          normal = normalize(normal * 2.0 - 1.0);
     
     return TBN * normal;
-//    vec3 tangentNormal = texture(TextureMap[material.NormalMapID], uv).xyz * 2.0 - 1.0;
-//
-//    vec3 Q1  = dFdx(FragPos);
-//    vec3 Q2  = dFdy(FragPos);
-//    vec2 st1 = dFdx(TexCoords);
-//    vec2 st2 = dFdy(TexCoords);
-//
-//    vec3 N   = normalize(Normal);
-//    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
-//    vec3 B  = -normalize(cross(N, T));
-//    mat3 TBN = mat3(T, B, N);
-//
-//    return normalize(TBN * tangentNormal);
 }
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
@@ -183,34 +170,34 @@ void main()
    }
   
 
-   vec3 albedo     = material.Albedo;
-   if (material.AlbedoMapID != 0)
-   {
-        albedo = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
-   }
-   
-   float metallic  = material.Matallic;
-   if (material.AlbedoMapID != 0)
-   {
-        metallic = texture(TextureMap[material.MatallicMapID], texCoords).r;
-   }
-   
-   float roughness = material.Roughness;
-   if (material.AlbedoMapID != 0)
-   {
-        roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
-   }
-   
-   float ao        = material.AmbientOcclusion;
-   if (material.AlbedoMapID != 0)
-   {
-        ao = texture(TextureMap[material.AOMapID], texCoords).r;
-   }
+//   vec3 albedo     = material.Albedo;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        albedo = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
+//   }
+//   
+//   float metallic  = material.Matallic;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        metallic = texture(TextureMap[material.MatallicMapID], texCoords).r;
+//   }
+//   
+//   float roughness = material.Roughness;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
+//   }
+//   
+//   float ao        = material.AmbientOcclusion;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        ao = texture(TextureMap[material.AOMapID], texCoords).r;
+//   }
 
-//   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
-//   float metallic  = 0.7f;
-//   float roughness = 1.0f;
-//   float ao        = 1.0f;
+   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
+   float metallic  = 0.7f;
+   float roughness = 1.0f;
+   float ao        = 1.0f;
 
    vec3 N = Normal;
    if(material.NormalMapID != 0)

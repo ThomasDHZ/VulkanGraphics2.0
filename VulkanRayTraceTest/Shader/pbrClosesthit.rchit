@@ -105,7 +105,7 @@ float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
-vec3 getNormalFromMap(Vertex vertex, MaterialInfo material);
+vec3 getNormalFromMap(MaterialInfo material, Vertex vertex);
 
 Vertex BuildVertexInfo()
 {
@@ -195,34 +195,40 @@ void main()
    Vertex vertex = BuildVertexInfo();
    const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
-   vec3 albedo     = material.Albedo;
-   if (material.AlbedoMapID != 0)
-   {
-        albedo = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
-   }
+//   vec3 albedo     = material.Albedo;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        albedo = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
+//   }
+//   
+//   float metallic  = material.Matallic;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        metallic = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
+//   }
+//   
+//   float roughness = material.Roughness;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
+//   }
+//   
+//   float ao        = material.AmbientOcclusion;
+//   if (material.AlbedoMapID != 0)
+//   {
+//        ao = texture(TextureMap[material.AOMapID], vertex.uv).r;
+//   }
+//
    
-   float metallic  = material.Matallic;
-   if (material.AlbedoMapID != 0)
-   {
-        metallic = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
-   }
-   
-   float roughness = material.Roughness;
-   if (material.AlbedoMapID != 0)
-   {
-        roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
-   }
-   
-   float ao        = material.AmbientOcclusion;
-   if (material.AlbedoMapID != 0)
-   {
-        ao = texture(TextureMap[material.AOMapID], vertex.uv).r;
-   }
+   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
+   float metallic  = 0.7f;
+   float roughness = 1.0f;
+   float ao        = 1.0f;
 
    vec3 N = vertex.normal;
-   if(MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material.NormalMapID != 0)
+   if(material.NormalMapID != 0)
    {
-      N = getNormalFromMap(vertex, material);
+      N = getNormalFromMap(material, vertex);
    }
    vec3 V = normalize(scenedata.viewPos - vertex.pos);
 
@@ -254,7 +260,7 @@ void main()
     }
 
    vec3 ambient = vec3(0.03) * albedo * ao;
-   vec3 color = albedo + Lo;
+   vec3 color = ambient + Lo;
 
    vec3 result = pow(color, vec3(1.0/2.2));
    rayHitInfo.color = result;
@@ -321,6 +327,18 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
 //    return finalTexCoords;
 //}
 
+vec3 getNormalFromMap(MaterialInfo material, Vertex vertex)
+{
+    vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    vec3 normal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz;
+         normal = normalize(normal * 2.0 - 1.0);
+    
+    return TBN * normal;
+}
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -361,17 +379,3 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 // ----------------------------------------------------------------------------
-
-
-vec3 getNormalFromMap(Vertex vertex, MaterialInfo material)
-{
-    vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-    mat3 TBN = transpose(mat3(T, B, N));
-
-     vec3 normal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz;
-         normal = normalize(normal * 2.0 - 1.0);
-    
-    return TBN * normal;
-}
