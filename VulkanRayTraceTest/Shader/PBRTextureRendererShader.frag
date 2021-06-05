@@ -253,8 +253,8 @@ void main()
     vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse + specular) * ao;
+    vec3 ambient = (kD * diffuse) * ao;
    vec3 color = ambient + Lo;
 
-   outColor = vec4(irradiance, 1.0);
+   outColor = vec4(color, 1.0);
 }

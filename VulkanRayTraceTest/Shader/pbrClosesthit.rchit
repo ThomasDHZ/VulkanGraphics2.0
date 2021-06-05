@@ -337,7 +337,7 @@ void main()
    vec3 ambient = (kD * diffuse) * ao;
    vec3 color = ambient + Lo;
 
-   rayHitInfo.color = irradiance;
+   rayHitInfo.color = color;
    rayHitInfo.normal = vertex.normal;
 }
 
@@ -461,8 +461,9 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 vec3 Irradiate(Vertex vertex)
 {
+    const int MaxReflectCount =15; 
     vec3 irradiance = vec3(0.0f);
-    if(rayHitInfo.reflectCount != 15)
+    if(rayHitInfo.reflectCount != MaxReflectCount)
     {
         float r1        = rnd(rayHitInfo.seed);
         float r2        = rnd(rayHitInfo.seed);
