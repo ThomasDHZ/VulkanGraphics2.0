@@ -119,20 +119,20 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Checkbox("Deleteplightflag", &deleteplightflag);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     ImGui::SliderInt("Active Camera", &assetManager->cameraManager.cameraIndex, 0, assetManager->cameraManager.CameraList.size());
-    //
-    //ImGui::SliderFloat("adsf", &assetManager->materialManager.MaterialList[0]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf2", &assetManager->materialManager.MaterialList[1]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf3", &assetManager->materialManager.MaterialList[2]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf4", &assetManager->materialManager.MaterialList[3]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf5", &assetManager->materialManager.MaterialList[4]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf6", &assetManager->materialManager.MaterialList[5]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf7", &assetManager->materialManager.MaterialList[6]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf8", &assetManager->materialManager.MaterialList[7]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf9", &assetManager->materialManager.MaterialList[8]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf10", &assetManager->materialManager.MaterialList[9]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf11", &assetManager->materialManager.MaterialList[10]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf12", &assetManager->materialManager.MaterialList[11]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf13", &assetManager->materialManager.MaterialList[12]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    
+    ImGui::SliderFloat("adsf", &assetManager->materialManager.MaterialList[0]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf2", &assetManager->materialManager.MaterialList[1]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf3", &assetManager->materialManager.MaterialList[2]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf4", &assetManager->materialManager.MaterialList[3]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf5", &assetManager->materialManager.MaterialList[4]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf6", &assetManager->materialManager.MaterialList[5]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf7", &assetManager->materialManager.MaterialList[6]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf8", &assetManager->materialManager.MaterialList[7]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf9", &assetManager->materialManager.MaterialList[8]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf10", &assetManager->materialManager.MaterialList[9]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf11", &assetManager->materialManager.MaterialList[10]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf12", &assetManager->materialManager.MaterialList[11]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf13", &assetManager->materialManager.MaterialList[12]->materialTexture.Reflectivness, 0.0f, 1.0f);
     
     if (ActiveRenderer == 0)
     {

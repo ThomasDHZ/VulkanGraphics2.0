@@ -337,7 +337,7 @@ void main()
    vec3 ambient = (kD * diffuse) * ao;
    vec3 color = ambient + Lo;
 
-   rayHitInfo.color = color;
+   rayHitInfo.color = irradiance;
    rayHitInfo.normal = vertex.normal;
 }
 

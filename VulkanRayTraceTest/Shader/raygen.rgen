@@ -1,22 +1,19 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
 #extension GL_EXT_debug_printf : enable
-#extension GL_EXT_ray_query : enable
 
 #include "Lighting.glsl"
-#include "RTXRandom.glsl"
 
 layout(push_constant) uniform RayTraceCamera
 {
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
-    uint frame;
 } Camera;
 
 struct RayPayload {
 	vec3 color;
-	uint seed;
+	float distance;
 	vec3 normal;
     int reflectCount;
 };
@@ -43,83 +40,27 @@ layout(binding = 2, set = 0) uniform CameraProperties
 
 layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 
-const float PI = 3.14159265359f;
 void main() 
 {
-    float occlusion = 0.0f;
-    uint seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, Camera.frame);
+	const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
+	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
+	vec2 d = inUV * 2.0 - 1.0;
 
-    for(int x = 0; x < 20; x++)
-    {
-        float r1 = rnd(seed);
-		float r2 = rnd(seed);
-        float sq = sqrt(1.0f - r2);
-        float phi = 2 * PI * r1;
-        vec4 origin = Camera.view * vec4(0,0,0,1);
-        vec3 direction = vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2));
-        uint cullMask = 0xff;
-	    float tmin = 0.001f;
-	    float tmax = 10000.0f;
+	vec4 origin = Camera.view * vec4(0,0,0,1);
+	vec4 target = Camera.proj * vec4(d.x, d.y, 1, 1) ;
+	vec4 direction = Camera.view*vec4(normalize(target.xyz / target.w), 0);
 
-        rayPayload.seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, Camera.frame);
-		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
-         occlusion = rayPayload.color.r;
-    }
+	uint rayFlags = gl_RayFlagsOpaqueEXT;
+	uint cullMask = 0xff;
+	float tmin = 0.001;
+	float tmax = 10000.0;
 
-//  if(Camera.frame == 0)
-//  {
-  	imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(vec3(occlusion), 1.0));
-//  }
-//  else
-//  {
-//    float a         = 1.0f / float(Camera.frame + 1);
-//    vec3  old_color = imageLoad(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy)).xyz;
-//	imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(mix(old_color, vec3(occlusion), a), 1.0));
-//  }
-////	rayPayload.color = vec3(0.0f);
-//	rayPayload.reflectCount = 0;
-//
-//	vec3 HitValues = vec3(0.0f);
-//	vec3 FinalColor = vec3(0.0f);
-//	uint seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, Camera.frame);
-//	uint rayFlags = gl_RayFlagsOpaqueEXT;
-//	uint cullMask = 0xff;
-//	float tmin = 0.001f;
-//	float tmax = 10000.0f;
-//
-//	for(int x = 0; x < 10; x++)
-//	{
-//		float r1 = rnd(seed);
-//		float r2 = rnd(seed);
-//		vec2 subPixel = vec2(0.5f);
-//		if(Camera.frame != 0);
-//		{
-//			subPixel = vec2(r1, r2);
-//		}
-//
-//		const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + subPixel;
-//		const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
-//		vec2 d = inUV * 2.0 - 1.0;
-//
-//		vec4 origin = Camera.view * vec4(0,0,0,1);
-//		vec4 target = Camera.proj * vec4(d.x, d.y, 1, 1) ;
-//		vec4 direction = Camera.view*vec4(normalize(target.xyz / target.w), 0);
-//
-//		rayPayload.seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, Camera.frame);
-//		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
-//		HitValues += rayPayload.color;
-//	}
-//	FinalColor = HitValues / 10;
-//
-//  if(Camera.frame > 0 ||
-//	 Camera.frame > 10)
-//  {
-//    float a         = 1.0f / float(Camera.frame + 1);
-//    vec3  old_color = imageLoad(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy)).xyz;
-//	imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(mix(old_color, FinalColor, a), 1.0));
-//  }
-//  else
-//  {
-//	imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(FinalColor, 1.0));
-//  }
+	rayPayload.color = vec3(0.0f);
+	rayPayload.reflectCount = 0;
+
+	vec3 BaseColor = vec3(0.0f);
+	vec3 finalColor = vec3(0.0f);
+	traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+
+	imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.color, 0.0));
 }
