@@ -148,11 +148,11 @@ void main()
 //    }
 
      result = mix(result, RTReflection.rgb, Reflection.a);
-//    vec3 finalResult = vec3(1.0) - exp(-normal * Exposure);
-//    finalResult = pow(finalResult, vec3(1.0 / Gamma));
+    vec3 finalResult = vec3(1.0) - exp(-result * Exposure);
+    finalResult = pow(finalResult, vec3(1.0 / Gamma));
 
     //Reflectivty is stored in alpha channel.
-    outColor = vec4(result, 1.0f);
+    outColor = vec4(finalResult, 1.0f);
 }
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, int index)

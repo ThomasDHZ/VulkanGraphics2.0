@@ -133,7 +133,12 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat("adsf11", &assetManager->materialManager.MaterialList[10]->materialTexture.Reflectivness, 0.0f, 1.0f);
     ImGui::SliderFloat("adsf12", &assetManager->materialManager.MaterialList[11]->materialTexture.Reflectivness, 0.0f, 1.0f);
     ImGui::SliderFloat("adsf13", &assetManager->materialManager.MaterialList[12]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    
+    ImGui::SliderFloat("adsf14", &assetManager->materialManager.MaterialList[13]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf15", &assetManager->materialManager.MaterialList[14]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf16", &assetManager->materialManager.MaterialList[15]->materialTexture.Reflectivness, 0.0f, 1.0f);
+    ImGui::SliderFloat("adsf17", &assetManager->materialManager.MaterialList[16]->materialTexture.Reflectivness, 0.0f, 1.0f);
+
+
     if (ActiveRenderer == 0)
     {
         blinnPhongRenderer.GUIUpdate(engine);

@@ -105,8 +105,8 @@ float GeometrySchlickGGX(float NdotV, float roughness);
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
-vec3 getNormalFromMap(MaterialInfo material, Vertex vertex);
-vec3 Irradiate(Vertex vertex);
+vec3 getNormalFromMap(PBRMaterial material, Vertex vertex);
+vec3 Irradiate(Vertex vertex, float metallic);
 
 // ----------------------------------------------------------------------------
 // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
@@ -178,7 +178,7 @@ Vertex BuildVertexInfo()
 	return vertex;
 }
 
-PBRMaterial BuildMaterialInfo(vec2 uv, MaterialInfo materialInfo)
+PBRMaterial BuildMaterialInfo(MaterialInfo materialInfo, vec2 uv)
 {
     PBRMaterial material;
 
@@ -233,47 +233,17 @@ PBRMaterial BuildMaterialInfo(vec2 uv, MaterialInfo materialInfo)
 void main()
 {
    Vertex vertex = BuildVertexInfo();
-   const MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-
-   vec3 albedo     = material.Albedo;
-   if (material.AlbedoMapID != 0)
-   {
-        albedo = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
-   }
-   
-   float metallic  = material.Matallic;
-   if (material.AlbedoMapID != 0)
-   {
-        metallic = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
-   }
-   
-   float roughness = material.Roughness;
-   if (material.AlbedoMapID != 0)
-   {
-        roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
-   }
-   
-   float ao        = material.AmbientOcclusion;
-   if (material.AlbedoMapID != 0)
-   {
-        ao = texture(TextureMap[material.AOMapID], vertex.uv).r;
-   }
-
-   
-//   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
-//   float metallic  = 0.7f;
-//   float roughness = 1.0f;
-//   float ao        = 1.0f;
+   PBRMaterial material = BuildMaterialInfo(MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material, vertex.uv);
 
    vec3 N = vertex.normal;
-   if(material.NormalMapID != 0)
+   if(MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material.NormalMapID != 0)
    {
       N = getNormalFromMap(material, vertex);
    }
    vec3 V = normalize(scenedata.viewPos - vertex.pos);
 
    vec3 F0 = vec3(0.04); 
-   F0 = mix(F0, albedo, metallic);
+   F0 = mix(F0, material.Albedo, material.Metallic);
 
     vec3 Lo = vec3(0.0);
     for(int x = 0; x < scenedata.DirectionalLightCount; x++)
@@ -283,8 +253,8 @@ void main()
 
         vec3 radiance = DLight[x].diffuse;
 
-        float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);      
+        float NDF = DistributionGGX(N, H, material.Roughness);   
+        float G   = GeometrySmith(N, V, L, material.Roughness);      
         vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
            
         vec3 nominator    = NDF * G * F; 
@@ -293,21 +263,21 @@ void main()
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;	  
+        kD *= 1.0 - material.Metallic;	  
 
         float NdotL = max(dot(N, L), 0.0);        
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD * material.Albedo / PI + specular) * radiance * NdotL;  
     }
-   vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+   vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, material.Roughness);
     
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	  
+    kD *= 1.0 - material.Metallic;	  
     
     //vec3 irradiance = vec3(0.0f);
-    vec3 irradiance = Irradiate(vertex);
+    vec3 irradiance = Irradiate(vertex, material.Metallic);
     
-    vec3 diffuse  = irradiance * albedo;
+    vec3 diffuse  = irradiance * material.Albedo;
 
 //    float totalWeight = 0.0f;
 //    vec3 specular = vec3(0.0f);
@@ -334,10 +304,10 @@ void main()
 //    vec2 brdf = vec2(max(dot(N, V), 0.0), roughness).rg;
 //    specular *= (F * brdf.x + brdf.y);
 
-   vec3 ambient = (kD * diffuse) * ao;
+   vec3 ambient = (kD * diffuse) * material.AmbientOcclusion;
    vec3 color = ambient + Lo;
 
-   rayHitInfo.color = irradiance;
+   rayHitInfo.color = color;
    rayHitInfo.normal = vertex.normal;
 }
 
@@ -401,14 +371,14 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
 //    return finalTexCoords;
 //}
 
-vec3 getNormalFromMap(MaterialInfo material, Vertex vertex)
+vec3 getNormalFromMap(PBRMaterial material, Vertex vertex)
 {
     vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
     vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
     vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-    vec3 normal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz;
+    vec3 normal = material.Normal;
          normal = normalize(normal * 2.0 - 1.0);
     
     return TBN * normal;
@@ -459,7 +429,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
 
-vec3 Irradiate(Vertex vertex)
+vec3 Irradiate(Vertex vertex, float metallic)
 {
     const int MaxReflectCount =15; 
     vec3 irradiance = vec3(0.0f);
@@ -476,7 +446,7 @@ vec3 Irradiate(Vertex vertex)
 
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-		irradiance += rayHitInfo.color; 
+		irradiance = mix(irradiance, rayHitInfo.color, metallic); 
     }
 
     return irradiance;
