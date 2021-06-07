@@ -307,6 +307,7 @@
     <None Include="Shader\pbranyhit.rahit" />
     <None Include="Shader\pbranyhit1.rahit" />
     <None Include="Shader\pbrClosesthit.rchit" />
+    <None Include="Shader\PBRFunctions.glsl" />
     <None Include="Shader\PBRIrradianceSkybox.frag" />
     <None Include="Shader\PBRIrradianceSkybox.vert" />
     <None Include="Shader\pbrmiss.rmiss" />
