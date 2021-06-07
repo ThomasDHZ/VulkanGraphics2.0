@@ -106,14 +106,14 @@ layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
 
 const float PI = 3.14159265359;
-vec3 getNormalFromMap(MaterialInfo material, vec2 uv)
+vec3 getNormalFromMap(PBRMaterial material, vec2 uv)
 {
     vec3 T = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(Tangent));
     vec3 B = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(BiTangent));
     vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
     mat3 TBN = transpose(mat3(T, B, N));
 
-    vec3 normal = texture(TextureMap[material.NormalMapID], uv).xyz;
+    vec3 normal = material.Normal;
          normal = normalize(normal * 2.0 - 1.0);
     
     return TBN * normal;
@@ -162,48 +162,19 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }  
+
+#include "MaterialBuilder.glsl"
 void main()
 {		
-   const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
-   
-   if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
+   PBRMaterial material = PBRMaterialBuilder(MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material, TexCoords);
+   if(material.Alpha == 0.0f)
    {
 	 discard;
    }
-  
-
-   vec3 albedo     = material.Albedo;
-   if (material.AlbedoMapID != 0)
-   {
-        albedo = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
-   }
-   
-   float metallic  = material.Matallic;
-   if (material.AlbedoMapID != 0)
-   {
-        metallic = texture(TextureMap[material.MatallicMapID], texCoords).r;
-   }
-   
-   float roughness = material.Roughness;
-   if (material.AlbedoMapID != 0)
-   {
-        roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
-   }
-   
-   float ao        = material.AmbientOcclusion;
-   if (material.AlbedoMapID != 0)
-   {
-        ao = texture(TextureMap[material.AOMapID], texCoords).r;
-   }
-
-//   vec3 albedo     = vec3(0.5f, 0.0f, 0.0f);
-//   float metallic  = 0.7f;
-//   float roughness = 1.0f;
-//   float ao        = 1.0f;
 
    vec3 N = Normal;
-   if(material.NormalMapID != 0)
+   if(MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material.NormalMapID != 0)
    {
       N = getNormalFromMap(material, texCoords);
    }
@@ -211,7 +182,7 @@ void main()
    vec3 R = reflect(-V, N); 
 
    vec3 F0 = vec3(0.04); 
-   F0 = mix(F0, albedo, metallic);
+   F0 = mix(F0, material.Albedo, material.Metallic);
 
     vec3 Lo = vec3(0.0);
     for(int x = 0; x < scenedata.DirectionalLightCount; x++)
@@ -221,8 +192,8 @@ void main()
 
         vec3 radiance = DLight[x].diffuse;
 
-        float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);      
+        float NDF = DistributionGGX(N, H, material.Roughness);   
+        float G   = GeometrySmith(N, V, L, material.Roughness);      
         vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
            
         vec3 nominator    = NDF * G * F; 
@@ -231,29 +202,29 @@ void main()
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;	  
+        kD *= 1.0 - material.Metallic;	  
 
         float NdotL = max(dot(N, L), 0.0);        
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD * material.Albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
     }
 
     // ambient lighting (we now use IBL as the ambient term)
-    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, material.Roughness);
     
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	  
+    kD *= 1.0 - material.Metallic;	  
     
     vec3 irradiance = texture(irradianceMap, N).rgb;
-    vec3 diffuse      = irradiance * albedo;
+    vec3 diffuse      = irradiance * material.Albedo;
     
     // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(prefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;    
-    vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 prefilteredColor = textureLod(prefilterMap, R,  material.Roughness * MAX_REFLECTION_LOD).rgb;    
+    vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), material.Roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * diffuse) * ao;
+    vec3 ambient = (kD * diffuse + specular) * material.AmbientOcclusion;
    vec3 color = ambient + Lo;
 
    outColor = vec4(color, 1.0);

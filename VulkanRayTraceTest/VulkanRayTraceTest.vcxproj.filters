@@ -632,6 +632,9 @@
     <None Include="Shader\RTXRandom.glsl">
       <Filter>Shader\RaytracedShaders</Filter>
     </None>
+    <None Include="Shader\MaterialBuilder.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanBuffer.h">

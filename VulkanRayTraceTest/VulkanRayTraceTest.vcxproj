@@ -302,6 +302,7 @@
     <None Include="Shader\LightDebug.vert" />
     <None Include="Shader\Material.glsl" />
     <None Include="Shader\Lighting.glsl" />
+    <None Include="Shader\MaterialBuilder.glsl" />
     <None Include="Shader\miss.rmiss" />
     <None Include="Shader\pbranyhit.rahit" />
     <None Include="Shader\pbranyhit1.rahit" />
