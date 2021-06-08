@@ -37,3 +37,16 @@ struct PBRMaterial
     float AmbientOcclusion;
 	float Alpha;
 };
+
+struct BlinnMaterial
+{
+	vec3 Diffuse;
+	vec3 Specular;
+	vec3 Normal;
+	vec3 Depth;
+	vec3 Emission;
+	float Shininess;
+	float Reflectivness;
+	float Alpha;
+};
+

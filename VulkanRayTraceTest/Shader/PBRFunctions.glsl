@@ -97,6 +97,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 
 vec3 CalcDirectionalLight(PBRMaterial material, vec3 F0, vec3 V, vec3 N)
 {
+
     vec3 Lo = vec3(0.0);
     for (int x = 0; x < scenedata.DirectionalLightCount; x++)
     {

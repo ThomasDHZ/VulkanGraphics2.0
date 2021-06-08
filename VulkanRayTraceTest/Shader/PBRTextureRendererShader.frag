@@ -106,20 +106,10 @@ layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
 
 const float PI = 3.14159265359;
-vec3 getNormalFromMap(PBRMaterial material, vec2 uv)
-{
-    vec3 T = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(Tangent));
-    vec3 B = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(BiTangent));
-    vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
-    mat3 TBN = transpose(mat3(T, B, N));
-
-    vec3 normal = material.Normal;
-         normal = normalize(normal * 2.0 - 1.0);
-    
-    return TBN * normal;
-}
 
 #include "PBRFunctions.glsl"
+vec3 getNormalFromMap(PBRMaterial material, vec2 uv);
+
 void main()
 {		
    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
@@ -162,5 +152,18 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * material.AmbientOcclusion;
    vec3 color = ambient + Lo;
 
-   outColor = vec4(color, 1.0);
+   outColor = vec4(color, material.Alpha);
+}
+
+vec3 getNormalFromMap(PBRMaterial material, vec2 uv)
+{
+    vec3 T = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(Tangent));
+    vec3 B = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(BiTangent));
+    vec3 N = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * Normal);
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    vec3 normal = material.Normal;
+         normal = normalize(normal * 2.0 - 1.0);
+    
+    return TBN * normal;
 }

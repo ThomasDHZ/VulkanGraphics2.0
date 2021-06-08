@@ -29,6 +29,18 @@ void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWind
 
 void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
 {
+    ImGui::LabelText("Material", "Material");
+    for (int x = 0; x < assetManager->materialManager.MaterialList.size(); x++)
+    {
+        ImGui::SliderFloat3(("Material Diffuse " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Diffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("Material Specular " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Specular.x, 0.0f, 1.0f);
+        //ImGui::SliderFloat3(("Material Emission " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture..x, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Material Shininess " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Shininess, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Material Reflectivness " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Reflectivness, 0.0f, 1.0f);
+        ImGui::SliderFloat(("Material Alpha " + std::to_string(x)).c_str(), &assetManager->materialManager.MaterialList[x]->materialTexture.Alpha, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
+
     ImGui::LabelText("Directional Light", "Directional Light");
     for(int x = 0; x < assetManager->lightManager.DirectionalLightList.size(); x++)
     {

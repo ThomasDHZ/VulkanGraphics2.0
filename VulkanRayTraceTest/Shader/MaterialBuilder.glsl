@@ -49,3 +49,46 @@ PBRMaterial PBRMaterialBuilder(MaterialInfo materialInfo, vec2 uv)
 
     return material;
 }
+
+BlinnMaterial BlinnMaterialBuilder(MaterialInfo materialInfo, vec2 uv)
+{
+    BlinnMaterial material;
+
+    material.Diffuse = materialInfo.Diffuse;
+    if (materialInfo.DiffuseMapID != 0)
+    {
+        material.Diffuse = texture(TextureMap[materialInfo.DiffuseMapID], uv).rgb;
+    }
+
+    material.Specular = materialInfo.Specular;
+    if (materialInfo.SpecularMapID != 0)
+    {
+        material.Specular = texture(TextureMap[materialInfo.SpecularMapID], uv).rgb;
+    }
+
+    if (materialInfo.NormalMapID != 0)
+    {
+        material.Normal = texture(TextureMap[materialInfo.NormalMapID], uv).rgb;
+    }
+
+    if (materialInfo.DepthMapID != 0)
+    {
+        material.Depth = texture(TextureMap[materialInfo.DepthMapID], uv).rgb;
+    }
+
+    if (materialInfo.EmissionMapID != 0)
+    {
+        material.Emission = texture(TextureMap[materialInfo.EmissionMapID], uv).rgb;
+    }
+
+    material.Alpha = materialInfo.Alpha;
+    if (materialInfo.AlphaMapID != 0)
+    {
+        material.Alpha = texture(TextureMap[materialInfo.AlphaMapID], uv).r;
+    }
+
+    material.Shininess = materialInfo.Shininess;
+    material.Reflectivness = materialInfo.Reflectivness;
+
+    return material;
+}
