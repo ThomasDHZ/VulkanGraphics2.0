@@ -3,7 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
-#extension GL_NV_ray_tracing : enable
+
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -177,6 +177,7 @@ Vertex BuildVertexInfo()
 
 void main()
 {
+
    Vertex vertex = BuildVertexInfo();
    PBRMaterial material = PBRMaterialBuilder(MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material, vertex.uv);
 
@@ -322,12 +323,12 @@ vec3 Irradiate(Vertex vertex, float metallic)
         float sq        = sqrt(1.0 - r2);
         float phi       = 2 * PI * r1;
  
-        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
         vec3 rayDir   = reflect(gl_WorldRayDirectionEXT * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2))), vertex.normal);
 
         rayHitInfo.reflectCount++;
-        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
 		irradiance = mix(irradiance, rayHitInfo.color, metallic); 
     }
 

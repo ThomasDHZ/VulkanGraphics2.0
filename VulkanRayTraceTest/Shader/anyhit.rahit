@@ -129,8 +129,7 @@ void main()
               ignoreIntersectionEXT;
             }
         }
-   
-   debugPrintfEXT("Alpha: %f \n", material.Alpha);
+  
    if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
    {
 	 ignoreIntersectionEXT;

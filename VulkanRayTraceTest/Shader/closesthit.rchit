@@ -3,7 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
-#extension GL_NV_ray_tracing : enable
+
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -17,7 +17,7 @@ layout(push_constant) uniform RayTraceCamera
 
 struct RayPayload {
 	vec3 color;
-	float distance;
+	float seed;
 	vec3 normal;
     int reflectCount;
 };
@@ -138,33 +138,33 @@ void main()
      }
      for(int x = 0; x < scenedata.DirectionalLightCount; x++)
      {
-        baseColor += CalcNormalDirLight(FragPos2, normal, texCoords, x);
+        baseColor += CalcNormalDirLight(FragPos2, normal, vertex.uv, x);
      }
-//     for(int x = 0; x < scenedata.PointLightCount; x++)
-//     {
-//        result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
-//     }
+     for(int x = 0; x < scenedata.PointLightCount; x++)
+     {
+       // result += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+     }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
-
-       if(material.Reflectivness > 0.0f &&
-       rayHitInfo.reflectCount != 13)
+    
+    const int MaxReflectCount = 9;
+    if(material.Reflectivness > 0.0f &&
+       rayHitInfo.reflectCount != MaxReflectCount)
     {
-        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
-        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
+        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+        vec3 origin   = hitPos.xyz + normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, normal);
 
         rayHitInfo.reflectCount++;
-        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
 		result = mix(baseColor, rayHitInfo.color, material.Reflectivness); 
     }
     else
 	{
         result = baseColor;
-        rayHitInfo.reflectCount = 13;
+        rayHitInfo.reflectCount = MaxReflectCount;
 	}
 
     rayHitInfo.color = result;
-	rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
 }
 

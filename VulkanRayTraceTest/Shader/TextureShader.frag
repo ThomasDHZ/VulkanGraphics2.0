@@ -163,7 +163,7 @@ void main()
     vec3 Reflection = texture(CubeMap, R).rgb;
     vec3 finalMix = mix(result, Reflection, material.Reflectivness);
 
-    outColor = vec4(finalMix, 1.0f);
+    outColor = vec4(finalMix, material.Alpha);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     if(material.DiffuseMapID != 0)
     {
@@ -176,7 +176,7 @@ void main()
     {
         if(material.Diffuse.r >= 0.8f)
         {
-           outBloom = vec4(material.Diffuse, 1.0f);
+           outBloom = vec4(material.Diffuse, material.Alpha);
         }
     }
 
