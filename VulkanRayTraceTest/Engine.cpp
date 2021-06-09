@@ -23,7 +23,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
     assetManager->AddModel();
     assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[0]);
-    //assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[1]);
+    assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[1]);
     //assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     //assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
     //std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, assetManager->textureManager);

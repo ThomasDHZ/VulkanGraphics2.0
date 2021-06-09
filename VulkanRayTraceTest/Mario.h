@@ -12,5 +12,7 @@ public:
 	Mario();
 	Mario(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Position);
 	~Mario();
+
+	void Update(VulkanEngine& engine, MaterialManager& materialManager, float timer) override;
 };
 

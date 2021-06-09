@@ -42,11 +42,12 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
 
 void AssetManager::Update(VulkanEngine& engine)
 {
+    float timer = engine.VulkanTimer();
     cameraManager.Update(engine);
     materialManager.Update(engine);
     textureManager.Update(engine);
-    meshManager.Update(engine, materialManager, cameraManager.ActiveCamera);
-    modelManager.Update(engine, materialManager);
+    meshManager.Update(engine, materialManager, timer, cameraManager.ActiveCamera);
+    modelManager.Update(engine, materialManager, timer);
     lightManager.Update(engine);
 
     if (cameraManager.ActiveCamera->cameraType == CameraType::Perspective_Camera)
@@ -64,7 +65,7 @@ void AssetManager::Update(VulkanEngine& engine)
     SceneData->UniformDataInfo.proj = cameraManager.ActiveCamera->GetProjectionMatrix();
     SceneData->UniformDataInfo.proj[1][1] *= -1;
     SceneData->UniformDataInfo.viewPos = glm::vec4(cameraManager.ActiveCamera->GetPosition(), 0.0f);
-    SceneData->UniformDataInfo.timer = engine.VulkanTimer();
+    SceneData->UniformDataInfo.timer = timer;
     SceneData->Update(engine);
 
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(cameraManager.ActiveCamera->GetViewMatrix())));

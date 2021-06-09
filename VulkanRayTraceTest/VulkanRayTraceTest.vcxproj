@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccelerationStructure.cpp" />
+    <ClCompile Include="Animation2D.cpp" />
     <ClCompile Include="Animation3D.cpp" />
     <ClCompile Include="AnimationPlayer2D.cpp" />
     <ClCompile Include="AnimationPlayer3D.cpp" />
@@ -345,6 +346,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
+    <ClInclude Include="Animation2D.h" />
     <ClInclude Include="Animation3D.h" />
     <ClInclude Include="AnimationPlayer2D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />

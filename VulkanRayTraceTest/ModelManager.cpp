@@ -1,10 +1,10 @@
 #include "ModelManager.h"
 
-void ModelManager::Update(VulkanEngine& engine, MaterialManager& materialManager)
+void ModelManager::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
 {
 	for (auto& model : ModelList)
 	{
-		model->Update(engine, materialManager);
+		model->Update(engine, materialManager, timer);
 	}
 }
 

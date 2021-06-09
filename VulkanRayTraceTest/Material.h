@@ -81,6 +81,8 @@ struct MaterialData
 		Matallic = materialTexture.Matallic;
 		Roughness = materialTexture.Roughness;
 		AmbientOcclusion = materialTexture.AmbientOcclusion;
+		Alpha = materialTexture.Alpha;
+
 		AlbedoMapID = materialTexture.AlbedoMap->TextureBufferIndex;
 		MatallicMapID = materialTexture.MatallicMap->TextureBufferIndex;
 		RoughnessMapID = materialTexture.RoughnessMap->TextureBufferIndex;

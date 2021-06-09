@@ -45,3 +45,19 @@ Sprite::~Sprite()
 {
 
 }
+
+void Sprite::AddAnimation(std::shared_ptr<Animation2D> animation)
+{
+    AnimationPlayer.AddAnimation(animation);
+}
+
+void Sprite::AddAnimation(std::vector<std::shared_ptr<Animation2D>> animation)
+{
+    AnimationPlayer.AddAnimation(animation);
+}
+
+void Sprite::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
+{
+    AnimationPlayer.Update(timer);
+    Mesh::Update(engine, materialManager, timer);
+}

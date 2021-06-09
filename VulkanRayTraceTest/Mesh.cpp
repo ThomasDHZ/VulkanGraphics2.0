@@ -166,7 +166,7 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	}
 }
 
-void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager)
+void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
 {
 	MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
 
@@ -193,7 +193,7 @@ void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager)
 	}
 }
 
-void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager)
+void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager, float timer)
 {
 	MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
 

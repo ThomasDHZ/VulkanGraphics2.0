@@ -1,5 +1,5 @@
 #include "Animaton2D.h"
-
+ 
 Animator2D::Animator2D()
 {
 }
