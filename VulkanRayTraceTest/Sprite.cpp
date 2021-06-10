@@ -5,7 +5,7 @@ Sprite::Sprite() : Mesh()
 
 }
 
-Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, uint32_t materialID) : Mesh()
+Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
 {
     std::vector<Vertex> SpriteVertices =
     {
@@ -22,7 +22,7 @@ Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm
     };
 
     MeshID = engine.GenerateID();
-    MaterialID = materialID;
+    MeshMaterial = material;
 
     MeshProperties = MeshPropertiesUniformBuffer(engine);
     ParentModelID = 0;

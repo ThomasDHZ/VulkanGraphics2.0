@@ -13,7 +13,7 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
     material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material->materialTexture.SpecularMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
     material->materialTexture.AlphaMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-    MaterialID = assetManager->materialManager.LoadMaterial(engine, "MegaManMaterial", material);
+    MeshMaterial = assetManager->materialManager.LoadMaterial(engine, "MegaManMaterial", material);
 
     std::vector<Frame2D> StandAnimation =
     {

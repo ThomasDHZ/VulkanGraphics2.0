@@ -8,7 +8,7 @@ private:
 
 public:
 	BillboardMesh();
-	BillboardMesh(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, uint32_t materialID);
+	BillboardMesh(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
 	~BillboardMesh();
 
 	Animator2D animator;

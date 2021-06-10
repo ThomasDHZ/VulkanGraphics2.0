@@ -13,7 +13,7 @@ Mario::Mario(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Positio
     material->materialTexture.NormalMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);
     material->materialTexture.SpecularMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
     material->materialTexture.AlphaMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-    MaterialID = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    MeshMaterial = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
 }
 
 Mario::~Mario()

@@ -56,7 +56,7 @@ void WaterSurfaceMesh::Update(VulkanEngine& engine, std::shared_ptr<AssetManager
 	waterReflectionRenderPass.Update(engine, assetManager, copysceneData, camera);
 	waterRefractionRenderPass.Update(engine, assetManager, copysceneData, camera);
 
-	MeshProperties.UniformDataInfo.MaterialIndex = assetManager->materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
+	MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);

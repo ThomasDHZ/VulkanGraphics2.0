@@ -41,10 +41,10 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	SetUpMesh(engine, VertexList, IndexList);
 }
 
-Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID, MeshDrawFlags MeshDrawFlags)
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags)
 {
 	MeshID = engine.GenerateID();
-	MaterialID = materialID;
+	MeshMaterial = material;
 	DrawFlags = MeshDrawFlags;
 
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
@@ -168,7 +168,6 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 
 void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
 {
-	MeshMaterial = materialManager.GetMaterial(MaterialID);
 	MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
 
 	MeshTransform = glm::mat4(1.0f);
@@ -196,7 +195,7 @@ void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float 
 
 void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager, float timer)
 {
-	MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
+	MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);

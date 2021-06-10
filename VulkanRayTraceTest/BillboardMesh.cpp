@@ -4,7 +4,7 @@ BillboardMesh::BillboardMesh() : Mesh()
 {
 }
 
-BillboardMesh::BillboardMesh(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, uint32_t materialID) : Mesh()
+BillboardMesh::BillboardMesh(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
 {
     std::vector<Vertex> SpriteVertices =
     {
@@ -21,7 +21,7 @@ BillboardMesh::BillboardMesh(VulkanEngine& engine, glm::vec2 SpriteSize, glm::ve
     };
 
     MeshID = engine.GenerateID();
-    MaterialID = materialID;
+    MeshMaterial = material;
     MeshType = Mesh_Type_Billboard;
 
     MeshProperties = MeshPropertiesUniformBuffer(engine);
@@ -48,7 +48,7 @@ BillboardMesh::~BillboardMesh()
 
 void BillboardMesh::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
 {
-    MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
+    MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
 
     MeshTransform = glm::mat4(1.0f);
     MeshTransform = glm::translate(MeshTransform, MeshPosition);

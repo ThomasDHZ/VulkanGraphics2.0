@@ -46,7 +46,6 @@ public:
 	uint32_t ParentModelID = 0;
 	uint32_t MeshID = 0;
 	uint32_t MeshBufferIndex = 0;
-	uint32_t MaterialID = 0;
 	uint32_t BoneCount = 0;
 	uint32_t VertexCount = 0;
 	uint32_t IndexCount = 0;
@@ -82,7 +81,7 @@ public:
 	Mesh();
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t MaterialID, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	~Mesh();
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

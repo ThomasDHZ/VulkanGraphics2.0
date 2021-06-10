@@ -12,7 +12,7 @@ protected:
 public:
 
 	Sprite();
-	Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, uint32_t materialID);
+	Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
 	~Sprite();
 
 	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager, float timer) override;

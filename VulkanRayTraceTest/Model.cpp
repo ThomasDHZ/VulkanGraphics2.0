@@ -6,20 +6,20 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, MeshManager& meshManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
 {
 	ModelID = engine.GenerateID();
-	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, 0, DrawFlags));
+	meshManager.AddMesh(std::make_shared<Mesh>(Mesh(engine, VertexList, IndexList, materialManager.GetDefaultMaterial(), DrawFlags)));
 	meshManager.MeshList.back()->ParentModelID = ModelID;
 	meshManager.MeshList.back()->VertexList = VertexList;
 	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
 	MeshList.emplace_back(meshManager.MeshList.back());
 }
 
-Model::Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, uint32_t materialID, MeshDrawFlags DrawFlags)
+Model::Model(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
 {
 	ModelID = engine.GenerateID();
-	meshManager.AddMesh(std::make_shared<Mesh>(engine, VertexList, IndexList, materialID, DrawFlags));
+	meshManager.AddMesh(std::make_shared<Mesh>(Mesh(engine, VertexList, IndexList, material, DrawFlags)));
 	meshManager.MeshList.back()->ParentModelID = ModelID;
 	meshManager.MeshList.back()->VertexList = VertexList;
 	meshManager.MeshList.back()->MeshTransform = glm::mat4(1.0f);
@@ -276,7 +276,7 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-uint32_t Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+std::shared_ptr<Material> Model::LoadMaterial(VulkanEngine& engine, MaterialManager& materailManager, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(engine, textureManager);
 
