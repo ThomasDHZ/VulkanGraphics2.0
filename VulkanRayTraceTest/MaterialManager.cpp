@@ -44,7 +44,15 @@ uint32_t MaterialManager::LoadMaterial(VulkanEngine& engine, std::string Materia
 
 std::shared_ptr<Material> MaterialManager::GetMaterial(uint32_t MaterialID)
 {
-	return MaterialList[MaterialID];
+	auto returnMaterial = MaterialList[0];
+	for (auto& material : MaterialList)
+	{
+		if (material->MaterialID == MaterialID)
+		{
+			returnMaterial = material;
+		}
+	}
+	return returnMaterial;
 }
 
 std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescriptor()

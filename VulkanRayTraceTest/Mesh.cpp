@@ -168,7 +168,8 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 
 void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
 {
-	MeshProperties.UniformDataInfo.MaterialIndex = materialManager.GetMaterialBufferIDByMaterialID(MaterialID);
+	MeshMaterial = materialManager.GetMaterial(MaterialID);
+	MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);

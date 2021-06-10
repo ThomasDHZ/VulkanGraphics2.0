@@ -54,6 +54,7 @@ public:
 
 	std::shared_ptr<Mesh> ParentMesh;
 	std::vector<std::shared_ptr<Mesh>> ChildMesh;
+	std::shared_ptr<Material> MeshMaterial;
 
 	std::vector<Vertex> VertexList;
 	glm::mat4 MeshTransform;
