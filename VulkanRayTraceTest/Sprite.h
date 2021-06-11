@@ -5,8 +5,8 @@
 class Sprite : public Mesh
 {
 private:
-	AnimationPlayer2D AnimationPlayer;
 protected:
+	AnimationPlayer2D AnimationPlayer;
 	void AddAnimation(std::shared_ptr<Animation2D> animation);
 	void AddAnimation(std::vector<std::shared_ptr<Animation2D>> AnimationList);
 public:
@@ -15,6 +15,7 @@ public:
 	Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
 	~Sprite();
 
+	void SetAnimation(uint32_t AnimationIndex);
 	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager, float timer) override;
 };
 

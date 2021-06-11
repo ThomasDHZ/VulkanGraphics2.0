@@ -12,6 +12,7 @@ public:
 
 	void AddAnimation(std::shared_ptr<Animation2D> animation);
 	void AddAnimation(std::vector<std::shared_ptr<Animation2D>> AnimationList);
+	void SetAnimation(uint32_t AnimationIndex);
 	void Update(float timer);
 	Frame2D GetCurrentFrame() { return CurrentAnimation->GetFrame(); };
 };

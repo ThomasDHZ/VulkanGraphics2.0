@@ -5,7 +5,22 @@
 class MegaMan : public Sprite
 {
 private:
+	enum MegaManAnimation
+	{
+		kStandAnimation,
+		kRunAnimation,
+		kSlideAnimation,
+		kJumpAnimation,
+		kClimbAnimation,
+		kShootStandAnimation,
+		kShootRunAnimation,
+		kShootJumpAnimation,
+		kShootClimbAnimation
+	};
+
+	MegaManAnimation CurrentAnimation;
 public:
+
 	static constexpr glm::vec2 SpriteSize = glm::vec2(1.0f);
 	static constexpr glm::vec2 UVSize = glm::vec2(.05f, 1.0f);
 

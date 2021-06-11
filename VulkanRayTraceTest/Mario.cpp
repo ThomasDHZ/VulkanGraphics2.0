@@ -14,6 +14,20 @@ Mario::Mario(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Positio
     material->materialTexture.SpecularMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
     material->materialTexture.AlphaMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/Mario_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
     MeshMaterial = assetManager.materialManager.LoadMaterial(engine, "MarioMaterial", material);
+
+    std::vector<Frame2D> StandAnimation =
+    {
+        Frame2D(0.0f, 0.0f),
+        Frame2D(0.1f, 0.0f),
+        Frame2D(0.2f, 0.0f)
+    };
+
+    std::vector<std::shared_ptr<Animation2D>> AnimationList
+    {
+        std::make_shared<Animation2D>(Animation2D(StandAnimation, 0.1f))
+    };
+
+    AnimationPlayer = AnimationPlayer2D(AnimationList);
 }
 
 Mario::~Mario()

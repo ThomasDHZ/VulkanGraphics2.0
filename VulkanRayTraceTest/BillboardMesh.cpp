@@ -48,7 +48,7 @@ BillboardMesh::~BillboardMesh()
 
 void BillboardMesh::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
 {
-    MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
+    MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
     MeshTransform = glm::mat4(1.0f);
     MeshTransform = glm::translate(MeshTransform, MeshPosition);

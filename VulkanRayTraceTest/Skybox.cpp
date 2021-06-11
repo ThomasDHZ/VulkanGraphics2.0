@@ -70,7 +70,7 @@ Skybox::Skybox(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 	IndexCount = 0;
 	PrimitiveCount = 0;
 
-	MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
+	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 	MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
 	MeshProperties.Update(engine);
 

@@ -168,7 +168,7 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 
 void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
 {
-	MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
+	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
@@ -176,6 +176,8 @@ void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float 
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
+
+	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
 
 	MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
 	glm::mat4 FinalTransform = MeshTransform;
@@ -185,6 +187,8 @@ void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float 
 
 	TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
+
+
 	MeshProperties.Update(engine);
 
 	if (IndexCount != 0)
@@ -195,7 +199,7 @@ void Mesh::Update(VulkanEngine& engine, MaterialManager& materialManager, float 
 
 void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, MaterialManager& materialManager, float timer)
 {
-	MeshProperties.UniformDataInfo.MaterialIndex = MeshMaterial->MaterialBufferIndex;
+	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
@@ -211,8 +215,9 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 			MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
 	}
-
 	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
+	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
+
 	glm::mat4 FinalTransform =  MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 
@@ -220,6 +225,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 
 	TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
+
 	MeshProperties.Update(engine);
 
 	if (IndexCount != 0)

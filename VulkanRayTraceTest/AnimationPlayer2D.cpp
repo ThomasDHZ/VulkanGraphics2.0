@@ -23,6 +23,11 @@ void AnimationPlayer2D::AddAnimation(std::vector<std::shared_ptr<Animation2D>> a
 	}
 }
 
+void AnimationPlayer2D::SetAnimation(uint32_t AnimationIndex)
+{
+	CurrentAnimation = AnimationList[AnimationIndex];
+}
+
 void AnimationPlayer2D::Update(float timer)
 {
 	if (AnimationList.size() >= 1)
