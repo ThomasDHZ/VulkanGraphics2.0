@@ -18,16 +18,20 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
     std::vector<Frame2D> StandAnimation =
     {
         Frame2D(0.0f, 0.0f),
-        Frame2D(0.1f, 0.0f),
-        Frame2D(0.2f, 0.0f)
+        Frame2D(0.051867f, 0.0f),
+    };
+
+    std::vector<Frame2D> StandToRunTransitionAnimation =
+    {
+        Frame2D(0.103734f, 0.0f)
     };
 
     std::vector<Frame2D> RunAnimation =
     {
-        Frame2D(0.0f, 0.0f),
-        Frame2D(0.1f, 0.0f),
-        Frame2D(0.2f, 0.0f),
-        Frame2D(0.3f, 0.0f)
+        Frame2D(0.18257f, 0.0f),
+        Frame2D(0.23444f, 0.0f),
+        Frame2D(0.27178f, 0.0f),
+        Frame2D(0.23444f, 0.0f)
     };
 
     std::vector<Frame2D> SlideAnimation =
@@ -72,6 +76,7 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
     std::vector<std::shared_ptr<Animation2D>> AnimationList
     {
         std::make_shared<Animation2D>(Animation2D(StandAnimation, 0.05f)),
+        std::make_shared<Animation2D>(Animation2D(StandToRunTransitionAnimation, 0.05f)),
         std::make_shared<Animation2D>(Animation2D(RunAnimation, 0.05f)),
         std::make_shared<Animation2D>(Animation2D(SlideAnimation, 0.05f)),
         std::make_shared<Animation2D>(Animation2D(JumpAnimation, 0.05f)),
@@ -92,6 +97,6 @@ MegaMan::~MegaMan()
 
 void MegaMan::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
 {
-    AnimationPlayer.SetAnimation(kShootRunAnimation);
+    AnimationPlayer.SetAnimation(kRunAnimation);
     Sprite::Update(engine, materialManager, timer);
 }

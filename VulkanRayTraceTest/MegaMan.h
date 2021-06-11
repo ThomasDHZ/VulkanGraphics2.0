@@ -8,6 +8,7 @@ private:
 	enum MegaManAnimation
 	{
 		kStandAnimation,
+		kStandToRunTransitionAnimation,
 		kRunAnimation,
 		kSlideAnimation,
 		kJumpAnimation,
