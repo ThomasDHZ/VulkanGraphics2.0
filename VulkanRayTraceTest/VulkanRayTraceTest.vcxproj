@@ -239,9 +239,12 @@
     <ClCompile Include="RenderedGTBNTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="RenderFrameBufferTexturePipeline.cpp" />
+    <ClCompile Include="RenderPass2D.cpp" />
     <ClCompile Include="RenderPBRFrameBufferTexturePipeline.cpp" />
     <ClCompile Include="RenderWaterTexturePipeline.cpp" />
+    <ClCompile Include="Shader2DPipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp" />
     <ClCompile Include="SkyBoxRenderingPipeline.cpp" />
@@ -325,6 +328,8 @@
     <None Include="Shader\RTXRandom.glsl" />
     <None Include="Shader\shader.frag" />
     <None Include="Shader\shader.vert" />
+    <None Include="Shader\Shader2D.frag" />
+    <None Include="Shader\Shader2D.vert" />
     <None Include="Shader\shadow.rmiss" />
     <None Include="Shader\SkyBoxFrameBufferShader.frag" />
     <None Include="Shader\SkyBoxFrameBufferShader.vert" />
@@ -439,10 +444,13 @@
     <ClInclude Include="RenderedGTBNTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="RenderFrameBufferTexturePipeline.h" />
+    <ClInclude Include="RenderPass2D.h" />
     <ClInclude Include="RenderPBRFrameBufferTexturePipeline.h" />
     <ClInclude Include="RenderWaterTexturePipeline.h" />
     <ClInclude Include="SceneData.h" />
+    <ClInclude Include="Shader2DPipeline.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h" />
     <ClInclude Include="SkyBoxRenderingPipeline.h" />

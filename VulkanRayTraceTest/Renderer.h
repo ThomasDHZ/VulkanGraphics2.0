@@ -7,6 +7,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "HybridRenderer.h"
+#include "Renderer2D.h"
 
 class Renderer
 {
@@ -24,6 +25,7 @@ private:
 	RayTraceRenderer rayTraceRenderer;
 	RayTracePBRRenderer pbrRayTraceRenderer;
 	HybridRenderer hybridRenderer;
+	Renderer2D renderer2D;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;

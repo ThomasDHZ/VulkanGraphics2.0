@@ -24,6 +24,8 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRTextureRendererShader.vert -o PBRTextu
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe PBRTextureRendererShader.frag -o PBRTextureRendererShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe TextureShader.vert -o TextureShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe TextureShader.frag -o TextureShaderFrag.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe Shader2D.vert -o Shader2DVert.spv
+C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe Shader2D.frag -o Shader2DFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe WaterRenderToTextureShader.vert -o WaterRenderToTextureShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe WaterRenderToTextureShader.frag -o WaterRenderToTextureShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe WaterSurfaceShader.vert -o WaterSurfaceShaderVert.spv
@@ -62,7 +64,7 @@ C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BRDFRenderer.vert -o BRDFRendererShaderVe
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe BRDFRenderer.frag -o BRDFRendererShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DepthDebugShader.frag -o DepthDebugShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DepthDebugShader.vert -o DepthDebugShaderVert.spv
-C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DepthShader.frag -o DepthShaderFrag.spv
+:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DepthShader.frag -o DepthShaderFrag.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe DepthShader.vert -o DepthShaderVert.spv
 C:/VulkanSDK/1.2.170.0/Bin32/glslc.exe animate.comp -o animate.spv
 pause

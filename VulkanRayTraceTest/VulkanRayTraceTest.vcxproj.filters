@@ -414,6 +414,15 @@
     <ClCompile Include="Animation2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer2D.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader2DPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass2D.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -639,6 +648,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\PBRFunctions.glsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Shader2D.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\Shader2D.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -1011,6 +1026,15 @@
     </ClInclude>
     <ClInclude Include="Animation2D.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer2D.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader2DPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass2D.h">
+      <Filter>Header Files\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

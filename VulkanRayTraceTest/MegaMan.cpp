@@ -36,41 +36,41 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
 
     std::vector<Frame2D> SlideAnimation =
     {
-        Frame2D(0.0f, 0.0f)
+        Frame2D(0.35062f, 0.0f)
     };
 
     std::vector<Frame2D> JumpAnimation =
     {
-        Frame2D(0.0f, 0.0f)
+        Frame2D(0.42116f, 0.0f)
     };
 
     std::vector<Frame2D> ClimbAnimation =
     {
-        Frame2D(0.0f, 0.0f),
-        Frame2D(0.1f, 0.0f)
+        Frame2D(0.48132f, 0.0f),
+        Frame2D(0.51658f, 0.0f)
     };
 
     std::vector<Frame2D> ShootStandAnimation =
     {
-        Frame2D(0.0f, 0.0f)
+        Frame2D(0.56016f, 0.0f)
     };
 
     std::vector<Frame2D> ShootRunAnimation =
     {
-        Frame2D(0.5f, 0.0f),
-        Frame2D(0.6f, 0.0f),
-        Frame2D(0.7f, 0.0f),
-        Frame2D(0.8f, 0.0f)
+        Frame2D(0.62240f, 0.0f),
+        Frame2D(0.69087f, 0.0f),
+        Frame2D(0.74066f, 0.0f),
+        Frame2D(0.69087f, 0.0f)
     };
 
     std::vector<Frame2D> ShootJumpAnimation =
     {
-        Frame2D(0.0f, 0.0f)
+        Frame2D(0.89626f, 0.0f)
     };
 
     std::vector<Frame2D> ShootClimbAnimation =
     {
-        Frame2D(0.0f, 0.0f)
+        Frame2D(0.94845f, 0.0f)
     };
 
     std::vector<std::shared_ptr<Animation2D>> AnimationList

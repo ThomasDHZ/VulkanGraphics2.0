@@ -20,6 +20,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<A
     rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
     pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
     hybridRenderer = HybridRenderer(engine, window, assetManager);
+    renderer2D = Renderer2D(engine, window, assetManager);
 }
 
 Renderer::~Renderer()
@@ -53,6 +54,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     rayTraceRenderer.RebuildSwapChain(engine, window);
     pbrRayTraceRenderer.RebuildSwapChain(engine, window);
     hybridRenderer.RebuildSwapChain(engine, window);
+    renderer2D.RebuildSwapChain(engine, window);
 }
 
 void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
@@ -159,6 +161,10 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     {
         hybridRenderer.GUIUpdate(engine);
     }
+    else if (ActiveRenderer == 5)
+    {
+        renderer2D.GUIUpdate(engine);
+    }
 }
 
 void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
@@ -216,6 +222,11 @@ void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
     {
         hybridRenderer.Draw(engine, window, imageIndex);
         hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 5)
+    {
+        renderer2D.Draw(engine, window, imageIndex);
+        renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
 
     interfaceRenderPass.Draw(engine, imageIndex);
