@@ -6,6 +6,7 @@ AssetManager::AssetManager()
 
 AssetManager::AssetManager(VulkanEngine& engine)
 {
+    inputManager = InputManager();
     cameraManager = CameraManager(engine);
     textureManager = TextureManager(engine);
     materialManager = MaterialManager(engine, textureManager);
@@ -40,14 +41,15 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
     modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material)));
 }
 
-void AssetManager::Update(VulkanEngine& engine)
+void AssetManager::Update(VulkanEngine& engine, VulkanWindow& window)
 {
     float timer = engine.VulkanTimer();
     cameraManager.Update(engine);
+    inputManager.Update(window, cameraManager);
     materialManager.Update(engine);
     textureManager.Update(engine);
-    meshManager.Update(engine, materialManager, timer, cameraManager.ActiveCamera);
-    modelManager.Update(engine, materialManager, timer);
+    meshManager.Update(engine, inputManager, materialManager, timer, cameraManager.ActiveCamera);
+    modelManager.Update(engine, inputManager, materialManager, timer);
     lightManager.Update(engine);
 
     if (cameraManager.ActiveCamera->cameraType == CameraType::Perspective_Camera)

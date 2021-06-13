@@ -29,6 +29,14 @@ void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWind
 
 void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
 {
+    ImGui::LabelText("Mesh", "Mesh");
+    for (int x = 0; x < assetManager->meshManager.MeshList.size(); x++)
+    {
+        ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
+        ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
+        ImGui::LabelText("______", "______");
+    }
+
     ImGui::LabelText("Material", "Material");
     for (int x = 0; x < assetManager->materialManager.MaterialList.size(); x++)
     {

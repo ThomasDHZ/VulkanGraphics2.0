@@ -15,7 +15,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     engine = VulkanEngine(window.GetWindowPtr());
     assetManager = std::make_shared<AssetManager>(AssetManager(engine));
 
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
  /*   assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
   */  assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
@@ -99,7 +99,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 
   //    assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
- //  assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
+ ///  assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
     assetManager->SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);

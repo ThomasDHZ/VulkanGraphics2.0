@@ -46,7 +46,7 @@ BillboardMesh::~BillboardMesh()
 {
 }
 
-void BillboardMesh::Update(VulkanEngine& engine, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
+void BillboardMesh::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
 {
     MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 

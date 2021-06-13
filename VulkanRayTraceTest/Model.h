@@ -65,7 +65,7 @@ public:
 	Model(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
 	~Model();
 
-	void Update(VulkanEngine& engine, MaterialManager& materialManager, float timer);
+	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer);
 	void SubmitToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
 	void AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh);
 	void Destory(VulkanEngine& engine);

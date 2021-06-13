@@ -95,8 +95,9 @@ MegaMan::~MegaMan()
 
 }
 
-void MegaMan::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
+void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
+    auto a = inputManager.mouse.GetMousePos();
     AnimationPlayer.SetAnimation(kRunAnimation);
-    Sprite::Update(engine, materialManager, timer);
+    Sprite::Update(engine, inputManager, materialManager, timer);
 }

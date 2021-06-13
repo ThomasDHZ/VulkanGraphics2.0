@@ -393,7 +393,7 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 	}
 }
 
-void Model::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
+void Model::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -409,7 +409,7 @@ void Model::Update(VulkanEngine& engine, MaterialManager& materialManager, float
 
 	for (auto& mesh : MeshList)
 	{
-		mesh->Update(engine, ModelTransform, BoneList, materialManager, timer);
+		mesh->Update(engine, ModelTransform, BoneList, inputManager, materialManager, timer);
 	}
 }
 

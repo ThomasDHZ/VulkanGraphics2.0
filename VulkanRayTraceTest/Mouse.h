@@ -15,4 +15,5 @@ private:
 
 public:
 	void Update(GLFWwindow* window, std::shared_ptr<Camera> camera);
+	glm::vec2 GetMousePos() { return glm::vec2(MouseXPos, MouseYPos); }
 };

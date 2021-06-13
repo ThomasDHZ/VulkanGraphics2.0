@@ -7,6 +7,7 @@
 #include "ModelManager.h"
 #include "LightManager.h"
 #include "CameraManager.h"
+#include "InputManager.h"
 class AssetManager
 {
 private:
@@ -15,6 +16,7 @@ public:
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
 	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 
+	InputManager inputManager;
 	CameraManager cameraManager;
 	MaterialManager materialManager;
 	TextureManager textureManager;
@@ -31,7 +33,7 @@ public:
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
 
-	void Update(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, VulkanWindow& window);
 	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID, std::shared_ptr<Camera> CameraView);
 	void Delete(VulkanEngine& engine);
 
