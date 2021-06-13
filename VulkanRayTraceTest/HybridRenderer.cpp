@@ -4,7 +4,7 @@ HybridRenderer::HybridRenderer() : BaseRenderer()
 {
 }
 
-HybridRenderer::HybridRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+HybridRenderer::HybridRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     FrameBufferTextureRenderer = GBufferRenderPass(engine, assetManager);
     FrameBufferTextureRenderer2 = GBufferRenderPass2(engine, assetManager);
@@ -43,7 +43,7 @@ HybridRenderer::~HybridRenderer()
 {
 }
 
-void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
+void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
@@ -146,7 +146,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
     }
 }
 
-void HybridRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
+void HybridRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferTextureRenderer2.Draw(engine, assetManager, imageIndex);

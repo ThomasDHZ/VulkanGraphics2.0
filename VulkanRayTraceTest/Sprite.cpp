@@ -62,10 +62,10 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
     AnimationPlayer.SetAnimation(AnimationIndex);
 }
 
-void Sprite::Update(VulkanEngine& engine, MaterialManager& materialManager, float timer)
+void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
     AnimationPlayer.Update(timer);
 
     UVOffset = AnimationPlayer.GetCurrentFrame();
-    Mesh::Update(engine, materialManager, timer);
+    Mesh::Update(engine, inputManager, materialManager, timer);
 }

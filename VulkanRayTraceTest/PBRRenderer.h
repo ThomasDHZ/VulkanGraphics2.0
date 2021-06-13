@@ -22,12 +22,12 @@ private:
 	BRDFRenderPass brdfRenderPass;
 public:
 	PBRRenderer();
-	PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr);
+	PBRRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr);
 	~PBRRenderer();
 
-	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
 	void GUIUpdate(VulkanEngine& engine);
-	void Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex);
+	void Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 
 	 std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);

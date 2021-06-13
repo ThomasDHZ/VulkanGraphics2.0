@@ -1,4 +1,5 @@
 #pragma once
+#include "InputManager.h"
 #include "Mesh.h"
 #include "AnimationPlayer2D.h"
 
@@ -16,6 +17,6 @@ public:
 	~Sprite();
 
 	void SetAnimation(uint32_t AnimationIndex);
-	virtual void Update(VulkanEngine& engine, MaterialManager& materialManager, float timer) override;
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer) override;
 };
 

@@ -116,7 +116,7 @@ public:
 	std::vector<VkLayerProperties> VulkanLayers;
 
 	VulkanEngine();
-	VulkanEngine(GLFWwindow* window);
+	VulkanEngine(std::shared_ptr<VulkanWindow> window);
 	~VulkanEngine();
 
 	uint32_t GenerateID();

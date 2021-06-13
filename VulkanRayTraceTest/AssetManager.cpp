@@ -4,9 +4,9 @@ AssetManager::AssetManager()
 {
 }
 
-AssetManager::AssetManager(VulkanEngine& engine)
+AssetManager::AssetManager(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
-    inputManager = InputManager();
+    inputManager = InputManager(window);
     cameraManager = CameraManager(engine);
     textureManager = TextureManager(engine);
     materialManager = MaterialManager(engine, textureManager);
@@ -41,11 +41,11 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
     modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material)));
 }
 
-void AssetManager::Update(VulkanEngine& engine, VulkanWindow& window)
+void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     float timer = engine.VulkanTimer();
     cameraManager.Update(engine);
-    inputManager.Update(window, cameraManager);
+    inputManager.Update(cameraManager);
     materialManager.Update(engine);
     textureManager.Update(engine);
     meshManager.Update(engine, inputManager, materialManager, timer, cameraManager.ActiveCamera);

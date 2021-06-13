@@ -4,7 +4,7 @@ PBRRenderer::PBRRenderer() : BaseRenderer()
 {
 }
 
-PBRRenderer::PBRRenderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+PBRRenderer::PBRRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f);
@@ -18,7 +18,7 @@ PBRRenderer::~PBRRenderer()
 {
 }
 
-void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
+void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     cubeMapRenderer.RebuildSwapChain(engine, assetManager);
     prefilterRenderPass.RebuildSwapChain(engine, assetManager);
@@ -85,7 +85,7 @@ void PBRRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Image(brdfRenderPass.BRDFTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void PBRRenderer::Draw(VulkanEngine& engine, VulkanWindow& window, uint32_t imageIndex)
+void PBRRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
     DebugDepthRenderer.Draw(engine, assetManager, imageIndex);

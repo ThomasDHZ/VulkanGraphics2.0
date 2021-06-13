@@ -10,9 +10,9 @@ Renderer::Renderer()
 {
 }
 
-Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPTR)
+Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPTR)
 {
-    interfaceRenderPass = InterfaceRenderPass(engine, window.GetWindowPtr());
+    interfaceRenderPass = InterfaceRenderPass(engine, window);
     assetManager = assetManagerPTR;
 
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
@@ -28,12 +28,12 @@ Renderer::~Renderer()
 
 }
 
-void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
+void Renderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     int width = 0, height = 0;
-    glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
+    glfwGetFramebufferSize(window->GetWindowPtr(), &width, &height);
     while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
+        glfwGetFramebufferSize(window->GetWindowPtr(), &width, &height);
         glfwWaitEvents();
     }
 
@@ -45,8 +45,8 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
 
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
 
-    assetManager->Update(engine);
-    engine.SwapChain.RebuildSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
+    assetManager->Update(engine, window);
+    engine.SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
@@ -57,7 +57,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window)
     renderer2D.RebuildSwapChain(engine, window);
 }
 
-void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
+void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
 {
     if(addlightflag)
     {
@@ -99,10 +99,7 @@ void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t curre
         UpdateRenderer = false;
     }
 
-    keyboard.Update(window.GetWindowPtr(), assetManager->cameraManager.ActiveCamera);
-    mouse.Update(window.GetWindowPtr(), assetManager->cameraManager.ActiveCamera);
-
-    assetManager->Update(engine);
+    assetManager->Update(engine, window);
     rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
     pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
     hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
@@ -167,7 +164,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     }
 }
 
-void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
+void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 

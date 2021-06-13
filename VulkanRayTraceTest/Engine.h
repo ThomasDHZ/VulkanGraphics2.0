@@ -17,9 +17,9 @@
 
 class Engine {
 private:
-    VulkanWindow window;
     VulkanEngine engine;
     Renderer renderer;
+    std::shared_ptr<VulkanWindow> window;
     std::shared_ptr<AssetManager> assetManager;
 
 public:

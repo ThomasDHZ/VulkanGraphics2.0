@@ -6,7 +6,7 @@ VulkanEngine::VulkanEngine()
 {
 }
 
-VulkanEngine::VulkanEngine(GLFWwindow* window)
+VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 {
 	ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
 
@@ -73,7 +73,7 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 
 	VulkanDebug.SetUpDebugger(Instance);
 
-	if (glfwCreateWindowSurface(Instance, window, nullptr, &Surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(Instance, window->GetWindowPtr(), nullptr, &Surface) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create window surface!");
 	}
 
@@ -100,8 +100,8 @@ VulkanEngine::VulkanEngine(GLFWwindow* window)
 		throw std::runtime_error("failed to find a suitable GPU!");
 	}
 
-	SetUpDeviceFeatures(window);
-	SwapChain = VulkanSwapChain(window, Device, PhysicalDevice, Surface);
+	SetUpDeviceFeatures(window->GetWindowPtr());
+	SwapChain = VulkanSwapChain(window->GetWindowPtr(), Device, PhysicalDevice, Surface);
 
 	InitializeCommandPool();
 	InitializeSyncObjects();

@@ -14,6 +14,6 @@ private:
 	double MouseYPos;
 
 public:
-	void Update(GLFWwindow* window, std::shared_ptr<Camera> camera);
+	void Update(std::shared_ptr<VulkanWindow> window, std::shared_ptr<Camera> ActiveCamera);
 	glm::vec2 GetMousePos() { return glm::vec2(MouseXPos, MouseYPos); }
 };

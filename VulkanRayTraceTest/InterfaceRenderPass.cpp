@@ -5,7 +5,7 @@ InterfaceRenderPass::InterfaceRenderPass()
 {
 }
 
-InterfaceRenderPass::InterfaceRenderPass(VulkanEngine& engine, GLFWwindow* window)
+InterfaceRenderPass::InterfaceRenderPass(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -74,7 +74,7 @@ InterfaceRenderPass::InterfaceRenderPass(VulkanEngine& engine, GLFWwindow* windo
 
     ImGui::StyleColorsDark();
 
-    ImGui_ImplGlfw_InitForVulkan(window, true);
+    ImGui_ImplGlfw_InitForVulkan(window->GetWindowPtr(), true);
     init_info.DescriptorPool = ImGuiDescriptorPool;
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info, RenderPass);

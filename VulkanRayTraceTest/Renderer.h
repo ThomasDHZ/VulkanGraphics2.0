@@ -4,8 +4,6 @@
 #include "BlinnPhongRasterRenderer.h"
 #include "RayTraceRenderer.h"
 #include "RayTracePBRRenderer.h"
-#include "Keyboard.h"
-#include "Mouse.h"
 #include "HybridRenderer.h"
 #include "Renderer2D.h"
 
@@ -17,8 +15,6 @@ private:
 	bool deletelightflag = false;
 	bool addplightflag = false;
 	bool deleteplightflag = false;
-	Keyboard keyboard;
-	Mouse mouse;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
 	PBRRenderer pbrRenderer;
@@ -39,12 +35,12 @@ public:
 	std::shared_ptr<AssetManager> assetManager;
 
 	Renderer();
-	Renderer(VulkanEngine& engine, VulkanWindow& window, std::shared_ptr<AssetManager> assetManagerPTR);
+	Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPTR);
 	~Renderer();
 
-	void RebuildSwapChain(VulkanEngine& engine, VulkanWindow& window);
-	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
+	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);
-	void Draw(VulkanEngine& engine, VulkanWindow& window);
+	void Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
 	void Destroy(VulkanEngine& engine);
 };

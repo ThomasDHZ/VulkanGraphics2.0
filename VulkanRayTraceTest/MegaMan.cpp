@@ -97,7 +97,17 @@ MegaMan::~MegaMan()
 
 void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
-    auto a = inputManager.mouse.GetMousePos();
-    AnimationPlayer.SetAnimation(kRunAnimation);
+    if (inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) || 
+        inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+    {
+        AnimationPlayer.SetAnimation(kRunAnimation);
+    }
+
+    if (inputManager.IsKeyReleased(KeyboardKey::KEY_LEFT) &&
+        inputManager.IsKeyReleased(KeyboardKey::KEY_RIGHT))
+    {
+        AnimationPlayer.SetAnimation(kStandAnimation);
+    }
+
     Sprite::Update(engine, inputManager, materialManager, timer);
 }

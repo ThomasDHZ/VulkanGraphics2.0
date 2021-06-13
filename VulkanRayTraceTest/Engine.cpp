@@ -11,9 +11,9 @@ Engine::Engine()
 
 Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 {
-    window = VulkanWindow(1280, 720, "VulkanEngine");
-    engine = VulkanEngine(window.GetWindowPtr());
-    assetManager = std::make_shared<AssetManager>(AssetManager(engine));
+    window = std::make_shared<VulkanWindow>(VulkanWindow(1280, 720, "VulkanEngine"));
+    engine = VulkanEngine(window);
+    assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
  /*   assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
@@ -141,12 +141,12 @@ Engine::~Engine()
     assetManager->Delete(engine);
     renderer.Destroy(engine);
     engine.Destroy();
-    window.Destroy();
+    window->Destroy();
 }
 
 void Engine::MainLoop()
 {
-    while (!glfwWindowShouldClose(window.GetWindowPtr())) 
+    while (!glfwWindowShouldClose(window->GetWindowPtr())) 
     {
         glfwPollEvents();
 

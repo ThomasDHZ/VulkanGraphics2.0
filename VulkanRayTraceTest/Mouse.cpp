@@ -1,13 +1,13 @@
 #include "Mouse.h"
 
-void Mouse::Update(GLFWwindow* window, std::shared_ptr<Camera> camera)
+void Mouse::Update(std::shared_ptr<VulkanWindow> window, std::shared_ptr<Camera> ActiveCamera)
 {
 
-	if (auto PCamera = dynamic_cast<PerspectiveCamera*>(camera.get()))
+	if (auto PCamera = dynamic_cast<PerspectiveCamera*>(ActiveCamera.get()))
 	{
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+		if (glfwGetMouseButton(window->GetWindowPtr(), GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 		{
-			glfwGetCursorPos(window, &MouseXPos, &MouseYPos);
+			glfwGetCursorPos(window->GetWindowPtr(), &MouseXPos, &MouseYPos);
 			if (firstMouse)
 			{
 				lastX = MouseXPos;
