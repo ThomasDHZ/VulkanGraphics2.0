@@ -38,6 +38,8 @@ Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm
     IndexCount = SpriteIndices.size();
     PrimitiveCount = static_cast<uint32_t>(SpriteIndices.size()) / 3;
 
+    timer2 = std::make_shared<Timer>(Timer());
+
     BottomLevelAccelerationBuffer = AccelerationStructure(engine);
     SetUpMesh(engine, VertexList, SpriteIndices);
 }
@@ -64,7 +66,7 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
 
 void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
-    AnimationPlayer.Update(timer);
+    AnimationPlayer.Update(timer2);
 
     UVOffset = AnimationPlayer.GetCurrentFrame();
     Mesh::Update(engine, inputManager, materialManager, timer);

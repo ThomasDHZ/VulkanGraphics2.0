@@ -2,28 +2,29 @@
 
 Animation2D::Animation2D()
 {
-	DeltaFrameTime = 0.0f;
+	CurrentFrameTime = 0.0f;
 	CurrentFrame = 0.0f;
-	NextFrame = 0.0f;
+	FrameHoldTime = 0.0f;
 }
 
-Animation2D::Animation2D(std::vector<Frame2D> frameList, float deltaFrameTime, uint32_t StartFrame)
+Animation2D::Animation2D(std::vector<Frame2D> frameList, float frameHoldTime, uint32_t StartFrame)
 {
 	FrameList = frameList;
-	DeltaFrameTime = deltaFrameTime;
 	CurrentFrame = StartFrame;
-	NextFrame = DeltaFrameTime;
+	CurrentFrameTime = 0.0f;
+	FrameHoldTime = frameHoldTime;
 }
 
-void Animation2D::Update(float timer)
+void Animation2D::Update(std::shared_ptr<Timer> timer)
 {
-//	if (timer >= NextFrame)
-//	{
+	CurrentFrameTime += timer->GetFrameTime();
+	while (CurrentFrameTime >= FrameHoldTime)
+	{
 		CurrentFrame += 1;
 		if (CurrentFrame > FrameList.size() - 1)
 		{
 			CurrentFrame = 0;
 		}
-		NextFrame += timer + DeltaFrameTime;
-//	}
+		CurrentFrameTime -= FrameHoldTime;
+	}
 }

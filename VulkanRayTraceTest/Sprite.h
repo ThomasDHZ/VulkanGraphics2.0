@@ -7,6 +7,7 @@ class Sprite : public Mesh
 {
 private:
 protected:
+	std::shared_ptr<Timer> timer2;
 	AnimationPlayer2D AnimationPlayer;
 	void AddAnimation(std::shared_ptr<Animation2D> animation);
 	void AddAnimation(std::vector<std::shared_ptr<Animation2D>> AnimationList);

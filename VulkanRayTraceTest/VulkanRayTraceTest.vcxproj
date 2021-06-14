@@ -262,6 +262,7 @@
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="FrameBufferTextureRenderPass.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
@@ -469,6 +470,7 @@
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="FrameBufferTextureRenderPass.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebugger.h" />

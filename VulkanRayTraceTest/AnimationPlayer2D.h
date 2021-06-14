@@ -4,6 +4,7 @@
 class AnimationPlayer2D
 {
 private:
+	uint32_t AnimationIndex = 0;
 	std::shared_ptr<Animation2D> CurrentAnimation;
 	std::vector<std::shared_ptr<Animation2D>> AnimationList;
 public:
@@ -13,7 +14,9 @@ public:
 	void AddAnimation(std::shared_ptr<Animation2D> animation);
 	void AddAnimation(std::vector<std::shared_ptr<Animation2D>> AnimationList);
 	void SetAnimation(uint32_t AnimationIndex);
-	void Update(float timer);
-	Frame2D GetCurrentFrame() { return CurrentAnimation->GetFrame(); };
+	void Update(std::shared_ptr<Timer> timer);
+	std::shared_ptr<Animation2D> GetCurrentAnimation() { return CurrentAnimation; }
+	uint32_t GetCurrentAnimationIndex() { return AnimationIndex; }
+	Frame2D GetCurrentFrame() { return CurrentAnimation->GetFrame(); }
 };
 
