@@ -46,7 +46,8 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
 
     std::vector<Frame2D> ClimbAnimation =
     {
-        Frame2D(UVSize.x * 8, 0.0f)
+        Frame2D(UVSize.x * 8, 0.0f),
+        Frame2D(1 - (UVSize.x * 9), 0.0f)
     };
 
     std::vector<Frame2D> ClimbUpAnimation =
@@ -82,6 +83,74 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
         Frame2D(UVSize.x * 16, 0.0f)
     };
 
+    std::vector<Frame2D> LeftStandAnimation =
+    {
+       Frame2D(UVSize.x * 16, 0.0f),
+       Frame2D(UVSize.x * 15, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftStandToRunTransitionAnimation =
+    {
+        Frame2D(UVSize.x * 14, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftRunAnimation =
+    {
+        Frame2D(UVSize.x * 13, 0.0f),
+        Frame2D(UVSize.x * 12, 0.0f),
+        Frame2D(UVSize.x * 11, 0.0f),
+        Frame2D(UVSize.x * 12, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftSlideAnimation =
+    {
+        Frame2D(UVSize.x * 10, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftJumpAnimation =
+    {
+        Frame2D(UVSize.x * 9, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftClimbAnimation =
+    {
+        Frame2D(UVSize.x * 8, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftClimbUpAnimation =
+    {
+        Frame2D(UVSize.x * 7, 0.0f),
+        Frame2D(1 - (UVSize.x * 8), 0.0f)
+    };
+
+    std::vector<Frame2D> LeftHurtAnimation =
+    {
+        Frame2D(UVSize.x * 6, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftShootStandAnimation =
+    {
+        Frame2D(UVSize.x * 5, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftShootRunAnimation =
+    {
+        Frame2D(UVSize.x * 4, 0.0f),
+        Frame2D(UVSize.x * 3, 0.0f),
+        Frame2D(UVSize.x * 2, 0.0f),
+        Frame2D(UVSize.x * 3, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftShootJumpAnimation =
+    {
+        Frame2D(UVSize.x * 2, 0.0f)
+    };
+
+    std::vector<Frame2D> LeftShootClimbAnimation =
+    {
+        Frame2D(UVSize.x * 1, 0.0f)
+    };
+
     std::vector<std::shared_ptr<Animation2D>> AnimationList
     {
         std::make_shared<Animation2D>(Animation2D(StandAnimation, 1.25f)),
@@ -95,7 +164,19 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
         std::make_shared<Animation2D>(Animation2D(ShootStandAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(ShootRunAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(ShootJumpAnimation, 0.15f)),
-        std::make_shared<Animation2D>(Animation2D(ShootClimbAnimation, 0.15f))
+        std::make_shared<Animation2D>(Animation2D(ShootClimbAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftStandAnimation, 1.25f)),
+        std::make_shared<Animation2D>(Animation2D(LeftStandToRunTransitionAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftRunAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftSlideAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftJumpAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftClimbAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftClimbUpAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftHurtAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftShootStandAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftShootRunAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftShootJumpAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftShootClimbAnimation, 0.15f))
     };
     
     AnimationPlayer = AnimationPlayer2D(AnimationList);
@@ -164,7 +245,14 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
         inputManager.IsKeyReleased(KeyboardKey::KEY_UP) &&
         inputManager.IsKeyReleased(KeyboardKey::KEY_DOWN))
     {
-        newAnimation = kStandAnimation;
+ /*       if (FaceRightFlag)
+        {
+            newAnimation = kStandAnimation;
+        }
+        else
+        {*/
+            newAnimation = kLeftStandAnimation;
+      //  }
     }
 
     if (newAnimation != AnimationPlayer.GetCurrentAnimationIndex())

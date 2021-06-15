@@ -18,9 +18,22 @@ private:
 		kShootStandAnimation,
 		kShootRunAnimation,
 		kShootJumpAnimation,
-		kShootClimbAnimation
+		kShootClimbAnimation,
+		kLeftStandAnimation,
+		kLeftStandToRunTransitionAnimation,
+		kLeftRunAnimation,
+		kLeftSlideAnimation,
+		kLeftJumpAnimation,
+		kLeftClimbAnimation,
+		kLeftClimbUpAnimation,
+		kLeftHurtAnimation,
+		kLeftShootStandAnimation,
+		kLeftShootRunAnimation,
+		kLeftShootJumpAnimation,
+		kLeftShootClimbAnimation
 	};
 
+	bool FaceRightFlag = true;
 	MegaManAnimation CurrentAnimation;
 public:
 
