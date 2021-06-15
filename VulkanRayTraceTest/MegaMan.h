@@ -13,6 +13,8 @@ private:
 		kSlideAnimation,
 		kJumpAnimation,
 		kClimbAnimation,
+		kClimbUpAnimation,
+		kHurtAnimation,
 		kShootStandAnimation,
 		kShootRunAnimation,
 		kShootJumpAnimation,
@@ -23,7 +25,7 @@ private:
 public:
 
 	static constexpr glm::vec2 SpriteSize = glm::vec2(1.0f);
-	static constexpr glm::vec2 UVSize = glm::vec2(.05f, 1.0f);
+	static constexpr glm::vec2 UVSize = glm::vec2(.05882f, 1.0f);
 
 	MegaMan();
 	MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
