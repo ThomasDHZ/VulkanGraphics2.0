@@ -74,17 +74,17 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
 
     std::vector<Frame2D> ShootJumpAnimation =
     {
-        Frame2D(UVSize.x * 14, 0.0f)
+        Frame2D(UVSize.x * 15, 0.0f)
     };
 
     std::vector<Frame2D> ShootClimbAnimation =
     {
-        Frame2D(UVSize.x * 15, 0.0f)
+        Frame2D(UVSize.x * 16, 0.0f)
     };
 
     std::vector<std::shared_ptr<Animation2D>> AnimationList
     {
-        std::make_shared<Animation2D>(Animation2D(StandAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(StandAnimation, 1.25f)),
         std::make_shared<Animation2D>(Animation2D(StandToRunTransitionAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(RunAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(SlideAnimation, 0.15f)),
@@ -108,32 +108,68 @@ MegaMan::~MegaMan()
 
 void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
-    AnimationPlayer.SetAnimation(kRunAnimation);
-    //uint32_t newAnimation = 0;
-    //if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
-    //{
-    //    newAnimation = kShootStandAnimation;
-    //}
+    uint32_t newAnimation = 0;
+    if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    {
+        newAnimation = kShootStandAnimation;
+    }
 
-    //if (inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) || 
-    //    inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
-    //{
-    //    newAnimation = kRunAnimation;
-    //    if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
-    //    {
-    //        newAnimation = kShootRunAnimation;
-    //    }
-    //}
+    if (inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) || 
+        inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+    {
+        newAnimation = kRunAnimation;
+    }
 
-    //if (inputManager.IsKeyReleased(KeyboardKey::KEY_LEFT) &&
-    //    inputManager.IsKeyReleased(KeyboardKey::KEY_RIGHT))
-    //{
-    //    newAnimation = kStandAnimation;
-    //}
+    if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
+        inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
+    {
+        newAnimation = kClimbAnimation;
+    }
 
-    //if (newAnimation != AnimationPlayer.GetCurrentAnimationIndex())
-    //{
-    //    AnimationPlayer.SetAnimation(newAnimation);
-    //}
+    if ((inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) ||
+        inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT)) &&
+        inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    {
+        newAnimation = kShootRunAnimation;
+    }
+
+    if ((inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
+        inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN)) &&
+        inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    {
+        newAnimation = kShootClimbAnimation;
+    }
+
+    if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z))
+    {
+        newAnimation = kJumpAnimation;
+    }
+
+    if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
+        inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
+    {
+        newAnimation = kSlideAnimation;
+    }
+
+    if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
+        inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    {
+        newAnimation = kShootJumpAnimation;
+    }
+
+    if (inputManager.IsKeyReleased(KeyboardKey::KEY_SPACE) &&
+        inputManager.IsKeyReleased(KeyboardKey::KEY_Z) &&
+        inputManager.IsKeyReleased(KeyboardKey::KEY_LEFT) &&
+        inputManager.IsKeyReleased(KeyboardKey::KEY_RIGHT) &&
+        inputManager.IsKeyReleased(KeyboardKey::KEY_UP) &&
+        inputManager.IsKeyReleased(KeyboardKey::KEY_DOWN))
+    {
+        newAnimation = kStandAnimation;
+    }
+
+    if (newAnimation != AnimationPlayer.GetCurrentAnimationIndex())
+    {
+        AnimationPlayer.SetAnimation(newAnimation);
+    }
     Sprite::Update(engine, inputManager, materialManager, timer);
 }

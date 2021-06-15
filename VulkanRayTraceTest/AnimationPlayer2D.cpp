@@ -24,10 +24,10 @@ void AnimationPlayer2D::AddAnimation(std::vector<std::shared_ptr<Animation2D>> a
 	}
 }
 
-void AnimationPlayer2D::SetAnimation(uint32_t AnimationIndex)
+void AnimationPlayer2D::SetAnimation(uint32_t animationIndex)
 {
-	AnimationIndex = AnimationIndex;
-	CurrentAnimation = AnimationList[AnimationIndex];
+	AnimationIndex = animationIndex;
+	CurrentAnimation = AnimationList[animationIndex];
 }
 
 void AnimationPlayer2D::Update(std::shared_ptr<Timer> timer)
