@@ -186,7 +186,7 @@ void RayTracedPipeline::SetUpPipeline(VulkanEngine& engine)
     RayTracingPipeline.pStages = ShaderList.data();
     RayTracingPipeline.groupCount = static_cast<uint32_t>(RayTraceShaders.size());
     RayTracingPipeline.pGroups = RayTraceShaders.data();
-    RayTracingPipeline.maxPipelineRayRecursionDepth = 1;
+    RayTracingPipeline.maxPipelineRayRecursionDepth = 2;
     RayTracingPipeline.layout = ShaderPipelineLayout;
     VkResult result = engine.vkCreateRayTracingPipelinesKHR(engine.Device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &ShaderPipeline);
 
