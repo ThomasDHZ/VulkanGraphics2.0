@@ -13,7 +13,7 @@ RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, VkImageLayout ima
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, imageLayout)
@@ -21,7 +21,7 @@ RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, glm::vec2& Textur
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedTexture, imageLayout)
@@ -29,7 +29,7 @@ RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, int width, int he
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedGTBNTexture::~RenderedGTBNTexture()
@@ -105,5 +105,5 @@ void RenderedGTBNTexture::RecreateRendererTexture(VulkanEngine& engine)
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

@@ -11,7 +11,7 @@ RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& engin
     CreateTextureView(engine);
     CreateTextureSampler(engine);
     SendTextureToGPU(engine);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedRayTracedColorTexture::~RenderedRayTracedColorTexture()
@@ -123,5 +123,5 @@ void RenderedRayTracedColorTexture::RecreateRendererTexture(VulkanEngine& engine
     CreateTextureView(engine);
     CreateTextureSampler(engine);
     UpdateImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    //ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
