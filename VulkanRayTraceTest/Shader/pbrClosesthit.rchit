@@ -22,6 +22,7 @@ struct RayPayload {
 	uint seed;
 	vec3 normal;
     int reflectCount;
+    int reflectCount2;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
@@ -101,7 +102,7 @@ layout(binding = 12) uniform sampler3D Texture3DMap[];
 const float PI = 3.14159265359;
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
 vec3 getNormalFromMap(PBRMaterial material, Vertex vertex);
-vec3 Irradiate(Vertex vertex, float metallic);
+vec3 Irradiate(Vertex vertex, float metallic, uint SampleCount);
 
 // ----------------------------------------------------------------------------
 // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
@@ -202,37 +203,57 @@ void main()
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - material.Metallic;	  
     
-    //vec3 irradiance = vec3(0.0f);
-    vec3 irradiance = Irradiate(vertex, material.Metallic);
+    uint SampleCount =  256;
+    vec3 irradiance = vec3(0.0f);
+  //  vec3 irradiance = Irradiate(vertex, material.Metallic, SampleCount);
     
     vec3 diffuse  = irradiance * material.Albedo;
 
-//    float totalWeight = 0.0f;
-//    vec3 specular = vec3(0.0f);
-//    if(rayHitInfo.reflectCount != 15)
-//    {
-//        vec2 Xi = Hammersley(rayHitInfo.reflectCount, 15);
-//        vec3 H = ImportanceSampleGGX(Xi, N, roughness);
-//        vec3 L  = normalize(2.0 * dot(V, H) * H - V);
-//
-//        float NdotL = max(dot(N, L), 0.0);
-//        if(NdotL > 0.0)
-//        {
-//          vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
-//          vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-//          vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal) * L;
-//
-//          rayHitInfo.reflectCount++;
-//          traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-//          specular =  rayHitInfo.color * NdotL; 
-//          totalWeight      += NdotL;
-//        }
-//    }
-//    specular = specular / totalWeight;
-//    vec2 brdf = vec2(max(dot(N, V), 0.0), roughness).rg;
-//    specular *= (F * brdf.x + brdf.y);
+    float totalWeight = 0.0f;
+    vec3 prefilter = vec3(0.0f);
+    vec3 specular = vec3(0.0f);
+    if(rayHitInfo.reflectCount2 != SampleCount)
+    {
+         float r1        = rnd(rayHitInfo.seed);
+         float r2        = rnd(rayHitInfo.seed);
+         float sq        = sqrt(1.0 - r2);
+         float phi       = 2 * PI * r1;
+         vec3 scatter   = vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2));
 
-   vec3 ambient = (kD * diffuse) * material.AmbientOcclusion;
+        vec2 Xi = Hammersley(rayHitInfo.reflectCount2, SampleCount);
+        vec3 H = ImportanceSampleGGX(Xi, N, material.Roughness);
+        vec3 L  = normalize(2.0 * dot(V, H) * H - V);
+
+        float NdotL = max(dot(N, L), 0.0);
+        vec3 rayDir = vec3(0.0);
+        if(NdotL > 0.0)
+        {
+            float D   = DistributionGGX(N, H, material.Roughness);
+            float NdotH = max(dot(N, H), 0.0);
+            float HdotV = max(dot(H, V), 0.0);
+            float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
+
+            float saTexel  = 4.0 * PI / 6.0f;
+            float saSample = 1.0 / (float(SampleCount) * pdf + 0.0001);
+            float mipLevel = material.Roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
+            scatter *= mipLevel;
+
+            rayDir = L * scatter * NdotL;
+            totalWeight += NdotL;
+        }
+        prefilter /= totalWeight;
+
+        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        rayDir =  reflect(gl_WorldRayDirectionEXT * rayDir, vertex.normal) * material.Roughness * 4.0f;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 100.0f, 0);
+        prefilter += rayHitInfo.color;
+    }
+
+    vec2 brdf = vec2(max(dot(N, V), 0.0), material.Roughness).rg;
+    specular = prefilter * (F * brdf.x + brdf.y);
+
+   vec3 ambient = (kD * diffuse + specular) * material.AmbientOcclusion;
    vec3 color = ambient + Lo;
 
    rayHitInfo.color = color;
@@ -312,9 +333,9 @@ vec3 getNormalFromMap(PBRMaterial material, Vertex vertex)
     return TBN * normal;
 }
 
-vec3 Irradiate(Vertex vertex, float metallic)
+vec3 Irradiate(Vertex vertex, float metallic, uint SampleCount)
 {
-    const int MaxReflectCount =15; 
+    const uint MaxReflectCount  = SampleCount; 
     vec3 irradiance = vec3(0.0f);
     if(rayHitInfo.reflectCount != MaxReflectCount)
     {

@@ -15,6 +15,7 @@ struct RayHitInfo
 	uint seed;
 	vec3 normal;
     int reflectCount;
+    int reflectCount2;
 };
 
 layout(location = 0) rayPayloadInEXT RayHitInfo rayPayload;

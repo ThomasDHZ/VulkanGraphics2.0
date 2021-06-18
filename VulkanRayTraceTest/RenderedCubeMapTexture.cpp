@@ -87,7 +87,6 @@ void RenderedCubeMapTexture::CreateTextureSampler(VulkanEngine& engine)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
     TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-    TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
 
     if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
     {

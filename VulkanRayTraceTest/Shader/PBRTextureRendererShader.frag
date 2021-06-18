@@ -141,7 +141,8 @@ void main()
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - material.Metallic;	  
     
-    vec3 irradiance = texture(irradianceMap, N).rgb;
+    //vec3 irradiance = texture(irradianceMap, N).rgb;
+    vec3 irradiance = vec3(0.0f);
     vec3 diffuse      = irradiance * material.Albedo;
     
     const float MAX_REFLECTION_LOD = 4.0;

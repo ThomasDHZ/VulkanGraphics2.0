@@ -64,7 +64,7 @@ C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe BRDFRenderer.vert -o BRDFRendererShaderVe
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe BRDFRenderer.frag -o BRDFRendererShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe DepthDebugShader.frag -o DepthDebugShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe DepthDebugShader.vert -o DepthDebugShaderVert.spv
-:/VulkanSDK/1.2.176.1/Bin32/glslc.exe DepthShader.frag -o DepthShaderFrag.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe DepthShader.frag -o DepthShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe DepthShader.vert -o DepthShaderVert.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe animate.comp -o animate.spv
 pause
