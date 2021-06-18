@@ -1,10 +1,10 @@
 #include "ModelManager.h"
 
-void ModelManager::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void ModelManager::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceFlag)
 {
 	for (auto& model : ModelList)
 	{
-		model->Update(engine, inputManager, materialManager, timer);
+		model->Update(engine, inputManager, materialManager, RayTraceFlag);
 	}
 }
 

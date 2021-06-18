@@ -33,7 +33,7 @@ public:
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
 
-	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
+	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);
 	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID, std::shared_ptr<Camera> CameraView);
 	void Delete(VulkanEngine& engine);
 

@@ -41,7 +41,7 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
     modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material)));
 }
 
-void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag)
 {
     float timer = engine.VulkanTimer();
     cameraManager.Update(engine);
@@ -49,7 +49,7 @@ void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     materialManager.Update(engine);
     textureManager.Update(engine);
     meshManager.Update(engine, inputManager, materialManager, timer, cameraManager.ActiveCamera);
-    modelManager.Update(engine, inputManager, materialManager, timer);
+    modelManager.Update(engine, inputManager, materialManager, RayTraceFlag);
     lightManager.Update(engine);
 
     if (cameraManager.ActiveCamera->cameraType == CameraType::Perspective_Camera)

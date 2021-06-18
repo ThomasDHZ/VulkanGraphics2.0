@@ -10,6 +10,7 @@
 class Renderer
 {
 private:
+	bool RayTraceFlag = false;
 	int ActiveRenderer = 0;
 	bool addlightflag = false;
 	bool deletelightflag = false;

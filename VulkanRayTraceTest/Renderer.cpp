@@ -45,7 +45,7 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWind
 
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
 
-    assetManager->Update(engine, window);
+    assetManager->Update(engine, window, RayTraceFlag);
     engine.SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
 
     interfaceRenderPass.RebuildSwapChain(engine);
@@ -99,10 +99,13 @@ void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window
         UpdateRenderer = false;
     }
 
-    assetManager->Update(engine, window);
-    rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
-    pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
-    hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+    assetManager->Update(engine, window, RayTraceFlag);
+    if (RayTraceFlag)
+    {
+        rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+        pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+        hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+    }
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
@@ -197,31 +200,37 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 
     if (ActiveRenderer == 0)
     {
+        RayTraceFlag = false;
         blinnPhongRenderer.Draw(engine, window, imageIndex);
         blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 1)
     {
+        RayTraceFlag = false;
         pbrRenderer.Draw(engine, window, imageIndex);
         pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 2)
     {
+        RayTraceFlag = true;
         rayTraceRenderer.Draw(engine, window, imageIndex);
         rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 3)
     {
+        RayTraceFlag = true;
         pbrRayTraceRenderer.Draw(engine, window, imageIndex);
         pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 4)
     {
+        RayTraceFlag = true;
         hybridRenderer.Draw(engine, window, imageIndex);
         hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 5)
     {
+        RayTraceFlag = false;
         renderer2D.Draw(engine, window, imageIndex);
         renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }

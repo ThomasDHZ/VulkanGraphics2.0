@@ -188,16 +188,10 @@ void Mesh::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMana
 	TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
 
-
 	MeshProperties.Update(engine);
-
-	if (IndexCount != 0)
-	{
-		MeshBottomLevelAccelerationStructure(engine);
-	}
 }
 
-void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceModeFlag)
 {
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -228,9 +222,12 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 
 	MeshProperties.Update(engine);
 
-	if (IndexCount != 0)
+	if (RayTraceModeFlag)
 	{
-		MeshBottomLevelAccelerationStructure(engine);
+		if (IndexCount != 0)
+		{
+			MeshBottomLevelAccelerationStructure(engine);
+		}
 	}
 }
 
