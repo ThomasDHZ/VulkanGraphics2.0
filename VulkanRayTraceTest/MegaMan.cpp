@@ -85,65 +85,72 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
 
     std::vector<Frame2D> LeftStandAnimation =
     {
-       Frame2D(UVSize.x * 16, 0.0f),
-       Frame2D(UVSize.x * 15, 0.0f)
+        Frame2D(UVSize.x * (16 - 0), 0.0f),
+        Frame2D(UVSize.x * (16 - 1), 0.0f),
     };
 
     std::vector<Frame2D> LeftStandToRunTransitionAnimation =
     {
-        Frame2D(UVSize.x * 14, 0.0f)
+        Frame2D(UVSize.x * (16 - 2), 0.0f)
     };
 
     std::vector<Frame2D> LeftRunAnimation =
     {
-        Frame2D(UVSize.x * 13, 0.0f),
-        Frame2D(UVSize.x * 12, 0.0f),
-        Frame2D(UVSize.x * 11, 0.0f),
-        Frame2D(UVSize.x * 12, 0.0f)
+        Frame2D(UVSize.x * (16 - 3), 0.0f),
+        Frame2D(UVSize.x * (16 - 4), 0.0f),
+        Frame2D(UVSize.x * (16 - 5), 0.0f),
+        Frame2D(UVSize.x * (16 - 4), 0.0f)
     };
 
     std::vector<Frame2D> LeftSlideAnimation =
     {
-        Frame2D(UVSize.x * 10, 0.0f)
+        Frame2D(UVSize.x * (16 - 6), 0.0f)
     };
 
     std::vector<Frame2D> LeftJumpAnimation =
     {
-        Frame2D(UVSize.x * 9, 0.0f)
+        Frame2D(UVSize.x* (16 - 7), 0.0f)
+    };
+
+    std::vector<Frame2D> LeftClimbAnimation =
+    {
+        Frame2D(UVSize.x * (16 - 8), 0.0f),
+        Frame2D(UVSize.x * (16 - 8), 0.0f)
     };
 
     std::vector<Frame2D> LeftClimbUpAnimation =
     {
-        Frame2D(UVSize.x * 7, 0.0f)
+        Frame2D(UVSize.x* (16 - 9), 0.0f)
     };
 
     std::vector<Frame2D> LeftHurtAnimation =
     {
-        Frame2D(UVSize.x * 6, 0.0f)
+        Frame2D(UVSize.x* (16 - 10), 0.0f)
     };
 
     std::vector<Frame2D> LeftShootStandAnimation =
     {
-        Frame2D(UVSize.x * 5, 0.0f)
+        Frame2D(UVSize.x* (16 - 11), 0.0f)
     };
 
     std::vector<Frame2D> LeftShootRunAnimation =
     {
-        Frame2D(UVSize.x * 4, 0.0f),
-        Frame2D(UVSize.x * 3, 0.0f),
-        Frame2D(UVSize.x * 2, 0.0f),
-        Frame2D(UVSize.x * 3, 0.0f)
+        Frame2D(UVSize.x * (16 - 12), 0.0f),
+        Frame2D(UVSize.x * (16 - 13), 0.0f),
+        Frame2D(UVSize.x * (16 - 14), 0.0f),
+        Frame2D(UVSize.x * (16 - 13), 0.0f)
     };
 
     std::vector<Frame2D> LeftShootJumpAnimation =
     {
-        Frame2D(UVSize.x * 2, 0.0f)
+        Frame2D(UVSize.x * (16 - 15), 0.0f)
     };
 
     std::vector<Frame2D> LeftShootClimbAnimation =
     {
-        Frame2D(UVSize.x * 1, 0.0f)
+        Frame2D(UVSize.x* (16 - 16), 0.0f)
     };
+
 
     std::vector<std::shared_ptr<Animation2D>> AnimationList
     {
@@ -164,6 +171,7 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
         std::make_shared<Animation2D>(Animation2D(LeftRunAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftSlideAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftJumpAnimation, 0.15f)),
+        std::make_shared<Animation2D>(Animation2D(LeftClimbAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftClimbUpAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftHurtAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftShootStandAnimation, 0.15f)),
@@ -185,7 +193,14 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     uint32_t newAnimation = 0;
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
-        newAnimation = kShootStandAnimation;
+        if (FlipSprite)
+        {
+            newAnimation = kLeftShootStandAnimation;
+        }
+        else
+        {
+            newAnimation = kShootStandAnimation;
+        }
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) || 
@@ -229,28 +244,53 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
         inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN)) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
-        FlipSprite = false;
+        if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+        {
+            FlipSprite = false;
+        }
+        else
+        {
+            FlipSprite = true;
+        }
         newAnimation = kShootClimbAnimation;
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z))
     {
-        FlipSprite = false;
-        newAnimation = kJumpAnimation;
+        if (FlipSprite)
+        {
+            newAnimation = kLeftJumpAnimation;
+        }
+        else
+        {
+            newAnimation = kJumpAnimation;
+        }
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
     {
-        FlipSprite = false;
-        newAnimation = kSlideAnimation;
+        if (FlipSprite)
+        {
+            newAnimation = kLeftSlideAnimation;
+        }
+        else
+        {
+            newAnimation = kSlideAnimation;
+        }
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
-        FlipSprite = false;
-        newAnimation = kShootJumpAnimation;
+        if (FlipSprite)
+        {
+            newAnimation = kLeftShootJumpAnimation;
+        }
+        else
+        {
+            newAnimation = kShootJumpAnimation;
+        }
     }
 
     if (inputManager.IsKeyReleased(KeyboardKey::KEY_SPACE) &&
@@ -262,11 +302,11 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         if (FlipSprite)
         {
-            newAnimation = kStandAnimation;
+            newAnimation = kLeftStandAnimation;
         }
         else
         {
-            newAnimation = kLeftStandAnimation;
+            newAnimation = kStandAnimation;
         }
     }
 

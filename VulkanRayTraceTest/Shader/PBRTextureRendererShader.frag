@@ -45,6 +45,7 @@ layout(binding = 1) buffer MeshProperties
 {
 	mat4 ModelTransform;
 	vec2 UVOffset;
+    vec2 UVFlip;
     uint MaterialIndex;
     float heightScale;
 	float minLayers;
