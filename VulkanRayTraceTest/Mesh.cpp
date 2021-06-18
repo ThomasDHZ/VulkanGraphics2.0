@@ -206,7 +206,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	{
 		for (auto bone : BoneList)
 		{
-			MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
+			//MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
 	}
 	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;

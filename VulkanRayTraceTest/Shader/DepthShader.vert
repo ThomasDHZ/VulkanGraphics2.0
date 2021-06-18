@@ -36,9 +36,12 @@ layout(binding = 0) uniform UniformBufferObject
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;
-	mat4 BoneTransform[100];
 	vec2 UVOffset;
-	uint MaterialIndex;
+    vec2 UVFlip;
+    uint MaterialIndex;
+    float heightScale;
+	float minLayers;
+	float maxLayers;
 } meshProperties[];
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos2 { MaterialInfo material; } MaterialList[];

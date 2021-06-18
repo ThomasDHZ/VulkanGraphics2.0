@@ -32,10 +32,10 @@ vertices;
 layout(binding = 3) buffer MeshProperties 
 {
 	mat4 ModelTransform;
-	mat4 BoneTransform[100];
 	vec2 UVOffset;
-	uint MaterialIndex;
-	    float heightScale;
+    vec2 UVFlip;
+    uint MaterialIndex;
+    float heightScale;
 	float minLayers;
 	float maxLayers;
 } meshProperties[];
@@ -56,10 +56,10 @@ void main()
   Vertex v0 = vertices.v[gl_GlobalInvocationID.x];
 
   mat4 BoneTransform = mat4(1.0f);
-  BoneTransform =  meshProperties[0].BoneTransform[v0.BoneID[0]] * v0.BoneWeights[0];
-  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[1]] * v0.BoneWeights[1];
-  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[2]] * v0.BoneWeights[2];
-  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[3]] * v0.BoneWeights[3];
+//  BoneTransform =  meshProperties[0].BoneTransform[v0.BoneID[0]] * v0.BoneWeights[0];
+//  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[1]] * v0.BoneWeights[1];
+//  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[2]] * v0.BoneWeights[2];
+//  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[3]] * v0.BoneWeights[3];
   vec4 BonePosition = BoneTransform * vec4(v0.Position, 1.0);
 
   v0.Position = vec3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[0].Transform * BonePosition);
