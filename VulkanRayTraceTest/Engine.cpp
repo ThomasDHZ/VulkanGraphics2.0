@@ -58,7 +58,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
    // assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
-   // assetManager->AddModel(engine, "../Models/TestAnimModel/model.dae");
+    assetManager->AddModel(engine, "../Models/TestAnimModel/model.dae");
 
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
      assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/

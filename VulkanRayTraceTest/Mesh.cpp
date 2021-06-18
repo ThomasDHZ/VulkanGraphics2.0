@@ -60,6 +60,27 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	SetUpMesh(engine, VertexList, IndexList);
 }
 
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, uint32_t boneCount, MeshDrawFlags MeshDrawFlags)
+{
+	MeshID = engine.GenerateID();
+	MeshMaterial = material;
+	DrawFlags = MeshDrawFlags;
+
+	MeshProperties = MeshPropertiesUniformBuffer(engine);
+
+	MeshTransform = glm::mat4(1.0f);
+	MeshTransform = glm::transpose(MeshTransform);
+
+	VertexCount = VertexList.size();
+	IndexCount = IndexList.size();
+	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
+	BoneCount = boneCount;
+	BoneTransform.resize(BoneCount, glm::mat4(1.0f));
+
+	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
+	SetUpMesh(engine, VertexList, IndexList);
+}
+
 Mesh::~Mesh()
 {
 
@@ -207,8 +228,10 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	{
 		for (auto bone : BoneList)
 		{
-			//MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
+			MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
+			BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
+		BoneTransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &BoneTransform);
 	}
 	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
 	MeshProperties.UniformDataInfo.UVOffset = UVOffset;

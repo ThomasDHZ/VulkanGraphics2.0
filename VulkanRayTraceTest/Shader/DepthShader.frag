@@ -45,6 +45,7 @@ layout(binding = 0) uniform UniformBufferObject
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;
+    mat4 BoneTransform[100];
 	vec2 UVOffset;
     vec2 UVFlip;
     uint MaterialIndex;

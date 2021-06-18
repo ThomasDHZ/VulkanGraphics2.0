@@ -61,6 +61,7 @@ struct SkyboxUniformBuffer
 struct MeshProperties
 {
 	alignas(16) glm::mat4 ModelTransform = glm::mat4(1.0f);
+	alignas(16) glm::mat4 BoneTransform[100];
 	alignas(8) glm::vec2 UVOffset = glm::vec2(0.0f);
 	alignas(8) glm::vec2 UVFlip = glm::vec2(0.0f);
 	alignas(4) uint32_t MaterialBufferIndex = 0;

@@ -159,10 +159,11 @@ void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialMan
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
-		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, materialID, DrawFlags));
+		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, materialID, BoneList.size(), DrawFlags));
 		meshManager.MeshList.back()->ParentModelID = ModelID;
 		meshManager.MeshList.back()->VertexList = vertices;
 		meshManager.MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
+
 		TotalVertex += meshManager.MeshList.back()->VertexCount;
 		TotalIndex += meshManager.MeshList.back()->IndexCount;
 		for (auto nodeMap : NodeMapList)
