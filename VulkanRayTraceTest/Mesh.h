@@ -52,7 +52,7 @@ public:
 	uint32_t IndexCount = 0;
 	uint32_t PrimitiveCount; //TriangleCount
 	glm::vec2 UVOffset = glm::vec2(0.0f);
-
+	glm::vec2 UVFlip = glm::vec2(0.0f);
 	std::shared_ptr<Mesh> ParentMesh;
 	std::vector<std::shared_ptr<Mesh>> ChildMesh;
 	std::shared_ptr<Material> MeshMaterial;

@@ -47,7 +47,7 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
     std::vector<Frame2D> ClimbAnimation =
     {
         Frame2D(UVSize.x * 8, 0.0f),
-        Frame2D(1 - (UVSize.x * 9), 0.0f)
+        Frame2D(UVSize.x * 8, 0.0f)
     };
 
     std::vector<Frame2D> ClimbUpAnimation =
@@ -112,15 +112,9 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
         Frame2D(UVSize.x * 9, 0.0f)
     };
 
-    std::vector<Frame2D> LeftClimbAnimation =
-    {
-        Frame2D(UVSize.x * 8, 0.0f)
-    };
-
     std::vector<Frame2D> LeftClimbUpAnimation =
     {
-        Frame2D(UVSize.x * 7, 0.0f),
-        Frame2D(1 - (UVSize.x * 8), 0.0f)
+        Frame2D(UVSize.x * 7, 0.0f)
     };
 
     std::vector<Frame2D> LeftHurtAnimation =
@@ -170,7 +164,6 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
         std::make_shared<Animation2D>(Animation2D(LeftRunAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftSlideAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftJumpAnimation, 0.15f)),
-        std::make_shared<Animation2D>(Animation2D(LeftClimbAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftClimbUpAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftHurtAnimation, 0.15f)),
         std::make_shared<Animation2D>(Animation2D(LeftShootStandAnimation, 0.15f)),
@@ -198,7 +191,16 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) || 
         inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
     {
-        newAnimation = kRunAnimation;
+        if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+        {
+            FlipSprite = false;
+            newAnimation = kRunAnimation;
+        }
+        else
+        {
+            FlipSprite = true;
+            newAnimation = kLeftRunAnimation;
+        }
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
@@ -211,30 +213,43 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
         inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT)) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
-        newAnimation = kShootRunAnimation;
+        if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+        {
+            FlipSprite = false;
+            newAnimation = kShootRunAnimation;
+        }
+        else
+        {
+            FlipSprite = true;
+            newAnimation = kLeftShootRunAnimation;
+        }
     }
 
     if ((inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
         inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN)) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
+        FlipSprite = false;
         newAnimation = kShootClimbAnimation;
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z))
     {
+        FlipSprite = false;
         newAnimation = kJumpAnimation;
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
     {
+        FlipSprite = false;
         newAnimation = kSlideAnimation;
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
+        FlipSprite = false;
         newAnimation = kShootJumpAnimation;
     }
 
@@ -245,14 +260,23 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
         inputManager.IsKeyReleased(KeyboardKey::KEY_UP) &&
         inputManager.IsKeyReleased(KeyboardKey::KEY_DOWN))
     {
- /*       if (FaceRightFlag)
+        if (FlipSprite)
         {
             newAnimation = kStandAnimation;
         }
         else
-        {*/
+        {
             newAnimation = kLeftStandAnimation;
-      //  }
+        }
+    }
+
+    if (FlipSprite)
+    {
+       UVFlip.x = 1.0f;
+    }
+    else
+    {
+      UVFlip.x = 0.0f;
     }
 
     if (newAnimation != AnimationPlayer.GetCurrentAnimationIndex())

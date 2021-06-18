@@ -24,7 +24,13 @@ void Renderer2D::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWi
 
 void Renderer2D::GUIUpdate(VulkanEngine& engine)
 {
-
+    for (int x = 0; x < assetManager->meshManager.MeshList.size(); x++)
+    {
+        ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
+        ImGui::SliderFloat2(("UV " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+        ImGui::SliderFloat2(("Flip UV " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshProperties.UniformDataInfo.UVFlip.x, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
 }
 
 void Renderer2D::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)

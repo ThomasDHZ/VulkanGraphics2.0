@@ -107,8 +107,15 @@ vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 void main() 
 {
    MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
-    
+   vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.x == 1.0f)
+   {
+        texCoords.x = 1.0f - texCoords.x;
+   }
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.y == 1.0f)
+   {
+        texCoords.y = 1.0f - texCoords.y;
+   }
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
    {
 	 discard;
