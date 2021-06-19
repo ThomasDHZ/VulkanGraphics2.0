@@ -16,9 +16,6 @@ struct Vertex
 	float	  Padding4 = 0.0f;
 	glm::vec3 BiTangant = glm::vec3(0.0f);
 	float	  Padding5 = 0.0f;
-	glm::vec4 Color = glm::vec4(0.0f);
-	glm::ivec4 BoneID = glm::ivec4(0);
-	glm::vec4 BoneWeights = glm::vec4(0.0f);
 	
 	static VkVertexInputBindingDescription GetBindingDescription()
 	{
@@ -64,24 +61,6 @@ struct Vertex
 		AttributeDescription.location = 4;
 		AttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
 		AttributeDescription.offset = offsetof(Vertex, BiTangant);
-		AttributeDescriptions.emplace_back(AttributeDescription);
-
-		AttributeDescription.binding = 0;
-		AttributeDescription.location = 5;
-		AttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
-		AttributeDescription.offset = offsetof(Vertex, Color);
-		AttributeDescriptions.emplace_back(AttributeDescription);
-
-		AttributeDescription.binding = 0;
-		AttributeDescription.location = 6;
-		AttributeDescription.format = VK_FORMAT_R32G32B32A32_SINT;
-		AttributeDescription.offset = offsetof(Vertex, BoneID);
-		AttributeDescriptions.emplace_back(AttributeDescription);
-
-		AttributeDescription.binding = 0;
-		AttributeDescription.location = 7;
-		AttributeDescription.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		AttributeDescription.offset = offsetof(Vertex, BoneWeights);
 		AttributeDescriptions.emplace_back(AttributeDescription);
 
 		return AttributeDescriptions;

@@ -26,9 +26,6 @@ struct Vertex
 	float Padding4;
 	vec3  BiTangant;
 	float Padding5;
-	vec4  Color;
-	ivec4 BoneID;
-	vec4  BoneWeights;
  };
 
  struct Bones
