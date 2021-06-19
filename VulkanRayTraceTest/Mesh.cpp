@@ -237,7 +237,6 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	{
 		for (auto bone : BoneList)
 		{
-			MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 			BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
 		BoneTransformBuffer.CopyBufferToMemory(engine.Device, BoneTransform.data(), sizeof(glm::mat4) * BoneTransform.size());
