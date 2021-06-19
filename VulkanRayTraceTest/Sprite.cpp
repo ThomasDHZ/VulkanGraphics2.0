@@ -68,6 +68,6 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
 {
     AnimationPlayer.Update(timer2);
 
-    UVOffset = AnimationPlayer.GetCurrentFrame();
+    UVOffset = AnimationPlayer.GetFrame();
     Mesh::Update(engine, inputManager, materialManager, timer);
 }

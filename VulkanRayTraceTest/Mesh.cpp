@@ -159,7 +159,7 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	if (BoneCount != 0)
 	{
 		BoneWeightBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(MeshBoneWeights) * BoneWeightList.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, BoneWeightList.data());
-		BoneTransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4) * BoneCount, VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &BoneTransform);
+		BoneTransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4) * BoneTransform.size(), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, BoneTransform.data());
 	}
 	TransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	TransformInverseBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
@@ -240,7 +240,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 			MeshProperties.UniformDataInfo.BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 			BoneTransform[bone->BoneID] = bone->FinalTransformMatrix;
 		}
-		BoneTransformBuffer.CopyBufferToMemory(engine.Device, &BoneTransform, sizeof(BoneTransform));
+		BoneTransformBuffer.CopyBufferToMemory(engine.Device, BoneTransform.data(), sizeof(glm::mat4) * BoneTransform.size());
 	}
 	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
 	MeshProperties.UniformDataInfo.UVOffset = UVOffset;

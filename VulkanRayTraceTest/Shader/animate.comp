@@ -49,7 +49,7 @@ layout(binding = 3) buffer MeshProperties
 	float maxLayers;
 } meshProperties[];
 
-layout(binding = 5) buffer BoneTransform { mat4 Transform; } MeshBoneTransform[];
+layout(binding = 5, scalar) buffer BoneTransform { mat4 Transform[]; } MeshBoneTransform;
 layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 
 void main()
@@ -58,10 +58,10 @@ void main()
   Bones b = bone.b[gl_GlobalInvocationID.x];
 
   mat4 BoneTransform = mat4(1.0f);
-  BoneTransform =  meshProperties[0].BoneTransform[b.BoneID[0]] * b.BoneWeights[0];
-  BoneTransform += meshProperties[0].BoneTransform[b.BoneID[1]] * b.BoneWeights[1];
-  BoneTransform += meshProperties[0].BoneTransform[b.BoneID[2]] * b.BoneWeights[2];
-  BoneTransform += meshProperties[0].BoneTransform[b.BoneID[3]] * b.BoneWeights[3];
+  BoneTransform =  MeshBoneTransform.Transform[b.BoneID[0]] * b.BoneWeights[0];
+  BoneTransform += MeshBoneTransform.Transform[b.BoneID[1]] * b.BoneWeights[1];
+  BoneTransform += MeshBoneTransform.Transform[b.BoneID[2]] * b.BoneWeights[2];
+  BoneTransform += MeshBoneTransform.Transform[b.BoneID[3]] * b.BoneWeights[3];
   vec4 BonePosition = BoneTransform * vec4(v0.Position, 1.0);
 
   v0.Position = vec3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[0].Transform * BonePosition);

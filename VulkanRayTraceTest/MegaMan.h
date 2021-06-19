@@ -43,6 +43,7 @@ private:
 		kLeftShootClimbAnimation
 	};
 
+	bool LastFlipSprite = false;
 	bool FlipSprite = false;
 	bool MegaManStatus;
 	MegaManAnimation CurrentAnimation;

@@ -17,6 +17,7 @@ public:
 	void Update(std::shared_ptr<Timer> timer);
 	std::shared_ptr<Animation2D> GetCurrentAnimation() { return CurrentAnimation; }
 	uint32_t GetCurrentAnimationIndex() { return AnimationIndex; }
-	Frame2D GetCurrentFrame() { return CurrentAnimation->GetFrame(); }
+	uint32_t GetCurrentFrame() { return CurrentAnimation->GetCurrentFrame(); }
+	Frame2D GetFrame() { return CurrentAnimation->GetFrame(); }
 };
 

@@ -221,6 +221,21 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
         inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
     {
+        if (AnimationPlayer.GetCurrentAnimationIndex() == kClimbAnimation)
+        {
+            if (AnimationPlayer.GetCurrentFrame() == 0)
+            {
+                FlipSprite = true;
+            }
+            else
+            {
+                FlipSprite = false;
+            }
+        }
+        else
+        {
+            LastFlipSprite = FlipSprite;
+        }
         newAnimation = kClimbAnimation;
     }
 
