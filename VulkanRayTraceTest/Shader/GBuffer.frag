@@ -62,10 +62,9 @@ layout(binding = 10) uniform samplerCube CubeMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
-layout(location = 2) in vec4 Color;
-layout(location = 3) in vec3 Normal;
-layout(location = 4) in vec4 Tangent;
-layout(location = 5) in vec4 BiTangent;
+layout(location = 2) in vec3 Normal;
+layout(location = 3) in vec4 Tangent;
+layout(location = 4) in vec4 BiTangent;
 
 layout(location = 0) out vec4 GPosition;
 layout(location = 1) out vec4 GAlebdo;
