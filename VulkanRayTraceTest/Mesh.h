@@ -27,6 +27,13 @@ enum MeshTypeFlag
 	Mesh_Type_SkyBox = 0x02,
 	Mesh_Type_Billboard = 0x04
 };
+
+struct MeshBoneWeights
+{
+	glm::ivec4 BoneID = glm::ivec4(0);
+	glm::vec4 BoneWeights = glm::vec4(0.0f);
+};
+
 class Mesh
 {
 private:
@@ -64,9 +71,11 @@ public:
 	glm::vec3 MeshRotation = glm::vec3(0.0f);
 	glm::vec3 MeshScale = glm::vec3(1.0f);
 	std::vector<glm::mat4> BoneTransform;
+	std::vector<MeshBoneWeights> BoneWeightList;
 
 	VulkanBuffer IndexBuffer;
 	VulkanBuffer VertexBuffer;
+	VulkanBuffer BoneWeightBuffer;
 	VulkanBuffer BoneTransformBuffer;
 	VulkanBuffer TransformBuffer;
 	VulkanBuffer TransformInverseBuffer;
@@ -86,7 +95,7 @@ public:
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, uint32_t boneCount, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	~Mesh();
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

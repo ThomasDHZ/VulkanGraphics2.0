@@ -27,14 +27,18 @@ struct Vertex
 	vec3  BiTangant;
 	float Padding5;
 	vec4  Color;
-	ivec4 BoneID ;
+	ivec4 BoneID;
 	vec4  BoneWeights;
  };
 
-layout(binding = 0, scalar) buffer Vertices
-{
-  Vertex v[];
-}vertices;
+ struct Bones
+ {
+ 	ivec4 BoneID;
+	vec4  BoneWeights;
+ };
+
+layout(binding = 0, scalar) buffer Vertices { Vertex v[]; }vertices;
+layout(binding = 1, scalar) buffer Bonesz { Bones b[]; }bone;
 
 layout(binding = 3) buffer MeshProperties 
 {
@@ -54,12 +58,13 @@ layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
 void main()
 {
   Vertex v0 = vertices.v[gl_GlobalInvocationID.x];
+  Bones b = bone.b[gl_GlobalInvocationID.x];
 
   mat4 BoneTransform = mat4(1.0f);
-  BoneTransform =  meshProperties[0].BoneTransform[v0.BoneID[0]] * v0.BoneWeights[0];
-  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[1]] * v0.BoneWeights[1];
-  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[2]] * v0.BoneWeights[2];
-  BoneTransform += meshProperties[0].BoneTransform[v0.BoneID[3]] * v0.BoneWeights[3];
+  BoneTransform =  meshProperties[0].BoneTransform[b.BoneID[0]] * b.BoneWeights[0];
+  BoneTransform += meshProperties[0].BoneTransform[b.BoneID[1]] * b.BoneWeights[1];
+  BoneTransform += meshProperties[0].BoneTransform[b.BoneID[2]] * b.BoneWeights[2];
+  BoneTransform += meshProperties[0].BoneTransform[b.BoneID[3]] * b.BoneWeights[3];
   vec4 BonePosition = BoneTransform * vec4(v0.Position, 1.0);
 
   v0.Position = vec3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[0].Transform * BonePosition);

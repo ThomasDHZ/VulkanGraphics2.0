@@ -154,12 +154,13 @@ void Model::LoadMesh(VulkanEngine& engine, MeshManager& meshManager, MaterialMan
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
 		 auto vertices = LoadVertices(mesh);
+		 auto boneWeights = LoadBoneWeights(mesh, vertices);
 		 auto indices = LoadIndices(mesh);
 		 auto materialID = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
 		
 		LoadBones(engine, scene->mRootNode, mesh, vertices);
 
-		meshManager.AddMesh(std::make_shared<Mesh>(engine, vertices, indices, materialID, BoneList.size(), DrawFlags));
+		meshManager.AddMesh(std::make_shared<Mesh>(Mesh(engine, vertices, indices, materialID, boneWeights, BoneList.size(), DrawFlags)));
 		meshManager.MeshList.back()->ParentModelID = ModelID;
 		meshManager.MeshList.back()->VertexList = vertices;
 		meshManager.MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
@@ -192,15 +193,6 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.Position = glm::vec3{ mesh->mVertices[x].x, mesh->mVertices[x].y, mesh->mVertices[x].z };
 		vertex.Normal = glm::vec3{ mesh->mNormals[x].x, mesh->mNormals[x].y, mesh->mNormals[x].z };
 
-	
-	/*	if(mesh->mColors[x])
-		{
-			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
-		}
-		else
-		{*/
-			vertex.Color = glm::vec4{ 0.6f, 0.6f, 0.6f, 1.0f };
-		//}
 		if (mesh->mTangents)
 		{
 			vertex.Tangant = glm::vec4{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z, 0.0f };
@@ -220,44 +212,47 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 			vertex.TexureCoord = glm::vec2{ 0.0f, 0.0f };
 		}
 
-		vertex.BoneID = glm::vec4(0.0f);
-		vertex.BoneWeights = glm::vec4(0.0f);
-
 		VertexList.emplace_back(vertex);
 		ModelVertices.emplace_back(vertex);
 	}
 
+	return VertexList;
+}
+
+std::vector<MeshBoneWeights> Model::LoadBoneWeights(aiMesh* mesh, std::vector<Vertex>& VertexList)
+{
+	std::vector<MeshBoneWeights> BoneWeightList(VertexList.size());
 	for (int x = 0; x < mesh->mNumBones; x++)
 	{
 		std::vector<unsigned int> AffectedVertices;
-		AffectedVertices.resize(VertexList.size(), 0);
+		AffectedVertices.resize(BoneWeightList.size(), 0);
 
 		aiBone* bone = mesh->mBones[x];
 		for (int y = 0; y < bone->mNumWeights; y++)
 		{
 			unsigned int vertexID = bone->mWeights[y].mVertexId;
 			float weight = bone->mWeights[y].mWeight;
-			BoneWeightPlacement(VertexList, vertexID, x, weight);
+			BoneWeightPlacement(BoneWeightList, vertexID, x, weight);
 		}
 	}
 
-	for (int x = 0; x < VertexList.size(); x++)
+	for (int x = 0; x < BoneWeightList.size(); x++)
 	{
-		float Weight = VertexList[x].BoneWeights.x +
-			VertexList[x].BoneWeights.y +
-			VertexList[x].BoneWeights.z +
-			VertexList[x].BoneWeights.w;
+		float Weight = BoneWeightList[x].BoneWeights.x +
+			BoneWeightList[x].BoneWeights.y +
+			BoneWeightList[x].BoneWeights.z +
+			BoneWeightList[x].BoneWeights.w;
 		if (Weight != 1.0f)
 		{
-			VertexList[x].BoneWeights = glm::vec4(
-				VertexList[x].BoneWeights.x / Weight,
-				VertexList[x].BoneWeights.y / Weight,
-				VertexList[x].BoneWeights.z / Weight,
-				VertexList[x].BoneWeights.w / Weight);
+			BoneWeightList[x].BoneWeights = glm::vec4(
+				BoneWeightList[x].BoneWeights.x / Weight,
+				BoneWeightList[x].BoneWeights.y / Weight,
+				BoneWeightList[x].BoneWeights.z / Weight,
+				BoneWeightList[x].BoneWeights.w / Weight);
 		}
 	}
 
-	return VertexList;
+	return BoneWeightList;
 }
 
 std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
@@ -370,14 +365,14 @@ std::shared_ptr<Material> Model::LoadMaterial(VulkanEngine& engine, MaterialMana
 	return materailManager.LoadMaterial(engine, "sfsd", ModelMaterial);
 }
 
-void Model::BoneWeightPlacement(std::vector<Vertex>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight)
+void Model::BoneWeightPlacement(std::vector<MeshBoneWeights>& meshBoneWeight, unsigned int vertexID, unsigned int bone_id, float weight)
 {
 	for (unsigned int i = 0; i < MAX_BONE_VERTEX_COUNT; i++)
 	{
-		if (VertexList[vertexID].BoneWeights[i] == 0.0)
+		if (meshBoneWeight[vertexID].BoneWeights[i] == 0.0)
 		{
-			VertexList[vertexID].BoneID[i] = bone_id;
-			VertexList[vertexID].BoneWeights[i] = weight;
+			meshBoneWeight[vertexID].BoneID[i] = bone_id;
+			meshBoneWeight[vertexID].BoneWeights[i] = weight;
 			return;
 		}
 	}

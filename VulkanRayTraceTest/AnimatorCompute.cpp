@@ -38,6 +38,7 @@ void AnimatorCompute::SetUpDescriptorPool(VulkanEngine& engine)
 	DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
 	DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
 	DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+	DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
 	descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
@@ -45,6 +46,7 @@ void AnimatorCompute::SetUpDescriptorLayout(VulkanEngine& engine)
 {
 	std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
+	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
@@ -58,14 +60,16 @@ void AnimatorCompute::SetUpDescriptorSets(VulkanEngine& engine)
 	descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorLayout);
 
 	VkDescriptorBufferInfo VertexBufferInfo = engine.AddBufferDescriptor(mesh->VertexBuffer);
-	VkDescriptorBufferInfo MeshDataufferInfo = engine.AddBufferDescriptor(mesh->MeshProperties.VulkanBufferData);
+	VkDescriptorBufferInfo BoneWeightBufferInfo = engine.AddBufferDescriptor(mesh->BoneWeightBuffer);
+	VkDescriptorBufferInfo MeshDataBufferInfo = engine.AddBufferDescriptor(mesh->MeshProperties.VulkanBufferData);
 	VkDescriptorBufferInfo BoneTransformBufferInfo = engine.AddBufferDescriptor(mesh->BoneTransformBuffer);
 	VkDescriptorBufferInfo TransformDataBufferInfo = engine.AddBufferDescriptor(mesh->TransformBuffer);
 
 	std::vector<VkWriteDescriptorSet> DescriptorList;
 	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshDataufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(5, descriptorSets, MeshDataufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(1, descriptorSets, BoneWeightBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(3, descriptorSets, MeshDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(5, descriptorSets, BoneTransformBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
 	DescriptorList.emplace_back(engine.AddBufferDescriptorSet(6, descriptorSets, TransformDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
 	vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
