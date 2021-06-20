@@ -8,13 +8,17 @@
 #include "Lighting.glsl"
 #include "Material.glsl"
 
-layout(push_constant) uniform RayTraceCamera
+layout(push_constant) uniform RayTraceConstants
 {
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
     uint frame;
-} Camera;
+    int AntiAliasingCount;
+    int MaxRefeflectCount;
+    int  ApplyAntiAliasing;
+} ConstData;
+
 struct RayHitInfo
 {
 	vec3 color;

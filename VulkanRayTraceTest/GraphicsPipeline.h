@@ -1,12 +1,15 @@
 #pragma once
 #include "VulkanEngine.h"
 
-struct RayTraceCamera
+struct RayTraceConstants
 {
 	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
 	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 	alignas(16) glm::vec3 CameraPos = glm::vec3(0.0f);
-	alignas(4) uint32_t frame;
+	alignas(4) uint32_t frame = 0;
+	alignas(4) int      AntiAliasingCount = 10;
+	alignas(4) int      MaxRefeflectCount = 15;
+	alignas(4) int	    ApplyAntiAliasing = 1;
 };
 
 struct ConstMeshInfo

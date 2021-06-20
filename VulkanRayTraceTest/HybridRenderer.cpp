@@ -76,6 +76,8 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Vulk
 
 void HybridRenderer::GUIUpdate(VulkanEngine& engine)
 {
+    rayTraceRenderPass.GUIUpdate();
+
     ImGui::Image(FrameBufferTextureRenderer2.NormalMapTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::LabelText("Directional Light", "Directional Light");
     for (int x = 0; x < assetManager->lightManager.DirectionalLightList.size(); x++)

@@ -7,6 +7,7 @@
 class RayTraceRenderPass
 {
 private:
+    RayTraceConstants RTXConst;
     VulkanBuffer instancesBuffer;
     void SetUpCommandBuffers(VulkanEngine& engine);
     uint32_t Frame = 0;
@@ -32,6 +33,7 @@ public:
     ~RayTraceRenderPass();
 
     void SetUpTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+    void GUIUpdate();
     void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID renderID, std::shared_ptr<Camera> ViewCamera);
     void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
     void Destroy(VulkanEngine& engine);

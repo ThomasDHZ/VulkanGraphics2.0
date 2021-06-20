@@ -8,12 +8,15 @@
 #include "Lighting.glsl"
 #include "Material.glsl"
 
-layout(push_constant) uniform RayTraceCamera
+layout(push_constant) uniform RayTraceConstants
 {
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
     uint frame;
+    int AntiAliasingCount;
+    int MaxRefeflectCount;
+    int  ApplyAntiAliasing;
 } ConstMesh;
 
 struct RayPayload {
@@ -150,7 +153,7 @@ void main()
      }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
        if(material.Reflectivness > 0.0f &&
-       rayHitInfo.reflectCount != 13)
+       rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
     {
         vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
@@ -163,7 +166,7 @@ void main()
     else
 	{
         result = baseColor;
-        rayHitInfo.reflectCount = 20;
+        rayHitInfo.reflectCount = ConstMesh.MaxRefeflectCount;
 	}
 
 //    	for (int x = 0; x < 20; x++) 

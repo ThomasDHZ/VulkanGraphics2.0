@@ -9,13 +9,16 @@
 #include "Material.glsl"
 #include "RTXRandom.glsl"
 
-layout(push_constant) uniform RayTraceCamera
+layout(push_constant) uniform RayTraceConstants
 {
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
     uint frame;
-} ConstMesh;
+    int AntiAliasingCount;
+    int MaxRefeflectCount;
+    int  ApplyAntiAliasing;
+} ConstData;
 
 struct RayPayload {
 	vec3 color;
@@ -199,8 +202,7 @@ void main()
     vec3 kS = F;
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - material.Metallic;	  
-    
-    uint SampleCount =  256;
+
     vec3 irradiance = vec3(0.0f);
   //  vec3 irradiance = Irradiate(vertex, material.Metallic, SampleCount);
     
@@ -209,7 +211,7 @@ void main()
     float totalWeight = 0.0f;
     vec3 prefilter = vec3(0.0f);
     vec3 specular = vec3(0.0f);
-    if(rayHitInfo.reflectCount2 != SampleCount)
+    if(rayHitInfo.reflectCount2 != ConstData.MaxRefeflectCount)
     {
          float r1        = rnd(rayHitInfo.seed);
          float r2        = rnd(rayHitInfo.seed);
@@ -217,7 +219,7 @@ void main()
          float phi       = 2 * PI * r1;
          vec3 scatter   = vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2));
 
-        vec2 Xi = Hammersley(rayHitInfo.reflectCount2, SampleCount);
+        vec2 Xi = Hammersley(rayHitInfo.reflectCount2, ConstData.MaxRefeflectCount);
         vec3 H = ImportanceSampleGGX(Xi, N, material.Roughness);
         vec3 L  = normalize(2.0 * dot(V, H) * H - V);
 
@@ -231,7 +233,7 @@ void main()
             float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
 
             float saTexel  = 4.0 * PI / 6.0f;
-            float saSample = 1.0 / (float(SampleCount) * pdf + 0.0001);
+            float saSample = 1.0 / (float(ConstData.MaxRefeflectCount) * pdf + 0.0001);
             float mipLevel = material.Roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
             scatter *= mipLevel;
 
@@ -330,11 +332,10 @@ vec3 getNormalFromMap(PBRMaterial material, Vertex vertex)
     return TBN * normal;
 }
 
-vec3 Irradiate(Vertex vertex, float metallic, uint SampleCount)
+vec3 Irradiate(Vertex vertex, float metallic)
 {
-    const uint MaxReflectCount  = SampleCount; 
     vec3 irradiance = vec3(0.0f);
-    if(rayHitInfo.reflectCount != MaxReflectCount)
+    if(rayHitInfo.reflectCount != ConstData.MaxRefeflectCount)
     {
         float r1        = rnd(rayHitInfo.seed);
         float r2        = rnd(rayHitInfo.seed);

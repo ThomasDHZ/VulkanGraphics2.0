@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stb_image.h>
 #include "SceneData.h"
+#include "ImGui/imgui.h"
 
 RayTraceRenderPass::RayTraceRenderPass()
 {
@@ -121,6 +122,13 @@ void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(VulkanEngine& engine
     instancesBuffer.DestoryBuffer(engine.Device);
 }
 
+void RayTraceRenderPass::GUIUpdate()
+{
+    ImGui::SliderInt("Apply Anti-Aliasing:", &RTXConst.ApplyAntiAliasing, 0, 1);
+    ImGui::SliderInt("Max Anti-Aliasing Coun", &RTXConst.AntiAliasingCount, 0, 15);
+    ImGui::SliderInt("Max Refeflect Count", &RTXConst.MaxRefeflectCount, 0, 1024);
+}
+
 void RayTraceRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
@@ -169,26 +177,25 @@ void RayTraceRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
 
     VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 
-    RayTraceCamera cameraInfo;
-    cameraInfo.proj = glm::inverse(ViewCamera->GetProjectionMatrix());
-    cameraInfo.proj[1][1] *= -1;
-    cameraInfo.view = glm::inverse(ViewCamera->GetViewMatrix());
-    cameraInfo.CameraPos = ViewCamera->GetPosition();
-    cameraInfo.frame = Frame++;
+    RTXConst.proj = glm::inverse(ViewCamera->GetProjectionMatrix());
+    RTXConst.proj[1][1] *= -1;
+    RTXConst.view = glm::inverse(ViewCamera->GetViewMatrix());
+    RTXConst.CameraPos = ViewCamera->GetPosition();
+    RTXConst.frame = Frame++;
 
-    if (cameraInfo.proj != LastCameraProjection)
+    if (RTXConst.proj != LastCameraProjection)
     {
         Frame = 0;
     }
-    if (cameraInfo.view != LastCameraView)
+    if (RTXConst.view != LastCameraView)
     {
         Frame = 0;
     }
 
-    LastCameraProjection = cameraInfo.proj;
-    LastCameraView = cameraInfo.view;
+    LastCameraProjection = RTXConst.proj;
+    LastCameraView = RTXConst.view;
 
-    vkCmdPushConstants(RayTraceCommandBuffer, ActivePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 0, sizeof(RayTraceCamera), &cameraInfo);
+    vkCmdPushConstants(RayTraceCommandBuffer, ActivePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 0, sizeof(RayTraceConstants), &RTXConst);
     vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, ActivePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, ActivePipeline->ShaderPipelineLayout, 0, 1, &ActivePipeline->DescriptorSets, 0, 0);
     if (ActivePipeline == RTHybridPipeline)

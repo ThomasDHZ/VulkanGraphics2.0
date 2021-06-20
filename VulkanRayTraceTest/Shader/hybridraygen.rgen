@@ -4,13 +4,16 @@
 
 #include "Lighting.glsl"
 
-layout(push_constant) uniform RayTraceCamera
+layout(push_constant) uniform RayTraceConstants
 {
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
     uint frame;
-} Camera;
+    int AntiAliasingCount;
+    int MaxRefeflectCount;
+    int  ApplyAntiAliasing;
+} ConstData;
 
 struct RayPayload {
 	vec3 color;
@@ -50,9 +53,9 @@ void main()
 	const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
 	vec2 d = inUV * 2.0 - 1.0;
 
-	vec4 origin = Camera.view * vec4(0,0,0,1);
-	vec4 target = Camera.proj * vec4(d.x, d.y, 1, 1) ;
-	vec4 direction = Camera.view*vec4(normalize(target.xyz / target.w), 0);
+	vec4 origin = ConstData.view * vec4(0,0,0,1);
+	vec4 target = ConstData.proj * vec4(d.x, d.y, 1, 1) ;
+	vec4 direction = ConstData.view*vec4(normalize(target.xyz / target.w), 0);
 
 	uint rayFlags = gl_RayFlagsOpaqueEXT;
 	uint cullMask = 0xff;

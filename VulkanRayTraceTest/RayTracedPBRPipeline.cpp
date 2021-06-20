@@ -118,7 +118,7 @@ void RayTracedPBRPipeline::SetUpPipeline(VulkanEngine& engine)
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR;
     pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(RayTraceCamera);
+    pushConstantRange.size = sizeof(RayTraceConstants);
 
     VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
     PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;

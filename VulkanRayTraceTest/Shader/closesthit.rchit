@@ -8,11 +8,15 @@
 #include "Lighting.glsl"
 #include "Material.glsl"
 
-layout(push_constant) uniform RayTraceCamera
+layout(push_constant) uniform RayTraceConstants
 {
     mat4 proj;
     mat4 view;
     vec3 CameraPos;
+    uint frame;
+    int AntiAliasingCount;
+    int MaxRefeflectCount;
+    int  ApplyAntiAliasing;
 } ConstMesh;
 
 struct RayPayload {
@@ -96,8 +100,10 @@ layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialLis
 layout(binding = 11) uniform sampler2D TextureMap[];
 layout(binding = 12) uniform sampler3D Texture3DMap[];
 
+Vertex vertex;
 MaterialInfo material;
 mat3 TBN;
+
 #include "RTVertexBuilder.glsl"
 #include "MaterialBuilder.glsl"
 #include "BlinePhongLighting.glsl"
@@ -106,53 +112,56 @@ vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
 void main()
 {
-    Vertex vertex = BuildVertexInfo();
-    material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-    vec2 texCoords = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
-
+vertex = BuildVertexInfo();
+   material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
    const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
    const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
    const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-    TBN = transpose(mat3(T, B, N));
+   TBN = transpose(mat3(T, B, N));
 
     vec3 result = vec3(0.0f);
     vec3 baseColor = vec3(0.0f);
     vec3 normal = vertex.normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
-    vec3 FragPos2  = vertex.pos;
+    vec3 FragPos  = vertex.pos;
     if(material.NormalMapID != 0)
     {
         ViewPos  = TBN * ConstMesh.CameraPos;
-        FragPos2  = TBN * vertex.pos;
+        FragPos  = TBN * vertex.pos;
     }
-    const vec3 viewDir = normalize(ViewPos - FragPos2);
+    const vec3 viewDir = normalize(ViewPos - FragPos);
+
+    vec3 view = normalize(viewDir);
+    vec3 hitposz =  normalize(gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT);
+    float fresnal = dot(view, hitposz);
 
     if(material.NormalMapID != 0)
     {
-        if(material.DepthMapID != 0)
-        {
-            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
-        }
-        normal = texture(TextureMap[material.NormalMapID], texCoords).rgb;
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
+        normal = texture(TextureMap[material.NormalMapID], vertex.uv).rgb;
         normal = normalize(normal * 2.0 - 1.0);
      }
      for(int x = 0; x < scenedata.DirectionalLightCount; x++)
      {
-        baseColor += CalcNormalDirLight(FragPos2, normal, vertex.uv, x);
+        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
      }
      for(int x = 0; x < scenedata.PointLightCount; x++)
      {
        // result += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
      }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
-    
-    const int MaxReflectCount = 9;
-    if(material.Reflectivness > 0.0f &&
-       rayHitInfo.reflectCount != MaxReflectCount)
+       if(rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
     {
         vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
-        vec3 origin   = hitPos.xyz + normal * 0.001f;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, normal);
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
 
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
@@ -161,10 +170,33 @@ void main()
     else
 	{
         result = baseColor;
-        rayHitInfo.reflectCount = MaxReflectCount;
+        rayHitInfo.reflectCount = ConstMesh.MaxRefeflectCount;
 	}
 
+//    	for (int x = 0; x < 20; x++) 
+//	{
+//		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+//		if(x == 0)
+//		{
+//			BaseColor = rayPayload.color;
+//		}
+//		finalColor = mix(BaseColor, rayPayload.color, rayPayload.MaterialReflect);
+//		
+//
+//		if (rayPayload.reflector == 1.0f) 
+//		{
+//			const vec4 hitPos = origin + direction * rayPayload.distance;
+//			origin.xyz = hitPos.xyz + rayPayload.normal * 0.001f;
+//			direction.xyz = reflect(direction.xyz, rayPayload.normal);
+//		} 
+//		else 
+//		{
+//			break;
+//		}
+//	}
+
     rayHitInfo.color = result;
+	//rayHitInfo.distance = 10000.0f;
 	rayHitInfo.normal = vertex.normal;
 }
 

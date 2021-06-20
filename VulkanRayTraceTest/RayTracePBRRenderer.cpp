@@ -23,6 +23,8 @@ void RayTracePBRRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr
 
 void RayTracePBRRenderer::GUIUpdate(VulkanEngine& engine)
 {
+    rayTraceRenderPass.GUIUpdate();
+
     ImGui::LabelText("Material", "Material");
     for (int x = 0; x < assetManager->materialManager.MaterialList.size(); x++)
     {
