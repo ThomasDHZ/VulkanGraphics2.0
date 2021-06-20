@@ -4,10 +4,12 @@ AnimationPlayer2D::AnimationPlayer2D()
 {
 }
 
-AnimationPlayer2D::AnimationPlayer2D(std::vector<std::shared_ptr<Animation2D>> animationList, uint32_t DefaultAnimation)
+AnimationPlayer2D::AnimationPlayer2D(std::vector<std::shared_ptr<Animation2D>> animationList, glm::ivec2 singleSpriteSize, uint32_t spritesInSpriteSheet, uint32_t DefaultAnimation)
 {
 	AnimationIndex = DefaultAnimation;
 	AnimationList = animationList;
+	SingleSpriteSize = singleSpriteSize;
+	SpriesInSpriteSheet = spritesInSpriteSheet;
 	CurrentAnimation = AnimationList[DefaultAnimation];
 }
 
@@ -34,6 +36,6 @@ void AnimationPlayer2D::Update(std::shared_ptr<Timer> timer)
 {
 	if (AnimationList.size() >= 1)
 	{
-		CurrentAnimation->Update(timer);
+		CurrentAnimation->Update(timer, SingleSpriteSize, SpriesInSpriteSheet);
 	}
 }

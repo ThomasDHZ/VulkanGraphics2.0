@@ -15,7 +15,7 @@ Animation2D::Animation2D(std::vector<Frame2D> frameList, float frameHoldTime, ui
 	FrameHoldTime = frameHoldTime;
 }
 
-void Animation2D::Update(std::shared_ptr<Timer> timer)
+void Animation2D::Update(std::shared_ptr<Timer> timer, glm::ivec2 SingleSpriteSize, uint32_t SpriesInSpriteSheet)
 {
 	CurrentFrameTime += timer->GetFrameTime();
 	while (CurrentFrameTime >= FrameHoldTime)

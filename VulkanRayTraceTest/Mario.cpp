@@ -27,7 +27,7 @@ Mario::Mario(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Positio
         std::make_shared<Animation2D>(Animation2D(StandAnimation, 0.1f))
     };
 
-    AnimationPlayer = AnimationPlayer2D(AnimationList);
+    AnimationPlayer = AnimationPlayer2D(AnimationList, SingleSpriteSize, SpritesInSpriteSheet, 0);
 }
 
 Mario::~Mario()

@@ -180,7 +180,7 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
         std::make_shared<Animation2D>(Animation2D(LeftShootClimbAnimation, 0.15f))
     };
     
-    AnimationPlayer = AnimationPlayer2D(AnimationList);
+    AnimationPlayer = AnimationPlayer2D(AnimationList, SingleSpriteSize, SpritesInSpriteSheet, 0);
 }
 
 MegaMan::~MegaMan()
