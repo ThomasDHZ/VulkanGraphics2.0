@@ -4,11 +4,11 @@ AnimationPlayer2D::AnimationPlayer2D()
 {
 }
 
-AnimationPlayer2D::AnimationPlayer2D(std::vector<std::shared_ptr<Animation2D>> animationList, glm::ivec2 singleSpriteSize, uint32_t spritesInSpriteSheet, uint32_t DefaultAnimation)
+AnimationPlayer2D::AnimationPlayer2D(std::vector<std::shared_ptr<Animation2D>> animationList, glm::vec2 spriteUVSize, uint32_t spritesInSpriteSheet, uint32_t DefaultAnimation)
 {
 	AnimationIndex = DefaultAnimation;
 	AnimationList = animationList;
-	SingleSpriteSize = singleSpriteSize;
+	SpriteUVSize = spriteUVSize;
 	SpriesInSpriteSheet = spritesInSpriteSheet;
 	CurrentAnimation = AnimationList[DefaultAnimation];
 }
@@ -32,10 +32,10 @@ void AnimationPlayer2D::SetAnimation(uint32_t animationIndex)
 	CurrentAnimation = AnimationList[animationIndex];
 }
 
-void AnimationPlayer2D::Update(std::shared_ptr<Timer> timer)
+void AnimationPlayer2D::Update(std::shared_ptr<Timer> timer, bool FlipSpriteX)
 {
 	if (AnimationList.size() >= 1)
 	{
-		CurrentAnimation->Update(timer, SingleSpriteSize, SpriesInSpriteSheet);
+		CurrentAnimation->Update(timer, SpriteUVSize, SpriesInSpriteSheet, FlipSpriteX);
 	}
 }

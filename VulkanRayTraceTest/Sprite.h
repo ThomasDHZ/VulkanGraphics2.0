@@ -7,6 +7,8 @@ class Sprite : public Mesh
 {
 private:
 protected:
+	bool LastFlipSpriteX = false;
+	bool FlipSpriteX = false;
 	std::shared_ptr<Timer> timer2;
 	AnimationPlayer2D AnimationPlayer;
 	void AddAnimation(std::shared_ptr<Animation2D> animation);

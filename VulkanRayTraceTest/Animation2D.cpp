@@ -7,7 +7,7 @@ Animation2D::Animation2D()
 	FrameHoldTime = 0.0f;
 }
 
-Animation2D::Animation2D(std::vector<Frame2D> frameList, float frameHoldTime, uint32_t StartFrame)
+Animation2D::Animation2D(std::vector<FrameOffset> frameList, float frameHoldTime, uint32_t StartFrame)
 {
 	FrameList = frameList;
 	CurrentFrame = StartFrame;
@@ -15,7 +15,7 @@ Animation2D::Animation2D(std::vector<Frame2D> frameList, float frameHoldTime, ui
 	FrameHoldTime = frameHoldTime;
 }
 
-void Animation2D::Update(std::shared_ptr<Timer> timer, glm::ivec2 SingleSpriteSize, uint32_t SpriesInSpriteSheet)
+void Animation2D::Update(std::shared_ptr<Timer> timer, glm::vec2 spriteUVSize, uint32_t SpriesInSpriteSheet, bool FlipSpriteX)
 {
 	CurrentFrameTime += timer->GetFrameTime();
 	while (CurrentFrameTime >= FrameHoldTime)
@@ -26,5 +26,14 @@ void Animation2D::Update(std::shared_ptr<Timer> timer, glm::ivec2 SingleSpriteSi
 			CurrentFrame = 0;
 		}
 		CurrentFrameTime -= FrameHoldTime;
+	}
+
+	if (!FlipSpriteX)
+	{
+		CurrentFrameUV = Frame2D(spriteUVSize.x * FrameList[CurrentFrame].x, 0.0f);
+	}
+	else
+	{
+		CurrentFrameUV = Frame2D(spriteUVSize.x * ((SpriesInSpriteSheet - 1) - FrameList[CurrentFrame].x), 0.0f);
 	}
 }

@@ -22,12 +22,12 @@ Mario::Mario(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Positio
         Frame2D(0.2f, 0.0f)
     };
 
-    std::vector<std::shared_ptr<Animation2D>> AnimationList
-    {
-        std::make_shared<Animation2D>(Animation2D(StandAnimation, 0.1f))
-    };
+    //std::vector<std::shared_ptr<Animation2D>> AnimationList
+    //{
+    //    std::make_shared<Animation2D>(FrameOffset(StandAnimation, 0.1f))
+    //};
 
-    AnimationPlayer = AnimationPlayer2D(AnimationList, SingleSpriteSize, SpritesInSpriteSheet, 0);
+    //AnimationPlayer = AnimationPlayer2D(AnimationList, UVSize, SingleSpriteSize, SpritesInSpriteSheet, 0);
 }
 
 Mario::~Mario()

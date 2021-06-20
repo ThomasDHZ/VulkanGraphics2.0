@@ -66,7 +66,15 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
 
 void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
-    AnimationPlayer.Update(timer2);
+    if (FlipSpriteX)
+    {
+        UVFlip.x = 1.0f;
+    }
+    else
+    {
+        UVFlip.x = 0.0f;
+    }
+    AnimationPlayer.Update(timer2, FlipSpriteX);
 
     UVOffset = AnimationPlayer.GetFrame();
     Mesh::Update(engine, inputManager, materialManager, timer);
