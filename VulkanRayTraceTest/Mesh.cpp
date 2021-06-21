@@ -208,6 +208,7 @@ void Mesh::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMana
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
 
 	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
+	MeshProperties.UniformDataInfo.UVScale = UVScale;
 	MeshProperties.UniformDataInfo.UVFlip = UVFlip;
 
 	MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
@@ -243,6 +244,7 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 	}
 	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
 	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
+	MeshProperties.UniformDataInfo.UVScale = UVScale;
 	MeshProperties.UniformDataInfo.UVFlip = UVFlip;
 
 	glm::mat4 FinalTransform =  MeshTransform;

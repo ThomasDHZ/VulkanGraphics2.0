@@ -45,6 +45,7 @@ layout(binding = 3) buffer MeshProperties
 {
 	mat4 ModelTransform;
 	vec2 UVOffset;
+    vec2 UVScale;
     vec2 UVFlip;
     uint MaterialIndex;
     float heightScale;
@@ -79,10 +80,17 @@ void main()
 
    const MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
-
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
    {
 	 discard;
+   }
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.x == 1.0f)
+   {
+        texCoords.x = 1.0f - texCoords.x;
+   }
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.y == 1.0f)
+   {
+        texCoords.y = 1.0f - texCoords.y;
    }
 
 	GPosition = vec4(FragPos, 1.0f);

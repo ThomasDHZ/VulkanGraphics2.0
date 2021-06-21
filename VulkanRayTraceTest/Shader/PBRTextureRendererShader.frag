@@ -45,6 +45,7 @@ layout(binding = 1) buffer MeshProperties
 {
 	mat4 ModelTransform;
 	vec2 UVOffset;
+    vec2 UVScale;
     vec2 UVFlip;
     uint MaterialIndex;
     float heightScale;
@@ -117,6 +118,14 @@ void main()
    if(material.Alpha == 0.0f)
    {
 	 discard;
+   }
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.x == 1.0f)
+   {
+        texCoords.x = 1.0f - texCoords.x;
+   }
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.y == 1.0f)
+   {
+        texCoords.y = 1.0f - texCoords.y;
    }
 
    vec3 N = Normal;

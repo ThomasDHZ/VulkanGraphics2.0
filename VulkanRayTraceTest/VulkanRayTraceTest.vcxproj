@@ -200,7 +200,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="InterfaceRenderPass.cpp" />
     <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="LevelModel.cpp" />
+    <ClCompile Include="Level2D.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="LightPathRenderer.cpp" />
     <ClCompile Include="LightViewCamera.cpp" />
@@ -406,8 +406,8 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="InterfaceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="LevelModel.h" />
     <ClInclude Include="ForwardRenderPass.h" />
+    <ClInclude Include="Level2D.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="LightPathRenderer.h" />

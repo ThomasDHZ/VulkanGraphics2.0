@@ -52,6 +52,7 @@ layout(binding = 3) buffer MeshProperties
 {
 	mat4 ModelTransform;
 	vec2 UVOffset;
+    vec2 UVScale;
     vec2 UVFlip;
     uint MaterialIndex;
     float heightScale;
@@ -112,8 +113,17 @@ vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
 void main()
 {
-vertex = BuildVertexInfo();
+   vertex = BuildVertexInfo();
    material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+   	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.x == 1.0f)
+	{
+		vertex.uv.x = 1.0f - vertex.uv.x;
+	}
+	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
+	{
+		vertex.uv.y = 1.0f - vertex.uv.y;
+	}
+
    const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
    const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
    const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);

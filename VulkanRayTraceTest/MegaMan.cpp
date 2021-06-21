@@ -99,7 +99,7 @@ MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage
         std::make_shared<Animation2D>(Animation2D(ShootClimbAnimation, 0.15f)),
     };
     
-    AnimationPlayer = AnimationPlayer2D(AnimationList, SpriteUVSize, SpritesInSpriteSheet, 0);
+    AnimationPlayer = AnimationPlayer2D(AnimationList, SpriteUVSize, SpritesInSpriteSheet, kStandAnimation);
 }
 
 MegaMan::~MegaMan()
@@ -113,6 +113,7 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
         newAnimation = kShootStandAnimation;
+        megaManStatus = MegaManStatus::kShooting;
     }
 
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) || 
@@ -148,8 +149,13 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
             LastFlipSpriteX = FlipSpriteX;
         }
         newAnimation = kClimbAnimation;
+        megaManStatus = MegaManStatus::kClimbing;
     }
 
+    if ((megaManStatus & MegaManStatus::kClimbing) != 0)
+    {
+        int a = 34;
+    }
     if ((inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) ||
         inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT)) &&
         inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))

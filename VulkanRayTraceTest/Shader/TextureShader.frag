@@ -46,6 +46,7 @@ layout(binding = 1) buffer MeshProperties
 {
 	mat4 ModelTransform;
 	vec2 UVOffset;
+    vec2 UVScale;
     vec2 UVFlip;
     uint MaterialIndex;
     float heightScale;
@@ -109,12 +110,24 @@ mat3 TBN;
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 void main() 
 {
-    material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-    vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
-    
+   material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
+   vec2 texCoords = TexCoords + meshProperties[ConstMesh.MeshIndex].UVOffset;
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f)
    {
 	 discard;
+   }
+   texCoords *= meshProperties[ConstMesh.MeshIndex].UVScale;
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.y == 1.0f)
+   {
+        texCoords.y = 1.0f - texCoords.y;
+   }
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.x == 1.0f)
+   {
+        texCoords.x = 1.0f - texCoords.x;
+   }
+   if(meshProperties[ConstMesh.MeshIndex].UVFlip.y == 1.0f)
+   {
+        texCoords.y = 1.0f - texCoords.y;
    }
     
     vec3 T = normalize(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[ConstMesh.MeshIndex].Transform) * vec3(Tangent));
