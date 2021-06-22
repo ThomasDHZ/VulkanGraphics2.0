@@ -255,9 +255,3 @@ ModelManifest.xml
 *.ktx2
 *.dds
 *.ipch
-*.bmp
-VulkanRayTraceTest/ForwardRenderPass.cpp
-VulkanRayTraceTest/ForwardRenderPass.h
-VulkanRayTraceTest/Renderer.cpp
-VulkanRayTraceTest/Skybox.cpp
-VulkanRayTraceTest/Skybox.h

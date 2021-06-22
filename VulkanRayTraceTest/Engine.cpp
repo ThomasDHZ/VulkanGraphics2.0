@@ -4,6 +4,7 @@
 #include "TerrainMesh.h"
 #include "BillboardMesh.h"
 #include "Mario.h"
+#include "MetalManStage.h"
 
 Engine::Engine()
 {
@@ -16,6 +17,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MetalManStage>(MetalManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
  /*   assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
   */ 
@@ -24,7 +26,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
     assetManager->AddModel();
     assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[0]);
-    //assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[1]);
+    assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[1]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
     //std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, assetManager->textureManager);
@@ -33,17 +35,17 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //std::shared_ptr<Material> MaterialID2 = assetManager->materialManager.LoadMaterial(engine, "FireMaterial", material2);
     //assetManager->meshManager.MeshList.emplace_back(std::make_shared<BillboardMesh>(BillboardMesh(engine, glm::vec2(3.0f), glm::vec2(1.0f), glm::vec3(2.0f), MaterialID2)));
 
-    assetManager->AddModel(engine, "../Models/Crate.dae");
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
-    material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MetalMan_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB);/*
-    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);*/
-    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MetalMan_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-    //material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MetalMan_height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    std::shared_ptr<Material> MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
-    assetManager->modelManager.ModelList[1]->MeshList[0]->MeshMaterial = MaterialID;
+    //assetManager->AddModel(engine, "../Models/Crate.dae");
+    //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+    //material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MetalMan_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB);/*
+    //material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);*/
+    //material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MetalMan_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    ////material->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+    ////material->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+    ////material->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+    //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MetalMan_height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    //std::shared_ptr<Material> MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
+    //assetManager->modelManager.ModelList[1]->MeshList[0]->MeshMaterial = MaterialID;
 
     assetManager->textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
   // assetManager->AddModel(engine, "../Models/viking_room.obj");
