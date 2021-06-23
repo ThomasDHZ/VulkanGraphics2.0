@@ -1,6 +1,6 @@
 #include "MegaMan.h"
 
-MegaMan::MegaMan()
+MegaMan::MegaMan() : Sprite()
 {
 
 }
@@ -121,10 +121,12 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
         {
+            MeshPosition.x += 0.1f;
             FlipSpriteX = false;
         }
         else
         {
+            MeshPosition.x -= 0.1f;
             FlipSpriteX = true;
         }
         newAnimation = kRunAnimation;
@@ -133,6 +135,15 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
         inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
     {
+        if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP))
+        {
+            MeshPosition.y += 0.1f;
+        }
+        else
+        {
+            MeshPosition.y -= 0.1f;
+        }
+
         if (AnimationPlayer.GetCurrentAnimationIndex() == kClimbAnimation)
         {
             if (AnimationPlayer.GetCurrentFrame() == 0)

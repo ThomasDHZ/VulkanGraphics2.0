@@ -1,6 +1,7 @@
 #include "MeshManager.h"
 #include "WaterSurfaceMesh.h"
 #include "BillboardMesh.h"
+#include "Level2D.h"
 
 MeshManager::MeshManager()
 {
@@ -24,6 +25,7 @@ void MeshManager::Update(VulkanEngine& engine, InputManager& inputManager, Mater
             switch (mesh->MeshType)
             {
             case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, inputManager, materialManager, timer); break;
+            case MeshTypeFlag::Mesh_Type_2D_Level: static_cast<Level2D*>(mesh.get())->Update(engine, MeshList); break;
             case MeshTypeFlag::Mesh_Type_Billboard: static_cast<BillboardMesh*>(mesh.get())->Update(engine, inputManager, materialManager, camera); break;
             default: mesh->Update(engine, inputManager, materialManager, timer);
             };

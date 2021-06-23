@@ -4,7 +4,7 @@
 #include "TerrainMesh.h"
 #include "BillboardMesh.h"
 #include "Mario.h"
-#include "MetalManStage.h"
+#include "SparkManStage.h"
 
 Engine::Engine()
 {
@@ -17,7 +17,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MetalManStage>(MetalManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
  /*   assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
   */ 

@@ -1,12 +1,18 @@
 #pragma once
 #include "Mesh.h"
+#include "TileCollider.h"
+#include "Sprite.h"
 
-typedef glm::ivec2 Tile;
+struct Tile
+{
+	//glm::vec2 TileUVOffset = glm::vec2(0.0f);
+	//Animation2D animation
+};
 class Level2D : public Mesh
 {
 private:
 	std::vector<uint32_t> IndexList;
-
+	std::vector<std::shared_ptr<TileCollider>> ColliderList;
 protected:
 	uint32_t TilesInTileSheet = 0;
 	glm::ivec2 LevelBounds = glm::ivec2(0);
@@ -20,6 +26,6 @@ public:
 	Level2D(VulkanEngine& engine, uint32_t TilesInTileSheet, glm::ivec2 LevelBounds, glm::vec2 TileSize, glm::vec2 TileUVSize, std::vector<uint32_t> TileLevelLayout, glm::vec3 lightDirection);
 	~Level2D();
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer) override;
+	void Update(VulkanEngine& engine, std::vector<std::shared_ptr<Mesh>> SpriteList);
 };
 

@@ -2,6 +2,7 @@
 #include "InputManager.h"
 #include "Mesh.h"
 #include "AnimationPlayer2D.h"
+#include "TileCollider.h"
 
 class Sprite : public Mesh
 {
@@ -11,6 +12,7 @@ protected:
 	bool FlipSpriteX = false;
 	std::shared_ptr<Timer> timer2;
 	AnimationPlayer2D AnimationPlayer;
+
 	void AddAnimation(std::shared_ptr<Animation2D> animation);
 	void AddAnimation(std::vector<std::shared_ptr<Animation2D>> AnimationList);
 public:
@@ -19,6 +21,7 @@ public:
 	Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
 	~Sprite();
 
+	TileCollider tileCollider;
 	void SetAnimation(uint32_t AnimationIndex);
 	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer) override;
 };

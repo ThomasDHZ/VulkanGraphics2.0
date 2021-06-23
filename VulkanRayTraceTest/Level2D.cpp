@@ -16,6 +16,7 @@ Level2D::Level2D(VulkanEngine& engine, uint32_t tilesInTileSheet, glm::ivec2 lev
 	LoadTiles(engine);
 
     MeshID = engine.GenerateID();
+	MeshType = MeshTypeFlag::Mesh_Type_2D_Level;
     MeshMaterial = 0;
 
     MeshProperties = MeshPropertiesUniformBuffer(engine);
@@ -73,12 +74,32 @@ void Level2D::LoadTiles(VulkanEngine& engine)
 				TopRightVertex,
 				TopLeftVertex
 			};
+
+			const std::vector<uint32_t> CollisionIndices
+			{
+				0, 1, 2, 2, 3, 0
+			};
 			
+			ColliderList.emplace_back(std::make_shared<TileCollider>(TileCollider(CollisionVertices, CollisionIndices, glm::vec3(x, y, 0.0f))));
 		}
 	}
 }
 
-void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void Level2D::Update(VulkanEngine& engine, std::vector<std::shared_ptr<Mesh>> SpriteList)
 {
-	
+	//MeshTypeFlag::Mesh_Type_2D_Sprite
+	for(auto & mesh : SpriteList)
+	{
+		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Sprite)
+		{
+			const auto sprite = static_cast<Sprite*>(mesh.get());
+			for (auto& LevelColliderTile : ColliderList)
+			{
+				if (sprite->tileCollider.CheckCollision(LevelColliderTile))
+				{
+					int a = 34;
+				}
+			}
+		}
+	}
 }

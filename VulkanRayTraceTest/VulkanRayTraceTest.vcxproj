@@ -213,7 +213,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="MeshManager.cpp" />
-    <ClCompile Include="MetalManStage.cpp" />
+    <ClCompile Include="SparkManStage.cpp" />
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
@@ -264,6 +264,7 @@
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="FrameBufferTextureRenderPass.cpp" />
+    <ClCompile Include="TileCollider.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
@@ -420,7 +421,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="MeshManager.h" />
-    <ClInclude Include="MetalManStage.h" />
+    <ClInclude Include="SparkManStage.h" />
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrthographicCamera.h" />
@@ -473,6 +474,7 @@
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="FrameBufferTextureRenderPass.h" />
+    <ClInclude Include="TileCollider.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanBuffer.h" />

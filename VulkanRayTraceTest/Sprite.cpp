@@ -22,6 +22,7 @@ Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm
     };
 
     MeshID = engine.GenerateID();
+    MeshType = MeshTypeFlag::Mesh_Type_2D_Sprite;
     MeshMaterial = material;
     AnimationPlayer = AnimationPlayer2D();
 
@@ -38,6 +39,7 @@ Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm
     IndexCount = SpriteIndices.size();
     PrimitiveCount = static_cast<uint32_t>(SpriteIndices.size()) / 3;
 
+    tileCollider = TileCollider(SpriteVertices, SpriteIndices, Position);
     timer2 = std::make_shared<Timer>(Timer());
 
     BottomLevelAccelerationBuffer = AccelerationStructure(engine);
@@ -75,6 +77,7 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
         UVFlip.x = 0.0f;
     }
     AnimationPlayer.Update(timer2, FlipSpriteX);
+    tileCollider.Update(MeshPosition);
 
     UVOffset = AnimationPlayer.GetFrame();
     Mesh::Update(engine, inputManager, materialManager, timer);

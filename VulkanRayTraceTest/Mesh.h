@@ -23,9 +23,11 @@ enum MeshDrawFlags
 enum MeshTypeFlag
 {
 	Mesh_Type_Normal = 0x00,
-	Mesh_Type_Water = 0x01,
-	Mesh_Type_SkyBox = 0x02,
-	Mesh_Type_Billboard = 0x04
+	Mesh_Type_2D_Level = 0x01,
+	Mesh_Type_2D_Sprite = 0x02,
+	Mesh_Type_Water = 0x04,
+	Mesh_Type_SkyBox = 0x08,
+	Mesh_Type_Billboard = 0x16
 };
 
 struct MeshBoneWeights
