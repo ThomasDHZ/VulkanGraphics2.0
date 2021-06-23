@@ -5,6 +5,7 @@
 #include "AssetManager.h"
 #include "RenderFrameBufferTexturePipeline.h"
 #include "Shader2DPipeline.h"
+#include "WireFramePipeline.h"
 
 class RenderPass2D
 {
@@ -24,6 +25,7 @@ public:
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 
 	std::shared_ptr<Shader2DPipeline> TexturePipeline;
+	std::shared_ptr<WireFramePipeline> wireFramePipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;

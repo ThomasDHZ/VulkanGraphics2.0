@@ -121,12 +121,14 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
         {
-            MeshPosition.x += 0.1f;
+            MeshPosition.x += 0.01f;
+            Velocity.x = 0.01f;
             FlipSpriteX = false;
         }
         else
         {
-            MeshPosition.x -= 0.1f;
+            MeshPosition.x -= 0.01f;
+            Velocity.x = -0.01f;
             FlipSpriteX = true;
         }
         newAnimation = kRunAnimation;
@@ -137,11 +139,13 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP))
         {
-            MeshPosition.y += 0.1f;
+            MeshPosition.y += 0.01f;
+            Velocity.y = 0.01f;
         }
         else
         {
-            MeshPosition.y -= 0.1f;
+            MeshPosition.y -= 0.01f;
+            Velocity.y = -0.01f;
         }
 
         if (AnimationPlayer.GetCurrentAnimationIndex() == kClimbAnimation)
@@ -221,6 +225,7 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
         inputManager.IsKeyReleased(KeyboardKey::KEY_UP) &&
         inputManager.IsKeyReleased(KeyboardKey::KEY_DOWN))
     {
+        Velocity = glm::vec2(0.0f);
         newAnimation = kStandAnimation;
     }
 

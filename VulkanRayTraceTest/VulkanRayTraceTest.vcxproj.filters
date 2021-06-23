@@ -438,6 +438,9 @@
     <ClCompile Include="TileCollider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WireFramePipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -669,6 +672,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\Shader2D.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\WireframeShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\WireframeShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -1062,6 +1071,9 @@
     </ClInclude>
     <ClInclude Include="TileCollider.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WireFramePipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

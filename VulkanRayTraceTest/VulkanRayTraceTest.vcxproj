@@ -171,6 +171,7 @@
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
+    <ClCompile Include="WireFramePipeline.cpp" />
     <ClCompile Include="DeferredSkyboxPipeline.cpp" />
     <ClCompile Include="DepthDebugPipeline.cpp" />
     <ClCompile Include="DepthDebugRenderPass.cpp" />
@@ -353,6 +354,8 @@
     <None Include="Shader\WaterRenderToTextureShader.vert" />
     <None Include="Shader\WaterSurfaceShader.frag" />
     <None Include="Shader\WaterSurfaceShader.vert" />
+    <None Include="Shader\WireframeShader.frag" />
+    <None Include="Shader\WireframeShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
@@ -378,6 +381,7 @@
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
+    <ClInclude Include="WireFramePipeline.h" />
     <ClInclude Include="DeferredSkyboxPipeline.h" />
     <ClInclude Include="DepthDebugPipeline.h" />
     <ClInclude Include="DepthDebugRenderPass.h" />

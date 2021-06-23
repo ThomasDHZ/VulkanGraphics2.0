@@ -26,6 +26,8 @@ C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe TextureShader.vert -o TextureShaderVert.s
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe TextureShader.frag -o TextureShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe Shader2D.vert -o Shader2DVert.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe Shader2D.frag -o Shader2DFrag.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe WireFrameShader.vert -o WireFrameShaderVert.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe WireFrameShader.frag -o WireFrameShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe WaterRenderToTextureShader.vert -o WaterRenderToTextureShaderVert.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe WaterRenderToTextureShader.frag -o WaterRenderToTextureShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe WaterSurfaceShader.vert -o WaterSurfaceShaderVert.spv

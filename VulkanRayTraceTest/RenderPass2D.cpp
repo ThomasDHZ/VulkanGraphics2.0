@@ -13,6 +13,7 @@ RenderPass2D::RenderPass2D(VulkanEngine& engine, std::shared_ptr<AssetManager> a
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     TexturePipeline = std::make_shared<Shader2DPipeline>(Shader2DPipeline(engine, assetManager, RenderPass));
+    wireFramePipeline = std::make_shared<WireFramePipeline>(WireFramePipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -155,9 +156,9 @@ void RenderPass2D::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> asse
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.ActiveCamera);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, wireFramePipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, wireFramePipeline->ShaderPipelineLayout, 0, 1, &wireFramePipeline->DescriptorSets, 0, nullptr);
+    assetManager->Draw(CommandBuffer, renderPassInfo, wireFramePipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.ActiveCamera);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
@@ -171,6 +172,7 @@ void RenderPass2D::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetM
     BloomTexture->RecreateRendererTexture(engine);
 
     TexturePipeline->Destroy(engine);
+    wireFramePipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -184,6 +186,7 @@ void RenderPass2D::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetM
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    wireFramePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
@@ -193,6 +196,7 @@ void RenderPass2D::Destroy(VulkanEngine& engine)
     BloomTexture->Delete(engine);
 
     TexturePipeline->Destroy(engine);
+    wireFramePipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
