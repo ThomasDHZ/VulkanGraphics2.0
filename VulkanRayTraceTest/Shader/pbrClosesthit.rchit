@@ -106,7 +106,7 @@ layout(binding = 12) uniform sampler3D Texture3DMap[];
 const float PI = 3.14159265359;
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
 vec3 getNormalFromMap(PBRMaterial material, Vertex vertex);
-vec3 Irradiate(Vertex vertex, float metallic, uint SampleCount);
+vec3 Irradiate(Vertex vertex, float metallic);
 
 // ----------------------------------------------------------------------------
 // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
@@ -204,59 +204,59 @@ void main()
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - material.Metallic;	  
 
-    vec3 irradiance = vec3(0.0f);
-  //  vec3 irradiance = Irradiate(vertex, material.Metallic, SampleCount);
+    //vec3 irradiance = vec3(0.0f);
+    vec3 irradiance = Irradiate(vertex, material.Metallic);
     
     vec3 diffuse  = irradiance * material.Albedo;
 
     float totalWeight = 0.0f;
     vec3 prefilter = vec3(0.0f);
     vec3 specular = vec3(0.0f);
-    if(rayHitInfo.reflectCount2 != ConstData.MaxRefeflectCount)
-    {
-         float r1        = rnd(rayHitInfo.seed);
-         float r2        = rnd(rayHitInfo.seed);
-         float sq        = sqrt(1.0 - r2);
-         float phi       = 2 * PI * r1;
-         vec3 scatter   = vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2));
+//    if(rayHitInfo.reflectCount2 != ConstData.MaxRefeflectCount)
+//    {
+//         float r1        = rnd(rayHitInfo.seed);
+//         float r2        = rnd(rayHitInfo.seed);
+//         float sq        = sqrt(1.0 - r2);
+//         float phi       = 2 * PI * r1;
+//         vec3 scatter   = vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2));
+//
+//        vec2 Xi = Hammersley(rayHitInfo.reflectCount2, ConstData.MaxRefeflectCount);
+//        vec3 H = ImportanceSampleGGX(Xi, N, material.Roughness);
+//        vec3 L  = normalize(2.0 * dot(V, H) * H - V);
+//
+//        float NdotL = max(dot(N, L), 0.0);
+//        vec3 rayDir = vec3(0.0);
+//        if(NdotL > 0.0)
+//        {
+//            float D   = DistributionGGX(N, H, material.Roughness);
+//            float NdotH = max(dot(N, H), 0.0);
+//            float HdotV = max(dot(H, V), 0.0);
+//            float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
+//
+//            float saTexel  = 4.0 * PI / 6.0f;
+//            float saSample = 1.0 / (float(ConstData.MaxRefeflectCount) * pdf + 0.0001);
+//            float mipLevel = material.Roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
+//            scatter *= mipLevel;
+//
+//            rayDir = L * scatter * NdotL;
+//            totalWeight += NdotL;
+//        }
+//        prefilter /= totalWeight;
+//
+//        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+//        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+//        rayDir =  reflect(gl_WorldRayDirectionEXT * rayDir, vertex.normal) * material.Roughness * 4.0f;
+//        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 100.0f, 0);
+//        prefilter += rayHitInfo.color;
+//    }
+//
+//    vec2 brdf = vec2(max(dot(N, V), 0.0), material.Roughness).rg;
+//    specular = prefilter * (F * brdf.x + brdf.y);
+//
+//   vec3 ambient = (kD * diffuse + specular) * material.AmbientOcclusion;
+//   vec3 color = ambient + Lo;
 
-        vec2 Xi = Hammersley(rayHitInfo.reflectCount2, ConstData.MaxRefeflectCount);
-        vec3 H = ImportanceSampleGGX(Xi, N, material.Roughness);
-        vec3 L  = normalize(2.0 * dot(V, H) * H - V);
-
-        float NdotL = max(dot(N, L), 0.0);
-        vec3 rayDir = vec3(0.0);
-        if(NdotL > 0.0)
-        {
-            float D   = DistributionGGX(N, H, material.Roughness);
-            float NdotH = max(dot(N, H), 0.0);
-            float HdotV = max(dot(H, V), 0.0);
-            float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
-
-            float saTexel  = 4.0 * PI / 6.0f;
-            float saSample = 1.0 / (float(ConstData.MaxRefeflectCount) * pdf + 0.0001);
-            float mipLevel = material.Roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
-            scatter *= mipLevel;
-
-            rayDir = L * scatter * NdotL;
-            totalWeight += NdotL;
-        }
-        prefilter /= totalWeight;
-
-        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
-        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        rayDir =  reflect(gl_WorldRayDirectionEXT * rayDir, vertex.normal) * material.Roughness * 4.0f;
-        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 100.0f, 0);
-        prefilter += rayHitInfo.color;
-    }
-
-    vec2 brdf = vec2(max(dot(N, V), 0.0), material.Roughness).rg;
-    specular = prefilter * (F * brdf.x + brdf.y);
-
-   vec3 ambient = (kD * diffuse + specular) * material.AmbientOcclusion;
-   vec3 color = ambient + Lo;
-
-   rayHitInfo.color = color;
+   rayHitInfo.color = irradiance;
    rayHitInfo.normal = vertex.normal;
 }
 

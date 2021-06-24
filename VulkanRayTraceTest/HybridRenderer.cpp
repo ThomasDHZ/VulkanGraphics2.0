@@ -66,6 +66,7 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Vulk
     frameBufferTextures.TBNBiTangentTexture = FrameBufferTextureRenderer2.GTBN_BiTangentTexture;
     frameBufferTextures.TBNNormalMapTexture = FrameBufferTextureRenderer2.GTBN_NormalTexture;
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
+    FrameBufferTextureRenderer2.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
     bloomRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
@@ -166,6 +167,7 @@ void HybridRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
 void HybridRenderer::Destroy(VulkanEngine& engine)
 {
     FrameBufferTextureRenderer.Destroy(engine);
+    FrameBufferTextureRenderer2.Destroy(engine);
     rayTraceRenderPass.Destroy(engine);
     bloomRenderPass.Destroy(engine);
     //DebugDepthRenderer.Destroy(engine);

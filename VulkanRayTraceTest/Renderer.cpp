@@ -18,7 +18,7 @@ Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, s
     blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
     pbrRenderer = PBRRenderer(engine, window, assetManager);
     rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
-    pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
+  //  pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
     hybridRenderer = HybridRenderer(engine, window, assetManager);
     renderer2D = Renderer2D(engine, window, assetManager);
 }
@@ -52,47 +52,13 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWind
     blinnPhongRenderer.RebuildSwapChain(engine, window);
     pbrRenderer.RebuildSwapChain(engine, window);
     rayTraceRenderer.RebuildSwapChain(engine, window);
-    pbrRayTraceRenderer.RebuildSwapChain(engine, window);
+  //  pbrRayTraceRenderer.RebuildSwapChain(engine, window);
     hybridRenderer.RebuildSwapChain(engine, window);
     renderer2D.RebuildSwapChain(engine, window);
 }
 
 void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
 {
-    if(addlightflag)
-    {
-        DirectionalLightBuffer dlight = DirectionalLightBuffer();
-        dlight.direction = glm::vec4(0.0f);
-        dlight.ambient = glm::vec4(0.2f);
-        dlight.diffuse = glm::vec4(0.5f);
-        dlight.specular = glm::vec4(1.0f);
-        assetManager->lightManager.AddDirectionalLight(engine, assetManager->cameraManager, dlight);
-        UpdateRenderer = true;
-        addlightflag = false;
-    }
-    if (deletelightflag)
-    {
-        assetManager->lightManager.DeleteDirectionalLight(engine, 0);
-        UpdateRenderer = true;
-        deletelightflag = false;
-    }
-    if (addplightflag)
-    {
-        PointLightBuffer dlight = PointLightBuffer();
-        dlight.position = glm::vec4(0.0f);
-        dlight.ambient = glm::vec4(0.2f);
-        dlight.diffuse = glm::vec4(0.5f);
-        dlight.specular = glm::vec4(1.0f);
-        assetManager->lightManager.AddPointLight(engine, dlight);
-        UpdateRenderer = true;
-        addplightflag = false;
-    }
-    if (deleteplightflag)
-    {
-        assetManager->lightManager.DeletePointLight(engine, 0);
-        UpdateRenderer = true;
-        deleteplightflag = false;
-    }
     if(UpdateRenderer)
     {
         RebuildSwapChain(engine, window);
@@ -103,43 +69,16 @@ void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window
     if (RayTraceFlag)
     {
         rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
-        pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
-        hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+      //  pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+        //hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
     }
 }
 
 void Renderer::GUIUpdate(VulkanEngine& engine)
 {
-    ImGui::SliderFloat3("Pos", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
-    ImGui::SliderFloat3("Diffuse", &assetManager->SceneData->UniformDataInfo.dlight.diffuse.x, 0.0f, 1.0f);
-
-
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::Checkbox("AddLight", &addlightflag);
-    ImGui::Checkbox("Deletelightflag", &deletelightflag);
-    ImGui::Checkbox("AddpLight", &addplightflag);
-    ImGui::Checkbox("Deleteplightflag", &deleteplightflag);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     ImGui::SliderInt("Active Camera", &assetManager->cameraManager.cameraIndex, 0, assetManager->cameraManager.CameraList.size());
-    
- /*   ImGui::SliderFloat("adsf", &assetManager->materialManager.MaterialList[0]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    ImGui::SliderFloat("adsf2", &assetManager->materialManager.MaterialList[1]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    ImGui::SliderFloat("adsf3", &assetManager->materialManager.MaterialList[2]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    ImGui::SliderFloat("adsf4", &assetManager->materialManager.MaterialList[3]->materialTexture.Reflectivness, 0.0f, 1.0f);*/
-    //ImGui::SliderFloat("adsf5", &assetManager->materialManager.MaterialList[4]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf6", &assetManager->materialManager.MaterialList[5]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf7", &assetManager->materialManager.MaterialList[6]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf8", &assetManager->materialManager.MaterialList[7]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf9", &assetManager->materialManager.MaterialList[8]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf10", &assetManager->materialManager.MaterialList[9]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf11", &assetManager->materialManager.MaterialList[10]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf12", &assetManager->materialManager.MaterialList[11]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf13", &assetManager->materialManager.MaterialList[12]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf14", &assetManager->materialManager.MaterialList[13]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf15", &assetManager->materialManager.MaterialList[14]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf16", &assetManager->materialManager.MaterialList[15]->materialTexture.Reflectivness, 0.0f, 1.0f);
-    //ImGui::SliderFloat("adsf17", &assetManager->materialManager.MaterialList[16]->materialTexture.Reflectivness, 0.0f, 1.0f);
-
 
     if (ActiveRenderer == 0)
     {
@@ -153,10 +92,10 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     {
         rayTraceRenderer.GUIUpdate(engine);
     }
-    else if (ActiveRenderer == 3)
-    {
-        pbrRayTraceRenderer.GUIUpdate(engine);
-    }
+    //else if (ActiveRenderer == 3)
+    //{
+    //    pbrRayTraceRenderer.GUIUpdate(engine);
+    //}
     else if (ActiveRenderer == 4)
     {
         hybridRenderer.GUIUpdate(engine);
@@ -216,12 +155,12 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
         rayTraceRenderer.Draw(engine, window, imageIndex);
         rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
-    else if (ActiveRenderer == 3)
+ /*   else if (ActiveRenderer == 3)
     {
         RayTraceFlag = true;
         pbrRayTraceRenderer.Draw(engine, window, imageIndex);
         pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
+    }*/
     else if (ActiveRenderer == 4)
     {
         RayTraceFlag = true;
@@ -288,6 +227,7 @@ void Renderer::Destroy(VulkanEngine& engine)
     blinnPhongRenderer.Destroy(engine);
     pbrRenderer.Destroy(engine);
     rayTraceRenderer.Destroy(engine);
-    pbrRayTraceRenderer.Destroy(engine);
+    //pbrRayTraceRenderer.Destroy(engine);
     hybridRenderer.Destroy(engine);
+    renderer2D.Destroy(engine);
 }

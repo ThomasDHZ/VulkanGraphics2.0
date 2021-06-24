@@ -257,13 +257,13 @@ void Mesh::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std:
 
 	MeshProperties.Update(engine);
 
-	if (RayTraceModeFlag)
-	{
+	/*if (RayTraceModeFlag)
+	{*/
 		if (IndexCount != 0)
 		{
 			MeshBottomLevelAccelerationStructure(engine);
 		}
-	}
+	//}
 }
 
 void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView)

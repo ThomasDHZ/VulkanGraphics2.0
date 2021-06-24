@@ -12,15 +12,11 @@ class Renderer
 private:
 	bool RayTraceFlag = false;
 	int ActiveRenderer = 0;
-	bool addlightflag = false;
-	bool deletelightflag = false;
-	bool addplightflag = false;
-	bool deleteplightflag = false;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
 	PBRRenderer pbrRenderer;
 	RayTraceRenderer rayTraceRenderer;
-	RayTracePBRRenderer pbrRayTraceRenderer;
+	//RayTracePBRRenderer pbrRayTraceRenderer;
 	HybridRenderer hybridRenderer;
 	Renderer2D renderer2D;
 	InterfaceRenderPass interfaceRenderPass;

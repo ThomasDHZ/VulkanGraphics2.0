@@ -221,6 +221,7 @@ void RayTraceRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<
 {
     RayTracedTexture->RecreateRendererTexture(engine);
     ShadowTextureMask->RecreateRendererTexture(engine);
+    ReflectionTextureMask->RecreateRendererTexture(engine);
     ReflectionTexture->RecreateRendererTexture(engine);
     SSAOTexture->RecreateRendererTexture(engine);
 
@@ -244,6 +245,7 @@ void RayTraceRenderPass::Destroy(VulkanEngine& engine)
     {
         RayTracedTexture->Delete(engine);
         ShadowTextureMask->Delete(engine);
+        ReflectionTextureMask->Delete(engine);
         ReflectionTexture->Delete(engine);
         SSAOTexture->Delete(engine);
     }
