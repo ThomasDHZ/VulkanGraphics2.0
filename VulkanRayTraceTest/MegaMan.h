@@ -30,7 +30,7 @@ private:
 		kShootJumpAnimation,
 		kShootClimbAnimation,
 	};
-
+	float Gravity = 0.098f;
 	int megaManStatus = 0;
 	MegaManAnimation CurrentAnimation;
 public:
@@ -42,6 +42,6 @@ public:
 	MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
 	~MegaMan();
 
-	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer) override;
+	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Mesh>> MeshList) override;
 };
 

@@ -68,19 +68,34 @@ void TileCollider::Update(glm::vec3 position)
 	Bottom = BottomRightVertex.y;
 }
 
-bool TileCollider::CheckCollision(std::shared_ptr<TileCollider> otherCollider)
+bool TileCollider::CheckGravityCollision(TileCollider& otherCollider, float gravity)
 {
-	const bool a = Right > otherCollider->Left;
-	const bool b = Left < otherCollider->Right;
-	const bool c = Bottom < otherCollider->Top;
-	const bool d = Top > otherCollider->Bottom;
-	return Right  > otherCollider->Left  &&
-		   Left   < otherCollider->Right &&
-		   Bottom < otherCollider->Top   &&
-		   Top    > otherCollider->Bottom;
+	return Right > otherCollider.Left &&
+		   Left < otherCollider.Right&&
+	       Bottom < otherCollider.Top&&
+		   Top + gravity  > otherCollider.Bottom;
 }
 
-bool TileCollider::CheckCollision(std::shared_ptr<TileCollider> collider1, std::shared_ptr<TileCollider> collider2)
+bool TileCollider::CheckCollision(TileCollider& otherCollider, glm::vec2 NextMove)
 {
-	return true;
+	return Right + NextMove.x > otherCollider.Left  &&
+		   Left + NextMove.x < otherCollider.Right &&
+		   Bottom + NextMove.y < otherCollider.Top   &&
+		   Top + NextMove.y    > otherCollider.Bottom;
+}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="otherCollider"></param>
+/// <returns></returns>
+bool TileCollider::CheckGravityCollisionX(TileCollider& otherCollider)
+{
+	return Right > otherCollider.Left &&
+		Left < otherCollider.Right;
+}
+
+bool TileCollider::CheckGravityCollisionY(TileCollider& otherCollider)
+{
+	return Bottom < otherCollider.Top&&
+		   Top  > otherCollider.Bottom;
 }

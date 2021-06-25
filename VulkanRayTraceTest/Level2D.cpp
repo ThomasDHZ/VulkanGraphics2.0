@@ -80,27 +80,27 @@ void Level2D::LoadTiles(VulkanEngine& engine)
 				0, 1, 2, 2, 3, 0
 			};
 			
-			ColliderList.emplace_back(std::make_shared<TileCollider>(TileCollider(CollisionVertices, CollisionIndices)));
+			TileList.emplace_back(std::make_shared<Tile>(Tile(CollisionVertices, CollisionIndices)));
 		}
 	}
 }
 
-void Level2D::Update(VulkanEngine& engine, std::vector<std::shared_ptr<Mesh>> SpriteList)
-{
-	for(auto & mesh : SpriteList)
-	{
-		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Sprite)
-		{
-			const auto sprite = static_cast<Sprite*>(mesh.get());
-			for (auto& LevelColliderTile : ColliderList)
-			{
-				if (sprite->tileCollider.CheckCollision(LevelColliderTile))
-				{
-					sprite->MeshPosition.x -= sprite->Velocity.x;
-					sprite->MeshPosition.y -= sprite->Velocity.y;
-					sprite->Velocity = glm::vec2(0.0f);
-				}
-			}
-		}
-	}
-}
+//void Level2D::Update(VulkanEngine& engine, std::vector<std::shared_ptr<Mesh>> SpriteList)
+//{
+//	for(auto & mesh : SpriteList)
+//	{
+//		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Sprite)
+//		{
+//			const auto sprite = static_cast<Sprite*>(mesh.get());
+//			for (auto& tile : TileList)
+//			{
+//				if (sprite->tileCollider.CheckCollision(tile->Collider))
+//				{
+//					sprite->MeshPosition.x -= sprite->Velocity.x;
+//					sprite->MeshPosition.y -= sprite->Velocity.y;
+//					sprite->Velocity = glm::vec2(0.0f);
+//				}
+//			}
+//		}
+//	}
+//}

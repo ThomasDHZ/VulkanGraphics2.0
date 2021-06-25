@@ -5,8 +5,10 @@ Sprite::Sprite() : Mesh()
 
 }
 
-Sprite::Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
+Sprite::Sprite(VulkanEngine& engine, glm::vec2 spriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
 {
+    SpriteSize = spriteSize;
+
     std::vector<Vertex> SpriteVertices =
     {
         {{ 0.0f,         0.0f,         0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {UVSize.x,  0.0f},     { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
@@ -66,8 +68,10 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
     AnimationPlayer.SetAnimation(AnimationIndex);
 }
 
-void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
+    Velocity.y = -0.01f;
+
     if (FlipSpriteX)
     {
         UVFlip.x = 1.0f;
@@ -79,6 +83,43 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
     AnimationPlayer.Update(timer2, FlipSpriteX);
     tileCollider.Update(MeshPosition);
 
+    for(auto & mesh : MeshList)
+	{
+		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Level)
+		{
+			const auto level = static_cast<Level2D*>(mesh.get());
+            for (auto& tile : level->TileList)
+            {
+                if (tileCollider.CheckCollision(tile->Collider, Velocity))
+                {
+                    if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
+                        Velocity.y < 0.0f)
+                    {
+                        Velocity.y = 0.0f;
+                    }
+                    else if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
+                        Velocity.y > 0.0f)
+                    {
+                        Velocity.y = 0.0f;
+                    }
+
+                    if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
+                        Velocity.x > 0.0f)
+                    {
+                        Velocity.x = 0.0f;
+                    }
+                    else if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
+                        Velocity.x < 0.0f)
+                    {
+                        Velocity.x = 0.0f;
+                    }
+                }
+            }
+		}
+	}
+
+    MeshPosition.x += Velocity.x;
+    MeshPosition.y += Velocity.y;
     UVOffset = AnimationPlayer.GetFrame();
     Mesh::Update(engine, inputManager, materialManager, timer);
 }

@@ -107,7 +107,7 @@ MegaMan::~MegaMan()
 
 }
 
-void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     uint32_t newAnimation = 0;
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
@@ -121,13 +121,11 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
         {
-            MeshPosition.x += 0.01f;
             Velocity.x = 0.01f;
             FlipSpriteX = false;
         }
         else
         {
-            MeshPosition.x -= 0.01f;
             Velocity.x = -0.01f;
             FlipSpriteX = true;
         }
@@ -139,12 +137,10 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP))
         {
-            MeshPosition.y += 0.01f;
             Velocity.y = 0.01f;
         }
         else
         {
-            MeshPosition.y -= 0.01f;
             Velocity.y = -0.01f;
         }
 
@@ -225,7 +221,7 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
         inputManager.IsKeyReleased(KeyboardKey::KEY_UP) &&
         inputManager.IsKeyReleased(KeyboardKey::KEY_DOWN))
     {
-        Velocity = glm::vec2(0.0f);
+        Velocity = glm::vec3(0.0f);
         newAnimation = kStandAnimation;
     }
 
@@ -233,5 +229,5 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         AnimationPlayer.SetAnimation(newAnimation);
     }
-    Sprite::Update(engine, inputManager, materialManager, timer);
+    Sprite::Update(engine, inputManager, materialManager, timer, MeshList);
 }

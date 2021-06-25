@@ -20,8 +20,10 @@ public:
 
 	void Update(glm::vec2 position);
 	void Update(glm::vec3 position);
-	bool CheckCollision(std::shared_ptr<TileCollider> otherCollider);
-	static bool CheckCollision(std::shared_ptr<TileCollider> collider1, std::shared_ptr<TileCollider> collider2);
+	bool CheckGravityCollision(TileCollider& otherCollider, float gravity);
+	bool CheckCollision(TileCollider& otherCollider, glm::vec2 NextMove);
+	bool CheckGravityCollisionX(TileCollider& otherCollider);
+	bool CheckGravityCollisionY(TileCollider& otherCollider);
 
 	glm::vec3 GetPosition() { return Position; }
 	Vertex GetVertex(uint32_t VertexIndex) { return VertexList[VertexIndex]; }
