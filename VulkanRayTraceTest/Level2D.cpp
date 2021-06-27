@@ -4,37 +4,6 @@ Level2D::Level2D() : Mesh()
 {
 }
 
-Level2D::Level2D(VulkanEngine& engine, uint32_t tilesInTileSheet, glm::ivec2 levelBounds, glm::vec2 tileSize, glm::vec2 tileUVSize, std::vector<uint32_t> tileLevelLayout, glm::vec3 lightDirection) : Mesh()
-{
-	TilesInTileSheet = tilesInTileSheet;
-	LevelBounds = levelBounds;
-	TileSize = tileSize;
-	TileUVSize = tileUVSize;
-	TileLevelLayout = tileLevelLayout;
-	LightDirection = lightDirection;
-
-	LoadTiles(engine);
-
-    MeshID = engine.GenerateID();
-	MeshType = MeshTypeFlag::Mesh_Type_2D_Level;
-    MeshMaterial = 0;
-
-    MeshProperties = MeshPropertiesUniformBuffer(engine);
-    ParentModelID = 0;
-
-    MeshPosition = glm::vec3(0.0f);
-    MeshTransform = glm::mat4(1.0f);
-    MeshTransform = glm::translate(MeshTransform, MeshPosition);
-    MeshTransform = glm::transpose(MeshTransform);
-
-    VertexCount = VertexList.size();
-    IndexCount = IndexList.size();
-    PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
-
-    BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-    SetUpMesh(engine, VertexList, IndexList);
-}
-
 Level2D::~Level2D()
 {
 }
