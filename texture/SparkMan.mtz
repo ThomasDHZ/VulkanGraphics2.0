@@ -60,7 +60,7 @@
       <y>0</y>
     </SampleUV>
   </MS>
-  <metallicMapPath>null</metallicMapPath>
+  <metallicMapPath>SparkMan_metallic.bmp</metallicMapPath>
   <SS>
     <SampleColor1>
       <r>0</r>
@@ -93,15 +93,15 @@
       <y>0</y>
     </SampleUV3>
   </SS>
-  <smoothnessMapPath>null</smoothnessMapPath>
+  <smoothnessMapPath>SparkMan_smoothness.bmp</smoothnessMapPath>
   <ES>
     <Blur0Contrast>1</Blur0Contrast>
   </ES>
-  <edgeMapPath>null</edgeMapPath>
+  <edgeMapPath>SparkMan_edge.bmp</edgeMapPath>
   <AOS>
     <Spread>50</Spread>
     <BlendText>1.0</BlendText>
   </AOS>
-  <aoMapPath>null</aoMapPath>
+  <aoMapPath>SparkMan_ao.bmp</aoMapPath>
   <MatS />
 </ProjectObject>
