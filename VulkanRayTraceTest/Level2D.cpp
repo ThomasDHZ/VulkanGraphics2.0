@@ -36,7 +36,7 @@ void Level2D::LoadTiles(VulkanEngine& engine)
 			IndexList.emplace_back(VertexCount + 3);
 			IndexList.emplace_back(VertexCount);
 
-			const std::vector<Vertex> CollisionVertices
+			std::vector<Vertex> CollisionVertices
 			{
 				BottomLeftVertex,
 				BottomRightVertex,
@@ -44,32 +44,12 @@ void Level2D::LoadTiles(VulkanEngine& engine)
 				TopLeftVertex
 			};
 
-			const std::vector<uint32_t> CollisionIndices
+			std::vector<uint32_t> CollisionIndices
 			{
 				0, 1, 2, 2, 3, 0
 			};
 			
-			TileList.emplace_back(std::make_shared<Tile>(Tile(CollisionVertices, CollisionIndices)));
+			TileList.emplace_back(std::make_shared<Tile>(Tile(CollisionVertices, CollisionIndices, TilePropertiesList[LevelTile])));
 		}
 	}
 }
-
-//void Level2D::Update(VulkanEngine& engine, std::vector<std::shared_ptr<Mesh>> SpriteList)
-//{
-//	for(auto & mesh : SpriteList)
-//	{
-//		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Sprite)
-//		{
-//			const auto sprite = static_cast<Sprite*>(mesh.get());
-//			for (auto& tile : TileList)
-//			{
-//				if (sprite->tileCollider.CheckCollision(tile->Collider))
-//				{
-//					sprite->MeshPosition.x -= sprite->Velocity.x;
-//					sprite->MeshPosition.y -= sprite->Velocity.y;
-//					sprite->Velocity = glm::vec2(0.0f);
-//				}
-//			}
-//		}
-//	}
-//}

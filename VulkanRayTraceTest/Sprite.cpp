@@ -90,7 +90,8 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
 			const auto level = static_cast<Level2D*>(mesh.get());
             for (auto& tile : level->TileList)
             {
-                if (tileCollider.CheckCollision(tile->Collider, Velocity))
+                if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
+                    tile->Collidable)
                 {
                     if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
                         Velocity.y < 0.0f)
