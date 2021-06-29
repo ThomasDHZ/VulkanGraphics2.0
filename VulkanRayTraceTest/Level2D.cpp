@@ -14,9 +14,9 @@ void Level2D::LoadTiles(VulkanEngine& engine)
 	{
 		for (unsigned int y = 0; y < LevelBounds.y - 1; y++)
 		{
-			const uint32_t LevelTile = TileLevelLayout[(y * LevelBounds.x) + x] + 1;
-			const float LefttSideUV = (LevelTile - 1) * TileUVSize.x;
-			const float RightSideUV = LevelTile * TileUVSize.x;
+			const uint32_t LevelTile = TileLevelLayout[(y * LevelBounds.x) + x];
+			const float LefttSideUV = LevelTile * TileUVSize.x;
+			const float RightSideUV = (LevelTile * TileUVSize.x) + TileUVSize.x;
 
 			const unsigned int VertexCount = VertexList.size();
 			const Vertex BottomLeftVertex =  { {x,        y,        0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { RightSideUV,  0.0f         }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };

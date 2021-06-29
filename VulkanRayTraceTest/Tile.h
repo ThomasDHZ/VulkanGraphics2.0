@@ -5,6 +5,7 @@
 struct TileProperties
 {
 	uint32_t TileIndex;
+	glm::vec2 TileOffset = glm::vec2(0.0f);
 	bool Collidable = true;
 	bool Climable = false;
 };
@@ -12,11 +13,12 @@ struct TileProperties
 class Tile
 {
 private:
-	uint32_t TileIndex;
 	std::vector<Vertex> VertexList;
 	std::vector<uint32_t> IndexList;
 
 public:
+	uint32_t TileIndex;
+	glm::vec2 TileOffset = glm::vec2(0.0f);
 	TileCollider Collider;
 	bool Collidable = true;
 	bool Climable = false;

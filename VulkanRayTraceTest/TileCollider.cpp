@@ -68,34 +68,10 @@ void TileCollider::Update(glm::vec3 position)
 	Bottom = BottomRightVertex.y;
 }
 
-bool TileCollider::CheckGravityCollision(TileCollider& otherCollider, float gravity)
-{
-	return Right > otherCollider.Left &&
-		   Left < otherCollider.Right&&
-	       Bottom < otherCollider.Top&&
-		   Top + gravity  > otherCollider.Bottom;
-}
-
 bool TileCollider::CheckCollision(TileCollider& otherCollider, glm::vec2 NextMove)
 {
 	return Right + NextMove.x > otherCollider.Left  &&
 		   Left + NextMove.x < otherCollider.Right &&
 		   Bottom + NextMove.y < otherCollider.Top   &&
 		   Top + NextMove.y    > otherCollider.Bottom;
-}
-/// <summary>
-/// 
-/// </summary>
-/// <param name="otherCollider"></param>
-/// <returns></returns>
-bool TileCollider::CheckGravityCollisionX(TileCollider& otherCollider)
-{
-	return Right > otherCollider.Left &&
-		Left < otherCollider.Right;
-}
-
-bool TileCollider::CheckGravityCollisionY(TileCollider& otherCollider)
-{
-	return Bottom < otherCollider.Top&&
-		   Top  > otherCollider.Bottom;
 }

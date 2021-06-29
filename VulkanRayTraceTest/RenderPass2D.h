@@ -19,6 +19,7 @@ public:
 	RenderPass2D(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	~RenderPass2D();
 
+	bool WireFrameFlag = false;
 	static constexpr RenderPassID rendererPassID = Texture_Renderer;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;

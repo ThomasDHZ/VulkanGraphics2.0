@@ -24,6 +24,7 @@ void Renderer2D::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWi
 
 void Renderer2D::GUIUpdate(VulkanEngine& engine)
 {
+    ImGui::Checkbox("Mesh Debug: ", &FrameBufferTextureRenderer.WireFrameFlag);
     ImGui::LabelText("Mesh", "Mesh");
     for (int x = 0; x < assetManager->meshManager.MeshList.size(); x++)
     {
