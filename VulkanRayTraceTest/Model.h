@@ -17,6 +17,12 @@
 
 const unsigned int MAX_BONE_VERTEX_COUNT = 4;
 
+enum ModelTypeEnum
+{
+	Model_Type_Normal = 0x00,
+	Model_Type_2D_Level = 0x01
+};
+
 class Node
 {
 	unsigned int NodeID;
@@ -48,6 +54,7 @@ private:
 
 public:
 	uint32_t ModelID = 0;
+	ModelTypeEnum ModelType = ModelTypeEnum::Model_Type_Normal;
 
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
 	glm::vec3 ModelRotation = glm::vec3(0.0f);
@@ -67,6 +74,7 @@ public:
 	~Model();
 
 	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceFlag);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer);
 	void SubmitToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
 	void AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh);
 	void Destory(VulkanEngine& engine);

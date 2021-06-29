@@ -409,6 +409,14 @@ void Model::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMan
 	}
 }
 
+void Model::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+{
+	for (auto& mesh : MeshList)
+	{
+		mesh->Update(engine, inputManager, materialManager, timer);
+	}
+}
+
 void Model::SubmitToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
 {
 	if (AnimatedModel)

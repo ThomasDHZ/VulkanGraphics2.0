@@ -42,6 +42,6 @@ public:
 	MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
 	~MegaMan();
 
-	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Mesh>> MeshList) override;
+	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Tile>> LevelTiles, std::vector<std::shared_ptr<Mesh>> MeshList);
 };
 

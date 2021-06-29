@@ -63,6 +63,27 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	SetUpMesh(engine, VertexList, IndexList);
 }
 
+Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag meshType, MeshDrawFlags MeshDrawFlags)
+{
+	MeshID = engine.GenerateID();
+	MeshMaterial = material;
+	MeshType = meshType;
+	DrawFlags = MeshDrawFlags;
+
+	MeshProperties = MeshPropertiesUniformBuffer(engine);
+
+	MeshTransform = glm::mat4(1.0f);
+	MeshTransform = glm::transpose(MeshTransform);
+
+	VertexCount = VertexList.size();
+	IndexCount = IndexList.size();
+	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
+	BoneCount = 0;
+
+	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
+	SetUpMesh(engine, VertexList, IndexList);
+}
+
 Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags)
 {
 	MeshID = engine.GenerateID();

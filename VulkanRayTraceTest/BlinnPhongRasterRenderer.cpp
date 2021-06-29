@@ -89,8 +89,6 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
         ImGui::LabelText("______", "______");
     }
 
-    ImGui::SliderFloat3("a", &assetManager->meshManager.MeshList[1]->MeshRotation.x, 0.0f, 180.0f);
-    ImGui::SliderInt("Frame", &static_cast<BillboardMesh*>(assetManager->meshManager.MeshList[1].get())->animator.CurrentFrame, 0, 60);
     ImGui::Image(FrameBufferTextureRenderer.RenderedTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(FrameBufferTextureRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::Image(lightPathRenderer.DepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
