@@ -193,6 +193,12 @@ void main()
    outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
    if(material.EmissionMapID != 0)
    {
+        if(texture(TextureMap[material.EmissionMapID], texCoords).r != 0.0 &&
+           texture(TextureMap[material.EmissionMapID], texCoords).g != 0.0 &&
+           texture(TextureMap[material.EmissionMapID], texCoords).b != 0.0)
+        {
+            outColor = vec4(texture(TextureMap[material.EmissionMapID], texCoords).rgb, 1.0f);
+        }
         outBloom = vec4(texture(TextureMap[material.EmissionMapID], texCoords).rgb, 1.0f);
    }
 }

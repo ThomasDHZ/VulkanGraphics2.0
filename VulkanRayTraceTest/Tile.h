@@ -8,6 +8,7 @@ struct TileProperties
 	glm::vec2 TileOffset = glm::vec2(0.0f);
 	bool Collidable = true;
 	bool Climable = false;
+	bool Animated = false;
 };
 
 class Tile
@@ -22,6 +23,7 @@ public:
 	TileCollider Collider;
 	bool Collidable = true;
 	bool Climable = false;
+	bool Animated = false;
 
 	Tile();
 	Tile(std::vector<Vertex>& vertexList, std::vector<uint32_t>& indexList, TileProperties& tileProperties);

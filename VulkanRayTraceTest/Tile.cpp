@@ -12,6 +12,7 @@ Tile::Tile(std::vector<Vertex>& vertexList, std::vector<uint32_t>& indexList, Ti
 	IndexList = indexList;
 	Collidable = tileProperties.Collidable;
 	Climable = tileProperties.Climable;
+	Animated = tileProperties.Animated;
 
 	if (Collidable)
 	{
