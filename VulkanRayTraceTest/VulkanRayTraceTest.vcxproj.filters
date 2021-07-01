@@ -444,6 +444,12 @@
     <ClCompile Include="Tile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LevelTile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LavaTest.cpp">
+      <Filter>Source Files\TestObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -1079,6 +1085,12 @@
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
     <ClInclude Include="Tile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LavaTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -171,6 +171,8 @@
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
+    <ClCompile Include="LavaTest.cpp" />
+    <ClCompile Include="LevelTile.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="WireFramePipeline.cpp" />
     <ClCompile Include="DeferredSkyboxPipeline.cpp" />
@@ -382,6 +384,8 @@
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
+    <ClInclude Include="LavaTest.h" />
+    <ClInclude Include="LevelTile.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="WireFramePipeline.h" />
     <ClInclude Include="DeferredSkyboxPipeline.h" />

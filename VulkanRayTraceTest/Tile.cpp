@@ -18,6 +18,10 @@ Tile::Tile(std::vector<Vertex>& vertexList, std::vector<uint32_t>& indexList, Ti
 	{
 		Collider = TileCollider(vertexList, indexList);
 	}
+	for (auto& animation : tileProperties.AnimationList)
+	{
+		AnimationPlayer.AddAnimation(animation);
+	}
 }
 
 Tile::~Tile()

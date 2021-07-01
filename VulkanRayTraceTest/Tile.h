@@ -1,6 +1,7 @@
 #pragma once
 #include "VulkanEngine.h"
 #include "TileCollider.h"
+#include "AnimationPlayer2D.h"
 
 struct TileProperties
 {
@@ -9,6 +10,7 @@ struct TileProperties
 	bool Collidable = true;
 	bool Climable = false;
 	bool Animated = false;
+	std::vector<std::shared_ptr<Animation2D>> AnimationList;
 };
 
 class Tile
@@ -16,7 +18,7 @@ class Tile
 private:
 	std::vector<Vertex> VertexList;
 	std::vector<uint32_t> IndexList;
-
+	AnimationPlayer2D AnimationPlayer;
 public:
 	uint32_t TileIndex;
 	glm::vec2 TileOffset = glm::vec2(0.0f);

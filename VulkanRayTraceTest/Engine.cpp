@@ -5,6 +5,7 @@
 #include "BillboardMesh.h"
 #include "Mario.h"
 #include "SparkManStage.h"
+#include "LavaTest.h"
 
 Engine::Engine()
 {
