@@ -4,23 +4,18 @@ Tile::Tile()
 {
 }
 
-Tile::Tile(std::vector<Vertex>& vertexList, std::vector<uint32_t>& indexList, TileProperties& tileProperties)
+Tile::Tile(uint32_t tileIndex, glm::ivec2 tileOffset, glm::vec2& tileSize, uint32_t tilesInSet, int tilePropertiesFlags, std::shared_ptr<Animation2D> TileAnimation)
 {
-	TileIndex = tileProperties.TileIndex;
-	TileOffset = tileProperties.TileOffset;
-	VertexList = vertexList;
-	IndexList = indexList;
-	Collidable = tileProperties.Collidable;
-	Climable = tileProperties.Climable;
-	Animated = tileProperties.Animated;
+	TileIndex = tileIndex;
+	TileOffset = tileOffset;
+	TileSize = tileSize;
+	TilesInSet = tilesInSet;
+	TileUVOffset = glm::vec2((float)TileOffset.x / (float)TilesInSet, (float)TileOffset.y / (float)TilesInSet);
+	TilePropertiesFlags = tilePropertiesFlags;
 
-	if (Collidable)
+	if (TileAnimation != nullptr)
 	{
-		Collider = TileCollider(vertexList, indexList);
-	}
-	for (auto& animation : tileProperties.AnimationList)
-	{
-		AnimationPlayer.AddAnimation(animation);
+		AnimationPlayer.AddAnimation(TileAnimation);
 	}
 }
 

@@ -3,6 +3,7 @@
 #include "AssetManager.h"
 #include "Tile.h"
 #include "Sprite.h"
+#include "LevelTile.h"
 
 class Level2D : public Model
 {
@@ -20,7 +21,7 @@ protected:
 	void LoadLevel(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material);
 public:
 	std::vector<std::shared_ptr<Tile>> TileList;
-	std::vector<TileProperties> TilePropertiesList;
+	std::vector<std::shared_ptr<LevelTile>> LevelTileLayout;
 	Level2D();
 	~Level2D();
 

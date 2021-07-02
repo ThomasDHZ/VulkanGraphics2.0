@@ -68,7 +68,7 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
     AnimationPlayer.SetAnimation(AnimationIndex);
 }
 
-void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Tile>> LevelTiles, std::vector<std::shared_ptr<Mesh>> MeshList)
+void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     Velocity.y = -0.01f;
 
@@ -87,10 +87,10 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
 	{
 		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Level)
 		{
-            for (auto& tile : LevelTiles)
+            for (auto& tile : LevelTileLayout)
             {
                 if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
-                    tile->Collidable)
+                    tile->TileProperties->TilePropertiesFlags & TileProperties::TileColliable)
                 {
                     if (tileCollider.CheckCollision(tile->Collider, Velocity) &&
                         Velocity.y < 0.0f)

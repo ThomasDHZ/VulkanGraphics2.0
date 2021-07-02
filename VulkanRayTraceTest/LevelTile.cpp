@@ -4,12 +4,16 @@ LevelTile::LevelTile()
 {
 }
 
-LevelTile::LevelTile(std::vector<Vertex>& collisionVertexList, std::vector<uint32_t>& collisionIndexList, std::shared_ptr<Tile> tilez)
+LevelTile::LevelTile(std::shared_ptr<Tile> tileProperties, glm::vec3 position, std::vector<Vertex> collisionVertexList, std::vector<uint32_t> collisionIndexList)
 {
-	tile = tilez;
-	if (tilez->Collidable)
+	TileProperties = tileProperties;
+	Position = position;
+	CollisionVertexList = collisionVertexList;
+	CollisionIndexList = collisionIndexList;
+
+	if ((TileProperties->TilePropertiesFlags & TileProperties::TileColliable) != 0)
 	{
-		Collider = TileCollider(collisionVertexList, collisionIndexList);
+		Collider = TileCollider(CollisionVertexList, CollisionIndexList);
 	}
 }
 

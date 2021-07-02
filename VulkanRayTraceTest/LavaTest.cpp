@@ -40,13 +40,10 @@ LavaTest::LavaTest(VulkanEngine& engine, std::shared_ptr<AssetManager> assetMana
 												 glm::ivec2(15,0) };
 	std::shared_ptr<Animation2D> LavaTop = std::make_shared<Animation2D>(Animation2D(LavaTopTiles, 0.15f));
 	std::shared_ptr<Animation2D> LavaMiddle = std::make_shared<Animation2D>(Animation2D(LavaMiddleTiles, 0.15f));
-	std::vector<std::shared_ptr<Animation2D>> LavaTopAnimation = { LavaTop };
-	std::vector<std::shared_ptr<Animation2D>> LavaMiddleAnimation = { LavaMiddle };
 
-	TilePropertiesList.emplace_back(TileProperties{ 0, glm::vec2(TilePropertiesList.size() * TileUVSize.x, TileUVSize.y), true, false, false, LavaTopAnimation });
-	TilePropertiesList.emplace_back(TileProperties{ 1, glm::vec2(TilePropertiesList.size() * TileUVSize.x, TileUVSize.y), true, false, false, LavaMiddleAnimation });
+	TileList.emplace_back(std::make_shared<Tile>(Tile(0, glm::ivec2(0, 0), TileSize, TilesInTileSheet, TileProperties::TileColliable)));
+	TileList.emplace_back(std::make_shared<Tile>(Tile(1, glm::ivec2(15, 0), TileSize, TilesInTileSheet, TileProperties::TileColliable)));
 
-	
 	TileLevelLayout = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 	LightDirection = glm::vec3(0.12f, 0.035f, -0.279f);

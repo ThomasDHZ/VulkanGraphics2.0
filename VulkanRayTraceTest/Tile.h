@@ -3,31 +3,27 @@
 #include "TileCollider.h"
 #include "AnimationPlayer2D.h"
 
-struct TileProperties
+enum TileProperties
 {
-	uint32_t TileIndex;
-	glm::vec2 TileOffset = glm::vec2(0.0f);
-	bool Collidable = true;
-	bool Climable = false;
-	bool Animated = false;
-	std::vector<std::shared_ptr<Animation2D>> AnimationList;
+	TileNone = 1 << 0,
+	TileColliable = 1 << 1,
+	TileClimable = 1 << 2
 };
 
 class Tile
 {
 private:
-	std::vector<Vertex> VertexList;
-	std::vector<uint32_t> IndexList;
+protected:
 	AnimationPlayer2D AnimationPlayer;
 public:
 	uint32_t TileIndex;
-	glm::vec2 TileOffset = glm::vec2(0.0f);
-	TileCollider Collider;
-	bool Collidable = true;
-	bool Climable = false;
-	bool Animated = false;
+	glm::ivec2 TileOffset = glm::ivec2(0);
+	glm::vec2 TileSize = glm::vec2(1.0f);
+	glm::vec2 TileUVOffset = glm::vec2(0.0f);
+	uint32_t TilesInSet = 0;
+	int TilePropertiesFlags = 0;
 
 	Tile();
-	Tile(std::vector<Vertex>& vertexList, std::vector<uint32_t>& indexList, TileProperties& tileProperties);
+	Tile(uint32_t tileIndex, glm::ivec2 tileOffset, glm::vec2& tileSize, uint32_t tilesInSet, int tilePropertiesFlags, std::shared_ptr<Animation2D> TileAnimation = nullptr);
 	~Tile();
 };

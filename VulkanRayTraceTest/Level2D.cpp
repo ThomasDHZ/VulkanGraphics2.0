@@ -29,7 +29,7 @@ void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
 		switch (mesh->MeshType)
 		{
 		case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, inputManager, materialManager, timer); break;
-	    case MeshTypeFlag::Mesh_Type_2D_Sprite: static_cast<Sprite*>(mesh.get())->Update(engine, inputManager, materialManager, timer, TileList, MeshList); break;
+	    case MeshTypeFlag::Mesh_Type_2D_Sprite: static_cast<Sprite*>(mesh.get())->Update(engine, inputManager, materialManager, timer, LevelTileLayout, MeshList); break;
 		default: mesh->Update(engine, inputManager, materialManager, timer);
 		};
 	}
@@ -46,15 +46,15 @@ void Level2D::LoadLevel(VulkanEngine& engine, std::shared_ptr<AssetManager> asse
 	{
 		for (unsigned int y = 0; y < LevelBounds.y - 1; y++)
 		{
-			const uint32_t LevelTile = TileLevelLayout[(y * LevelBounds.x) + x];
-			const float LefttSideUV = LevelTile * TileUVSize.x;
-			const float RightSideUV = (LevelTile * TileUVSize.x) + TileUVSize.x;
+			std::shared_ptr<Tile> tile = TileList[TileLevelLayout[(y * LevelBounds.x) + x]];
+			const float LefttSideUV = 0.0f;
+			const float RightSideUV = 1.0f;
 
 			const unsigned int VertexCount = VertexList.size();
 			const Vertex BottomLeftVertex =  { {x,        y,        0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { RightSideUV,  0.0f         }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
-			const Vertex BottomRightVertex = { {x + 1.0f, y,        0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { LefttSideUV,  0.0f         }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
-			const Vertex TopRightVertex =    { {x + 1.0f, y + 1.0f, 0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { LefttSideUV, -TileUVSize.y }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
-			const Vertex TopLeftVertex =     { {x,        y + 1.0f, 0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { RightSideUV, -TileUVSize.y }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
+			const Vertex BottomRightVertex = { {x + TileSize.x, y,        0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { LefttSideUV,  0.0f         }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
+			const Vertex TopRightVertex =    { {x + TileSize.x, y + TileSize.y, 0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { LefttSideUV, -TileUVSize.y }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
+			const Vertex TopLeftVertex =     { {x,        y + TileSize.y, 0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { RightSideUV, -TileUVSize.y }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
 
 			VertexList.emplace_back(BottomLeftVertex);
 			VertexList.emplace_back(BottomRightVertex);
@@ -81,7 +81,7 @@ void Level2D::LoadLevel(VulkanEngine& engine, std::shared_ptr<AssetManager> asse
 				0, 1, 2, 2, 3, 0
 			};
 			
-			TileList.emplace_back(std::make_shared<Tile>(Tile(CollisionVertices, CollisionIndices, TilePropertiesList[LevelTile])));
+			LevelTileLayout.emplace_back(std::make_shared<LevelTile>(LevelTile(tile, glm::vec3((float)x, (float)y, 0.0f), CollisionVertices, CollisionIndices)));
 		}
 	}
 

@@ -107,7 +107,7 @@ MegaMan::~MegaMan()
 
 }
 
-void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Tile>> LevelTiles, std::vector<std::shared_ptr<Mesh>> MeshList)
+void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     uint32_t newAnimation = 0;
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
@@ -229,5 +229,5 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         AnimationPlayer.SetAnimation(newAnimation);
     }
-    Sprite::Update(engine, inputManager, materialManager, timer, LevelTiles, MeshList);
+    Sprite::Update(engine, inputManager, materialManager, timer, LevelTileLayout, MeshList);
 }

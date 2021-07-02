@@ -4,6 +4,7 @@
 #include "AnimationPlayer2D.h"
 #include "TileCollider.h"
 #include "Tile.h"
+#include "LevelTile.h"
 
 class Sprite : public Mesh
 {
@@ -26,6 +27,6 @@ public:
 
 	TileCollider tileCollider;
 	void SetAnimation(uint32_t AnimationIndex);
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<Tile>> LevelTiles, std::vector<std::shared_ptr<Mesh>> MeshList);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList);
 };
 
