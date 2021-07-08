@@ -55,8 +55,8 @@ void Level2D::LoadLevel(VulkanEngine& engine, std::shared_ptr<AssetManager> asse
 		for (unsigned int y = 0; y < LevelBounds.y - 1; y++)
 		{
 			std::shared_ptr<Tile> tile = TileList[TileLevelLayout[(y * LevelBounds.x) + x]];
-			const float LefttSideUV = tile->TileUVOffset.x;
-			const float RightSideUV = tile->TileUVOffset.x + TileUVSize.x;
+			const float LefttSideUV = tile->TileUVSize.x;
+			const float RightSideUV = tile->TileUVSize.x + TileUVSize.x;
 
 			const unsigned int VertexCount = VertexList.size();
 			const Vertex BottomLeftVertex =  { {x,        y,        0.0f}, {0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f}, { RightSideUV,  0.0f         }, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f} };
