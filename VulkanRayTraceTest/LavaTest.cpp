@@ -17,7 +17,7 @@ LavaTest::LavaTest(VulkanEngine& engine, std::shared_ptr<AssetManager> assetMana
 	material->materialTexture.AlphaMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/lava_Alpha.bmp", VK_FORMAT_R8G8B8A8_UNORM);
 	auto loadedmaterial = assetManager->materialManager.LoadMaterial(engine, "MegaManMaterial", material);
 
-	TilesInTileSheet = 42;
+	TilesInTileSheet = 16;
 	LevelBounds = glm::ivec2(16, 2);
 	TileSize = glm::vec2(4.0f);
 	TileUVSize = glm::vec2(.03125, 1.0f);
@@ -41,8 +41,8 @@ LavaTest::LavaTest(VulkanEngine& engine, std::shared_ptr<AssetManager> assetMana
 	std::shared_ptr<Animation2D> LavaTop = std::make_shared<Animation2D>(Animation2D(LavaTopTiles, 0.15f));
 	std::shared_ptr<Animation2D> LavaMiddle = std::make_shared<Animation2D>(Animation2D(LavaMiddleTiles, 0.15f));
 
-	TileList.emplace_back(std::make_shared<Tile>(Tile(0, glm::ivec2(0, 0), TileSize, TilesInTileSheet, TileProperties::TileColliable)));
-	TileList.emplace_back(std::make_shared<Tile>(Tile(1, glm::ivec2(15, 0), TileSize, TilesInTileSheet, TileProperties::TileColliable)));
+	TileList.emplace_back(std::make_shared<Tile>(Tile(0, glm::ivec2(0, 0), TileSize, TileUVSize, TilesInTileSheet, TileProperties::TileColliable, LavaTop)));
+	TileList.emplace_back(std::make_shared<Tile>(Tile(1, glm::ivec2(15, 0), TileSize, TileUVSize, TilesInTileSheet, TileProperties::TileColliable, LavaMiddle)));
 
 	TileLevelLayout = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };

@@ -14,7 +14,6 @@ class Tile
 {
 private:
 protected:
-	AnimationPlayer2D AnimationPlayer;
 public:
 	uint32_t TileIndex;
 	glm::ivec2 TileOffset = glm::ivec2(0);
@@ -22,8 +21,9 @@ public:
 	glm::vec2 TileUVOffset = glm::vec2(0.0f);
 	uint32_t TilesInSet = 0;
 	int TilePropertiesFlags = 0;
+	AnimationPlayer2D AnimationPlayer;
 
 	Tile();
-	Tile(uint32_t tileIndex, glm::ivec2 tileOffset, glm::vec2& tileSize, uint32_t tilesInSet, int tilePropertiesFlags, std::shared_ptr<Animation2D> TileAnimation = nullptr);
+	Tile(uint32_t tileIndex, glm::ivec2 tileOffset, glm::vec2& tileSize, glm::vec2& tileUVOffset, uint32_t tilesInSet, int tilePropertiesFlags, std::shared_ptr<Animation2D> TileAnimation = nullptr);
 	~Tile();
 };

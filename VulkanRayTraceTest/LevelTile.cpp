@@ -20,3 +20,11 @@ LevelTile::LevelTile(std::shared_ptr<Tile> tileProperties, glm::vec3 position, s
 LevelTile::~LevelTile()
 {
 }
+
+void LevelTile::Update(std::shared_ptr<Timer> timer)
+{
+	if (TileProperties->AnimationPlayer.AnimationExistFlag())
+	{
+		TileProperties->AnimationPlayer.Update(timer, false);
+	}
+}

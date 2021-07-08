@@ -3,6 +3,7 @@
 
 Level2D::Level2D() : Model()
 {
+	timer2 = std::make_shared<Timer>(Timer());
 }
 
 Level2D::~Level2D()
@@ -17,6 +18,13 @@ void Level2D::AddSprite(VulkanEngine& engine, std::shared_ptr<AssetManager> asse
 
 void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
 {
+	for (auto& tile : LevelTileLayout)
+	{
+		tile->Update(timer2);
+		MeshList.back()->UVOffset = tile->TileProperties->AnimationPlayer.GetFrame();
+		int a = 34;
+	}
+
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));

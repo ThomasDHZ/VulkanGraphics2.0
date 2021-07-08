@@ -17,7 +17,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     engine = VulkanEngine(window);
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
-    assetManager->modelManager.ModelList.emplace_back(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+    assetManager->modelManager.ModelList.emplace_back(std::make_shared<LavaTest>(LavaTest(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
  /*   assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
   */ 

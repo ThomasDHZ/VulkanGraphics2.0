@@ -15,4 +15,5 @@ public:
 	LevelTile();
 	LevelTile(std::shared_ptr<Tile> tileProperties, glm::vec3 position, std::vector<Vertex> collisionVertexList, std::vector<uint32_t> collisionIndexList);
 	~LevelTile();
+	void Update(std::shared_ptr<Timer> Timer);
 };

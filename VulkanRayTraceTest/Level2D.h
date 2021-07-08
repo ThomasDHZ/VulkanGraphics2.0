@@ -8,6 +8,7 @@
 class Level2D : public Model
 {
 private:
+	std::shared_ptr<Timer> timer2;
 
 protected:
 	uint32_t TilesInTileSheet = 0;
