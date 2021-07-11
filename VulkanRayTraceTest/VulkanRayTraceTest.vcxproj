@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccelerationStructure.cpp" />
+    <ClCompile Include="AnimatedTileMesh.cpp" />
     <ClCompile Include="Animation2D.cpp" />
     <ClCompile Include="Animation3D.cpp" />
     <ClCompile Include="AnimationPlayer2D.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="LavaTest.cpp" />
     <ClCompile Include="LevelTile.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TileMesh.cpp" />
     <ClCompile Include="WireFramePipeline.cpp" />
     <ClCompile Include="DeferredSkyboxPipeline.cpp" />
     <ClCompile Include="DepthDebugPipeline.cpp" />
@@ -362,6 +364,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
+    <ClInclude Include="AnimatedTileMesh.h" />
     <ClInclude Include="Animation2D.h" />
     <ClInclude Include="Animation3D.h" />
     <ClInclude Include="AnimationPlayer2D.h" />
@@ -387,6 +390,7 @@
     <ClInclude Include="LavaTest.h" />
     <ClInclude Include="LevelTile.h" />
     <ClInclude Include="Tile.h" />
+    <ClInclude Include="TileMesh.h" />
     <ClInclude Include="WireFramePipeline.h" />
     <ClInclude Include="DeferredSkyboxPipeline.h" />
     <ClInclude Include="DepthDebugPipeline.h" />

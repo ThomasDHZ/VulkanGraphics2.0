@@ -18,7 +18,7 @@ LavaTest::LavaTest(VulkanEngine& engine, std::shared_ptr<AssetManager> assetMana
 	auto loadedmaterial = assetManager->materialManager.LoadMaterial(engine, "MegaManMaterial", material);
 
 	TilesInTileSheet = 16;
-	LevelBounds = glm::ivec2(3, 3);
+	LevelBounds = glm::ivec2(5, 2);
 	TileSize = glm::vec2(4.0f);
 	TileUVSize = glm::vec2(.03125, 1.0f);
 	
@@ -42,10 +42,10 @@ LavaTest::LavaTest(VulkanEngine& engine, std::shared_ptr<AssetManager> assetMana
 	std::shared_ptr<Animation2D> LavaMiddle = std::make_shared<Animation2D>(Animation2D(LavaMiddleTiles, 0.15f));
 
 	TileList.emplace_back(std::make_shared<Tile>(Tile(0, LavaTop, TileSize, TileUVSize, TilesInTileSheet, TileProperties::TileColliable)));
-	TileList.emplace_back(std::make_shared<Tile>(Tile(1, glm::ivec2(15, 0), TileSize, TileUVSize, TilesInTileSheet, TileProperties::TileColliable)));
+	TileList.emplace_back(std::make_shared<Tile>(Tile(1, LavaMiddle, TileSize, TileUVSize, TilesInTileSheet, TileProperties::TileColliable)));
 
-	TileLevelLayout = { 0, 0,
-						1, 1};
+	TileLevelLayout = { 0, 0, 0, 0, 0,
+						1, 1, 1, 1, 1};
 	LightDirection = glm::vec3(0.12f, 0.035f, -0.279f);
 
 	AddSprite(engine, assetManager, std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 7.0f, 0.0f))));

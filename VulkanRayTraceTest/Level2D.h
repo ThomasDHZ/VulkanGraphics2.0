@@ -4,6 +4,7 @@
 #include "Tile.h"
 #include "Sprite.h"
 #include "LevelTile.h"
+#include "AnimatedTileMesh.h"
 
 class Level2D : public Model
 {
@@ -19,14 +20,17 @@ protected:
 	glm::vec3 LightDirection = glm::vec3(1.0f);
 	std::shared_ptr<Material> material;
 
+	void AddSprite(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Sprite> sprite);
+	void AddTiles(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material);
+	void AddAnimatedTile(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material, uint32_t TileIndex);
 	void LoadLevel(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material);
+	std::vector<uint32_t> GetUniqueAnimatedTiles();
 public:
 	std::vector<std::shared_ptr<Tile>> TileList;
 	std::vector<std::shared_ptr<LevelTile>> LevelTileLayout;
 	Level2D();
 	~Level2D();
 
-	void AddSprite(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Sprite> sprite);
 	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer) override;
 };
 
