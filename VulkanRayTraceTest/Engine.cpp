@@ -13,16 +13,11 @@ Engine::Engine()
 
 Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 {
-    window = std::make_shared<VulkanWindow>(VulkanWindow(1280, 720, "VulkanEngine"));
+    window = std::make_shared<VulkanWindow>(VulkanWindow(width, height, WindowName));
     engine = VulkanEngine(window);
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
     assetManager->modelManager.ModelList.emplace_back(std::make_shared<LavaTest>(LavaTest(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
- /*   assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(1.0f, 0.0f, 0.0f))));
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 0.0f, 0.0f))));
-  */ 
-  // assetManager->meshManager.MeshList.emplace_back(std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(3.0f, 0.0f, 0.0f))));
-    //assetManager->meshManager.MeshList.emplace_back(std::make_shared<Mario>(Mario(engine, assetManager, glm::vec3(4.0f, 0.0f, 0.0f))));
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
@@ -57,9 +52,10 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
     assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
-    //assetManager->AddModel(engine, "../Models/RayReflectionTest.obj");
-   // assetManager->AddModel(engine, "../Models/TestAnimModel/model.dae");
-
+    //LoadModel("../Models/RayReflectionTest.obj");
+    //LoadModel("../Models/TestAnimModel/model.dae");
+    //LoadModel("../Models/vulkanscene_shadow.obj");
+  //  LoadModel("../Models/Sponza/Sponza.obj");
   /*   assetManager.AddModel(engine, "../Models/EnemyBeast.fbx");
      assetManager.AddModel(engine, "../Models/PlayerMarine.fbx");*/
 
@@ -79,27 +75,20 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     CubeMapFiles2[4] = "../texture/skybox/CosmicCoolCloudBack.png";
     CubeMapFiles2[5] = "../texture/skybox/CosmicCoolCloudTop.png";
 
-    assetManager->textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+    LoadCubeMap(CubeMapFiles);
 
+    MaterialTexture material;
+    material.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    material.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    material.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_nor_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
 
+    std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
+    LoadTerrain("../texture/perlin_noise.png", materialPtr);
 
-    //assetManager->meshManager.MeshList.emplace_back(std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/perlin_noise.png")));
-    //std::shared_ptr<Material> material1 = std::make_shared<Material>(engine, assetManager->textureManager);
-    //material1->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    //material1->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    //material1->materialTexture.RoughnessMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    //material1->materialTexture.AOMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    //material1->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_nor_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    //material1->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    //material1->materialTexture.MatallicMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    //std::shared_ptr<Material> MaterialID1 = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material1);
-    //assetManager->meshManager.MeshList.back()->MeshMaterial = MaterialID1;
-    //assetManager->modelManager.ModelList[0]->MeshList[0]->MeshMaterial = MaterialID;
-
-
-
- //   assetManager->AddModel(engine, "../Models/vulkanscene_shadow.obj");
- ///  assetManager->AddModel(engine, "../Models/Sponza/Sponza.obj");
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
     assetManager->SceneData->UniformDataInfo.dlight.diffuse = glm::vec4(0.5f);
@@ -162,4 +151,29 @@ void Engine::MainLoop()
     }
 
     vkDeviceWaitIdle(engine.Device);
+}
+
+std::shared_ptr<Material> Engine::LoadMaterial(const std::string& MaterialName, MaterialTexture& material)
+{
+    return assetManager->materialManager.LoadMaterial(engine, MaterialName, material);
+}
+
+std::shared_ptr<Material> Engine::LoadMaterial(const std::string& MaterialName, std::shared_ptr<Material> material)
+{
+    return assetManager->materialManager.LoadMaterial(engine, MaterialName, material);
+}
+
+void Engine::LoadModel(const std::string& FilePath)
+{
+    assetManager->AddModel(engine, FilePath);
+}
+
+void Engine::LoadCubeMap(std::string CubeMapFiles[6])
+{
+    assetManager->textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+}
+
+void Engine::LoadTerrain(const std::string& HeightMapPath, std::shared_ptr<Material> material)
+{
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/perlin_noise.png", material)));
 }

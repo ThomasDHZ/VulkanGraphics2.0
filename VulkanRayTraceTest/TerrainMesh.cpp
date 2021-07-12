@@ -4,12 +4,13 @@ TerrainMesh::TerrainMesh()
 {
 }
 
-TerrainMesh::TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation)
+TerrainMesh::TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation, std::shared_ptr<Material> material)
 {
 
 	MeshID = engine.GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(engine);
 	DrawFlags = MeshDrawFlags::Mesh_Draw_All;
+	MeshMaterial = material;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -18,6 +19,7 @@ TerrainMesh::TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocati
 	VertexCount = VertexList.size();
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
+	
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);

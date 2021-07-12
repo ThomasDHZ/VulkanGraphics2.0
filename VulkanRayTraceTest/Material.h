@@ -2,6 +2,9 @@
 #include "VulkanEngine.h"
 #include "TextureManager.h"
 
+const uint32_t DefaultTextureID = 0;
+const uint32_t DefaultAlphaTextureID = 1;
+
 struct MaterialTexture
 {
 	glm::vec3 Ambient = glm::vec3(0.2f);
@@ -10,13 +13,13 @@ struct MaterialTexture
 	float Shininess = 32;
 	float Reflectivness = 0.0f;
 
-	std::shared_ptr<Texture> DiffuseMap;
-	std::shared_ptr<Texture> SpecularMap;
-	std::shared_ptr<Texture> NormalMap;
-	std::shared_ptr<Texture> DepthMap;
-	std::shared_ptr<Texture> AlphaMap;
-	std::shared_ptr<Texture> EmissionMap;
-	std::shared_ptr<Texture> ShadowMap;
+	std::shared_ptr<Texture> DiffuseMap = nullptr;
+	std::shared_ptr<Texture> SpecularMap = nullptr;
+	std::shared_ptr<Texture> NormalMap = nullptr;
+	std::shared_ptr<Texture> DepthMap = nullptr;
+	std::shared_ptr<Texture> AlphaMap = nullptr;
+	std::shared_ptr<Texture> EmissionMap = nullptr;
+	std::shared_ptr<Texture> ShadowMap = nullptr;
 
 	//PBR
 	glm::vec3 Albedo = glm::vec3(0.5, 0.0f, 0.0f);
@@ -25,10 +28,10 @@ struct MaterialTexture
 	float AmbientOcclusion = 1.0f;
 	float Alpha = 1.0f;
 
-	std::shared_ptr<Texture> AlbedoMap;
-	std::shared_ptr<Texture> MatallicMap;
-	std::shared_ptr<Texture> RoughnessMap;
-	std::shared_ptr<Texture> AOMap;
+	std::shared_ptr<Texture> AlbedoMap = nullptr;
+	std::shared_ptr<Texture> MatallicMap = nullptr;
+	std::shared_ptr<Texture> RoughnessMap = nullptr;
+	std::shared_ptr<Texture> AOMap = nullptr;
 };
 
 struct MaterialData
@@ -39,13 +42,13 @@ struct MaterialData
 	alignas(4) float Shininess = 32;
 	alignas(4) float Reflectivness = 0.0f;
 
-	alignas(4) uint32_t DiffuseMapID = 0;
-	alignas(4) uint32_t SpecularMapID = 0;
-	alignas(4) uint32_t NormalMapID = 0;
-	alignas(4) uint32_t DepthMapID = 0;
-	alignas(4) uint32_t AlphaMapID = 1;
-	alignas(4) uint32_t EmissionMapID = 0;
-	alignas(4) uint32_t ShadowMapID = 0;
+	alignas(4) uint32_t DiffuseMapID = DefaultTextureID;
+	alignas(4) uint32_t SpecularMapID = DefaultTextureID;
+	alignas(4) uint32_t NormalMapID = DefaultTextureID;
+	alignas(4) uint32_t DepthMapID = DefaultTextureID;
+	alignas(4) uint32_t AlphaMapID = DefaultAlphaTextureID;
+	alignas(4) uint32_t EmissionMapID = DefaultTextureID;
+	alignas(4) uint32_t ShadowMapID = DefaultTextureID;
 
 
 	//PBR
@@ -68,13 +71,34 @@ struct MaterialData
 		Shininess = materialTexture.Shininess;
 		Reflectivness = materialTexture.Reflectivness;
 
-		DiffuseMapID = materialTexture.DiffuseMap->TextureBufferIndex;
-		SpecularMapID = materialTexture.SpecularMap->TextureBufferIndex;
-		NormalMapID = materialTexture.NormalMap->TextureBufferIndex;
-		DepthMapID = materialTexture.DepthMap->TextureBufferIndex;
-		AlphaMapID = materialTexture.AlphaMap->TextureBufferIndex;
-		EmissionMapID = materialTexture.EmissionMap->TextureBufferIndex;
-		ShadowMapID = materialTexture.ShadowMap->TextureBufferIndex;
+		if (materialTexture.DiffuseMap != nullptr)
+		{
+			DiffuseMapID = materialTexture.DiffuseMap->TextureBufferIndex;
+		}
+		if (materialTexture.SpecularMap != nullptr)
+		{
+			SpecularMapID = materialTexture.SpecularMap->TextureBufferIndex;
+		}
+		if (materialTexture.NormalMap != nullptr)
+		{
+			NormalMapID = materialTexture.NormalMap->TextureBufferIndex;
+		}
+		if (materialTexture.DepthMap != nullptr)
+		{
+			DepthMapID = materialTexture.DepthMap->TextureBufferIndex;
+		}
+		if (materialTexture.AlphaMap != nullptr)
+		{
+			AlphaMapID = materialTexture.AlphaMap->TextureBufferIndex;
+		}
+		if (materialTexture.EmissionMap != nullptr)
+		{
+			EmissionMapID = materialTexture.EmissionMap->TextureBufferIndex;
+		}
+		if (materialTexture.ShadowMap != nullptr)
+		{
+			ShadowMapID = materialTexture.ShadowMap->TextureBufferIndex;
+		}
 
 
 		Albedo = materialTexture.Albedo;
@@ -83,10 +107,22 @@ struct MaterialData
 		AmbientOcclusion = materialTexture.AmbientOcclusion;
 		Alpha = materialTexture.Alpha;
 
-		AlbedoMapID = materialTexture.AlbedoMap->TextureBufferIndex;
-		MatallicMapID = materialTexture.MatallicMap->TextureBufferIndex;
-		RoughnessMapID = materialTexture.RoughnessMap->TextureBufferIndex;
-		AOMapID = materialTexture.AOMap->TextureBufferIndex;
+		if (materialTexture.AlbedoMap != nullptr)
+		{
+			AlbedoMapID = materialTexture.AlbedoMap->TextureBufferIndex;
+		}
+		if (materialTexture.MatallicMap != nullptr)
+		{
+			MatallicMapID = materialTexture.MatallicMap->TextureBufferIndex;
+		}
+		if (materialTexture.RoughnessMap != nullptr)
+		{
+			RoughnessMapID = materialTexture.RoughnessMap->TextureBufferIndex;
+		}
+		if (materialTexture.AOMap != nullptr)
+		{
+			AOMapID = materialTexture.AOMap->TextureBufferIndex;
+		}
 	}
 };
 

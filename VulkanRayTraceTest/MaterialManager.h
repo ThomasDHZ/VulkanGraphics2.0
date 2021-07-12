@@ -20,6 +20,7 @@ public:
 	void Destory(VulkanEngine& engine);
 
 	std::shared_ptr<Material> LoadMaterial(VulkanEngine& engine, std::string MaterialName, std::shared_ptr<Material> material);
+	std::shared_ptr<Material> LoadMaterial(VulkanEngine& engine, std::string MaterialName, MaterialTexture& material);
 	std::shared_ptr<Material> GetDefaultMaterial();
 	std::shared_ptr<Material> GetMaterial(uint32_t MaterialID);
 

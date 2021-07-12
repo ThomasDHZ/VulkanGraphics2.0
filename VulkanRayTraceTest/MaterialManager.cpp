@@ -33,13 +33,25 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 std::shared_ptr<Material> MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, std::shared_ptr<Material> material)
 {
 	uint32_t MaterialID = engine.GenerateID();
+	MaterialList.emplace_back(material);
+	MaterialList.back()->MaterialID = MaterialID;
+	MaterialList.back()->MaterialBufferIndex = MaterialList.size();
+	MaterialList.back()->UpdateBufferIndexs(engine);
 
-		MaterialList.emplace_back(material);
-		MaterialList.back()->MaterialID = MaterialID;
-		MaterialList.back()->MaterialBufferIndex = MaterialList.size();
-		MaterialList.back()->UpdateBufferIndexs(engine);
-	
 	return material;
+}
+
+std::shared_ptr<Material> MaterialManager::LoadMaterial(VulkanEngine& engine, std::string MaterialName, MaterialTexture& material)
+{
+	std::shared_ptr<Material> materialData = std::make_shared<Material>(Material(engine, material));
+
+	uint32_t MaterialID = engine.GenerateID();
+	MaterialList.emplace_back(materialData);
+	MaterialList.back()->MaterialID = MaterialID;
+	MaterialList.back()->MaterialBufferIndex = MaterialList.size();
+	MaterialList.back()->UpdateBufferIndexs(engine);
+
+	return MaterialList.back();
 }
 
 std::shared_ptr<Material> MaterialManager::GetDefaultMaterial()

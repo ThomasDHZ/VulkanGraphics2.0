@@ -11,7 +11,7 @@ private:
 	void BuildTerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation);
 public:
 	TerrainMesh();
-	TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation);
+	TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation, std::shared_ptr<Material> material);
 	~TerrainMesh();
 
 	void Destory(VulkanEngine& engine) override;
