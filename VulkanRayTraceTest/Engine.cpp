@@ -6,6 +6,8 @@
 #include "Mario.h"
 #include "SparkManStage.h"
 #include "LavaTest.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 Engine::Engine()
 {
@@ -18,6 +20,29 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
     assetManager->modelManager.ModelList.emplace_back(std::make_shared<LavaTest>(LavaTest(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+
+    FT_Library ft;
+    // All functions return a value different than 0 whenever an error occurred
+    if (FT_Init_FreeType(&ft))
+    {
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+       // return -1;
+    }
+
+    // find path to font
+    std::string font_name = "../fonts/Antonio-Regular.ttf";
+    if (font_name.empty())
+    {
+        std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
+       // return -1;
+    }
+
+    // load font as face
+    FT_Face face;
+    if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
+        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+       // return -1;
+    }
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
