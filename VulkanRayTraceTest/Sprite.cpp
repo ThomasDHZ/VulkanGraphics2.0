@@ -85,7 +85,8 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
 
     for(auto & mesh : MeshList)
 	{
-		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Level_Tile)
+		if (mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Level_Tile ||
+            mesh->MeshType == MeshTypeFlag::Mesh_Type_2D_Level_Animated_Tile)
 		{
             for (auto& tile : LevelTileLayout)
             {
