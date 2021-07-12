@@ -31,6 +31,6 @@ public:
 	Level2D();
 	~Level2D();
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer) override;
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager) override;
 };
 

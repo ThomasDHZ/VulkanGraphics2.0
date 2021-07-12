@@ -229,5 +229,5 @@ void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
     {
         AnimationPlayer.SetAnimation(newAnimation);
     }
-    Sprite::Update(engine, inputManager, materialManager, timer, LevelTileLayout, MeshList);
+    Sprite::Update(engine, inputManager, materialManager, LevelTileLayout, MeshList);
 }

@@ -42,7 +42,7 @@ Sprite::Sprite(VulkanEngine& engine, glm::vec2 spriteSize, glm::vec2 UVSize, glm
     PrimitiveCount = static_cast<uint32_t>(SpriteIndices.size()) / 3;
 
     tileCollider = TileCollider(SpriteVertices, SpriteIndices, Position);
-    timer2 = std::make_shared<Timer>(Timer());
+    MeshTimer = std::make_shared<Timer>(Timer());
 
     BottomLevelAccelerationBuffer = AccelerationStructure(engine);
     SetUpMesh(engine, VertexList, SpriteIndices);
@@ -68,7 +68,7 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
     AnimationPlayer.SetAnimation(AnimationIndex);
 }
 
-void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
+void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     Velocity.y = -0.01f;
 
@@ -80,7 +80,7 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
     {
         UVFlip.x = 0.0f;
     }
-    AnimationPlayer.Update(timer2, FlipSpriteX);
+    AnimationPlayer.Update(FlipSpriteX);
     tileCollider.Update(MeshPosition);
 
     for(auto & mesh : MeshList)
@@ -121,5 +121,5 @@ void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMa
     MeshPosition.x += Velocity.x;
     MeshPosition.y += Velocity.y;
     UVOffset = AnimationPlayer.GetFrame();
-    Mesh::Update(engine, inputManager, materialManager, timer);
+    Mesh::Update(engine, inputManager, materialManager);
 }

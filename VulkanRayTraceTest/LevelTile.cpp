@@ -25,6 +25,6 @@ void LevelTile::Update(std::shared_ptr<Timer> timer)
 {
 	if (TileProperties->AnimationPlayer.AnimationExistFlag())
 	{
-		TileProperties->AnimationPlayer.Update(timer, false);
+		TileProperties->AnimationPlayer.Update(false);
 	}
 }

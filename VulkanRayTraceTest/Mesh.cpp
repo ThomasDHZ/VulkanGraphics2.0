@@ -20,6 +20,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, MeshDrawFlags 
 	IndexCount = indices.size();
 	PrimitiveCount = static_cast<uint32_t>(indices.size()) / 3;
 	BoneCount = 0;
+	MeshTimer = std::make_shared<Timer>(Timer());
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, indices);
@@ -38,6 +39,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 	BoneCount = 0;
+	MeshTimer = std::make_shared<Timer>(Timer());
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);
@@ -58,6 +60,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 	BoneCount = 0;
+	MeshTimer = std::make_shared<Timer>(Timer());
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);
@@ -79,6 +82,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 	BoneCount = 0;
+	MeshTimer = std::make_shared<Timer>(Timer());
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);
@@ -101,6 +105,7 @@ Mesh::Mesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<ui
 	BoneCount = boneCount;
 	BoneTransform.resize(BoneCount, glm::mat4(1.0f));
 	BoneWeightList = boneWeights;
+	MeshTimer = std::make_shared<Timer>(Timer());
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);
@@ -217,7 +222,7 @@ void Mesh::SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std:
 	}
 }
 
-void Mesh::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void Mesh::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 

@@ -11,6 +11,7 @@
 #include "bone.h"
 #include "Camera.h"
 #include "InputManager.h"
+#include "Timer.h"
 
 enum MeshDrawFlags
 {
@@ -41,6 +42,8 @@ class Mesh
 {
 private:
 protected:
+	std::shared_ptr<Timer> MeshTimer;
+
 	void MeshBottomLevelAccelerationStructure(VulkanEngine& engine);
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
 	{
@@ -105,7 +108,7 @@ public:
 
 	void SetUpMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager);
 	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceModeFlag);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID);

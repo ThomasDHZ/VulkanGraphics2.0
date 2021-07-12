@@ -132,7 +132,7 @@ void Level2D::AddAnimatedTile(VulkanEngine& engine, std::shared_ptr<AssetManager
 	}
 }
 
-void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -145,11 +145,11 @@ void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
 	{
 		switch (mesh->MeshType)
 		{
-			case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, inputManager, materialManager, timer); break;
-			case MeshTypeFlag::Mesh_Type_2D_Level_Tile:  mesh->Update(engine, inputManager, materialManager, timer); break;
+			case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, inputManager, materialManager); break;
+			case MeshTypeFlag::Mesh_Type_2D_Level_Tile:  mesh->Update(engine, inputManager, materialManager); break;
 			case MeshTypeFlag::Mesh_Type_2D_Level_Animated_Tile:  static_cast<AnimatedTileMesh*>(mesh.get())->Update(engine, inputManager, materialManager, timer2); break;
-			case MeshTypeFlag::Mesh_Type_2D_Sprite: static_cast<Sprite*>(mesh.get())->Update(engine, inputManager, materialManager, timer, LevelTileLayout, MeshList); break;
-			default: mesh->Update(engine, inputManager, materialManager, timer);
+			case MeshTypeFlag::Mesh_Type_2D_Sprite: static_cast<Sprite*>(mesh.get())->Update(engine, inputManager, materialManager, LevelTileLayout, MeshList); break;
+			default: mesh->Update(engine, inputManager, materialManager);
 		};
 	}
 }

@@ -17,7 +17,7 @@ public:
 	~MeshManager();
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
-	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::shared_ptr<Camera> camera);
+	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera);
 	void UpdateBufferIndex(VulkanEngine& engine);
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView);
 	void Destroy(VulkanEngine& engine);

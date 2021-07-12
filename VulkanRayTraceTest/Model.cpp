@@ -409,11 +409,11 @@ void Model::Update(VulkanEngine& engine, InputManager& inputManager, MaterialMan
 	}
 }
 
-void Model::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void Model::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh->Update(engine, inputManager, materialManager, timer);
+		mesh->Update(engine, inputManager, materialManager);
 	}
 }
 

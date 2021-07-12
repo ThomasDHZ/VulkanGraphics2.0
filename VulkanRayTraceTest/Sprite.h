@@ -12,7 +12,6 @@ private:
 protected:
 	bool LastFlipSpriteX = false;
 	bool FlipSpriteX = false;
-	std::shared_ptr<Timer> timer2;
 	AnimationPlayer2D AnimationPlayer;
 
 	void AddAnimation(std::shared_ptr<Animation2D> animation);
@@ -27,6 +26,6 @@ public:
 
 	TileCollider tileCollider;
 	void SetAnimation(uint32_t AnimationIndex);
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList);
 };
 

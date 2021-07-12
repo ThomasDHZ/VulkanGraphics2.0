@@ -74,7 +74,7 @@ public:
 	~Model();
 
 	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceFlag);
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager);
 	void SubmitToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
 	void AddMesh(VulkanEngine& engine, std::shared_ptr<Mesh> mesh);
 	void Destory(VulkanEngine& engine);

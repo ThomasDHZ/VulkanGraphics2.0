@@ -17,7 +17,7 @@ void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 	MeshList.emplace_back(mesh);
 }
 
-void MeshManager::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::shared_ptr<Camera> camera)
+void MeshManager::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
 {
     for (auto& mesh : MeshList)
     {
@@ -25,10 +25,10 @@ void MeshManager::Update(VulkanEngine& engine, InputManager& inputManager, Mater
         {
             switch (mesh->MeshType)
             {
-            case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, inputManager, materialManager, timer); break;
+            case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, inputManager, materialManager); break;
             //case MeshTypeFlag::Mesh_Type_2D_Sprite: static_cast<Sprite*>(mesh.get())->Update(engine, inputManager, materialManager, timer, MeshList); break;
             case MeshTypeFlag::Mesh_Type_Billboard: static_cast<BillboardMesh*>(mesh.get())->Update(engine, inputManager, materialManager, camera); break;
-            default: mesh->Update(engine, inputManager, materialManager, timer);
+            default: mesh->Update(engine, inputManager, materialManager);
             };
            
         }

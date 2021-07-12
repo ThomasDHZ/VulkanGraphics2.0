@@ -17,5 +17,5 @@ void AnimatedTileMesh::Update(VulkanEngine& engine, InputManager& inputManager, 
 {
 	tile->Update(timer);
 	UVOffset = tile->TileProperties->AnimationPlayer.GetFrame();
-	Mesh::Update(engine, inputManager, materialManager, 0.0f);
+	Mesh::Update(engine, inputManager, materialManager);
 }

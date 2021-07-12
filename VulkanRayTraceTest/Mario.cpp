@@ -35,6 +35,6 @@ Mario::~Mario()
 
 }
 
-void Mario::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer)
+void Mario::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 }
