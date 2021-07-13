@@ -26,6 +26,7 @@ enum RenderPassID
 	FrameBuffer_Renderer,
     Deferred_Renderer,
 	Texture_Renderer,
+	GUI_Renderer,
 	SSAO_Renderer,
 	BRDF_Renderer,
 	CubeTexture_Renderer,
@@ -42,7 +43,8 @@ enum RendererID
 	BlinnPhong_RayTrace_Renderer,
 	PBR_RayTrace_Renderer,
 	Hybrid_Renderer,
-	LightPath_Renderer
+	LightPath_Renderer,
+	GUI_Renderer
 };
 
 struct DescriptorSetLayoutBindingInfo

@@ -28,27 +28,39 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
        // return -1;
     }
 
-    //std::string font_name = "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf";
-    //FT_Face face;
-    //if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
-    //    std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
-    //}
-    //else
-    //{
-    //    for (unsigned char c = 0; c < 128; c++)
-    //    {
-    //        Character character =
-    //        {
-    //            std::make_shared<TextTexture>(TextTexture(engine, face->glyph->bitmap.buffer, face->glyph->bitmap_left, face->glyph->bitmap.rows)),
-    //            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-    //            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-    //            static_cast<unsigned int>(face->glyph->advance.x)
-    //        };
-    //        Characters.insert(std::pair<char, Character>(c, character));
-    //    }
-    //}
-    //FT_Done_Face(face);
-    //FT_Done_FreeType(ft);
+    std::string font_name = "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf";
+    FT_Face face;
+    if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
+        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+    }
+    else
+    {
+        FT_Set_Pixel_Sizes(face, 0, 48);
+
+        for (unsigned char c = 0; c < 128; c++)
+        {
+            if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+            {
+                std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+                continue;
+            }
+
+            if (c != 32)
+            {
+                Character character =
+                {
+                    std::make_shared<TextTexture>(TextTexture(engine, face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows)),
+                    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                    static_cast<unsigned int>(face->glyph->advance.x)
+                };
+                Characters.insert(std::pair<char, Character>(c, character));
+            }
+            
+        }
+    }
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);

@@ -450,15 +450,13 @@ void Texture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t 
 	VulkanBuffer StagingBuffer;
 	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &GlyphData);
 
-	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
-
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	TextureInfo.imageType = VK_IMAGE_TYPE_2D;
 	TextureInfo.extent.width = Width;
 	TextureInfo.extent.height = Height;
 	TextureInfo.extent.depth = Depth;
-	TextureInfo.mipLevels = MipMapLevels;
+	TextureInfo.mipLevels = 1;
 	TextureInfo.arrayLayers = 1;
 	TextureInfo.format = VK_FORMAT_R8_UINT;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -473,8 +471,6 @@ void Texture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t 
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
 	StagingBuffer.DestoryBuffer(engine.Device);
-
-	GenerateMipmaps(engine, VK_FORMAT_R8_UINT);
 }
 
 void Texture::CreateTexture3D(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format)

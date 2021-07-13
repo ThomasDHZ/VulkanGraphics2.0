@@ -40,6 +40,11 @@ struct ConstBloomProperites
 	alignas(4) uint32_t BloomPass = 0;
 };
 
+struct ConstTextProperties
+{
+	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+};
+
 class GraphicsPipeline
 {
 protected:

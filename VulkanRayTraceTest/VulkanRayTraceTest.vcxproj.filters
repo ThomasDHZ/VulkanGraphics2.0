@@ -459,6 +459,15 @@
     <ClCompile Include="TextTexture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="TextRenderPipeline.cpp">
+      <Filter>Source Files\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRenderPass.cpp">
+      <Filter>Source Files\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIRenderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -696,6 +705,12 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="Shader\WireframeShader.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\TextShader.frag">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Shader\TextShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>
@@ -1110,6 +1125,15 @@
     </ClInclude>
     <ClInclude Include="TextTexture.h">
       <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRenderPipeline.h">
+      <Filter>Header Files\Pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRenderPass.h">
+      <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="GUIRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -172,8 +172,11 @@
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
+    <ClCompile Include="GUIRenderer.cpp" />
+    <ClCompile Include="TextRenderPass.cpp" />
     <ClCompile Include="LavaTest.cpp" />
     <ClCompile Include="LevelTile.cpp" />
+    <ClCompile Include="TextRenderPipeline.cpp" />
     <ClCompile Include="TextTexture.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileMesh.cpp" />
@@ -353,6 +356,8 @@
     <None Include="Shader\SSAOBlurShader.vert" />
     <None Include="Shader\SSAOShader.frag" />
     <None Include="Shader\SSAOShader.vert" />
+    <None Include="Shader\TextShader.frag" />
+    <None Include="Shader\TextShader.vert" />
     <None Include="Shader\TextureShader.frag" />
     <None Include="Shader\TextureShader.vert" />
     <None Include="Shader\Vertex.glsl" />
@@ -388,8 +393,11 @@
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
+    <ClInclude Include="GUIRenderer.h" />
+    <ClInclude Include="TextRenderPass.h" />
     <ClInclude Include="LavaTest.h" />
     <ClInclude Include="LevelTile.h" />
+    <ClInclude Include="TextRenderPipeline.h" />
     <ClInclude Include="TextTexture.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="TileMesh.h" />
