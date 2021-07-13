@@ -456,6 +456,9 @@
     <ClCompile Include="TileMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TextTexture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -1104,6 +1107,9 @@
     </ClInclude>
     <ClInclude Include="TileMesh.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextTexture.h">
+      <Filter>Header Files\Texture</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

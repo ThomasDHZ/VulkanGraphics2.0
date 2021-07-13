@@ -22,27 +22,33 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager->modelManager.ModelList.emplace_back(std::make_shared<LavaTest>(LavaTest(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
 
     FT_Library ft;
-    // All functions return a value different than 0 whenever an error occurred
     if (FT_Init_FreeType(&ft))
     {
         std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
        // return -1;
     }
 
-    // find path to font
-    std::string font_name = "../fonts/Antonio-Regular.ttf";
-    if (font_name.empty())
-    {
-        std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
-       // return -1;
-    }
-
-    // load font as face
-    FT_Face face;
-    if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
-        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
-       // return -1;
-    }
+    //std::string font_name = "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf";
+    //FT_Face face;
+    //if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
+    //    std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+    //}
+    //else
+    //{
+    //    for (unsigned char c = 0; c < 128; c++)
+    //    {
+    //        Character character =
+    //        {
+    //            std::make_shared<TextTexture>(TextTexture(engine, face->glyph->bitmap.buffer, face->glyph->bitmap_left, face->glyph->bitmap.rows)),
+    //            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+    //            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+    //            static_cast<unsigned int>(face->glyph->advance.x)
+    //        };
+    //        Characters.insert(std::pair<char, Character>(c, character));
+    //    }
+    //}
+    //FT_Done_Face(face);
+    //FT_Done_FreeType(ft);
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);

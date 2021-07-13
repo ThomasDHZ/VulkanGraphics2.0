@@ -14,6 +14,16 @@
 #include "VulkanWindow.h"
 #include "VulkanEngine.h"
 #include "Renderer.h"
+#include <map>
+#include "TextTexture.h"
+
+struct Character {
+    std::shared_ptr<TextTexture> CharTexture;
+    glm::ivec2   Size;      // Size of glyph
+    glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
+    unsigned int Advance;   // Horizontal offset to advance to next glyph
+};
+
 
 class Engine {
 private:
@@ -21,6 +31,7 @@ private:
     Renderer renderer;
     std::shared_ptr<VulkanWindow> window;
     std::shared_ptr<AssetManager> assetManager;
+    std::map<char, Character> Characters;
 
 public:
     Engine();

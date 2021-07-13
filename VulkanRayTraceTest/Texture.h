@@ -28,6 +28,7 @@ protected:
     virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
     virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTexture(VulkanEngine& engine, std::vector<glm::vec4>& Pixels, VkFormat format);
+    virtual void CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height);
     virtual void CreateTexture3D(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
     virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
    
