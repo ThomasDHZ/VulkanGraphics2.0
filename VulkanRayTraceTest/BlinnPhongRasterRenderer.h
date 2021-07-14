@@ -6,10 +6,12 @@
 #include "BloomRenderPass.h"
 #include "DepthDebugRenderPass.h"
 #include "LightPathRenderer.h"
+#include "TextRenderPass.h"
 
 class BlinnPhongRasterRenderer : public BaseRenderer
 {
 private:
+	TextRenderPass text;
 	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
 	BloomRenderPass BloomRenderer;
 	DepthDebugRenderPass DebugDepthRenderer;

@@ -1,5 +1,8 @@
 #pragma once
-#include "FrameBufferPipeline.h"
+#include "RenderFrameBufferTexturePipeline.h"
+#include "SkyBoxFrameBufferRenderingPipeline.h"
+#include "RenderedColorTexture.h"
+#include "RenderedDepthTexture.h"
 #include "TextRenderPipeline.h"
 
 class TextRenderPass
@@ -11,19 +14,22 @@ private:
 
 public:
 	TextRenderPass();
-	TextRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<TextTexture> FontTexture);
+	TextRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	~TextRenderPass();
 
-	static constexpr RenderPassID rendererPassID = RenderPassID::GUI_Renderer;
+	static constexpr RenderPassID rendererPassID = Texture_Renderer;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<TextRenderPipeline> TextPipeline;
+	std::shared_ptr<RenderedColorTexture> BloomTexture;
+	std::shared_ptr<RenderedDepthTexture> DepthTexture;
+	std::shared_ptr<TextRenderPipeline> TextRenderingPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<TextTexture> FontTexture);
+	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
 	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID);
 	void Destroy(VulkanEngine& engine);
 };

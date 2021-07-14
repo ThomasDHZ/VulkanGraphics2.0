@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseRenderer.h"
 #include "TextRenderPass.h"
+#include "TextTexture.h"
 
 class GUIRenderer : public BaseRenderer
 {

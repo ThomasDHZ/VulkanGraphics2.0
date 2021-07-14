@@ -26,7 +26,7 @@ enum RenderPassID
 	FrameBuffer_Renderer,
     Deferred_Renderer,
 	Texture_Renderer,
-	GUI_Renderer,
+	Text_Renderer,
 	SSAO_Renderer,
 	BRDF_Renderer,
 	CubeTexture_Renderer,

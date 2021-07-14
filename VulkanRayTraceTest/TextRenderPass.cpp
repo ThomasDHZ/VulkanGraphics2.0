@@ -1,17 +1,20 @@
 #include "TextRenderPass.h"
 #include "GraphicsPipeline.h"
+#include "Skybox.h"
 
 TextRenderPass::TextRenderPass()
 {
 }
 
-TextRenderPass::TextRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<TextTexture> FontTexture)
+TextRenderPass::TextRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
+    BloomTexture = std::make_shared<RenderedColorTexture>(engine);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TextPipeline = std::make_shared<TextRenderPipeline>(TextRenderPipeline(engine, assetManager, RenderPass, FontTexture));
+    TextRenderingPipeline = std::make_shared<TextRenderPipeline>(TextRenderPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -34,13 +37,38 @@ void TextRenderPass::CreateRenderPass(VulkanEngine& engine)
     AlebdoAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     AttachmentDescriptionList.emplace_back(AlebdoAttachment);
 
+    VkAttachmentDescription BloomAttachment = {};
+    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BloomAttachment);
+
+    VkAttachmentDescription DepthAttachment = {};
+    DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
+    DepthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    DepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    DepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    DepthAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(DepthAttachment);
+
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    VkAttachmentReference depthReference = { 2, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDescription.colorAttachmentCount = static_cast<uint32_t>(ColorRefsList.size());
     subpassDescription.pColorAttachments = ColorRefsList.data();
+    subpassDescription.pDepthStencilAttachment = &depthReference;
 
     std::vector<VkSubpassDependency> DependencyList;
 
@@ -87,6 +115,8 @@ void TextRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(RenderedTexture->View);
+        AttachmentList.emplace_back(BloomTexture->View);
+        AttachmentList.emplace_back(DepthTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -133,16 +163,18 @@ void TextRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
 
-    std::array<VkClearValue, 1> clearValues{};
+    std::array<VkClearValue, 3> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[1].color = { 1.0f, 0.0f, 0.0f, 1.0f };
+    clearValues[2].depthStencil = { 1.0f, 0 };
 
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TextPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TextPipeline->ShaderPipelineLayout, 0, 1, &TextPipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, TextPipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.ActiveCamera);
+    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TextRenderingPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TextRenderingPipeline->ShaderPipelineLayout, 0, 1, &TextRenderingPipeline->DescriptorSets, 0, nullptr);
+    assetManager->Draw(CommandBuffer, renderPassInfo, TextRenderingPipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.ActiveCamera);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
@@ -150,10 +182,13 @@ void TextRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void TextRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<TextTexture> FontTexture)
+void TextRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine);
-    TextPipeline->Destroy(engine);
+    BloomTexture->RecreateRendererTexture(engine);
+    DepthTexture->RecreateRendererTexture(engine);
+
+    TextRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -166,17 +201,21 @@ void TextRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TextPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, FontTexture);
+    TextRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
 }
 
 void TextRenderPass::Destroy(VulkanEngine& engine)
 {
     RenderedTexture->Delete(engine);
-    TextPipeline->Destroy(engine);
+    BloomTexture->Delete(engine);
+    DepthTexture->Delete(engine);
+
+    TextRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
+
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
