@@ -6,8 +6,7 @@
 #include "Mario.h"
 #include "SparkManStage.h"
 #include "LavaTest.h"
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include "TextMesh.h"
 
 Engine::Engine()
 {
@@ -19,48 +18,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     engine = VulkanEngine(window);
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
-    assetManager->modelManager.ModelList.emplace_back(std::make_shared<LavaTest>(LavaTest(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
-
-    //FT_Library ft;
-    //if (FT_Init_FreeType(&ft))
-    //{
-    //    std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
-    //   // return -1;
-    //}
-
-    //std::string font_name = "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf";
-    //FT_Face face;
-    //if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {
-    //    std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
-    //}
-    //else
-    //{
-    //    FT_Set_Pixel_Sizes(face, 0, 48);
-
-    //    for (unsigned char c = 0; c < 128; c++)
-    //    {
-    //        if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-    //        {
-    //            std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
-    //            continue;
-    //        }
-
-    //        if (c != 32)
-    //        {
-    //            Character character =
-    //            {
-    //                std::make_shared<TextTexture>(TextTexture(engine, face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows)),
-    //                glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-    //                glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-    //                static_cast<unsigned int>(face->glyph->advance.x)
-    //            };
-    //            Characters.insert(std::pair<char, Character>(c, character));
-    //        }
-    //        
-    //    }
-    //}
-    //FT_Done_Face(face);
-    //FT_Done_FreeType(ft);
+   // assetManager->modelManager.ModelList.emplace_back(std::make_shared<LavaTest>(LavaTest(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
@@ -130,7 +88,9 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     material.MatallicMap = LoadTexture2D("../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
 
     std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
-    LoadTerrain("../texture/perlin_noise.png", materialPtr);
+   // LoadTerrain("../texture/perlin_noise.png", materialPtr);
+
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, "../texture/perlin_noise.png", materialPtr)));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

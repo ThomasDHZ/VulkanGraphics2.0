@@ -1,10 +1,10 @@
 #include "TerrainMesh.h"
 
-TerrainMesh::TerrainMesh()
+TerrainMesh::TerrainMesh() : Mesh()
 {
 }
 
-TerrainMesh::TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation, std::shared_ptr<Material> material)
+TerrainMesh::TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation, std::shared_ptr<Material> material) : Mesh()
 {
 
 	MeshID = engine.GenerateID();
@@ -20,7 +20,6 @@ TerrainMesh::TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocati
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 	
-
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, VertexList, IndexList);
 }

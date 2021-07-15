@@ -173,6 +173,7 @@
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="GUIRenderer.cpp" />
+    <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="TextRenderPass.cpp" />
     <ClCompile Include="LavaTest.cpp" />
     <ClCompile Include="LevelTile.cpp" />
@@ -394,6 +395,7 @@
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="GUIRenderer.h" />
+    <ClInclude Include="TextMesh.h" />
     <ClInclude Include="TextRenderPass.h" />
     <ClInclude Include="LavaTest.h" />
     <ClInclude Include="LevelTile.h" />

@@ -58,6 +58,12 @@
     <Filter Include="Shader\RaytracedShaders">
       <UniqueIdentifier>{04593aa1-7f49-433c-8f05-06bd2a9896fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Mesh">
+      <UniqueIdentifier>{44a49060-f196-4c1f-858b-baa130ed88a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Mesh">
+      <UniqueIdentifier>{79a0fd42-4976-43d9-92c7-e71147e3bde3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -108,9 +114,6 @@
     <ClCompile Include="VulkanWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -133,9 +136,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AssetManager.cpp">
@@ -179,9 +179,6 @@
     </ClCompile>
     <ClCompile Include="WaterSurfacePipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
-    </ClCompile>
-    <ClCompile Include="WaterSurfaceMesh.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CubeMapTexture.cpp">
       <Filter>Source Files\Texture</Filter>
@@ -236,9 +233,6 @@
     </ClCompile>
     <ClCompile Include="HeightMapTexture.cpp">
       <Filter>Source Files\Texture</Filter>
-    </ClCompile>
-    <ClCompile Include="TerrainMesh.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PBRPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
@@ -335,9 +329,6 @@
     </ClCompile>
     <ClCompile Include="BloomRenderPass.cpp">
       <Filter>Source Files\RenderPass</Filter>
-    </ClCompile>
-    <ClCompile Include="BillboardMesh.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Animaton2D.cpp">
       <Filter>Source Files</Filter>
@@ -450,12 +441,6 @@
     <ClCompile Include="LavaTest.cpp">
       <Filter>Source Files\TestObjects</Filter>
     </ClCompile>
-    <ClCompile Include="AnimatedTileMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TileMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextTexture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
@@ -467,6 +452,30 @@
     </ClCompile>
     <ClCompile Include="GUIRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="BillboardMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterSurfaceMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimatedTileMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Source Files\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -769,9 +778,6 @@
     <ClInclude Include="Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SceneData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -800,9 +806,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AssetManager.h">
@@ -846,9 +849,6 @@
     </ClInclude>
     <ClInclude Include="WaterSurfacePipeline.h">
       <Filter>Header Files\Pipelines</Filter>
-    </ClInclude>
-    <ClInclude Include="WaterSurfaceMesh.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
@@ -903,9 +903,6 @@
     </ClInclude>
     <ClInclude Include="HeightMapTexture.h">
       <Filter>Header Files\Texture</Filter>
-    </ClInclude>
-    <ClInclude Include="TerrainMesh.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PBRPipeline.h">
       <Filter>Header Files\Pipelines</Filter>
@@ -1002,9 +999,6 @@
     </ClInclude>
     <ClInclude Include="BloomRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
-    </ClInclude>
-    <ClInclude Include="BillboardMesh.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Animaton2D.h">
       <Filter>Header Files</Filter>
@@ -1117,12 +1111,6 @@
     <ClInclude Include="LavaTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AnimatedTileMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TileMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TextTexture.h">
       <Filter>Header Files\Texture</Filter>
     </ClInclude>
@@ -1134,6 +1122,30 @@
     </ClInclude>
     <ClInclude Include="GUIRenderer.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BillboardMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterSurfaceMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="TileMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedTileMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Header Files\Mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
