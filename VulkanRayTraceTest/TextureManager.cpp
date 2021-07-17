@@ -25,10 +25,12 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(VulkanEngine& engine, c
 	return texture;
 }
 
-uint32_t TextureManager::LoadTexture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
+std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
 {
-	TextureList.emplace_back(std::make_shared<Texture2D>(Texture2D(engine, width, height, PixelList, format)));
-	return TextureList.back()->TextureID;
+	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, width, height, PixelList, format));
+	TextureList.emplace_back(texture);
+	TextureList.back()->TextureID;
+	return texture;
 }
 
 uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
@@ -37,6 +39,14 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 	TextureList.emplace_back(RenderedTexture);
 	TextureList.back()->TextureBufferIndex = TextureList.size();
 	return TextureID;
+}
+
+std::shared_ptr<TextTexture> TextureManager::LoadTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height)
+{
+	std::shared_ptr<TextTexture> texture = std::make_shared<TextTexture>(TextTexture(engine, GlyphData, width, height));
+	TextureList.emplace_back(texture);
+	TextureList.back()->TextureID;
+	return texture;
 }
 
 uint32_t TextureManager::Load3DTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format)

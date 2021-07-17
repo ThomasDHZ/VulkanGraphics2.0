@@ -4,7 +4,8 @@
 
 class TextTexture : public Texture
 {
-protected:
+private:
+    void CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height);
     void CreateTextureView(VulkanEngine& engine);
     void CreateTextureSampler(VulkanEngine& engine);
 public:
