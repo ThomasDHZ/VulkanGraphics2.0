@@ -107,6 +107,6 @@ layout(location = 1) out vec4 outBloom;
 void main() 
 {
 	MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
-    outColor = vec4(texture(TextureMap[material.DiffuseMapID], TexCoords).rgb, 1.0f);
+    outColor = texture(TextureMap[material.DiffuseMapID], TexCoords);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }

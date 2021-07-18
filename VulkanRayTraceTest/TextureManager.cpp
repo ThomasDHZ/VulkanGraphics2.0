@@ -41,9 +41,9 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 	return TextureID;
 }
 
-std::shared_ptr<TextTexture> TextureManager::LoadTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height)
+std::shared_ptr<FontTexture> TextureManager::LoadTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height)
 {
-	std::shared_ptr<TextTexture> texture = std::make_shared<TextTexture>(TextTexture(engine, GlyphData, width, height));
+	std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(engine, GlyphData, width, height));
 	TextureList.emplace_back(texture);
 	TextureList.back()->TextureID;
 	return texture;

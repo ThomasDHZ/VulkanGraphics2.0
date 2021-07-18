@@ -15,7 +15,8 @@
 #include "VulkanEngine.h"
 #include "Renderer.h"
 #include <map>
-#include "TextTexture.h"
+#include "FontTexture.h"
+#include "Font.h"
 
 class Engine {
 private:
@@ -23,6 +24,7 @@ private:
     Renderer renderer;
     std::shared_ptr<VulkanWindow> window;
     std::shared_ptr<AssetManager> assetManager;
+    std::shared_ptr<Font> font;
 
 public:
     Engine();

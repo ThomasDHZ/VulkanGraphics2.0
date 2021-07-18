@@ -3,7 +3,7 @@
 #include <memory>
 #include "Texture2D.h"
 #include "Texture3D.h"
-#include "TextTexture.h"
+#include "FontTexture.h"
 #include "CubeMapTexture.h"
 #include "RenderedRayTracedColorTexture.h"
 
@@ -24,7 +24,7 @@ public:
 	std::shared_ptr<Texture2D> LoadTexture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
 	std::shared_ptr<Texture2D> LoadTexture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format);
 	uint32_t LoadTexture2D(std::shared_ptr<Texture> RenderedTexture);
-	std::shared_ptr<TextTexture> LoadTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height);
+	std::shared_ptr<FontTexture> LoadTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height);
 	uint32_t Load3DTexture(VulkanEngine& engine, const std::string TextureLocation, VkFormat format);
 	uint32_t LoadTexture3D(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format);
 	void DeleteTexture(VulkanEngine& engine, uint32_t TextureBufferIndex);

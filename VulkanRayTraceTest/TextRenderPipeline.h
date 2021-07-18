@@ -1,7 +1,7 @@
 #pragma once
 #include "AssetManager.h"
 #include "GraphicsPipeline.h"
-#include "TextTexture.h"
+#include "FontTexture.h"
 
 class TextRenderPipeline : public GraphicsPipeline
 {

@@ -92,16 +92,8 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
    // LoadTerrain("../texture/perlin_noise.png", materialPtr);
 
-    MaterialTexture fontmaterial;
-    fontmaterial.DiffuseMap = LoadTexture2D("../texture/DragonQuestFont.png", VK_FORMAT_R8G8B8A8_SRGB);
-    fontmaterial.AlbedoMap = LoadTexture2D("../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    fontmaterial.RoughnessMap = LoadTexture2D("../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    fontmaterial.AOMap = LoadTexture2D("../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    fontmaterial.MatallicMap = LoadTexture2D("../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-
-    std::shared_ptr<Material> materialPtr2 = LoadMaterial("FontMaterial", fontmaterial);
-
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, "../texture/perlin_noise.png", materialPtr2)));
+    font = std::make_shared<Font>(Font(engine, assetManager->materialManager, assetManager->textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf"));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, font, "../texture/perlin_noise.png")));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

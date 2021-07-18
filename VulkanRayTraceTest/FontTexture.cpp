@@ -1,10 +1,10 @@
-#include "TextTexture.h"
+#include "FontTexture.h"
 
-TextTexture::TextTexture() : Texture()
+FontTexture::FontTexture() : Texture()
 {
 }
 
-TextTexture::TextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height) : Texture()
+FontTexture::FontTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height) : Texture()
 {
 	TextureID = engine.GenerateID();
 	CreateTextTexture(engine, GlyphData, width, height);
@@ -12,42 +12,50 @@ TextTexture::TextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, 
 	CreateTextureSampler(engine);
 }
 
-TextTexture::~TextTexture()
+FontTexture::~FontTexture()
 {
 }
 
-void TextTexture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height)
+void FontTexture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height)
 {
 	Width = width;
 	Height = height;
 
-	VkDeviceSize imageSize = Width * Height;
-
-
+	VkDeviceSize glypfSize = Width * Height;
 	byte* buff = static_cast<byte*>(GlyphData);
 
-	std::vector<byte> PixelList;
-	for (int x = 0; x < imageSize; x++)
+	std::vector<Pixel> PixelList;
+	for (int y = 0; y < height; y++)
 	{
-		PixelList.emplace_back(0xff);
+		for (int x = 0; x < width; x++)
+		{
+			const uint32_t index = x + (width * y);
+			PixelList.emplace_back(Pixel(buff[index], buff[index], buff[index], 0xff));
+		}
 	}
-	//imageSize *= 4;
+	glypfSize *= 4;
+
+	VkDeviceSize imageSize = Width * Height * sizeof(Pixel);
+
 	VulkanBuffer StagingBuffer;
 	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &PixelList[0]);
 
+	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
+
 	VkImageCreateInfo TextureInfo = {};
+	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	TextureInfo.imageType = VK_IMAGE_TYPE_2D;
-	TextureInfo.format = VK_FORMAT_R8_UNORM;
 	TextureInfo.extent.width = Width;
 	TextureInfo.extent.height = Height;
-	TextureInfo.extent.depth = 1;
-	TextureInfo.mipLevels = 1;
+	TextureInfo.extent.depth = Depth;
+	TextureInfo.mipLevels = MipMapLevels;
 	TextureInfo.arrayLayers = 1;
-	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
 	TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	Texture::CreateTextureImage(engine, TextureInfo);
 
@@ -55,17 +63,19 @@ void TextTexture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint3
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
 	StagingBuffer.DestoryBuffer(engine.Device);
+
+	GenerateMipmaps(engine, VK_FORMAT_R8G8B8A8_UNORM);
 }
 
-void TextTexture::CreateTextureView(VulkanEngine& engine)
+void FontTexture::CreateTextureView(VulkanEngine& engine)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	TextureImageViewInfo.format = VK_FORMAT_R8_UNORM;
+	TextureImageViewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
 	TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
-	TextureImageViewInfo.subresourceRange.levelCount = 1;
+	TextureImageViewInfo.subresourceRange.levelCount = MipMapLevels;
 	TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
@@ -75,21 +85,25 @@ void TextTexture::CreateTextureView(VulkanEngine& engine)
 	}
 }
 
-void TextTexture::CreateTextureSampler(VulkanEngine& engine)
+void FontTexture::CreateTextureSampler(VulkanEngine& engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	TextureImageSamplerInfo.magFilter = VK_FILTER_LINEAR;
-	TextureImageSamplerInfo.minFilter = VK_FILTER_LINEAR;
-	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	TextureImageSamplerInfo.magFilter = VK_FILTER_NEAREST;
+	TextureImageSamplerInfo.minFilter = VK_FILTER_NEAREST;
 	TextureImageSamplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	TextureImageSamplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	TextureImageSamplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	TextureImageSamplerInfo.mipLodBias = 0.0f;
-	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_NEVER;
-	TextureImageSamplerInfo.minLod = 0.0f;
-	TextureImageSamplerInfo.maxLod = 1.0f;
-	TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+	TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
+	TextureImageSamplerInfo.maxAnisotropy = 16.0f;
+	TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	TextureImageSamplerInfo.unnormalizedCoordinates = VK_FALSE;
+	TextureImageSamplerInfo.compareEnable = VK_FALSE;
+	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+	TextureImageSamplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	TextureImageSamplerInfo.minLod = 0;
+	TextureImageSamplerInfo.maxLod = static_cast<float>(MipMapLevels);
+	TextureImageSamplerInfo.mipLodBias = 0;
 
 	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{

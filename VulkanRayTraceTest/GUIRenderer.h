@@ -1,12 +1,12 @@
 #pragma once
 #include "BaseRenderer.h"
 #include "TextRenderPass.h"
-#include "TextTexture.h"
+#include "FontTexture.h"
 
 class GUIRenderer : public BaseRenderer
 {
 private:
-	std::shared_ptr<TextTexture> textTexture;
+	std::shared_ptr<FontTexture> textTexture;
 	TextRenderPass TextRenderer;
 
 public:
