@@ -92,8 +92,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
    // LoadTerrain("../texture/perlin_noise.png", materialPtr);
 
-    font = std::make_shared<Font>(Font(engine, assetManager->materialManager, assetManager->textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf"));
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, font, "../texture/perlin_noise.png")));
+    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, assetManager->guiManager.FontList[0], "../texture/perlin_noise.png")));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

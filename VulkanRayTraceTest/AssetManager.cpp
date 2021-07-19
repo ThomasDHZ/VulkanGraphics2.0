@@ -11,6 +11,7 @@ AssetManager::AssetManager(VulkanEngine& engine, std::shared_ptr<VulkanWindow> w
     textureManager = TextureManager(engine);
     materialManager = MaterialManager(engine, textureManager);
     lightManager = LightManager(engine, cameraManager);
+    guiManager = GUIManager(engine, materialManager, textureManager);
 
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
@@ -41,6 +42,11 @@ void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexLis
     modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material)));
 }
 
+void AssetManager::LoadFont(VulkanEngine& engine, const std::string FontLocation)
+{
+    guiManager.LoadFont(engine, materialManager, textureManager, FontLocation);
+}
+
 void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag)
 {
     float timer = engine.VulkanTimer();
@@ -51,6 +57,7 @@ void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     meshManager.Update(engine, inputManager, materialManager, cameraManager.ActiveCamera);
     modelManager.Update(engine, inputManager, materialManager, RayTraceFlag);
     lightManager.Update(engine);
+    guiManager.Update(engine);
 
     if (cameraManager.ActiveCamera->cameraType == CameraType::Perspective_Camera)
     {

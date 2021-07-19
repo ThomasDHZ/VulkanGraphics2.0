@@ -2,13 +2,17 @@
 #include "BaseRenderer.h"
 #include "TextRenderPass.h"
 #include "FontTexture.h"
+#include "FrameBufferTextureRenderPass.h"
+#include "BloomRenderPass.h"
+#include "DepthDebugRenderPass.h"
+#include "FrameBufferRenderPass.h"
+#include "DepthRenderer.h"
 
 class GUIRenderer : public BaseRenderer
 {
 private:
-	std::shared_ptr<FontTexture> textTexture;
 	TextRenderPass TextRenderer;
-
+	FrameBufferRenderPass FrameBufferRenderer;
 public:
 	GUIRenderer();
 	GUIRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr);
@@ -22,4 +26,3 @@ public:
 
 	std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);
 };
-

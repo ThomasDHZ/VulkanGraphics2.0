@@ -6,6 +6,7 @@
 #include "RayTracePBRRenderer.h"
 #include "HybridRenderer.h"
 #include "Renderer2D.h"
+#include "GUIRenderer.h"
 
 class Renderer
 {
@@ -19,6 +20,7 @@ private:
 	//RayTracePBRRenderer pbrRayTraceRenderer;
 	HybridRenderer hybridRenderer;
 	Renderer2D renderer2D;
+	GUIRenderer guiRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;
