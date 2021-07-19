@@ -20,8 +20,6 @@ public:
 	static constexpr RenderPassID rendererPassID = Texture_Renderer;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<RenderedColorTexture> BloomTexture;
-	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 	std::shared_ptr<TextRenderPipeline> TextRenderingPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;

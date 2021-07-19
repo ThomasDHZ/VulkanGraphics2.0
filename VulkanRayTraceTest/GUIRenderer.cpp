@@ -16,6 +16,8 @@ GUIRenderer::~GUIRenderer()
 
 void GUIRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
+    TextRenderer.RebuildSwapChain(engine, assetManager);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, TextRenderer.RenderedTexture, TextRenderer.RenderedTexture);
 }
 
 void GUIRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
@@ -26,6 +28,7 @@ void GUIRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> windo
 
 void GUIRenderer::Destroy(VulkanEngine& engine)
 {
+    TextRenderer.Destroy(engine);
     FrameBufferRenderer.Destroy(engine);
 }
 
