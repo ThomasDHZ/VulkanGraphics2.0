@@ -140,12 +140,12 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
         model->SubmitToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
     }
 
-    if (ActiveRenderer == 0)
+ /*   if (ActiveRenderer == 0)
     {
         RayTraceFlag = false;
         blinnPhongRenderer.Draw(engine, window, imageIndex);
         blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
+    }*/
  //   else if (ActiveRenderer == 1)
  //   {
  //       RayTraceFlag = false;
