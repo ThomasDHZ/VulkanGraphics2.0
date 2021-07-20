@@ -61,11 +61,6 @@ layout(location = 4) out vec3 BiTangent;
 
 void main() 
 {
-    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
+    gl_Position = vec4(aPos.xy, 0.0, 1.0);
     TexCoords = aTexCoords;
-    Normal = aNormal;
-	Tangent = aTangent.rgb;
-	BiTangent = aBitangent.rgb;
-
-    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 }

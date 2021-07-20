@@ -16,12 +16,12 @@ Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, s
     assetManager = assetManagerPTR;
 
      blinnPhongRenderer = BlinnPhongRasterRenderer(engine, window, assetManager);
-    //pbrRenderer = PBRRenderer(engine, window, assetManager);
-    //rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
-  //  pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
-    //hybridRenderer = HybridRenderer(engine, window, assetManager);
-    //guiRenderer = GUIRenderer(engine, window, assetManager);
-    //renderer2D = Renderer2D(engine, window, assetManager);
+    pbrRenderer = PBRRenderer(engine, window, assetManager);
+    rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
+   // pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
+    hybridRenderer = HybridRenderer(engine, window, assetManager);
+    guiRenderer = GUIRenderer(engine, window, assetManager);
+    renderer2D = Renderer2D(engine, window, assetManager);
     guiRenderer = GUIRenderer(engine, window, assetManager);
 }
 
@@ -83,30 +83,31 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     ImGui::SliderInt("Active Camera", &assetManager->cameraManager.cameraIndex, 0, assetManager->cameraManager.CameraList.size());
 
-    //if (ActiveRenderer == 0)
+    if (ActiveRenderer == 0)
+    {
+        blinnPhongRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 1)
+    {
+        pbrRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 2)
+    {
+        rayTraceRenderer.GUIUpdate(engine);
+    }
+    //else if (ActiveRenderer == 3)
     //{
-    //    blinnPhongRenderer.GUIUpdate(engine);
+    //    pbrRayTraceRenderer.GUIUpdate(engine);
     //}
-    //else if (ActiveRenderer == 1)
-    //{
-    //    pbrRenderer.GUIUpdate(engine);
-    //}
-    //else if (ActiveRenderer == 2)
-    //{
-    //    rayTraceRenderer.GUIUpdate(engine);
-    //}
-    ////else if (ActiveRenderer == 3)
-    ////{
-    ////    pbrRayTraceRenderer.GUIUpdate(engine);
-    ////}
-    //else if (ActiveRenderer == 4)
-    //{
-    //    hybridRenderer.GUIUpdate(engine);
-    //}
-    //else if (ActiveRenderer == 5)
-    //{
-    //    renderer2D.GUIUpdate(engine);
-    //}
+    else if (ActiveRenderer == 4)
+    {
+        hybridRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 5)
+    {
+        renderer2D.GUIUpdate(engine);
+    }
+    guiRenderer.GUIUpdate(engine);
 }
 
 void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
@@ -140,42 +141,42 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
         model->SubmitToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
     }
 
- /*   if (ActiveRenderer == 0)
+    if (ActiveRenderer == 0)
     {
         RayTraceFlag = false;
         blinnPhongRenderer.Draw(engine, window, imageIndex);
         blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 1)
+    {
+        RayTraceFlag = false;
+        pbrRenderer.Draw(engine, window, imageIndex);
+        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 2)
+    {
+        RayTraceFlag = true;
+        rayTraceRenderer.Draw(engine, window, imageIndex);
+        rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+ /*   else if (ActiveRenderer == 3)
+    {
+        RayTraceFlag = true;
+        pbrRayTraceRenderer.Draw(engine, window, imageIndex);
+        pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }*/
- //   else if (ActiveRenderer == 1)
- //   {
- //       RayTraceFlag = false;
- //       pbrRenderer.Draw(engine, window, imageIndex);
- //       pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
- //   }
- //   else if (ActiveRenderer == 2)
- //   {
- //       RayTraceFlag = true;
- //       rayTraceRenderer.Draw(engine, window, imageIndex);
- //       rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
- //   }
- ///*   else if (ActiveRenderer == 3)
- //   {
- //       RayTraceFlag = true;
- //       pbrRayTraceRenderer.Draw(engine, window, imageIndex);
- //       pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
- //   }*/
- //   else if (ActiveRenderer == 4)
- //   {
- //       RayTraceFlag = true;
- //       hybridRenderer.Draw(engine, window, imageIndex);
- //       hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
- //   }
- //   else if (ActiveRenderer == 5)
- //   {
- //       RayTraceFlag = false;
- //       renderer2D.Draw(engine, window, imageIndex);
- //       renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
- //   }
+    else if (ActiveRenderer == 4)
+    {
+        RayTraceFlag = true;
+        hybridRenderer.Draw(engine, window, imageIndex);
+        hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 5)
+    {
+        RayTraceFlag = false;
+        renderer2D.Draw(engine, window, imageIndex);
+        renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
 
     guiRenderer.Draw(engine, window, imageIndex);
     guiRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);

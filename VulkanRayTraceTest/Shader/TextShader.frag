@@ -101,12 +101,9 @@ layout(location = 3) in vec3 Tangent;
 layout(location = 4) in vec3 BiTangent;
 
 layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec4 outBloom;
-
 
 void main() 
 {
 	MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
     outColor = texture(TextureMap[material.DiffuseMapID], TexCoords);
-    outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }

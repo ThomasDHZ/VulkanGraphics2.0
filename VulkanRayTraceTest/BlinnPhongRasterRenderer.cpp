@@ -7,11 +7,10 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
-    text = TextRenderPass(engine, assetManager);
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
-    //BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
-    //DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, text.RenderedTexture, text.RenderedTexture);
+    BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
+    DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     //lightPathRenderer = DepthRenderer(engine, assetManager);
 }
 
@@ -98,10 +97,9 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
 
 void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
-    text.Draw(engine, assetManager, imageIndex, rendererID);
-    //FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
-    //BloomRenderer.Draw(engine, assetManager, imageIndex);
-    //DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
+    FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
+    BloomRenderer.Draw(engine, assetManager, imageIndex);
+    DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
    /* lightPathRenderer.Draw(engine, assetManager, imageIndex);*/
 }
@@ -117,10 +115,9 @@ void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
 
 std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
 {
-    CommandBufferSubmitList.emplace_back(text.CommandBuffer);
-    //CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
-    //CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
-    //CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
     //CommandBufferSubmitList.emplace_back(lightPathRenderer.CommandBuffer);
     return CommandBufferSubmitList;
