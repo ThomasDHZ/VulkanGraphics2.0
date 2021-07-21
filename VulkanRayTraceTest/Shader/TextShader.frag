@@ -13,7 +13,7 @@ layout(push_constant) uniform GUIProperties
 	vec4 Color;
 	vec2 Translation;
 	vec2 Scale;
-} ConstMesh;
+} guiProperties;
 
 layout(binding = 0) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 1) uniform sampler2D TextureMap[];
@@ -24,5 +24,5 @@ layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    outColor = texture(TextureMap[0], TexCoords);
+    outColor = texture(TextureMap[0], TexCoords) * guiProperties.Color;
 }

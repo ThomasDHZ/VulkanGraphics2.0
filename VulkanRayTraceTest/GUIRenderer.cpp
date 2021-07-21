@@ -21,13 +21,11 @@ void GUIRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanW
 void GUIRenderer::GUIUpdate(VulkanEngine& engine)
 {
     ImGui::LabelText("Mesh", "Mesh");
-    for (int x = 0; x < assetManager->meshManager.MeshList.size(); x++)
+    for (int x = 0; x < assetManager->meshManager.GUIMeshList.size(); x++)
     {
-        ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
-        ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
-        ImGui::SliderFloat2(("UV " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-        ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->UVScale.x, 0.0f, 2.0f);
-        ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &assetManager->meshManager.MeshList[x]->UVFlip.x, 0.0f, 1.0f);
+        ImGui::SliderFloat2(("Mesh Pos " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Translation.x, -1.0f, 1.0f);
+        ImGui::SliderFloat2(("Mesh Rot " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Scale.x, -1.0f, 1.0f);
+        ImGui::SliderFloat4(("Color " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Color.x, -1.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 }
