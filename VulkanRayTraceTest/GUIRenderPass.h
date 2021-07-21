@@ -3,9 +3,9 @@
 #include "SkyBoxFrameBufferRenderingPipeline.h"
 #include "RenderedColorTexture.h"
 #include "RenderedDepthTexture.h"
-#include "TextRenderPipeline.h"
+#include "GUIRenderPipeline.h"
 
-class TextRenderPass
+class GUIRenderPass
 {
 private:
 	void CreateRenderPass(VulkanEngine& engine);
@@ -13,14 +13,14 @@ private:
 	void SetUpCommandBuffers(VulkanEngine& engine);
 
 public:
-	TextRenderPass();
-	TextRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	~TextRenderPass();
+	GUIRenderPass();
+	GUIRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	~GUIRenderPass();
 
 	static constexpr RenderPassID rendererPassID = Texture_Renderer;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<TextRenderPipeline> TextRenderingPipeline;
+	std::shared_ptr<GUIRenderPipeline> TextRenderingPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;

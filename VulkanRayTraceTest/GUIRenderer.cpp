@@ -6,7 +6,7 @@ GUIRenderer::GUIRenderer() : BaseRenderer()
 
 GUIRenderer::GUIRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
-    TextRenderer = TextRenderPass(engine, assetManager);
+    TextRenderer = GUIRenderPass(engine, assetManager);
 }
 
 GUIRenderer::~GUIRenderer()

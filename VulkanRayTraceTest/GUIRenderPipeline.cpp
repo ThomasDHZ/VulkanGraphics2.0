@@ -1,11 +1,12 @@
-#include "TextRenderPipeline.h"
+#include "GUIRenderPipeline.h"
 #include "Vertex.h"
+#include "GUIMesh.h"
 
-TextRenderPipeline::TextRenderPipeline() : GraphicsPipeline()
+GUIRenderPipeline::GUIRenderPipeline() : GraphicsPipeline()
 {
 }
 
-TextRenderPipeline::TextRenderPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+GUIRenderPipeline::GUIRenderPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -13,11 +14,11 @@ TextRenderPipeline::TextRenderPipeline(VulkanEngine& engine, std::shared_ptr<Ass
     SetUpDescriptorSets(engine, assetManager);
 }
 
-TextRenderPipeline::~TextRenderPipeline()
+GUIRenderPipeline::~GUIRenderPipeline()
 {
 }
 
-void TextRenderPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->GetMaterialDescriptorCount()));
@@ -25,7 +26,7 @@ void TextRenderPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_p
     DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
-void TextRenderPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->GetMaterialDescriptorCount() });
@@ -33,7 +34,7 @@ void TextRenderPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared
     DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void TextRenderPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     assetManager->SceneData->Update(engine);
@@ -47,7 +48,7 @@ void TextRenderPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_p
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void TextRenderPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void GUIRenderPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/TextShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -135,7 +136,7 @@ void TextRenderPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRende
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(ConstMeshInfo);
+    pushConstantRange.size = sizeof(GUIProperties);
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -174,7 +175,7 @@ void TextRenderPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRende
     }
 }
 
-void TextRenderPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void GUIRenderPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpDescriptorPool(engine, assetManager);

@@ -1,6 +1,6 @@
 #pragma once
 #include "BaseRenderer.h"
-#include "TextRenderPass.h"
+#include "GUIRenderPass.h"
 #include "FontTexture.h"
 #include "FrameBufferTextureRenderPass.h"
 #include "BloomRenderPass.h"
@@ -11,7 +11,7 @@
 class GUIRenderer : public BaseRenderer
 {
 private:
-	TextRenderPass TextRenderer;
+	GUIRenderPass TextRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
 public:
 	GUIRenderer();

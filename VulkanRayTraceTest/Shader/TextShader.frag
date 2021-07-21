@@ -10,9 +10,9 @@
 layout(push_constant) uniform GUIProperties
 {
 	uint MaterialID;
-	vec3 Color;
-	vec3 Translation;
-	vec3 Scale;
+	vec4 Color;
+	vec2 Translation;
+	vec2 Scale;
 } ConstMesh;
 
 layout(binding = 0) buffer MaterialInfos { MaterialInfo material; } MaterialList[];

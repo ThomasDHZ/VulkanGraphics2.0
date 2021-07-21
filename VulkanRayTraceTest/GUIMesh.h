@@ -45,9 +45,9 @@ struct GUIVertex
 struct GUIProperties
 {
 	alignas(4) uint32_t MaterialID = 0;
-	alignas(16) glm::vec3 Color = glm::vec3(1.0f);
-	alignas(16) glm::vec3 Translation = glm::vec3(1.0f);
-	alignas(16) glm::vec3 Scale = glm::vec3(1.0f);
+	alignas(16) glm::vec4 Color = glm::vec4(1.0f);
+	alignas(8) glm::vec2 Translation = glm::vec2(0.0f);
+	alignas(8) glm::vec2 Scale = glm::vec2(1.0f);
 };
 
 class GUIMesh
@@ -63,9 +63,9 @@ protected:
 	std::shared_ptr<Material> material;
 
 public:
-	glm::vec3 Color = glm::vec3(1.0f);
-	glm::vec3 Translation = glm::vec3(1.0f);
-	glm::vec3 Scale = glm::vec3(1.0f);
+	glm::vec4 Color = glm::vec4(1.0f);
+	glm::vec2 Translation = glm::vec2(0.0f);
+	glm::vec2 Scale = glm::vec2(1.0f);
 
 	GUIMesh();
 	GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList);

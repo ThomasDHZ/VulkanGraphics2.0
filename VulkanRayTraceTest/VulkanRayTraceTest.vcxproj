@@ -178,10 +178,10 @@
     <ClCompile Include="GUIPanel.cpp" />
     <ClCompile Include="GUIRenderer.cpp" />
     <ClCompile Include="TextMesh.cpp" />
-    <ClCompile Include="TextRenderPass.cpp" />
+    <ClCompile Include="GUIRenderPass.cpp" />
     <ClCompile Include="LavaTest.cpp" />
     <ClCompile Include="LevelTile.cpp" />
-    <ClCompile Include="TextRenderPipeline.cpp" />
+    <ClCompile Include="GUIRenderPipeline.cpp" />
     <ClCompile Include="FontTexture.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileMesh.cpp" />
@@ -404,10 +404,10 @@
     <ClInclude Include="GUIPanel.h" />
     <ClInclude Include="GUIRenderer.h" />
     <ClInclude Include="TextMesh.h" />
-    <ClInclude Include="TextRenderPass.h" />
+    <ClInclude Include="GUIRenderPass.h" />
     <ClInclude Include="LavaTest.h" />
     <ClInclude Include="LevelTile.h" />
-    <ClInclude Include="TextRenderPipeline.h" />
+    <ClInclude Include="GUIRenderPipeline.h" />
     <ClInclude Include="FontTexture.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="TileMesh.h" />

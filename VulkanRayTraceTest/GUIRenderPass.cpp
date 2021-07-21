@@ -1,26 +1,26 @@
-#include "TextRenderPass.h"
+#include "GUIRenderPass.h"
 #include "GraphicsPipeline.h"
 #include "Skybox.h"
 
-TextRenderPass::TextRenderPass()
+GUIRenderPass::GUIRenderPass()
 {
 }
 
-TextRenderPass::TextRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+GUIRenderPass::GUIRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TextRenderingPipeline = std::make_shared<TextRenderPipeline>(TextRenderPipeline(engine, assetManager, RenderPass));
+    TextRenderingPipeline = std::make_shared<GUIRenderPipeline>(GUIRenderPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
 }
 
-TextRenderPass::~TextRenderPass()
+GUIRenderPass::~GUIRenderPass()
 {
 }
 
-void TextRenderPass::CreateRenderPass(VulkanEngine& engine)
+void GUIRenderPass::CreateRenderPass(VulkanEngine& engine)
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
@@ -64,7 +64,7 @@ void TextRenderPass::CreateRenderPass(VulkanEngine& engine)
     }
 }
 
-void TextRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void GUIRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
 {
     SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
 
@@ -89,7 +89,7 @@ void TextRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
     }
 }
 
-void TextRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void GUIRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -102,7 +102,7 @@ void TextRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
     }
 }
 
-void TextRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
+void GUIRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -135,7 +135,7 @@ void TextRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void TextRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine);
 
@@ -156,7 +156,7 @@ void TextRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
     SetUpCommandBuffers(engine);
 }
 
-void TextRenderPass::Destroy(VulkanEngine& engine)
+void GUIRenderPass::Destroy(VulkanEngine& engine)
 {
     RenderedTexture->Delete(engine);
     TextRenderingPipeline->Destroy(engine);
