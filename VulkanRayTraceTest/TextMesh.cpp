@@ -1,27 +1,15 @@
 #include "TextMesh.h"
 
-TextMesh::TextMesh() : Mesh()
+TextMesh::TextMesh() : GUIMesh()
 {
 }
 
-TextMesh::TextMesh(VulkanEngine& engine, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text) : Mesh()
+TextMesh::TextMesh(VulkanEngine& engine, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text) : GUIMesh()
 {
 	font = fontPTR;
-	MeshID = engine.GenerateID();
-	MeshProperties = MeshPropertiesUniformBuffer(engine);
-	DrawFlags = MeshDrawFlags::Mesh_Draw_All;
-	MeshMaterial = font->GetFontMaterial();
-
-	MeshTransform = glm::mat4(1.0f);
-	MeshTransform = glm::transpose(MeshTransform);
-
 	BuildTextMesh(engine, Text);
-	VertexCount = VertexList.size();
-	IndexCount = IndexList.size();
-	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
+	material = font->GetFontMaterial();
 
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	SetUpMesh(engine, VertexList, IndexList);
 }
 
 TextMesh::~TextMesh()
@@ -31,9 +19,9 @@ TextMesh::~TextMesh()
 void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 {
 	float counter = 0;
-	float StartPos = 0.0f;
+	float StartPos = -5.0f;
 	float EndPos = 0.0f;
-	float scale = 1.0f;
+	float scale = 0.009f;
 	glm::vec2 LetterSize = glm::vec2(5.0f);
 	for (std::string::const_iterator x = Text.begin(); x != Text.end(); x++)
 	{
@@ -48,10 +36,10 @@ void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 		VertexCount = VertexList.size();
 		IndexCount = IndexList.size();
 
-		const Vertex BottomLeftVertex =  { { xpos + w, ypos,     0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {1.0f,  0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f } };
-		const Vertex BottomRightVertex = { { xpos,     ypos,     0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f } };
-		const Vertex TopRightVertex =    { { xpos,	   ypos + h, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, -1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f } };
-		const Vertex TopLeftVertex =     { { xpos + w, ypos + h, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {1.0f, -1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f } };
+		const GUIVertex BottomLeftVertex =  { { xpos + w, ypos,    }, {1.0f,  0.0f} };
+		const GUIVertex BottomRightVertex = { { xpos,     ypos,    }, {0.0f,  0.0f} };
+		const GUIVertex TopRightVertex =    { { xpos,	  ypos + h }, {0.0f, -1.0f} };
+		const GUIVertex TopLeftVertex =     { { xpos + w, ypos + h }, {1.0f, -1.0f} };
 
 		VertexList.emplace_back(BottomLeftVertex);
 		VertexList.emplace_back(BottomRightVertex);
@@ -68,4 +56,11 @@ void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 		counter++;
 		StartPos += (ch.Advance >> 6) * scale;
 	}
+
+	VertexCount = VertexList.size();
+	IndexCount = IndexList.size();
+
+	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(GUIVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
+	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+
 }

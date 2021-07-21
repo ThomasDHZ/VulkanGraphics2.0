@@ -8,6 +8,7 @@
 #include "LavaTest.h"
 #include "TextMesh.h"
 #include <ft2build.h>
+#include "GUIPanel.h"
 #include FT_FREETYPE_H
 
 Engine::Engine()
@@ -92,7 +93,8 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
    // LoadTerrain("../texture/perlin_noise.png", materialPtr);
 
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, assetManager->guiManager.FontList[0], "../texture/perlin_noise.png")));
+    assetManager->meshManager.GUIMeshList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr)));
+    assetManager->meshManager.GUIMeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, assetManager->guiManager.FontList[0], "../texture/perlin_noise.png")));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

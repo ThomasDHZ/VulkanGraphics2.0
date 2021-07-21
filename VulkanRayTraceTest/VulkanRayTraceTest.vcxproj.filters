@@ -474,9 +474,6 @@
     <ClCompile Include="AnimatedTileMesh.cpp">
       <Filter>Source Files\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="TextMesh.cpp">
-      <Filter>Source Files\Mesh</Filter>
-    </ClCompile>
     <ClCompile Include="Sprite.cpp">
       <Filter>Source Files\Mesh</Filter>
     </ClCompile>
@@ -488,6 +485,15 @@
     </ClCompile>
     <ClCompile Include="GUIManager.cpp">
       <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIMesh.cpp">
+      <Filter>Source Files\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIPanel.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMesh.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1150,9 +1156,6 @@
     <ClInclude Include="Mesh.h">
       <Filter>Header Files\Mesh</Filter>
     </ClInclude>
-    <ClInclude Include="TextMesh.h">
-      <Filter>Header Files\Mesh</Filter>
-    </ClInclude>
     <ClInclude Include="Sprite.h">
       <Filter>Header Files\Mesh</Filter>
     </ClInclude>
@@ -1164,6 +1167,15 @@
     </ClInclude>
     <ClInclude Include="GUIManager.h">
       <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="GUIMesh.h">
+      <Filter>Header Files\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="GUIPanel.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="TextMesh.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

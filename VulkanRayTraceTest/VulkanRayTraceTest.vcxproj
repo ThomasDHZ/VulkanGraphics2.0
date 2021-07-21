@@ -174,6 +174,8 @@
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GUIManager.cpp" />
+    <ClCompile Include="GUIMesh.cpp" />
+    <ClCompile Include="GUIPanel.cpp" />
     <ClCompile Include="GUIRenderer.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="TextRenderPass.cpp" />
@@ -398,6 +400,8 @@
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="GUIManager.h" />
+    <ClInclude Include="GUIMesh.h" />
+    <ClInclude Include="GUIPanel.h" />
     <ClInclude Include="GUIRenderer.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="TextRenderPass.h" />
