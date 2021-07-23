@@ -734,10 +734,10 @@
     <None Include="Shader\WireframeShader.vert">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\TextShader.frag">
+    <None Include="Shader\GUIShader.frag">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Shader\TextShader.vert">
+    <None Include="Shader\GUIShader.vert">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

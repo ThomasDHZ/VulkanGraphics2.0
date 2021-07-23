@@ -34,15 +34,15 @@ void GUIMesh::Update(VulkanEngine& engine, InputManager& inputManager)
 
 void GUIMesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 {
-	GUIProperties GUIInfo;
+	GUIMeshProperties GUIInfo;
+	GUIInfo.MaterialID = material->MaterialBufferIndex;
 	GUIInfo.Color = Color;
 	GUIInfo.Translation = Translation;
 	GUIInfo.Scale = Scale;
 
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
-	vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(GUIProperties), &GUIInfo);
-	vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
+	vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(GUIMeshProperties), &GUIInfo);
 	vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 	vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
 }

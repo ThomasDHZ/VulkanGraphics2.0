@@ -23,8 +23,8 @@ void GUIRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::LabelText("Mesh", "Mesh");
     for (int x = 0; x < assetManager->meshManager.GUIMeshList.size(); x++)
     {
-        ImGui::SliderFloat2(("Mesh Pos " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Translation.x, -1.0f, 1.0f);
-        ImGui::SliderFloat2(("Mesh Rot " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Scale.x, -1.0f, 1.0f);
+        ImGui::SliderFloat2(("Mesh Pos " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Translation.x, -2.0f, 2.0f);
+        ImGui::SliderFloat2(("Mesh Sacle " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Scale.x, -1.0f, 1.0f);
         ImGui::SliderFloat4(("Color " + std::to_string(x)).c_str(), &assetManager->meshManager.GUIMeshList[x]->Color.x, -1.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }

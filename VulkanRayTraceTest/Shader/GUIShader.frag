@@ -24,5 +24,6 @@ layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    outColor = texture(TextureMap[0], TexCoords) * guiProperties.Color;
+	MaterialInfo material = MaterialList[guiProperties.MaterialID].material;
+    outColor = texture(TextureMap[material.DiffuseMapID], TexCoords) * guiProperties.Color;
 }

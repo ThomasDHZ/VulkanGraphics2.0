@@ -94,7 +94,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
    // LoadTerrain("../texture/perlin_noise.png", materialPtr);
 
     assetManager->meshManager.GUIMeshList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr)));
-   // assetManager->meshManager.GUIMeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, assetManager->guiManager.FontList[0], "../texture/perlin_noise.png")));
+    assetManager->meshManager.GUIMeshList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->textureManager, assetManager->guiManager.FontList[0], "SparkMan")));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

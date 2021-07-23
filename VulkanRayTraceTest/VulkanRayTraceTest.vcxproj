@@ -361,8 +361,8 @@
     <None Include="Shader\SSAOBlurShader.vert" />
     <None Include="Shader\SSAOShader.frag" />
     <None Include="Shader\SSAOShader.vert" />
-    <None Include="Shader\TextShader.frag" />
-    <None Include="Shader\TextShader.vert" />
+    <None Include="Shader\GUIShader.frag" />
+    <None Include="Shader\GUIShader.vert" />
     <None Include="Shader\TextureShader.frag" />
     <None Include="Shader\TextureShader.vert" />
     <None Include="Shader\Vertex.glsl" />

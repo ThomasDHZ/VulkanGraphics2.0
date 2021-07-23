@@ -42,7 +42,7 @@ struct GUIVertex
 	}
 };
 
-struct GUIProperties
+struct GUIMeshProperties
 {
 	alignas(4) uint32_t MaterialID = 0;
 	alignas(16) glm::vec4 Color = glm::vec4(1.0f);
