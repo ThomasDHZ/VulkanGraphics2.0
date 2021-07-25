@@ -94,7 +94,7 @@ void AssetManager::Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo ren
 
 void AssetManager::GUIDraw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout)
 {
-    meshManager.GUIDraw(commandBuffer, renderPassInfo, layout);
+   guiManager.GUIDraw(commandBuffer, renderPassInfo, layout);
 }
 
 void AssetManager::Delete(VulkanEngine& engine)

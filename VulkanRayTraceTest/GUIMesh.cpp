@@ -37,14 +37,21 @@ void GUIMesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 	GUIMeshProperties GUIInfo;
 	GUIInfo.MaterialID = material->MaterialBufferIndex;
 	GUIInfo.Color = Color;
-	GUIInfo.Translation = Translation;
+	GUIInfo.Position = Position;
 	GUIInfo.Scale = Scale;
+	GUIInfo.UVOffset = UVOffset;
 
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
 	vkCmdPushConstants(commandBuffer, layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(GUIMeshProperties), &GUIInfo);
 	vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 	vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
+}
+
+void GUIMesh::AddChildMesh(std::shared_ptr<GUIMesh> mesh)
+{
+	mesh->ParentMesh = this;
+	ChildrenMeshList.emplace_back(mesh);
 }
 
 void GUIMesh::Destory(VulkanEngine& engine)

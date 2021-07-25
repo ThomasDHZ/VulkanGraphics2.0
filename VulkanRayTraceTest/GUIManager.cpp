@@ -17,6 +17,14 @@ void GUIManager::Update(VulkanEngine& engine)
 {
 }
 
+void GUIManager::GUIDraw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout)
+{
+	for (auto& mesh : GuiMeshList)
+	{
+		mesh->Draw(commandBuffer, layout);
+	}
+}
+
 void GUIManager::LoadFont(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation)
 {
 	FontList.emplace_back(std::make_shared<Font>(Font(engine, materialManager, textureManager, FontLocation)));

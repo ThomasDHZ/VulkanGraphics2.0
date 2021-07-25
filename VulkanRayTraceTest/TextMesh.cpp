@@ -40,8 +40,8 @@ void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 
 		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos - h  }, {font->GetChar(*x + 1).UVOffset.x, 0.0f} }));
 		VertexList.emplace_back(GUIVertex({ { xpos,     ypos - h  }, {font->GetChar(*x    ).UVOffset.x, 0.0f} }));
-		VertexList.emplace_back(GUIVertex({ { xpos,	    ypos    }, {font->GetChar(*x    ).UVOffset.x, 1.0f} }));
-		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos    }, {font->GetChar(*x + 1).UVOffset.x, 1.0f} }));
+		VertexList.emplace_back(GUIVertex({ { xpos,	    ypos    }, {font->GetChar(*x    ).UVOffset.x, 0.5f} }));
+		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos    }, {font->GetChar(*x + 1).UVOffset.x, 0.5f} }));
 
 		IndexList.emplace_back(VertexCount);
 		IndexList.emplace_back(VertexCount + 1);

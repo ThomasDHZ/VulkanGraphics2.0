@@ -495,6 +495,12 @@
     <ClCompile Include="GUIRenderPipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="GUIObject.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="StatsPanel.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\shader.frag">
@@ -1176,6 +1182,12 @@
     </ClInclude>
     <ClInclude Include="GUIRenderPass.h">
       <Filter>Header Files\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="StatsPanel.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUIObject.h">
+      <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

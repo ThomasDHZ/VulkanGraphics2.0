@@ -175,8 +175,10 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GUIManager.cpp" />
     <ClCompile Include="GUIMesh.cpp" />
+    <ClCompile Include="GUIObject.cpp" />
     <ClCompile Include="GUIPanel.cpp" />
     <ClCompile Include="GUIRenderer.cpp" />
+    <ClCompile Include="StatsPanel.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="GUIRenderPass.cpp" />
     <ClCompile Include="LavaTest.cpp" />
@@ -401,8 +403,10 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="GUIManager.h" />
     <ClInclude Include="GUIMesh.h" />
+    <ClInclude Include="GUIObject.h" />
     <ClInclude Include="GUIPanel.h" />
     <ClInclude Include="GUIRenderer.h" />
+    <ClInclude Include="StatsPanel.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="GUIRenderPass.h" />
     <ClInclude Include="LavaTest.h" />

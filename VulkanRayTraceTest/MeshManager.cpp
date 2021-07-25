@@ -60,14 +60,6 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& re
     }
 }
 
-void MeshManager::GUIDraw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout)
-{
-    for (auto& mesh : GUIMeshList)
-    {
-        mesh->Draw(commandBuffer, layout);
-    }
-}
-
 void MeshManager::Destroy(VulkanEngine& engine)
 {
     for (auto mesh : MeshList)

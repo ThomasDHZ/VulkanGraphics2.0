@@ -13,6 +13,7 @@ layout(push_constant) uniform GUIProperties
 	vec4 Color;
 	vec2 Translation;
 	vec2 Scale;
+	vec2 UVOffset;
 } guiProperties;
 
 layout(binding = 0) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
@@ -25,5 +26,7 @@ layout(location = 0) out vec4 outColor;
 void main() 
 {
 	MaterialInfo material = MaterialList[guiProperties.MaterialID].material;
-    outColor = texture(TextureMap[material.DiffuseMapID], TexCoords) * guiProperties.Color;
+	vec2 texCoords = TexCoords + guiProperties.UVOffset;
+
+    outColor = texture(TextureMap[material.DiffuseMapID], texCoords) * guiProperties.Color;
 }

@@ -15,6 +15,7 @@ layout(push_constant) uniform GUIProperties
 	vec4 Color;
 	vec2 Translation;
 	vec2 Scale;
+	vec2 UVOffset;
 } guiProperties;
 
 layout (location = 0) in vec2 aPos;
