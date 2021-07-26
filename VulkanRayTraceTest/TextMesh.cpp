@@ -4,17 +4,17 @@ TextMesh::TextMesh() : GUIObject()
 {
 }
 
-TextMesh::TextMesh(VulkanEngine& engine, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text) : GUIObject()
+TextMesh::TextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text) : GUIObject()
 {
 	font = fontPTR;
-	BuildTextMesh(engine, Text);
+	BuildTextMesh(engine, materialManager, textureManager, Text);
 }
 
 TextMesh::~TextMesh()
 {
 }
 
-void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
+void TextMesh::BuildTextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string Text)
 {
 	float counter = 0;
 	float StartXPos = 0.0f;
@@ -36,10 +36,10 @@ void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 		uint32_t VertexCount = VertexList.size();
 		uint32_t IndexCount = IndexList.size();
 
-		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos - h  }, {font->GetChar(*x + 1).UVOffset.x, 0.0f} }));
-		VertexList.emplace_back(GUIVertex({ { xpos,     ypos - h  }, {font->GetChar(*x    ).UVOffset.x, 0.0f} }));
-		VertexList.emplace_back(GUIVertex({ { xpos,	    ypos    }, {font->GetChar(*x    ).UVOffset.x, 0.5f} }));
-		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos    }, {font->GetChar(*x + 1).UVOffset.x, 0.5f} }));
+		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos - h }, {1.0f,  0.0f} }));
+		VertexList.emplace_back(GUIVertex({ { xpos,     ypos - h }, {0.0f,  0.0f} }));
+		VertexList.emplace_back(GUIVertex({ { xpos,	    ypos     }, {0.0f, 1.0f} }));
+		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos     }, {1.0f, 1.0f} }));
 
 		IndexList.emplace_back(VertexCount);
 		IndexList.emplace_back(VertexCount + 1);
@@ -48,9 +48,13 @@ void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 		IndexList.emplace_back(VertexCount + 3);
 		IndexList.emplace_back(VertexCount);
 
-		StartXPos += ((ch.Advance >> 6)/2.5f) * scale;
+		StartXPos += (ch.Advance >> 6) * scale;
 		counter++;
 
-		AddGUIMesh(std::make_shared<GUIMesh>(GUIMesh(engine, VertexList, IndexList, font->GetFontMaterial())));
+		MaterialTexture materialTexture;
+		materialTexture.DiffuseMap = ch.CharTexture;
+
+		material = materialManager.LoadMaterial(engine, "z", materialTexture);
+		AddGUIMesh(std::make_shared<GUIMesh>(GUIMesh(engine, VertexList, IndexList, material)));
 	}
 }

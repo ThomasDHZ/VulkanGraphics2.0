@@ -9,8 +9,7 @@
 
 struct Character
 {
-	std::vector<Pixel> PixelList;
-	glm::vec2	 UVOffset;
+	std::shared_ptr<Texture2D> CharTexture;
 	glm::ivec2   Size;      // Size of glyph
 	glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
 	unsigned int Advance;   // Horizontal offset to advance to next glyph
@@ -19,16 +18,13 @@ struct Character
 class Font
 {
 private:
-	std::vector<Pixel> FontPixelList;
 	std::map<char, Character> Characters;
-	std::shared_ptr<Material> FontMaterial;
 
 public:
 	Font();
 	Font(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation);
 	~Font();
 
-	std::shared_ptr<Material> GetFontMaterial() { return FontMaterial; };
 	Character GetChar(uint32_t index) { return Characters[index]; }
 };
 

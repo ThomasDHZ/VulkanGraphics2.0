@@ -31,73 +31,35 @@ Font::Font(VulkanEngine& engine, MaterialManager& materialManager, TextureManage
 				continue;
 			}
 
-			if (MaxWidth < face->glyph->bitmap.width)
+			if (c != 32)
 			{
-				MaxWidth = face->glyph->bitmap.width;
-			}
-			if (MaxHeight < face->glyph->bitmap.rows)
-			{
-				MaxHeight = face->glyph->bitmap.rows;
-			}
+				uint32_t size = face->glyph->bitmap.width * face->glyph->bitmap.rows;
+				byte* buff = static_cast<byte*>(face->glyph->bitmap.buffer);
 
-
-			uint32_t size = face->glyph->bitmap.width * face->glyph->bitmap.rows;
-			byte* buff = static_cast<byte*>(face->glyph->bitmap.buffer);
-
-			std::vector<Pixel> PixelList;
-			for (int y = 0; y < 50; y++)
-			{
-				for (int x = 0; x < 45; x++)
+				std::vector<Pixel> PixelList;
+				for (int y = 0; y < face->glyph->bitmap.rows; y++)
 				{
-					if (y < face->glyph->bitmap.rows &&
-						x < face->glyph->bitmap.width )
+					for (int x = 0; x < face->glyph->bitmap.width; x++)
 					{
 						const uint32_t index = x + (face->glyph->bitmap.width * y);
 						const byte ByteColor = buff[index];
 						PixelList.emplace_back(Pixel(ByteColor, ByteColor, ByteColor, ByteColor));
 					}
-					else
-					{
-						PixelList.emplace_back(Pixel(0x00, 0x00, 0x00, 0x00));
-					}
 				}
-			}
 
-			Character character =
-			{
-				PixelList,
-				glm::vec2(0.0078125f * c, 1.0f),
-				glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-				glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-				static_cast<unsigned int>(face->glyph->advance.x)
-			};
-			Characters.insert(std::pair<char, Character>(c, character));
+				Character character =
+				{
+					textureManager.LoadTexture2D(engine, face->glyph->bitmap.width, face->glyph->bitmap.rows, PixelList, VK_FORMAT_R8G8B8A8_SRGB),
+					glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+					glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+					static_cast<unsigned int>(face->glyph->advance.x)
+				};
+				Characters.insert(std::pair<char, Character>(c, character));
+			}
 		}
 	}
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
-
-	for (int y = 0; y < 50; y++)
-	{
-		for (unsigned char c = 0; c < 128; c++)
-		{
-
-			for (int x = 0; x < 45; x++)
-			{
-				const uint32_t index = x + (45 * y);
-				const Pixel PixelColor = Characters[c].PixelList[index];
-				FontPixelList.emplace_back(PixelColor);
-			}
-		}
-	}
-
-
-	auto fontTexture = textureManager.LoadTexture2D(engine, 45 * 128, 50, FontPixelList, VK_FORMAT_R8G8B8A8_SRGB);
-
-	MaterialTexture material;
-	material.DiffuseMap = fontTexture;
-
-	FontMaterial = materialManager.LoadMaterial(engine, "FontMaterial", material);
 }
 
 Font::~Font()
