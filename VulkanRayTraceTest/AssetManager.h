@@ -39,7 +39,7 @@ public:
 
 	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);
 	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID, std::shared_ptr<Camera> CameraView);
-	void GUIDraw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout);
+	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Delete(VulkanEngine& engine);
 
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);

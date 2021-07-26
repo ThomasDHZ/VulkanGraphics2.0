@@ -127,7 +127,7 @@ void GUIRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> ass
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TextRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TextRenderingPipeline->ShaderPipelineLayout, 0, 1, &TextRenderingPipeline->DescriptorSets, 0, nullptr);
-    assetManager->GUIDraw(CommandBuffer, renderPassInfo, TextRenderingPipeline->ShaderPipelineLayout);
+    assetManager->GUIDraw(CommandBuffer, TextRenderingPipeline->ShaderPipelineLayout);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {

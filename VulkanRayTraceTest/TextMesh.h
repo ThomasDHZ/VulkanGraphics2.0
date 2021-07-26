@@ -1,9 +1,9 @@
 #pragma once
-#include "GUIMesh.h"
+#include "GUIObject.h"
 #include "Font.h"
 #include <map>
 
-class TextMesh : public GUIMesh
+class TextMesh : public GUIObject
 {
 private:
 	std::shared_ptr<Font> font;

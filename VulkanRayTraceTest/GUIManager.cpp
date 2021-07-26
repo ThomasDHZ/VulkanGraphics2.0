@@ -17,11 +17,19 @@ void GUIManager::Update(VulkanEngine& engine)
 {
 }
 
-void GUIManager::GUIDraw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout)
+void GUIManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 {
-	for (auto& mesh : GuiMeshList)
+	for (auto& obj : GuiObjectList)
 	{
-		mesh->Draw(commandBuffer, layout);
+		obj->Draw(commandBuffer, layout);
+	}
+}
+
+void GUIManager::Destory(VulkanEngine& engine)
+{
+	for (auto& obj : GuiObjectList)
+	{
+		obj->Destory(engine);
 	}
 }
 

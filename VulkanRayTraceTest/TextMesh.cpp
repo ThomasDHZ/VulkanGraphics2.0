@@ -1,15 +1,13 @@
 #include "TextMesh.h"
 
-TextMesh::TextMesh() : GUIMesh()
+TextMesh::TextMesh() : GUIObject()
 {
 }
 
-TextMesh::TextMesh(VulkanEngine& engine, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text) : GUIMesh()
+TextMesh::TextMesh(VulkanEngine& engine, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text) : GUIObject()
 {
 	font = fontPTR;
 	BuildTextMesh(engine, Text);
-	material = font->GetFontMaterial();
-
 }
 
 TextMesh::~TextMesh()
@@ -18,15 +16,15 @@ TextMesh::~TextMesh()
 
 void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 {
-	std::vector<GUIVertex> VertexList;
-	std::vector<uint32_t> IndexList;
-
 	float counter = 0;
 	float StartXPos = 0.0f;
 	float StartYPos = 0.0f;
 	float scale = 0.01f;
 	for (std::string::const_iterator x = Text.begin(); x != Text.end(); x++)
 	{
+		std::vector<GUIVertex> VertexList;
+		std::vector<uint32_t> IndexList;
+
 		const Character ch = font->GetChar(*x);
 
 		float xpos = StartXPos + ch.Bearing.x * scale;
@@ -35,8 +33,8 @@ void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 		float w = ch.Size.x * scale;
 		float h = ch.Size.y * scale;
 
-		VertexCount = VertexList.size();
-		IndexCount = IndexList.size();
+		uint32_t VertexCount = VertexList.size();
+		uint32_t IndexCount = IndexList.size();
 
 		VertexList.emplace_back(GUIVertex({ { xpos + w, ypos - h  }, {font->GetChar(*x + 1).UVOffset.x, 0.0f} }));
 		VertexList.emplace_back(GUIVertex({ { xpos,     ypos - h  }, {font->GetChar(*x    ).UVOffset.x, 0.0f} }));
@@ -52,9 +50,7 @@ void TextMesh::BuildTextMesh(VulkanEngine& engine, const std::string Text)
 
 		StartXPos += ((ch.Advance >> 6)/2.5f) * scale;
 		counter++;
+
+		AddGUIMesh(std::make_shared<GUIMesh>(GUIMesh(engine, VertexList, IndexList, font->GetFontMaterial())));
 	}
-
-	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(GUIVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
-	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
-
 }

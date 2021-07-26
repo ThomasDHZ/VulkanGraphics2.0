@@ -1,13 +1,13 @@
 #pragma once
-#include "GUIMesh.h"
+#include "GUIObject.h"
 
-class GUIPanel : public GUIMesh
+class GUIPanel : public GUIObject
 {
 private:
 protected:
 public:
 	GUIPanel();
-	GUIPanel(VulkanEngine& engine, std::shared_ptr<Material> meshmaterial);
+	GUIPanel(VulkanEngine& engine, std::shared_ptr<Material> meshmaterial, glm::vec2 position);
 	~GUIPanel();
 };
 
