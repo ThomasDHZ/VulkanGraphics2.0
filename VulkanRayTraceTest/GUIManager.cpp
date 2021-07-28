@@ -13,8 +13,12 @@ GUIManager::~GUIManager()
 {
 }
 
-void GUIManager::Update(VulkanEngine& engine)
+void GUIManager::Update(VulkanEngine& engine, InputManager& inputManager)
 {
+	for (auto& obj : GuiObjectList)
+	{
+		obj->Update(engine, inputManager);
+	}
 }
 
 void GUIManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)

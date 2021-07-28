@@ -4,7 +4,7 @@ TextMesh::TextMesh() : GUIObject()
 {
 }
 
-TextMesh::TextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text) : GUIObject()
+TextMesh::TextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position) : GUIObject(engine, position)
 {
 	font = fontPTR;
 	BuildTextMesh(engine, materialManager, textureManager, Text);

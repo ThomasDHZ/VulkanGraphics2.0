@@ -93,8 +93,13 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
    // LoadTerrain("../texture/perlin_noise.png", materialPtr);
 
-    assetManager->guiManager.GuiObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr, glm::vec2(0.0f))));
-    assetManager->guiManager.GuiObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->materialManager, assetManager->textureManager, assetManager->guiManager.FontList[0], "SparkMan")));
+    GuiRectangle rectangle;
+    rectangle.UpperLeftVertex = glm::vec2(-0.5f, -0.5f);
+    rectangle.UpperRightVertex = glm::vec2(0.5f, -0.5f);
+    rectangle.LowerRightVertex = glm::vec2(0.5f, 0.5f);
+    rectangle.LowerLeftVertex = glm::vec2(-0.5f, 0.5f);
+    assetManager->guiManager.GuiObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr, rectangle, glm::vec2(0.0f))));
+    assetManager->guiManager.GuiObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->materialManager, assetManager->textureManager, assetManager->guiManager.FontList[0], "SparkMan", glm::vec2(0.0f))));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

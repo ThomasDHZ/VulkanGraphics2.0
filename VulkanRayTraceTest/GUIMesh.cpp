@@ -13,6 +13,17 @@ GUIMesh::GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::
 	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
 }
 
+GUIMesh::GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, glm::vec2 Position)
+{
+	MeshPosition = Position;
+
+	VertexCount = VertexList.size();
+	IndexCount = IndexList.size();
+
+	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(GUIVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
+	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+}
+
 GUIMesh::GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial)
 {
 	VertexCount = VertexList.size();
@@ -24,12 +35,26 @@ GUIMesh::GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::
 	material = meshmaterial;
 }
 
+GUIMesh::GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial, glm::vec2 Position)
+{
+	MeshPosition = Position;
+
+	VertexCount = VertexList.size();
+	IndexCount = IndexList.size();
+
+	VertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, VertexList.size() * sizeof(GUIVertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, VertexList.data());
+	IndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
+
+	material = meshmaterial;
+}
+
 GUIMesh::~GUIMesh()
 {
 }
 
-void GUIMesh::Update(VulkanEngine& engine, InputManager& inputManager)
+void GUIMesh::Update(VulkanEngine& engine, InputManager& inputManager, glm::vec2& objectPosition)
 {
+	ObjectPosition = objectPosition;
 }
 
 void GUIMesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
@@ -37,7 +62,7 @@ void GUIMesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 	GUIMeshProperties GUIInfo;
 	GUIInfo.MaterialID = material->MaterialBufferIndex;
 	GUIInfo.Color = Color;
-	GUIInfo.Position = Position;
+	GUIInfo.Position = ObjectPosition + MeshPosition;
 	GUIInfo.Scale = Scale;
 	GUIInfo.UVOffset = UVOffset;
 

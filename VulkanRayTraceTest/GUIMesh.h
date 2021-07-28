@@ -65,18 +65,22 @@ protected:
 	std::vector<std::shared_ptr<GUIMesh>> ChildrenMeshList;
 	std::shared_ptr<Material> material;
 
+	glm::vec2 ObjectPosition = glm::vec2(0.0f);
+
 public:
-	glm::vec2 Position = glm::vec2(0.0f);
+	glm::vec2 MeshPosition = glm::vec2(0.0f);
 	glm::vec2 Scale = glm::vec2(1.0f);
 	glm::vec4 Color = glm::vec4(1.0f);
 	glm::vec2 UVOffset = glm::vec2(0.0f);
 
 	GUIMesh();
 	GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList);
+	GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, glm::vec2 Position);
 	GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial);
+	GUIMesh(VulkanEngine& engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial, glm::vec2 Position);
 	~GUIMesh();
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, glm::vec2& objectPosition);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	virtual void Destory(VulkanEngine& engine);
 	void AddChildMesh(std::shared_ptr<GUIMesh> mesh);

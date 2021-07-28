@@ -22,6 +22,7 @@ public:
 
 	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
 	void GUIUpdate(VulkanEngine& engine);
+
 	void Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex);
 	void Destroy(VulkanEngine& engine);
 

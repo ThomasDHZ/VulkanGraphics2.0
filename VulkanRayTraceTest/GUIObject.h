@@ -6,19 +6,23 @@ class GUIObject
 {
 private:
 	std::vector<std::shared_ptr<GUIMesh>> GuiMeshList;
+	std::vector<std::shared_ptr<GUIObject>> GuiObjectList;
+	GUIObject* ParentObject;
 protected:
-	glm::vec2 Position;
+
 
 public:
+	glm::vec2 Position;
+
 	GUIObject();
 	GUIObject(VulkanEngine& engine, glm::vec2 position);
 	~GUIObject();
 
 	void AddGUIMesh(std::shared_ptr<GUIMesh> mesh);
-	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
-	void Destory(VulkanEngine& engine);
+	void AddChildObject(std::shared_ptr<GUIObject> obj);
 
-	uint32_t GetGUIMeshCount() { return GuiMeshList.size(); }
-	std::shared_ptr<GUIMesh> GetGUIMesh(uint32_t index) { return GuiMeshList[index]; }
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
+	virtual void Destory(VulkanEngine& engine);
 };
 

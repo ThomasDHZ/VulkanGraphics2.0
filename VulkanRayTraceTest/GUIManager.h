@@ -17,7 +17,7 @@ public:
 	GUIManager(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager);
 	~GUIManager();
 
-	void Update(VulkanEngine& engine);
+	void Update(VulkanEngine& engine, InputManager& inputManager);
 	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Destory(VulkanEngine& engine);
 

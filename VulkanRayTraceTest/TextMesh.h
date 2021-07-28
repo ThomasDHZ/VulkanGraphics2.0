@@ -12,7 +12,7 @@ private:
 public:
 
 	TextMesh();
-	TextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text);
+	TextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position);
 	~TextMesh();
 };
 

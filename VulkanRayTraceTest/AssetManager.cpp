@@ -57,7 +57,7 @@ void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     meshManager.Update(engine, inputManager, materialManager, cameraManager.ActiveCamera);
     modelManager.Update(engine, inputManager, materialManager, RayTraceFlag);
     lightManager.Update(engine);
-    guiManager.Update(engine);
+    guiManager.Update(engine, inputManager);
 
     if (cameraManager.ActiveCamera->cameraType == CameraType::Perspective_Camera)
     {
