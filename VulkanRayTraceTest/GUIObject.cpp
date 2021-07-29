@@ -1,12 +1,15 @@
 #include "GUIObject.h"
 
-GUIObject::GUIObject()
+GUIObject::GUIObject() : Object()
 {
 }
 
-GUIObject::GUIObject(VulkanEngine& engine, glm::vec2 position)
+GUIObject::GUIObject(VulkanEngine& engine) : Object(engine, ObjectType::Obj_GuiObject)
 {
-	Position = position;
+}
+
+GUIObject::GUIObject(VulkanEngine& engine, glm::vec2 position) : Object(engine, position, ObjectType::Obj_GuiObject)
+{
 }
 
 GUIObject::~GUIObject()
@@ -18,17 +21,11 @@ void GUIObject::AddGUIMesh(std::shared_ptr<GUIMesh> mesh)
 	GuiMeshList.emplace_back(mesh);
 }
 
-void GUIObject::AddChildObject(std::shared_ptr<GUIObject> obj)
-{
-	ParentObject = this;
-	GuiObjectList.emplace_back(obj);
-}
-
 void GUIObject::Update(VulkanEngine& engine, InputManager& inputManager)
 {
 	for (auto& mesh : GuiMeshList)
 	{
-		mesh->Update(engine, inputManager, Position);
+		mesh->Update(engine, inputManager, glm::vec2(Position.x, Position.y));
 	}
 }
 

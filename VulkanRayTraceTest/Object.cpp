@@ -4,49 +4,30 @@ Object::Object()
 {
 }
 
-Object::Object(VulkanEngine& engine, glm::vec2 position)
+Object::Object(VulkanEngine& engine, ObjectType objType)
 {
-	Position = glm::vec3(position.x, position.y, 0.0f);
+	glm::vec3(0.0f);
+	ObjType = objType;
 }
 
-Object::Object(VulkanEngine& engine, glm::vec3 position)
+Object::Object(VulkanEngine& engine, glm::vec2 position, ObjectType objType)
+{
+	Position = glm::vec3(position.x, position.y, 0.0f);
+	ObjType = objType;
+}
+
+Object::Object(VulkanEngine& engine, glm::vec3 position, ObjectType objType)
 {
 	Position = position;
+	ObjType = objType;
 }
 
 Object::~Object()
 {
 }
 
-void Object::AddChildModel(std::shared_ptr<Model> model)
-{
-	ModelList.emplace_back(model);
-}
-
-void Object::AddChildMesh(std::shared_ptr<Mesh> mesh)
-{
-	MeshList.emplace_back(mesh);
-}
-
 void Object::AddChildObject(std::shared_ptr<Object> obj)
 {
 	ParentObject = this;
 	ObjectList.emplace_back(obj);
-}
-
-void Object::Update(VulkanEngine& engine, InputManager& inputManager)
-{
-}
-
-void Object::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
-{
-
-}
-
-void Object::Destory(VulkanEngine& engine)
-{
-	for (auto& mesh : MeshList)
-	{
-		mesh->Destory(engine);
-	}
 }

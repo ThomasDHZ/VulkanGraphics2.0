@@ -180,6 +180,7 @@
     <ClCompile Include="GUIPanel.cpp" />
     <ClCompile Include="GUIRenderer.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="StatsPanel.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="GUIRenderPass.cpp" />
@@ -411,6 +412,7 @@
     <ClInclude Include="GuiRectangle.h" />
     <ClInclude Include="GUIRenderer.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="StatsPanel.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="GUIRenderPass.h" />

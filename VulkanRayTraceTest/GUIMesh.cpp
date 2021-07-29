@@ -52,7 +52,7 @@ GUIMesh::~GUIMesh()
 {
 }
 
-void GUIMesh::Update(VulkanEngine& engine, InputManager& inputManager, glm::vec2& objectPosition)
+void GUIMesh::Update(VulkanEngine& engine, InputManager& inputManager, glm::vec2 objectPosition)
 {
 	ObjectPosition = objectPosition;
 }
