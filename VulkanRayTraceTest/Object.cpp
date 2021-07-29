@@ -6,20 +6,23 @@ Object::Object()
 
 Object::Object(VulkanEngine& engine, ObjectType objType)
 {
-	glm::vec3(0.0f);
+	ObjID = engine.GenerateObjID();
 	ObjType = objType;
+	glm::vec3(0.0f);
 }
 
 Object::Object(VulkanEngine& engine, glm::vec2 position, ObjectType objType)
 {
-	Position = glm::vec3(position.x, position.y, 0.0f);
+	ObjID = engine.GenerateObjID();
 	ObjType = objType;
+	Position = glm::vec3(position.x, position.y, 0.0f);
 }
 
 Object::Object(VulkanEngine& engine, glm::vec3 position, ObjectType objType)
 {
-	Position = position;
+	ObjID = engine.GenerateObjID();
 	ObjType = objType;
+	Position = position;
 }
 
 Object::~Object()

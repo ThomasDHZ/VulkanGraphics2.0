@@ -114,6 +114,12 @@ VulkanEngine::~VulkanEngine()
 
 }
 
+uint32_t VulkanEngine::GenerateObjID()
+{
+	NextObjID++;
+	return NextObjID;
+}
+
 uint32_t VulkanEngine::GenerateID()
 {
 	NextID++;

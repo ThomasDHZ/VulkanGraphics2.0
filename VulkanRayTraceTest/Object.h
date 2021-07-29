@@ -17,8 +17,9 @@ protected:
 	std::vector<std::shared_ptr<Object>> ObjectList;
 
 public:
-	glm::vec3 Position;
+	uint32_t ObjID = 0;
 	ObjectType ObjType;
+	glm::vec3 Position;
 
 	Object();
 	Object(VulkanEngine& engine, ObjectType objType);
