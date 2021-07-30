@@ -16,49 +16,74 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::AddChildMesh(std::shared_ptr<Mesh> mesh)
+void GameObject::AddChildMesh(std::shared_ptr<MeshManager> meshManager, std::shared_ptr<Mesh> mesh)
 {
 	MeshList.emplace_back(mesh);
+	meshManager->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
+void GameObject::AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
 {
 	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, VertexList, MeshDrawFlags)));
+	meshManager->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags)
+void GameObject::AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags)
 {
 	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, VertexList, IndexList, MeshDrawFlags)));
+	meshManager->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags)
+void GameObject::AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags)
 {
 	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, VertexList, IndexList, material, MeshDrawFlags)));
+	meshManager->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildMesh(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType, MeshDrawFlags MeshDrawFlags)
+void GameObject::AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType, MeshDrawFlags MeshDrawFlags)
 {
 	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, VertexList, IndexList, material, MeshType, MeshDrawFlags)));
+	meshManager->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildModel(std::shared_ptr<Model> model)
+void GameObject::AddChildModel(MeshManager& meshManager, std::shared_ptr<Model> model)
 {
 	ModelList.emplace_back(model);
+	for (auto& mesh : ModelList.back()->MeshList)
+	{
+		MeshList.emplace_back(mesh);
+		meshManager.AddMesh(mesh);
+	}
 }
 
 void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
 {
 	ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materialManager, textureManager, VertexList, IndexList, DrawFlags)));
+	for (auto& mesh : ModelList.back()->MeshList)
+	{
+		MeshList.emplace_back(mesh);
+		meshManager.AddMesh(mesh);
+	}
 }
 
 void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
 {
 	ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material, DrawFlags)));
+	for (auto& mesh : ModelList.back()->MeshList)
+	{
+		MeshList.emplace_back(mesh);
+		meshManager.AddMesh(mesh);
+	}
 }
 
 void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags)
 {
 	ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materiallManager, textureManager, FilePath, DrawFlags)));
+	for (auto& mesh : ModelList.back()->MeshList)
+	{
+		MeshList.emplace_back(mesh);
+		meshManager.AddMesh(mesh);
+	}
 }
 
 void GameObject::Update(VulkanEngine& engine, InputManager& inputManager)

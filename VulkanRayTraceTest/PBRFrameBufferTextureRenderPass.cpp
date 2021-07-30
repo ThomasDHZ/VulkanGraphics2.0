@@ -174,7 +174,7 @@ void PBRFrameBufferTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, PBRTexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, PBRTexturePipeline->ShaderPipelineLayout, 0, 1, &PBRTexturePipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, PBRTexturePipeline->ShaderPipelineLayout, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, renderPassInfo, PBRTexturePipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.ActiveCamera);
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);

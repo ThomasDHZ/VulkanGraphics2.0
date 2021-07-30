@@ -22,10 +22,10 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     engine = VulkanEngine(window);
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
      
-    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(engine));
-    gameObject->AddChildModel(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
-    assetManager->ObjManager.ObjectList.emplace_back(gameObject);
-   // assetManager->modelManager.ModelList.emplace_back(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+    //std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(engine));
+    //gameObject->AddChildModel(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+    //assetManager->ObjManager.ObjectList.emplace_back(gameObject);
+    assetManager->modelManager.ModelList.emplace_back(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
