@@ -17,5 +17,6 @@ public:
 	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Destory(VulkanEngine& engine);
+	std::shared_ptr<Model> GetModel(uint32_t ModelID);
 };
 

@@ -42,7 +42,7 @@ void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(VulkanEngine& engine
             glm::mat4 transformMatrix2 = glm::transpose(glm::mat4(1.0f));
             if (assetManager->meshManager.MeshList[x]->ParentModelID != 0)
             {
-                const auto model = assetManager->modelManager.GetModelIndex(assetManager->meshManager.MeshList[x]->ParentModelID);
+                const auto model = assetManager->ObjManager.GetModel(assetManager->meshManager.MeshList[x]->ParentModelID);
                 transformMatrix2 = glm::transpose(model->ModelTransform);
             }
             VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);

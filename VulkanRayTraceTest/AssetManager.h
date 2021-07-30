@@ -24,7 +24,7 @@ public:
 	MaterialManager materialManager;
 	TextureManager textureManager;
 	MeshManager meshManager;
-	ModelManager modelManager;
+	//ModelManager modelManager;
 	LightManager lightManager;
 	GUIManager guiManager;
 	ObjectManager ObjManager;
@@ -33,10 +33,10 @@ public:
 	AssetManager(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
 	~AssetManager();
 
-	void AddModel();
-	void AddModel(VulkanEngine& engine, const std::string& FilePath);
-	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
+	//void AddModel();
+	//void AddModel(VulkanEngine& engine, const std::string& FilePath);
+	//void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	//void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
 	void LoadFont(VulkanEngine& engine, const std::string FontLocation);
 
 	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);

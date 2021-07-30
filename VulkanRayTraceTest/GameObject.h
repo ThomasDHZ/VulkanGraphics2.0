@@ -4,11 +4,13 @@
 class GameObject : public Object
 {
 private:
-	std::vector<std::shared_ptr<Model>> ModelList;
-	std::vector<std::shared_ptr<Mesh>> MeshList;
 protected:
 
 public:
+
+	std::vector<std::shared_ptr<Model>> ModelList;
+	std::vector<std::shared_ptr<Mesh>> MeshList;
+
 	GameObject();
 	GameObject(VulkanEngine& engine);
 	GameObject(VulkanEngine& engine, glm::vec3 position);
@@ -28,4 +30,6 @@ public:
 	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceModeFlag);
 	virtual void SubmitAnimationToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
 	virtual void Destory(VulkanEngine& engine);
+
+	std::shared_ptr<Model> GetModel(uint32_t ModelID);
 };

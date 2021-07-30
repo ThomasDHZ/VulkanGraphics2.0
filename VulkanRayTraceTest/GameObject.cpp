@@ -127,3 +127,17 @@ void GameObject::Destory(VulkanEngine& engine)
 		mesh->Destory(engine);
 	}
 }
+
+std::shared_ptr<Model> GameObject::GetModel(uint32_t ModelID)
+{
+	std::shared_ptr<Model> modelptr = nullptr;
+	for (auto& model : ModelList)
+	{
+		if (ModelID == model->ModelID)
+		{
+			modelptr = model;
+		}
+	}
+
+	return modelptr;
+}

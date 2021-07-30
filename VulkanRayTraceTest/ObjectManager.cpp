@@ -61,3 +61,20 @@ void ObjectManager::Destory(VulkanEngine& engine)
 		obj->Destory(engine);
 	}
 }
+
+std::shared_ptr<Model> ObjectManager::GetModel(uint32_t ModelID)
+{
+	std::shared_ptr<Model> modelptr = nullptr;
+	for (auto& obj : ObjectList)
+	{
+		if (obj->ObjType == ObjectType::Obj_GameObject)
+		{
+			modelptr = static_cast<GameObject*>(obj.get())->GetModel(ModelID);
+			if (modelptr != nullptr)
+			{
+				break;
+			}
+		}
+	}
+	return modelptr;
+}

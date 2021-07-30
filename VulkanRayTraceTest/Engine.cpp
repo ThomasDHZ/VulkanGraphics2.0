@@ -187,11 +187,6 @@ std::shared_ptr<Material> Engine::LoadMaterial(const std::string& MaterialName, 
     return assetManager->materialManager.LoadMaterial(engine, MaterialName, material);
 }
 
-void Engine::LoadModel(const std::string& FilePath)
-{
-    assetManager->AddModel(engine, FilePath);
-}
-
 void Engine::LoadCubeMap(std::string CubeMapFiles[6])
 {
     assetManager->textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);

@@ -35,7 +35,6 @@ public:
     std::shared_ptr<Texture> LoadTexture2D(const std::string& FilePath, VkFormat format);
     std::shared_ptr<Material> LoadMaterial(const std::string& MaterialName, MaterialTexture& material);
     std::shared_ptr<Material> LoadMaterial(const std::string& MaterialName, std::shared_ptr<Material> material);
-    void LoadModel(const std::string& FilePath);
     void LoadCubeMap(std::string CubeMapFiles[6]);
     void LoadTerrain(const std::string& HeightMapPath, std::shared_ptr<Material> material);
 };
