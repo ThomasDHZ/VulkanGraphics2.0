@@ -82,9 +82,9 @@ void WaterSurfaceMesh::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<As
 
 void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a)
 {
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, waterSurfacePipeline->ShaderPipeline);
-	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, waterSurfacePipeline->ShaderPipelineLayout, 0, 1, &waterSurfacePipeline->DescriptorSets, 0, nullptr);
-	Mesh::Draw(commandBuffer, renderPassInfo, RendererID);
+	//vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, waterSurfacePipeline->ShaderPipeline);
+	//vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, waterSurfacePipeline->ShaderPipelineLayout, 0, 1, &waterSurfacePipeline->DescriptorSets, 0, nullptr);
+	//Mesh::Draw(commandBuffer);
 }
 
 void WaterSurfaceMesh::SubmitToCMDBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)

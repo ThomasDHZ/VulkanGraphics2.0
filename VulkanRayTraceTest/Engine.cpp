@@ -9,6 +9,7 @@
 #include "TextMesh.h"
 #include <ft2build.h>
 #include "GUIPanel.h"
+#include "GameObject.h"
 #include FT_FREETYPE_H
 
 Engine::Engine()
@@ -20,8 +21,11 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     window = std::make_shared<VulkanWindow>(VulkanWindow(width, height, WindowName));
     engine = VulkanEngine(window);
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
-
-    assetManager->modelManager.ModelList.emplace_back(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+     
+    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(engine));
+    gameObject->AddChildModel(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
+    assetManager->ObjManager.ObjectList.emplace_back(gameObject);
+   // assetManager->modelManager.ModelList.emplace_back(std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
@@ -98,8 +102,8 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     rectangle.UpperRightVertex = glm::vec2(0.5f, -0.5f);
     rectangle.LowerRightVertex = glm::vec2(0.5f, 0.5f);
     rectangle.LowerLeftVertex = glm::vec2(-0.5f, 0.5f);
-    assetManager->guiManager.GuiObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr, rectangle, glm::vec2(0.0f))));
-    assetManager->guiManager.GuiObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->materialManager, assetManager->textureManager, assetManager->guiManager.FontList[0], "SparkMan", glm::vec2(0.0f))));
+    assetManager->ObjManager.ObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr, rectangle, glm::vec2(0.0f))));
+    assetManager->ObjManager.ObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->materialManager, assetManager->textureManager, assetManager->guiManager.FontList[0], "SparkMan", glm::vec2(0.0f))));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);

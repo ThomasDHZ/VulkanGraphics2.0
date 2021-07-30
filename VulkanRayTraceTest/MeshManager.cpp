@@ -52,11 +52,11 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& re
         {
             mesh->Draw(commandBuffer, layout, RendererID, CameraView);
         }
-        else if(mesh->DrawFlags == MeshDrawFlags::Mesh_Skip_Water_Renderer)
+  /*      else if(mesh->DrawFlags == MeshDrawFlags::Mesh_Skip_Water_Renderer)
         {
             auto water = static_cast<WaterSurfaceMesh*>(mesh.get());
             water->Draw(commandBuffer, renderPassInfo, RendererID, 1);
-        }
+        }*/
     }
 }
 

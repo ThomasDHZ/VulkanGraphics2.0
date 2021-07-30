@@ -220,7 +220,7 @@ void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManage
             vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipelineLayout, 0, 1, &prefilterRenderingPipeline->DescriptorSets, 0, nullptr);
             vkCmdPushConstants(CommandBuffer, prefilterRenderingPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterConst), &prefilterConst);
             vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer, renderPassInfo, RendererID);
+            static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
             vkCmdEndRenderPass(CommandBuffer);
 
             VkImageSubresourceRange ImageSubresourceRange{};

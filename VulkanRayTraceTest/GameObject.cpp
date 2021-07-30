@@ -4,11 +4,11 @@ GameObject::GameObject() : Object()
 {
 }
 
-GameObject::GameObject(VulkanEngine& engine) : Object(engine, ObjectType::Obj_GuiObject)
+GameObject::GameObject(VulkanEngine& engine) : Object(engine, ObjectType::Obj_GameObject)
 {
 }
 
-GameObject::GameObject(VulkanEngine& engine, glm::vec3 position) : Object(engine, position, ObjectType::Obj_GuiObject)
+GameObject::GameObject(VulkanEngine& engine, glm::vec3 position) : Object(engine, position, ObjectType::Obj_GameObject)
 {
 }
 
@@ -61,6 +61,10 @@ void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, M
 	ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materiallManager, textureManager, FilePath, DrawFlags)));
 }
 
+void GameObject::Update(VulkanEngine& engine, InputManager& inputManager)
+{
+}
+
 void GameObject::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	for (auto& mesh : MeshList)
@@ -77,19 +81,20 @@ void GameObject::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, cons
 	}
 }
 
-void GameObject::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView)
+void GameObject::Draw(VkCommandBuffer& commandBuffer)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh->Draw(commandBuffer, layout, RendererID, CameraView);
+		mesh->Draw(commandBuffer);
 	}
 }
 
-void GameObject::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID)
+void GameObject::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView)
 {
+
 	for (auto& mesh : MeshList)
 	{
-		mesh->Draw(commandBuffer, renderPassInfo, RendererID);
+		mesh->Draw(commandBuffer, layout, RenderPassID::Forward_Renderer, CameraView);
 	}
 }
 

@@ -265,7 +265,7 @@ void GBufferRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager>
     vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipelineLayout, 0, 1, &gBufferPipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, gBufferPipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, gBufferPipeline->ShaderPipelineLayout, assetManager->cameraManager.ActiveCamera);
     vkCmdEndRenderPass(CommandBuffer);
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");

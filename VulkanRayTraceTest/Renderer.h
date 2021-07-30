@@ -16,9 +16,9 @@ private:
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
 	PBRRenderer pbrRenderer;
-	RayTraceRenderer rayTraceRenderer;
+	//RayTraceRenderer rayTraceRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;
-	HybridRenderer hybridRenderer;
+	//HybridRenderer hybridRenderer;
 	Renderer2D renderer2D;
 	GUIRenderer guiRenderer;
 	InterfaceRenderPass interfaceRenderPass;

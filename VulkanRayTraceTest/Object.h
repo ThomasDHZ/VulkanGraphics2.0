@@ -30,6 +30,8 @@ public:
 	void AddChildObject(std::shared_ptr<Object> obj);
 
 	virtual void Update(VulkanEngine& engine, InputManager& inputManager) = 0;
-	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout) = 0;
+	virtual void Draw(VkCommandBuffer& commandBuffer);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
+	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);
 	virtual void Destory(VulkanEngine& engine) = 0;
 };

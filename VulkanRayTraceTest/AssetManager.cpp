@@ -12,6 +12,7 @@ AssetManager::AssetManager(VulkanEngine& engine, std::shared_ptr<VulkanWindow> w
     materialManager = MaterialManager(engine, textureManager);
     lightManager = LightManager(engine, cameraManager);
     guiManager = GUIManager(engine, materialManager, textureManager);
+    ObjManager = ObjectManager(engine, materialManager, textureManager);
 
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
@@ -58,7 +59,7 @@ void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     modelManager.Update(engine, inputManager, materialManager, RayTraceFlag);
     lightManager.Update(engine);
     guiManager.Update(engine, inputManager);
-
+    ObjManager.Update(engine, inputManager);
     if (cameraManager.ActiveCamera->cameraType == CameraType::Perspective_Camera)
     {
        // SceneData->UniformDataInfo.sLight.direction = static_cast<PerspectiveCamera*>(ActiveCamera.get())->GetFront();
@@ -87,14 +88,14 @@ void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     SkyUniformBuffer->Update(engine);
 }
 
-void AssetManager::Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID, std::shared_ptr<Camera> CameraView)
+void AssetManager::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView)
 {
-   meshManager.Draw(commandBuffer, renderPassInfo, layout, renderPassID, CameraView);
+    ObjManager.Draw(commandBuffer, layout, CameraView);
 }
 
 void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 {
-   guiManager.Draw(commandBuffer, layout);
+   ObjManager.GUIDraw(commandBuffer, layout);
 }
 
 void AssetManager::Delete(VulkanEngine& engine)
@@ -111,6 +112,7 @@ void AssetManager::Delete(VulkanEngine& engine)
     textureManager.Destory(engine);
     materialManager.Destory(engine);
     lightManager.Destory(engine);
+    ObjManager.Destory(engine);
 }
 
 std::vector<std::shared_ptr<Mesh>> AssetManager::GetMeshByType(MeshTypeFlag type)

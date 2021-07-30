@@ -166,7 +166,7 @@ void WaterRenderToTextureRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterTexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterTexturePipeline->ShaderPipelineLayout, 0, 1, &WaterTexturePipeline->DescriptorSets, 0, nullptr);
 
-    assetManager->Draw(CommandBuffer, renderPassInfo, WaterTexturePipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, WaterTexturePipeline->ShaderPipelineLayout, assetManager->cameraManager.ActiveCamera);
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &WaterSkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
