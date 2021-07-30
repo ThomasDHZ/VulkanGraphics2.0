@@ -136,11 +136,7 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
     VkSemaphore waitSemaphores[] = { engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
-    for (auto& model : assetManager->modelManager.ModelList)
-    {
-        model->SubmitToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
-    }
-
+    assetManager->ObjManager.SubmitAnimationToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
     if (ActiveRenderer == 0)
     {
         RayTraceFlag = false;

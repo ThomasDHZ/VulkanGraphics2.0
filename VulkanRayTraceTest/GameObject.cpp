@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "Level2D.h"
 
 GameObject::GameObject() : Object()
 {
@@ -58,7 +59,7 @@ void GameObject::AddChildModel(MeshManager& meshManager, std::shared_ptr<Model> 
 
 void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
 {
-	ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materialManager, textureManager, VertexList, IndexList, DrawFlags)));
+	ModelList.emplace_back(std::make_shared<Model>(Model(engine, materialManager, textureManager, VertexList, IndexList, DrawFlags)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
@@ -68,7 +69,7 @@ void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, M
 
 void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
 {
-	ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material, DrawFlags)));
+	ModelList.emplace_back(std::make_shared<Model>(Model(engine, VertexList, IndexList, material, DrawFlags)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
@@ -78,7 +79,7 @@ void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, s
 
 void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags)
 {
-	ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materiallManager, textureManager, FilePath, DrawFlags)));
+	ModelList.emplace_back(std::make_shared<Model>(Model(engine, materiallManager, textureManager, FilePath, DrawFlags)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
@@ -86,15 +87,20 @@ void GameObject::AddChildModel(VulkanEngine& engine, MeshManager& meshManager, M
 	}
 }
 
-void GameObject::Update(VulkanEngine& engine, InputManager& inputManager)
-{
-}
-
 void GameObject::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	for (auto& mesh : MeshList)
 	{
 		mesh->Update(engine, inputManager, materialManager);
+	}
+	for (auto& model : ModelList)
+	{
+		switch (model->ModelType)
+		{
+		case ModelTypeEnum::Model_Type_Normal: model->Update(engine, inputManager, materialManager, false); break;
+		case ModelTypeEnum::Model_Type_2D_Level: static_cast<Level2D*>(model.get())->Update(engine, inputManager, materialManager); break;
+		default: model->Update(engine, inputManager, materialManager, false);
+		};
 	}
 }
 
@@ -106,20 +112,11 @@ void GameObject::Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, cons
 	}
 }
 
-void GameObject::Draw(VkCommandBuffer& commandBuffer)
+void GameObject::SubmitAnimationToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
 {
-	for (auto& mesh : MeshList)
+	for (auto& model : ModelList)
 	{
-		mesh->Draw(commandBuffer);
-	}
-}
-
-void GameObject::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView)
-{
-
-	for (auto& mesh : MeshList)
-	{
-		mesh->Draw(commandBuffer, layout, RenderPassID::Forward_Renderer, CameraView);
+		model->SubmitAnimationToCommandBuffer(engine, CMDBufferList, imageIndex);
 	}
 }
 

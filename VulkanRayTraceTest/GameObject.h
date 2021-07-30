@@ -24,10 +24,8 @@ public:
 	void AddChildModel(VulkanEngine& engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw_All);
 	void AddChildModel(VulkanEngine& engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager) override;
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager) override;
 	virtual void Update(VulkanEngine& engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceModeFlag);
-	virtual void Draw(VkCommandBuffer& commandBuffer) override;
-	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView) override;
+	virtual void SubmitAnimationToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
 	virtual void Destory(VulkanEngine& engine);
 };

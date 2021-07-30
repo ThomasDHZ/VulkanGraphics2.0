@@ -1,4 +1,5 @@
 #include "ObjectManager.h"
+#include "GameObject.h"
 
 ObjectManager::ObjectManager()
 {
@@ -12,11 +13,22 @@ ObjectManager::~ObjectManager()
 {
 }
 
-void ObjectManager::Update(VulkanEngine& engine, InputManager& inputManager)
+void ObjectManager::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	for (auto& obj : ObjectList)
 	{
-		obj->Update(engine, inputManager);
+		obj->Update(engine, inputManager, materialManager);
+	}
+}
+
+void ObjectManager::SubmitAnimationToCommandBuffer(VulkanEngine& engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+{
+	for (auto& obj : ObjectList)
+	{
+		if (obj->ObjType == ObjectType::Obj_GameObject)
+		{
+			static_cast<GameObject*>(obj.get())->SubmitAnimationToCommandBuffer(engine, CMDBufferList, imageIndex);
+		}
 	}
 }
 

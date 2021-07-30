@@ -1,4 +1,5 @@
 #pragma once
+#include "GUIMesh.h"
 #include "GUIObject.h"
 #include "GuiRectangle.h"
 

@@ -13,11 +13,11 @@ GUIManager::~GUIManager()
 {
 }
 
-void GUIManager::Update(VulkanEngine& engine, InputManager& inputManager)
+void GUIManager::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	for (auto& obj : GuiObjectList)
 	{
-		obj->Update(engine, inputManager);
+		obj->Update(engine, inputManager, materialManager);
 	}
 }
 

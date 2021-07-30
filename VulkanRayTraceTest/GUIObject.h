@@ -1,6 +1,6 @@
 #pragma once
 #include "object.h"
-
+#include "GUIMesh.h"
 class GUIObject : public Object
 {
 private:
@@ -17,7 +17,7 @@ public:
 
 	void AddGUIMesh(std::shared_ptr<GUIMesh> mesh);
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager);
+	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager) override;
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	virtual void Destory(VulkanEngine& engine);
 };

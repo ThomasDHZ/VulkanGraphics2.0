@@ -30,17 +30,17 @@ void AssetManager::AddModel()
 
 void AssetManager::AddModel(VulkanEngine& engine, const std::string& FilePath)
 {
-    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materialManager, textureManager, FilePath)));
+    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, materialManager, textureManager, FilePath)));
 }
 
 void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, materialManager, textureManager, VertexList, IndexList)));
+    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, materialManager, textureManager, VertexList, IndexList)));
 }
 
 void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 {
-    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, meshManager, VertexList, IndexList, material)));
+    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, VertexList, IndexList, material)));
 }
 
 void AssetManager::LoadFont(VulkanEngine& engine, const std::string FontLocation)
@@ -58,8 +58,8 @@ void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     meshManager.Update(engine, inputManager, materialManager, cameraManager.ActiveCamera);
     modelManager.Update(engine, inputManager, materialManager, RayTraceFlag);
     lightManager.Update(engine);
-    guiManager.Update(engine, inputManager);
-    ObjManager.Update(engine, inputManager);
+    guiManager.Update(engine, inputManager, materialManager);
+    ObjManager.Update(engine, inputManager, materialManager);
     if (cameraManager.ActiveCamera->cameraType == CameraType::Perspective_Camera)
     {
        // SceneData->UniformDataInfo.sLight.direction = static_cast<PerspectiveCamera*>(ActiveCamera.get())->GetFront();
