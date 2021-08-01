@@ -16,7 +16,7 @@ public:
 	GameObject(VulkanEngine& engine, glm::vec3 position);
 	~GameObject();
 
-	void AddChildMesh(std::shared_ptr<MeshManager> meshManager, std::shared_ptr<Mesh> mesh);
+	void AddChildMesh(MeshManager& meshManager, std::shared_ptr<Mesh> mesh);
 	void AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	void AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	void AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);

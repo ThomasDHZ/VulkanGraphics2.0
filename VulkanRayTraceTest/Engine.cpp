@@ -30,6 +30,26 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     gameObject2->AddChildModel(assetManager->meshManager, std::make_shared<Model>(Model(engine, assetManager->materialManager, assetManager->textureManager, "../Models/TestAnimModel/model.dae")));
     assetManager->ObjManager.ObjectList.emplace_back(gameObject2);
 
+    std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(engine));
+    gameObject3->AddChildMesh(assetManager->meshManager, std::make_shared<Skybox>(Skybox(engine, assetManager)));
+    assetManager->ObjManager.ObjectList.emplace_back(gameObject3);
+
+
+    MaterialTexture material;
+    material.DiffuseMap = LoadTexture2D("../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    material.AlbedoMap = LoadTexture2D("../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
+    material.RoughnessMap = LoadTexture2D("../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.AOMap = LoadTexture2D("../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.NormalMap = LoadTexture2D("../texture/forrest_ground_01_nor_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.DepthMap = LoadTexture2D("../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+    material.MatallicMap = LoadTexture2D("../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
+
+    std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
+
+    std::shared_ptr<GameObject> gameObject4 = std::make_shared<GameObject>(GameObject(engine));
+    gameObject4->AddChildMesh(assetManager->meshManager, std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/perlin_noise.png", materialPtr)));
+    assetManager->ObjManager.ObjectList.emplace_back(gameObject4);
+
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
     //std::shared_ptr<Material> material2 = std::make_shared<Material>(engine, assetManager->textureManager);
@@ -88,17 +108,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
     LoadCubeMap(CubeMapFiles);
 
-    MaterialTexture material;
-    material.DiffuseMap = LoadTexture2D("../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    material.AlbedoMap = LoadTexture2D("../texture/forrest_ground_01_diff_4k.jpg", VK_FORMAT_R8G8B8A8_SRGB);
-    material.RoughnessMap = LoadTexture2D("../texture/forrest_ground_01_rough_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material.AOMap = LoadTexture2D("../texture/forrest_ground_01_ao_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material.NormalMap = LoadTexture2D("../texture/forrest_ground_01_nor_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material.DepthMap = LoadTexture2D("../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
-    material.MatallicMap = LoadTexture2D("../texture/forrest_ground_01_disp_4k.jpg", VK_FORMAT_R8G8B8A8_UNORM);
 
-    std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
-   // LoadTerrain("../texture/perlin_noise.png", materialPtr);
 
     GuiRectangle rectangle;
     rectangle.UpperLeftVertex = glm::vec2(-0.5f, -0.5f);

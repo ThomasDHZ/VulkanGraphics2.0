@@ -17,10 +17,10 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::AddChildMesh(std::shared_ptr<MeshManager> meshManager, std::shared_ptr<Mesh> mesh)
+void GameObject::AddChildMesh(MeshManager& meshManager, std::shared_ptr<Mesh> mesh)
 {
 	MeshList.emplace_back(mesh);
-	meshManager->AddMesh(MeshList.back());
+	meshManager.AddMesh(MeshList.back());
 }
 
 void GameObject::AddChildMesh(VulkanEngine& engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
