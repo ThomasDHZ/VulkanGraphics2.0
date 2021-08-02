@@ -21,7 +21,8 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     window = std::make_shared<VulkanWindow>(VulkanWindow(width, height, WindowName));
     engine = VulkanEngine(window);
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
-     
+    renderer = Renderer(engine, window, assetManager);
+
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(engine));
     gameObject->AddChildModel(assetManager->meshManager, std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
     assetManager->ObjManager.ObjectList.emplace_back(gameObject);
@@ -151,7 +152,6 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager->SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     assetManager->SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
-    renderer = Renderer(engine, window, assetManager);
 }
 
 Engine::~Engine()

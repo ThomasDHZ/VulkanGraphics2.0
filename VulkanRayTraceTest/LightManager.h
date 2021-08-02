@@ -41,8 +41,8 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetSpotLightBufferListDescriptor();
 	void Destory(VulkanEngine& engine);
 
-	uint32_t GetDirectionalLightDescriptorCount() { return DirectionalLightList.size(); }
-	uint32_t GetPointLightDescriptorCount() { return PointLightList.size(); }
-	uint32_t GetSpotLightDescriptorCount() { return SpotLightList.size(); }
+	uint32_t GetDirectionalLightDescriptorCount();
+	uint32_t GetPointLightDescriptorCount();
+	uint32_t GetSpotLightDescriptorCount();
 };
 

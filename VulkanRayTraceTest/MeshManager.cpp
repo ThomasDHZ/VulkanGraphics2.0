@@ -170,3 +170,15 @@ std::shared_ptr<Mesh> MeshManager::GetMeshIndex(uint32_t MeshID)
 
     return meshptr;
 }
+
+uint32_t MeshManager::GetMeshDescriptorCount()
+{
+    if (MeshList.size() > 0)
+    {
+        return MeshList.size();
+    }
+    else
+    {
+        return 1;
+    }
+}

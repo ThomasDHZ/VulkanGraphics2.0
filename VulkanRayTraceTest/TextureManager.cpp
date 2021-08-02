@@ -221,8 +221,40 @@ std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescrip
 VkDescriptorImageInfo TextureManager::GetSkyBoxTextureBufferListDescriptor()
 {
 	VkDescriptorImageInfo DescriptorImage{};
-	DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	DescriptorImage.imageView = CubeMap->GetTextureView();
-	DescriptorImage.sampler = CubeMap->GetTextureSampler();
+	if (CubeMap.get() != nullptr)
+	{
+		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		DescriptorImage.imageView = CubeMap->GetTextureView();
+		DescriptorImage.sampler = CubeMap->GetTextureSampler();
+	}
+	else
+	{
+		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		DescriptorImage.imageView = VK_NULL_HANDLE;
+		DescriptorImage.sampler = VK_NULL_HANDLE;
+	}
 	return DescriptorImage;
+}
+
+uint32_t TextureManager::GetTextureBufferDescriptorCount()
+{
+	if (TextureList.size() > 0)
+	{
+		return TextureList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+uint32_t TextureManager::Get3DTextureBufferDescriptorCount()
+{
+	if (Texture3DList.size() > 0)
+	{
+		return Texture3DList.size();
+	}
+	else
+	{
+		return 1;
+	}
 }

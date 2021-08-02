@@ -52,6 +52,6 @@ public:
 	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
 	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor();
 
-	uint32_t GetTextureBufferDescriptorCount() { return TextureList.size(); }
-	uint32_t Get3DTextureBufferDescriptorCount() { return TextureList.size(); }
+	uint32_t GetTextureBufferDescriptorCount();
+	uint32_t Get3DTextureBufferDescriptorCount();
 };

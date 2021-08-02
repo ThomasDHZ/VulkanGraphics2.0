@@ -195,3 +195,38 @@ void LightManager::Destory(VulkanEngine& engine)
 		spotLight->Destroy(engine);
 	}
 }
+uint32_t LightManager::GetDirectionalLightDescriptorCount() 
+{
+	if (DirectionalLightList.size() > 0)
+	{
+		return DirectionalLightList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+uint32_t LightManager::GetPointLightDescriptorCount() 
+{
+	if (PointLightList.size() > 0)
+	{
+		return PointLightList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+uint32_t LightManager::GetSpotLightDescriptorCount() 
+{
+	if (SpotLightList.size() > 0)
+	{
+		return SpotLightList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}

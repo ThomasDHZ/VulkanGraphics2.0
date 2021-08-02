@@ -106,6 +106,18 @@ std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescri
 	return MaterialBufferList;
 }
 
+uint32_t MaterialManager::GetMaterialDescriptorCount()
+{
+	if (MaterialList.size() > 0)
+	{
+		return MaterialList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+
 uint32_t MaterialManager::GetMaterialBufferIDByMaterialID(uint32_t MaterialID)
 {
 	uint32_t BufferIndex = 0;
