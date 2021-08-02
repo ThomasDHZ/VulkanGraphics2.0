@@ -217,6 +217,7 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	deviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
 	deviceFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
 
+
 	VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
 	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
 	BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
@@ -246,10 +247,15 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	RayTracinDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
 	RayTracinDeviceProperties.pNext = &RayTracingPipelineProperties;
 
+	VkPhysicalDeviceRobustness2FeaturesEXT  PhysicalDeviceRobustness2Features;
+	PhysicalDeviceRobustness2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
+	PhysicalDeviceRobustness2Features.nullDescriptor = VK_TRUE;
+	PhysicalDeviceRobustness2Features.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
+
 	VkPhysicalDeviceFeatures2 deviceFeatures2{};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 	deviceFeatures2.features = deviceFeatures;
-	deviceFeatures2.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
+	deviceFeatures2.pNext = &PhysicalDeviceRobustness2Features;
 
 	VkDeviceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

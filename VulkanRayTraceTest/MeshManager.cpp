@@ -85,13 +85,24 @@ std::vector<VkDescriptorBufferInfo> MeshManager::GetVertexBufferListDescriptors(
 std::vector<VkDescriptorBufferInfo> MeshManager::GetIndexBufferListDescriptors()
 {
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
-    for (auto& mesh : MeshList)
+    if (MeshList.size() == 0)
     {
-        VkDescriptorBufferInfo IndexBufferInfo = {};
-        IndexBufferInfo.buffer = mesh->IndexBuffer.Buffer;
-        IndexBufferInfo.offset = 0;
-        IndexBufferInfo.range = VK_WHOLE_SIZE;
-        IndexBufferInfoList.emplace_back(IndexBufferInfo);
+        VkDescriptorBufferInfo nullBuffer;
+        nullBuffer.buffer = VK_NULL_HANDLE;
+        nullBuffer.offset = 0;
+        nullBuffer.range = VK_WHOLE_SIZE;
+        IndexBufferInfoList.emplace_back(nullBuffer);
+    }
+    else
+    {
+        for (auto& mesh : MeshList)
+        {
+            VkDescriptorBufferInfo IndexBufferInfo = {};
+            IndexBufferInfo.buffer = mesh->IndexBuffer.Buffer;
+            IndexBufferInfo.offset = 0;
+            IndexBufferInfo.range = VK_WHOLE_SIZE;
+            IndexBufferInfoList.emplace_back(IndexBufferInfo);
+        }
     }
     return IndexBufferInfoList;
 }
@@ -99,13 +110,24 @@ std::vector<VkDescriptorBufferInfo> MeshManager::GetIndexBufferListDescriptors()
 std::vector<VkDescriptorBufferInfo> MeshManager::GetTransformBufferListDescriptors()
 {
     std::vector<VkDescriptorBufferInfo> TransformBufferList{};
-    for (auto& mesh : MeshList)
+    if (MeshList.size() == 0)
     {
-        VkDescriptorBufferInfo TransformBufferInfo = {};
-        TransformBufferInfo.buffer = mesh->TransformBuffer.Buffer;
-        TransformBufferInfo.offset = 0;
-        TransformBufferInfo.range = VK_WHOLE_SIZE;
-        TransformBufferList.emplace_back(TransformBufferInfo);
+        VkDescriptorBufferInfo nullBuffer;
+        nullBuffer.buffer = VK_NULL_HANDLE;
+        nullBuffer.offset = 0;
+        nullBuffer.range = VK_WHOLE_SIZE;
+        TransformBufferList.emplace_back(nullBuffer);
+    }
+    else
+    {
+        for (auto& mesh : MeshList)
+        {
+            VkDescriptorBufferInfo TransformBufferInfo = {};
+            TransformBufferInfo.buffer = mesh->TransformBuffer.Buffer;
+            TransformBufferInfo.offset = 0;
+            TransformBufferInfo.range = VK_WHOLE_SIZE;
+            TransformBufferList.emplace_back(TransformBufferInfo);
+        }
     }
     return TransformBufferList;
 }
@@ -113,13 +135,24 @@ std::vector<VkDescriptorBufferInfo> MeshManager::GetTransformBufferListDescripto
 std::vector<VkDescriptorBufferInfo> MeshManager::GetMeshPropertiesListDescriptors()
 {
     std::vector<VkDescriptorBufferInfo> MeshPropertiesmBufferList{};
-    for (auto& mesh : MeshList)
+    if (MeshList.size() == 0)
     {
-        VkDescriptorBufferInfo MeshPropertiesmBufferBufferInfo = {};
-        MeshPropertiesmBufferBufferInfo.buffer = mesh->MeshProperties.VulkanBufferData.Buffer;
-        MeshPropertiesmBufferBufferInfo.offset = 0;
-        MeshPropertiesmBufferBufferInfo.range = VK_WHOLE_SIZE;
-        MeshPropertiesmBufferList.emplace_back(MeshPropertiesmBufferBufferInfo);
+        VkDescriptorBufferInfo nullBuffer;
+        nullBuffer.buffer = VK_NULL_HANDLE;
+        nullBuffer.offset = 0;
+        nullBuffer.range = VK_WHOLE_SIZE;
+        MeshPropertiesmBufferList.emplace_back(nullBuffer);
+    }
+    else
+    {
+        for (auto& mesh : MeshList)
+        {
+            VkDescriptorBufferInfo MeshPropertiesmBufferBufferInfo = {};
+            MeshPropertiesmBufferBufferInfo.buffer = mesh->MeshProperties.VulkanBufferData.Buffer;
+            MeshPropertiesmBufferBufferInfo.offset = 0;
+            MeshPropertiesmBufferBufferInfo.range = VK_WHOLE_SIZE;
+            MeshPropertiesmBufferList.emplace_back(MeshPropertiesmBufferBufferInfo);
+        }
     }
     return MeshPropertiesmBufferList;
 }

@@ -234,7 +234,6 @@
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="MeshManager.cpp" />
     <ClCompile Include="SparkManStage.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PBRFrameBufferTextureRenderPass.cpp" />
@@ -467,7 +466,6 @@
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="MeshManager.h" />
     <ClInclude Include="SparkManStage.h" />
-    <ClInclude Include="ModelManager.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="PBRFrameBufferTextureRenderPass.h" />

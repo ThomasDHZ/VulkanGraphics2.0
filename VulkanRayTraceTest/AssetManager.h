@@ -4,7 +4,6 @@
 #include "MaterialManager.h"
 #include "TextureManager.h"
 #include "MeshManager.h"
-#include "ModelManager.h"
 #include "LightManager.h"
 #include "CameraManager.h"
 #include "InputManager.h"

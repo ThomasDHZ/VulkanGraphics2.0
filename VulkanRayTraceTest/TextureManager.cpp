@@ -171,13 +171,24 @@ std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string 
 std::vector<VkDescriptorImageInfo> TextureManager::GetTextureBufferListDescriptor()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
-	for (auto texture : TextureList)
+	if (TextureList.size() == 0)
 	{
-		VkDescriptorImageInfo DescriptorImage{};
-		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		DescriptorImage.imageView = texture->GetTextureView();
-		DescriptorImage.sampler = texture->GetTextureSampler();
-		DescriptorImageList.emplace_back(DescriptorImage);
+		VkDescriptorImageInfo nullBuffer;
+		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		nullBuffer.imageView = VK_NULL_HANDLE;
+		nullBuffer.sampler = VK_NULL_HANDLE;
+		DescriptorImageList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (auto texture : TextureList)
+		{
+			VkDescriptorImageInfo DescriptorImage{};
+			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			DescriptorImage.imageView = texture->GetTextureView();
+			DescriptorImage.sampler = texture->GetTextureSampler();
+			DescriptorImageList.emplace_back(DescriptorImage);
+		}
 	}
 	return DescriptorImageList;
 }
@@ -185,13 +196,24 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetTextureBufferListDescripto
 std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescriptor()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
-	for (auto texture : Texture3DList)
+	if (Texture3DList.size() == 0)
 	{
-		VkDescriptorImageInfo DescriptorImage{};
-		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		DescriptorImage.imageView = texture->GetTextureView();
-		DescriptorImage.sampler = texture->GetTextureSampler();
-		DescriptorImageList.emplace_back(DescriptorImage);
+		VkDescriptorImageInfo nullBuffer;
+		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		nullBuffer.imageView = VK_NULL_HANDLE;
+		nullBuffer.sampler = VK_NULL_HANDLE;
+		DescriptorImageList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (auto texture : Texture3DList)
+		{
+			VkDescriptorImageInfo DescriptorImage{};
+			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			DescriptorImage.imageView = texture->GetTextureView();
+			DescriptorImage.sampler = texture->GetTextureSampler();
+			DescriptorImageList.emplace_back(DescriptorImage);
+		}
 	}
 	return DescriptorImageList;
 }

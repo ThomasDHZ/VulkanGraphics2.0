@@ -83,13 +83,24 @@ std::shared_ptr<Material> MaterialManager::GetMaterial(uint32_t MaterialID)
 std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescriptor()
 {
 	std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
-	for (int x = 0; x < MaterialList.size(); x++)
+	if (MaterialList.size() == 0)
 	{
-		VkDescriptorBufferInfo MaterialBufferInfo = {};
-		MaterialBufferInfo.buffer = MaterialList[x]->GetMaterialBuffer();
-		MaterialBufferInfo.offset = 0;
-		MaterialBufferInfo.range = VK_WHOLE_SIZE;
-		MaterialBufferList.emplace_back(MaterialBufferInfo);
+		VkDescriptorBufferInfo nullBuffer;
+		nullBuffer.buffer = VK_NULL_HANDLE;
+		nullBuffer.offset = 0;
+		nullBuffer.range = VK_WHOLE_SIZE;
+		MaterialBufferList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (int x = 0; x < MaterialList.size(); x++)
+		{
+			VkDescriptorBufferInfo MaterialBufferInfo = {};
+			MaterialBufferInfo.buffer = MaterialList[x]->GetMaterialBuffer();
+			MaterialBufferInfo.offset = 0;
+			MaterialBufferInfo.range = VK_WHOLE_SIZE;
+			MaterialBufferList.emplace_back(MaterialBufferInfo);
+		}
 	}
 
 	return MaterialBufferList;

@@ -105,13 +105,24 @@ void LightManager::DeleteSpotLight(VulkanEngine& engine, uint32_t LightBufferInd
 std::vector<VkDescriptorBufferInfo> LightManager::GetDirectionalLightBufferListDescriptor()
 {
 	std::vector<VkDescriptorBufferInfo> DirectionalLightBufferList{};
-	for (int x = 0; x < DirectionalLightList.size(); x++)
+	if (DirectionalLightList.size() == 0)
 	{
-		VkDescriptorBufferInfo DirectionalLightBufferInfo = {};
-		DirectionalLightBufferInfo.buffer = DirectionalLightList[x]->GetLightBuffer();
-		DirectionalLightBufferInfo.offset = 0;
-		DirectionalLightBufferInfo.range = VK_WHOLE_SIZE;
-		DirectionalLightBufferList.emplace_back(DirectionalLightBufferInfo);
+		VkDescriptorBufferInfo nullBuffer;
+		nullBuffer.buffer = VK_NULL_HANDLE;
+		nullBuffer.offset = 0;
+		nullBuffer.range = VK_WHOLE_SIZE;
+		DirectionalLightBufferList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (int x = 0; x < DirectionalLightList.size(); x++)
+		{
+			VkDescriptorBufferInfo DirectionalLightBufferInfo = {};
+			DirectionalLightBufferInfo.buffer = DirectionalLightList[x]->GetLightBuffer();
+			DirectionalLightBufferInfo.offset = 0;
+			DirectionalLightBufferInfo.range = VK_WHOLE_SIZE;
+			DirectionalLightBufferList.emplace_back(DirectionalLightBufferInfo);
+		}
 	}
 
 	return DirectionalLightBufferList;
@@ -120,13 +131,24 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetDirectionalLightBufferListD
 std::vector<VkDescriptorBufferInfo> LightManager::GetPointLightBufferListDescriptor()
 {
 	std::vector<VkDescriptorBufferInfo> PointLightBufferList{};
-	for (int x = 0; x < PointLightList.size(); x++)
+	if (PointLightList.size() == 0)
 	{
-		VkDescriptorBufferInfo PointLightBufferInfo = {};
-		PointLightBufferInfo.buffer = PointLightList[x]->GetLightBuffer();
-		PointLightBufferInfo.offset = 0;
-		PointLightBufferInfo.range = VK_WHOLE_SIZE;
-		PointLightBufferList.emplace_back(PointLightBufferInfo);
+		VkDescriptorBufferInfo nullBuffer;
+		nullBuffer.buffer = VK_NULL_HANDLE;
+		nullBuffer.offset = 0;
+		nullBuffer.range = VK_WHOLE_SIZE;
+		PointLightBufferList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (int x = 0; x < PointLightList.size(); x++)
+		{
+			VkDescriptorBufferInfo PointLightBufferInfo = {};
+			PointLightBufferInfo.buffer = PointLightList[x]->GetLightBuffer();
+			PointLightBufferInfo.offset = 0;
+			PointLightBufferInfo.range = VK_WHOLE_SIZE;
+			PointLightBufferList.emplace_back(PointLightBufferInfo);
+		}
 	}
 
 	return PointLightBufferList;
@@ -135,13 +157,24 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetPointLightBufferListDescrip
 std::vector<VkDescriptorBufferInfo> LightManager::GetSpotLightBufferListDescriptor()
 {
 	std::vector<VkDescriptorBufferInfo> SpotLightBufferList{};
-	for (int x = 0; x < SpotLightList.size(); x++)
+	if (SpotLightList.size() == 0)
 	{
-		VkDescriptorBufferInfo SpotLightBufferInfo = {};
-		SpotLightBufferInfo.buffer = SpotLightList[x]->GetLightBuffer();
-		SpotLightBufferInfo.offset = 0;
-		SpotLightBufferInfo.range = VK_WHOLE_SIZE;
-		SpotLightBufferList.emplace_back(SpotLightBufferInfo);
+		VkDescriptorBufferInfo nullBuffer;
+		nullBuffer.buffer = VK_NULL_HANDLE;
+		nullBuffer.offset = 0;
+		nullBuffer.range = VK_WHOLE_SIZE;
+		SpotLightBufferList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (int x = 0; x < SpotLightList.size(); x++)
+		{
+			VkDescriptorBufferInfo SpotLightBufferInfo = {};
+			SpotLightBufferInfo.buffer = SpotLightList[x]->GetLightBuffer();
+			SpotLightBufferInfo.offset = 0;
+			SpotLightBufferInfo.range = VK_WHOLE_SIZE;
+			SpotLightBufferList.emplace_back(SpotLightBufferInfo);
+		}
 	}
 
 	return SpotLightBufferList;
