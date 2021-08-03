@@ -22,14 +22,13 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     engine = std::make_shared<VulkanEngine>(VulkanEngine(window));
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
 
-
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(engine));
     gameObject->AddChildModel(assetManager->meshManager, std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
     assetManager->ObjManager.ObjectList.emplace_back(gameObject);
 
-    //std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(engine));
-    //gameObject2->AddChildModel(assetManager->meshManager, std::make_shared<Model>(Model(engine, assetManager->materialManager, assetManager->textureManager, "../Models/TestAnimModel/model.dae")));
-    //assetManager->ObjManager.ObjectList.emplace_back(gameObject2);
+    std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(engine));
+    gameObject2->AddChildModel(assetManager->meshManager, std::make_shared<Model>(Model(engine, assetManager->materialManager, assetManager->textureManager, "../Models/TestAnimModel/model.dae")));
+    assetManager->ObjManager.ObjectList.emplace_back(gameObject2);
 
     std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(engine));
     gameObject3->AddChildMesh(assetManager->meshManager, std::make_shared<Skybox>(Skybox(engine, assetManager)));
