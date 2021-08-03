@@ -25,7 +25,6 @@ private:
 
 	size_t currentFrame = 0;
 
-	bool UpdateRenderer = false;
 	bool framebufferResized = false;
 
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;

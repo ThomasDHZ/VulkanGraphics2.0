@@ -84,7 +84,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<Skybox>(Skybox(engine, assetManager)));
+    assetManager->meshManager.AddMesh(std::make_shared<Skybox>(Skybox(engine, assetManager)));
     //LoadModel("../Models/RayReflectionTest.obj");
     //LoadModel("../Models/TestAnimModel/model.dae");
     //LoadModel("../Models/vulkanscene_shadow.obj");
@@ -153,8 +153,6 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager->SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     assetManager->SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
-
-    renderer.RebuildSwapChain(engine, window);
 }
 
 Engine::~Engine()
@@ -207,5 +205,5 @@ void Engine::LoadCubeMap(std::string CubeMapFiles[6])
 
 void Engine::LoadTerrain(const std::string& HeightMapPath, std::shared_ptr<Material> material)
 {
-    assetManager->meshManager.MeshList.emplace_back(std::make_shared<TerrainMesh>(TerrainMesh(engine, HeightMapPath, material)));
+    assetManager->meshManager.AddMesh(std::make_shared<TerrainMesh>(TerrainMesh(engine, HeightMapPath, material)));
 }

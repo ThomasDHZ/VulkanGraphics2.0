@@ -128,6 +128,7 @@ public:
 	uint32_t DrawFrame = 0;
 
 	std::vector<VkLayerProperties> VulkanLayers;
+	bool UpdateRendererFlag = false;
 
 	VulkanEngine();
 	VulkanEngine(std::shared_ptr<VulkanWindow> window);

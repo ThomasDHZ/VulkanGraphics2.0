@@ -62,10 +62,10 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWind
 
 void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
 {
-    if(UpdateRenderer)
+    if(engine.UpdateRendererFlag)
     {
         RebuildSwapChain(engine, window);
-        UpdateRenderer = false;
+        engine.UpdateRendererFlag = false;
     }
 
     assetManager->Update(engine, window, RayTraceFlag);
