@@ -18,10 +18,10 @@ public:
 	~MeshManager();
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
-	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera);
-	void UpdateBufferIndex(VulkanEngine& engine);
+	void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera);
+	void UpdateBufferIndex(std::shared_ptr<VulkanEngine> engine);
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView);
-	void Destroy(VulkanEngine& engine);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();
 	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors();

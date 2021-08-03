@@ -21,11 +21,11 @@ public:
 	glm::vec2 SpriteSize = glm::vec2(0.0f);
 
 	Sprite();
-	Sprite(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
+	Sprite(std::shared_ptr<VulkanEngine> engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
 	~Sprite();
 
 	TileCollider tileCollider;
 	void SetAnimation(uint32_t AnimationIndex);
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList);
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList);
 };
 

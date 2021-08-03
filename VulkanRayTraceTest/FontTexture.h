@@ -5,11 +5,11 @@
 class FontTexture : public Texture
 {
 private:
-    void CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* GlyphData, uint32_t width, uint32_t height);
+    void CreateTextureView(std::shared_ptr<VulkanEngine> engine);
+    void CreateTextureSampler(std::shared_ptr<VulkanEngine> engine);
 public:
     FontTexture();
-    FontTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height);
+    FontTexture(std::shared_ptr<VulkanEngine> engine, void* GlyphData, uint32_t width, uint32_t height);
     ~FontTexture();
 };

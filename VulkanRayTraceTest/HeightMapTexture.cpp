@@ -5,12 +5,12 @@ HeightMapTexture::HeightMapTexture() : Texture()
 {
 }
 
-HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string TextureLocation) : Texture()
+HeightMapTexture::HeightMapTexture(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation) : Texture()
 {
 	Width = 0;
 	Height = 0;
 	Depth = 1;
-	TextureID = engine.GenerateID();
+	TextureID = engine->GenerateID();
 	TextureBufferIndex = 0;
 	MipMapLevels = 1;
 	TypeOfTexture = vkHeightMap;
@@ -22,7 +22,7 @@ HeightMapTexture::HeightMapTexture(VulkanEngine& engine, const std::string Textu
 	CreateTextureSampler(engine);
 }
 
-HeightMapTexture::HeightMapTexture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList) : Texture()
+HeightMapTexture::HeightMapTexture(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList) : Texture()
 {
 }
 
@@ -30,7 +30,7 @@ HeightMapTexture::~HeightMapTexture()
 {
 }
 
-void HeightMapTexture::LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format)
+void HeightMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format)
 {
 	int ColorChannels;
 	stbi_uc* pixels = stbi_load(TextureLocation.c_str(), &Width, &Height, &ColorChannels, STBI_rgb_alpha);
@@ -42,7 +42,7 @@ void HeightMapTexture::LoadTexture(VulkanEngine& engine, std::string TextureLoca
 	}
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels);
+	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -65,11 +65,11 @@ void HeightMapTexture::LoadTexture(VulkanEngine& engine, std::string TextureLoca
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer(engine.Device);
+	StagingBuffer.DestoryBuffer(engine->Device);
 	stbi_image_free(pixels);
 }
 
-void HeightMapTexture::CreateTextureView(VulkanEngine& engine, VkFormat format)
+void HeightMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -82,12 +82,12 @@ void HeightMapTexture::CreateTextureView(VulkanEngine& engine, VkFormat format)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void HeightMapTexture::CreateTextureSampler(VulkanEngine& engine)
+void HeightMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -107,7 +107,7 @@ void HeightMapTexture::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.maxLod = static_cast<float>(MipMapLevels);
 	TextureImageSamplerInfo.mipLodBias = 0;
 
-	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

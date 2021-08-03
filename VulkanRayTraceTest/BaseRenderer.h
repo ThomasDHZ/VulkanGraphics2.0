@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "AssetManager.h"
 #include "InterfaceRenderPass.h"
 #include "Skybox.h"
@@ -11,13 +11,13 @@ protected:
 
 public:
 	BaseRenderer();
-	BaseRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr);
+	BaseRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr);
 	~BaseRenderer();
 
-	virtual void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
-	virtual void GUIUpdate(VulkanEngine& engine);
-	virtual void Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex, Skybox skybox);
-	virtual void Destroy(VulkanEngine& engine);
+	virtual void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
+	virtual void GUIUpdate(std::shared_ptr<VulkanEngine> engine);
+	virtual void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex, Skybox skybox);
+	virtual void Destroy(std::shared_ptr<VulkanEngine> engine);
 
 	virtual std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);
 };

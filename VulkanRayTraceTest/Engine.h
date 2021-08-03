@@ -12,7 +12,7 @@
 #include <optional>
 #include <set>
 #include "VulkanWindow.h"
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "Renderer.h"
 #include <map>
 #include "FontTexture.h"
@@ -20,7 +20,7 @@
 
 class Engine {
 private:
-    VulkanEngine engine;
+    std::shared_ptr<VulkanEngine> engine;
     Renderer renderer;
     std::shared_ptr<VulkanWindow> window;
     std::shared_ptr<AssetManager> assetManager;

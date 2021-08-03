@@ -4,9 +4,9 @@ FontTexture::FontTexture() : Texture()
 {
 }
 
-FontTexture::FontTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height) : Texture()
+FontTexture::FontTexture(std::shared_ptr<VulkanEngine> engine, void* GlyphData, uint32_t width, uint32_t height) : Texture()
 {
-	TextureID = engine.GenerateID();
+	TextureID = engine->GenerateID();
 	CreateTextTexture(engine, GlyphData, width, height);
 	CreateTextureView(engine);
 	CreateTextureSampler(engine);
@@ -16,7 +16,7 @@ FontTexture::~FontTexture()
 {
 }
 
-void FontTexture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint32_t width, uint32_t height)
+void FontTexture::CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* GlyphData, uint32_t width, uint32_t height)
 {
 	Width = width;
 	Height = height;
@@ -38,7 +38,7 @@ void FontTexture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint3
 	VkDeviceSize imageSize = Width * Height * sizeof(Pixel);
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &PixelList[0]);
+	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &PixelList[0]);
 
 	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
 
@@ -62,12 +62,12 @@ void FontTexture::CreateTextTexture(VulkanEngine& engine, void* GlyphData, uint3
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
-	StagingBuffer.DestoryBuffer(engine.Device);
+	StagingBuffer.DestoryBuffer(engine->Device);
 
 	GenerateMipmaps(engine, VK_FORMAT_R8G8B8A8_UNORM);
 }
 
-void FontTexture::CreateTextureView(VulkanEngine& engine)
+void FontTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -80,12 +80,12 @@ void FontTexture::CreateTextureView(VulkanEngine& engine)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void FontTexture::CreateTextureSampler(VulkanEngine& engine)
+void FontTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -105,7 +105,7 @@ void FontTexture::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.maxLod = static_cast<float>(MipMapLevels);
 	TextureImageSamplerInfo.mipLodBias = 0;
 
-	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

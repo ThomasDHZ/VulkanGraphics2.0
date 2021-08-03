@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "AssetManager.h"
 #include "Level2D.h"
 
@@ -9,6 +9,6 @@ private:
 
 public:
 	LavaTest();
-	LavaTest(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
+	LavaTest(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
 	~LavaTest();
 };

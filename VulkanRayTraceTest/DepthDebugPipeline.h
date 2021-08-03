@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "AssetManager.h"
 #include "GraphicsPipeline.h"
 
@@ -12,15 +12,15 @@ struct ConstDepthDebugProperites
 class DepthDebugPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> DepthTexture);
-	void SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass);
+	void SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
+	void SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
+	void SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> DepthTexture);
+	void SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass);
 public:
 	DepthDebugPipeline();
-	DepthDebugPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> DepthTexture);
+	DepthDebugPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> DepthTexture);
 	~DepthDebugPipeline();
 
-	void UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> DepthTexture);
+	void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> DepthTexture);
 };
 

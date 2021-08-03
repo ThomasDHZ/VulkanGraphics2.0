@@ -4,7 +4,7 @@ AssetManager::AssetManager()
 {
 }
 
-AssetManager::AssetManager(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+AssetManager::AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     inputManager = InputManager(window);
     cameraManager = CameraManager(engine);
@@ -28,29 +28,29 @@ AssetManager::~AssetManager()
 //    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model()));
 //}
 //
-//void AssetManager::AddModel(VulkanEngine& engine, const std::string& FilePath)
+//void AssetManager::AddModel(std::shared_ptr<VulkanEngine> engine, const std::string& FilePath)
 //{
 //    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, materialManager, textureManager, FilePath)));
 //}
 //
-//void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+//void AssetManager::AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 //{
 //    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, materialManager, textureManager, VertexList, IndexList)));
 //}
 //
-//void AssetManager::AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
+//void AssetManager::AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 //{
 //    modelManager.ModelList.emplace_back(std::make_shared<Model>(Model(engine, VertexList, IndexList, material)));
 //}
 
-void AssetManager::LoadFont(VulkanEngine& engine, const std::string FontLocation)
+void AssetManager::LoadFont(std::shared_ptr<VulkanEngine> engine, const std::string FontLocation)
 {
     guiManager.LoadFont(engine, materialManager, textureManager, FontLocation);
 }
 
-void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag)
+void AssetManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag)
 {
-    float timer = engine.VulkanTimer();
+    float timer = engine->VulkanTimer();
     cameraManager.Update(engine);
     inputManager.Update(cameraManager);
     materialManager.Update(engine);
@@ -79,10 +79,10 @@ void AssetManager::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     SceneData->Update(engine);
 
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(cameraManager.ActiveCamera->GetViewMatrix())));
-    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(cameraManager.ActiveCamera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
+    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(cameraManager.ActiveCamera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
     SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.view = glm::mat4(glm::mat3(cameraManager.ActiveCamera->GetViewMatrix()));
-    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(cameraManager.ActiveCamera->GetZoom()), engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
+    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(cameraManager.ActiveCamera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
     SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(cameraManager.ActiveCamera->GetPosition(), 0.0f);
     SkyUniformBuffer->Update(engine);
@@ -98,7 +98,7 @@ void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layo
    ObjManager.GUIDraw(commandBuffer, layout);
 }
 
-void AssetManager::Delete(VulkanEngine& engine)
+void AssetManager::Delete(std::shared_ptr<VulkanEngine> engine)
 {
     //for (auto& model : modelManager.ModelList)
     //{

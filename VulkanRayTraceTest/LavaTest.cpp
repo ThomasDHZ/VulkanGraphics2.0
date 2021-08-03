@@ -6,7 +6,7 @@ LavaTest::LavaTest() : Level2D()
 
 }
 
-LavaTest::LavaTest(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Level2D()
+LavaTest::LavaTest(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Level2D()
 {
 	std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
 	material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/lava_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);

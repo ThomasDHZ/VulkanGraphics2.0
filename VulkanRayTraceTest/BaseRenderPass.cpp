@@ -8,14 +8,14 @@ BaseRenderPass::~BaseRenderPass()
 {
 }
 
-void BaseRenderPass::Destroy(VulkanEngine& engine)
+void BaseRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

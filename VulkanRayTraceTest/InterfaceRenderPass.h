@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_vulkan.h"
 #include "ImGui/imgui_impl_glfw.h"
@@ -19,21 +19,21 @@ private:
 	VkDescriptorPool ImGuiDescriptorPool;
 	VkCommandPool ImGuiCommandPool;
 
-	void CreateRenderPass(VulkanEngine& engine);
-	void CreateRendererFramebuffers(VulkanEngine& engine);
+	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
+	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
 
 public:
 	InterfaceRenderPass();
-	InterfaceRenderPass(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
+	InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
 	~InterfaceRenderPass();
 
 	RenderPassID RendererID = Interface_Renderer;
 	VkCommandBuffer ImGuiCommandBuffers;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
-	void Draw(VulkanEngine& engine, int frame);
-	void RebuildSwapChain(VulkanEngine& engine);
-	void Destroy(VulkanEngine& engine);
+	void Draw(std::shared_ptr<VulkanEngine> engine, int frame);
+	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }
 };

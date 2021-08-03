@@ -5,7 +5,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 {
 }
 
-BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
     BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
@@ -18,7 +18,7 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 {
 }
 
-void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void BlinnPhongRasterRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
@@ -27,7 +27,7 @@ void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, std::share
     //lightPathRenderer.RebuildSwapChain(engine, assetManager);
 }
 
-void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
+void BlinnPhongRasterRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     //ImGui::LabelText("Mesh", "Mesh");
     //for (int x = 0; x < assetManager->meshManager.MeshList.size(); x++)
@@ -95,7 +95,7 @@ void BlinnPhongRasterRenderer::GUIUpdate(VulkanEngine& engine)
     //ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void BlinnPhongRasterRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
     BloomRenderer.Draw(engine, assetManager, imageIndex);
@@ -104,7 +104,7 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, std::shared_ptr<Vulkan
    /* lightPathRenderer.Draw(engine, assetManager, imageIndex);*/
 }
 
-void BlinnPhongRasterRenderer::Destroy(VulkanEngine& engine)
+void BlinnPhongRasterRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     FrameBufferTextureRenderer.Destroy(engine);
     BloomRenderer.Destroy(engine);

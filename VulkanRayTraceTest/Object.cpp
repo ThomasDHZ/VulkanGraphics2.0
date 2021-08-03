@@ -4,23 +4,23 @@ Object::Object()
 {
 }
 
-Object::Object(VulkanEngine& engine, ObjectType objType)
+Object::Object(std::shared_ptr<VulkanEngine> engine, ObjectType objType)
 {
-	ObjID = engine.GenerateObjID();
+	ObjID = engine->GenerateObjID();
 	ObjType = objType;
 	glm::vec3(0.0f);
 }
 
-Object::Object(VulkanEngine& engine, glm::vec2 position, ObjectType objType)
+Object::Object(std::shared_ptr<VulkanEngine> engine, glm::vec2 position, ObjectType objType)
 {
-	ObjID = engine.GenerateObjID();
+	ObjID = engine->GenerateObjID();
 	ObjType = objType;
 	Position = glm::vec3(position.x, position.y, 0.0f);
 }
 
-Object::Object(VulkanEngine& engine, glm::vec3 position, ObjectType objType)
+Object::Object(std::shared_ptr<VulkanEngine> engine, glm::vec3 position, ObjectType objType)
 {
-	ObjID = engine.GenerateObjID();
+	ObjID = engine->GenerateObjID();
 	ObjType = objType;
 	Position = position;
 }

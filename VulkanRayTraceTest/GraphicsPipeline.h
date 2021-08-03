@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 
 struct RayTraceConstants
 {
@@ -56,6 +56,6 @@ public:
 	GraphicsPipeline();
 	~GraphicsPipeline();
 
-	virtual void UpdateGraphicsPipeLine(VulkanEngine& engine);
-	virtual void Destroy(VulkanEngine& engine);
+	virtual void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine);
+	virtual void Destroy(std::shared_ptr<VulkanEngine> engine);
 };

@@ -4,7 +4,7 @@ GUIRenderer::GUIRenderer() : BaseRenderer()
 {
 }
 
-GUIRenderer::GUIRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+GUIRenderer::GUIRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     TextRenderer = GUIRenderPass(engine, assetManager);
 }
@@ -13,12 +13,12 @@ GUIRenderer::~GUIRenderer()
 {
 }
 
-void GUIRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void GUIRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     TextRenderer.RebuildSwapChain(engine, assetManager);
 }
 
-void GUIRenderer::GUIUpdate(VulkanEngine& engine)
+void GUIRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     ImGui::LabelText("Mesh", "Mesh");
     for (int x = 0; x < assetManager->guiManager.GuiObjectList.size(); x++)
@@ -27,12 +27,12 @@ void GUIRenderer::GUIUpdate(VulkanEngine& engine)
     }
 }
 
-void GUIRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void GUIRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     TextRenderer.Draw(engine, assetManager, imageIndex, rendererID);
 }
 
-void GUIRenderer::Destroy(VulkanEngine& engine)
+void GUIRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     TextRenderer.Destroy(engine);
 }

@@ -4,7 +4,7 @@ BillboardMesh::BillboardMesh() : Mesh()
 {
 }
 
-BillboardMesh::BillboardMesh(VulkanEngine& engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
+BillboardMesh::BillboardMesh(std::shared_ptr<VulkanEngine> engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
 {
     std::vector<Vertex> SpriteVertices =
     {
@@ -20,7 +20,7 @@ BillboardMesh::BillboardMesh(VulkanEngine& engine, glm::vec2 SpriteSize, glm::ve
         1, 2, 3
     };
 
-    MeshID = engine.GenerateID();
+    MeshID = engine->GenerateID();
     MeshMaterial = material;
     MeshType = Mesh_Type_Billboard;
 
@@ -46,7 +46,7 @@ BillboardMesh::~BillboardMesh()
 {
 }
 
-void BillboardMesh::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
+void BillboardMesh::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
 {
     MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -63,8 +63,8 @@ void BillboardMesh::Update(VulkanEngine& engine, InputManager& inputManager, Mat
 
     VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
-    TransformBuffer.CopyBufferToMemory(engine.Device, &FinalTransform, sizeof(FinalTransform));
-    TransformInverseBuffer.CopyBufferToMemory(engine.Device, &transformMatrix, sizeof(transformMatrix));
+    TransformBuffer.CopyBufferToMemory(engine->Device, &FinalTransform, sizeof(FinalTransform));
+    TransformInverseBuffer.CopyBufferToMemory(engine->Device, &transformMatrix, sizeof(transformMatrix));
 
     MeshProperties.UniformDataInfo.UVOffset = animator.GetFrameUVs(animator.CurrentFrame);
     MeshProperties.Update(engine);

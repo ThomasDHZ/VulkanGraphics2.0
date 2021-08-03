@@ -5,8 +5,8 @@ class PointLight : public Light<PointLightBuffer>
 private:
 public:
 	PointLight();
-	PointLight(VulkanEngine& engine);
-	PointLight(VulkanEngine& engine, PointLightBuffer light);
+	PointLight(std::shared_ptr<VulkanEngine> engine);
+	PointLight(std::shared_ptr<VulkanEngine> engine, PointLightBuffer light);
 	~PointLight();
 };
 

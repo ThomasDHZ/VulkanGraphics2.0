@@ -5,7 +5,7 @@ SparkManStage::SparkManStage() : Level2D()
 
 }
 
-SparkManStage::SparkManStage(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Level2D()
+SparkManStage::SparkManStage(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Level2D()
 {
 	std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
 	material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/SparkMan_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB);

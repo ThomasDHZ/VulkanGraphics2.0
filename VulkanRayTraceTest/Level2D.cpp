@@ -11,13 +11,13 @@ Level2D::~Level2D()
 {
 }
 
-void Level2D::AddSprite(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Sprite> sprite)
+void Level2D::AddSprite(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Sprite> sprite)
 {
 	assetManager->meshManager.MeshList.emplace_back(sprite);
 	MeshList.emplace_back(assetManager->meshManager.MeshList.back());
 }
 
-void Level2D::AddTiles(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material)
+void Level2D::AddTiles(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material)
 {
 	std::vector<Vertex> VertexList;
 	std::vector<uint32_t> IndexList;
@@ -75,7 +75,7 @@ void Level2D::AddTiles(VulkanEngine& engine, std::shared_ptr<AssetManager> asset
 	}
 }
 
-void Level2D::AddAnimatedTile(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material, uint32_t TileIndex)
+void Level2D::AddAnimatedTile(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material, uint32_t TileIndex)
 {
 	std::vector<Vertex> VertexList;
 	std::vector<uint32_t> IndexList;
@@ -132,7 +132,7 @@ void Level2D::AddAnimatedTile(VulkanEngine& engine, std::shared_ptr<AssetManager
 	}
 }
 
-void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
+void Level2D::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -154,9 +154,9 @@ void Level2D::Update(VulkanEngine& engine, InputManager& inputManager, MaterialM
 	}
 }
 
-void Level2D::LoadLevel(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material)
+void Level2D::LoadLevel(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material)
 {
-	ModelID = engine.GenerateID();
+	ModelID = engine->GenerateID();
 	ModelType = ModelTypeEnum::Model_Type_2D_Level;
 
 	AddTiles(engine, assetManager, material);

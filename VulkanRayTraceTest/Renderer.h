@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "PBRRenderer.h"
 #include "BlinnPhongRasterRenderer.h"
 #include "RayTraceRenderer.h"
@@ -33,12 +33,12 @@ public:
 	std::shared_ptr<AssetManager> assetManager;
 
 	Renderer();
-	Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPTR);
+	Renderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPTR);
 	~Renderer();
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
-	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage);
-	void GUIUpdate(VulkanEngine& engine);
-	void Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
-	void Destroy(VulkanEngine& engine);
+	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
+	void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage);
+	void GUIUpdate(std::shared_ptr<VulkanEngine> engine);
+	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };

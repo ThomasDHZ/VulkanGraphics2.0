@@ -5,10 +5,10 @@ RenderedGTBNTexture::RenderedGTBNTexture() : Texture()
 {
 }
 
-RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, VkImageLayout imageLayout) : Texture(engine, TextureType::vkRenderedTexture, imageLayout)
+RenderedGTBNTexture::RenderedGTBNTexture(std::shared_ptr<VulkanEngine> engine, VkImageLayout imageLayout) : Texture(engine, TextureType::vkRenderedTexture, imageLayout)
 {
-    Width = engine.SwapChain.GetSwapChainResolution().width;
-    Height = engine.SwapChain.GetSwapChainResolution().height;
+    Width = engine->SwapChain.GetSwapChainResolution().width;
+    Height = engine->SwapChain.GetSwapChainResolution().height;
 
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -16,7 +16,7 @@ RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, VkImageLayout ima
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, imageLayout)
+RenderedGTBNTexture::RenderedGTBNTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, imageLayout)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -24,7 +24,7 @@ RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, glm::vec2& Textur
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedGTBNTexture::RenderedGTBNTexture(VulkanEngine& engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedTexture, imageLayout)
+RenderedGTBNTexture::RenderedGTBNTexture(std::shared_ptr<VulkanEngine> engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedTexture, imageLayout)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -36,14 +36,14 @@ RenderedGTBNTexture::~RenderedGTBNTexture()
 {
 }
 
-void RenderedGTBNTexture::CreateTextureImage(VulkanEngine& engine)
+void RenderedGTBNTexture::CreateTextureImage(std::shared_ptr<VulkanEngine> engine)
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
     TextureInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-    TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
-    TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
+    TextureInfo.extent.width = engine->SwapChain.GetSwapChainResolution().width;
+    TextureInfo.extent.height = engine->SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
@@ -55,7 +55,7 @@ void RenderedGTBNTexture::CreateTextureImage(VulkanEngine& engine)
     Texture::CreateTextureImage(engine, TextureInfo);
 }
 
-void RenderedGTBNTexture::CreateTextureView(VulkanEngine& engine)
+void RenderedGTBNTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -69,12 +69,12 @@ void RenderedGTBNTexture::CreateTextureView(VulkanEngine& engine)
     TextureImageViewInfo.subresourceRange.layerCount = 1;
     TextureImageViewInfo.image = Image;
 
-    if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+    if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
         throw std::runtime_error("Failed to create Image View.");
     }
 }
 
-void RenderedGTBNTexture::CreateTextureSampler(VulkanEngine& engine)
+void RenderedGTBNTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -90,16 +90,16 @@ void RenderedGTBNTexture::CreateTextureSampler(VulkanEngine& engine)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+    if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
     {
         throw std::runtime_error("Failed to create Sampler.");
     }
 }
 
-void RenderedGTBNTexture::RecreateRendererTexture(VulkanEngine& engine)
+void RenderedGTBNTexture::RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine)
 {
-    Width = engine.SwapChain.GetSwapChainResolution().width;
-    Height = engine.SwapChain.GetSwapChainResolution().height;
+    Width = engine->SwapChain.GetSwapChainResolution().width;
+    Height = engine->SwapChain.GetSwapChainResolution().height;
 
     Texture::Delete(engine);
     CreateTextureImage(engine);

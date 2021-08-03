@@ -134,12 +134,12 @@ void OrthographicCamera::ProcessKeyboard(Camera_Movement direction, float deltaT
 		Position.x += 1.0f * velocity;
 }
 
-void OrthographicCamera::Update(VulkanEngine& engine)
+void OrthographicCamera::Update(std::shared_ptr<VulkanEngine> engine)
 {
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), Position) * glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0, 0, 1));
 	ViewMatrix = glm::inverse(transform);
 
-	const auto 	Aspect = engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height;
+	const auto 	Aspect = engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height;
 	ProjectionMatrix = glm::ortho(-Aspect * Zoom, Aspect * Zoom, -1.0f * Zoom, 1.0f * Zoom, -10.0f, 10.0f);
 	ViewScreenSize = glm::vec2((Aspect * Zoom) * 2, (1.0f * Zoom) * 2);
 }

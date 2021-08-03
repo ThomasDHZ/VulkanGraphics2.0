@@ -19,10 +19,10 @@ public:
     float Pitch;
 
 	LightViewCamera();
-	LightViewCamera(VulkanEngine& engine, glm::vec3 lightPos, glm::vec3 lightview);
+	LightViewCamera(std::shared_ptr<VulkanEngine> engine, glm::vec3 lightPos, glm::vec3 lightview);
 	~LightViewCamera();
 
-	void Update(VulkanEngine& engine) override;
-	void Update(VulkanEngine& engine, glm::vec3 lightPos, glm::vec3 lightview);
+	void Update(std::shared_ptr<VulkanEngine> engine) override;
+	void Update(std::shared_ptr<VulkanEngine> engine, glm::vec3 lightPos, glm::vec3 lightview);
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
 };

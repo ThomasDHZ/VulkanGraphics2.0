@@ -1,4 +1,4 @@
-#include "Engine.h"
+#include "engine.h"
 #include "MegaMan.h"
 #include "Skybox.h"
 #include "TerrainMesh.h"
@@ -19,18 +19,17 @@ Engine::Engine()
 Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 {
     window = std::make_shared<VulkanWindow>(VulkanWindow(width, height, WindowName));
-    engine = VulkanEngine(window);
+    engine = std::make_shared<VulkanEngine>(VulkanEngine(window));
     assetManager = std::make_shared<AssetManager>(AssetManager(engine, window));
-    renderer = Renderer(engine, window, assetManager);
 
 
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(engine));
     gameObject->AddChildModel(assetManager->meshManager, std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
     assetManager->ObjManager.ObjectList.emplace_back(gameObject);
 
-    std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(engine));
-    gameObject2->AddChildModel(assetManager->meshManager, std::make_shared<Model>(Model(engine, assetManager->materialManager, assetManager->textureManager, "../Models/TestAnimModel/model.dae")));
-    assetManager->ObjManager.ObjectList.emplace_back(gameObject2);
+    //std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(engine));
+    //gameObject2->AddChildModel(assetManager->meshManager, std::make_shared<Model>(Model(engine, assetManager->materialManager, assetManager->textureManager, "../Models/TestAnimModel/model.dae")));
+    //assetManager->ObjManager.ObjectList.emplace_back(gameObject2);
 
     std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(engine));
     gameObject3->AddChildMesh(assetManager->meshManager, std::make_shared<Skybox>(Skybox(engine, assetManager)));
@@ -153,13 +152,15 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     assetManager->SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     assetManager->SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
+
+    renderer = Renderer(engine, window, assetManager);
 }
 
 Engine::~Engine()
 {
     assetManager->Delete(engine);
     renderer.Destroy(engine);
-    engine.Destroy();
+    engine->Destroy();
     window->Destroy();
 }
 
@@ -180,7 +181,7 @@ void Engine::MainLoop()
         renderer.Draw(engine, window);
     }
 
-    vkDeviceWaitIdle(engine.Device);
+    vkDeviceWaitIdle(engine->Device);
 }
 
 std::shared_ptr<Texture> Engine::LoadTexture2D(const std::string& FilePath, VkFormat format)

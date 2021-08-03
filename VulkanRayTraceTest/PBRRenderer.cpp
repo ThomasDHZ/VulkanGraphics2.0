@@ -4,7 +4,7 @@ PBRRenderer::PBRRenderer() : BaseRenderer()
 {
 }
 
-PBRRenderer::PBRRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f);
@@ -18,7 +18,7 @@ PBRRenderer::~PBRRenderer()
 {
 }
 
-void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void PBRRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     cubeMapRenderer.RebuildSwapChain(engine, assetManager);
     prefilterRenderPass.RebuildSwapChain(engine, assetManager);
@@ -28,7 +28,7 @@ void PBRRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanW
     FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
 }
 
-void PBRRenderer::GUIUpdate(VulkanEngine& engine)
+void PBRRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     ImGui::LabelText("Material", "Material");
     for (int x = 0; x < assetManager->materialManager.MaterialList.size(); x++)
@@ -85,14 +85,14 @@ void PBRRenderer::GUIUpdate(VulkanEngine& engine)
     ImGui::Image(brdfRenderPass.BRDFTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void PBRRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void PBRRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
     DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
 }
 
-void PBRRenderer::Destroy(VulkanEngine& engine)
+void PBRRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     cubeMapRenderer.Destroy(engine);
     prefilterRenderPass.Destroy(engine);

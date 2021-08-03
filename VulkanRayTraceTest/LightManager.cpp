@@ -4,7 +4,7 @@ LightManager::LightManager()
 {
 }
 
-LightManager::LightManager(VulkanEngine& engine, CameraManager& cameraManager)
+LightManager::LightManager(std::shared_ptr<VulkanEngine> engine, CameraManager& cameraManager)
 {
 	DirectionalLightBuffer dlight = DirectionalLightBuffer();
 	dlight.direction = glm::vec4(1.0f);
@@ -29,7 +29,7 @@ LightManager::~LightManager()
 {
 }
 
-void LightManager::Update(VulkanEngine& engine)
+void LightManager::Update(std::shared_ptr<VulkanEngine> engine)
 {
 	for (auto& directionalLight : DirectionalLightList)
 	{
@@ -49,51 +49,51 @@ void LightManager::UpdateImGui()
 {
 }
 
-void LightManager::AddDirectionalLight(VulkanEngine& engine, std::shared_ptr<DirectionalLight> light)
+void LightManager::AddDirectionalLight(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<DirectionalLight> light)
 {
 	DirectionalLightList.emplace_back(light);
 }
 
-void LightManager::AddDirectionalLight(VulkanEngine& engine, CameraManager& cameraManager, DirectionalLightBuffer light)
+void LightManager::AddDirectionalLight(std::shared_ptr<VulkanEngine> engine, CameraManager& cameraManager, DirectionalLightBuffer light)
 {
 	DirectionalLightList.emplace_back(std::make_shared<DirectionalLight>(DirectionalLight(engine, cameraManager, light)));
 }
 
-void LightManager::AddPointLight(VulkanEngine& engine, std::shared_ptr<PointLight> light)
+void LightManager::AddPointLight(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<PointLight> light)
 {
 	PointLightList.emplace_back(light);
 }
 
-void LightManager::AddPointLight(VulkanEngine& engine, PointLightBuffer light)
+void LightManager::AddPointLight(std::shared_ptr<VulkanEngine> engine, PointLightBuffer light)
 {
 	PointLightList.emplace_back(std::make_shared<PointLight>(PointLight(engine, light)));
 }
 
-void LightManager::AddSpotLight(VulkanEngine& engine, std::shared_ptr<SpotLight> light)
+void LightManager::AddSpotLight(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<SpotLight> light)
 {
 	SpotLightList.emplace_back(light);
 }
 
-void LightManager::AddSpotLight(VulkanEngine& engine, SpotLightBuffer light)
+void LightManager::AddSpotLight(std::shared_ptr<VulkanEngine> engine, SpotLightBuffer light)
 {
 	SpotLightList.emplace_back(std::make_shared<SpotLight>(SpotLight(engine, light)));
 }
 
-void LightManager::DeleteDirectionalLight(VulkanEngine& engine, uint32_t LightBufferIndex)
+void LightManager::DeleteDirectionalLight(std::shared_ptr<VulkanEngine> engine, uint32_t LightBufferIndex)
 {
 	DirectionalLightList[LightBufferIndex]->Destroy(engine);
 	DirectionalLightList.erase(DirectionalLightList.begin() + LightBufferIndex);
 	Update(engine);
 }
 
-void LightManager::DeletePointLight(VulkanEngine& engine, uint32_t LightBufferIndex)
+void LightManager::DeletePointLight(std::shared_ptr<VulkanEngine> engine, uint32_t LightBufferIndex)
 {
 	PointLightList[LightBufferIndex]->Destroy(engine);
 	PointLightList.erase(PointLightList.begin() + LightBufferIndex);
 	Update(engine);
 }
 
-void LightManager::DeleteSpotLight(VulkanEngine& engine, uint32_t LightBufferIndex)
+void LightManager::DeleteSpotLight(std::shared_ptr<VulkanEngine> engine, uint32_t LightBufferIndex)
 {
 	SpotLightList[LightBufferIndex]->Destroy(engine);
 
@@ -180,7 +180,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetSpotLightBufferListDescript
 	return SpotLightBufferList;
 }
 
-void LightManager::Destory(VulkanEngine& engine)
+void LightManager::Destory(std::shared_ptr<VulkanEngine> engine)
 {
 	for (auto& directionalLight : DirectionalLightList)
 	{

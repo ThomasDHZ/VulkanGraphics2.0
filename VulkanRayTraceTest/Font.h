@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "MaterialManager.h"
 #include "Texture2D.h"
 #include "Material.h"
@@ -22,7 +22,7 @@ private:
 
 public:
 	Font();
-	Font(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation);
+	Font(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation);
 	~Font();
 
 	Character GetChar(uint32_t index) { return Characters[index]; }

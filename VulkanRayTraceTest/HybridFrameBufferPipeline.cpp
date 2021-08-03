@@ -5,7 +5,7 @@ HybridFrameBufferPipeline::HybridFrameBufferPipeline() : GraphicsPipeline()
 {
 }
 
-HybridFrameBufferPipeline::HybridFrameBufferPipeline(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures) : GraphicsPipeline()
+HybridFrameBufferPipeline::HybridFrameBufferPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures) : GraphicsPipeline()
 {
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -17,32 +17,32 @@ HybridFrameBufferPipeline::~HybridFrameBufferPipeline()
 {
 }
 
-void HybridFrameBufferPipeline::SetUpDescriptorPool(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void HybridFrameBufferPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetDirectionalLightDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetPointLightDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetSpotLightDescriptorCount()));
-    DescriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetDirectionalLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetPointLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetSpotLightDescriptorCount()));
+    DescriptorPool = engine->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void HybridFrameBufferPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void HybridFrameBufferPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -65,63 +65,63 @@ void HybridFrameBufferPipeline::SetUpDescriptorLayout(VulkanEngine& engine, std:
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 17, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetDirectionalLightDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 18, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetPointLightDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 19, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetSpotLightDescriptorCount() });
-    DescriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
+    DescriptorSetLayout = engine->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void HybridFrameBufferPipeline::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures)
+void HybridFrameBufferPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures)
 {
-    DescriptorSets = engine.CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorImageInfo PositionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.PositionTexture->View, HybridTextures.PositionTexture->Sampler);
-    VkDescriptorImageInfo AlebdoTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.AlebdoTexture->View, HybridTextures.AlebdoTexture->Sampler);
-    VkDescriptorImageInfo NormalTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.NormalTexture->View, HybridTextures.NormalTexture->Sampler);
-    //VkDescriptorImageInfo TangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.TangentTexture->View, HybridTextures.TangentTexture->Sampler);
-    //VkDescriptorImageInfo BiTangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.BiTangentTexture->View, HybridTextures.BiTangentTexture->Sampler);
-    VkDescriptorImageInfo ShadowTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ShadowTexture->View, HybridTextures.ShadowTexture->Sampler);
-    VkDescriptorImageInfo ReflectionTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ReflectionTexture->View, HybridTextures.ReflectionTexture->Sampler);
-    VkDescriptorImageInfo SSAOTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.SSA0Texture->View, HybridTextures.SSA0Texture->Sampler);
-    VkDescriptorImageInfo SkyBoxTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.SkyBoxTexture->View, HybridTextures.SkyBoxTexture->Sampler);
-    VkDescriptorImageInfo BloomTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.BloomTexture->View, HybridTextures.BloomTexture->Sampler);
-    VkDescriptorImageInfo NormalMapTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.NormalMapTexture->View, HybridTextures.NormalMapTexture->Sampler);
-    VkDescriptorImageInfo SpecularMapTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.SpecularMapTexture->View, HybridTextures.SpecularMapTexture->Sampler);
-    VkDescriptorImageInfo ReflectionMapTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.ReflectionMapTexture->View, HybridTextures.ReflectionMapTexture->Sampler);
-    VkDescriptorImageInfo TBNTangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.TBNTangentTexture->View, HybridTextures.TBNTangentTexture->Sampler);
-    VkDescriptorImageInfo TBNBiTangentTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.TBNBiTangentTexture->View, HybridTextures.TBNBiTangentTexture->Sampler);
-    VkDescriptorImageInfo TBNNormalMapTextureBufferInfo = engine.AddTextureDescriptor(HybridTextures.TBNNormalMapTexture->View, HybridTextures.TBNNormalMapTexture->Sampler);
-    VkDescriptorBufferInfo SceneDataBufferInfo = engine.AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
+    VkDescriptorImageInfo PositionTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.PositionTexture->View, HybridTextures.PositionTexture->Sampler);
+    VkDescriptorImageInfo AlebdoTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.AlebdoTexture->View, HybridTextures.AlebdoTexture->Sampler);
+    VkDescriptorImageInfo NormalTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.NormalTexture->View, HybridTextures.NormalTexture->Sampler);
+    //VkDescriptorImageInfo TangentTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.TangentTexture->View, HybridTextures.TangentTexture->Sampler);
+    //VkDescriptorImageInfo BiTangentTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.BiTangentTexture->View, HybridTextures.BiTangentTexture->Sampler);
+    VkDescriptorImageInfo ShadowTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.ShadowTexture->View, HybridTextures.ShadowTexture->Sampler);
+    VkDescriptorImageInfo ReflectionTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.ReflectionTexture->View, HybridTextures.ReflectionTexture->Sampler);
+    VkDescriptorImageInfo SSAOTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.SSA0Texture->View, HybridTextures.SSA0Texture->Sampler);
+    VkDescriptorImageInfo SkyBoxTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.SkyBoxTexture->View, HybridTextures.SkyBoxTexture->Sampler);
+    VkDescriptorImageInfo BloomTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.BloomTexture->View, HybridTextures.BloomTexture->Sampler);
+    VkDescriptorImageInfo NormalMapTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.NormalMapTexture->View, HybridTextures.NormalMapTexture->Sampler);
+    VkDescriptorImageInfo SpecularMapTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.SpecularMapTexture->View, HybridTextures.SpecularMapTexture->Sampler);
+    VkDescriptorImageInfo ReflectionMapTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.ReflectionMapTexture->View, HybridTextures.ReflectionMapTexture->Sampler);
+    VkDescriptorImageInfo TBNTangentTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.TBNTangentTexture->View, HybridTextures.TBNTangentTexture->Sampler);
+    VkDescriptorImageInfo TBNBiTangentTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.TBNBiTangentTexture->View, HybridTextures.TBNBiTangentTexture->Sampler);
+    VkDescriptorImageInfo TBNNormalMapTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.TBNNormalMapTexture->View, HybridTextures.TBNNormalMapTexture->Sampler);
+    VkDescriptorBufferInfo SceneDataBufferInfo = engine->AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = assetManager->lightManager.GetDirectionalLightBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> PointLightBufferInfoList = assetManager->lightManager.GetPointLightBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> SpotLightBufferInfoList = assetManager->lightManager.GetSpotLightBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(0, DescriptorSets, PositionTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(1, DescriptorSets, AlebdoTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(2, DescriptorSets, NormalTextureBufferInfo));
-    //DescriptorList.emplace_back(engine.AddTextureDescriptorSet(3, DescriptorSets, TangentTextureBufferInfo));
-    //DescriptorList.emplace_back(engine.AddTextureDescriptorSet(4, DescriptorSets, BiTangentTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(5, DescriptorSets, ShadowTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(6, DescriptorSets, ReflectionTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(7, DescriptorSets, SSAOTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(8, DescriptorSets, SkyBoxTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(9, DescriptorSets, BloomTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(10, DescriptorSets, NormalMapTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(11, DescriptorSets, SpecularMapTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(12, DescriptorSets, ReflectionMapTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(13, DescriptorSets, TBNTangentTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(14, DescriptorSets, TBNBiTangentTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddTextureDescriptorSet(15, DescriptorSets, TBNNormalMapTextureBufferInfo));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(16, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(17, DescriptorSets, DirectionalLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(18, DescriptorSets, PointLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(engine.AddBufferDescriptorSet(19, DescriptorSets, SpotLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(0, DescriptorSets, PositionTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(1, DescriptorSets, AlebdoTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(2, DescriptorSets, NormalTextureBufferInfo));
+    //DescriptorList.emplace_back(engine->AddTextureDescriptorSet(3, DescriptorSets, TangentTextureBufferInfo));
+    //DescriptorList.emplace_back(engine->AddTextureDescriptorSet(4, DescriptorSets, BiTangentTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(5, DescriptorSets, ShadowTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(6, DescriptorSets, ReflectionTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(7, DescriptorSets, SSAOTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(8, DescriptorSets, SkyBoxTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(9, DescriptorSets, BloomTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(10, DescriptorSets, NormalMapTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(11, DescriptorSets, SpecularMapTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(12, DescriptorSets, ReflectionMapTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(13, DescriptorSets, TBNTangentTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(14, DescriptorSets, TBNBiTangentTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(15, DescriptorSets, TBNNormalMapTextureBufferInfo));
+    DescriptorList.emplace_back(engine->AddBufferDescriptorSet(16, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
+    DescriptorList.emplace_back(engine->AddBufferDescriptorSet(17, DescriptorSets, DirectionalLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine->AddBufferDescriptorSet(18, DescriptorSets, PointLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(engine->AddBufferDescriptorSet(19, DescriptorSets, SpotLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    vkUpdateDescriptorSets(engine->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void HybridFrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const VkRenderPass& renderPass)
+void HybridFrameBufferPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/HybridFrameBufferVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine.CreateShader("Shader/HybridFrameBufferFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/HybridFrameBufferVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/HybridFrameBufferFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -135,14 +135,14 @@ void HybridFrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const 
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)engine.SwapChain.GetSwapChainResolution().width;
-    viewport.height = (float)engine.SwapChain.GetSwapChainResolution().height;
+    viewport.width = (float)engine->SwapChain.GetSwapChainResolution().width;
+    viewport.height = (float)engine->SwapChain.GetSwapChainResolution().height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor = {};
     scissor.offset = { 0, 0 };
-    scissor.extent = engine.SwapChain.GetSwapChainResolution();
+    scissor.extent = engine->SwapChain.GetSwapChainResolution();
 
     VkPipelineViewportStateCreateInfo viewportState = {};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -194,7 +194,7 @@ void HybridFrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const 
     PipelineLayoutInfo.setLayoutCount = 1;
     PipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 
-    if (vkCreatePipelineLayout(engine.Device, &PipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
+    if (vkCreatePipelineLayout(engine->Device, &PipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create FrameBuffer Pipeline Layout.");
     }
@@ -215,18 +215,18 @@ void HybridFrameBufferPipeline::SetUpShaderPipeLine(VulkanEngine& engine, const 
     PipelineInfo.subpass = 0;
     PipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(engine.Device, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS)
+    if (vkCreateGraphicsPipelines(engine->Device, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create FrameBuffer Pipeline.");
     }
 
     for (auto& shader : PipelineShaderStageList)
     {
-        vkDestroyShaderModule(engine.Device, shader.module, nullptr);
+        vkDestroyShaderModule(engine->Device, shader.module, nullptr);
     }
 }
 
-void HybridFrameBufferPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures)
+void HybridFrameBufferPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine(engine);
     SetUpDescriptorPool(engine, assetManager);

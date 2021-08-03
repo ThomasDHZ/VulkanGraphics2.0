@@ -5,7 +5,7 @@ Sprite::Sprite() : Mesh()
 
 }
 
-Sprite::Sprite(VulkanEngine& engine, glm::vec2 spriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
+Sprite::Sprite(std::shared_ptr<VulkanEngine> engine, glm::vec2 spriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
 {
     SpriteSize = spriteSize;
 
@@ -23,7 +23,7 @@ Sprite::Sprite(VulkanEngine& engine, glm::vec2 spriteSize, glm::vec2 UVSize, glm
         1, 2, 3
     };
 
-    MeshID = engine.GenerateID();
+    MeshID = engine->GenerateID();
     MeshType = MeshTypeFlag::Mesh_Type_2D_Sprite;
     MeshMaterial = material;
     AnimationPlayer = AnimationPlayer2D();
@@ -68,7 +68,7 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
     AnimationPlayer.SetAnimation(AnimationIndex);
 }
 
-void Sprite::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
+void Sprite::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     Velocity.y = -0.01f;
 

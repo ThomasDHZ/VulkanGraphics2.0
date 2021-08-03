@@ -81,31 +81,31 @@ public:
 	{
 	}
 
-	UniformData(VulkanEngine& engine)
+	UniformData(std::shared_ptr<VulkanEngine> engine)
 	{
-		VulkanBufferData.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VulkanBufferData.CreateBuffer(engine->Device, engine->PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
-	UniformData(VulkanEngine& engine, T UniformData)
+	UniformData(std::shared_ptr<VulkanEngine> engine, T UniformData)
 	{
-		VulkanBufferData.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VulkanBufferData.CreateBuffer(engine->Device, engine->PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		Update(engine);
 	}
 
-	void Update(VulkanEngine& engine)
+	void Update(std::shared_ptr<VulkanEngine> engine)
 	{
-		VulkanBufferData.CopyBufferToMemory(engine.Device, &UniformDataInfo, sizeof(T));
+		VulkanBufferData.CopyBufferToMemory(engine->Device, &UniformDataInfo, sizeof(T));
 	}
 
-	void Update(VulkanEngine& engine, T UniformData)
+	void Update(std::shared_ptr<VulkanEngine> engine, T UniformData)
 	{
 		UniformDataInfo = UniformData;
-		VulkanBufferData.CopyBufferToMemory(engine.Device, &UniformDataInfo, sizeof(T));
+		VulkanBufferData.CopyBufferToMemory(engine->Device, &UniformDataInfo, sizeof(T));
 	}
 
-	void Destroy(VulkanEngine& engine)
+	void Destroy(std::shared_ptr<VulkanEngine> engine)
 	{
-		VulkanBufferData.DestoryBuffer(engine.Device);
+		VulkanBufferData.DestoryBuffer(engine->Device);
 	}
 };
 

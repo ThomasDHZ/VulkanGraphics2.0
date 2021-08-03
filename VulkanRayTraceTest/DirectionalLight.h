@@ -10,11 +10,11 @@ private:
 	std::shared_ptr<LightViewCamera> lightViewCamera;
 public:
 	DirectionalLight();
-	DirectionalLight(VulkanEngine& engine);
-	DirectionalLight(VulkanEngine& engine, CameraManager& cameraManager, DirectionalLightBuffer light);
+	DirectionalLight(std::shared_ptr<VulkanEngine> engine);
+	DirectionalLight(std::shared_ptr<VulkanEngine> engine, CameraManager& cameraManager, DirectionalLightBuffer light);
 	~DirectionalLight();
 
-	void Update(VulkanEngine& engine) override;
-	void Destroy(VulkanEngine& engine) override;
+	void Update(std::shared_ptr<VulkanEngine> engine) override;
+	void Destroy(std::shared_ptr<VulkanEngine> engine) override;
 };
 

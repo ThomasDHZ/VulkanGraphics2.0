@@ -14,10 +14,10 @@ public:
 	VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{};
 
 	RayTracingGraphicsPipeline();
-	RayTracingGraphicsPipeline(VulkanEngine& engine);
+	RayTracingGraphicsPipeline(std::shared_ptr<VulkanEngine> engine);
 	~RayTracingGraphicsPipeline();
 
-	virtual void UpdateGraphicsPipeLine(VulkanEngine& engine) override;
-	void Destroy(VulkanEngine& engine) override;
+	virtual void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine) override;
+	void Destroy(std::shared_ptr<VulkanEngine> engine) override;
 };
 

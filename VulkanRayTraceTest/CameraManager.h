@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "Camera.h"
 
 class CameraManager
@@ -11,9 +11,9 @@ public:
 	int cameraIndex = 0;
 
 	CameraManager();
-	CameraManager(VulkanEngine& engine);
+	CameraManager(std::shared_ptr<VulkanEngine> engine);
 	~CameraManager();
 
-	void Update(VulkanEngine& engine);
+	void Update(std::shared_ptr<VulkanEngine> engine);
 };
 

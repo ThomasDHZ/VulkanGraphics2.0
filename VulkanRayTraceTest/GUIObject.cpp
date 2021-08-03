@@ -4,11 +4,11 @@ GUIObject::GUIObject() : Object()
 {
 }
 
-GUIObject::GUIObject(VulkanEngine& engine) : Object(engine, ObjectType::Obj_GuiObject)
+GUIObject::GUIObject(std::shared_ptr<VulkanEngine> engine) : Object(engine, ObjectType::Obj_GuiObject)
 {
 }
 
-GUIObject::GUIObject(VulkanEngine& engine, glm::vec2 position) : Object(engine, position, ObjectType::Obj_GuiObject)
+GUIObject::GUIObject(std::shared_ptr<VulkanEngine> engine, glm::vec2 position) : Object(engine, position, ObjectType::Obj_GuiObject)
 {
 }
 
@@ -21,7 +21,7 @@ void GUIObject::AddGUIMesh(std::shared_ptr<GUIMesh> mesh)
 	GuiMeshList.emplace_back(mesh);
 }
 
-void GUIObject::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
+void GUIObject::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	for (auto& mesh : GuiMeshList)
 	{
@@ -37,7 +37,7 @@ void GUIObject::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 	}
 }
 
-void GUIObject::Destory(VulkanEngine& engine)
+void GUIObject::Destory(std::shared_ptr<VulkanEngine> engine)
 {
 	for (auto& mesh : GuiMeshList)
 	{

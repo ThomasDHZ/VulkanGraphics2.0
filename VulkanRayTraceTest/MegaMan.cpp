@@ -5,7 +5,7 @@ MegaMan::MegaMan() : Sprite()
 
 }
 
-MegaMan::MegaMan(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Sprite(engine, SpriteSize, SpriteUVSize, Position, 0)
+MegaMan::MegaMan(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Sprite(engine, SpriteSize, SpriteUVSize, Position, 0)
 {
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
     material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
@@ -107,7 +107,7 @@ MegaMan::~MegaMan()
 
 }
 
-void MegaMan::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
+void MegaMan::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     uint32_t newAnimation = 0;
     if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))

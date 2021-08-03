@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "RenderedGBufferAlbedoTexture.h"
@@ -14,13 +14,13 @@
 class GBufferRenderPass2
 {
 private:
-	void CreateRenderPass(VulkanEngine& engine);
-	void CreateRendererFramebuffers(VulkanEngine& engine);
-	void SetUpCommandBuffers(VulkanEngine& engine);
+	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
+	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
+	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
 
 public:
 	GBufferRenderPass2();
-	GBufferRenderPass2(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	GBufferRenderPass2(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
 	~GBufferRenderPass2();
 
 	static constexpr RenderPassID RendererID = Deferred_Renderer;
@@ -43,7 +43,7 @@ public:
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
-	void Destroy(VulkanEngine& engine);
+	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
+	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };

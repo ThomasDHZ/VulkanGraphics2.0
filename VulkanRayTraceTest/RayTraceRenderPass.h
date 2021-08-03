@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "RayTracedHybridPipeline.h"
 #include "RayTracedPipeline.h"
 #include "RayTracedPBRPipeline.h"
@@ -9,7 +9,7 @@ class RayTraceRenderPass
 private:
     RayTraceConstants RTXConst;
     VulkanBuffer instancesBuffer;
-    void SetUpCommandBuffers(VulkanEngine& engine);
+    void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
     uint32_t Frame = 0;
     glm::mat4 LastCameraView = glm::mat4(1.0f);
     glm::mat4 LastCameraProjection = glm::mat4(1.0f);
@@ -29,14 +29,14 @@ public:
     VkCommandBuffer RayTraceCommandBuffer;
 
     RayTraceRenderPass();
-    RayTraceRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+    RayTraceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
     ~RayTraceRenderPass();
 
-    void SetUpTopLevelAccelerationStructure(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+    void SetUpTopLevelAccelerationStructure(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
     void GUIUpdate();
-    void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID renderID, std::shared_ptr<Camera> ViewCamera);
-    void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
-    void Destroy(VulkanEngine& engine);
+    void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID renderID, std::shared_ptr<Camera> ViewCamera);
+    void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+    void Destroy(std::shared_ptr<VulkanEngine> engine);
 
     VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
     {

@@ -4,7 +4,7 @@ GUIManager::GUIManager()
 {
 }
 
-GUIManager::GUIManager(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager)
+GUIManager::GUIManager(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager)
 {
 	FontList.emplace_back(std::make_shared<Font>(Font(engine, materialManager, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf")));
 }
@@ -13,7 +13,7 @@ GUIManager::~GUIManager()
 {
 }
 
-void GUIManager::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
+void GUIManager::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 	for (auto& obj : GuiObjectList)
 	{
@@ -29,7 +29,7 @@ void GUIManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 	}
 }
 
-void GUIManager::Destory(VulkanEngine& engine)
+void GUIManager::Destory(std::shared_ptr<VulkanEngine> engine)
 {
 	for (auto& obj : GuiObjectList)
 	{
@@ -37,7 +37,7 @@ void GUIManager::Destory(VulkanEngine& engine)
 	}
 }
 
-void GUIManager::LoadFont(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation)
+void GUIManager::LoadFont(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation)
 {
 	FontList.emplace_back(std::make_shared<Font>(Font(engine, materialManager, textureManager, FontLocation)));
 }

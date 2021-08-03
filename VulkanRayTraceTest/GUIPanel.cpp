@@ -5,7 +5,7 @@ GUIPanel::GUIPanel() : GUIObject()
 
 }
 
-GUIPanel::GUIPanel(VulkanEngine& engine, std::shared_ptr<Material> meshmaterial, GuiRectangle rectangle, glm::vec2 position) : GUIObject(engine, position)
+GUIPanel::GUIPanel(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Material> meshmaterial, GuiRectangle rectangle, glm::vec2 position) : GUIObject(engine, position)
 {
 	std::vector<GUIVertex> VertexList = {
 		{{rectangle.UpperLeftVertex.x, rectangle.UpperLeftVertex.y}, {1.0f, 0.0f}},

@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "TextureManager.h"
 
 const uint32_t DefaultTextureID = 0;
@@ -139,12 +139,12 @@ public:
 	MaterialTexture materialTexture;
 
 	Material();
-	Material(VulkanEngine& engine, TextureManager& textureManager);
-	Material(VulkanEngine& engine, MaterialTexture& MaterialInfo);
+	Material(std::shared_ptr<VulkanEngine> engine, TextureManager& textureManager);
+	Material(std::shared_ptr<VulkanEngine> engine, MaterialTexture& MaterialInfo);
 	~Material();
 
-	void UpdateBufferIndexs(VulkanEngine& engine);
-	void Delete(VulkanEngine& engine);
+	void UpdateBufferIndexs(std::shared_ptr<VulkanEngine> engine);
+	void Delete(std::shared_ptr<VulkanEngine> engine);
 
 	VkBuffer GetMaterialBuffer() { return MaterialBuffer.Buffer; }
 };

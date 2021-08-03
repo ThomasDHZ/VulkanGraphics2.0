@@ -4,7 +4,7 @@ TextMesh::TextMesh() : GUIObject()
 {
 }
 
-TextMesh::TextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position) : GUIObject(engine, position)
+TextMesh::TextMesh(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position) : GUIObject(engine, position)
 {
 	font = fontPTR;
 	BuildTextMesh(engine, materialManager, textureManager, Text);
@@ -14,7 +14,7 @@ TextMesh::~TextMesh()
 {
 }
 
-void TextMesh::BuildTextMesh(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string Text)
+void TextMesh::BuildTextMesh(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string Text)
 {
 	float counter = 0;
 	float StartXPos = 0.0f;

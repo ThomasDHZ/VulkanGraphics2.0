@@ -8,12 +8,12 @@ private:
 	HeightMapTexture HeightMap;
 	std::vector<uint32_t> IndexList;
 
-	void BuildTerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation);
+	void BuildTerrainMesh(std::shared_ptr<VulkanEngine> engine, const std::string HeightMapLocation);
 public:
 	TerrainMesh();
-	TerrainMesh(VulkanEngine& engine, const std::string HeightMapLocation, std::shared_ptr<Material> material);
+	TerrainMesh(std::shared_ptr<VulkanEngine> engine, const std::string HeightMapLocation, std::shared_ptr<Material> material);
 	~TerrainMesh();
 
-	void Destory(VulkanEngine& engine) override;
+	void Destory(std::shared_ptr<VulkanEngine> engine) override;
 };
 

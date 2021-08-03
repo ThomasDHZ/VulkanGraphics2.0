@@ -6,7 +6,7 @@ GUIRenderPass::GUIRenderPass()
 {
 }
 
-GUIRenderPass::GUIRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+GUIRenderPass::GUIRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
 
@@ -20,7 +20,7 @@ GUIRenderPass::~GUIRenderPass()
 {
 }
 
-void GUIRenderPass::CreateRenderPass(VulkanEngine& engine)
+void GUIRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
@@ -59,50 +59,50 @@ void GUIRenderPass::CreateRenderPass(VulkanEngine& engine)
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(engine.Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
 }
 
-void GUIRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void GUIRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
 {
-    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(engine.SwapChain.GetSwapChainImageViews()[i]);
+        AttachmentList.emplace_back(engine->SwapChain.GetSwapChainImageViews()[i]);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine.SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine.SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = engine->SwapChain.GetSwapChainResolution().width;
+        frameBufferCreateInfo.height = engine->SwapChain.GetSwapChainResolution().height;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine.Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void GUIRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void GUIRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.commandPool = engine->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void GUIRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
+void GUIRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -116,7 +116,7 @@ void GUIRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> ass
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
 
     std::array<VkClearValue, 1> clearValues{};
     clearValues[0].color = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -135,18 +135,18 @@ void GUIRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> ass
     }
 }
 
-void GUIRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine);
 
     TextRenderingPipeline->Destroy(engine);
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
@@ -156,18 +156,18 @@ void GUIRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asset
     SetUpCommandBuffers(engine);
 }
 
-void GUIRenderPass::Destroy(VulkanEngine& engine)
+void GUIRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     RenderedTexture->Delete(engine);
     TextRenderingPipeline->Destroy(engine);
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

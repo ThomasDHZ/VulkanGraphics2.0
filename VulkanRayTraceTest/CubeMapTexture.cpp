@@ -6,14 +6,14 @@ CubeMapTexture::CubeMapTexture() : Texture()
 {
 }
 
-CubeMapTexture::CubeMapTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
 {
 	LoadTexture(engine, CubeMapFiles, textureFormat);
 	CreateTextureView(engine, textureFormat);
 	CreateTextureSampler(engine);
 }
 
-CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6], VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapFiles[6], VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
 {
 	CubeMapLayout cubeMapfiles;
 	cubeMapfiles.Left = CubeMapFiles[0];
@@ -28,7 +28,7 @@ CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapFiles[6]
 	CreateTextureSampler(engine);
 }
 
-CubeMapTexture::CubeMapTexture(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat)
+CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapLocation, VkFormat textureFormat)
 {
 	LoadTexture(engine, CubeMapLocation, textureFormat);
 	CreateTextureView(engine, textureFormat);
@@ -39,7 +39,7 @@ CubeMapTexture::~CubeMapTexture()
 {
 }
 
-void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
 	std::vector<unsigned char*> textureData;
 	int texChannels;
@@ -55,15 +55,15 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 	const VkDeviceSize layerSize = imageSize / 6;
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* data;
-	vkMapMemory(engine.Device, StagingBuffer.BufferMemory, 0, imageSize, 0, &data);
+	vkMapMemory(engine->Device, StagingBuffer.BufferMemory, 0, imageSize, 0, &data);
 	for (int x = 0; x < 6; ++x)
 	{
 		memcpy(static_cast<char*>(data) + (x * layerSize), textureData[x], static_cast<size_t>(layerSize));
 	}
-	vkUnmapMemory(engine.Device, StagingBuffer.BufferMemory);
+	vkUnmapMemory(engine->Device, StagingBuffer.BufferMemory);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -87,14 +87,14 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, CubeMapLayout CubeMapFile
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer(engine.Device);
+	StagingBuffer.DestoryBuffer(engine->Device);
 	for (auto texturedata : textureData)
 	{
 		stbi_image_free(texturedata);
 	}
 }
 
-void CubeMapTexture::LoadTexture(VulkanEngine& engine, std::string CubeMapLocation, VkFormat textureFormat)
+void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapLocation, VkFormat textureFormat)
 {
 	std::vector<unsigned char*> textureData;
 	int texChannels;
@@ -105,7 +105,7 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, std::string CubeMapLocati
 	const VkDeviceSize layerSize = imageSize / 6;
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, layerSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &data[0]);
+	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, layerSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &data[0]);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -129,14 +129,14 @@ void CubeMapTexture::LoadTexture(VulkanEngine& engine, std::string CubeMapLocati
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer(engine.Device);
+	StagingBuffer.DestoryBuffer(engine->Device);
 	for (auto texturedata : textureData)
 	{
 		stbi_image_free(texturedata);
 	}
 }
 
-void CubeMapTexture::CreateTextureView(VulkanEngine& engine, VkFormat textureFormat)
+void CubeMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat textureFormat)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -149,12 +149,12 @@ void CubeMapTexture::CreateTextureView(VulkanEngine& engine, VkFormat textureFor
 	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 	TextureImageViewInfo.subresourceRange.layerCount = 6;
 
-	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void CubeMapTexture::CreateTextureSampler(VulkanEngine& engine)
+void CubeMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -172,7 +172,7 @@ void CubeMapTexture::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
 
-	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

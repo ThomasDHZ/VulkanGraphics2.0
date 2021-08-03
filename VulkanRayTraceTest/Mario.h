@@ -12,9 +12,9 @@ public:
 	static constexpr glm::vec2 UVSize = glm::vec2(.05f, 1.0f);
 
 	Mario();
-	Mario(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Position);
+	Mario(std::shared_ptr<VulkanEngine> engine, AssetManager& assetManager, glm::vec3 Position);
 	~Mario();
 
-	void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager) override;
+	void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager) override;
 };
 

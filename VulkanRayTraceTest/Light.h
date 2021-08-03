@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "SceneData.h"
 
 template <class T>
@@ -16,7 +16,7 @@ public:
 
 	}
 	
-	Light(VulkanEngine& engine)
+	Light(std::shared_ptr<VulkanEngine> engine)
 	{
 		LightBuffer = UniformData<T>(engine);
 		Update(engine);
@@ -27,12 +27,12 @@ public:
 
 	}
 
-	virtual void Update(VulkanEngine& engine)
+	virtual void Update(std::shared_ptr<VulkanEngine> engine)
 	{
 		LightBuffer.Update(engine);
 	}
 
-	virtual void Destroy(VulkanEngine& engine)
+	virtual void Destroy(std::shared_ptr<VulkanEngine> engine)
 	{
 		LightBuffer.Destroy(engine);
 	}

@@ -6,7 +6,7 @@ SSAORenderPass::SSAORenderPass()
 {
 }
 
-SSAORenderPass::SSAORenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+SSAORenderPass::SSAORenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
 {
     SSAOTexture = std::make_shared<RenderedColorTexture>(engine);
 
@@ -22,7 +22,7 @@ SSAORenderPass::~SSAORenderPass()
 {
 }
 
-void SSAORenderPass::CreateRenderPass(VulkanEngine& engine)
+void SSAORenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -76,17 +76,17 @@ void SSAORenderPass::CreateRenderPass(VulkanEngine& engine)
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine.Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void SSAORenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void SSAORenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
 {
-    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(SSAOTexture->View);
@@ -96,31 +96,31 @@ void SSAORenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine.SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine.SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = engine->SwapChain.GetSwapChainResolution().width;
+        frameBufferCreateInfo.height = engine->SwapChain.GetSwapChainResolution().height;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine.Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void SSAORenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void SSAORenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.commandPool = engine->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void SSAORenderPass::GenerateKernal(VulkanEngine& engine, SSAOTextureList& textures)
+void SSAORenderPass::GenerateKernal(std::shared_ptr<VulkanEngine> engine, SSAOTextureList& textures)
 {
     std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0);
     std::default_random_engine generator;
@@ -134,13 +134,13 @@ void SSAORenderPass::GenerateKernal(VulkanEngine& engine, SSAOTextureList& textu
         scale = Lerp(0.1f, 1.0f, scale * scale);
         sample *= scale;
        
-        std::shared_ptr<VulkanBuffer> SampleBuffer = std::make_shared<VulkanBuffer>(VulkanBuffer(engine.Device, engine.PhysicalDevice, sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample));
+        std::shared_ptr<VulkanBuffer> SampleBuffer = std::make_shared<VulkanBuffer>(VulkanBuffer(engine->Device, engine->PhysicalDevice, sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample));
         SamplePointBufferList.emplace_back(SampleBuffer);
     }
     textures.KernalSampleBufferList = SamplePointBufferList;
 }
 
-void SSAORenderPass::GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList& textures)
+void SSAORenderPass::GenerateNoiseTexture(std::shared_ptr<VulkanEngine> engine, SSAOTextureList& textures)
 {
     std::uniform_real_distribution <float> randomBits(0.0f, 1.0f);
     std::vector<glm::vec4> pixelList;
@@ -158,15 +158,15 @@ float SSAORenderPass::Lerp(float a, float b, float f)
     return a + f * (b - a);
 }
 
-void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void SSAORenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     SSAOProperties sSAOProperties = {};
     sSAOProperties.kernelSize = KernalSampleSize;
     sSAOProperties.radius = radius;
     sSAOProperties.bias = bias;
     sSAOProperties.projection = assetManager->cameraManager.ActiveCamera->GetProjectionMatrix();
-    sSAOProperties.TextureWidth = engine.SwapChain.SwapChainResolution.width;
-    sSAOProperties.TextureHeight = engine.SwapChain.SwapChainResolution.height;
+    sSAOProperties.TextureWidth = engine->SwapChain.SwapChainResolution.width;
+    sSAOProperties.TextureHeight = engine->SwapChain.SwapChainResolution.height;
 
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -183,7 +183,7 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -199,7 +199,7 @@ void SSAORenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> as
     }
 }
 
-void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+void SSAORenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
 {
     NoiseTexture->Update(engine, 0);
     SSAOTexture->RecreateRendererTexture(engine);
@@ -207,15 +207,15 @@ void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
 
     for (auto SamplePoint : SamplePointBufferList)
     {
-        SamplePoint->DestoryBuffer(engine.Device);
+        SamplePoint->DestoryBuffer(engine->Device);
     }
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
@@ -227,7 +227,7 @@ void SSAORenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Asse
     SetUpCommandBuffers(engine);
 }
 
-void SSAORenderPass::Destroy(VulkanEngine& engine)
+void SSAORenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     NoiseTexture->Delete(engine);
     SSAOTexture->Delete(engine);
@@ -235,15 +235,15 @@ void SSAORenderPass::Destroy(VulkanEngine& engine)
 
     for (auto SamplePoint : SamplePointBufferList)
     {
-        SamplePoint->DestoryBuffer(engine.Device);
+        SamplePoint->DestoryBuffer(engine->Device);
     }
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

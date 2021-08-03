@@ -10,7 +10,7 @@ Renderer::Renderer()
 {
 }
 
-Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPTR)
+Renderer::Renderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPTR)
 {
     interfaceRenderPass = InterfaceRenderPass(engine, window);
     assetManager = assetManagerPTR;
@@ -30,7 +30,7 @@ Renderer::~Renderer()
 
 }
 
-void Renderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void Renderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     int width = 0, height = 0;
     glfwGetFramebufferSize(window->GetWindowPtr(), &width, &height);
@@ -39,16 +39,16 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWind
         glfwWaitEvents();
     }
 
-    vkDeviceWaitIdle(engine.Device);
+    vkDeviceWaitIdle(engine->Device);
 
-    for (auto imageView : engine.SwapChain.GetSwapChainImageViews()) {
-        vkDestroyImageView(engine.Device, imageView, nullptr);
+    for (auto imageView : engine->SwapChain.GetSwapChainImageViews()) {
+        vkDestroyImageView(engine->Device, imageView, nullptr);
     }
 
-    vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
+    vkDestroySwapchainKHR(engine->Device, engine->SwapChain.GetSwapChain(), nullptr);
 
     assetManager->Update(engine, window, RayTraceFlag);
-    engine.SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
+    engine->SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine->Device, engine->PhysicalDevice, engine->Surface);
 
     interfaceRenderPass.RebuildSwapChain(engine);
     blinnPhongRenderer.RebuildSwapChain(engine, window);
@@ -60,12 +60,12 @@ void Renderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWind
     //guiRenderer.RebuildSwapChain(engine, window);
 }
 
-void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
+void Renderer::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
 {
-    if(engine.UpdateRendererFlag)
+    if(engine->UpdateRendererFlag)
     {
         RebuildSwapChain(engine, window);
-        engine.UpdateRendererFlag = false;
+        engine->UpdateRendererFlag = false;
     }
 
     assetManager->Update(engine, window, RayTraceFlag);
@@ -77,7 +77,7 @@ void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window
     //}
 }
 
-void Renderer::GUIUpdate(VulkanEngine& engine)
+void Renderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
@@ -110,12 +110,12 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     //guiRenderer.GUIUpdate(engine);
 }
 
-void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void Renderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+    vkWaitForFences(engine->Device, 1, &engine->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(engine.Device, engine.SwapChain.GetSwapChain(), UINT64_MAX, engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(engine->Device, engine->SwapChain.GetSwapChain(), UINT64_MAX, engine->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         RebuildSwapChain(engine, window);
@@ -127,13 +127,13 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 
     Update(engine, window, imageIndex);
 
-    if (engine.imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
-        vkWaitForFences(engine.Device, 1, &engine.imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+    if (engine->imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
+        vkWaitForFences(engine->Device, 1, &engine->imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
 
-    engine.imagesInFlight[imageIndex] = engine.inFlightFences[currentFrame];
+    engine->imagesInFlight[imageIndex] = engine->inFlightFences[currentFrame];
 
-    VkSemaphore waitSemaphores[] = { engine.vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
+    VkSemaphore waitSemaphores[] = { engine->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
     assetManager->ObjManager.SubmitAnimationToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
@@ -187,13 +187,13 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
     submitInfo.commandBufferCount = static_cast<uint32_t>(CommandBufferSubmitList.size());
     submitInfo.pCommandBuffers = CommandBufferSubmitList.data();
 
-    VkSemaphore signalSemaphores[] = { engine.vulkanSemaphores[currentFrame].RenderCompleteSemaphore };
+    VkSemaphore signalSemaphores[] = { engine->vulkanSemaphores[currentFrame].RenderCompleteSemaphore };
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    vkResetFences(engine.Device, 1, &engine.inFlightFences[currentFrame]);
+    vkResetFences(engine->Device, 1, &engine->inFlightFences[currentFrame]);
 
-    if (vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, engine.inFlightFences[currentFrame]) != VK_SUCCESS) {
+    if (vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, engine->inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
@@ -203,13 +203,13 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
-    VkSwapchainKHR swapChains[] = { engine.SwapChain.GetSwapChain() };
+    VkSwapchainKHR swapChains[] = { engine->SwapChain.GetSwapChain() };
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
     presentInfo.pImageIndices = &imageIndex;
 
-    result = vkQueuePresentKHR(engine.PresentQueue, &presentInfo);
+    result = vkQueuePresentKHR(engine->PresentQueue, &presentInfo);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
         framebufferResized = false;
@@ -223,7 +223,7 @@ void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
     CommandBufferSubmitList.clear();
 }
 
-void Renderer::Destroy(VulkanEngine& engine)
+void Renderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     interfaceRenderPass.Destroy(engine);
     blinnPhongRenderer.Destroy(engine);

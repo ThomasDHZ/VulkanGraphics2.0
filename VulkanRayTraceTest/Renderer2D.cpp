@@ -4,7 +4,7 @@ Renderer2D::Renderer2D() : BaseRenderer()
 {
 }
 
-Renderer2D::Renderer2D(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+Renderer2D::Renderer2D(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     FrameBufferTextureRenderer = RenderPass2D(engine, assetManager);
     BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
@@ -15,14 +15,14 @@ Renderer2D::~Renderer2D()
 {
 }
 
-void Renderer2D::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void Renderer2D::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
     FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
 }
 
-void Renderer2D::GUIUpdate(VulkanEngine& engine)
+void Renderer2D::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     ImGui::Checkbox("Mesh Debug: ", &FrameBufferTextureRenderer.WireFrameFlag);
     ImGui::LabelText("Mesh", "Mesh");
@@ -46,14 +46,14 @@ void Renderer2D::GUIUpdate(VulkanEngine& engine)
     }
 }
 
-void Renderer2D::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void Renderer2D::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
     BloomRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
 }
 
-void Renderer2D::Destroy(VulkanEngine& engine)
+void Renderer2D::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     FrameBufferTextureRenderer.Destroy(engine);
     BloomRenderer.Destroy(engine);

@@ -6,23 +6,23 @@ Texture2D::Texture2D() : Texture()
 {
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, TextureType textureType) : Texture(engine, textureType, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, TextureType textureType) : Texture(engine, textureType, VK_IMAGE_LAYOUT_UNDEFINED)
 {
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, const std::string TextureLocation, VkFormat format) : Texture(engine, TextureLocation, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
-{
-	CreateTextureView(engine, format);
-	CreateTextureSampler(engine);
-}
-
-Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format) : Texture (engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation, VkFormat format) : Texture(engine, TextureLocation, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
 }
 
-Texture2D::Texture2D(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format) : Texture(engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format) : Texture (engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+{
+	CreateTextureView(engine, format);
+	CreateTextureSampler(engine);
+}
+
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format) : Texture(engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
@@ -33,7 +33,7 @@ Texture2D::~Texture2D()
 {
 }
 
-void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
+void Texture2D::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -46,12 +46,12 @@ void Texture2D::CreateTextureView(VulkanEngine& engine, VkFormat format)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void Texture2D::CreateTextureSampler(VulkanEngine& engine)
+void Texture2D::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -71,7 +71,7 @@ void Texture2D::CreateTextureSampler(VulkanEngine& engine)
 	TextureImageSamplerInfo.maxLod = static_cast<float>(MipMapLevels);
 	TextureImageSamplerInfo.mipLodBias = 0;
 
-	if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

@@ -10,12 +10,12 @@ GraphicsPipeline::~GraphicsPipeline()
 {
 }
 
-void GraphicsPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine)
+void GraphicsPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine)
 {
-    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
+    vkDestroyPipeline(engine->Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine->Device, ShaderPipelineLayout, nullptr);
+    vkDestroyDescriptorPool(engine->Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(engine->Device, DescriptorSetLayout, nullptr);
 
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
@@ -23,12 +23,12 @@ void GraphicsPipeline::UpdateGraphicsPipeLine(VulkanEngine& engine)
     DescriptorSetLayout = VK_NULL_HANDLE;
 }
 
-void GraphicsPipeline::Destroy(VulkanEngine& engine)
+void GraphicsPipeline::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    vkDestroyPipeline(engine.Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine.Device, ShaderPipelineLayout, nullptr);
-    vkDestroyDescriptorPool(engine.Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine.Device, DescriptorSetLayout, nullptr);
+    vkDestroyPipeline(engine->Device, ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(engine->Device, ShaderPipelineLayout, nullptr);
+    vkDestroyDescriptorPool(engine->Device, DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(engine->Device, DescriptorSetLayout, nullptr);
 
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;

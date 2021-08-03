@@ -8,13 +8,13 @@
 class GUIRenderPass
 {
 private:
-	void CreateRenderPass(VulkanEngine& engine);
-	void CreateRendererFramebuffers(VulkanEngine& engine);
-	void SetUpCommandBuffers(VulkanEngine& engine);
+	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
+	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
+	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
 
 public:
 	GUIRenderPass();
-	GUIRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
+	GUIRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
 	~GUIRenderPass();
 
 	static constexpr RenderPassID rendererPassID = Texture_Renderer;
@@ -26,8 +26,8 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager);
-	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID);
-	void Destroy(VulkanEngine& engine);
+	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
+	void UpdateSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
+	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };

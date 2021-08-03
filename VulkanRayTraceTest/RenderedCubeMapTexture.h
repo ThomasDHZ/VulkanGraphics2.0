@@ -3,15 +3,15 @@
 class RenderedCubeMapTexture : public Texture
 {
 private:
-    void CreateTextureImage(VulkanEngine& engine);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextureImage(std::shared_ptr<VulkanEngine> engine);
+    void CreateTextureView(std::shared_ptr<VulkanEngine> engine);
+    void CreateTextureSampler(std::shared_ptr<VulkanEngine> engine);
 public:
     RenderedCubeMapTexture();
-    RenderedCubeMapTexture(VulkanEngine& engine);
-    RenderedCubeMapTexture(VulkanEngine& engine, glm::vec2 TextureResolution);
-    RenderedCubeMapTexture(VulkanEngine& engine, int width, int Height);
+    RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine);
+    RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2 TextureResolution);
+    RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, int width, int Height);
     ~RenderedCubeMapTexture();
 
-    void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine);
 };

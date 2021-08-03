@@ -83,7 +83,7 @@ void PerspectiveCamera::MouseScroll(float yoffset)
         Zoom = 45.0f;
 }
 
-void PerspectiveCamera::Update(VulkanEngine& engine)
+void PerspectiveCamera::Update(std::shared_ptr<VulkanEngine> engine)
 {
     glm::vec3 front;
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
@@ -96,6 +96,6 @@ void PerspectiveCamera::Update(VulkanEngine& engine)
 
     ViewMatrix = glm::lookAt(Position, Position + Front, Up);
 
-    const auto Aspect = engine.SwapChain.GetSwapChainResolution().width / (float)engine.SwapChain.GetSwapChainResolution().height;
+    const auto Aspect = engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height;
     ProjectionMatrix = glm::perspective(glm::radians(Zoom), Aspect, 0.1f, 10000.0f);
 }

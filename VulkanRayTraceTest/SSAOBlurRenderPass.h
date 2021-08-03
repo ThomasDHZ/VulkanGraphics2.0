@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
@@ -8,13 +8,13 @@
 class SSAOBlurRenderPass
 {
 private:
-	void CreateRenderPass(VulkanEngine& engine);
-	void CreateRendererFramebuffers(VulkanEngine& engine);
-	void SetUpCommandBuffers(VulkanEngine& engine);
+	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
+	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
+	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
 
 public:
 	SSAOBlurRenderPass();
-	SSAOBlurRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture);
+	SSAOBlurRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture);
 	~SSAOBlurRenderPass();
 
 	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
@@ -26,7 +26,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManage, std::shared_ptr<Texture> SSAOTexture);
-	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
-	void Destroy(VulkanEngine& engine);
+	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManage, std::shared_ptr<Texture> SSAOTexture);
+	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };

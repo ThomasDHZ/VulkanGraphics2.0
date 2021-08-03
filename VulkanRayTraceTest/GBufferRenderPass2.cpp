@@ -6,7 +6,7 @@ GBufferRenderPass2::GBufferRenderPass2()
 {
 }
 
-GBufferRenderPass2::GBufferRenderPass2(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+GBufferRenderPass2::GBufferRenderPass2(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
 
     GPositionTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
@@ -30,7 +30,7 @@ GBufferRenderPass2::~GBufferRenderPass2()
 {
 }
 
-void GBufferRenderPass2::CreateRenderPass(VulkanEngine& engine)
+void GBufferRenderPass2::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -181,17 +181,17 @@ void GBufferRenderPass2::CreateRenderPass(VulkanEngine& engine)
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine.Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void GBufferRenderPass2::CreateRendererFramebuffers(VulkanEngine& engine)
+void GBufferRenderPass2::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
 {
-    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(GPositionTexture->View);
@@ -209,31 +209,31 @@ void GBufferRenderPass2::CreateRendererFramebuffers(VulkanEngine& engine)
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine.SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine.SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = engine->SwapChain.GetSwapChainResolution().width;
+        frameBufferCreateInfo.height = engine->SwapChain.GetSwapChainResolution().height;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine.Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void GBufferRenderPass2::SetUpCommandBuffers(VulkanEngine& engine)
+void GBufferRenderPass2::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.commandPool = engine->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void GBufferRenderPass2::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void GBufferRenderPass2::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -247,7 +247,7 @@ void GBufferRenderPass2::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine.SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
 
     std::array<VkClearValue, 9> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -278,7 +278,7 @@ void GBufferRenderPass2::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager
     }
 }
 
-void GBufferRenderPass2::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void GBufferRenderPass2::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     GPositionTexture->RecreateRendererTexture(engine);
     GNormalTexture->RecreateRendererTexture(engine);
@@ -290,12 +290,12 @@ void GBufferRenderPass2::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<
     SpecularMapTexture->RecreateRendererTexture(engine);
     DepthTexture->RecreateRendererTexture(engine);
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
@@ -306,7 +306,7 @@ void GBufferRenderPass2::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<
     SetUpCommandBuffers(engine);
 }
 
-void GBufferRenderPass2::Destroy(VulkanEngine& engine)
+void GBufferRenderPass2::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
 
     GPositionTexture->Delete(engine);
@@ -322,12 +322,12 @@ void GBufferRenderPass2::Destroy(VulkanEngine& engine)
     gBufferPipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

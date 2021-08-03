@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 
 enum CameraType
 {
@@ -41,7 +41,7 @@ public:
     CameraType cameraType;
     glm::vec3 Position;
 
-    virtual void Update(VulkanEngine& engine) = 0;
+    virtual void Update(std::shared_ptr<VulkanEngine> engine) = 0;
     virtual void UpdateScreenSize(int NewWidth, int NewHeight);
     virtual void UpdateScreenSize(glm::vec2& ScreenSize);
     virtual void ProcessKeyboard(Camera_Movement direction, float deltaTime);

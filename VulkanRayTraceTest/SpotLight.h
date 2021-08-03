@@ -5,8 +5,8 @@ class SpotLight : public Light<SpotLightBuffer>
 private:
 public:
 	SpotLight();
-	SpotLight(VulkanEngine& engine);
-	SpotLight(VulkanEngine& engine, SpotLightBuffer light);
+	SpotLight(std::shared_ptr<VulkanEngine> engine);
+	SpotLight(std::shared_ptr<VulkanEngine> engine, SpotLightBuffer light);
 	~SpotLight();
 };
 

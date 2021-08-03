@@ -4,7 +4,7 @@ RayTraceRenderer::RayTraceRenderer() : BaseRenderer()
 {
 }
 
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+RayTraceRenderer::RayTraceRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
     FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
@@ -14,13 +14,13 @@ RayTraceRenderer::~RayTraceRenderer()
 {
 }
 
-void RayTraceRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void RayTraceRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
     FrameBufferRenderer.RebuildSwapChain(engine, assetManager, rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
-void RayTraceRenderer::GUIUpdate(VulkanEngine& engine)
+void RayTraceRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     rayTraceRenderPass.GUIUpdate();
 
@@ -75,13 +75,13 @@ void RayTraceRenderer::GUIUpdate(VulkanEngine& engine)
     }
 }
 
-void RayTraceRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void RayTraceRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID, assetManager->cameraManager.ActiveCamera);
       FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
 }
 
-void RayTraceRenderer::Destroy(VulkanEngine& engine)
+void RayTraceRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     rayTraceRenderPass.Destroy(engine);
       FrameBufferRenderer.Destroy(engine);

@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
@@ -10,18 +10,18 @@ class SSAORenderPass
 {
 private:
 
-	void CreateRenderPass(VulkanEngine& engine);
-	void CreateRendererFramebuffers(VulkanEngine& engine);
-	void SetUpCommandBuffers(VulkanEngine& engine);
-	void GenerateKernal(VulkanEngine& engine, SSAOTextureList& Textures);
-	void GenerateNoiseTexture(VulkanEngine& engine, SSAOTextureList& textures);
+	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
+	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
+	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
+	void GenerateKernal(std::shared_ptr<VulkanEngine> engine, SSAOTextureList& Textures);
+	void GenerateNoiseTexture(std::shared_ptr<VulkanEngine> engine, SSAOTextureList& textures);
 	float Lerp(float a, float b, float f);
 
 	std::vector<std::shared_ptr<VulkanBuffer>> SamplePointBufferList;
 	std::shared_ptr<Texture2D> NoiseTexture;
 public:
 	SSAORenderPass();
-	SSAORenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& Textures);
+	SSAORenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& Textures);
 	~SSAORenderPass();
 
 	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
@@ -35,7 +35,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& Textures);
-	void Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
-	void Destroy(VulkanEngine& engine);
+	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& Textures);
+	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };

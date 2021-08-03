@@ -1,6 +1,6 @@
 #pragma once
 #include "Camera.h"
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 
 class PerspectiveCamera : public Camera
 {
@@ -28,7 +28,7 @@ public:
     void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
     void MouseScroll(float yoffset);
-    void Update(VulkanEngine& engine);
+    void Update(std::shared_ptr<VulkanEngine> engine);
 
     glm::vec3 GetFront() { return Front; }
 };

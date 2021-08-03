@@ -8,7 +8,7 @@ private:
 
 public:
 	SparkManStage();
-	SparkManStage(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
+	SparkManStage(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
 	~SparkManStage();
 };
 

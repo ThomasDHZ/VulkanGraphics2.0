@@ -1,6 +1,6 @@
 #pragma once
 #include "Camera.h"
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 
 class OrthographicCamera : public Camera
 {
@@ -16,6 +16,6 @@ public:
 	OrthographicCamera(glm::vec2 viewScreenSize, glm::vec3 position);
 	OrthographicCamera(glm::vec2 viewScreenSize, glm::vec3 position, float zoom);
 
-	void Update(VulkanEngine& engine);
+	void Update(std::shared_ptr<VulkanEngine> engine);
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
 };

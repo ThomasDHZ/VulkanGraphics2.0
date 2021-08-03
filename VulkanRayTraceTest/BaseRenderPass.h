@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "AssetManager.h"
 #include "Skybox.h"
 
@@ -7,9 +7,9 @@ class BaseRenderPass
 {
 private:
 protected:
-	//virtual void CreateRenderPass(VulkanEngine& engine)= 0;
-	//virtual void CreateRendererFramebuffers(VulkanEngine& engine) = 0;
-	//virtual void SetUpCommandBuffers(VulkanEngine& engine) = 0;
+	//virtual void CreateRenderPass(std::shared_ptr<VulkanEngine> engine)= 0;
+	//virtual void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine) = 0;
+	//virtual void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine) = 0;
 public:
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
@@ -18,9 +18,9 @@ public:
 	BaseRenderPass();
 	~BaseRenderPass();
 
-	//virtual void UpdateSwapChain(VulkanEngine& engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData) = 0;
-	//virtual void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer, Skybox& skybox) = 0;
-	//virtual void Draw(VulkanEngine& engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer) = 0;
-	virtual void Destroy(VulkanEngine& engine);
+	//virtual void UpdateSwapChain(std::shared_ptr<VulkanEngine> engine, AssetManager& assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData) = 0;
+	//virtual void Draw(std::shared_ptr<VulkanEngine> engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer, Skybox& skybox) = 0;
+	//virtual void Draw(std::shared_ptr<VulkanEngine> engine, AssetManager& assetManager, uint32_t imageIndex, VkCommandBuffer commandBuffer) = 0;
+	virtual void Destroy(std::shared_ptr<VulkanEngine> engine);
 };
 

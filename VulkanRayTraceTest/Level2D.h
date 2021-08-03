@@ -20,10 +20,10 @@ protected:
 	glm::vec3 LightDirection = glm::vec3(1.0f);
 	std::shared_ptr<Material> material;
 
-	void AddSprite(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Sprite> sprite);
-	void AddTiles(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material);
-	void AddAnimatedTile(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material, uint32_t TileIndex);
-	void LoadLevel(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material);
+	void AddSprite(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Sprite> sprite);
+	void AddTiles(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material);
+	void AddAnimatedTile(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material, uint32_t TileIndex);
+	void LoadLevel(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material);
 	std::vector<uint32_t> GetUniqueAnimatedTiles();
 public:
 	std::vector<std::shared_ptr<Tile>> TileList;
@@ -31,6 +31,6 @@ public:
 	Level2D();
 	~Level2D();
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager) override;
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager) override;
 };
 

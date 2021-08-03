@@ -11,14 +11,14 @@ protected:
 
 public:
 	GUIObject();
-	GUIObject(VulkanEngine& engine);
-	GUIObject(VulkanEngine& engine, glm::vec2 position);
+	GUIObject(std::shared_ptr<VulkanEngine> engine);
+	GUIObject(std::shared_ptr<VulkanEngine> engine, glm::vec2 position);
 	~GUIObject();
 
 	void AddGUIMesh(std::shared_ptr<GUIMesh> mesh);
 
-	virtual void Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager) override;
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager) override;
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
-	virtual void Destory(VulkanEngine& engine);
+	virtual void Destory(std::shared_ptr<VulkanEngine> engine);
 };
 

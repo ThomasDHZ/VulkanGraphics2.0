@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "Model.h"
 #include "MaterialManager.h"
 #include "TextureManager.h"
@@ -29,19 +29,19 @@ public:
 	ObjectManager ObjManager;
 
 	AssetManager();
-	AssetManager(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
+	AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
 	~AssetManager();
 
 	//void AddModel();
-	//void AddModel(VulkanEngine& engine, const std::string& FilePath);
-	//void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	//void AddModel(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
-	void LoadFont(VulkanEngine& engine, const std::string FontLocation);
+	//void AddModel(std::shared_ptr<VulkanEngine> engine, const std::string& FilePath);
+	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
+	void LoadFont(std::shared_ptr<VulkanEngine> engine, const std::string FontLocation);
 
-	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);
+	void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);
 	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, RenderPassID renderPassID, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
-	void Delete(VulkanEngine& engine);
+	void Delete(std::shared_ptr<VulkanEngine> engine);
 
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);
 

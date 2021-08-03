@@ -4,7 +4,7 @@ HybridRenderer::HybridRenderer() : BaseRenderer()
 {
 }
 
-HybridRenderer::HybridRenderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+HybridRenderer::HybridRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     FrameBufferTextureRenderer = GBufferRenderPass(engine, assetManager);
     FrameBufferTextureRenderer2 = GBufferRenderPass2(engine, assetManager);
@@ -43,7 +43,7 @@ HybridRenderer::~HybridRenderer()
 {
 }
 
-void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
+void HybridRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
@@ -75,7 +75,7 @@ void HybridRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<Vulk
     FrameBufferRenderer.RebuildSwapChain(engine, assetManager, frameBufferTextures);
 }
 
-void HybridRenderer::GUIUpdate(VulkanEngine& engine)
+void HybridRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     rayTraceRenderPass.GUIUpdate();
 
@@ -149,7 +149,7 @@ void HybridRenderer::GUIUpdate(VulkanEngine& engine)
     }
 }
 
-void HybridRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void HybridRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferTextureRenderer2.Draw(engine, assetManager, imageIndex);
@@ -164,7 +164,7 @@ void HybridRenderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> wi
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex, rendererID);
 }
 
-void HybridRenderer::Destroy(VulkanEngine& engine)
+void HybridRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     FrameBufferTextureRenderer.Destroy(engine);
     FrameBufferTextureRenderer2.Destroy(engine);

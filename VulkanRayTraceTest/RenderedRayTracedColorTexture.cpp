@@ -5,7 +5,7 @@ RenderedRayTracedColorTexture::RenderedRayTracedColorTexture() : Texture2D()
 {
 }
 
-RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(VulkanEngine& engine) : Texture2D(engine, TextureType::vkRenderedTexture)
+RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(std::shared_ptr<VulkanEngine> engine) : Texture2D(engine, TextureType::vkRenderedTexture)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -18,14 +18,14 @@ RenderedRayTracedColorTexture::~RenderedRayTracedColorTexture()
 {
 }
 
-void RenderedRayTracedColorTexture::CreateTextureImage(VulkanEngine& engine)
+void RenderedRayTracedColorTexture::CreateTextureImage(std::shared_ptr<VulkanEngine> engine)
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
     TextureInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
-    TextureInfo.extent.width = engine.SwapChain.GetSwapChainResolution().width;
-    TextureInfo.extent.height = engine.SwapChain.GetSwapChainResolution().height;
+    TextureInfo.extent.width = engine->SwapChain.GetSwapChainResolution().width;
+    TextureInfo.extent.height = engine->SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
@@ -37,7 +37,7 @@ void RenderedRayTracedColorTexture::CreateTextureImage(VulkanEngine& engine)
     Texture::CreateTextureImage(engine, TextureInfo);
 }
 
-void RenderedRayTracedColorTexture::CreateTextureView(VulkanEngine& engine)
+void RenderedRayTracedColorTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -51,12 +51,12 @@ void RenderedRayTracedColorTexture::CreateTextureView(VulkanEngine& engine)
     TextureImageViewInfo.subresourceRange.layerCount = 1;
     TextureImageViewInfo.image = Image;
 
-    if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+    if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
         throw std::runtime_error("Failed to create Image View.");
     }
 }
 
-void RenderedRayTracedColorTexture::CreateTextureSampler(VulkanEngine& engine)
+void RenderedRayTracedColorTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -72,21 +72,21 @@ void RenderedRayTracedColorTexture::CreateTextureSampler(VulkanEngine& engine)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+    if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
     {
         throw std::runtime_error("Failed to create Sampler.");
     }
 }
 
-void RenderedRayTracedColorTexture::SendTextureToGPU(VulkanEngine& engine)
+void RenderedRayTracedColorTexture::SendTextureToGPU(std::shared_ptr<VulkanEngine> engine)
 {
     VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = engine.CommandPool;
+    commandBufferAllocateInfo.commandPool = engine->CommandPool;
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;
     VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
+    vkAllocateCommandBuffers(engine->Device, &commandBufferAllocateInfo, &cmdBuffer);
 
     VkCommandBufferBeginInfo cmdBufferBeginInfo{};
     cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -104,19 +104,19 @@ void RenderedRayTracedColorTexture::SendTextureToGPU(VulkanEngine& engine)
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
+    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
 
-    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
+    vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
 
-    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, INT64_MAX);
-    vkDestroyFence(engine.Device, fence, nullptr);
+    vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, INT64_MAX);
+    vkDestroyFence(engine->Device, fence, nullptr);
 
-    vkFreeCommandBuffers(engine.Device, engine.CommandPool, 1, &cmdBuffer);
+    vkFreeCommandBuffers(engine->Device, engine->CommandPool, 1, &cmdBuffer);
 
     UpdateImageLayout(engine, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-void RenderedRayTracedColorTexture::RecreateRendererTexture(VulkanEngine& engine)
+void RenderedRayTracedColorTexture::RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine)
 {
     Texture::Delete(engine);
     CreateTextureImage(engine);

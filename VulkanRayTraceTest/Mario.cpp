@@ -5,7 +5,7 @@ Mario::Mario()
 
 }
 
-Mario::Mario(VulkanEngine& engine, AssetManager& assetManager, glm::vec3 Position) : Sprite(engine, SpriteSize, UVSize, Position, 0)
+Mario::Mario(std::shared_ptr<VulkanEngine> engine, AssetManager& assetManager, glm::vec3 Position) : Sprite(engine, SpriteSize, UVSize, Position, 0)
 {
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
     material->materialTexture.DiffuseMap = assetManager.textureManager.LoadTexture2D(engine, "../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB);
@@ -35,6 +35,6 @@ Mario::~Mario()
 
 }
 
-void Mario::Update(VulkanEngine& engine, InputManager& inputManager, MaterialManager& materialManager)
+void Mario::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
 {
 }

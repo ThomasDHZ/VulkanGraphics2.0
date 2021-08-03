@@ -4,7 +4,7 @@ Font::Font()
 {
 }
 
-Font::Font(VulkanEngine& engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation)
+Font::Font(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation)
 {
 	uint32_t MaxWidth = 0;
 	uint32_t MaxHeight = 0;

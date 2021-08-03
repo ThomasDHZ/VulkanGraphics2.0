@@ -4,14 +4,14 @@
 class RenderedRayTracedColorTexture : public Texture2D
 {
 private:
-    void CreateTextureImage(VulkanEngine& engine);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
-    void SendTextureToGPU(VulkanEngine& engine);
+    void CreateTextureImage(std::shared_ptr<VulkanEngine> engine);
+    void CreateTextureView(std::shared_ptr<VulkanEngine> engine);
+    void CreateTextureSampler(std::shared_ptr<VulkanEngine> engine);
+    void SendTextureToGPU(std::shared_ptr<VulkanEngine> engine);
 public:
     RenderedRayTracedColorTexture();
-    RenderedRayTracedColorTexture(VulkanEngine& engine);
+    RenderedRayTracedColorTexture(std::shared_ptr<VulkanEngine> engine);
     ~RenderedRayTracedColorTexture();
 
-    void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine);
 };

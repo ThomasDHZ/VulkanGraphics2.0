@@ -1,6 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.h>
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "DDSTextureLoader.h"
 
 enum TextureType
@@ -18,18 +18,18 @@ class Texture
 private:
 
 protected:
-    void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
-    void GenerateMipmaps(VulkanEngine& engine, VkFormat imageFormat);
-    void UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout newImageLayout);
+    void TransitionImageLayout(std::shared_ptr<VulkanEngine> engine, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void CopyBufferToImage(std::shared_ptr<VulkanEngine> engine, VkBuffer buffer);
+    void GenerateMipmaps(std::shared_ptr<VulkanEngine> engine, VkFormat imageFormat);
+    void UpdateImageLayout(std::shared_ptr<VulkanEngine> engine, VkCommandBuffer buffer, VkImageLayout newImageLayout);
 
-    virtual void LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
-    virtual void LoadDDSTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
-    virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
-    virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
-    virtual void CreateTexture(VulkanEngine& engine, std::vector<glm::vec4>& Pixels, VkFormat format);
-    virtual void CreateTexture3D(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
-    virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
+    virtual void LoadKTXTexture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format);
+    virtual void LoadDDSTexture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format);
+    virtual void LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format);
+    virtual void CreateTexture(std::shared_ptr<VulkanEngine> engine, std::vector<Pixel>& Pixels, VkFormat format);
+    virtual void CreateTexture(std::shared_ptr<VulkanEngine> engine, std::vector<glm::vec4>& Pixels, VkFormat format);
+    virtual void CreateTexture3D(std::shared_ptr<VulkanEngine> engine, std::vector<Pixel>& Pixels, VkFormat format);
+    virtual void CreateTextureImage(std::shared_ptr<VulkanEngine> engine, VkImageCreateInfo TextureInfo);
    
 public:
     VkImage Image = VK_NULL_HANDLE;
@@ -51,29 +51,29 @@ public:
     int Depth;
 
     Texture();
-    Texture(VulkanEngine& engine, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, glm::vec2& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, glm::vec3& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, unsigned int depth, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, glm::vec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, glm::vec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, glm::vec2& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, glm::vec3& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, unsigned int depth, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, glm::vec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, glm::vec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, glm::vec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
     ~Texture();
 
-    void Update(VulkanEngine& engine, uint32_t NewTextureBufferIndex);
-    void UpdateImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int facecount);
-    void UpdateImageLayout(VulkanEngine& engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
-    void UpdateImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
-    void UpdateCubeImageLayout(VulkanEngine& engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
-    void UpdateCubeImageLayout(VulkanEngine& engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
-    void CopyTexture(VulkanEngine& engine, VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
-    void CopyTexture(VulkanEngine& engine, VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture, int FaceCopy);
-    virtual void Delete(VulkanEngine& engine);
+    void Update(std::shared_ptr<VulkanEngine> engine, uint32_t NewTextureBufferIndex);
+    void UpdateImageLayout(std::shared_ptr<VulkanEngine> engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int facecount);
+    void UpdateImageLayout(std::shared_ptr<VulkanEngine> engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateImageLayout(std::shared_ptr<VulkanEngine> engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(std::shared_ptr<VulkanEngine> engine, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(std::shared_ptr<VulkanEngine> engine, VkCommandBuffer commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void CopyTexture(std::shared_ptr<VulkanEngine> engine, VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
+    void CopyTexture(std::shared_ptr<VulkanEngine> engine, VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture, int FaceCopy);
+    virtual void Delete(std::shared_ptr<VulkanEngine> engine);
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }
 };

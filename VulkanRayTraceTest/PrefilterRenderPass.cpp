@@ -5,7 +5,7 @@ PrefilterRenderPass::PrefilterRenderPass()
 {
 }
 
-PrefilterRenderPass::PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize)
+PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize)
 {
     CubeMapSize = cubeMapSize;
 
@@ -28,17 +28,17 @@ PrefilterRenderPass::PrefilterRenderPass(VulkanEngine& engine, std::shared_ptr<A
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(engine.Device, fence, nullptr);
+    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
+    vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(engine->Device, fence, nullptr);
 }
 
 PrefilterRenderPass::~PrefilterRenderPass()
 {
 }
 
-void PrefilterRenderPass::CreateRenderPass(VulkanEngine& engine)
+void PrefilterRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -92,17 +92,17 @@ void PrefilterRenderPass::CreateRenderPass(VulkanEngine& engine)
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine.Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void PrefilterRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
+void PrefilterRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
 {
-    SwapChainFramebuffers.resize(engine.SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine.SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(RenderedTexture->View);
@@ -116,27 +116,27 @@ void PrefilterRenderPass::CreateRendererFramebuffers(VulkanEngine& engine)
         frameBufferCreateInfo.height = CubeMapSize;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine.Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void PrefilterRenderPass::SetUpCommandBuffers(VulkanEngine& engine)
+void PrefilterRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine.CommandPool;
+    allocInfo.commandPool = engine->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine.Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void PrefilterRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -283,17 +283,17 @@ void PrefilterRenderPass::Draw(VulkanEngine& engine, std::shared_ptr<AssetManage
     }
 }
 
-void PrefilterRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<AssetManager> assetManager)
+void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     RenderedTexture->RecreateRendererTexture(engine, glm::vec2(CubeMapSize));
     prefilterRenderingPipeline->Destroy(engine);
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
@@ -313,25 +313,25 @@ void PrefilterRenderPass::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine.Device, &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(engine.GraphicsQueue, 1, &submitInfo, fence);
-    vkWaitForFences(engine.Device, 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(engine.Device, fence, nullptr);
+    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
+    vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(engine->Device, fence, nullptr);
 }
 
-void PrefilterRenderPass::Destroy(VulkanEngine& engine)
+void PrefilterRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     RenderedTexture->Delete(engine);
     BlurredSkyBoxTexture->Delete(engine);
 
     prefilterRenderingPipeline->Destroy(engine);
 
-    vkDestroyRenderPass(engine.Device, RenderPass, nullptr);
+    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine.Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }
