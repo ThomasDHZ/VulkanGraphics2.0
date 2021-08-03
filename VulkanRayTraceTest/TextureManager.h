@@ -13,6 +13,7 @@ private:
 	void UpdateTexture2DBufferIndex(VulkanEngine& engine);
 	uint32_t IsTextureLoaded(std::string name);
 
+	VkSampler NullSampler;
 public:
 	std::vector<std::shared_ptr<Texture>> TextureList;
 	std::vector<std::shared_ptr<Texture3D>> Texture3DList;

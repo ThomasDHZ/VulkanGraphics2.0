@@ -21,9 +21,9 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 void BlinnPhongRasterRenderer::RebuildSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
-    //BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
+    BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
     //DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-    //FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
+    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
     //lightPathRenderer.RebuildSwapChain(engine, assetManager);
 }
 
@@ -99,7 +99,7 @@ void BlinnPhongRasterRenderer::Draw(VulkanEngine& engine, std::shared_ptr<Vulkan
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
     BloomRenderer.Draw(engine, assetManager, imageIndex);
-    DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
+    //DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
    /* lightPathRenderer.Draw(engine, assetManager, imageIndex);*/
 }
@@ -117,7 +117,7 @@ std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitL
 {
     CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
+   // CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
     //CommandBufferSubmitList.emplace_back(lightPathRenderer.CommandBuffer);
     return CommandBufferSubmitList;
