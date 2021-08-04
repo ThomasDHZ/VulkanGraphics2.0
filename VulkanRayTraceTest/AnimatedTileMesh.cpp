@@ -13,7 +13,7 @@ AnimatedTileMesh::~AnimatedTileMesh()
 {
 }
 
-void AnimatedTileMesh::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Timer> timer)
+void AnimatedTileMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<Timer> timer)
 {
 	tile->Update(timer);
 	UVOffset = tile->TileProperties->AnimationPlayer.GetFrame();

@@ -47,7 +47,7 @@ void PrefilterRenderingPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngin
     DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
     VkDescriptorBufferInfo SceneDataBufferInfo = engine->AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
-    VkDescriptorImageInfo TextureBufferInfo = assetManager->textureManager.GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorImageInfo TextureBufferInfo = assetManager->textureManager->GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine->AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));

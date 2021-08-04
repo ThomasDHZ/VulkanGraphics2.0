@@ -22,7 +22,7 @@ private:
 
 public:
 	Font();
-	Font(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation);
+	Font(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string FontLocation);
 	~Font();
 
 	Character GetChar(uint32_t index) { return Characters[index]; }

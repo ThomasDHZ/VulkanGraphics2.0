@@ -8,12 +8,12 @@ MegaMan::MegaMan() : Sprite()
 MegaMan::MegaMan(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Sprite(engine, SpriteSize, SpriteUVSize, Position, 0)
 {
     std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
-    material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.AlbedoMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
-    material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.SpecularMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material->materialTexture.AlphaMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
-    MeshMaterial = assetManager->materialManager.LoadMaterial(engine, "MegaManMaterial", material);
+    material->materialTexture.DiffuseMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.AlbedoMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
+    material->materialTexture.NormalMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.SpecularMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
+    material->materialTexture.AlphaMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_Alpha.png", VK_FORMAT_R8G8B8A8_UNORM);
+    MeshMaterial = assetManager->materialManager->LoadMaterial("MegaManMaterial", material);
 
     std::vector<FrameOffset> StandAnimation =
     {
@@ -107,19 +107,19 @@ MegaMan::~MegaMan()
 
 }
 
-void MegaMan::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
+void MegaMan::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     uint32_t newAnimation = 0;
-    if (inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    if (inputManager->IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
         newAnimation = kShootStandAnimation;
         megaManStatus = MegaManStatus::kShooting;
     }
 
-    if (inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) || 
-        inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+    if (inputManager->IsKeyPressed(KeyboardKey::KEY_LEFT) ||
+        inputManager->IsKeyPressed(KeyboardKey::KEY_RIGHT))
     {
-        if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+        if (inputManager->IsKeyPressed(KeyboardKey::KEY_RIGHT))
         {
             Velocity.x = 0.01f;
             FlipSpriteX = false;
@@ -132,10 +132,10 @@ void MegaMan::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputMa
         newAnimation = kRunAnimation;
     }
 
-    if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
-        inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
+    if (inputManager->IsKeyPressed(KeyboardKey::KEY_UP) ||
+        inputManager->IsKeyPressed(KeyboardKey::KEY_DOWN))
     {
-        if (inputManager.IsKeyPressed(KeyboardKey::KEY_UP))
+        if (inputManager->IsKeyPressed(KeyboardKey::KEY_UP))
         {
             Velocity.y = 0.01f;
         }
@@ -167,11 +167,11 @@ void MegaMan::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputMa
     {
         int a = 34;
     }
-    if ((inputManager.IsKeyPressed(KeyboardKey::KEY_LEFT) ||
-        inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT)) &&
-        inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    if ((inputManager->IsKeyPressed(KeyboardKey::KEY_LEFT) ||
+        inputManager->IsKeyPressed(KeyboardKey::KEY_RIGHT)) &&
+        inputManager->IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
-        if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+        if (inputManager->IsKeyPressed(KeyboardKey::KEY_RIGHT))
         {
             FlipSpriteX = false;
         }
@@ -182,11 +182,11 @@ void MegaMan::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputMa
         newAnimation = kShootRunAnimation;
     }
 
-    if ((inputManager.IsKeyPressed(KeyboardKey::KEY_UP) ||
-        inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN)) &&
-        inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    if ((inputManager->IsKeyPressed(KeyboardKey::KEY_UP) ||
+        inputManager->IsKeyPressed(KeyboardKey::KEY_DOWN)) &&
+        inputManager->IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
-        if (inputManager.IsKeyPressed(KeyboardKey::KEY_RIGHT))
+        if (inputManager->IsKeyPressed(KeyboardKey::KEY_RIGHT))
         {
             FlipSpriteX = false;
         }
@@ -197,29 +197,29 @@ void MegaMan::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputMa
         newAnimation = kShootClimbAnimation;
     }
 
-    if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z))
+    if (inputManager->IsKeyPressed(KeyboardKey::KEY_Z))
     {
         newAnimation = kJumpAnimation;
     }
 
-    if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
-        inputManager.IsKeyPressed(KeyboardKey::KEY_DOWN))
+    if (inputManager->IsKeyPressed(KeyboardKey::KEY_Z) &&
+        inputManager->IsKeyPressed(KeyboardKey::KEY_DOWN))
     {
         newAnimation = kSlideAnimation;
     }
 
-    if (inputManager.IsKeyPressed(KeyboardKey::KEY_Z) &&
-        inputManager.IsKeyPressed(KeyboardKey::KEY_SPACE))
+    if (inputManager->IsKeyPressed(KeyboardKey::KEY_Z) &&
+        inputManager->IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
         newAnimation = kShootJumpAnimation;
     }
 
-    if (inputManager.IsKeyReleased(KeyboardKey::KEY_SPACE) &&
-        inputManager.IsKeyReleased(KeyboardKey::KEY_Z) &&
-        inputManager.IsKeyReleased(KeyboardKey::KEY_LEFT) &&
-        inputManager.IsKeyReleased(KeyboardKey::KEY_RIGHT) &&
-        inputManager.IsKeyReleased(KeyboardKey::KEY_UP) &&
-        inputManager.IsKeyReleased(KeyboardKey::KEY_DOWN))
+    if (inputManager->IsKeyReleased(KeyboardKey::KEY_SPACE) &&
+        inputManager->IsKeyReleased(KeyboardKey::KEY_Z) &&
+        inputManager->IsKeyReleased(KeyboardKey::KEY_LEFT) &&
+        inputManager->IsKeyReleased(KeyboardKey::KEY_RIGHT) &&
+        inputManager->IsKeyReleased(KeyboardKey::KEY_UP) &&
+        inputManager->IsKeyReleased(KeyboardKey::KEY_DOWN))
     {
         Velocity = glm::vec3(0.0f);
         newAnimation = kStandAnimation;

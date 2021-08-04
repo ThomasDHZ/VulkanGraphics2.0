@@ -21,9 +21,9 @@ void GUIRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::sh
 void GUIRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     ImGui::LabelText("Mesh", "Mesh");
-    for (int x = 0; x < assetManager->guiManager.GuiObjectList.size(); x++)
+    for (int x = 0; x < assetManager->guiManager->GuiObjectList.size(); x++)
     {
-        ImGui::SliderFloat2(("Obj Pos " + std::to_string(x)).c_str(), & assetManager->guiManager.GuiObjectList[x]->Position.x, -2.0f, 2.0f);
+        ImGui::SliderFloat2(("Obj Pos " + std::to_string(x)).c_str(), & assetManager->guiManager->GuiObjectList[x]->Position.x, -2.0f, 2.0f);
     }
 }
 

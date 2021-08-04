@@ -35,25 +35,25 @@ void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(std::shared_ptr<Vulk
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
-    for (int x = 0; x < assetManager->meshManager.MeshList.size(); x++)
+    for (int x = 0; x < assetManager->meshManager->MeshList.size(); x++)
     {
-        if (assetManager->meshManager.MeshList[x]->ShowMesh)
+        if (assetManager->meshManager->MeshList[x]->ShowMesh)
         {
             glm::mat4 transformMatrix2 = glm::transpose(glm::mat4(1.0f));
-            if (assetManager->meshManager.MeshList[x]->ParentModelID != 0)
+            if (assetManager->meshManager->MeshList[x]->ParentModelID != 0)
             {
-                const auto model = assetManager->ObjManager.GetModel(assetManager->meshManager.MeshList[x]->ParentModelID);
+                const auto model = assetManager->ObjManager->GetModel(assetManager->meshManager->MeshList[x]->ParentModelID);
                 transformMatrix2 = glm::transpose(model->ModelTransform);
             }
             VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
             VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
             AccelerationStructureInstance.transform = transformMatrix;
-            AccelerationStructureInstance.instanceCustomIndex = assetManager->meshManager.MeshList[x]->MeshBufferIndex;
+            AccelerationStructureInstance.instanceCustomIndex = assetManager->meshManager->MeshList[x]->MeshBufferIndex;
             AccelerationStructureInstance.mask = 0xFF;
             AccelerationStructureInstance.instanceShaderBindingTableRecordOffset = 0;
             AccelerationStructureInstance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-            AccelerationStructureInstance.accelerationStructureReference = assetManager->meshManager.MeshList[x]->BottomLevelAccelerationBuffer.AccelerationBuffer.BufferDeviceAddress;
+            AccelerationStructureInstance.accelerationStructureReference = assetManager->meshManager->MeshList[x]->BottomLevelAccelerationBuffer.AccelerationBuffer.BufferDeviceAddress;
             AccelerationStructureInstanceList.emplace_back(AccelerationStructureInstance);
         }
     }

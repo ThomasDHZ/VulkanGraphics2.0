@@ -270,7 +270,7 @@ void GBufferRenderPass2::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gBufferPipeline->ShaderPipelineLayout, 0, 1, &gBufferPipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, gBufferPipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, renderPassInfo, gBufferPipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager->ActiveCamera);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {

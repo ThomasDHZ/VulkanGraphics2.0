@@ -181,7 +181,7 @@ void FrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, st
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer);
 

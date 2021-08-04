@@ -81,7 +81,7 @@ void Renderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
-    ImGui::SliderInt("Active Camera", &assetManager->cameraManager.cameraIndex, 0, assetManager->cameraManager.CameraList.size());
+    ImGui::SliderInt("Active Camera", &assetManager->cameraManager->cameraIndex, 0, assetManager->cameraManager->CameraList.size());
 
     if (ActiveRenderer == 0)
     {
@@ -136,7 +136,7 @@ void Renderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vulkan
     VkSemaphore waitSemaphores[] = { engine->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
-    assetManager->ObjManager.SubmitAnimationToCommandBuffer(engine, CommandBufferSubmitList, imageIndex);
+    assetManager->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList, imageIndex);
     if (ActiveRenderer == 0)
     {
         RayTraceFlag = false;

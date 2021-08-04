@@ -152,7 +152,7 @@ void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::sh
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipelineLayout, 0, 1, &pbrIrradiancePipeline->DescriptorSets, 0, nullptr);
 
-    assetManager->Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer);
 

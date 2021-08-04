@@ -4,10 +4,12 @@ MaterialManager::MaterialManager()
 {
 }
 
-MaterialManager::MaterialManager(std::shared_ptr<VulkanEngine> engine, TextureManager& textureManager)
+MaterialManager::MaterialManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<TextureManager> texturemanager)
 {
+	engine = Engine;
+	textureManager = texturemanager;
 	std::shared_ptr<Material> materialData = std::make_shared<Material>(engine, textureManager);
-	LoadMaterial(engine, "Default Material", materialData);
+	LoadMaterial("Default Material", materialData);
 }
 
 MaterialManager::~MaterialManager()
@@ -30,7 +32,7 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 }
 
 
-std::shared_ptr<Material> MaterialManager::LoadMaterial(std::shared_ptr<VulkanEngine> engine, std::string MaterialName, std::shared_ptr<Material> material)
+std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName, std::shared_ptr<Material> material)
 {
 	uint32_t MaterialID = engine->GenerateID();
 	MaterialList.emplace_back(material);
@@ -41,7 +43,7 @@ std::shared_ptr<Material> MaterialManager::LoadMaterial(std::shared_ptr<VulkanEn
 	return material;
 }
 
-std::shared_ptr<Material> MaterialManager::LoadMaterial(std::shared_ptr<VulkanEngine> engine, std::string MaterialName, MaterialTexture& material)
+std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName, MaterialTexture& material)
 {
 	std::shared_ptr<Material> materialData = std::make_shared<Material>(Material(engine, material));
 
@@ -132,7 +134,7 @@ uint32_t MaterialManager::GetMaterialBufferIDByMaterialID(uint32_t MaterialID)
 	return BufferIndex;
 }
 
-void MaterialManager::Update(std::shared_ptr<VulkanEngine> engine)
+void MaterialManager::Update()
 {
 	for(int x = 0; x < MaterialList.size(); x++)
 	{
@@ -141,16 +143,16 @@ void MaterialManager::Update(std::shared_ptr<VulkanEngine> engine)
 	}
 }
 
-void MaterialManager::DeleteMaterial(std::shared_ptr<VulkanEngine> engine, uint32_t DeleteMaterialBufferIndex)
+void MaterialManager::DeleteMaterial(uint32_t DeleteMaterialBufferIndex)
 {
 	auto material = GetMaterial(DeleteMaterialBufferIndex);
 	material->Delete(engine);
 	MaterialList.erase(MaterialList.begin() + DeleteMaterialBufferIndex);
 
-	Update(engine);
+	Update();
 }
 
-void MaterialManager::Destory(std::shared_ptr<VulkanEngine> engine)
+void MaterialManager::Destory()
 {
 	for (auto& material : MaterialList)
 	{

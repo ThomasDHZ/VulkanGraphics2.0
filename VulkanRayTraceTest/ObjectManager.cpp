@@ -5,15 +5,16 @@ ObjectManager::ObjectManager()
 {
 }
 
-ObjectManager::ObjectManager(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager)
+ObjectManager::ObjectManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager)
 {
+	engine = Engine;
 }
 
 ObjectManager::~ObjectManager()
 {
 }
 
-void ObjectManager::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
+void ObjectManager::Update(std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
 {
 	for (auto& obj : ObjectList)
 	{
@@ -21,7 +22,7 @@ void ObjectManager::Update(std::shared_ptr<VulkanEngine> engine, InputManager& i
 	}
 }
 
-void ObjectManager::SubmitAnimationToCommandBuffer(std::shared_ptr<VulkanEngine> engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+void ObjectManager::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
 {
 	for (auto& obj : ObjectList)
 	{
@@ -54,7 +55,7 @@ void ObjectManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout lay
 	}
 }
 
-void ObjectManager::Destory(std::shared_ptr<VulkanEngine> engine)
+void ObjectManager::Destory()
 {
 	for (auto& obj : ObjectList)
 	{

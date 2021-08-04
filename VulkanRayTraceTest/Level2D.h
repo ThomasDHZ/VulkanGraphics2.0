@@ -31,6 +31,6 @@ public:
 	Level2D();
 	~Level2D();
 
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager) override;
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager) override;
 };
 

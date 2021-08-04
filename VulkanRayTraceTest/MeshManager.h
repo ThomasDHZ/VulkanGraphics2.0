@@ -9,19 +9,21 @@
 class MeshManager
 {
 private: 
-protected:
-
+	std::shared_ptr<VulkanEngine> engine;
+	std::shared_ptr<InputManager> inputManager;
+	std::shared_ptr<MaterialManager> materialManager;
 public:
 	std::vector<std::shared_ptr<Mesh>> MeshList;
 
 	MeshManager();
+	MeshManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager);
 	~MeshManager();
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
-	void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera);
-	void UpdateBufferIndex(std::shared_ptr<VulkanEngine> engine);
+	void Update(std::shared_ptr<Camera> camera);
+	void UpdateBufferIndex();
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void Destroy();
 		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();
 	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors();

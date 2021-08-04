@@ -11,7 +11,7 @@ private:
 public:
 	DirectionalLight();
 	DirectionalLight(std::shared_ptr<VulkanEngine> engine);
-	DirectionalLight(std::shared_ptr<VulkanEngine> engine, CameraManager& cameraManager, DirectionalLightBuffer light);
+	DirectionalLight(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<CameraManager> cameraManager, DirectionalLightBuffer light);
 	~DirectionalLight();
 
 	void Update(std::shared_ptr<VulkanEngine> engine) override;

@@ -18,15 +18,14 @@ public:
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
 	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 
-	InputManager inputManager;
-	CameraManager cameraManager;
-	MaterialManager materialManager;
-	TextureManager textureManager;
-	MeshManager meshManager;
-	//ModelManager modelManager;
-	LightManager lightManager;
-	GUIManager guiManager;
-	ObjectManager ObjManager;
+	std::shared_ptr<InputManager> inputManager;
+	std::shared_ptr<CameraManager> cameraManager;
+	std::shared_ptr<MaterialManager> materialManager;
+	std::shared_ptr<TextureManager> textureManager;
+	std::shared_ptr<MeshManager> meshManager;
+	std::shared_ptr<LightManager> lightManager;
+	std::shared_ptr<GUIManager> guiManager;
+	std::shared_ptr<ObjectManager> ObjManager;
 
 	AssetManager();
 	AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
@@ -45,18 +44,18 @@ public:
 
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);
 
-	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors() { return meshManager.GetVertexBufferListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors() { return meshManager.GetIndexBufferListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors() { return meshManager.GetTransformBufferListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors() { return meshManager.GetMeshPropertiesListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor() { return materialManager.GetMaterialBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor() { return textureManager.GetTextureBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor() { return textureManager.Get3DTextureBufferListDescriptor(); }
-	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor() { return textureManager.GetSkyBoxTextureBufferListDescriptor(); }
+	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors() { return meshManager->GetVertexBufferListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors() { return meshManager->GetIndexBufferListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors() { return meshManager->GetTransformBufferListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors() { return meshManager->GetMeshPropertiesListDescriptors(); }
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor() { return materialManager->GetMaterialBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor() { return textureManager->GetTextureBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor() { return textureManager->Get3DTextureBufferListDescriptor(); }
+	VkDescriptorImageInfo  GetSkyBoxTextureBufferListDescriptor() { return textureManager->GetSkyBoxTextureBufferListDescriptor(); }
 
-	uint32_t GetMeshDescriptorCount() { return meshManager.GetMeshDescriptorCount(); }
-	uint32_t GetMaterialDescriptorCount() { return materialManager.GetMaterialDescriptorCount(); }
-	uint32_t GetTextureBufferDescriptorCount() { return textureManager.GetTextureBufferDescriptorCount(); }
-	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager.Get3DTextureBufferDescriptorCount(); }
+	uint32_t GetMeshDescriptorCount() { return meshManager->GetMeshDescriptorCount(); }
+	uint32_t GetMaterialDescriptorCount() { return materialManager->GetMaterialDescriptorCount(); }
+	uint32_t GetTextureBufferDescriptorCount() { return textureManager->GetTextureBufferDescriptorCount(); }
+	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager->Get3DTextureBufferDescriptorCount(); }
 };
 

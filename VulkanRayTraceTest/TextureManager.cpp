@@ -5,12 +5,14 @@ TextureManager::TextureManager()
 {
 }
 
-TextureManager::TextureManager(std::shared_ptr<VulkanEngine> engine)
+TextureManager::TextureManager(std::shared_ptr<VulkanEngine> Engine)
 {
-	LoadTexture2D(engine, "../texture/DefaultTexture.png", VK_FORMAT_R8G8B8A8_UNORM);
+	engine = Engine;
+
+	LoadTexture2D("../texture/DefaultTexture.png", VK_FORMAT_R8G8B8A8_UNORM);
 	TextureList.back()->FileName = "DefaultTexture";
 	
-	LoadTexture2D(engine, "../texture/AlphaDefault.png", VK_FORMAT_R8G8B8A8_UNORM);
+	LoadTexture2D("../texture/AlphaDefault.png", VK_FORMAT_R8G8B8A8_UNORM);
 	TextureList.back()->FileName = "DefaultAlphaTexture";
 
 	VkSamplerCreateInfo NullSamplerInfo = {};
@@ -40,14 +42,14 @@ TextureManager::~TextureManager()
 {
 }
 
-std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation, VkFormat format)
+std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(const std::string TextureLocation, VkFormat format)
 {
 	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format));
 	TextureList.emplace_back(texture);
 	return texture;
 }
 
-std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
+std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
 {
 	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, width, height, PixelList, format));
 	TextureList.emplace_back(texture);
@@ -63,7 +65,7 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 	return TextureID;
 }
 
-std::shared_ptr<FontTexture> TextureManager::LoadTextTexture(std::shared_ptr<VulkanEngine> engine, void* GlyphData, uint32_t width, uint32_t height)
+std::shared_ptr<FontTexture> TextureManager::LoadTextTexture(void* GlyphData, uint32_t width, uint32_t height)
 {
 	std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(engine, GlyphData, width, height));
 	TextureList.emplace_back(texture);
@@ -71,40 +73,40 @@ std::shared_ptr<FontTexture> TextureManager::LoadTextTexture(std::shared_ptr<Vul
 	return texture;
 }
 
-uint32_t TextureManager::Load3DTexture(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation, VkFormat format)
+uint32_t TextureManager::Load3DTexture(const std::string TextureLocation, VkFormat format)
 {
 	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, TextureLocation, format)));
 	return Texture3DList.back()->TextureID;
 }
 
-uint32_t TextureManager::LoadTexture3D(std::shared_ptr<VulkanEngine> engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format)
+uint32_t TextureManager::LoadTexture3D(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format)
 {
 	unsigned int TextureID = Texture3DList.size();
 	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, width, height, depth, PixelList, format)));
 	return TextureID;
 }
 
-void TextureManager::LoadCubeMap(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+void TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
 	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
 }
 
-void TextureManager::LoadCubeMap(std::shared_ptr<VulkanEngine> engine, std::string CubeMapFiles[6], VkFormat textureFormat)
+void TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
 {
 	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
 }
 
-void TextureManager::LoadCubeMap(std::shared_ptr<VulkanEngine> engine, std::string CubeMapLocation, VkFormat textureFormat)
+void TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
 {
 	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapLocation, textureFormat));
 }
 
-void TextureManager::LoadCubeMap(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Texture> cubeMapTexture)
+void TextureManager::LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture)
 {
 	CubeMap = cubeMapTexture;
 }
 
-void TextureManager::DeleteTexture(std::shared_ptr<VulkanEngine> engine, uint32_t TextureBufferIndex)
+void TextureManager::DeleteTexture(uint32_t TextureBufferIndex)
 {
 	auto texture = GetTextureByBufferIndex(TextureBufferIndex);
 	texture->Delete(engine);
@@ -116,7 +118,7 @@ void TextureManager::DeleteTexture(std::shared_ptr<VulkanEngine> engine, uint32_
 	}
 }
 
-void TextureManager::UnloadAllTextures(std::shared_ptr<VulkanEngine> engine)
+void TextureManager::UnloadAllTextures()
 {
 	for (auto& texture : TextureList)
 	{
@@ -129,19 +131,19 @@ void TextureManager::UnloadAllTextures(std::shared_ptr<VulkanEngine> engine)
 	}
 }
 
-void TextureManager::UnloadCubeMap(std::shared_ptr<VulkanEngine> engine)
+void TextureManager::UnloadCubeMap()
 {
 	if(CubeMap != nullptr)
 	CubeMap->Delete(engine);
 }
 
-void TextureManager::Destory(std::shared_ptr<VulkanEngine> engine)
+void TextureManager::Destory()
 {
-	UnloadAllTextures(engine);
-	UnloadCubeMap(engine);
+	UnloadAllTextures();
+	UnloadCubeMap();
 }
 
-void TextureManager::Update(std::shared_ptr<VulkanEngine> engine)
+void TextureManager::Update()
 {
 	for (int x = 0; x < TextureList.size(); x++)
 	{

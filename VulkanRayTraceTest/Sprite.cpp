@@ -68,7 +68,7 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
     AnimationPlayer.SetAnimation(AnimationIndex);
 }
 
-void Sprite::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
+void Sprite::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     Velocity.y = -0.01f;
 

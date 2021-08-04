@@ -13,8 +13,8 @@ Level2D::~Level2D()
 
 void Level2D::AddSprite(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Sprite> sprite)
 {
-	assetManager->meshManager.MeshList.emplace_back(sprite);
-	MeshList.emplace_back(assetManager->meshManager.MeshList.back());
+	assetManager->meshManager->MeshList.emplace_back(sprite);
+	MeshList.emplace_back(assetManager->meshManager->MeshList.back());
 }
 
 void Level2D::AddTiles(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Material> material)
@@ -69,9 +69,9 @@ void Level2D::AddTiles(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Ass
 
 	if (VertexList.size() != 0)
 	{
-		assetManager->meshManager.AddMesh(std::make_shared<TileMesh>(TileMesh(engine, VertexList, IndexList, material)));
-		assetManager->meshManager.MeshList.back()->ParentModelID = ModelID;
-		MeshList.emplace_back(assetManager->meshManager.MeshList.back());
+		assetManager->meshManager->AddMesh(std::make_shared<TileMesh>(TileMesh(engine, VertexList, IndexList, material)));
+		assetManager->meshManager->MeshList.back()->ParentModelID = ModelID;
+		MeshList.emplace_back(assetManager->meshManager->MeshList.back());
 	}
 }
 
@@ -126,13 +126,13 @@ void Level2D::AddAnimatedTile(std::shared_ptr<VulkanEngine> engine, std::shared_
 	}
 	if (VertexList.size() != 0)
 	{
-		assetManager->meshManager.AddMesh(std::make_shared<AnimatedTileMesh>(AnimatedTileMesh(engine, VertexList, IndexList, material, LevelTileLayout.back())));
-		assetManager->meshManager.MeshList.back()->ParentModelID = ModelID;
-		MeshList.emplace_back(assetManager->meshManager.MeshList.back());
+		assetManager->meshManager->AddMesh(std::make_shared<AnimatedTileMesh>(AnimatedTileMesh(engine, VertexList, IndexList, material, LevelTileLayout.back())));
+		assetManager->meshManager->MeshList.back()->ParentModelID = ModelID;
+		MeshList.emplace_back(assetManager->meshManager->MeshList.back());
 	}
 }
 
-void Level2D::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
+void Level2D::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);

@@ -4,7 +4,7 @@ TextMesh::TextMesh() : GUIObject()
 {
 }
 
-TextMesh::TextMesh(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position) : GUIObject(engine, position)
+TextMesh::TextMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position) : GUIObject(engine, position)
 {
 	font = fontPTR;
 	BuildTextMesh(engine, materialManager, textureManager, Text);
@@ -14,7 +14,7 @@ TextMesh::~TextMesh()
 {
 }
 
-void TextMesh::BuildTextMesh(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string Text)
+void TextMesh::BuildTextMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string Text)
 {
 	float counter = 0;
 	float StartXPos = 0.0f;
@@ -54,7 +54,7 @@ void TextMesh::BuildTextMesh(std::shared_ptr<VulkanEngine> engine, MaterialManag
 		MaterialTexture materialTexture;
 		materialTexture.DiffuseMap = ch.CharTexture;
 
-		material = materialManager.LoadMaterial(engine, "z", materialTexture);
+		material = materialManager->LoadMaterial("z", materialTexture);
 		AddGUIMesh(std::make_shared<GUIMesh>(GUIMesh(engine, VertexList, IndexList, material)));
 	}
 }

@@ -38,9 +38,9 @@ void RayTracedHybridPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> 
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->GetMeshDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetDirectionalLightDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetPointLightDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetSpotLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager->GetDirectionalLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager->GetPointLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager->GetSpotLightDescriptorCount()));
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->GetMeshDescriptorCount()));
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->GetMeshDescriptorCount()));
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->GetMeshDescriptorCount()));
@@ -62,9 +62,9 @@ void RayTracedHybridPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->GetMeshDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetDirectionalLightDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetPointLightDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetSpotLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager->GetDirectionalLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager->GetPointLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager->GetSpotLightDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->GetMeshDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->GetMeshDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->GetMeshDescriptorCount() });
@@ -89,9 +89,9 @@ void RayTracedHybridPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> 
     VkDescriptorImageInfo SSAOTexturDescriptor = engine->AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, SSAOTexture->View);
     VkDescriptorBufferInfo SceneDataBufferInfo = engine->AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
 
-    std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = assetManager->lightManager.GetDirectionalLightBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> PointLightBufferInfoList = assetManager->lightManager.GetPointLightBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> SpotLightBufferInfoList = assetManager->lightManager.GetSpotLightBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = assetManager->lightManager->GetDirectionalLightBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> PointLightBufferInfoList = assetManager->lightManager->GetPointLightBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> SpotLightBufferInfoList = assetManager->lightManager->GetSpotLightBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager->GetMeshPropertiesListDescriptors();
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager->GetVertexBufferListDescriptors();
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager->GetIndexBufferListDescriptors();

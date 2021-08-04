@@ -17,7 +17,7 @@ public:
 
 	void AddGUIMesh(std::shared_ptr<GUIMesh> mesh);
 
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager) override;
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager) override;
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	virtual void Destory(std::shared_ptr<VulkanEngine> engine);
 };

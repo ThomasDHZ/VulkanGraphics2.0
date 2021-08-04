@@ -24,15 +24,15 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(engine));
     gameObject->AddChildModel(assetManager->meshManager, std::make_shared<SparkManStage>(SparkManStage(engine, assetManager, glm::vec3(0.0f, 0.0f, 0.0f))));
-    assetManager->ObjManager.ObjectList.emplace_back(gameObject);
+    assetManager->ObjManager->ObjectList.emplace_back(gameObject);
 
     std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(engine));
     gameObject2->AddChildModel(assetManager->meshManager, std::make_shared<Model>(Model(engine, assetManager->materialManager, assetManager->textureManager, "../Models/TestAnimModel/model.dae")));
-    assetManager->ObjManager.ObjectList.emplace_back(gameObject2);
+    assetManager->ObjManager->ObjectList.emplace_back(gameObject2);
 
     std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(engine));
     gameObject3->AddChildMesh(assetManager->meshManager, std::make_shared<Skybox>(Skybox(engine, assetManager)));
-    assetManager->ObjManager.ObjectList.emplace_back(gameObject3);
+    assetManager->ObjManager->ObjectList.emplace_back(gameObject3);
 
 
     MaterialTexture material;
@@ -48,7 +48,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
     std::shared_ptr<GameObject> gameObject4 = std::make_shared<GameObject>(GameObject(engine));
     gameObject4->AddChildMesh(assetManager->meshManager, std::make_shared<TerrainMesh>(TerrainMesh(engine, "../texture/perlin_noise.png", materialPtr)));
-    assetManager->ObjManager.ObjectList.emplace_back(gameObject4);
+    assetManager->ObjManager->ObjectList.emplace_back(gameObject4);
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
@@ -70,7 +70,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //std::shared_ptr<Material> MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MeshMaterial = MaterialID;
 
-    assetManager->textureManager.Load3DTexture(engine, "C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
+    assetManager->textureManager->Load3DTexture("C:/Users/dotha/Desktop/detailed_surfaces/media/sculptureSphere.dds", VK_FORMAT_R8_UNORM);
   // assetManager->AddModel(engine, "../Models/viking_room.obj");
     //std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
     //material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/container2.png", VK_FORMAT_R8G8B8A8_SRGB);
@@ -82,7 +82,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/toy_box_disp.png", VK_FORMAT_R8G8B8A8_UNORM);
     //uint32_t MaterialID = assetManager->materialManager.LoadMaterial(engine, "MarioMaterial", material);
     //assetManager->modelManager.ModelList[1]->MeshList[0]->MaterialID = MaterialID;
-    assetManager->meshManager.AddMesh(std::make_shared<Skybox>(Skybox(engine, assetManager)));
+    assetManager->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(engine, assetManager)));
     //LoadModel("../Models/RayReflectionTest.obj");
     //LoadModel("../Models/TestAnimModel/model.dae");
     //LoadModel("../Models/vulkanscene_shadow.obj");
@@ -115,8 +115,8 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     rectangle.UpperRightVertex = glm::vec2(0.5f, -0.5f);
     rectangle.LowerRightVertex = glm::vec2(0.5f, 0.5f);
     rectangle.LowerLeftVertex = glm::vec2(-0.5f, 0.5f);
-    assetManager->ObjManager.ObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr, rectangle, glm::vec2(0.0f))));
-    assetManager->ObjManager.ObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->materialManager, assetManager->textureManager, assetManager->guiManager.FontList[0], "SparkMan", glm::vec2(0.0f))));
+    assetManager->ObjManager->ObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(engine, materialPtr, rectangle, glm::vec2(0.0f))));
+    assetManager->ObjManager->ObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(engine, assetManager->materialManager, assetManager->textureManager, assetManager->guiManager->FontList[0], "SparkMan", glm::vec2(0.0f))));
 
     assetManager->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     assetManager->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
@@ -185,25 +185,25 @@ void Engine::MainLoop()
 
 std::shared_ptr<Texture> Engine::LoadTexture2D(const std::string& FilePath, VkFormat format)
 {
-    return assetManager->textureManager.LoadTexture2D(engine, FilePath, format);
+    return assetManager->textureManager->LoadTexture2D(FilePath, format);
 }
 
 std::shared_ptr<Material> Engine::LoadMaterial(const std::string& MaterialName, MaterialTexture& material)
 {
-    return assetManager->materialManager.LoadMaterial(engine, MaterialName, material);
+    return assetManager->materialManager->LoadMaterial(MaterialName, material);
 }
 
 std::shared_ptr<Material> Engine::LoadMaterial(const std::string& MaterialName, std::shared_ptr<Material> material)
 {
-    return assetManager->materialManager.LoadMaterial(engine, MaterialName, material);
+    return assetManager->materialManager->LoadMaterial(MaterialName, material);
 }
 
 void Engine::LoadCubeMap(std::string CubeMapFiles[6])
 {
-    assetManager->textureManager.LoadCubeMap(engine, CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+    assetManager->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
 }
 
 void Engine::LoadTerrain(const std::string& HeightMapPath, std::shared_ptr<Material> material)
 {
-    assetManager->meshManager.AddMesh(std::make_shared<TerrainMesh>(TerrainMesh(engine, HeightMapPath, material)));
+    assetManager->meshManager->AddMesh(std::make_shared<TerrainMesh>(TerrainMesh(engine, HeightMapPath, material)));
 }

@@ -54,7 +54,7 @@ Skybox::Skybox(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManage
 	 std::vector<uint32_t> IndexPlaceholder= { 0xFFFFFFFF };
 
 	MeshID = engine->GenerateID();
-	MeshMaterial = assetManager->materialManager.GetDefaultMaterial();
+	MeshMaterial = assetManager->materialManager->GetDefaultMaterial();
 	DrawFlags = MeshDrawFlags::Mesh_SkyBox;
 	MeshType = MeshTypeFlag::Mesh_Type_SkyBox;
 

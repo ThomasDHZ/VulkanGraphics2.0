@@ -29,7 +29,7 @@ public:
 
 	void AddChildObject(std::shared_ptr<Object> obj);
 
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager) = 0;
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager) = 0;
 	virtual void Draw(VkCommandBuffer& commandBuffer);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);

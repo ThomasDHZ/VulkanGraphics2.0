@@ -5,6 +5,7 @@
 class CameraManager
 {
 private:
+	std::shared_ptr<VulkanEngine> engine;
 public:
 	std::shared_ptr<Camera> ActiveCamera;
 	std::vector<std::shared_ptr<Camera>> CameraList;
@@ -14,6 +15,6 @@ public:
 	CameraManager(std::shared_ptr<VulkanEngine> engine);
 	~CameraManager();
 
-	void Update(std::shared_ptr<VulkanEngine> engine);
+	void Update();
 };
 

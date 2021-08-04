@@ -36,9 +36,9 @@ void HybridFrameBufferPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetDirectionalLightDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetPointLightDescriptorCount()));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager.GetSpotLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager->GetDirectionalLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager->GetPointLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, assetManager->lightManager->GetSpotLightDescriptorCount()));
     DescriptorPool = engine->CreateDescriptorPool(DescriptorPoolList);
 }
 
@@ -62,9 +62,9 @@ void HybridFrameBufferPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngi
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 14, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 15, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 16, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 17, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetDirectionalLightDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 18, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetPointLightDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 19, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager.GetSpotLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 17, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager->GetDirectionalLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 18, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager->GetPointLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 19, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, assetManager->lightManager->GetSpotLightDescriptorCount() });
     DescriptorSetLayout = engine->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
@@ -89,9 +89,9 @@ void HybridFrameBufferPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine
     VkDescriptorImageInfo TBNBiTangentTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.TBNBiTangentTexture->View, HybridTextures.TBNBiTangentTexture->Sampler);
     VkDescriptorImageInfo TBNNormalMapTextureBufferInfo = engine->AddTextureDescriptor(HybridTextures.TBNNormalMapTexture->View, HybridTextures.TBNNormalMapTexture->Sampler);
     VkDescriptorBufferInfo SceneDataBufferInfo = engine->AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
-    std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = assetManager->lightManager.GetDirectionalLightBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> PointLightBufferInfoList = assetManager->lightManager.GetPointLightBufferListDescriptor();
-    std::vector<VkDescriptorBufferInfo> SpotLightBufferInfoList = assetManager->lightManager.GetSpotLightBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = assetManager->lightManager->GetDirectionalLightBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> PointLightBufferInfoList = assetManager->lightManager->GetPointLightBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> SpotLightBufferInfoList = assetManager->lightManager->GetSpotLightBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine->AddTextureDescriptorSet(0, DescriptorSets, PositionTextureBufferInfo));

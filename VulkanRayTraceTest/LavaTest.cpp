@@ -9,13 +9,13 @@ LavaTest::LavaTest() : Level2D()
 LavaTest::LavaTest(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Level2D()
 {
 	std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
-	material->materialTexture.DiffuseMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/lava_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
-	material->materialTexture.SpecularMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/lava_Specular.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-	material->materialTexture.NormalMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Lava_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-	material->materialTexture.DepthMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/Lava_height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-	material->materialTexture.EmissionMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/lava_emission.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-	material->materialTexture.AlphaMap = assetManager->textureManager.LoadTexture2D(engine, "../texture/lava_Alpha.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-	auto loadedmaterial = assetManager->materialManager.LoadMaterial(engine, "MegaManMaterial", material);
+	material->materialTexture.DiffuseMap = assetManager->textureManager->LoadTexture2D("../texture/lava_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
+	material->materialTexture.SpecularMap = assetManager->textureManager->LoadTexture2D("../texture/lava_Specular.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+	material->materialTexture.NormalMap = assetManager->textureManager->LoadTexture2D("../texture/Lava_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+	material->materialTexture.DepthMap = assetManager->textureManager->LoadTexture2D("../texture/Lava_height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+	material->materialTexture.EmissionMap = assetManager->textureManager->LoadTexture2D("../texture/lava_emission.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+	material->materialTexture.AlphaMap = assetManager->textureManager->LoadTexture2D("../texture/lava_Alpha.bmp", VK_FORMAT_R8G8B8A8_UNORM);
+	auto loadedmaterial = assetManager->materialManager->LoadMaterial("MegaManMaterial", material);
 
 	TilesInTileSheet = 16;
 	LevelBounds = glm::ivec2(5, 2);

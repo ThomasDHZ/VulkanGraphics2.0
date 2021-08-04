@@ -222,7 +222,7 @@ void Mesh::SetUpMesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& 
 	}
 }
 
-void Mesh::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
+void Mesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
 {
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -249,7 +249,7 @@ void Mesh::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManag
 	MeshProperties.Update(engine);
 }
 
-void Mesh::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceModeFlag)
+void Mesh::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, bool RayTraceModeFlag)
 {
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 

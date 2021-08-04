@@ -8,6 +8,13 @@ MeshManager::MeshManager()
 {
 }
 
+MeshManager::MeshManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<InputManager> inputmanager, std::shared_ptr<MaterialManager> materialmanager)
+{
+    engine = Engine;
+    inputManager = inputmanager;
+    materialManager = materialmanager;
+}
+
 MeshManager::~MeshManager()
 {
 }
@@ -17,7 +24,7 @@ void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 	MeshList.emplace_back(mesh);
 }
 
-void MeshManager::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera)
+void MeshManager::Update(std::shared_ptr<Camera> camera)
 {
     for (auto& mesh : MeshList)
     {
@@ -33,10 +40,10 @@ void MeshManager::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inp
            
         }
     }
-    UpdateBufferIndex(engine);
+    UpdateBufferIndex();
 }
 
-void MeshManager::UpdateBufferIndex(std::shared_ptr<VulkanEngine> engine)
+void MeshManager::UpdateBufferIndex()
 {
 	for (int x = 0; x < MeshList.size(); x++)
 	{
@@ -60,7 +67,7 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& re
     }
 }
 
-void MeshManager::Destroy(std::shared_ptr<VulkanEngine> engine)
+void MeshManager::Destroy()
 {
     for (auto mesh : MeshList)
     {

@@ -4,7 +4,7 @@ Font::Font()
 {
 }
 
-Font::Font(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation)
+Font::Font(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string FontLocation)
 {
 	uint32_t MaxWidth = 0;
 	uint32_t MaxHeight = 0;
@@ -49,7 +49,7 @@ Font::Font(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManage
 
 				Character character =
 				{
-					textureManager.LoadTexture2D(engine, face->glyph->bitmap.width, face->glyph->bitmap.rows, PixelList, VK_FORMAT_R8G8B8A8_SRGB),
+					textureManager->LoadTexture2D(face->glyph->bitmap.width, face->glyph->bitmap.rows, PixelList, VK_FORMAT_R8G8B8A8_SRGB),
 					glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
 					glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
 					static_cast<unsigned int>(face->glyph->advance.x)

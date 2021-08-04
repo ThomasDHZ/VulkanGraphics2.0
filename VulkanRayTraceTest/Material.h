@@ -139,7 +139,7 @@ public:
 	MaterialTexture materialTexture;
 
 	Material();
-	Material(std::shared_ptr<VulkanEngine> engine, TextureManager& textureManager);
+	Material(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<TextureManager> textureManager);
 	Material(std::shared_ptr<VulkanEngine> engine, MaterialTexture& MaterialInfo);
 	~Material();
 

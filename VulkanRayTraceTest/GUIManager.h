@@ -7,20 +7,22 @@
 class GUIManager
 {
 private:
-	
-
+	std::shared_ptr<VulkanEngine> engine;
+	std::shared_ptr<MaterialManager> materialManager;
+	std::shared_ptr<TextureManager> textureManager;
+	std::shared_ptr<InputManager> inputManager;
 public:
 	std::vector<std::shared_ptr<GUIObject>> GuiObjectList;
 	std::vector<std::shared_ptr<Font>> FontList;
 
 	GUIManager();
-	GUIManager(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager);
+	GUIManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<InputManager> inputManager);
 	~GUIManager();
 
-	void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager);
+	void Update();
 	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
-	void Destory(std::shared_ptr<VulkanEngine> engine);
+	void Destory();
 
-	void LoadFont(std::shared_ptr<VulkanEngine> engine, MaterialManager& materialManager, TextureManager& textureManager, const std::string FontLocation);
+	void LoadFont(const std::string FontLocation);
 };
 

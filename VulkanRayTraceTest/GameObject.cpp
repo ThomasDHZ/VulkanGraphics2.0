@@ -17,10 +17,10 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::AddChildMesh(MeshManager& meshManager, std::shared_ptr<Mesh> mesh)
+void GameObject::AddChildMesh(std::shared_ptr<MeshManager> meshManager, std::shared_ptr<Mesh> mesh)
 {
 	MeshList.emplace_back(mesh);
-	meshManager.AddMesh(MeshList.back());
+	meshManager->AddMesh(MeshList.back());
 }
 
 void GameObject::AddChildMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
@@ -47,47 +47,47 @@ void GameObject::AddChildMesh(std::shared_ptr<VulkanEngine> engine, std::shared_
 	meshManager->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildModel(MeshManager& meshManager, std::shared_ptr<Model> model)
+void GameObject::AddChildModel(std::shared_ptr<MeshManager> meshManager, std::shared_ptr<Model> model)
 {
 	ModelList.emplace_back(model);
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
-		meshManager.AddMesh(mesh);
+		meshManager->AddMesh(mesh);
 	}
 }
 
-void GameObject::AddChildModel(std::shared_ptr<VulkanEngine> engine, MeshManager& meshManager, MaterialManager& materialManager, TextureManager& textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
+void GameObject::AddChildModel(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MeshManager> meshManager, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
 {
 	ModelList.emplace_back(std::make_shared<Model>(Model(engine, materialManager, textureManager, VertexList, IndexList, DrawFlags)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
-		meshManager.AddMesh(mesh);
+		meshManager->AddMesh(mesh);
 	}
 }
 
-void GameObject::AddChildModel(std::shared_ptr<VulkanEngine> engine, MeshManager& meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
+void GameObject::AddChildModel(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MeshManager> meshManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
 {
 	ModelList.emplace_back(std::make_shared<Model>(Model(engine, VertexList, IndexList, material, DrawFlags)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
-		meshManager.AddMesh(mesh);
+		meshManager->AddMesh(mesh);
 	}
 }
 
-void GameObject::AddChildModel(std::shared_ptr<VulkanEngine> engine, MeshManager& meshManager, MaterialManager& materiallManager, TextureManager& textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags)
+void GameObject::AddChildModel(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MeshManager> meshManager, std::shared_ptr<MaterialManager> materiallManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags)
 {
 	ModelList.emplace_back(std::make_shared<Model>(Model(engine, materiallManager, textureManager, FilePath, DrawFlags)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
-		meshManager.AddMesh(mesh);
+		meshManager->AddMesh(mesh);
 	}
 }
 
-void GameObject::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
+void GameObject::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
 {
 	for (auto& mesh : MeshList)
 	{
@@ -104,7 +104,7 @@ void GameObject::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inpu
 	}
 }
 
-void GameObject::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, InputManager& inputManager, MaterialManager& materialManager, bool RayTraceModeFlag)
+void GameObject::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, bool RayTraceModeFlag)
 {
 	for (auto& mesh : MeshList)
 	{

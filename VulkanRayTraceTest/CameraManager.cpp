@@ -6,8 +6,10 @@ CameraManager::CameraManager()
 {
 }
 
-CameraManager::CameraManager(std::shared_ptr<VulkanEngine> engine)
+CameraManager::CameraManager(std::shared_ptr<VulkanEngine> Engine)
 {
+    engine = Engine;
+
     CameraList.emplace_back(std::make_shared<PerspectiveCamera>(PerspectiveCamera(glm::vec2(engine->SwapChain.SwapChainResolution.width, engine->SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f))));
     ActiveCamera = CameraList.front();
 
@@ -19,7 +21,7 @@ CameraManager::~CameraManager()
 {
 }
 
-void CameraManager::Update(std::shared_ptr<VulkanEngine> engine)
+void CameraManager::Update()
 {
     ActiveCamera = CameraList[cameraIndex];
     ActiveCamera->Update(engine);

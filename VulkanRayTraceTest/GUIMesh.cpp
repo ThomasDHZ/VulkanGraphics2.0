@@ -52,7 +52,7 @@ GUIMesh::~GUIMesh()
 {
 }
 
-void GUIMesh::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, glm::vec2 objectPosition)
+void GUIMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, glm::vec2 objectPosition)
 {
 	ObjectPosition = objectPosition;
 }

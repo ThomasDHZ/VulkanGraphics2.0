@@ -12,6 +12,6 @@ public:
 	~BillboardMesh();
 
 	Animator2D animator;
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager, std::shared_ptr<Camera> camera);
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputmanager, std::shared_ptr<MaterialManager> materialmanager, std::shared_ptr<Camera> camera);
 };
 

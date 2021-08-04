@@ -80,7 +80,7 @@ public:
 	GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial, glm::vec2 Position);
 	~GUIMesh();
 
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, glm::vec2 objectPosition);
+	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, glm::vec2 objectPosition);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	virtual void Destory(std::shared_ptr<VulkanEngine> engine);
 	void AddChildMesh(std::shared_ptr<GUIMesh> mesh);

@@ -21,7 +21,7 @@ void GUIObject::AddGUIMesh(std::shared_ptr<GUIMesh> mesh)
 	GuiMeshList.emplace_back(mesh);
 }
 
-void GUIObject::Update(std::shared_ptr<VulkanEngine> engine, InputManager& inputManager, MaterialManager& materialManager)
+void GUIObject::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
 {
 	for (auto& mesh : GuiMeshList)
 	{

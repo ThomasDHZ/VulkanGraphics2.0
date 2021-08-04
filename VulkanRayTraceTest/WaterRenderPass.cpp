@@ -166,11 +166,11 @@ void WaterRenderToTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterTexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterTexturePipeline->ShaderPipelineLayout, 0, 1, &WaterTexturePipeline->DescriptorSets, 0, nullptr);
 
-    assetManager->Draw(CommandBuffer, renderPassInfo, WaterTexturePipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
+    assetManager->Draw(CommandBuffer, renderPassInfo, WaterTexturePipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager->ActiveCamera);
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, 0, 1, &WaterSkyboxRenderingPipeline->DescriptorSets, 0, nullptr);
-    skybox.Draw(CommandBuffer, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager.ActiveCamera);
+    skybox.Draw(CommandBuffer, WaterSkyboxRenderingPipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager->ActiveCamera);
     vkCmdEndRenderPass(CommandBuffer);
 
     if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {

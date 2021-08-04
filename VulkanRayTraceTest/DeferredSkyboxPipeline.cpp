@@ -47,7 +47,7 @@ void DeferredSkyboxPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> e
     DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
     VkDescriptorBufferInfo SceneDataBufferInfo = engine->AddBufferDescriptor(assetManager->SkyUniformBuffer->VulkanBufferData);
-    VkDescriptorImageInfo TextureBufferInfo = assetManager->textureManager.GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorImageInfo TextureBufferInfo = assetManager->textureManager->GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine->AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
