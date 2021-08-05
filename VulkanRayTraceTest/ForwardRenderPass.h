@@ -17,13 +17,12 @@ class ForwardRenderPass : public BaseRenderPass
 {
 private:
 
-	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
-	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
-	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
+	void CreateRenderPass();
+	void CreateRendererFramebuffers();
+	void SetUpCommandBuffers();
 
 public:
 	ForwardRenderPass();
-	ForwardRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
 	~ForwardRenderPass();
 
 	static constexpr RenderPassID rendererPassID = Forward_Renderer;
@@ -35,7 +34,7 @@ public:
 	std::shared_ptr<PBRPipeline> pbrRenderingPipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> skyBoxRenderingPipeline;
 
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID);
-	void Destroy(std::shared_ptr<VulkanEngine> engine) override;
+	void RebuildSwapChain();
+	void Draw(uint32_t imageIndex, RendererID rendererID);
+	void Destroy() override;
 };

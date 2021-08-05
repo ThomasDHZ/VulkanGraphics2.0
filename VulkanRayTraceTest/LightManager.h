@@ -45,4 +45,7 @@ public:
 	uint32_t GetPointLightDescriptorCount();
 	uint32_t GetSpotLightDescriptorCount();
 };
-
+namespace GlobalPtr
+{
+	static std::shared_ptr<LightManager> lightManagerPtr;
+}

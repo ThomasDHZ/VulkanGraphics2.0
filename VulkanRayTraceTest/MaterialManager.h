@@ -28,4 +28,7 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
 	uint32_t GetMaterialDescriptorCount();
 };
-
+namespace GlobalPtr
+{
+	static std::shared_ptr<MaterialManager> materialManagerPtr;
+}

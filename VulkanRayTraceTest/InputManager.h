@@ -20,4 +20,7 @@ public:
 	bool IsKeyPressed(KeyboardKey key) { return keyboard.IsKeyPressed(Window, key); }
 	bool IsKeyReleased(KeyboardKey key) { return keyboard.IsKeyReleased(Window, key); }
 };
-
+namespace GlobalPtr
+{
+	static std::shared_ptr<InputManager> inputManagerPtr;
+}

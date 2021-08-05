@@ -1,5 +1,6 @@
 #pragma once
 #include <GLFW/glfw3.h>
+#include <memory>
 
 class VulkanWindow
 {
@@ -25,3 +26,7 @@ public:
 	unsigned int GetWindowHeight() { return Height; }
 	bool GetFrameBufferResizedFlag() { return FramebufferResized; }
 };
+namespace GlobalPtr
+{
+	static std::shared_ptr<VulkanWindow> windowPtr;
+}

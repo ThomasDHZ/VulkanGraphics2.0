@@ -3,20 +3,16 @@
 
 ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()
 {
-}
+    DepthTexture = std::make_shared<RenderedDepthTexture>(GlobalPtr::enginePtr);
 
-ForwardRenderPass::ForwardRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager) : BaseRenderPass()
-{
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
+    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
+    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(engine, assetManager, RenderPass));
-    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(engine, assetManager, RenderPass));
-    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(engine, assetManager, RenderPass));
-    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, RenderPass));
-
-    SetUpCommandBuffers(engine);
+    SetUpCommandBuffers();
 }
 
 ForwardRenderPass::~ForwardRenderPass()
@@ -24,7 +20,7 @@ ForwardRenderPass::~ForwardRenderPass()
 }
 
 
-void ForwardRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void ForwardRenderPass::CreateRenderPass()
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
@@ -78,18 +74,18 @@ void ForwardRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(GlobalPtr::enginePtr->Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
 }
 
-void ForwardRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void ForwardRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(GlobalPtr::enginePtr->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++) {
+    for (size_t i = 0; i < GlobalPtr::enginePtr->SwapChain.GetSwapChainImageCount(); i++) {
         std::array<VkImageView, 2> attachments = {
-            engine->SwapChain.GetSwapChainImageViews()[i],
+            GlobalPtr::enginePtr->SwapChain.GetSwapChainImageViews()[i],
             DepthTexture->GetTextureView()
         };
 
@@ -98,56 +94,56 @@ void ForwardRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine>
         framebufferInfo.renderPass = RenderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = engine->SwapChain.GetSwapChainResolution().width;
-        framebufferInfo.height = engine->SwapChain.GetSwapChainResolution().height;
+        framebufferInfo.width = GlobalPtr::enginePtr->SwapChain.GetSwapChainResolution().width;
+        framebufferInfo.height = GlobalPtr::enginePtr->SwapChain.GetSwapChainResolution().height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(GlobalPtr::enginePtr->Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
 }
 
-void ForwardRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void ForwardRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = GlobalPtr::enginePtr->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(GlobalPtr::enginePtr->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void ForwardRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void ForwardRenderPass::RebuildSwapChain()
 {
-    DepthTexture->RecreateRendererTexture(engine);
-    DebugLightPipeline->Destroy(engine);
-    forwardRenderingPipeline->Destroy(engine);
-    pbrRenderingPipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
+    DepthTexture->RecreateRendererTexture(GlobalPtr::enginePtr);
+    DebugLightPipeline->Destroy(GlobalPtr::enginePtr);
+    forwardRenderingPipeline->Destroy(GlobalPtr::enginePtr);
+    pbrRenderingPipeline->Destroy(GlobalPtr::enginePtr);
+    skyBoxRenderingPipeline->Destroy(GlobalPtr::enginePtr);
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(GlobalPtr::enginePtr->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(GlobalPtr::enginePtr->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    DebugLightPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    forwardRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    pbrRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    SetUpCommandBuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    DebugLightPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
+    forwardRenderingPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
+    pbrRenderingPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
+    SetUpCommandBuffers();
 }
 
-void ForwardRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
+void ForwardRenderPass::Draw(uint32_t imageIndex, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -161,7 +157,7 @@ void ForwardRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_p
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = GlobalPtr::enginePtr->SwapChain.SwapChainResolution;
 
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -176,21 +172,21 @@ void ForwardRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_p
     {
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
-        assetManager->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager->ActiveCamera);
+        GlobalPtr::assetManagerPtr->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID, GlobalPtr::assetManagerPtr->cameraManager->ActiveCamera);
 
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+        static_cast<Skybox*>(GlobalPtr::assetManagerPtr->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
     }
     else if (rendererID == RendererID::BlinnPhong_Raster_Renderer)
     {
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &forwardRenderingPipeline->DescriptorSets, 0, nullptr);
-        assetManager->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager->ActiveCamera);
+        GlobalPtr::assetManagerPtr->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID, GlobalPtr::assetManagerPtr->cameraManager->ActiveCamera);
 
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+        static_cast<Skybox*>(GlobalPtr::assetManagerPtr->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
     }
 
     vkCmdEndRenderPass(CommandBuffer);
@@ -200,13 +196,13 @@ void ForwardRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_p
 
 }
 
-void ForwardRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void ForwardRenderPass::Destroy()
 {
-    DepthTexture->Delete(engine);
-    DebugLightPipeline->Destroy(engine);
-    forwardRenderingPipeline->Destroy(engine);
-    pbrRenderingPipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
-    BaseRenderPass::Destroy(engine);
+    DepthTexture->Delete(GlobalPtr::enginePtr);
+    DebugLightPipeline->Destroy(GlobalPtr::enginePtr);
+    forwardRenderingPipeline->Destroy(GlobalPtr::enginePtr);
+    pbrRenderingPipeline->Destroy(GlobalPtr::enginePtr);
+    skyBoxRenderingPipeline->Destroy(GlobalPtr::enginePtr);
+    BaseRenderPass::Destroy();
 }
 

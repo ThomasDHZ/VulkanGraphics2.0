@@ -33,4 +33,7 @@ public:
 	std::shared_ptr<Mesh> GetMeshIndex(uint32_t MeshID);
 	uint32_t GetMeshDescriptorCount();
 };
-
+namespace GlobalPtr
+{
+	static std::shared_ptr<MeshManager> meshManagerPtr;
+}

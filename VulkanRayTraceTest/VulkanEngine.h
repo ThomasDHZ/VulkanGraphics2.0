@@ -188,4 +188,9 @@ public:
 	uint32_t GetSwapChainMinImageCount() { return SwapChain.GetSwapChainMinImageCount(); }
 	uint32_t GetSwapChainImageCount() { return SwapChain.GetSwapChainImageCount(); }
 };
+
+namespace GlobalPtr
+{
+	static std::shared_ptr<VulkanEngine> enginePtr;
+}
 #endif
