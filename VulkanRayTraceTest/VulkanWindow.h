@@ -6,11 +6,12 @@ class VulkanWindow
 {
 private:
 
+
+public:
 	bool FramebufferResized;
 	unsigned int Width;
 	unsigned int Height;
 	GLFWwindow* GLFWindow;
-public:
 	VulkanWindow();
 	VulkanWindow(unsigned int width, unsigned int height, const char* WindowName);
 	~VulkanWindow();
@@ -26,7 +27,3 @@ public:
 	unsigned int GetWindowHeight() { return Height; }
 	bool GetFrameBufferResizedFlag() { return FramebufferResized; }
 };
-namespace GlobalPtr
-{
-	static std::shared_ptr<VulkanWindow> windowPtr;
-}

@@ -17,14 +17,11 @@
 #include <map>
 #include "FontTexture.h"
 #include "Font.h"
+#include "GlobalPtr.h"
 
 class Engine {
 private:
-    std::shared_ptr<VulkanEngine> engine;
     Renderer renderer;
-    std::shared_ptr<VulkanWindow> window;
-    std::shared_ptr<AssetManager> assetManager;
-    std::shared_ptr<Font> font;
 
 public:
     Engine();

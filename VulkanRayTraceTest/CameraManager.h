@@ -17,7 +17,4 @@ public:
 
 	void Update();
 };
-namespace GlobalPtr
-{
-	static std::shared_ptr<CameraManager> cameraManagerPtr;
-}
+

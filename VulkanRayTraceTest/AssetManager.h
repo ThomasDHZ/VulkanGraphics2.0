@@ -58,7 +58,4 @@ public:
 	uint32_t GetTextureBufferDescriptorCount() { return textureManager->GetTextureBufferDescriptorCount(); }
 	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager->Get3DTextureBufferDescriptorCount(); }
 };
-namespace GlobalPtr
-{
-	static std::shared_ptr<AssetManager> assetManagerPtr;
-}
+

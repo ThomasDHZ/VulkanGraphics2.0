@@ -25,7 +25,3 @@ public:
 
 	void LoadFont(const std::string FontLocation);
 };
-namespace GlobalPtr
-{
-	static std::shared_ptr<GUIManager> GuiManagerPtr;
-}

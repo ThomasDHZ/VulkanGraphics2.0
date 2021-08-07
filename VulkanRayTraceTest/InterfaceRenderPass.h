@@ -3,6 +3,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_vulkan.h"
 #include "ImGui/imgui_impl_glfw.h"
+#include "GlobalPtr.h"
 
 static void check_vk_result(VkResult err)
 {

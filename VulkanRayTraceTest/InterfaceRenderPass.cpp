@@ -73,8 +73,8 @@ InterfaceRenderPass::InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine, s
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
     ImGui::StyleColorsDark();
-
-    ImGui_ImplGlfw_InitForVulkan(window->GetWindowPtr(), true);
+    auto a = GlobalPtr::windowPtr->Height;
+    ImGui_ImplGlfw_InitForVulkan(GlobalPtr::windowPtr->GLFWindow, true);
     init_info.DescriptorPool = ImGuiDescriptorPool;
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info, RenderPass);

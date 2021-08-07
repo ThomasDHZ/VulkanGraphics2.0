@@ -2,6 +2,7 @@
 #include "Vulkanengine.h"
 #include "AssetManager.h"
 #include "Skybox.h"
+#include "GlobalPtr.h"
 
 class BaseRenderPass
 {

@@ -21,7 +21,3 @@ public:
 	void Destory();
 	std::shared_ptr<Model> GetModel(uint32_t ModelID);
 };
-namespace GlobalPtr
-{
-	static std::shared_ptr<ObjectManager> objectManagerPtr;
-}
