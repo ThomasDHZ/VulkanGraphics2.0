@@ -310,7 +310,7 @@ void Texture::LoadDDSTexture(std::shared_ptr<VulkanEngine> engine, std::string T
 	VkDeviceSize imageSize = Width * Height * Depth * textureInfo.BytesOfKeyValueData;
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &textureInfo.TextureData[0]);
+	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &textureInfo.TextureData[0]);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -344,7 +344,7 @@ void Texture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string Text
 	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels);
+	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixels);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -377,7 +377,7 @@ void Texture::CreateTexture(std::shared_ptr<VulkanEngine> engine, std::vector<Pi
 	VkDeviceSize imageSize = Width * Height * sizeof(Pixel);
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);
+	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);
 	
 	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
 	
@@ -411,7 +411,7 @@ void Texture::CreateTexture(std::shared_ptr<VulkanEngine> engine, std::vector<gl
 	VkDeviceSize imageSize = Width * Height * sizeof(glm::vec4);
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);
+	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);
 
 	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
 
@@ -445,7 +445,7 @@ void Texture::CreateTexture3D(std::shared_ptr<VulkanEngine> engine, std::vector<
 	VkDeviceSize imageSize = Width * Height * Depth * sizeof(Pixel);
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);
+	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &Pixels[0]);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
