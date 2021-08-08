@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <set>
 
+std::shared_ptr<VulkanEngine> EnginePtr::enginePtr = nullptr;
+
 VulkanEngine::VulkanEngine()
 {
 }

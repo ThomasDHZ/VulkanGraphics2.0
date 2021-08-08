@@ -4,6 +4,8 @@
 #include "Level2D.h"
 #include "Sprite.h"
 
+std::shared_ptr<MeshManager> MeshManagerPtr::meshManager = nullptr;
+
 MeshManager::MeshManager()
 {
 }

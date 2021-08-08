@@ -18,3 +18,18 @@ public:
 	void Update();
 };
 
+class CameraManagerPtr
+{
+private:
+	static std::shared_ptr<CameraManager> cameraManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
+	{
+		cameraManager = std::make_shared<CameraManager>(CameraManager(engine));
+	}
+
+	static std::shared_ptr<CameraManager> GetCameraManagerPtr()
+	{
+		return cameraManager;
+	}
+};

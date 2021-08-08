@@ -27,3 +27,18 @@ public:
 	unsigned int GetWindowHeight() { return Height; }
 	bool GetFrameBufferResizedFlag() { return FramebufferResized; }
 };
+class WindowPtr
+{
+private:
+	static std::shared_ptr<VulkanWindow> windowPtr;
+public:
+	static void SetUpPtr(unsigned int width, unsigned int height, const char* WindowName)
+	{
+		windowPtr = std::make_shared<VulkanWindow>(VulkanWindow(width, height, WindowName));
+	}
+
+	static std::shared_ptr<VulkanWindow> GetWindowPtr()
+	{
+		return windowPtr;
+	}
+};

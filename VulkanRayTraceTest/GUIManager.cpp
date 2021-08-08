@@ -1,5 +1,7 @@
 #include "GUIManager.h"
 
+std::shared_ptr<GUIManager> GuiManagerPtr::guiManager = nullptr;
+
 GUIManager::GUIManager()
 {
 }

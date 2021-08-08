@@ -1,6 +1,8 @@
 #include "TextureManager.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
+std::shared_ptr<TextureManager> TextureManagerPtr::textureManager = nullptr;
+
 TextureManager::TextureManager()
 {
 }

@@ -1,5 +1,7 @@
 #include "AssetManager.h"
 
+std::shared_ptr<AssetManager> AssetPtr::assetPtr = nullptr;
+
 AssetManager::AssetManager()
 {
 }

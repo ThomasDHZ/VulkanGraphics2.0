@@ -3,14 +3,14 @@
 
 ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()
 {
-    DepthTexture = std::make_shared<RenderedDepthTexture>(GlobalPtr::enginePtr);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(EnginePtr::GetEnginePtr());
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
-    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
-    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
-    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass));
+    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
+    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
+    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
 
     SetUpCommandBuffers();
 }
@@ -74,18 +74,18 @@ void ForwardRenderPass::CreateRenderPass()
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(GlobalPtr::enginePtr->Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(EnginePtr::GetEnginePtr()->Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
 }
 
 void ForwardRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(GlobalPtr::enginePtr->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < GlobalPtr::enginePtr->SwapChain.GetSwapChainImageCount(); i++) {
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++) {
         std::array<VkImageView, 2> attachments = {
-            GlobalPtr::enginePtr->SwapChain.GetSwapChainImageViews()[i],
+            EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageViews()[i],
             DepthTexture->GetTextureView()
         };
 
@@ -94,11 +94,11 @@ void ForwardRenderPass::CreateRendererFramebuffers()
         framebufferInfo.renderPass = RenderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = GlobalPtr::enginePtr->SwapChain.GetSwapChainResolution().width;
-        framebufferInfo.height = GlobalPtr::enginePtr->SwapChain.GetSwapChainResolution().height;
+        framebufferInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+        framebufferInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(GlobalPtr::enginePtr->Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
@@ -108,38 +108,38 @@ void ForwardRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = GlobalPtr::enginePtr->CommandPool;
+    allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(GlobalPtr::enginePtr->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
 void ForwardRenderPass::RebuildSwapChain()
 {
-    DepthTexture->RecreateRendererTexture(GlobalPtr::enginePtr);
-    DebugLightPipeline->Destroy(GlobalPtr::enginePtr);
-    forwardRenderingPipeline->Destroy(GlobalPtr::enginePtr);
-    pbrRenderingPipeline->Destroy(GlobalPtr::enginePtr);
-    skyBoxRenderingPipeline->Destroy(GlobalPtr::enginePtr);
+    DepthTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    DebugLightPipeline->Destroy(EnginePtr::GetEnginePtr());
+    forwardRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    pbrRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(GlobalPtr::enginePtr->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(GlobalPtr::enginePtr->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(EnginePtr::GetEnginePtr()->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    DebugLightPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
-    forwardRenderingPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
-    pbrRenderingPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(GlobalPtr::enginePtr, GlobalPtr::assetManagerPtr, RenderPass);
+    DebugLightPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
+    forwardRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
+    pbrRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
     SetUpCommandBuffers();
 }
 
@@ -157,7 +157,7 @@ void ForwardRenderPass::Draw(uint32_t imageIndex, RendererID rendererID)
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = GlobalPtr::enginePtr->SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
 
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -172,21 +172,21 @@ void ForwardRenderPass::Draw(uint32_t imageIndex, RendererID rendererID)
     {
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
-        GlobalPtr::assetManagerPtr->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID, GlobalPtr::assetManagerPtr->cameraManager->ActiveCamera);
+        AssetPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID, AssetPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        static_cast<Skybox*>(GlobalPtr::assetManagerPtr->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+        static_cast<Skybox*>(AssetPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
     }
     else if (rendererID == RendererID::BlinnPhong_Raster_Renderer)
     {
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &forwardRenderingPipeline->DescriptorSets, 0, nullptr);
-        GlobalPtr::assetManagerPtr->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID, GlobalPtr::assetManagerPtr->cameraManager->ActiveCamera);
+        AssetPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID, AssetPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        static_cast<Skybox*>(GlobalPtr::assetManagerPtr->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+        static_cast<Skybox*>(AssetPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
     }
 
     vkCmdEndRenderPass(CommandBuffer);
@@ -198,11 +198,11 @@ void ForwardRenderPass::Draw(uint32_t imageIndex, RendererID rendererID)
 
 void ForwardRenderPass::Destroy()
 {
-    DepthTexture->Delete(GlobalPtr::enginePtr);
-    DebugLightPipeline->Destroy(GlobalPtr::enginePtr);
-    forwardRenderingPipeline->Destroy(GlobalPtr::enginePtr);
-    pbrRenderingPipeline->Destroy(GlobalPtr::enginePtr);
-    skyBoxRenderingPipeline->Destroy(GlobalPtr::enginePtr);
+    DepthTexture->Delete(EnginePtr::GetEnginePtr());
+    DebugLightPipeline->Destroy(EnginePtr::GetEnginePtr());
+    forwardRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    pbrRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
     BaseRenderPass::Destroy();
 }
 

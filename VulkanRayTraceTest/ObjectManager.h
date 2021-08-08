@@ -21,3 +21,19 @@ public:
 	void Destory();
 	std::shared_ptr<Model> GetModel(uint32_t ModelID);
 };
+
+class ObjManagerPtr
+{
+private:
+	static std::shared_ptr<ObjectManager> ObjManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<InputManager> inputManager, std::shared_ptr<TextureManager> textureManager)
+	{
+		ObjManager = std::make_shared<ObjectManager>(ObjectManager(engine, materialManager, textureManager));
+	}
+
+	static std::shared_ptr<ObjectManager> GetObjManagerPtr()
+	{
+		return ObjManager;
+	}
+};

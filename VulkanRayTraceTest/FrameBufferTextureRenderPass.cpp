@@ -6,24 +6,24 @@ FrameBufferTextureRenderPass::FrameBufferTextureRenderPass()
 {
 }
 
-FrameBufferTextureRenderPass::FrameBufferTextureRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+FrameBufferTextureRenderPass::FrameBufferTextureRenderPass(std::shared_ptr<AssetManager> assetManager)
 {
-    RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
-    BloomTexture = std::make_shared<RenderedColorTexture>(engine);
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
+    RenderedTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
+    BloomTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
+    DepthTexture = std::make_shared<RenderedDepthTexture>(EnginePtr::GetEnginePtr());
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<RenderFrameBufferTexturePipeline>(RenderFrameBufferTexturePipeline(engine, assetManager, RenderPass));
-    skyBoxRenderingPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(SkyBoxFrameBufferRenderingPipeline(engine, assetManager, RenderPass));
-    SetUpCommandBuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    TexturePipeline = std::make_shared<RenderFrameBufferTexturePipeline>(RenderFrameBufferTexturePipeline(EnginePtr::GetEnginePtr(), assetManager, RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(SkyBoxFrameBufferRenderingPipeline(EnginePtr::GetEnginePtr(), assetManager, RenderPass));
+    SetUpCommandBuffers();
 }
 
 FrameBufferTextureRenderPass::~FrameBufferTextureRenderPass()
 {
 }
 
-void FrameBufferTextureRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void FrameBufferTextureRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -102,17 +102,17 @@ void FrameBufferTextureRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(EnginePtr::GetEnginePtr()->Device, &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void FrameBufferTextureRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void FrameBufferTextureRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(RenderedTexture->View);
@@ -124,31 +124,31 @@ void FrameBufferTextureRenderPass::CreateRendererFramebuffers(std::shared_ptr<Vu
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine->SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine->SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+        frameBufferCreateInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void FrameBufferTextureRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void FrameBufferTextureRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void FrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
+void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -162,7 +162,7 @@ void FrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, st
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
 
     std::array<VkClearValue, 3> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -190,47 +190,47 @@ void FrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, st
     }
 }
 
-void FrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void FrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<AssetManager> assetManager)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
-    BloomTexture->RecreateRendererTexture(engine);
-    DepthTexture->RecreateRendererTexture(engine);
+    RenderedTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    BloomTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    DepthTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
 
-    TexturePipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
+    TexturePipeline->Destroy(EnginePtr::GetEnginePtr());
+    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(EnginePtr::GetEnginePtr()->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    SetUpCommandBuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    TexturePipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), assetManager, RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), assetManager, RenderPass);
+    SetUpCommandBuffers();
 }
 
-void FrameBufferTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void FrameBufferTextureRenderPass::Destroy()
 {
-    RenderedTexture->Delete(engine);
-    BloomTexture->Delete(engine);
-    DepthTexture->Delete(engine);
+    RenderedTexture->Delete(EnginePtr::GetEnginePtr());
+    BloomTexture->Delete(EnginePtr::GetEnginePtr());
+    DepthTexture->Delete(EnginePtr::GetEnginePtr());
 
-    TexturePipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
+    TexturePipeline->Destroy(EnginePtr::GetEnginePtr());
+    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(EnginePtr::GetEnginePtr()->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

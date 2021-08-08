@@ -59,3 +59,18 @@ public:
 	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager->Get3DTextureBufferDescriptorCount(); }
 };
 
+class AssetPtr
+{
+private:
+	static std::shared_ptr<AssetManager> assetPtr;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+	{
+		assetPtr = std::make_shared<AssetManager>(AssetManager(engine, window));
+	}
+
+	static std::shared_ptr<AssetManager> GetAssetPtr()
+	{
+		return assetPtr;
+	}
+};

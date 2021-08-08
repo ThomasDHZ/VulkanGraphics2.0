@@ -41,7 +41,6 @@ public:
 	void Destory();
 
 
-
 	std::shared_ptr<Texture> GetTextureByName(const std::string TextureName);
 	std::shared_ptr<Texture3D> Get3DTextureByName(const std::string TextureName);
 
@@ -57,4 +56,20 @@ public:
 
 	uint32_t GetTextureBufferDescriptorCount();
 	uint32_t Get3DTextureBufferDescriptorCount();
+};
+
+class TextureManagerPtr
+{
+private:
+	static std::shared_ptr<TextureManager> textureManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
+	{
+		textureManager = std::make_shared<TextureManager>(TextureManager(engine));
+	}
+
+	static std::shared_ptr<TextureManager> GetTextureManagerPtr()
+	{
+		return textureManager;
+	}
 };

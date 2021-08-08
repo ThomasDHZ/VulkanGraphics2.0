@@ -1,5 +1,7 @@
 #include "LightManager.h"
 
+std::shared_ptr<LightManager> LightManagerPtr::lightManager = nullptr;
+
 LightManager::LightManager()
 {
 }

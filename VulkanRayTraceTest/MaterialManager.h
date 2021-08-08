@@ -28,3 +28,19 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
 	uint32_t GetMaterialDescriptorCount();
 };
+
+class MaterialManagerPtr
+{
+private:
+	static std::shared_ptr<MaterialManager> materialManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<TextureManager> textureManager)
+	{
+		materialManager = std::make_shared<MaterialManager>(MaterialManager(engine, textureManager));
+	}
+
+	static std::shared_ptr<MaterialManager> GetMaterialManagerPtr()
+	{
+		return materialManager;
+	}
+};

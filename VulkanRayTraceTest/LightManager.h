@@ -46,3 +46,18 @@ public:
 	uint32_t GetSpotLightDescriptorCount();
 };
 
+class LightManagerPtr
+{
+private:
+	static std::shared_ptr<LightManager> lightManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<CameraManager> camera)
+	{
+		lightManager = std::make_shared<LightManager>(LightManager(engine, camera));
+	}
+
+	static std::shared_ptr<LightManager> GetLightManagerPtr()
+	{
+		return lightManager;
+	}
+};

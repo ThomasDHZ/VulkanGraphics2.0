@@ -1,5 +1,7 @@
 #include "InputManager.h"
 
+std::shared_ptr<InputManager> InputManagerPtr::inputManager = nullptr;
+
 InputManager::InputManager()
 {
 }

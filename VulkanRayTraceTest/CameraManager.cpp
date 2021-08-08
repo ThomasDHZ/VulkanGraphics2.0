@@ -2,6 +2,8 @@
 #include "PerspectiveCamera.h"
 #include "OrthographicCamera.h"
 
+std::shared_ptr<CameraManager> CameraManagerPtr::cameraManager = nullptr;
+
 CameraManager::CameraManager()
 {
 }

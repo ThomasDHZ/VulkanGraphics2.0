@@ -20,8 +20,8 @@ private:
 	VkDescriptorPool ImGuiDescriptorPool;
 	VkCommandPool ImGuiCommandPool;
 
-	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
-	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
+	void CreateRenderPass();
+	void CreateRendererFramebuffers();
 
 public:
 	InterfaceRenderPass();
@@ -32,9 +32,9 @@ public:
 	VkCommandBuffer ImGuiCommandBuffers;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
-	void Draw(std::shared_ptr<VulkanEngine> engine, int frame);
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void Draw(int frame);
+	void RebuildSwapChain();
+	void Destroy();
 
 	VkRenderPass GetRenderPass() { return RenderPass; }
 };

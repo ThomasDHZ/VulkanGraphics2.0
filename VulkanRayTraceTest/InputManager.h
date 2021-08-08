@@ -21,3 +21,18 @@ public:
 	bool IsKeyReleased(KeyboardKey key) { return keyboard.IsKeyReleased(Window, key); }
 };
 
+class InputManagerPtr
+{
+private:
+	static std::shared_ptr<InputManager> inputManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanWindow> window, std::shared_ptr<CameraManager> camera)
+	{
+		inputManager = std::make_shared<InputManager>(InputManager(window, camera));
+	}
+
+	static std::shared_ptr<InputManager> GetInputManagerPtr()
+	{
+		return inputManager;
+	}
+};

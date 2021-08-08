@@ -1,6 +1,8 @@
 #include "ObjectManager.h"
 #include "GameObject.h"
 
+std::shared_ptr<ObjectManager> ObjManagerPtr::ObjManager = nullptr;
+
 ObjectManager::ObjectManager()
 {
 }

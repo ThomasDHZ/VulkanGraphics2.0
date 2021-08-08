@@ -1,5 +1,7 @@
 #include "MaterialManager.h"
 
+std::shared_ptr<MaterialManager> MaterialManagerPtr::materialManager = nullptr;
+
 MaterialManager::MaterialManager()
 {
 }

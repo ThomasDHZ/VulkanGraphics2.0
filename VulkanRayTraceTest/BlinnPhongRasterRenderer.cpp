@@ -5,12 +5,12 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 {
 }
 
-BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr(), assetManagerPtr)
 {
-    FrameBufferTextureRenderer = FrameBufferTextureRenderPass(engine, assetManager);
-    BloomRenderer = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
-    DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
+    FrameBufferTextureRenderer = FrameBufferTextureRenderPass(assetManager);
+    BloomRenderer = BloomRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.BloomTexture);
+    DebugDepthRenderer = DepthDebugRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     //lightPathRenderer = DepthRenderer(engine, assetManager);
 }
 
@@ -18,16 +18,16 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 {
 }
 
-void BlinnPhongRasterRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+void BlinnPhongRasterRenderer::RebuildSwapChain()
 {
-    FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
-    BloomRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.BloomTexture);
-    //DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
-    //lightPathRenderer.RebuildSwapChain(engine, assetManager);
+    FrameBufferTextureRenderer.RebuildSwapChain(assetManager);
+    BloomRenderer.RebuildSwapChain(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.BloomTexture);
+    //DebugDepthRenderer.RebuildSwapChain(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
+    FrameBufferRenderer.RebuildSwapChain(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
+    //lightPathRenderer.RebuildSwapChain(EnginePtr::GetEnginePtr(), assetManager);
 }
 
-void BlinnPhongRasterRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
+void BlinnPhongRasterRenderer::GUIUpdate()
 {
     //ImGui::LabelText("Mesh", "Mesh");
     //for (int x = 0; x < assetManager->meshManager.MeshList.size(); x++)
@@ -95,22 +95,22 @@ void BlinnPhongRasterRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     //ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void BlinnPhongRasterRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void BlinnPhongRasterRenderer::Draw(uint32_t imageIndex)
 {
-    FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
-    BloomRenderer.Draw(engine, assetManager, imageIndex);
-    //DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
-    FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
-   /* lightPathRenderer.Draw(engine, assetManager, imageIndex);*/
+    FrameBufferTextureRenderer.Draw(assetManager, imageIndex, rendererID);
+    BloomRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);
+    //DebugDepthRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);
+    FrameBufferRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);
+   /* lightPathRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);*/
 }
 
-void BlinnPhongRasterRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
+void BlinnPhongRasterRenderer::Destroy()
 {
-    FrameBufferTextureRenderer.Destroy(engine);
-    BloomRenderer.Destroy(engine);
-    DebugDepthRenderer.Destroy(engine);
-    FrameBufferRenderer.Destroy(engine);
-    lightPathRenderer.Destroy(engine);
+    FrameBufferTextureRenderer.Destroy();
+    BloomRenderer.Destroy(EnginePtr::GetEnginePtr());
+    DebugDepthRenderer.Destroy(EnginePtr::GetEnginePtr());
+    FrameBufferRenderer.Destroy(EnginePtr::GetEnginePtr());
+    lightPathRenderer.Destroy(EnginePtr::GetEnginePtr());
 }
 
 std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)

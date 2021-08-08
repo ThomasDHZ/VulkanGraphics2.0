@@ -33,3 +33,19 @@ public:
 	std::shared_ptr<Mesh> GetMeshIndex(uint32_t MeshID);
 	uint32_t GetMeshDescriptorCount();
 };
+
+class MeshManagerPtr
+{
+private:
+	static std::shared_ptr<MeshManager> meshManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
+	{
+		meshManager = std::make_shared<MeshManager>(MeshManager(engine, inputManager, materialManager));
+	}
+
+	static std::shared_ptr<MeshManager> GetCameraManagerPtr()
+	{
+		return meshManager;
+	}
+};
