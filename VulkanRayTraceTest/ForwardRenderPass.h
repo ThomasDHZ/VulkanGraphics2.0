@@ -12,7 +12,6 @@
 #include "BaseRenderPass.h"
 #include "PBRPipeline.h"
 #include "RenderedColorTexture.h"
-#include "GlobalPtr.h"
 
 class ForwardRenderPass : public BaseRenderPass
 {

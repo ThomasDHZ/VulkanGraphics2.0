@@ -17,7 +17,6 @@
 #include <map>
 #include "FontTexture.h"
 #include "Font.h"
-#include "GlobalPtr.h"
 
 class Engine {
 private:

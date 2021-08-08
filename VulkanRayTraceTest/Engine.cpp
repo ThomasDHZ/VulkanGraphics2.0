@@ -165,10 +165,10 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 Engine::~Engine()
 {
-    //AssetPtr::assetManagerPtr->Delete(EnginePtr::GetEnginePtr());
-    //renderer.Destroy(EnginePtr::GetEnginePtr());
-    //EnginePtr::GetEnginePtr()->Destroy();
-    //EnginePtr::GetEnginePtr()->Destroy();
+    AssetPtr::GetAssetPtr()->Delete(EnginePtr::GetEnginePtr());
+    renderer.Destroy(EnginePtr::GetEnginePtr());
+    EnginePtr::GetEnginePtr()->Destroy();
+    WindowPtr::GetWindowPtr()->Destroy();
 }
 
 void Engine::MainLoop()

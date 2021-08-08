@@ -174,7 +174,6 @@
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GlobalPtr.cpp" />
     <ClCompile Include="GUIManager.cpp" />
     <ClCompile Include="GUIMesh.cpp" />
     <ClCompile Include="GUIObject.cpp" />
@@ -191,6 +190,7 @@
     <ClCompile Include="FontTexture.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileMesh.cpp" />
+    <ClCompile Include="VulkanPtr.cpp" />
     <ClCompile Include="WireFramePipeline.cpp" />
     <ClCompile Include="DeferredSkyboxPipeline.cpp" />
     <ClCompile Include="DepthDebugPipeline.cpp" />
@@ -405,7 +405,6 @@
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="GlobalPtr.h" />
     <ClInclude Include="GUIManager.h" />
     <ClInclude Include="GUIMesh.h" />
     <ClInclude Include="GUIObject.h" />
@@ -423,6 +422,7 @@
     <ClInclude Include="FontTexture.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="TileMesh.h" />
+    <ClInclude Include="VulkanPtr.h" />
     <ClInclude Include="WireFramePipeline.h" />
     <ClInclude Include="DeferredSkyboxPipeline.h" />
     <ClInclude Include="DepthDebugPipeline.h" />

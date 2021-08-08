@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "VulkanBuffer.h"
 #include <chrono>
+#include "VulkanPtr.h"
 
 #define VKB_VALIDATION_LAYERS
 
@@ -104,7 +105,6 @@ public:
 	VkSurfaceKHR Surface = VK_NULL_HANDLE;
 	VkQueue GraphicsQueue = VK_NULL_HANDLE;
 	VkQueue PresentQueue = VK_NULL_HANDLE;
-	VkDescriptorPool      DescriptorPool = VK_NULL_HANDLE;
 	VkCommandPool CommandPool = VK_NULL_HANDLE;
 	VulkanSwapChain SwapChain;
 

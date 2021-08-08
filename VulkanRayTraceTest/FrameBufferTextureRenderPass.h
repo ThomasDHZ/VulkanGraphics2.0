@@ -7,7 +7,6 @@
 #include "SkyBoxRenderingPipeline.h"
 #include "RenderPBRFrameBufferTexturePipeline.h"
 #include "SkyBoxFrameBufferRenderingPipeline.h"
-#include "GlobalPtr.h"
 
 class FrameBufferTextureRenderPass
 {

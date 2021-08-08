@@ -4,7 +4,6 @@
 #include "MegaMan.h"
 #include "Mario.h"
 #include "TerrainMesh.h"
-#include "GlobalPtr.h"
 
 Renderer::Renderer()
 {

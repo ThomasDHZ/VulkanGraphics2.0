@@ -513,7 +513,7 @@
     <ClCompile Include="Object.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="GlobalPtr.cpp">
+    <ClCompile Include="VulkanPtr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1213,7 +1213,7 @@
     <ClInclude Include="ObjectManager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="GlobalPtr.h">
+    <ClInclude Include="VulkanPtr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
