@@ -1,5 +1,5 @@
 #pragma once
-#include <vulkan/vulkan.h>
+#include "VulkanPtr.h"
 
 class VulkanBuffer
 {
@@ -7,7 +7,7 @@ private:
 
 	VkDescriptorBufferInfo BufferDescriptor;
 
-	uint32_t GetMemoryType(VkPhysicalDevice& physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+	uint32_t GetMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 protected:
 
@@ -21,18 +21,17 @@ public:
 	VkAccelerationStructureKHR BufferHandle = VK_NULL_HANDLE;
 
 	VulkanBuffer();
-	VulkanBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
+	VulkanBuffer(VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
 	~VulkanBuffer();
-	
-	VkResult CreateBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
-	void CopyBuffer(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-	void CopyBufferToMemory(VkDevice& device, void* DataToCopy, VkDeviceSize BufferSize);
-	void DestoryBuffer(VkDevice& device);
-	VkCommandBuffer BeginSingleTimeCommand(VkDevice& device, VkCommandPool& renderCommandPool);
-	void EndSingleTimeCommand(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkCommandBuffer commandBuffer);
-	
+
+	VkResult CreateBuffer(VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
+	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void CopyBufferToMemory(void* DataToCopy, VkDeviceSize BufferSize);
+	void DestoryBuffer();
+	VkCommandBuffer BeginSingleTimeCommand();
+	void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
+
 	VkBuffer GetBuffer() { return Buffer; }
 	VkDeviceMemory GetBufferMemory() { return BufferMemory; }
 	VkDeviceSize GetBufferSize() { return BufferSize; }
 };
-

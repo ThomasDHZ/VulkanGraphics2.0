@@ -89,7 +89,7 @@ public:
 		}
 	}
 	
-	static void CreateCommandPool(VkCommandPool commandPool)
+	static void SetCommandPool(VkCommandPool commandPool)
 	{
 		if (CommandPool == VK_NULL_HANDLE)
 		{

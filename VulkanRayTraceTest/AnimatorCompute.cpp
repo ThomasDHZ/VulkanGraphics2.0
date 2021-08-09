@@ -157,7 +157,7 @@ void AnimatorCompute::Compute(std::shared_ptr<VulkanEngine> engine, uint32_t cur
 		1, &BufferMemoryBarrier,
 		0, nullptr);
 
-	mesh->VertexBuffer.CopyBufferToMemory(engine->Device, &mesh->VertexList[0], sizeof(Vertex) * mesh->VertexList.size());
+	mesh->VertexBuffer.CopyBufferToMemory(&mesh->VertexList[0], sizeof(Vertex) * mesh->VertexList.size());
 	vkEndCommandBuffer(commandBuffer);
 }
 

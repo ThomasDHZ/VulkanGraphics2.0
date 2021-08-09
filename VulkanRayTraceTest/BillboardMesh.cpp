@@ -63,8 +63,8 @@ void BillboardMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
     VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
 
-    TransformBuffer.CopyBufferToMemory(engine->Device, &FinalTransform, sizeof(FinalTransform));
-    TransformInverseBuffer.CopyBufferToMemory(engine->Device, &transformMatrix, sizeof(transformMatrix));
+    TransformBuffer.CopyBufferToMemory(&FinalTransform, sizeof(FinalTransform));
+    TransformInverseBuffer.CopyBufferToMemory(&transformMatrix, sizeof(transformMatrix));
 
     MeshProperties.UniformDataInfo.UVOffset = animator.GetFrameUVs(animator.CurrentFrame);
     MeshProperties.Update(engine);

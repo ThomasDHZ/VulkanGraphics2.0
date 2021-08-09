@@ -104,7 +104,6 @@ public:
 	VkSurfaceKHR Surface = VK_NULL_HANDLE;
 	VkQueue GraphicsQueue = VK_NULL_HANDLE;
 	VkQueue PresentQueue = VK_NULL_HANDLE;
-	VkDescriptorPool      DescriptorPool = VK_NULL_HANDLE;
 	VkCommandPool CommandPool = VK_NULL_HANDLE;
 	VulkanSwapChain SwapChain;
 
