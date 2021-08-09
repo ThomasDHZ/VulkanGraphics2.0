@@ -141,6 +141,9 @@ void TextureManager::UnloadCubeMap()
 
 void TextureManager::Destory()
 {
+	vkDestroySampler(engine->Device, NullSampler, nullptr);
+	NullSampler = VK_NULL_HANDLE;
+
 	UnloadAllTextures();
 	UnloadCubeMap();
 }

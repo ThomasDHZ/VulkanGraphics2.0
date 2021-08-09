@@ -15,12 +15,12 @@ private:
 	int ActiveRenderer = 0;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	PBRRenderer pbrRenderer;
-	RayTraceRenderer rayTraceRenderer;
-	RayTracePBRRenderer pbrRayTraceRenderer;
-	HybridRenderer hybridRenderer;
-	Renderer2D renderer2D;
-	GUIRenderer guiRenderer;
+	//PBRRenderer pbrRenderer;
+	//RayTraceRenderer rayTraceRenderer;
+	//RayTracePBRRenderer pbrRayTraceRenderer;
+	//HybridRenderer hybridRenderer;
+	//Renderer2D renderer2D;
+	//GUIRenderer guiRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	size_t currentFrame = 0;

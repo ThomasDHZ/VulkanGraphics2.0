@@ -31,10 +31,6 @@ public:
 	AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
 	~AssetManager();
 
-	//void AddModel();
-	//void AddModel(std::shared_ptr<VulkanEngine> engine, const std::string& FilePath);
-	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
 	void LoadFont(std::shared_ptr<VulkanEngine> engine, const std::string FontLocation);
 
 	void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);
