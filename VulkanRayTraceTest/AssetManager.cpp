@@ -8,14 +8,14 @@ AssetManager::AssetManager()
 
 AssetManager::AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    cameraManager = std::make_shared<CameraManager>(CameraManager(engine));
-    inputManager = std::make_shared<InputManager>(InputManager(window, cameraManager));
-    textureManager = std::make_shared<TextureManager>(TextureManager(engine));
-    materialManager = std::make_shared<MaterialManager>(engine, textureManager);
-    meshManager = std::make_shared<MeshManager>(MeshManager(engine, inputManager, materialManager));
-    lightManager = std::make_shared<LightManager>(engine, cameraManager);
-    guiManager = std::make_shared<GUIManager>(engine, materialManager, textureManager, inputManager);
-    ObjManager = std::make_shared<ObjectManager>(engine, materialManager, textureManager);
+    cameraManager = CameraManagerPtr::GetCameraManagerPtr();
+    inputManager = InputManagerPtr::GetInputManagerPtr();
+    textureManager = TextureManagerPtr::GetTextureManagerPtr();
+    materialManager = MaterialManagerPtr::GetMaterialManagerPtr();
+    meshManager = MeshManagerPtr::GetCameraManagerPtr();
+    lightManager = LightManagerPtr::GetLightManagerPtr();
+    guiManager = GuiManagerPtr::GetGuiManagerPtr();
+    ObjManager = ObjManagerPtr::GetObjManagerPtr();
 
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
@@ -82,19 +82,15 @@ void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layo
 
 void AssetManager::Delete(std::shared_ptr<VulkanEngine> engine)
 {
-    //for (auto& model : modelManager.ModelList)
-    //{
-    //    model->Destory(engine);
-    //}
-
     SceneData->Destroy(engine);
     SkyUniformBuffer->Destroy(engine);
 
-    meshManager->Destroy();
-    textureManager->Destory();
-    materialManager->Destory();
-    lightManager->Destory();
-    ObjManager->Destory();
+    TextureManagerPtr::GetTextureManagerPtr()->Destory();
+    MaterialManagerPtr::GetMaterialManagerPtr()->Destory();
+    MeshManagerPtr::GetCameraManagerPtr()->Destroy();
+    LightManagerPtr::GetLightManagerPtr()->Destory();
+    GuiManagerPtr::GetGuiManagerPtr()->Destory();
+    ObjManagerPtr::GetObjManagerPtr()->Destory();
 }
 
 std::vector<std::shared_ptr<Mesh>> AssetManager::GetMeshByType(MeshTypeFlag type)
