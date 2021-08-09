@@ -20,9 +20,9 @@ RayTracedHybridPipeline::~RayTracedHybridPipeline()
 void RayTracedHybridPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionMaskTexture, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture)
 {
     RayTracingGraphicsPipeline::UpdateGraphicsPipeLine(engine);
-    raygenShaderBindingTable.DestoryBuffer(engine->Device);
-    missShaderBindingTable.DestoryBuffer(engine->Device);
-    hitShaderBindingTable.DestoryBuffer(engine->Device);
+    raygenShaderBindingTable.DestoryBuffer();
+    missShaderBindingTable.DestoryBuffer();
+    hitShaderBindingTable.DestoryBuffer();
 
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);

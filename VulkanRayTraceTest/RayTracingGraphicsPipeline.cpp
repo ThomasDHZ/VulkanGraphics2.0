@@ -39,7 +39,7 @@ void RayTracingGraphicsPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEn
 void RayTracingGraphicsPipeline::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
 	GraphicsPipeline::Destroy(engine);
-	raygenShaderBindingTable.DestoryBuffer(engine->Device);
-	missShaderBindingTable.DestoryBuffer(engine->Device);
-	hitShaderBindingTable.DestoryBuffer(engine->Device);
+	raygenShaderBindingTable.DestoryBuffer();
+	missShaderBindingTable.DestoryBuffer();
+	hitShaderBindingTable.DestoryBuffer();
 }

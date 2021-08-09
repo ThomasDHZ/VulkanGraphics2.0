@@ -144,7 +144,7 @@ void Mesh::MeshBottomLevelAccelerationStructure(std::shared_ptr<VulkanEngine> en
 		BottomLevelAccelerationBuffer.CreateAccelerationStructure(engine, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
 	}
 
-	VulkanBuffer scratchBuffer = VulkanBuffer(engine->Device, engine->PhysicalDevice, AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VulkanBuffer scratchBuffer = VulkanBuffer(AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	scratchBuffer.BufferDeviceAddress = engine->GetBufferDeviceAddress(scratchBuffer.Buffer);
 
 	VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
@@ -167,7 +167,7 @@ void Mesh::MeshBottomLevelAccelerationStructure(std::shared_ptr<VulkanEngine> en
 
 	BottomLevelAccelerationBuffer.AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
 
-	scratchBuffer.DestoryBuffer(engine->Device);
+	scratchBuffer.DestoryBuffer();
 }
 
 void Mesh::SetUpMesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
@@ -338,11 +338,11 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderP
 
 void Mesh::Destory(std::shared_ptr<VulkanEngine> engine)
 {
-	VertexBuffer.DestoryBuffer(engine->Device);
-	IndexBuffer.DestoryBuffer(engine->Device);
-	TransformBuffer.DestoryBuffer(engine->Device);
-	TransformInverseBuffer.DestoryBuffer(engine->Device);
-	BoneTransformBuffer.DestoryBuffer(engine->Device);
+	VertexBuffer.DestoryBuffer();
+	IndexBuffer.DestoryBuffer();
+	TransformBuffer.DestoryBuffer();
+	TransformInverseBuffer.DestoryBuffer();
+	BoneTransformBuffer.DestoryBuffer();
 	MeshProperties.Destroy(engine);
 
 	if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)

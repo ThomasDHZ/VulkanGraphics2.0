@@ -81,6 +81,6 @@ void GUIMesh::AddChildMesh(std::shared_ptr<GUIMesh> mesh)
 
 void GUIMesh::Destory(std::shared_ptr<VulkanEngine> engine)
 {
-	VertexBuffer.DestoryBuffer(engine->Device);
-	IndexBuffer.DestoryBuffer(engine->Device);
+	VertexBuffer.DestoryBuffer();
+	IndexBuffer.DestoryBuffer();
 }

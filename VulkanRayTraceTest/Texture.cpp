@@ -333,7 +333,7 @@ void Texture::LoadDDSTexture(std::shared_ptr<VulkanEngine> engine, std::string T
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer(engine->Device);
+	StagingBuffer.DestoryBuffer();
 }
 
 void Texture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format)
@@ -366,7 +366,7 @@ void Texture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string Text
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
-	StagingBuffer.DestoryBuffer(engine->Device);
+	StagingBuffer.DestoryBuffer();
 	stbi_image_free(pixels);
 
 	GenerateMipmaps(engine, format);
@@ -401,7 +401,7 @@ void Texture::CreateTexture(std::shared_ptr<VulkanEngine> engine, std::vector<Pi
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
-	StagingBuffer.DestoryBuffer(engine->Device);
+	StagingBuffer.DestoryBuffer();
 
 	GenerateMipmaps(engine, format);
 }
@@ -435,7 +435,7 @@ void Texture::CreateTexture(std::shared_ptr<VulkanEngine> engine, std::vector<gl
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
-	StagingBuffer.DestoryBuffer(engine->Device);
+	StagingBuffer.DestoryBuffer();
 
 	GenerateMipmaps(engine, format);
 }
@@ -468,7 +468,7 @@ void Texture::CreateTexture3D(std::shared_ptr<VulkanEngine> engine, std::vector<
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer(engine->Device);
+	StagingBuffer.DestoryBuffer();
 }
 
 void Texture::CreateTextureImage(std::shared_ptr<VulkanEngine> engine, VkImageCreateInfo TextureInfo)

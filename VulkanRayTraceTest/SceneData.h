@@ -105,7 +105,7 @@ public:
 
 	void Destroy(std::shared_ptr<VulkanEngine> engine)
 	{
-		VulkanBufferData.DestoryBuffer(engine->Device);
+		VulkanBufferData.DestoryBuffer();
 	}
 };
 

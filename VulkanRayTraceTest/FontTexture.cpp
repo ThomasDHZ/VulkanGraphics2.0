@@ -62,7 +62,7 @@ void FontTexture::CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
-	StagingBuffer.DestoryBuffer(engine->Device);
+	StagingBuffer.DestoryBuffer();
 
 	GenerateMipmaps(engine, VK_FORMAT_R8G8B8A8_UNORM);
 }

@@ -21,13 +21,13 @@ public:
 	VkAccelerationStructureKHR BufferHandle = VK_NULL_HANDLE;
 
 	VulkanBuffer();
-	VulkanBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
+	VulkanBuffer(VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
 	~VulkanBuffer();
 	
 	VkResult CreateBuffer(VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData = nullptr);
 	void CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 	void CopyBufferToMemory(void* DataToCopy, VkDeviceSize BufferSize);
-	void DestoryBuffer(VkDevice& device);
+	void DestoryBuffer();
 	VkCommandBuffer BeginSingleTimeCommand();
 	void EndSingleTimeCommand(VkCommandBuffer commandBuffer);
 	

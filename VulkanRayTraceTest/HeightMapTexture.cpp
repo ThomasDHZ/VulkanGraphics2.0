@@ -65,7 +65,7 @@ void HeightMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::st
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer(engine->Device);
+	StagingBuffer.DestoryBuffer();
 	stbi_image_free(pixels);
 }
 

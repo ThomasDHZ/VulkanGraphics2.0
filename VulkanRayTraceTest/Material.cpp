@@ -43,5 +43,5 @@ void Material::UpdateBufferIndexs(std::shared_ptr<VulkanEngine> engine)
 
 void Material::Delete(std::shared_ptr<VulkanEngine> engine)
 {
-	MaterialBuffer.DestoryBuffer(engine->Device);
+	MaterialBuffer.DestoryBuffer();
 } 

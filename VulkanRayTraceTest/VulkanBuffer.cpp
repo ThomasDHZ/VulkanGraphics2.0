@@ -20,7 +20,7 @@ VulkanBuffer::VulkanBuffer()
 {
 }
 
-VulkanBuffer::VulkanBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
+VulkanBuffer::VulkanBuffer(VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
 {
 	CreateBuffer(BufferSize, usage, properties, BufferData);
 }
@@ -87,13 +87,21 @@ void VulkanBuffer::CopyBufferToMemory(void* DataToCopy, VkDeviceSize BufferSize)
 	vkUnmapMemory(VulkanPtr::GetDevice(), BufferMemory);
 }
 
-void VulkanBuffer::DestoryBuffer(VkDevice& device)
+void VulkanBuffer::DestoryBuffer()
 {
-	vkDestroyBuffer(device, Buffer, nullptr);
-	vkFreeMemory(device, BufferMemory, nullptr);
+	if (Buffer != nullptr &&
+		BufferMemory != nullptr)
+	{
+		vkDestroyBuffer(VulkanPtr::GetDevice(), Buffer, nullptr);
+		vkFreeMemory(VulkanPtr::GetDevice(), BufferMemory, nullptr);
 
-	Buffer = VK_NULL_HANDLE;
-	BufferMemory = VK_NULL_HANDLE;
+		Buffer = VK_NULL_HANDLE;
+		BufferMemory = VK_NULL_HANDLE;
+	}
+	else
+	{
+		std::cout << "Buffer already destoryed." << std::endl;
+	}
 }
 
 
