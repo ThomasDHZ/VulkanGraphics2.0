@@ -3,7 +3,6 @@
 #include "AssetManager.h"
 #include "Skybox.h"
 
-
 class BaseRenderPass
 {
 private:

@@ -7,10 +7,10 @@ ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
-    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
-    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
-    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass));
+    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
 
     SetUpCommandBuffers();
 }
@@ -136,10 +136,10 @@ void ForwardRenderPass::RebuildSwapChain()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    DebugLightPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
-    forwardRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
-    pbrRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetPtr::GetAssetPtr(), RenderPass);
+    DebugLightPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);
+    forwardRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);
+    pbrRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);
     SetUpCommandBuffers();
 }
 
@@ -172,21 +172,21 @@ void ForwardRenderPass::Draw(uint32_t imageIndex, RendererID rendererID)
     {
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrRenderingPipeline->ShaderPipelineLayout, 0, 1, &pbrRenderingPipeline->DescriptorSets, 0, nullptr);
-        AssetPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID, AssetPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+        AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, pbrRenderingPipeline->ShaderPipelineLayout, rendererPassID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        static_cast<Skybox*>(AssetPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+        static_cast<Skybox*>(AssetManagerPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
     }
     else if (rendererID == RendererID::BlinnPhong_Raster_Renderer)
     {
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, forwardRenderingPipeline->ShaderPipelineLayout, 0, 1, &forwardRenderingPipeline->DescriptorSets, 0, nullptr);
-        AssetPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID, AssetPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+        AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, forwardRenderingPipeline->ShaderPipelineLayout, rendererPassID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
         vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-        static_cast<Skybox*>(AssetPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+        static_cast<Skybox*>(AssetManagerPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
     }
 
     vkCmdEndRenderPass(CommandBuffer);

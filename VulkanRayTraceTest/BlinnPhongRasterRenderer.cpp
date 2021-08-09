@@ -9,7 +9,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<AssetManager>
 {
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(assetManager);
     BloomRenderer = BloomRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.BloomTexture);
-    //DebugDepthRenderer = DepthDebugRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
+    DebugDepthRenderer = DepthDebugRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     //lightPathRenderer = DepthRenderer(engine, assetManager);
 }
@@ -108,9 +108,9 @@ void BlinnPhongRasterRenderer::Destroy()
 {
     FrameBufferTextureRenderer.Destroy();
     BloomRenderer.Destroy(EnginePtr::GetEnginePtr());
-    //DebugDepthRenderer.Destroy(EnginePtr::GetEnginePtr());
+    DebugDepthRenderer.Destroy(EnginePtr::GetEnginePtr());
     FrameBufferRenderer.Destroy(EnginePtr::GetEnginePtr());
-   // lightPathRenderer.Destroy(EnginePtr::GetEnginePtr());
+    lightPathRenderer.Destroy(EnginePtr::GetEnginePtr());
 }
 
 std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)

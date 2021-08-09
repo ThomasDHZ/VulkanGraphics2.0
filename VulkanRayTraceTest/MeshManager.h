@@ -41,7 +41,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
 	{
-		meshManager = std::make_shared<MeshManager>(MeshManager(engine, inputManager, materialManager));
+		if (meshManager == nullptr)
+		{
+			meshManager = std::make_shared<MeshManager>(MeshManager(engine, inputManager, materialManager));
+		}
+		else
+		{
+			std::cout << "Mesh Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<MeshManager> GetCameraManagerPtr()

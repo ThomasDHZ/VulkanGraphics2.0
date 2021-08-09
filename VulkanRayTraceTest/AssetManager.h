@@ -31,6 +31,10 @@ public:
 	AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
 	~AssetManager();
 
+	//void AddModel();
+	//void AddModel(std::shared_ptr<VulkanEngine> engine, const std::string& FilePath);
+	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
 	void LoadFont(std::shared_ptr<VulkanEngine> engine, const std::string FontLocation);
 
 	void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);
@@ -55,14 +59,21 @@ public:
 	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager->Get3DTextureBufferDescriptorCount(); }
 };
 
-class AssetPtr
+class AssetManagerPtr
 {
 private:
 	static std::shared_ptr<AssetManager> assetPtr;
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 	{
-		assetPtr = std::make_shared<AssetManager>(AssetManager(engine, window));
+		if (assetPtr == nullptr)
+		{
+			assetPtr = std::make_shared<AssetManager>(AssetManager(engine, window));
+		}
+		else
+		{
+			std::cout << "Asset Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<AssetManager> GetAssetPtr()

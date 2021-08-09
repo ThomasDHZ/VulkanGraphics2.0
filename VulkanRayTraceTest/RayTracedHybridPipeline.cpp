@@ -20,9 +20,9 @@ RayTracedHybridPipeline::~RayTracedHybridPipeline()
 void RayTracedHybridPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> ShadowTextureMask, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionMaskTexture, std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture, std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture)
 {
     RayTracingGraphicsPipeline::UpdateGraphicsPipeLine(engine);
-    raygenShaderBindingTable.DestoryBuffer();
-    missShaderBindingTable.DestoryBuffer();
-    hitShaderBindingTable.DestoryBuffer();
+    raygenShaderBindingTable.DestoryBuffer(engine->Device);
+    missShaderBindingTable.DestoryBuffer(engine->Device);
+    hitShaderBindingTable.DestoryBuffer(engine->Device);
 
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
@@ -218,7 +218,7 @@ void RayTracedHybridPipeline::SetUpShaderBindingTable(std::shared_ptr<VulkanEngi
     std::vector<uint8_t> shaderHandleStorage(sbtSize);
     engine->vkGetRayTracingShaderGroupHandlesKHR(engine->Device, ShaderPipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
 
-    raygenShaderBindingTable.CreateBuffer(handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
-    missShaderBindingTable.CreateBuffer(handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
-    hitShaderBindingTable.CreateBuffer(handleSize * 3, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
+    raygenShaderBindingTable.CreateBuffer(engine->Device, engine->PhysicalDevice, handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
+    missShaderBindingTable.CreateBuffer(engine->Device, engine->PhysicalDevice, handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
+    hitShaderBindingTable.CreateBuffer(engine->Device, engine->PhysicalDevice, handleSize * 3, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned * 3);
 }

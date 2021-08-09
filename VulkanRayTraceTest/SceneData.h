@@ -83,29 +83,29 @@ public:
 
 	UniformData(std::shared_ptr<VulkanEngine> engine)
 	{
-		VulkanBufferData.CreateBuffer(sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VulkanBufferData.CreateBuffer(engine->Device, engine->PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
 	UniformData(std::shared_ptr<VulkanEngine> engine, T UniformData)
 	{
-		VulkanBufferData.CreateBuffer(sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VulkanBufferData.CreateBuffer(engine->Device, engine->PhysicalDevice, sizeof(T), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		Update(engine);
 	}
 
 	void Update(std::shared_ptr<VulkanEngine> engine)
 	{
-		VulkanBufferData.CopyBufferToMemory(&UniformDataInfo, sizeof(T));
+		VulkanBufferData.CopyBufferToMemory(engine->Device, &UniformDataInfo, sizeof(T));
 	}
 
 	void Update(std::shared_ptr<VulkanEngine> engine, T UniformData)
 	{
 		UniformDataInfo = UniformData;
-		VulkanBufferData.CopyBufferToMemory(&UniformDataInfo, sizeof(T));
+		VulkanBufferData.CopyBufferToMemory(engine->Device, &UniformDataInfo, sizeof(T));
 	}
 
 	void Destroy(std::shared_ptr<VulkanEngine> engine)
 	{
-		VulkanBufferData.DestoryBuffer();
+		VulkanBufferData.DestoryBuffer(engine->Device);
 	}
 };
 

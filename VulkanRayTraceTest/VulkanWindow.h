@@ -1,6 +1,7 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include <memory>
+#include <iostream>
 
 class VulkanWindow
 {
@@ -34,7 +35,14 @@ private:
 public:
 	static void SetUpPtr(unsigned int width, unsigned int height, const char* WindowName)
 	{
-		windowPtr = std::make_shared<VulkanWindow>(VulkanWindow(width, height, WindowName));
+		if (windowPtr == nullptr)
+		{
+			windowPtr = std::make_shared<VulkanWindow>(VulkanWindow(width, height, WindowName));
+		}
+		else
+		{
+			std::cout << "Window has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<VulkanWindow> GetWindowPtr()

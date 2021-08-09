@@ -53,7 +53,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<CameraManager> camera)
 	{
-		lightManager = std::make_shared<LightManager>(LightManager(engine, camera));
+		if (lightManager == nullptr)
+		{
+			lightManager = std::make_shared<LightManager>(LightManager(engine, camera));
+		}
+		else
+		{
+			std::cout << "Light Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<LightManager> GetLightManagerPtr()

@@ -55,7 +55,7 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLa
 	const VkDeviceSize layerSize = imageSize / 6;
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* data;
 	vkMapMemory(engine->Device, StagingBuffer.BufferMemory, 0, imageSize, 0, &data);
@@ -87,7 +87,7 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLa
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer();
+	StagingBuffer.DestoryBuffer(engine->Device);
 	for (auto texturedata : textureData)
 	{
 		stbi_image_free(texturedata);
@@ -105,7 +105,7 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::stri
 	const VkDeviceSize layerSize = imageSize / 6;
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(layerSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &data[0]);
+	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, layerSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &data[0]);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -129,7 +129,7 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::stri
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-	StagingBuffer.DestoryBuffer();
+	StagingBuffer.DestoryBuffer(engine->Device);
 	for (auto texturedata : textureData)
 	{
 		stbi_image_free(texturedata);

@@ -13,7 +13,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "VulkanBuffer.h"
 #include <chrono>
-#include "VulkanPtr.h"
 
 #define VKB_VALIDATION_LAYERS
 
@@ -105,6 +104,7 @@ public:
 	VkSurfaceKHR Surface = VK_NULL_HANDLE;
 	VkQueue GraphicsQueue = VK_NULL_HANDLE;
 	VkQueue PresentQueue = VK_NULL_HANDLE;
+	VkDescriptorPool      DescriptorPool = VK_NULL_HANDLE;
 	VkCommandPool CommandPool = VK_NULL_HANDLE;
 	VulkanSwapChain SwapChain;
 
@@ -195,7 +195,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanWindow> window)
 	{
-		enginePtr = std::make_shared<VulkanEngine>(VulkanEngine(window));
+		if (enginePtr == nullptr)
+		{
+			enginePtr = std::make_shared<VulkanEngine>(VulkanEngine(window));
+		}
+		else
+		{
+			std::cout << "Engine has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<VulkanEngine> GetEnginePtr()

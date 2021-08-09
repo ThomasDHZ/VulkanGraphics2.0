@@ -33,7 +33,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<InputManager> inputManager, std::shared_ptr<TextureManager> textureManager)
 	{
-		guiManager = std::make_shared<GUIManager>(GUIManager(engine, materialManager, textureManager, inputManager));
+		if (guiManager == nullptr)
+		{
+			guiManager = std::make_shared<GUIManager>(GUIManager(engine, materialManager, textureManager, inputManager));
+		}
+		else
+		{
+			std::cout << "Gui Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<GUIManager> GetGuiManagerPtr()

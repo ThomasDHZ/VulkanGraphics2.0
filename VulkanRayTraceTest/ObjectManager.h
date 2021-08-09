@@ -29,7 +29,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<InputManager> inputManager, std::shared_ptr<TextureManager> textureManager)
 	{
-		ObjManager = std::make_shared<ObjectManager>(ObjectManager(engine, materialManager, textureManager));
+		if (ObjManager == nullptr)
+		{
+			ObjManager = std::make_shared<ObjectManager>(ObjectManager(engine, materialManager, textureManager));
+		}
+		else
+		{
+			std::cout << "Object Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<ObjectManager> GetObjManagerPtr()

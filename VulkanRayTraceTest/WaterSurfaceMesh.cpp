@@ -69,7 +69,7 @@ void WaterSurfaceMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_
 	glm::mat4 FinalTransform = MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 
-	TransformBuffer.CopyBufferToMemory(&FinalTransform, sizeof(FinalTransform));
+	TransformBuffer.CopyBufferToMemory(engine->Device, &FinalTransform, sizeof(FinalTransform));
 	MeshProperties.Update(engine);
 }
 

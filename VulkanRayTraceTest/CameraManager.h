@@ -25,7 +25,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
 	{
-		cameraManager = std::make_shared<CameraManager>(CameraManager(engine));
+		if (cameraManager == nullptr)
+		{
+			cameraManager = std::make_shared<CameraManager>(CameraManager(engine));
+		}
+		else
+		{
+			std::cout << "Camera Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<CameraManager> GetCameraManagerPtr()

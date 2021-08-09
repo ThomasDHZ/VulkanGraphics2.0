@@ -38,7 +38,7 @@ void FontTexture::CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* 
 	VkDeviceSize imageSize = Width * Height * sizeof(Pixel);
 
 	VulkanBuffer StagingBuffer;
-	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &PixelList[0]);
+	StagingBuffer.CreateBuffer(engine->Device, engine->PhysicalDevice, imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &PixelList[0]);
 
 	MipMapLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(Width, Height)))) + 1;
 
@@ -62,7 +62,7 @@ void FontTexture::CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* 
 	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 	CopyBufferToImage(engine, StagingBuffer.Buffer);
 
-	StagingBuffer.DestoryBuffer();
+	StagingBuffer.DestoryBuffer(engine->Device);
 
 	GenerateMipmaps(engine, VK_FORMAT_R8G8B8A8_UNORM);
 }

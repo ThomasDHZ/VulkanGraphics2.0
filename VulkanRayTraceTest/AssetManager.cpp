@@ -1,6 +1,6 @@
 #include "AssetManager.h"
 
-std::shared_ptr<AssetManager> AssetPtr::assetPtr = nullptr;
+std::shared_ptr<AssetManager> AssetManagerPtr::assetPtr = nullptr;
 
 AssetManager::AssetManager()
 {
@@ -8,14 +8,14 @@ AssetManager::AssetManager()
 
 AssetManager::AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    cameraManager = CameraManagerPtr::GetCameraManagerPtr();
-    inputManager = InputManagerPtr::GetInputManagerPtr();
-    textureManager = TextureManagerPtr::GetTextureManagerPtr();
-    materialManager = MaterialManagerPtr::GetMaterialManagerPtr();
-    meshManager = MeshManagerPtr::GetCameraManagerPtr();
-    lightManager = LightManagerPtr::GetLightManagerPtr();
-    guiManager = GuiManagerPtr::GetGuiManagerPtr();
-    ObjManager = ObjManagerPtr::GetObjManagerPtr();
+    cameraManager = std::make_shared<CameraManager>(CameraManager(engine));
+    inputManager = std::make_shared<InputManager>(InputManager(window, cameraManager));
+    textureManager = std::make_shared<TextureManager>(TextureManager(engine));
+    materialManager = std::make_shared<MaterialManager>(engine, textureManager);
+    meshManager = std::make_shared<MeshManager>(MeshManager(engine, inputManager, materialManager));
+    lightManager = std::make_shared<LightManager>(engine, cameraManager);
+    guiManager = std::make_shared<GUIManager>(engine, materialManager, textureManager, inputManager);
+    ObjManager = std::make_shared<ObjectManager>(engine, materialManager, textureManager);
 
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
@@ -82,14 +82,18 @@ void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layo
 
 void AssetManager::Delete(std::shared_ptr<VulkanEngine> engine)
 {
+    //for (auto& model : modelManager.ModelList)
+    //{
+    //    model->Destory(engine);
+    //}
+
     SceneData->Destroy(engine);
     SkyUniformBuffer->Destroy(engine);
 
-    materialManager->Destory();
-    textureManager->Destory();
     meshManager->Destroy();
+    textureManager->Destory();
+    materialManager->Destory();
     lightManager->Destory();
-    guiManager->Destory();
     ObjManager->Destory();
 }
 

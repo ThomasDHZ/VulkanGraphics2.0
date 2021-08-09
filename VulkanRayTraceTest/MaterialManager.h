@@ -36,7 +36,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<TextureManager> textureManager)
 	{
-		materialManager = std::make_shared<MaterialManager>(MaterialManager(engine, textureManager));
+		if (materialManager == nullptr)
+		{
+			materialManager = std::make_shared<MaterialManager>(MaterialManager(engine, textureManager));
+		}
+		else
+		{
+			std::cout << "Material Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<MaterialManager> GetMaterialManagerPtr()

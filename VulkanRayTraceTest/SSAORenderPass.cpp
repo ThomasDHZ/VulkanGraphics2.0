@@ -134,7 +134,7 @@ void SSAORenderPass::GenerateKernal(std::shared_ptr<VulkanEngine> engine, SSAOTe
         scale = Lerp(0.1f, 1.0f, scale * scale);
         sample *= scale;
        
-        std::shared_ptr<VulkanBuffer> SampleBuffer = std::make_shared<VulkanBuffer>(VulkanBuffer(sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample));
+        std::shared_ptr<VulkanBuffer> SampleBuffer = std::make_shared<VulkanBuffer>(VulkanBuffer(engine->Device, engine->PhysicalDevice, sizeof(sample), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &sample));
         SamplePointBufferList.emplace_back(SampleBuffer);
     }
     textures.KernalSampleBufferList = SamplePointBufferList;
@@ -207,7 +207,7 @@ void SSAORenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
 
     for (auto SamplePoint : SamplePointBufferList)
     {
-        SamplePoint->DestoryBuffer();
+        SamplePoint->DestoryBuffer(engine->Device);
     }
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
@@ -235,7 +235,7 @@ void SSAORenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 
     for (auto SamplePoint : SamplePointBufferList)
     {
-        SamplePoint->DestoryBuffer();
+        SamplePoint->DestoryBuffer(engine->Device);
     }
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);

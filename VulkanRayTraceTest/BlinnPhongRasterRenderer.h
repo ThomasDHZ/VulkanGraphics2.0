@@ -12,9 +12,9 @@ class BlinnPhongRasterRenderer : public BaseRenderer
 private:
 	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
 	BloomRenderPass BloomRenderer;
-	//DepthDebugRenderPass DebugDepthRenderer;
+	DepthDebugRenderPass DebugDepthRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
-	//DepthRenderer lightPathRenderer;
+	DepthRenderer lightPathRenderer;
 public:
 	BlinnPhongRasterRenderer();
 	BlinnPhongRasterRenderer(std::shared_ptr<AssetManager> assetManagerPtr);

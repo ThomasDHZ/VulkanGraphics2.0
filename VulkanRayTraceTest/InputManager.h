@@ -28,7 +28,14 @@ private:
 public:
 	static void SetUpPtr(std::shared_ptr<VulkanWindow> window, std::shared_ptr<CameraManager> camera)
 	{
-		inputManager = std::make_shared<InputManager>(InputManager(window, camera));
+		if (inputManager == nullptr)
+		{
+			inputManager = std::make_shared<InputManager>(InputManager(window, camera));
+		}
+		else
+		{
+			std::cout << "Input Manager has already been initialized." << std::endl;
+		}
 	}
 
 	static std::shared_ptr<InputManager> GetInputManagerPtr()
