@@ -122,6 +122,10 @@ void GameObject::SubmitAnimationToCommandBuffer(std::shared_ptr<VulkanEngine> en
 
 void GameObject::Destory(std::shared_ptr<VulkanEngine> engine)
 {
+	for (auto& model : ModelList)
+	{
+		model->Destory(engine);
+	}
 }
 
 std::shared_ptr<Model> GameObject::GetModel(uint32_t ModelID)

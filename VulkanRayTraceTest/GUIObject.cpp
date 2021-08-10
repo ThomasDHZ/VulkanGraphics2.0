@@ -43,4 +43,5 @@ void GUIObject::Destory(std::shared_ptr<VulkanEngine> engine)
 	{
 		mesh->Destory(engine);
 	}
+
 }
