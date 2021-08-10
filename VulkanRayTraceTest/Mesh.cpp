@@ -342,9 +342,13 @@ void Mesh::Destory(std::shared_ptr<VulkanEngine> engine)
 	IndexBuffer.DestoryBuffer();
 	TransformBuffer.DestoryBuffer();
 	TransformInverseBuffer.DestoryBuffer();
-	BoneTransformBuffer.DestoryBuffer();
 	MeshProperties.Destroy(engine);
 
+	if (BoneTransformBuffer.BufferMemory != nullptr &&
+		BoneTransformBuffer.Buffer != nullptr)
+	{
+		BoneTransformBuffer.DestoryBuffer();
+	}
 	if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
 	{
 		BottomLevelAccelerationBuffer.Destroy(engine);

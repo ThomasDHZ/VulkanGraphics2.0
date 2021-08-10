@@ -11,6 +11,7 @@
 class Renderer
 {
 private:
+	bool FirstFrame = true;
 	bool RayTraceFlag = false;
 	int ActiveRenderer = 0;
 
