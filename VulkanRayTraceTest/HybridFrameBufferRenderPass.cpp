@@ -97,7 +97,7 @@ void HybridFrameBufferRenderPass::CreateRendererFramebuffers(std::shared_ptr<Vul
     }
 }
 
-void HybridFrameBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t index, RendererID rendererID)
+void HybridFrameBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -113,7 +113,7 @@ void HybridFrameBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[index];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine->SwapChain.GetSwapChainResolution();
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

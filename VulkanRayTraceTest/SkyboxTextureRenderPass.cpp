@@ -127,7 +127,7 @@ void SkyboxTextureRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> 
     }
 }
 
-void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -142,7 +142,7 @@ void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::sh
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

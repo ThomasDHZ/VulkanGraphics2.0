@@ -85,11 +85,11 @@ void PBRRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     ImGui::Image(brdfRenderPass.BRDFTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void PBRRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void PBRRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
-    DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
-    FrameBufferRenderer.Draw(imageIndex);
+    FrameBufferTextureRenderer.Draw(engine, assetManager, rendererID);
+    DebugDepthRenderer.Draw(engine, assetManager);
+    FrameBufferRenderer.Draw();
 }
 
 void PBRRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)

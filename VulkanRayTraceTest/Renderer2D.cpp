@@ -46,11 +46,11 @@ void Renderer2D::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     }
 }
 
-void Renderer2D::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void Renderer2D::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
-    BloomRenderer.Draw(imageIndex);
-    FrameBufferRenderer.Draw(imageIndex);
+    FrameBufferTextureRenderer.Draw(engine, assetManager, rendererID);
+    BloomRenderer.Draw();
+    FrameBufferRenderer.Draw();
 }
 
 void Renderer2D::Destroy(std::shared_ptr<VulkanEngine> engine)

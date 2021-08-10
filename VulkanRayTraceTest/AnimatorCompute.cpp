@@ -108,7 +108,7 @@ void AnimatorCompute::CreateShaderPipeLine(std::shared_ptr<VulkanEngine> engine)
 	vkDestroyShaderModule(engine->Device, ComputeShaderCode.module, nullptr);
 }
 
-void AnimatorCompute::Compute(std::shared_ptr<VulkanEngine> engine, uint32_t currentFrame)
+void AnimatorCompute::Compute(std::shared_ptr<VulkanEngine> engine)
 {
 	ConstMeshInfo meshInfo;
 	meshInfo.MeshIndex = 0;

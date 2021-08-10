@@ -95,12 +95,12 @@ void BlinnPhongRasterRenderer::GUIUpdate()
     //ImGui::Image(BloomRenderer.BloomTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void BlinnPhongRasterRenderer::Draw(uint32_t imageIndex)
+void BlinnPhongRasterRenderer::Draw()
 {
-    FrameBufferTextureRenderer.Draw(assetManager, imageIndex, rendererID);
-    BloomRenderer.Draw(imageIndex);
+    FrameBufferTextureRenderer.Draw(assetManager, rendererID);
+    BloomRenderer.Draw();
     //DebugDepthRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);
-    FrameBufferRenderer.Draw(imageIndex);
+    FrameBufferRenderer.Draw();
    /* lightPathRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);*/
 }
 

@@ -16,7 +16,7 @@ RayTraceRenderer::~RayTraceRenderer()
 
 void RayTraceRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
+    rayTraceRenderPass.RebuildSwapChain(engine, assetManager);
     FrameBufferRenderer.RebuildSwapChain(rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
@@ -75,16 +75,16 @@ void RayTraceRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     }
 }
 
-void RayTraceRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void RayTraceRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID, assetManager->cameraManager->ActiveCamera);
-      FrameBufferRenderer.Draw(imageIndex);
+    rayTraceRenderPass.Draw(engine, assetManager, rendererID, assetManager->cameraManager->ActiveCamera);
+    FrameBufferRenderer.Draw();
 }
 
 void RayTraceRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     rayTraceRenderPass.Destroy(engine);
-      FrameBufferRenderer.Destroy();
+    FrameBufferRenderer.Destroy();
 }
 
 std::vector<VkCommandBuffer> RayTraceRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)

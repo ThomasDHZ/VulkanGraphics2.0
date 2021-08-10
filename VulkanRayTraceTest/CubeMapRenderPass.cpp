@@ -17,7 +17,7 @@ CubeMapRenderPass::CubeMapRenderPass(uint32_t cubeMapSize)
     CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     SetUpCommandBuffers();
     BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    Draw(0);
+    Draw();
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -135,7 +135,7 @@ void CubeMapRenderPass::SetUpCommandBuffers()
     }
 }
 
-void CubeMapRenderPass::Draw(uint32_t imageIndex)
+void CubeMapRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -151,7 +151,7 @@ void CubeMapRenderPass::Draw(uint32_t imageIndex)
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = rectextent;
 
@@ -295,7 +295,7 @@ void CubeMapRenderPass::RebuildSwapChain()
     CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     SetUpCommandBuffers();
     BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    Draw(0);
+    Draw();
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

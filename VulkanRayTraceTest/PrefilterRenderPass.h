@@ -35,8 +35,7 @@ public:
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
-	void RebuildSwapChain(glm::vec2 );
-	void Draw(uint32_t imageIndex);
+	void Draw();
 	void Destroy();
 };
 

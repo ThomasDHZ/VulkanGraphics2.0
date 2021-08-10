@@ -34,7 +34,7 @@ public:
 
 	void RebuildSwapChain(std::shared_ptr<AssetManager> assetManager);
 	void UpdateSwapChain(std::shared_ptr<AssetManager> assetManager);
-	void Draw(std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID);
+	void Draw(std::shared_ptr<AssetManager> assetManager, RendererID rendererID);
 	void Destroy();
 };
 

@@ -156,7 +156,7 @@ void InterfaceRenderPass::CreateRendererFramebuffers()
 }
 
 
-void InterfaceRenderPass::Draw(int frame)
+void InterfaceRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -168,7 +168,7 @@ void InterfaceRenderPass::Draw(int frame)
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[frame];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->GetSwapChainResolution();
 

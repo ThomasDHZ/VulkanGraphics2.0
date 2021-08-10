@@ -142,7 +142,7 @@ void RayTraceRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engin
     }
 }
 
-void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID renderID, std::shared_ptr<Camera> ViewCamera)
+void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID renderID, std::shared_ptr<Camera> ViewCamera)
 {
     std::shared_ptr<RayTracingGraphicsPipeline> ActivePipeline;
     switch (renderID)
@@ -217,7 +217,7 @@ void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
-void RayTraceRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void RayTraceRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     RayTracedTexture->RecreateRendererTexture(engine);
     ShadowTextureMask->RecreateRendererTexture(engine);

@@ -47,8 +47,8 @@ WaterSurfaceMesh::~WaterSurfaceMesh()
 
 void WaterSurfaceMesh::DrawWaterTexture(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, Skybox skybox)
 {
-	waterReflectionRenderPass.Draw(engine, assetManager, imageIndex, skybox);
-	waterRefractionRenderPass.Draw(engine, assetManager, imageIndex, skybox);
+	waterReflectionRenderPass.Draw(engine, assetManager, skybox);
+	waterRefractionRenderPass.Draw(engine, assetManager, skybox);
 }
 
 void WaterSurfaceMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera)

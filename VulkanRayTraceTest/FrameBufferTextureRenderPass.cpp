@@ -148,7 +148,7 @@ void FrameBufferTextureRenderPass::SetUpCommandBuffers()
     }
 }
 
-void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
+void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManager, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -160,7 +160,7 @@ void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManag
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
 

@@ -67,7 +67,7 @@ void HybridRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
     frameBufferTextures.TBNNormalMapTexture = FrameBufferTextureRenderer2.GTBN_NormalTexture;
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     FrameBufferTextureRenderer2.RebuildSwapChain(engine, assetManager);
-    rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
+    rayTraceRenderPass.RebuildSwapChain(engine, assetManager);
     bloomRenderPass.RebuildSwapChain(FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
     SSAORenderer.RebuildSwapChain(engine, assetManager, textures);
@@ -149,19 +149,19 @@ void HybridRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     }
 }
 
-void HybridRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void HybridRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
-    FrameBufferTextureRenderer2.Draw(engine, assetManager, imageIndex);
-    rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID, assetManager->cameraManager->ActiveCamera);
-    bloomRenderPass.Draw(imageIndex);
+    FrameBufferTextureRenderer.Draw(engine, assetManager);
+    FrameBufferTextureRenderer2.Draw(engine, assetManager);
+    rayTraceRenderPass.Draw(engine, assetManager, rendererID, assetManager->cameraManager->ActiveCamera);
+    bloomRenderPass.Draw();
    // DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     if (ApplySSAO)
     {
-        SSAORenderer.Draw(engine, assetManager, imageIndex);
-        SSAOBlurRenderer.Draw(engine, assetManager, imageIndex);
+        SSAORenderer.Draw(engine, assetManager);
+        SSAOBlurRenderer.Draw(engine, assetManager);
     }
-    FrameBufferRenderer.Draw(engine, assetManager, imageIndex, rendererID);
+    FrameBufferRenderer.Draw(engine, assetManager, rendererID);
 }
 
 void HybridRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)

@@ -16,7 +16,7 @@ public:
 
 	virtual void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
 	virtual void GUIUpdate(std::shared_ptr<VulkanEngine> engine);
-	virtual void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex, Skybox skybox);
+	virtual void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, Skybox skybox);
 	virtual void Destroy(std::shared_ptr<VulkanEngine> engine);
 
 	virtual std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);

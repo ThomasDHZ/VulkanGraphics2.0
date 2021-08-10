@@ -35,6 +35,6 @@ public:
 	std::shared_ptr<SkyBoxRenderingPipeline> skyBoxRenderingPipeline;
 
 	void RebuildSwapChain();
-	void Draw(uint32_t imageIndex, RendererID rendererID);
+	void Draw(RendererID rendererID);
 	void Destroy() override;
 };

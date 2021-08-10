@@ -25,10 +25,10 @@ void LightPathRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     ImGui::Image(DebugDepthRenderer.DebugDepthTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
 }
 
-void LightPathRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void LightPathRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    lightRenderPass.Draw(engine, assetManager, imageIndex);
-    DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
+    lightRenderPass.Draw(engine, assetManager);
+    DebugDepthRenderer.Draw(engine, assetManager);
 }
 
 void LightPathRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)

@@ -285,9 +285,6 @@
     <ClCompile Include="BaseRenderer.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files\Managers</Filter>
-    </ClCompile>
     <ClCompile Include="RenderFrameBufferTexturePipeline.cpp">
       <Filter>Source Files\Pipelines</Filter>
     </ClCompile>
@@ -515,6 +512,9 @@
     </ClCompile>
     <ClCompile Include="VulkanPtr.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -982,9 +982,6 @@
     <ClInclude Include="BaseRenderer.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
     <ClInclude Include="RenderFrameBufferTexturePipeline.h">
       <Filter>Header Files\Pipelines</Filter>
     </ClInclude>
@@ -1215,6 +1212,9 @@
     </ClInclude>
     <ClInclude Include="VulkanPtr.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

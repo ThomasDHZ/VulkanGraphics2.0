@@ -147,7 +147,7 @@ void PBRFrameBufferTextureRenderPass::SetUpCommandBuffers(std::shared_ptr<Vulkan
     }
 }
 
-void PBRFrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID rendererID)
+void PBRFrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -159,7 +159,7 @@ void PBRFrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine,
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
 

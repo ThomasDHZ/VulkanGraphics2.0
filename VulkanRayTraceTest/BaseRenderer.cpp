@@ -21,7 +21,7 @@ void BaseRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
 }
 
-void BaseRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex, Skybox skybox)
+void BaseRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, Skybox skybox)
 {
 }
 

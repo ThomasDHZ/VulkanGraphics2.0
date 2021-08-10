@@ -26,6 +26,6 @@ public:
 
 	VkCommandBuffer commandBuffer;
 
-	void Compute(std::shared_ptr<VulkanEngine> engine, uint32_t currentFrame);
+	void Compute(std::shared_ptr<VulkanEngine> engine);
 	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };

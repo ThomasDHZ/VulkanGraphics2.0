@@ -418,7 +418,7 @@ void Model::SubmitAnimationToCommandBuffer(std::shared_ptr<VulkanEngine> engine,
 {
 	if (AnimatedModel)
 	{
-		AnimationRenderer.Compute(engine, imageIndex);
+		AnimationRenderer.Compute(EnginePtr::GetEnginePtr());
 		CMDBufferList.emplace_back(AnimationRenderer.commandBuffer);
 	}
 }

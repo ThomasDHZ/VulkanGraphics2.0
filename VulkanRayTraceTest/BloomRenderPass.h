@@ -27,6 +27,6 @@ public:
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture);
-	void Draw(uint32_t imageIndex);
+	void Draw();
 	void Destroy();
 };

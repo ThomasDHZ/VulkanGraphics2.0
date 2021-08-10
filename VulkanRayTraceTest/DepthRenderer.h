@@ -26,7 +26,7 @@ public:
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
 	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };
 

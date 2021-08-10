@@ -27,9 +27,9 @@ void GUIRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     }
 }
 
-void GUIRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
+void GUIRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    TextRenderer.Draw(engine, assetManager, imageIndex, rendererID);
+    TextRenderer.Draw(engine, assetManager, rendererID);
 }
 
 void GUIRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)

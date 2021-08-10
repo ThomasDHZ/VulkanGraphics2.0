@@ -158,7 +158,7 @@ float SSAORenderPass::Lerp(float a, float b, float f)
     return a + f * (b - a);
 }
 
-void SSAORenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void SSAORenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     SSAOProperties sSAOProperties = {};
     sSAOProperties.kernelSize = KernalSampleSize;
@@ -181,7 +181,7 @@ void SSAORenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

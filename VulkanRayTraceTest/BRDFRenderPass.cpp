@@ -15,7 +15,7 @@ BRDFRenderPass::BRDFRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared
     CreateRendererFramebuffers(engine);
     BRDFPipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(engine, assetManager, RenderPass));
     SetUpCommandBuffers(engine);
-    Draw(engine, assetManager, 0);
+    Draw(engine, assetManager);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -134,7 +134,7 @@ void BRDFRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
     }
 }
 
-void BRDFRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void BRDFRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -149,7 +149,7 @@ void BRDFRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -188,7 +188,7 @@ void BRDFRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
     CreateRendererFramebuffers(engine);
     BRDFPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
     SetUpCommandBuffers(engine);
-    Draw(engine, assetManager, 0);
+    Draw(engine, assetManager);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

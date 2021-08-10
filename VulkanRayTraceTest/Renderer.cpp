@@ -16,12 +16,12 @@ Renderer::Renderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanW
 
      blinnPhongRenderer = BlinnPhongRasterRenderer(assetManager);
      pbrRenderer = PBRRenderer(engine, window, assetManager);
-    /*rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
+    rayTraceRenderer = RayTraceRenderer(engine, window, assetManager);
     pbrRayTraceRenderer = RayTracePBRRenderer(engine, window, assetManager);
     hybridRenderer = HybridRenderer(engine, window, assetManager);
-    guiRenderer = GUIRenderer(engine, window, assetManager);
+    //guiRenderer = GUIRenderer(engine, window, assetManager);
     renderer2D = Renderer2D(engine, window, assetManager);
-    guiRenderer = GUIRenderer(engine, window, assetManager);*/
+    //guiRenderer = GUIRenderer(engine, window, assetManager);
 }
 
 Renderer::~Renderer()
@@ -52,10 +52,10 @@ void Renderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::share
     interfaceRenderPass.RebuildSwapChain();
     blinnPhongRenderer.RebuildSwapChain();
     pbrRenderer.RebuildSwapChain(engine, window);
-    //rayTraceRenderer.RebuildSwapChain(engine, window);
-    //pbrRayTraceRenderer.RebuildSwapChain(engine, window);
-    //hybridRenderer.RebuildSwapChain(engine, window);
-    //renderer2D.RebuildSwapChain(engine, window);
+    rayTraceRenderer.RebuildSwapChain(engine, window);
+    pbrRayTraceRenderer.RebuildSwapChain(engine, window);
+    hybridRenderer.RebuildSwapChain(engine, window);
+    renderer2D.RebuildSwapChain(engine, window);
     //guiRenderer.RebuildSwapChain(engine, window);
 }
 
@@ -70,9 +70,9 @@ void Renderer::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vulk
     assetManager->Update(engine, window, RayTraceFlag);
     if (RayTraceFlag)
     {
-       /* rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
+       rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
         pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
-        hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);*/
+        hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, assetManager);
     }
 }
 
@@ -90,22 +90,22 @@ void Renderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     {
         pbrRenderer.GUIUpdate(engine);
     }
-    //else if (ActiveRenderer == 2)
-    //{
-    //    rayTraceRenderer.GUIUpdate(engine);
-    //}
-    //else if (ActiveRenderer == 3)
-    //{
-    //    pbrRayTraceRenderer.GUIUpdate(engine);
-    //}
-    //else if (ActiveRenderer == 4)
-    //{
-    //    hybridRenderer.GUIUpdate(engine);
-    //}
-    //else if (ActiveRenderer == 5)
-    //{
-    //    renderer2D.GUIUpdate(engine);
-    //}
+    else if (ActiveRenderer == 2)
+    {
+        rayTraceRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 3)
+    {
+        pbrRayTraceRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 4)
+    {
+        hybridRenderer.GUIUpdate(engine);
+    }
+    else if (ActiveRenderer == 5)
+    {
+        renderer2D.GUIUpdate(engine);
+    }
    /* guiRenderer.GUIUpdate(engine);*/
 }
 
@@ -113,8 +113,7 @@ void Renderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vulkan
 {
     vkWaitForFences(engine->Device, 1, &engine->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
-    uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(engine->Device, engine->SwapChain.GetSwapChain(), UINT64_MAX, engine->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &imageIndex);
+    VkResult result = vkAcquireNextImageKHR(engine->Device, engine->SwapChain.GetSwapChain(), UINT64_MAX, engine->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &EnginePtr::GetEnginePtr()->DrawFrame);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         RebuildSwapChain(engine, window);
@@ -124,58 +123,58 @@ void Renderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vulkan
         throw std::runtime_error("failed to acquire swap chain image!");
     }
 
-    Update(engine, window, imageIndex);
+    Update(engine, window, EnginePtr::GetEnginePtr()->DrawFrame);
 
-    if (engine->imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
-        vkWaitForFences(engine->Device, 1, &engine->imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+    if (engine->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] != VK_NULL_HANDLE) {
+        vkWaitForFences(engine->Device, 1, &engine->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame], VK_TRUE, UINT64_MAX);
     }
 
-    engine->imagesInFlight[imageIndex] = engine->inFlightFences[currentFrame];
+    engine->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] = engine->inFlightFences[currentFrame];
 
     VkSemaphore waitSemaphores[] = { engine->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
-    assetManager->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList, imageIndex);
+    assetManager->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList, EnginePtr::GetEnginePtr()->DrawFrame);
     if (ActiveRenderer == 0)
     {
         RayTraceFlag = false;
-        blinnPhongRenderer.Draw(imageIndex);
+        blinnPhongRenderer.Draw();
         blinnPhongRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
     else if (ActiveRenderer == 1)
     {
         RayTraceFlag = false;
-        pbrRenderer.Draw(engine, window, imageIndex);
+        pbrRenderer.Draw(engine, window);
         pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
-    //else if (ActiveRenderer == 2)
-    //{
-    //    RayTraceFlag = true;
-    //    rayTraceRenderer.Draw(engine, window, imageIndex);
-    //    rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    //}
-    //else if (ActiveRenderer == 3)
-    //{
-    //    RayTraceFlag = true;
-    //    pbrRayTraceRenderer.Draw(engine, window, imageIndex);
-    //    pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    //}
-    //else if (ActiveRenderer == 4)
-    //{
-    //    RayTraceFlag = true;
-    //    hybridRenderer.Draw(engine, window, imageIndex);
-    //    hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    //}
-    //else if (ActiveRenderer == 5)
-    //{
-    //    RayTraceFlag = false;
-    //    renderer2D.Draw(engine, window, imageIndex);
-    //    renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    //}
+    else if (ActiveRenderer == 2)
+    {
+        RayTraceFlag = true;
+        rayTraceRenderer.Draw(engine, window);
+        rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 3)
+    {
+        RayTraceFlag = true;
+        pbrRayTraceRenderer.Draw(engine, window);
+        pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 4)
+    {
+        RayTraceFlag = true;
+        hybridRenderer.Draw(engine, window);
+        hybridRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 5)
+    {
+        RayTraceFlag = false;
+        renderer2D.Draw(engine, window);
+        renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
 
-    //guiRenderer.Draw(engine, window, imageIndex);
+    //guiRenderer.Draw(engine, window);
     //guiRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    interfaceRenderPass.Draw(imageIndex);
+    interfaceRenderPass.Draw();
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
 
     VkSubmitInfo submitInfo{};
@@ -206,7 +205,7 @@ void Renderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vulkan
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
-    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pImageIndices = &EnginePtr::GetEnginePtr()->DrawFrame;
 
     result = vkQueuePresentKHR(engine->PresentQueue, &presentInfo);
 
@@ -227,9 +226,9 @@ void Renderer::Destroy(std::shared_ptr<VulkanEngine> engine)
     interfaceRenderPass.Destroy();
     blinnPhongRenderer.Destroy();
     pbrRenderer.Destroy(engine);
-    //rayTraceRenderer.Destroy(engine);
-    //pbrRayTraceRenderer.Destroy(engine);
-    //hybridRenderer.Destroy(engine);
-    //renderer2D.Destroy(engine);
+    rayTraceRenderer.Destroy(engine);
+    pbrRayTraceRenderer.Destroy(engine);
+    hybridRenderer.Destroy(engine);
+    renderer2D.Destroy(engine);
     //guiRenderer.Destroy(engine);
 }

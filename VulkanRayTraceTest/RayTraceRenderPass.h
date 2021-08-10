@@ -34,8 +34,8 @@ public:
 
     void SetUpTopLevelAccelerationStructure(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
     void GUIUpdate();
-    void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, RendererID renderID, std::shared_ptr<Camera> ViewCamera);
-    void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
+    void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID renderID, std::shared_ptr<Camera> ViewCamera);
+    void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
     void Destroy(std::shared_ptr<VulkanEngine> engine);
 
     VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
