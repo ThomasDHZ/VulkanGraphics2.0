@@ -8,7 +8,7 @@ RayTracePBRRenderer::RayTracePBRRenderer(std::shared_ptr<VulkanEngine> engine, s
 {
     rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
     SSAOBlurRenderer = SSAOBlurRenderPass(engine, assetManager, rayTraceRenderPass.RayTracedTexture);
-    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
 RayTracePBRRenderer::~RayTracePBRRenderer()
@@ -18,7 +18,7 @@ RayTracePBRRenderer::~RayTracePBRRenderer()
 void RayTracePBRRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
+    FrameBufferRenderer.RebuildSwapChain(rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
 void RayTracePBRRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
@@ -77,13 +77,13 @@ void RayTracePBRRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 void RayTracePBRRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t imageIndex)
 {
     rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID, assetManager->cameraManager->ActiveCamera);
-    FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
+    FrameBufferRenderer.Draw(imageIndex);
 }
 
 void RayTracePBRRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     rayTraceRenderPass.Destroy(engine);
-    FrameBufferRenderer.Destroy(engine);
+    FrameBufferRenderer.Destroy();
 }
 
 std::vector<VkCommandBuffer> RayTracePBRRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)

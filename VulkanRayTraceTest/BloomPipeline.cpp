@@ -5,48 +5,48 @@ BloomPipeline::BloomPipeline() : GraphicsPipeline()
 {
 }
 
-BloomPipeline::BloomPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> BloomTexture) : GraphicsPipeline()
+BloomPipeline::BloomPipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture> BloomTexture) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, BloomTexture);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(BloomTexture);
 }
 
 BloomPipeline::~BloomPipeline()
 {
 }
 
-void BloomPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void BloomPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPool = engine->CreateDescriptorPool(DescriptorPoolList);
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void BloomPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void BloomPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    DescriptorSetLayout = engine->CreateDescriptorSetLayout(LayoutBindingInfo);
+    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void BloomPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> BloomTexture)
+void BloomPipeline::SetUpDescriptorSets(std::shared_ptr<Texture> BloomTexture)
 {
-    DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorImageInfo RenderedTextureBufferInfo = engine->AddTextureDescriptor(BloomTexture->View, BloomTexture->Sampler);
+    VkDescriptorImageInfo RenderedTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(BloomTexture->View, BloomTexture->Sampler);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(0, DescriptorSets, RenderedTextureBufferInfo));
-    vkUpdateDescriptorSets(engine->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSets, RenderedTextureBufferInfo));
+    vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void BloomPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void BloomPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/BloomShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/BloomShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/BloomShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/BloomShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -60,14 +60,14 @@ void BloomPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, co
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)engine->SwapChain.GetSwapChainResolution().width;
-    viewport.height = (float)engine->SwapChain.GetSwapChainResolution().height;
+    viewport.width = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    viewport.height = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor = {};
     scissor.offset = { 0, 0 };
-    scissor.extent = engine->SwapChain.GetSwapChainResolution();
+    scissor.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
 
     VkPipelineViewportStateCreateInfo viewportState = {};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -126,7 +126,7 @@ void BloomPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, co
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
-    if (vkCreatePipelineLayout(engine->Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
+    if (vkCreatePipelineLayout(VulkanPtr::GetDevice(), &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create FrameBuffer Pipeline Layout.");
     }
@@ -147,22 +147,22 @@ void BloomPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, co
     PipelineInfo.subpass = 0;
     PipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(engine->Device, VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS)
+    if (vkCreateGraphicsPipelines(VulkanPtr::GetDevice(), VK_NULL_HANDLE, 1, &PipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create FrameBuffer Pipeline.");
     }
 
     for (auto& shader : PipelineShaderStageList)
     {
-        vkDestroyShaderModule(engine->Device, shader.module, nullptr);
+        vkDestroyShaderModule(VulkanPtr::GetDevice(), shader.module, nullptr);
     }
 }
 
-void BloomPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> BloomTexture)
+void BloomPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> BloomTexture)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, BloomTexture);
+    GraphicsPipeline::UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr());
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(BloomTexture);
 }

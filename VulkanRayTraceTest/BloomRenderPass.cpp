@@ -6,22 +6,22 @@ BloomRenderPass::BloomRenderPass()
 {
 }
 
-BloomRenderPass::BloomRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
+BloomRenderPass::BloomRenderPass(std::shared_ptr<Texture> InputBloomTexture)
 {
-    BloomTexture = std::make_shared<RenderedColorTexture>(engine);
+    BloomTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    BloomPipelinePass1 = std::make_shared<BloomPipeline>(BloomPipeline(engine, assetManager, RenderPass, InputBloomTexture));
-    BloomPipelinePass2 = std::make_shared<BloomPipeline>(BloomPipeline(engine, assetManager, RenderPass, BloomTexture));
-    SetUpCommandBuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    BloomPipelinePass1 = std::make_shared<BloomPipeline>(BloomPipeline(RenderPass, InputBloomTexture));
+    BloomPipelinePass2 = std::make_shared<BloomPipeline>(BloomPipeline(RenderPass, BloomTexture));
+    SetUpCommandBuffers();
 }
 
 BloomRenderPass::~BloomRenderPass()
 {
 }
 
-void BloomRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void BloomRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -75,17 +75,17 @@ void BloomRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(VulkanPtr::GetDevice(), &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void BloomRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void BloomRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(BloomTexture->View);
@@ -95,31 +95,31 @@ void BloomRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> e
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine->SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine->SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+        frameBufferCreateInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(VulkanPtr::GetDevice(), &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void BloomRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void BloomRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void BloomRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void BloomRenderPass::Draw(uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -136,7 +136,7 @@ void BloomRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[imageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -161,41 +161,41 @@ void BloomRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
     }
 }
 
-void BloomRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
+void BloomRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture)
 {
-    BloomTexture->RecreateRendererTexture(engine);
+    BloomTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
 
-    BloomPipelinePass1->Destroy(engine);
-    BloomPipelinePass2->Destroy(engine);
+    BloomPipelinePass1->Destroy(EnginePtr::GetEnginePtr());
+    BloomPipelinePass2->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    BloomPipelinePass1->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, InputBloomTexture);
-    BloomPipelinePass2->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, BloomTexture);
-    SetUpCommandBuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    BloomPipelinePass1->UpdateGraphicsPipeLine(RenderPass, InputBloomTexture);
+    BloomPipelinePass2->UpdateGraphicsPipeLine(RenderPass, BloomTexture);
+    SetUpCommandBuffers();
 }
 
-void BloomRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void BloomRenderPass::Destroy()
 {
-    BloomTexture->Delete(engine);
-    BloomPipelinePass1->Destroy(engine);
-    BloomPipelinePass2->Destroy(engine);
+    BloomTexture->Delete(EnginePtr::GetEnginePtr());
+    BloomPipelinePass1->Destroy(EnginePtr::GetEnginePtr());
+    BloomPipelinePass2->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

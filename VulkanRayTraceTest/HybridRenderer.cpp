@@ -9,7 +9,7 @@ HybridRenderer::HybridRenderer(std::shared_ptr<VulkanEngine> engine, std::shared
     FrameBufferTextureRenderer = GBufferRenderPass(engine, assetManager);
     FrameBufferTextureRenderer2 = GBufferRenderPass2(engine, assetManager);
     rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
-    bloomRenderPass = BloomRenderPass(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
+    bloomRenderPass = BloomRenderPass(FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
 
     SSAOTextureList textures = {};
@@ -68,7 +68,7 @@ void HybridRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
     FrameBufferTextureRenderer2.RebuildSwapChain(engine, assetManager);
     rayTraceRenderPass.RebuildSwapChain(engine, assetManager, 0);
-    bloomRenderPass.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.GBloomTexture);
+    bloomRenderPass.RebuildSwapChain(FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
     SSAORenderer.RebuildSwapChain(engine, assetManager, textures);
     SSAOBlurRenderer.RebuildSwapChain(engine, assetManager, SSAORenderer.SSAOTexture);
@@ -154,7 +154,7 @@ void HybridRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex);
     FrameBufferTextureRenderer2.Draw(engine, assetManager, imageIndex);
     rayTraceRenderPass.Draw(engine, assetManager, imageIndex, rendererID, assetManager->cameraManager->ActiveCamera);
-    bloomRenderPass.Draw(engine, assetManager, imageIndex);
+    bloomRenderPass.Draw(imageIndex);
    // DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     if (ApplySSAO)
     {
@@ -169,7 +169,7 @@ void HybridRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
     FrameBufferTextureRenderer.Destroy(engine);
     FrameBufferTextureRenderer2.Destroy(engine);
     rayTraceRenderPass.Destroy(engine);
-    bloomRenderPass.Destroy(engine);
+    bloomRenderPass.Destroy();
     //DebugDepthRenderer.Destroy(engine);
     SSAORenderer.Destroy(engine);
     SSAOBlurRenderer.Destroy(engine);

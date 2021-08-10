@@ -5,19 +5,19 @@ PrefilterRenderPass::PrefilterRenderPass()
 {
 }
 
-PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize)
+PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize)
 {
     CubeMapSize = cubeMapSize;
 
-    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, glm::vec2(CubeMapSize)));
-    BlurredSkyBoxTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(engine, glm::vec2(CubeMapSize, CubeMapSize)));
+    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize)));
+    BlurredSkyBoxTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize, CubeMapSize)));
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(engine, assetManager, RenderPass));
-    SetUpCommandBuffers(engine);
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    Draw(engine, assetManager, 0);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    SetUpCommandBuffers();
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    Draw(0);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -28,17 +28,17 @@ PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<VulkanEngine> engine, s
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
-    vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(engine->Device, fence, nullptr);
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 PrefilterRenderPass::~PrefilterRenderPass()
 {
 }
 
-void PrefilterRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void PrefilterRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -92,17 +92,17 @@ void PrefilterRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(VulkanPtr::GetDevice(), &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void PrefilterRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void PrefilterRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(RenderedTexture->View);
@@ -116,27 +116,27 @@ void PrefilterRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngin
         frameBufferCreateInfo.height = CubeMapSize;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(VulkanPtr::GetDevice(), &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void PrefilterRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void PrefilterRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void PrefilterRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void PrefilterRenderPass::Draw(uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -220,7 +220,7 @@ void PrefilterRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared
             vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipelineLayout, 0, 1, &prefilterRenderingPipeline->DescriptorSets, 0, nullptr);
             vkCmdPushConstants(CommandBuffer, prefilterRenderingPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterConst), &prefilterConst);
             vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+            static_cast<Skybox*>(AssetManagerPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
             vkCmdEndRenderPass(CommandBuffer);
 
             VkImageSubresourceRange ImageSubresourceRange{};
@@ -283,26 +283,26 @@ void PrefilterRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared
     }
 }
 
-void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PrefilterRenderPass::RebuildSwapChain()
 {
-    RenderedTexture->RecreateRendererTexture(engine, glm::vec2(CubeMapSize));
-    prefilterRenderingPipeline->Destroy(engine);
+    RenderedTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize));
+    prefilterRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(engine, assetManager, RenderPass));
-    SetUpCommandBuffers(engine);
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    Draw(engine, assetManager, 0);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    SetUpCommandBuffers();
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    Draw(0);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -313,25 +313,25 @@ void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine,
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
-    vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(engine->Device, fence, nullptr);
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
-void PrefilterRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void PrefilterRenderPass::Destroy()
 {
-    RenderedTexture->Delete(engine);
-    BlurredSkyBoxTexture->Delete(engine);
+    RenderedTexture->Delete(EnginePtr::GetEnginePtr());
+    BlurredSkyBoxTexture->Delete(EnginePtr::GetEnginePtr());
 
-    prefilterRenderingPipeline->Destroy(engine);
+    prefilterRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

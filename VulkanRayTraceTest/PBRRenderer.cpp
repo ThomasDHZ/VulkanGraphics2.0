@@ -7,11 +7,11 @@ PBRRenderer::PBRRenderer() : BaseRenderer()
 PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     cubeMapRenderer = CubeMapRenderPass(512.0f);
-    prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f);
+    prefilterRenderPass = PrefilterRenderPass(512.0f);
     brdfRenderPass = BRDFRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
     FrameBufferTextureRenderer = PBRFrameBufferTextureRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture, prefilterRenderPass.BlurredSkyBoxTexture, brdfRenderPass.BRDFTexture);
     DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-    FrameBufferRenderer = FrameBufferRenderPass(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
 }
 
 PBRRenderer::~PBRRenderer()
@@ -21,11 +21,11 @@ PBRRenderer::~PBRRenderer()
 void PBRRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     cubeMapRenderer.RebuildSwapChain();
-    prefilterRenderPass.RebuildSwapChain(engine, assetManager);
+    prefilterRenderPass.RebuildSwapChain();
     brdfRenderPass.RebuildSwapChain(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture, prefilterRenderPass.BlurredSkyBoxTexture, brdfRenderPass.BRDFTexture);
     DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
+    FrameBufferRenderer.RebuildSwapChain(FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
 }
 
 void PBRRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
@@ -89,17 +89,17 @@ void PBRRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vul
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, imageIndex, rendererID);
     DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
-    FrameBufferRenderer.Draw(engine, assetManager, imageIndex);
+    FrameBufferRenderer.Draw(imageIndex);
 }
 
 void PBRRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     cubeMapRenderer.Destroy();
-    prefilterRenderPass.Destroy(engine);
+    prefilterRenderPass.Destroy();
     brdfRenderPass.Destroy(engine);
     FrameBufferTextureRenderer.Destroy(engine);
     DebugDepthRenderer.Destroy(engine);
-    FrameBufferRenderer.Destroy(engine);
+    FrameBufferRenderer.Destroy();
 }
 
 std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
