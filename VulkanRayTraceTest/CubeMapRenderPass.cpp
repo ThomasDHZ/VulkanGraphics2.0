@@ -5,19 +5,19 @@ CubeMapRenderPass::CubeMapRenderPass()
 {
 }
 
-CubeMapRenderPass::CubeMapRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t cubeMapSize)
+CubeMapRenderPass::CubeMapRenderPass(uint32_t cubeMapSize)
 {
     CubeMapSize = cubeMapSize;
 
-    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, glm::vec2(CubeMapSize)));
-    BlurredSkyBoxTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(engine, glm::vec2(CubeMapSize, CubeMapSize)));
+    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize)));
+    BlurredSkyBoxTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize, CubeMapSize)));
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, RenderPass));
-    SetUpCommandBuffers(engine);
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    Draw(engine, assetManager, 0);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    SetUpCommandBuffers();
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    Draw(0);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -27,17 +27,17 @@ CubeMapRenderPass::CubeMapRenderPass(std::shared_ptr<VulkanEngine> engine, std::
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
-   vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
-   vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, UINT64_MAX);
-   vkDestroyFence(engine->Device, fence, nullptr);
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+   vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+   vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+   vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 CubeMapRenderPass::~CubeMapRenderPass()
 {
 }
 
-void CubeMapRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void CubeMapRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -91,17 +91,17 @@ void CubeMapRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(VulkanPtr::GetDevice(), &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void CubeMapRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void CubeMapRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(RenderedTexture->View);
@@ -115,27 +115,27 @@ void CubeMapRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine>
         frameBufferCreateInfo.height = CubeMapSize;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(VulkanPtr::GetDevice(), &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void CubeMapRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void CubeMapRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void CubeMapRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex)
+void CubeMapRenderPass::Draw(uint32_t imageIndex)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -212,7 +212,7 @@ void CubeMapRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_p
         vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, CubeMapTexturePipeline->ShaderPipelineLayout, 0, 1, &CubeMapTexturePipeline->DescriptorSets, 0, nullptr);
         vkCmdPushConstants(CommandBuffer, CubeMapTexturePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &skyboxView);
         vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+        static_cast<Skybox*>(AssetManagerPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
         vkCmdEndRenderPass(CommandBuffer);
 
         VkImageSubresourceRange ImageSubresourceRange{};
@@ -275,27 +275,27 @@ void CubeMapRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_p
     }
 }
 
-void CubeMapRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void CubeMapRenderPass::RebuildSwapChain()
 {
-    RenderedTexture->RecreateRendererTexture(engine, glm::vec2(CubeMapSize));
+    RenderedTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize));
 
-    CubeMapTexturePipeline->Destroy(engine);
+    CubeMapTexturePipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(engine, assetManager, RenderPass));
-    SetUpCommandBuffers(engine);
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    Draw(engine, assetManager, 0);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    SetUpCommandBuffers();
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    Draw(0);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -305,25 +305,25 @@ void CubeMapRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, s
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
-    vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(engine->Device, fence, nullptr);
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
-void CubeMapRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void CubeMapRenderPass::Destroy()
 {
-    RenderedTexture->Delete(engine);
-    BlurredSkyBoxTexture->Delete(engine);
+    RenderedTexture->Delete(EnginePtr::GetEnginePtr());
+    BlurredSkyBoxTexture->Delete(EnginePtr::GetEnginePtr());
 
-    CubeMapTexturePipeline->Destroy(engine);
+    CubeMapTexturePipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

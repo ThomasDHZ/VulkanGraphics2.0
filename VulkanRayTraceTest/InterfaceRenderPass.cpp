@@ -5,7 +5,7 @@ InterfaceRenderPass::InterfaceRenderPass()
 {
 }
 
-InterfaceRenderPass::InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+InterfaceRenderPass::InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine)
 {
     CreateRenderPass();
     CreateRendererFramebuffers();

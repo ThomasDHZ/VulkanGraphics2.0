@@ -47,7 +47,7 @@ layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 
 void main() 
 {
-	debugPrintfEXT("AntiAlis: %i \n", Camera.ApplyAntiAliasing);
+	//debugPrintfEXT("AntiAlis: %i \n", Camera.ApplyAntiAliasing);
 	if(Camera.ApplyAntiAliasing == 0)
 	{
 		const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);

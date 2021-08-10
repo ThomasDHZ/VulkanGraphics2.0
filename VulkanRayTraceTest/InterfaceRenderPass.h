@@ -24,7 +24,7 @@ private:
 
 public:
 	InterfaceRenderPass();
-	InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
+	InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine);
 	~InterfaceRenderPass();
 
 	RenderPassID RendererID = Interface_Renderer;

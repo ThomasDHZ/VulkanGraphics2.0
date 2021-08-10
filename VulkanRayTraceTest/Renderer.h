@@ -16,7 +16,7 @@ private:
 	int ActiveRenderer = 0;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	//PBRRenderer pbrRenderer;
+	PBRRenderer pbrRenderer;
 	//RayTraceRenderer rayTraceRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;
 	//HybridRenderer hybridRenderer;

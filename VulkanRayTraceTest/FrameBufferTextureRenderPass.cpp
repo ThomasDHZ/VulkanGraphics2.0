@@ -14,8 +14,8 @@ FrameBufferTextureRenderPass::FrameBufferTextureRenderPass(std::shared_ptr<Asset
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    TexturePipeline = std::make_shared<RenderFrameBufferTexturePipeline>(RenderFrameBufferTexturePipeline(EnginePtr::GetEnginePtr(), assetManager, RenderPass));
-    skyBoxRenderingPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(SkyBoxFrameBufferRenderingPipeline(EnginePtr::GetEnginePtr(), assetManager, RenderPass));
+    TexturePipeline = std::make_shared<RenderFrameBufferTexturePipeline>(RenderFrameBufferTexturePipeline(RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(SkyBoxFrameBufferRenderingPipeline(RenderPass));
     SetUpCommandBuffers();
 }
 
@@ -210,8 +210,8 @@ void FrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<AssetManager
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    TexturePipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), assetManager, RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), assetManager, RenderPass);
+    TexturePipeline->UpdateGraphicsPipeLine(RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
 

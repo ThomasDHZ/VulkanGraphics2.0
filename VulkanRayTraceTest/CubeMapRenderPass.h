@@ -11,13 +11,13 @@
 class CubeMapRenderPass
 {
 private:
-	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
-	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
-	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
+	void CreateRenderPass();
+	void CreateRendererFramebuffers();
+	void SetUpCommandBuffers();
 
 public:
 	CubeMapRenderPass();
-	CubeMapRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t CubeMapSize);
+	CubeMapRenderPass(uint32_t CubeMapSize);
 	~CubeMapRenderPass();
 
 	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
@@ -33,8 +33,8 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void RebuildSwapChain();
+	void Draw(uint32_t imageIndex);
+	void Destroy();
 };
 

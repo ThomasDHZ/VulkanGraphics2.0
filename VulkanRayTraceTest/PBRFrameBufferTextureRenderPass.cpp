@@ -14,7 +14,7 @@ PBRFrameBufferTextureRenderPass::PBRFrameBufferTextureRenderPass(std::shared_ptr
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     PBRTexturePipeline = std::make_shared<RenderPBRFrameBufferTexturePipeline>(RenderPBRFrameBufferTexturePipeline(engine, assetManager, RenderPass, irradianceMap, prefilterMap, brdfLUT));
-    skyBoxRenderingPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(SkyBoxFrameBufferRenderingPipeline(engine, assetManager, RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(SkyBoxFrameBufferRenderingPipeline(RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -207,7 +207,7 @@ void PBRFrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEng
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     PBRTexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, irradianceMap, prefilterMap, brdfLUT);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 
@@ -232,7 +232,7 @@ void PBRFrameBufferTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngi
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
     PBRTexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, irradianceMap, prefilterMap, brdfLUT);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 

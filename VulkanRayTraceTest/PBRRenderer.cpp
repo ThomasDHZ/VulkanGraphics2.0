@@ -6,7 +6,7 @@ PBRRenderer::PBRRenderer() : BaseRenderer()
 
 PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
-    cubeMapRenderer = CubeMapRenderPass(engine, assetManager, 512.0f);
+    cubeMapRenderer = CubeMapRenderPass(512.0f);
     prefilterRenderPass = PrefilterRenderPass(engine, assetManager, 512.0f);
     brdfRenderPass = BRDFRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
     FrameBufferTextureRenderer = PBRFrameBufferTextureRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture, prefilterRenderPass.BlurredSkyBoxTexture, brdfRenderPass.BRDFTexture);
@@ -20,7 +20,7 @@ PBRRenderer::~PBRRenderer()
 
 void PBRRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    cubeMapRenderer.RebuildSwapChain(engine, assetManager);
+    cubeMapRenderer.RebuildSwapChain();
     prefilterRenderPass.RebuildSwapChain(engine, assetManager);
     brdfRenderPass.RebuildSwapChain(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture, prefilterRenderPass.BlurredSkyBoxTexture, brdfRenderPass.BRDFTexture);
@@ -94,7 +94,7 @@ void PBRRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vul
 
 void PBRRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    cubeMapRenderer.Destroy(engine);
+    cubeMapRenderer.Destroy();
     prefilterRenderPass.Destroy(engine);
     brdfRenderPass.Destroy(engine);
     FrameBufferTextureRenderer.Destroy(engine);
