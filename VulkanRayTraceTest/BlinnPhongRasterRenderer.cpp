@@ -9,7 +9,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<AssetManager>
 {
     FrameBufferTextureRenderer = FrameBufferTextureRenderPass(assetManager);
     BloomRenderer = BloomRenderPass(FrameBufferTextureRenderer.BloomTexture);
-    //DebugDepthRenderer = DepthDebugRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
+  //  DebugDepthRenderer = DepthDebugRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
     //lightPathRenderer = DepthRenderer(engine, assetManager);
 }

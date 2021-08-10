@@ -10,7 +10,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<V
     prefilterRenderPass = PrefilterRenderPass(512.0f);
     brdfRenderPass = BRDFRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
     FrameBufferTextureRenderer = PBRFrameBufferTextureRenderPass(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture, prefilterRenderPass.BlurredSkyBoxTexture, brdfRenderPass.BRDFTexture);
-    DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
+    DebugDepthRenderer = DepthDebugRenderPass(FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
 }
 
@@ -24,7 +24,7 @@ void PBRRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::sh
     prefilterRenderPass.RebuildSwapChain();
     brdfRenderPass.RebuildSwapChain(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture);
     FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager, cubeMapRenderer.BlurredSkyBoxTexture, prefilterRenderPass.BlurredSkyBoxTexture, brdfRenderPass.BRDFTexture);
-    DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
+    DebugDepthRenderer.RebuildSwapChain(FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer.RebuildSwapChain(FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
 }
 
@@ -88,7 +88,7 @@ void PBRRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 void PBRRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     FrameBufferTextureRenderer.Draw(engine, assetManager, rendererID);
-    DebugDepthRenderer.Draw(engine, assetManager);
+    DebugDepthRenderer.Draw();
     FrameBufferRenderer.Draw();
 }
 
@@ -98,7 +98,7 @@ void PBRRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
     prefilterRenderPass.Destroy();
     brdfRenderPass.Destroy(engine);
     FrameBufferTextureRenderer.Destroy(engine);
-    DebugDepthRenderer.Destroy(engine);
+    DebugDepthRenderer.Destroy();
     FrameBufferRenderer.Destroy();
 }
 

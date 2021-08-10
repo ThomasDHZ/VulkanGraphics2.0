@@ -4,21 +4,21 @@ DepthDebugRenderPass::DepthDebugRenderPass()
 {
 }
 
-DepthDebugRenderPass::DepthDebugRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
+DepthDebugRenderPass::DepthDebugRenderPass(std::shared_ptr<Texture> InputBloomTexture)
 {
-    DebugDepthTexture = std::make_shared<RenderedColorTexture>(engine);
+    DebugDepthTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    DebugDepthPipeline = std::make_shared<DepthDebugPipeline>(DepthDebugPipeline(engine, assetManager, RenderPass, InputBloomTexture));
-    SetUpCommandBuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    DebugDepthPipeline = std::make_shared<DepthDebugPipeline>(DepthDebugPipeline(RenderPass, InputBloomTexture));
+    SetUpCommandBuffers();
 }
 
 DepthDebugRenderPass::~DepthDebugRenderPass()
 {
 }
 
-void DepthDebugRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void DepthDebugRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -72,17 +72,17 @@ void DepthDebugRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(VulkanPtr::GetDevice(), &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void DepthDebugRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void DepthDebugRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(DebugDepthTexture->View);
@@ -92,31 +92,31 @@ void DepthDebugRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngi
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine->SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine->SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+        frameBufferCreateInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void DepthDebugRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void DepthDebugRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void DepthDebugRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void DepthDebugRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -133,7 +133,7 @@ void DepthDebugRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::share
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -152,37 +152,37 @@ void DepthDebugRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::share
     }
 }
 
-void DepthDebugRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
+void DepthDebugRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture)
 {
-    DebugDepthTexture->RecreateRendererTexture(engine);
-    DebugDepthPipeline->Destroy(engine);
+    DebugDepthTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    DebugDepthPipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
-    DebugDepthPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, InputBloomTexture);
-    SetUpCommandBuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
+    DebugDepthPipeline->UpdateGraphicsPipeLine(RenderPass, InputBloomTexture);
+    SetUpCommandBuffers();
 }
 
-void DepthDebugRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void DepthDebugRenderPass::Destroy()
 {
-    DebugDepthTexture->Delete(engine);
-    DebugDepthPipeline->Destroy(engine);
+    DebugDepthTexture->Delete(EnginePtr::GetEnginePtr());
+    DebugDepthPipeline->Destroy(EnginePtr::GetEnginePtr());
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

@@ -7,7 +7,7 @@ LightPathRenderer::LightPathRenderer() : BaseRenderer()
 LightPathRenderer::LightPathRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
 {
     lightRenderPass = DepthRenderer(engine, assetManager);
-    DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, lightRenderPass.DepthTexture);
+    DebugDepthRenderer = DepthDebugRenderPass(lightRenderPass.DepthTexture);
 }
 
 LightPathRenderer::~LightPathRenderer()
@@ -17,7 +17,7 @@ LightPathRenderer::~LightPathRenderer()
 void LightPathRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     lightRenderPass.RebuildSwapChain(engine, assetManager);
-    DebugDepthRenderer.RebuildSwapChain(engine, assetManager, lightRenderPass.DepthTexture);
+    DebugDepthRenderer.RebuildSwapChain(lightRenderPass.DepthTexture);
 }
 
 void LightPathRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
@@ -28,13 +28,13 @@ void LightPathRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 void LightPathRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     lightRenderPass.Draw(engine, assetManager);
-    DebugDepthRenderer.Draw(engine, assetManager);
+    DebugDepthRenderer.Draw();
 }
 
 void LightPathRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     lightRenderPass.Destroy(engine);
-    DebugDepthRenderer.Destroy(engine);
+    DebugDepthRenderer.Destroy();
 }
 
 std::vector<VkCommandBuffer> LightPathRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)

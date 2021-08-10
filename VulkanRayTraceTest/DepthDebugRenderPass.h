@@ -7,13 +7,13 @@
 class DepthDebugRenderPass
 {
 private:
-	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
-	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
-	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
+	void CreateRenderPass();
+	void CreateRendererFramebuffers();
+	void SetUpCommandBuffers();
 
 public:
 	DepthDebugRenderPass();
-	DepthDebugRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> DepthTexture);
+	DepthDebugRenderPass(std::shared_ptr<Texture> DepthTexture);
 	~DepthDebugRenderPass();
 
 	static constexpr RenderPassID rendererPassID = DebugDepth_Renderer;
@@ -25,7 +25,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManage, std::shared_ptr<Texture> DepthTexture);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void RebuildSwapChain(std::shared_ptr<Texture> DepthTexture);
+	void Draw();
+	void Destroy();
 };
