@@ -30,7 +30,7 @@ TerrainMesh::~TerrainMesh()
 
 void TerrainMesh::Destory(std::shared_ptr<VulkanEngine> engine)
 {
-	HeightMap.Delete(engine);
+	HeightMap.Delete();
 	Mesh::Destory(engine);
 }
 

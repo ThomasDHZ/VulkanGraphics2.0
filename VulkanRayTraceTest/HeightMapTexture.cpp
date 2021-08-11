@@ -17,7 +17,7 @@ HeightMapTexture::HeightMapTexture(std::shared_ptr<VulkanEngine> engine, const s
 	FileName = TextureLocation;
 	TextureFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
-	LoadTexture(engine, TextureLocation, VK_FORMAT_R8G8B8A8_UNORM);
+	LoadTexture(TextureLocation, VK_FORMAT_R8G8B8A8_UNORM);
 	CreateTextureView(engine, VK_FORMAT_R8G8B8A8_UNORM);
 	CreateTextureSampler(engine);
 }
@@ -30,7 +30,7 @@ HeightMapTexture::~HeightMapTexture()
 {
 }
 
-void HeightMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format)
+void HeightMapTexture::LoadTexture(std::string TextureLocation, VkFormat format)
 {
 	int ColorChannels;
 	stbi_uc* pixels = stbi_load(TextureLocation.c_str(), &Width, &Height, &ColorChannels, STBI_rgb_alpha);
@@ -59,11 +59,11 @@ void HeightMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::st
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	Texture::CreateTextureImage(engine, TextureInfo);
+	Texture::CreateTextureImage(TextureInfo);
 
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	CopyBufferToImage(engine, StagingBuffer.Buffer);
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	TransitionImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(StagingBuffer.Buffer);
+	TransitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	StagingBuffer.DestoryBuffer();
 	stbi_image_free(pixels);

@@ -201,7 +201,7 @@ void SSAORenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<
 
 void SSAORenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
 {
-    NoiseTexture->Update(engine, 0);
+    NoiseTexture->Update(0);
     SSAOTexture->RecreateRendererTexture(engine);
     RasterSSAOPipeline->Destroy(engine);
 
@@ -229,8 +229,8 @@ void SSAORenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
 
 void SSAORenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    NoiseTexture->Delete(engine);
-    SSAOTexture->Delete(engine);
+    NoiseTexture->Delete();
+    SSAOTexture->Delete();
     RasterSSAOPipeline->Destroy(engine);
 
     for (auto SamplePoint : SamplePointBufferList)

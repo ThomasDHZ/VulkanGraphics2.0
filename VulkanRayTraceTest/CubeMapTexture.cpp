@@ -6,14 +6,14 @@ CubeMapTexture::CubeMapTexture() : Texture()
 {
 }
 
-CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(TextureType::vkTextureCube)
 {
 	LoadTexture(engine, CubeMapFiles, textureFormat);
 	CreateTextureView(engine, textureFormat);
 	CreateTextureSampler(engine);
 }
 
-CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapFiles[6], VkFormat textureFormat) : Texture(engine, TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapFiles[6], VkFormat textureFormat) : Texture(TextureType::vkTextureCube)
 {
 	CubeMapLayout cubeMapfiles;
 	cubeMapfiles.Left = CubeMapFiles[0];
@@ -81,11 +81,11 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLa
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	CreateTextureImage(engine, TextureInfo);
+	CreateTextureImage(TextureInfo);
 
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	CopyBufferToImage(engine, StagingBuffer.Buffer);
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	TransitionImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(StagingBuffer.Buffer);
+	TransitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	StagingBuffer.DestoryBuffer();
 	for (auto texturedata : textureData)
@@ -123,11 +123,11 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::stri
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	CreateTextureImage(engine, TextureInfo);
+	CreateTextureImage(TextureInfo);
 
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	CopyBufferToImage(engine, StagingBuffer.Buffer);
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	TransitionImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(StagingBuffer.Buffer);
+	TransitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	StagingBuffer.DestoryBuffer();
 	for (auto texturedata : textureData)

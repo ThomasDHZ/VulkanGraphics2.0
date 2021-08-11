@@ -16,7 +16,7 @@ PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize)
     CreateRendererFramebuffers();
     prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     SetUpCommandBuffers();
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();
 
     VkSubmitInfo submitInfo{};
@@ -301,7 +301,7 @@ void PrefilterRenderPass::RebuildSwapChain()
     CreateRendererFramebuffers();
     prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     SetUpCommandBuffers();
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();
 
     VkSubmitInfo submitInfo{};
@@ -321,8 +321,8 @@ void PrefilterRenderPass::RebuildSwapChain()
 
 void PrefilterRenderPass::Destroy()
 {
-    RenderedTexture->Delete(EnginePtr::GetEnginePtr());
-    BlurredSkyBoxTexture->Delete(EnginePtr::GetEnginePtr());
+    RenderedTexture->Delete();
+    BlurredSkyBoxTexture->Delete();
 
     prefilterRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
 

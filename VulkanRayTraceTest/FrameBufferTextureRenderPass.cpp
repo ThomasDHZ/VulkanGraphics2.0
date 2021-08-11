@@ -217,9 +217,9 @@ void FrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<AssetManager
 
 void FrameBufferTextureRenderPass::Destroy()
 {
-    RenderedTexture->Delete(EnginePtr::GetEnginePtr());
-    BloomTexture->Delete(EnginePtr::GetEnginePtr());
-    DepthTexture->Delete(EnginePtr::GetEnginePtr());
+    RenderedTexture->Delete();
+    BloomTexture->Delete();
+    DepthTexture->Delete();
 
     TexturePipeline->Destroy(EnginePtr::GetEnginePtr());
     skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());

@@ -57,14 +57,14 @@ void FontTexture::CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* 
 	TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 	TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	Texture::CreateTextureImage(engine, TextureInfo);
+	Texture::CreateTextureImage(TextureInfo);
 
-	TransitionImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	CopyBufferToImage(engine, StagingBuffer.Buffer);
+	TransitionImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	CopyBufferToImage(StagingBuffer.Buffer);
 
 	StagingBuffer.DestoryBuffer();
 
-	GenerateMipmaps(engine, VK_FORMAT_R8G8B8A8_UNORM);
+	GenerateMipmaps(VK_FORMAT_R8G8B8A8_UNORM);
 }
 
 void FontTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)

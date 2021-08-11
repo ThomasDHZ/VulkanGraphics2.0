@@ -302,15 +302,15 @@ void GBufferRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, s
 void GBufferRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
 
-    GPositionTexture->Delete(engine);
-    GNormalTexture->Delete(engine);
-    GAlbedoTexture->Delete(engine);
-    //GTangentTexture->Delete(engine);
-    //GBiTangentTexture->Delete(engine);
-    GBloomTexture->Delete(engine);
-    NormalMapTexture->Delete(engine);
-    SpecularMapTexture->Delete(engine);
-    DepthTexture->Delete(engine);
+    GPositionTexture->Delete();
+    GNormalTexture->Delete();
+    GAlbedoTexture->Delete();
+    //GTangentTexture->Delete();
+    //GBiTangentTexture->Delete();
+    GBloomTexture->Delete();
+    NormalMapTexture->Delete();
+    SpecularMapTexture->Delete();
+    DepthTexture->Delete();
 
     gBufferPipeline->Destroy(engine);
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);

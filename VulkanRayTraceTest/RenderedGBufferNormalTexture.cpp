@@ -5,7 +5,7 @@ RenderedGBufferNormalTexture::RenderedGBufferNormalTexture() : Texture()
 {
 }
 
-RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<VulkanEngine> engine, VkImageLayout imageLayout) : Texture(engine, TextureType::vkRenderedTexture, imageLayout)
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<VulkanEngine> engine, VkImageLayout imageLayout) : Texture(TextureType::vkRenderedTexture, imageLayout)
 {
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
@@ -16,7 +16,7 @@ RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<Vulka
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(engine, TextureResolution, TextureType::vkRenderedTexture, imageLayout)
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(TextureResolution, TextureType::vkRenderedTexture, imageLayout)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -24,7 +24,7 @@ RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<Vulka
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<VulkanEngine> engine, int width, int height, VkImageLayout imageLayout) : Texture(engine, width, height, TextureType::vkRenderedTexture, imageLayout)
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<VulkanEngine> engine, int width, int height, VkImageLayout imageLayout) : Texture(width, height, TextureType::vkRenderedTexture, imageLayout)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -52,7 +52,7 @@ void RenderedGBufferNormalTexture::CreateTextureImage(std::shared_ptr<VulkanEngi
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-    Texture::CreateTextureImage(engine, TextureInfo);
+    Texture::CreateTextureImage(TextureInfo);
 }
 
 void RenderedGBufferNormalTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
@@ -101,7 +101,7 @@ void RenderedGBufferNormalTexture::RecreateRendererTexture(std::shared_ptr<Vulka
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
 
-    Texture::Delete(engine);
+    Texture::Delete();
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);

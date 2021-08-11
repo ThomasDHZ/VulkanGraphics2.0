@@ -4,7 +4,7 @@ RenderedCubeMapTexture::RenderedCubeMapTexture() : Texture()
 {
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine) : Texture(engine, TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
+RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
 {
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
@@ -14,14 +14,14 @@ RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> eng
     CreateTextureSampler(engine);
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2 TextureResolution) : Texture(engine, TextureResolution, TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
+RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, int width, int height) : Texture(engine, width, height, TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
+RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, int width, int height) : Texture(width, height, TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
 {
     CreateTextureImage(engine);
     CreateTextureView(engine);
@@ -50,7 +50,7 @@ void RenderedCubeMapTexture::CreateTextureImage(std::shared_ptr<VulkanEngine> en
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    Texture::CreateTextureImage(engine, TextureInfo);
+    Texture::CreateTextureImage(TextureInfo);
 }
 
 void RenderedCubeMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
@@ -96,7 +96,7 @@ void RenderedCubeMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> 
 
 void RenderedCubeMapTexture::RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine)
 {
-    Texture::Delete(engine);
+    Texture::Delete();
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);

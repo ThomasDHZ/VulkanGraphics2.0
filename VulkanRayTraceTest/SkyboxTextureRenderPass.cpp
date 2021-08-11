@@ -182,7 +182,7 @@ void SkyboxTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngine> engi
 
 void SkyboxTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    CubeMapTexture->Delete(engine);
+    CubeMapTexture->Delete();
     pbrIrradiancePipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);

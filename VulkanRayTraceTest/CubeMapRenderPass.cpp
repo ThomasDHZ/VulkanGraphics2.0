@@ -16,7 +16,7 @@ CubeMapRenderPass::CubeMapRenderPass(uint32_t cubeMapSize)
     CreateRendererFramebuffers();
     CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     SetUpCommandBuffers();
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();
 
     VkSubmitInfo submitInfo{};
@@ -294,7 +294,7 @@ void CubeMapRenderPass::RebuildSwapChain()
     CreateRendererFramebuffers();
     CubeMapTexturePipeline = std::make_shared<CubeMapRenderingPipeline>(CubeMapRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     SetUpCommandBuffers();
-    BlurredSkyBoxTexture->UpdateCubeImageLayout(EnginePtr::GetEnginePtr(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();
 
     VkSubmitInfo submitInfo{};
@@ -313,8 +313,8 @@ void CubeMapRenderPass::RebuildSwapChain()
 
 void CubeMapRenderPass::Destroy()
 {
-    RenderedTexture->Delete(EnginePtr::GetEnginePtr());
-    BlurredSkyBoxTexture->Delete(EnginePtr::GetEnginePtr());
+    RenderedTexture->Delete();
+    BlurredSkyBoxTexture->Delete();
 
     CubeMapTexturePipeline->Destroy(EnginePtr::GetEnginePtr());
 

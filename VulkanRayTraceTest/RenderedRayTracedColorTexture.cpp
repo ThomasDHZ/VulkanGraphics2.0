@@ -34,7 +34,7 @@ void RenderedRayTracedColorTexture::CreateTextureImage(std::shared_ptr<VulkanEng
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-    Texture::CreateTextureImage(engine, TextureInfo);
+    Texture::CreateTextureImage(TextureInfo);
 }
 
 void RenderedRayTracedColorTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
@@ -92,7 +92,7 @@ void RenderedRayTracedColorTexture::SendTextureToGPU(std::shared_ptr<VulkanEngin
     cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
     vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    UpdateImageLayout(engine, cmdBuffer, VK_IMAGE_LAYOUT_GENERAL);
+    UpdateImageLayout(cmdBuffer, VK_IMAGE_LAYOUT_GENERAL);
     vkEndCommandBuffer(cmdBuffer);
 
     VkSubmitInfo submitInfo{};
@@ -113,15 +113,15 @@ void RenderedRayTracedColorTexture::SendTextureToGPU(std::shared_ptr<VulkanEngin
 
     vkFreeCommandBuffers(engine->Device, engine->CommandPool, 1, &cmdBuffer);
 
-    UpdateImageLayout(engine, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    UpdateImageLayout(VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void RenderedRayTracedColorTexture::RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine)
 {
-    Texture::Delete(engine);
+    Texture::Delete();
     CreateTextureImage(engine);
     CreateTextureView(engine);
     CreateTextureSampler(engine);
-    UpdateImageLayout(engine, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    UpdateImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

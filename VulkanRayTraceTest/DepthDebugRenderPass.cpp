@@ -174,7 +174,7 @@ void DepthDebugRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomT
 
 void DepthDebugRenderPass::Destroy()
 {
-    DebugDepthTexture->Delete(EnginePtr::GetEnginePtr());
+    DebugDepthTexture->Delete();
     DebugDepthPipeline->Destroy(EnginePtr::GetEnginePtr());
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);

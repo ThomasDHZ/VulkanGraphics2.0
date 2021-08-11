@@ -198,7 +198,7 @@ void ForwardRenderPass::Draw(RendererID rendererID)
 
 void ForwardRenderPass::Destroy()
 {
-    DepthTexture->Delete(EnginePtr::GetEnginePtr());
+    DepthTexture->Delete();
     DebugLightPipeline->Destroy(EnginePtr::GetEnginePtr());
     forwardRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
     pbrRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());

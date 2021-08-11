@@ -186,7 +186,7 @@ void BloomRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTextur
 
 void BloomRenderPass::Destroy()
 {
-    BloomTexture->Delete(EnginePtr::GetEnginePtr());
+    BloomTexture->Delete();
     BloomPipelinePass1->Destroy(EnginePtr::GetEnginePtr());
     BloomPipelinePass2->Destroy(EnginePtr::GetEnginePtr());
 

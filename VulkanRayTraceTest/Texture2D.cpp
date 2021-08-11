@@ -6,23 +6,23 @@ Texture2D::Texture2D() : Texture()
 {
 }
 
-Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, TextureType textureType) : Texture(engine, textureType, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, TextureType textureType) : Texture(textureType, VK_IMAGE_LAYOUT_UNDEFINED)
 {
 }
 
-Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation, VkFormat format) : Texture(engine, TextureLocation, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
-{
-	CreateTextureView(engine, format);
-	CreateTextureSampler(engine);
-}
-
-Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format) : Texture (engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation, VkFormat format) : Texture(TextureLocation, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);
 }
 
-Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format) : Texture(engine, width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format) : Texture (width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+{
+	CreateTextureView(engine, format);
+	CreateTextureSampler(engine);
+}
+
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format) : Texture(width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
 {
 	CreateTextureView(engine, format);
 	CreateTextureSampler(engine);

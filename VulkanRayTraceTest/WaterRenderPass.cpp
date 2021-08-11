@@ -224,8 +224,8 @@ void WaterRenderToTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngi
 
 void WaterRenderToTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    RenderedTexture->Delete(engine);
-    DepthTexture->Delete(engine);
+    RenderedTexture->Delete();
+    DepthTexture->Delete();
 
     SceneDataBuffer->Destroy(engine);
     SkyUniformBuffer->Destroy(engine);

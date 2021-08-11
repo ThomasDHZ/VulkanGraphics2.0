@@ -158,7 +158,7 @@ void GUIRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::
 
 void GUIRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    RenderedTexture->Delete(engine);
+    RenderedTexture->Delete();
     TextRenderingPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);

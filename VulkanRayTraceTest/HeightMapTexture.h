@@ -3,7 +3,7 @@
 class HeightMapTexture : public Texture
 {
 private:
-    void LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string TextureLocation, VkFormat format) override;
+    void LoadTexture(std::string TextureLocation, VkFormat format) override;
     void CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat format);
     void CreateTextureSampler(std::shared_ptr<VulkanEngine> engine);
 public:

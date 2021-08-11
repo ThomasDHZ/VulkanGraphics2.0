@@ -238,9 +238,9 @@ void PBRFrameBufferTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngi
 
 void PBRFrameBufferTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    RenderedTexture->Delete(engine);
-    BloomTexture->Delete(engine);
-    DepthTexture->Delete(engine);
+    RenderedTexture->Delete();
+    BloomTexture->Delete();
+    DepthTexture->Delete();
 
     PBRTexturePipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);

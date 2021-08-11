@@ -111,7 +111,7 @@ void TextureManager::LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture)
 void TextureManager::DeleteTexture(uint32_t TextureBufferIndex)
 {
 	auto texture = GetTextureByBufferIndex(TextureBufferIndex);
-	texture->Delete(engine);
+	texture->Delete();
 	TextureList.erase(TextureList.begin() + TextureBufferIndex);
 
 	for(int x = 0; x < TextureList.size(); x++)
@@ -124,19 +124,21 @@ void TextureManager::UnloadAllTextures()
 {
 	for (auto& texture : TextureList)
 	{
-		texture->Delete(engine);
+		texture->Delete();
 	}
 
 	for (auto& texture : Texture3DList)
 	{
-		texture->Delete(engine);
+		texture->Delete();
 	}
 }
 
 void TextureManager::UnloadCubeMap()
 {
-	if(CubeMap != nullptr)
-	CubeMap->Delete(engine);
+	if (CubeMap != nullptr)
+	{
+		CubeMap->Delete();
+	}
 }
 
 void TextureManager::Destory()
@@ -152,7 +154,7 @@ void TextureManager::Update()
 {
 	for (int x = 0; x < TextureList.size(); x++)
 	{
-		TextureList[x]->Update(engine, x);
+		TextureList[x]->Update(x);
 	}
 }
 

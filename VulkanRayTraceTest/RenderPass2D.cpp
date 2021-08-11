@@ -201,8 +201,8 @@ void RenderPass2D::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::s
 
 void RenderPass2D::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    RenderedTexture->Delete(engine);
-    BloomTexture->Delete(engine);
+    RenderedTexture->Delete();
+    BloomTexture->Delete();
 
     TexturePipeline->Destroy(engine);
     wireFramePipeline->Destroy(engine);
