@@ -46,14 +46,14 @@ TextureManager::~TextureManager()
 
 std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(const std::string TextureLocation, VkFormat format)
 {
-	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, TextureLocation, format));
+	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureLocation, format));
 	TextureList.emplace_back(texture);
 	return texture;
 }
 
 std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
 {
-	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(engine, width, height, PixelList, format));
+	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(width, height, PixelList, format));
 	TextureList.emplace_back(texture);
 	TextureList.back()->TextureID;
 	return texture;
@@ -69,7 +69,7 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 
 std::shared_ptr<FontTexture> TextureManager::LoadTextTexture(void* GlyphData, uint32_t width, uint32_t height)
 {
-	std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(engine, GlyphData, width, height));
+	std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(GlyphData, width, height));
 	TextureList.emplace_back(texture);
 	TextureList.back()->TextureID;
 	return texture;
@@ -77,30 +77,30 @@ std::shared_ptr<FontTexture> TextureManager::LoadTextTexture(void* GlyphData, ui
 
 uint32_t TextureManager::Load3DTexture(const std::string TextureLocation, VkFormat format)
 {
-	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, TextureLocation, format)));
+	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(TextureLocation, format)));
 	return Texture3DList.back()->TextureID;
 }
 
 uint32_t TextureManager::LoadTexture3D(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format)
 {
 	unsigned int TextureID = Texture3DList.size();
-	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(engine, width, height, depth, PixelList, format)));
+	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(width, height, depth, PixelList, format)));
 	return TextureID;
 }
 
 void TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 }
 
 void TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapFiles, textureFormat));
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 }
 
 void TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(engine, CubeMapLocation, textureFormat));
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
 }
 
 void TextureManager::LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture)

@@ -51,7 +51,7 @@ void RenderedRayTracedColorTexture::CreateTextureView(std::shared_ptr<VulkanEngi
     TextureImageViewInfo.subresourceRange.layerCount = 1;
     TextureImageViewInfo.image = Image;
 
-    if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
+    if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
         throw std::runtime_error("Failed to create Image View.");
     }
 }
@@ -72,7 +72,7 @@ void RenderedRayTracedColorTexture::CreateTextureSampler(std::shared_ptr<VulkanE
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+    if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
     {
         throw std::runtime_error("Failed to create Sampler.");
     }
@@ -86,7 +86,7 @@ void RenderedRayTracedColorTexture::SendTextureToGPU(std::shared_ptr<VulkanEngin
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     commandBufferAllocateInfo.commandBufferCount = 1;
     VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(engine->Device, &commandBufferAllocateInfo, &cmdBuffer);
+    vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &commandBufferAllocateInfo, &cmdBuffer);
 
     VkCommandBufferBeginInfo cmdBufferBeginInfo{};
     cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -104,14 +104,14 @@ void RenderedRayTracedColorTexture::SendTextureToGPU(std::shared_ptr<VulkanEngin
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = 0;
     VkFence fence;
-    vkCreateFence(engine->Device, &fenceCreateInfo, nullptr, &fence);
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
 
     vkQueueSubmit(engine->GraphicsQueue, 1, &submitInfo, fence);
 
-    vkWaitForFences(engine->Device, 1, &fence, VK_TRUE, INT64_MAX);
-    vkDestroyFence(engine->Device, fence, nullptr);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, INT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 
-    vkFreeCommandBuffers(engine->Device, engine->CommandPool, 1, &cmdBuffer);
+    vkFreeCommandBuffers(VulkanPtr::GetDevice(), engine->CommandPool, 1, &cmdBuffer);
 
     UpdateImageLayout(VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

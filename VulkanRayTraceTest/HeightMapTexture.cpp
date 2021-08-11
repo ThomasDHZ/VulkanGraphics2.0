@@ -5,12 +5,12 @@ HeightMapTexture::HeightMapTexture() : Texture()
 {
 }
 
-HeightMapTexture::HeightMapTexture(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation) : Texture()
+HeightMapTexture::HeightMapTexture(const std::string TextureLocation) : Texture()
 {
 	Width = 0;
 	Height = 0;
 	Depth = 1;
-	TextureID = engine->GenerateID();
+	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
 	TextureBufferIndex = 0;
 	MipMapLevels = 1;
 	TypeOfTexture = vkHeightMap;
@@ -18,11 +18,11 @@ HeightMapTexture::HeightMapTexture(std::shared_ptr<VulkanEngine> engine, const s
 	TextureFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
 	LoadTexture(TextureLocation, VK_FORMAT_R8G8B8A8_UNORM);
-	CreateTextureView(engine, VK_FORMAT_R8G8B8A8_UNORM);
-	CreateTextureSampler(engine);
+	CreateTextureView(VK_FORMAT_R8G8B8A8_UNORM);
+	CreateTextureSampler();
 }
 
-HeightMapTexture::HeightMapTexture(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList) : Texture()
+HeightMapTexture::HeightMapTexture(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList) : Texture()
 {
 }
 
@@ -69,7 +69,7 @@ void HeightMapTexture::LoadTexture(std::string TextureLocation, VkFormat format)
 	stbi_image_free(pixels);
 }
 
-void HeightMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat format)
+void HeightMapTexture::CreateTextureView(VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -82,12 +82,12 @@ void HeightMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine, V
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void HeightMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
+void HeightMapTexture::CreateTextureSampler()
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -107,7 +107,7 @@ void HeightMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine
 	TextureImageSamplerInfo.maxLod = static_cast<float>(MipMapLevels);
 	TextureImageSamplerInfo.mipLodBias = 0;
 
-	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

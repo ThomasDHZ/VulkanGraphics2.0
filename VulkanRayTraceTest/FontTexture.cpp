@@ -4,19 +4,19 @@ FontTexture::FontTexture() : Texture()
 {
 }
 
-FontTexture::FontTexture(std::shared_ptr<VulkanEngine> engine, void* GlyphData, uint32_t width, uint32_t height) : Texture()
+FontTexture::FontTexture(void* GlyphData, uint32_t width, uint32_t height) : Texture()
 {
-	TextureID = engine->GenerateID();
-	CreateTextTexture(engine, GlyphData, width, height);
-	CreateTextureView(engine);
-	CreateTextureSampler(engine);
+	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
+	CreateTextTexture(GlyphData, width, height);
+	CreateTextureView();
+	CreateTextureSampler();
 }
 
 FontTexture::~FontTexture()
 {
 }
 
-void FontTexture::CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* GlyphData, uint32_t width, uint32_t height)
+void FontTexture::CreateTextTexture(void* GlyphData, uint32_t width, uint32_t height)
 {
 	Width = width;
 	Height = height;
@@ -67,7 +67,7 @@ void FontTexture::CreateTextTexture(std::shared_ptr<VulkanEngine> engine, void* 
 	GenerateMipmaps(VK_FORMAT_R8G8B8A8_UNORM);
 }
 
-void FontTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
+void FontTexture::CreateTextureView()
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -80,12 +80,12 @@ void FontTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void FontTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
+void FontTexture::CreateTextureSampler()
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -105,7 +105,7 @@ void FontTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 	TextureImageSamplerInfo.maxLod = static_cast<float>(MipMapLevels);
 	TextureImageSamplerInfo.mipLodBias = 0;
 
-	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

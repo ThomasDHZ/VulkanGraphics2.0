@@ -4,14 +4,14 @@ class HeightMapTexture : public Texture
 {
 private:
     void LoadTexture(std::string TextureLocation, VkFormat format) override;
-    void CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat format);
-    void CreateTextureSampler(std::shared_ptr<VulkanEngine> engine);
+    void CreateTextureView(VkFormat format);
+    void CreateTextureSampler();
 public:
     std::vector<Pixel> HeightMap;
 
     HeightMapTexture();
-    HeightMapTexture(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation);
-    HeightMapTexture(std::shared_ptr<VulkanEngine> engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList);
+    HeightMapTexture(const std::string TextureLocation);
+    HeightMapTexture(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList);
     ~HeightMapTexture();
 
     Pixel GetPixel(uint32_t x, uint32_t y);

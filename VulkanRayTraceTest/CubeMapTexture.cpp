@@ -6,14 +6,14 @@ CubeMapTexture::CubeMapTexture() : Texture()
 {
 }
 
-CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(TextureType::vkTextureCube)
 {
-	LoadTexture(engine, CubeMapFiles, textureFormat);
-	CreateTextureView(engine, textureFormat);
-	CreateTextureSampler(engine);
+	LoadTexture(CubeMapFiles, textureFormat);
+	CreateTextureView(textureFormat);
+	CreateTextureSampler();
 }
 
-CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapFiles[6], VkFormat textureFormat) : Texture(TextureType::vkTextureCube)
+CubeMapTexture::CubeMapTexture(std::string CubeMapFiles[6], VkFormat textureFormat) : Texture(TextureType::vkTextureCube)
 {
 	CubeMapLayout cubeMapfiles;
 	cubeMapfiles.Left = CubeMapFiles[0];
@@ -23,23 +23,23 @@ CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string
 	cubeMapfiles.Front = CubeMapFiles[4];
 	cubeMapfiles.Back = CubeMapFiles[5];
 
-	LoadTexture(engine, cubeMapfiles, textureFormat);
-	CreateTextureView(engine, textureFormat);
-	CreateTextureSampler(engine);
+	LoadTexture(cubeMapfiles, textureFormat);
+	CreateTextureView(textureFormat);
+	CreateTextureSampler();
 }
 
-CubeMapTexture::CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapLocation, VkFormat textureFormat)
+CubeMapTexture::CubeMapTexture(std::string CubeMapLocation, VkFormat textureFormat)
 {
-	LoadTexture(engine, CubeMapLocation, textureFormat);
-	CreateTextureView(engine, textureFormat);
-	CreateTextureSampler(engine);
+	LoadTexture(CubeMapLocation, textureFormat);
+	CreateTextureView(textureFormat);
+	CreateTextureSampler();
 }
 
 CubeMapTexture::~CubeMapTexture()
 {
 }
 
-void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+void CubeMapTexture::LoadTexture(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
 	std::vector<unsigned char*> textureData;
 	int texChannels;
@@ -58,12 +58,12 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLa
 	StagingBuffer.CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	void* data;
-	vkMapMemory(engine->Device, StagingBuffer.BufferMemory, 0, imageSize, 0, &data);
+	vkMapMemory(VulkanPtr::GetDevice(), StagingBuffer.BufferMemory, 0, imageSize, 0, &data);
 	for (int x = 0; x < 6; ++x)
 	{
 		memcpy(static_cast<char*>(data) + (x * layerSize), textureData[x], static_cast<size_t>(layerSize));
 	}
-	vkUnmapMemory(engine->Device, StagingBuffer.BufferMemory);
+	vkUnmapMemory(VulkanPtr::GetDevice(), StagingBuffer.BufferMemory);
 
 	VkImageCreateInfo TextureInfo = {};
 	TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -94,7 +94,7 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLa
 	}
 }
 
-void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapLocation, VkFormat textureFormat)
+void CubeMapTexture::LoadTexture(std::string CubeMapLocation, VkFormat textureFormat)
 {
 	std::vector<unsigned char*> textureData;
 	int texChannels;
@@ -136,7 +136,7 @@ void CubeMapTexture::LoadTexture(std::shared_ptr<VulkanEngine> engine, std::stri
 	}
 }
 
-void CubeMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat textureFormat)
+void CubeMapTexture::CreateTextureView(VkFormat textureFormat)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -149,12 +149,12 @@ void CubeMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkF
 	TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 	TextureImageViewInfo.subresourceRange.layerCount = 6;
 
-	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void CubeMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
+void CubeMapTexture::CreateTextureSampler()
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -172,7 +172,7 @@ void CubeMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 	TextureImageSamplerInfo.anisotropyEnable = VK_TRUE;
 
-	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

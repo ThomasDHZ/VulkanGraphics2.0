@@ -14,14 +14,14 @@ struct CubeMapLayout
 class CubeMapTexture : public Texture
 {
 private:
-	void LoadTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat);
-	void LoadTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapLocation, VkFormat textureFormat);
-	void CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat textureFormat);
-	void CreateTextureSampler(std::shared_ptr<VulkanEngine> engine);
+	void LoadTexture(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
+	void LoadTexture(std::string CubeMapLocation, VkFormat textureFormat);
+	void CreateTextureView(VkFormat textureFormat);
+	void CreateTextureSampler();
 public:
 	CubeMapTexture();
-	CubeMapTexture(std::shared_ptr<VulkanEngine> engine, CubeMapLayout CubeMapFiles, VkFormat textureFormat);
-	CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapFiles[6], VkFormat textureFormat);
-	CubeMapTexture(std::shared_ptr<VulkanEngine> engine, std::string CubeMapLocation, VkFormat textureFormat);
+	CubeMapTexture(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
+	CubeMapTexture(std::string CubeMapFiles[6], VkFormat textureFormat);
+	CubeMapTexture(std::string CubeMapLocation, VkFormat textureFormat);
 	~CubeMapTexture();
 };

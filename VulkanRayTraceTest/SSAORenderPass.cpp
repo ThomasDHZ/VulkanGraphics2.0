@@ -149,7 +149,7 @@ void SSAORenderPass::GenerateNoiseTexture(std::shared_ptr<VulkanEngine> engine, 
     {
         pixelList.emplace_back(glm::vec4(randomBits(generator) * 2.0 - 1.0, randomBits(generator) * 2.0 - 1.0, 0.0f, 1.0f));
     }
-    NoiseTexture = std::make_shared<Texture2D>(Texture2D(engine, 4, 4, pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
+    NoiseTexture = std::make_shared<Texture2D>(Texture2D(4, 4, pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
     textures.NoiseTexture = NoiseTexture;
 }
 

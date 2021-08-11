@@ -66,7 +66,7 @@ void RenderedCubeMapTexture::CreateTextureView(std::shared_ptr<VulkanEngine> eng
     TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
     TextureImageViewInfo.subresourceRange.layerCount = 6;
 
-    if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
+    if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
         throw std::runtime_error("Failed to create Image View.");
     }
 }
@@ -88,7 +88,7 @@ void RenderedCubeMapTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> 
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
     TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
-    if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+    if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
     {
         throw std::runtime_error("Failed to create Sampler.");
     }

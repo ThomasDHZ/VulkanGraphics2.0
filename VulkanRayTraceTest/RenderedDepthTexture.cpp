@@ -69,7 +69,7 @@ void RenderedDepthTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engin
     TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
     TextureImageViewInfo.subresourceRange.layerCount = 1;
 
-    if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
+    if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
         throw std::runtime_error("Failed to create Image View.");
     }
 }
@@ -90,7 +90,7 @@ void RenderedDepthTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> en
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+    if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
     {
         throw std::runtime_error("Failed to create Sampler.");
     }

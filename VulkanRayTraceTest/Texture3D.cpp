@@ -6,24 +6,24 @@ Texture3D::Texture3D() : Texture()
 {
 }
 
-Texture3D::Texture3D(std::shared_ptr<VulkanEngine> engine, const std::string TextureLocation, VkFormat format) : Texture(vkTexture3D)
+Texture3D::Texture3D(const std::string TextureLocation, VkFormat format) : Texture(vkTexture3D)
 {
 	LoadDDSTexture(TextureLocation, format);
-	CreateTextureView(engine, format);
-	CreateTextureSampler(engine);
+	CreateTextureView(format);
+	CreateTextureSampler();
 }
 
-Texture3D::Texture3D(std::shared_ptr<VulkanEngine> engine, int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format) : Texture(width, height, depth, PixelList, format, vkTexture3D)
+Texture3D::Texture3D(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format) : Texture(width, height, depth, PixelList, format, vkTexture3D)
 {
-	CreateTextureView(engine, format);
-	CreateTextureSampler(engine);
+	CreateTextureView(format);
+	CreateTextureSampler();
 }
 
 Texture3D::~Texture3D()
 {
 }
 
-void Texture3D::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat format)
+void Texture3D::CreateTextureView(VkFormat format)
 {
 	VkImageViewCreateInfo TextureImageViewInfo = {};
 	TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -36,12 +36,12 @@ void Texture3D::CreateTextureView(std::shared_ptr<VulkanEngine> engine, VkFormat
 	TextureImageViewInfo.subresourceRange.layerCount = 1;
 	TextureImageViewInfo.image = Image;
 
-	if (vkCreateImageView(engine->Device, &TextureImageViewInfo, nullptr, &View)) {
+	if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
 		throw std::runtime_error("Failed to create Image View.");
 	}
 }
 
-void Texture3D::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
+void Texture3D::CreateTextureSampler()
 {
 	VkSamplerCreateInfo TextureImageSamplerInfo = {};
 	TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -58,7 +58,7 @@ void Texture3D::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
 	TextureImageSamplerInfo.compareEnable = VK_FALSE;
 	TextureImageSamplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
-	if (vkCreateSampler(engine->Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+	if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
 	{
 		throw std::runtime_error("Failed to create Sampler.");
 	}

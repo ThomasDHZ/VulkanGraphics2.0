@@ -36,7 +36,7 @@ void TerrainMesh::Destory(std::shared_ptr<VulkanEngine> engine)
 
 void TerrainMesh::BuildTerrainMesh(std::shared_ptr<VulkanEngine> engine, const std::string HeightMapLocation)
 {
-	HeightMap = HeightMapTexture(engine, HeightMapLocation);
+	HeightMap = HeightMapTexture(HeightMapLocation);
 	const uint32_t Width = HeightMap.Width;
 	const uint32_t Height = HeightMap.Height;
 
