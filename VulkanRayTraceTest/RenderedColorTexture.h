@@ -4,16 +4,16 @@
 class RenderedColorTexture : public Texture
 {
 private:
-    void CreateTextureImage(std::shared_ptr<VulkanEngine> engine);
-    void CreateTextureView(std::shared_ptr<VulkanEngine> engine);
-    void CreateTextureSampler(std::shared_ptr<VulkanEngine> engine);
+    void CreateTextureImage();
+    void CreateTextureView();
+    void CreateTextureSampler();
 public:
     RenderedColorTexture();
     RenderedColorTexture(std::shared_ptr<VulkanEngine> engine);
-    RenderedColorTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2 TextureResolution);
-    RenderedColorTexture(std::shared_ptr<VulkanEngine> engine, int width, int Height);
+    RenderedColorTexture(glm::vec2 TextureResolution);
+    RenderedColorTexture(int width, int Height);
     ~RenderedColorTexture();
 
-    void RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine);
-    void RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2 TextureResolution);
+    void RecreateRendererTexture();
+    void RecreateRendererTexture(glm::vec2 TextureResolution);
 };

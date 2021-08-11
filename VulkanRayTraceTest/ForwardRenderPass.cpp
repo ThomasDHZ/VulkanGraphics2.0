@@ -119,7 +119,7 @@ void ForwardRenderPass::SetUpCommandBuffers()
 
 void ForwardRenderPass::RebuildSwapChain()
 {
-    DepthTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    DepthTexture->RecreateRendererTexture();
     DebugLightPipeline->Destroy(EnginePtr::GetEnginePtr());
     forwardRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
     pbrRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());

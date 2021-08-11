@@ -9,8 +9,8 @@ CubeMapRenderPass::CubeMapRenderPass(uint32_t cubeMapSize)
 {
     CubeMapSize = cubeMapSize;
 
-    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize)));
-    BlurredSkyBoxTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize, CubeMapSize)));
+    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(glm::vec2(CubeMapSize)));
+    BlurredSkyBoxTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::vec2(CubeMapSize, CubeMapSize)));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -277,7 +277,7 @@ void CubeMapRenderPass::Draw()
 
 void CubeMapRenderPass::RebuildSwapChain()
 {
-    RenderedTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr(), glm::vec2(CubeMapSize));
+    RenderedTexture->RecreateRendererTexture(glm::vec2(CubeMapSize));
 
     CubeMapTexturePipeline->Destroy(EnginePtr::GetEnginePtr());
 

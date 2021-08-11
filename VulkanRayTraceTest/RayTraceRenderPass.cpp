@@ -219,11 +219,11 @@ void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
 
 void RayTraceRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
-    RayTracedTexture->RecreateRendererTexture(engine);
-    ShadowTextureMask->RecreateRendererTexture(engine);
-    ReflectionTextureMask->RecreateRendererTexture(engine);
-    ReflectionTexture->RecreateRendererTexture(engine);
-    SSAOTexture->RecreateRendererTexture(engine);
+    RayTracedTexture->RecreateRendererTexture();
+    ShadowTextureMask->RecreateRendererTexture();
+    ReflectionTextureMask->RecreateRendererTexture();
+    ReflectionTexture->RecreateRendererTexture();
+    SSAOTexture->RecreateRendererTexture();
 
     RTPipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, RayTracedTexture);
     RTPBRPipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, RayTracedTexture);

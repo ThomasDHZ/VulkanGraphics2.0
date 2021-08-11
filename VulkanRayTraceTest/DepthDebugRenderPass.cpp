@@ -154,7 +154,7 @@ void DepthDebugRenderPass::Draw()
 
 void DepthDebugRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture)
 {
-    DebugDepthTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    DebugDepthTexture->RecreateRendererTexture();
     DebugDepthPipeline->Destroy(EnginePtr::GetEnginePtr());
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);

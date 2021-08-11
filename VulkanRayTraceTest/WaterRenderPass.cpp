@@ -204,8 +204,8 @@ void WaterRenderToTextureRenderPass::Update(std::shared_ptr<VulkanEngine> engine
 
 void WaterRenderToTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
-    DepthTexture->RecreateRendererTexture(engine);
+    RenderedTexture->RecreateRendererTexture();
+    DepthTexture->RecreateRendererTexture();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

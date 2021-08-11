@@ -172,7 +172,7 @@ void BRDFRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<
 
 void BRDFRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> InputBloomTexture)
 {
-    BRDFTexture->RecreateRendererTexture(engine);
+    BRDFTexture->RecreateRendererTexture();
     BRDFPipeline->Destroy(engine);
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);

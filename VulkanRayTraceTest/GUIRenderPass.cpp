@@ -137,7 +137,7 @@ void GUIRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<A
 
 void GUIRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
+    RenderedTexture->RecreateRendererTexture();
 
     TextRenderingPipeline->Destroy(engine);
 

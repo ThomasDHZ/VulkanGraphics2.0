@@ -177,8 +177,8 @@ void RenderPass2D::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<As
 
 void RenderPass2D::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
-    BloomTexture->RecreateRendererTexture(engine);
+    RenderedTexture->RecreateRendererTexture();
+    BloomTexture->RecreateRendererTexture();
 
     TexturePipeline->Destroy(engine);
     wireFramePipeline->Destroy(engine);

@@ -150,7 +150,7 @@ void SSAOBlurRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
 
 void SSAOBlurRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture)
 {
-    SSAOBlurTexture->RecreateRendererTexture(engine);
+    SSAOBlurTexture->RecreateRendererTexture();
 
     RasterSSAOPipeline->Destroy(engine);
 

@@ -192,9 +192,9 @@ void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManag
 
 void FrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<AssetManager> assetManager)
 {
-    RenderedTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
-    BloomTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
-    DepthTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    RenderedTexture->RecreateRendererTexture();
+    BloomTexture->RecreateRendererTexture();
+    DepthTexture->RecreateRendererTexture();
 
     TexturePipeline->Destroy(EnginePtr::GetEnginePtr());
     skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());

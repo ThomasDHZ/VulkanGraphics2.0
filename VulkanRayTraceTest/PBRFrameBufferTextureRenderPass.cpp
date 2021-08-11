@@ -188,9 +188,9 @@ void PBRFrameBufferTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine,
 
 void PBRFrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
-    BloomTexture->RecreateRendererTexture(engine);
-    DepthTexture->RecreateRendererTexture(engine);
+    RenderedTexture->RecreateRendererTexture();
+    BloomTexture->RecreateRendererTexture();
+    DepthTexture->RecreateRendererTexture();
 
     PBRTexturePipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);
@@ -213,9 +213,9 @@ void PBRFrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEng
 
 void PBRFrameBufferTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT)
 {
-    RenderedTexture->RecreateRendererTexture(engine);
-    BloomTexture->RecreateRendererTexture(engine);
-    DepthTexture->RecreateRendererTexture(engine);
+    RenderedTexture->RecreateRendererTexture();
+    BloomTexture->RecreateRendererTexture();
+    DepthTexture->RecreateRendererTexture();
 
     PBRTexturePipeline->Destroy(engine);
     skyBoxRenderingPipeline->Destroy(engine);

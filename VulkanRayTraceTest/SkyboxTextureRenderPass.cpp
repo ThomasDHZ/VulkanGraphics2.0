@@ -163,7 +163,7 @@ void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::sh
 
 void SkyboxTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManage)
 {
-    CubeMapTexture->RecreateRendererTexture(engine);
+    CubeMapTexture->RecreateRendererTexture();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

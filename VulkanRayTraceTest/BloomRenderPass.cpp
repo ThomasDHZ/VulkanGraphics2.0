@@ -163,7 +163,7 @@ void BloomRenderPass::Draw()
 
 void BloomRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture)
 {
-    BloomTexture->RecreateRendererTexture(EnginePtr::GetEnginePtr());
+    BloomTexture->RecreateRendererTexture();
 
     BloomPipelinePass1->Destroy(EnginePtr::GetEnginePtr());
     BloomPipelinePass2->Destroy(EnginePtr::GetEnginePtr());

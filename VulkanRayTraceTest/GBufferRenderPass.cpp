@@ -274,15 +274,15 @@ void GBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_p
 
 void GBufferRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
-    GPositionTexture->RecreateRendererTexture(engine);
-    GNormalTexture->RecreateRendererTexture(engine);
-    GAlbedoTexture->RecreateRendererTexture(engine);
+    GPositionTexture->RecreateRendererTexture();
+    GNormalTexture->RecreateRendererTexture();
+    GAlbedoTexture->RecreateRendererTexture();
     //GTangentTexture->RecreateRendererTexture(engine);
     //GBiTangentTexture->RecreateRendererTexture(engine);
-    GBloomTexture->RecreateRendererTexture(engine);
-    NormalMapTexture->RecreateRendererTexture(engine);
-    SpecularMapTexture->RecreateRendererTexture(engine);
-    DepthTexture->RecreateRendererTexture(engine);
+    GBloomTexture->RecreateRendererTexture();
+    NormalMapTexture->RecreateRendererTexture();
+    SpecularMapTexture->RecreateRendererTexture();
+    DepthTexture->RecreateRendererTexture();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

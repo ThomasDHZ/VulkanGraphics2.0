@@ -10,26 +10,26 @@ RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine)
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
 
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
+RenderedColorTexture::RenderedColorTexture(glm::vec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
 {
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 }
 
-RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine, int width, int height) : Texture(width, height, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
+RenderedColorTexture::RenderedColorTexture(int width, int height) : Texture(width, height, TextureType::vkRenderedTexture, VK_IMAGE_LAYOUT_UNDEFINED)
 {
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 }
@@ -38,7 +38,7 @@ RenderedColorTexture::~RenderedColorTexture()
 {
 }
 
-void RenderedColorTexture::CreateTextureImage(std::shared_ptr<VulkanEngine> engine)
+void RenderedColorTexture::CreateTextureImage()
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -57,7 +57,7 @@ void RenderedColorTexture::CreateTextureImage(std::shared_ptr<VulkanEngine> engi
     Texture::CreateTextureImage(TextureInfo);
 }
 
-void RenderedColorTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engine)
+void RenderedColorTexture::CreateTextureView()
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -76,7 +76,7 @@ void RenderedColorTexture::CreateTextureView(std::shared_ptr<VulkanEngine> engin
     }
 }
 
-void RenderedColorTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> engine)
+void RenderedColorTexture::CreateTextureSampler()
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -98,28 +98,28 @@ void RenderedColorTexture::CreateTextureSampler(std::shared_ptr<VulkanEngine> en
     }
 }
 
-void RenderedColorTexture::RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine)
+void RenderedColorTexture::RecreateRendererTexture()
 {
-    Width = engine->SwapChain.GetSwapChainResolution().width;
-    Height = engine->SwapChain.GetSwapChainResolution().height;
+    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
 
     Texture::Delete();
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
 
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-void RenderedColorTexture::RecreateRendererTexture(std::shared_ptr<VulkanEngine> engine, glm::vec2 TextureResolution)
+void RenderedColorTexture::RecreateRendererTexture(glm::vec2 TextureResolution)
 {
     Width = TextureResolution.x;
     Height = TextureResolution.y;
 
     Texture::Delete();
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
 
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
