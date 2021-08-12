@@ -9,7 +9,7 @@ BRDFRenderPass::BRDFRenderPass()
 
 BRDFRenderPass::BRDFRenderPass(std::shared_ptr<Texture> InputBloomTexture)
 {
-    BRDFTexture = std::make_shared<RenderedColorTexture>();
+    BRDFTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr()));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
