@@ -151,7 +151,7 @@ void DepthRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<A
 void DepthRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     DepthTexture->RecreateRendererTexture();
-    depthPipeline->Destroy(engine);
+    depthPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -171,7 +171,7 @@ void DepthRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::
 void DepthRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     DepthTexture->Delete();
-    depthPipeline->Destroy(engine);
+    depthPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

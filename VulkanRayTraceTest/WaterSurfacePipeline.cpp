@@ -228,7 +228,7 @@ void WaterSurfacePipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> 
     DescriptorPool = VK_NULL_HANDLE;
     DescriptorSetLayout = VK_NULL_HANDLE;
 
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

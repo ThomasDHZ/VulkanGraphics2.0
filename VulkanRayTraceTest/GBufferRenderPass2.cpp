@@ -319,8 +319,8 @@ void GBufferRenderPass2::Destroy(std::shared_ptr<VulkanEngine> engine)
     SpecularMapTexture->Delete();
     DepthTexture->Delete();
 
-    gBufferPipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
+    gBufferPipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

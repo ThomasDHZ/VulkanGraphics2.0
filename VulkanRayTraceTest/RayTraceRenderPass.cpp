@@ -249,7 +249,7 @@ void RayTraceRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
         ReflectionTexture->Delete();
         SSAOTexture->Delete();
     }
-    RTPipeline->Destroy(engine);
-    RTPBRPipeline->Destroy(engine);
-    RTHybridPipeline->Destroy(engine);
+    RTPipeline->Destroy();
+    RTPBRPipeline->Destroy();
+    RTHybridPipeline->Destroy();
 }

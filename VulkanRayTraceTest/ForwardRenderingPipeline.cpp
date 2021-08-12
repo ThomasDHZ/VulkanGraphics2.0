@@ -208,7 +208,7 @@ void ForwardRenderingPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine>
 
 void ForwardRenderingPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

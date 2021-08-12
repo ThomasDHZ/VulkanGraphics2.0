@@ -15,7 +15,7 @@ SkyboxTextureRenderPass::SkyboxTextureRenderPass(std::shared_ptr<VulkanEngine> e
     SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(camera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
     SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SkyUniformBuffer->Update(engine);
+    SkyUniformBuffer->Update();
 
     CubeMapTexture = std::make_shared<RenderedCubeMapTexture>(engine);
 
@@ -183,7 +183,7 @@ void SkyboxTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngine> engi
 void SkyboxTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     CubeMapTexture->Delete();
-    pbrIrradiancePipeline->Destroy(engine);
+    pbrIrradiancePipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

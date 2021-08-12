@@ -157,7 +157,7 @@ void FrameBufferPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 
 void FrameBufferPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr());
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);

@@ -191,7 +191,7 @@ void SSAOPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, con
 
 void SSAOPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, SSAOTextureList& textures)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool(engine, assetManager, textures);
     SetUpDescriptorLayout(engine, assetManager, textures);
     SetUpShaderPipeLine(engine, renderPass);

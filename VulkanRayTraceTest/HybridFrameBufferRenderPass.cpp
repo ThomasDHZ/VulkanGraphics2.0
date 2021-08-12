@@ -132,7 +132,7 @@ void HybridFrameBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std
 
 void HybridFrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures)
 {
-    frameBufferPipeline->Destroy(engine);
+    frameBufferPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -151,7 +151,7 @@ void HybridFrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine>
 
 void HybridFrameBufferRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    frameBufferPipeline->Destroy(engine);
+    frameBufferPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

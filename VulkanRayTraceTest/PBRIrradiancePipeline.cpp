@@ -183,6 +183,6 @@ void PBRIrradiancePipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> en
 
 void PBRIrradiancePipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass, RenderPassID RendererID)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpShaderPipeLine(engine, renderPass, RendererID);
 }

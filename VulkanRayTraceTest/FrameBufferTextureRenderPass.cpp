@@ -196,8 +196,8 @@ void FrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<AssetManager
     BloomTexture->RecreateRendererTexture();
     DepthTexture->RecreateRendererTexture();
 
-    TexturePipeline->Destroy(EnginePtr::GetEnginePtr());
-    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    TexturePipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -221,8 +221,8 @@ void FrameBufferTextureRenderPass::Destroy()
     BloomTexture->Delete();
     DepthTexture->Delete();
 
-    TexturePipeline->Destroy(EnginePtr::GetEnginePtr());
-    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    TexturePipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

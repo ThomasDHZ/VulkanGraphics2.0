@@ -37,7 +37,7 @@ void GUIRenderPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engi
 void GUIRenderPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-    assetManager->SceneData->Update(engine);
+    assetManager->SceneData->Update();
 
     std::vector<VkDescriptorBufferInfo> MaterialBufferList = assetManager->GetMaterialBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = assetManager->GetTextureBufferListDescriptor();
@@ -177,7 +177,7 @@ void GUIRenderPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine
 
 void GUIRenderPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(engine);
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool(engine, assetManager);
     SetUpDescriptorLayout(engine, assetManager);
     SetUpShaderPipeLine(engine, renderPass);

@@ -29,12 +29,12 @@ public:
 
 	virtual void Update(std::shared_ptr<VulkanEngine> engine)
 	{
-		LightBuffer.Update(engine);
+		LightBuffer.Update();
 	}
 
 	virtual void Destroy(std::shared_ptr<VulkanEngine> engine)
 	{
-		LightBuffer.Destroy(engine);
+		LightBuffer.Destroy();
 	}
 
 	VkBuffer GetLightBuffer() { return LightBuffer.VulkanBufferData.Buffer; }

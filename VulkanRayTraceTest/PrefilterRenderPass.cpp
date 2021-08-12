@@ -286,7 +286,7 @@ void PrefilterRenderPass::Draw()
 void PrefilterRenderPass::RebuildSwapChain()
 {
     RenderedTexture->RecreateRendererTexture(glm::vec2(CubeMapSize));
-    prefilterRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    prefilterRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -324,7 +324,7 @@ void PrefilterRenderPass::Destroy()
     RenderedTexture->Delete();
     BlurredSkyBoxTexture->Delete();
 
-    prefilterRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    prefilterRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

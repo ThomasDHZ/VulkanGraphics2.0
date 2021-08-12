@@ -17,7 +17,7 @@ public:
 	RayTracingGraphicsPipeline(std::shared_ptr<VulkanEngine> engine);
 	~RayTracingGraphicsPipeline();
 
-	virtual void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine) override;
-	void Destroy(std::shared_ptr<VulkanEngine> engine) override;
+	virtual void UpdateGraphicsPipeLine() override;
+	void Destroy() override;
 };
 

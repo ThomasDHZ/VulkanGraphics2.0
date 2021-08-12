@@ -180,8 +180,8 @@ void RenderPass2D::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::s
     RenderedTexture->RecreateRendererTexture();
     BloomTexture->RecreateRendererTexture();
 
-    TexturePipeline->Destroy(engine);
-    wireFramePipeline->Destroy(engine);
+    TexturePipeline->Destroy();
+    wireFramePipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -204,8 +204,8 @@ void RenderPass2D::Destroy(std::shared_ptr<VulkanEngine> engine)
     RenderedTexture->Delete();
     BloomTexture->Delete();
 
-    TexturePipeline->Destroy(engine);
-    wireFramePipeline->Destroy(engine);
+    TexturePipeline->Destroy();
+    wireFramePipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

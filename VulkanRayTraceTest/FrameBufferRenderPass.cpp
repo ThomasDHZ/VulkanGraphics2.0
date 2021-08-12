@@ -132,7 +132,7 @@ void FrameBufferRenderPass::Draw()
 
 void FrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
-    frameBufferPipeline->Destroy(EnginePtr::GetEnginePtr());
+    frameBufferPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -151,7 +151,7 @@ void FrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<Texture> RenderedTe
 
 void FrameBufferRenderPass::Destroy()
 {
-    frameBufferPipeline->Destroy(EnginePtr::GetEnginePtr());
+    frameBufferPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

@@ -120,10 +120,10 @@ void ForwardRenderPass::SetUpCommandBuffers()
 void ForwardRenderPass::RebuildSwapChain()
 {
     DepthTexture->RecreateRendererTexture();
-    DebugLightPipeline->Destroy(EnginePtr::GetEnginePtr());
-    forwardRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
-    pbrRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
-    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    DebugLightPipeline->Destroy();
+    forwardRenderingPipeline->Destroy();
+    pbrRenderingPipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -199,10 +199,10 @@ void ForwardRenderPass::Draw(RendererID rendererID)
 void ForwardRenderPass::Destroy()
 {
     DepthTexture->Delete();
-    DebugLightPipeline->Destroy(EnginePtr::GetEnginePtr());
-    forwardRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
-    pbrRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
-    skyBoxRenderingPipeline->Destroy(EnginePtr::GetEnginePtr());
+    DebugLightPipeline->Destroy();
+    forwardRenderingPipeline->Destroy();
+    pbrRenderingPipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
     BaseRenderPass::Destroy();
 }
 

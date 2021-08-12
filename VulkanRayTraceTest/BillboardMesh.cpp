@@ -67,7 +67,7 @@ void BillboardMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
     TransformInverseBuffer.CopyBufferToMemory(&transformMatrix, sizeof(transformMatrix));
 
     MeshProperties.UniformDataInfo.UVOffset = animator.GetFrameUVs(animator.CurrentFrame);
-    MeshProperties.Update(engine);
+    MeshProperties.Update();
 
 
     if (IndexCount != 0)

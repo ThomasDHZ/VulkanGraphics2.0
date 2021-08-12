@@ -157,7 +157,7 @@ void brdfRenderingPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 
 void brdfRenderingPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr());
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);

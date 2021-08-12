@@ -203,7 +203,7 @@ void SSAORenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
 {
     NoiseTexture->Update(0);
     SSAOTexture->RecreateRendererTexture();
-    RasterSSAOPipeline->Destroy(engine);
+    RasterSSAOPipeline->Destroy();
 
     for (auto SamplePoint : SamplePointBufferList)
     {
@@ -231,7 +231,7 @@ void SSAORenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     NoiseTexture->Delete();
     SSAOTexture->Delete();
-    RasterSSAOPipeline->Destroy(engine);
+    RasterSSAOPipeline->Destroy();
 
     for (auto SamplePoint : SamplePointBufferList)
     {

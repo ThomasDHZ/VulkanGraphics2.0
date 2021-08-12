@@ -152,7 +152,7 @@ void SSAOBlurRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, 
 {
     SSAOBlurTexture->RecreateRendererTexture();
 
-    RasterSSAOPipeline->Destroy(engine);
+    RasterSSAOPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -172,7 +172,7 @@ void SSAOBlurRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, 
 void SSAOBlurRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     SSAOBlurTexture->Delete();
-    RasterSSAOPipeline->Destroy(engine);
+    RasterSSAOPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

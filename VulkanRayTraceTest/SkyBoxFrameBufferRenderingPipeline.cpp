@@ -183,7 +183,7 @@ void SkyBoxFrameBufferRenderingPipeline::SetUpShaderPipeLine(const VkRenderPass&
 
 void SkyBoxFrameBufferRenderingPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr());
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);

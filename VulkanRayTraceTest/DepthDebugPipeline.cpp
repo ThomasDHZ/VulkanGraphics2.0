@@ -160,7 +160,7 @@ void DepthDebugPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 
 void DepthDebugPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> DepthTexture)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr());
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);

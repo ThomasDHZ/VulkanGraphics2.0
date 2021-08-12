@@ -13,7 +13,7 @@ WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(std::shared_ptr<V
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
-    SceneDataBuffer = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine, sceneDataptr->UniformDataInfo));
+    SceneDataBuffer = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(sceneDataptr->UniformDataInfo));
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
 
     CreateRenderPass(engine);
@@ -190,7 +190,7 @@ void WaterRenderToTextureRenderPass::Update(std::shared_ptr<VulkanEngine> engine
     copysceneDataptr.UniformDataInfo.proj[1][1] *= -1;
     copysceneDataptr.UniformDataInfo.viewPos = glm::vec4(TextureCamera->GetPosition(), 0.0f);
 
-    SceneDataBuffer->Update(engine, copysceneDataptr.UniformDataInfo);
+    SceneDataBuffer->Update(copysceneDataptr.UniformDataInfo);
 
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
     SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
@@ -199,7 +199,7 @@ void WaterRenderToTextureRenderPass::Update(std::shared_ptr<VulkanEngine> engine
     SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(camera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
     SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
-    SkyUniformBuffer->Update(engine);
+    SkyUniformBuffer->Update();
 }
 
 void WaterRenderToTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneDataptr)
@@ -227,11 +227,11 @@ void WaterRenderToTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engin
     RenderedTexture->Delete();
     DepthTexture->Delete();
 
-    SceneDataBuffer->Destroy(engine);
-    SkyUniformBuffer->Destroy(engine);
+    SceneDataBuffer->Destroy();
+    SkyUniformBuffer->Destroy();
 
-    WaterTexturePipeline->Destroy(engine);
-    WaterSkyboxRenderingPipeline->Destroy(engine);
+    WaterTexturePipeline->Destroy();
+    WaterSkyboxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

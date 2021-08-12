@@ -165,8 +165,8 @@ void BloomRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTextur
 {
     BloomTexture->RecreateRendererTexture();
 
-    BloomPipelinePass1->Destroy(EnginePtr::GetEnginePtr());
-    BloomPipelinePass2->Destroy(EnginePtr::GetEnginePtr());
+    BloomPipelinePass1->Destroy();
+    BloomPipelinePass2->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -187,8 +187,8 @@ void BloomRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTextur
 void BloomRenderPass::Destroy()
 {
     BloomTexture->Delete();
-    BloomPipelinePass1->Destroy(EnginePtr::GetEnginePtr());
-    BloomPipelinePass2->Destroy(EnginePtr::GetEnginePtr());
+    BloomPipelinePass1->Destroy();
+    BloomPipelinePass2->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

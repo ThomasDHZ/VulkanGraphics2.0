@@ -192,8 +192,8 @@ void PBRFrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEng
     BloomTexture->RecreateRendererTexture();
     DepthTexture->RecreateRendererTexture();
 
-    PBRTexturePipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
+    PBRTexturePipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -217,8 +217,8 @@ void PBRFrameBufferTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngi
     BloomTexture->RecreateRendererTexture();
     DepthTexture->RecreateRendererTexture();
 
-    PBRTexturePipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
+    PBRTexturePipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -242,8 +242,8 @@ void PBRFrameBufferTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engi
     BloomTexture->Delete();
     DepthTexture->Delete();
 
-    PBRTexturePipeline->Destroy(engine);
-    skyBoxRenderingPipeline->Destroy(engine);
+    PBRTexturePipeline->Destroy();
+    skyBoxRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

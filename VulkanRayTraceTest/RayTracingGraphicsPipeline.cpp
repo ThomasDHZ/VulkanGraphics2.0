@@ -23,12 +23,12 @@ RayTracingGraphicsPipeline::~RayTracingGraphicsPipeline()
 {
 }
 
-void RayTracingGraphicsPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine)
+void RayTracingGraphicsPipeline::UpdateGraphicsPipeLine()
 {
-    vkDestroyPipeline(engine->Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine->Device, ShaderPipelineLayout, nullptr);
-    vkDestroyDescriptorPool(engine->Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine->Device, DescriptorSetLayout, nullptr);
+    vkDestroyPipeline(VulkanPtr::GetDevice(), ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(VulkanPtr::GetDevice(), ShaderPipelineLayout, nullptr);
+    vkDestroyDescriptorPool(VulkanPtr::GetDevice(), DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(VulkanPtr::GetDevice(), DescriptorSetLayout, nullptr);
 
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
@@ -36,9 +36,9 @@ void RayTracingGraphicsPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEn
     DescriptorSetLayout = VK_NULL_HANDLE;
 }
 
-void RayTracingGraphicsPipeline::Destroy(std::shared_ptr<VulkanEngine> engine)
+void RayTracingGraphicsPipeline::Destroy()
 {
-	GraphicsPipeline::Destroy(engine);
+	GraphicsPipeline::Destroy();
 	raygenShaderBindingTable.DestoryBuffer();
 	missShaderBindingTable.DestoryBuffer();
 	hitShaderBindingTable.DestoryBuffer();

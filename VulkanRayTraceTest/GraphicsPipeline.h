@@ -56,6 +56,6 @@ public:
 	GraphicsPipeline();
 	~GraphicsPipeline();
 
-	virtual void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine);
-	virtual void Destroy(std::shared_ptr<VulkanEngine> engine);
+	virtual void UpdateGraphicsPipeLine();
+	virtual void Destroy();
 };

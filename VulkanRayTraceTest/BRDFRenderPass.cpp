@@ -173,7 +173,7 @@ void BRDFRenderPass::Draw()
 void BRDFRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture)
 {
     BRDFTexture->RecreateRendererTexture();
-    BRDFPipeline->Destroy(EnginePtr::GetEnginePtr());
+    BRDFPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -208,7 +208,7 @@ void BRDFRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture
 void BRDFRenderPass::Destroy()
 {
     BRDFTexture->Delete();
-    BRDFPipeline->Destroy(EnginePtr::GetEnginePtr());
+    BRDFPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

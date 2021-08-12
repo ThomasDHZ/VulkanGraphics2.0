@@ -279,7 +279,7 @@ void CubeMapRenderPass::RebuildSwapChain()
 {
     RenderedTexture->RecreateRendererTexture(glm::vec2(CubeMapSize));
 
-    CubeMapTexturePipeline->Destroy(EnginePtr::GetEnginePtr());
+    CubeMapTexturePipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -316,7 +316,7 @@ void CubeMapRenderPass::Destroy()
     RenderedTexture->Delete();
     BlurredSkyBoxTexture->Delete();
 
-    CubeMapTexturePipeline->Destroy(EnginePtr::GetEnginePtr());
+    CubeMapTexturePipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

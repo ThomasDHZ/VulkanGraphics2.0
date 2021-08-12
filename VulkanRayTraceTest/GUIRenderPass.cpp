@@ -139,7 +139,7 @@ void GUIRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::
 {
     RenderedTexture->RecreateRendererTexture();
 
-    TextRenderingPipeline->Destroy(engine);
+    TextRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -159,7 +159,7 @@ void GUIRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::
 void GUIRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     RenderedTexture->Delete();
-    TextRenderingPipeline->Destroy(engine);
+    TextRenderingPipeline->Destroy();
 
     vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

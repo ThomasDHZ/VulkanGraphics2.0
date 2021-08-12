@@ -70,7 +70,7 @@ void WaterSurfaceMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
 
 	TransformBuffer.CopyBufferToMemory(&FinalTransform, sizeof(FinalTransform));
-	MeshProperties.Update(engine);
+	MeshProperties.Update();
 }
 
 void WaterSurfaceMesh::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> sceneData)
@@ -95,7 +95,7 @@ void WaterSurfaceMesh::SubmitToCMDBuffer(std::shared_ptr<VulkanEngine> engine, s
 
 void WaterSurfaceMesh::Destory(std::shared_ptr<VulkanEngine> engine)
 {
-	waterSurfacePipeline->Destroy(engine);
+	waterSurfacePipeline->Destroy();
 	waterReflectionRenderPass.Destroy(engine);
 	waterRefractionRenderPass.Destroy(engine);
 	Mesh::Destory(engine);

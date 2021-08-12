@@ -246,7 +246,7 @@ void Mesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputMan
 	TransformBuffer.CopyBufferToMemory(&FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(&transformMatrix, sizeof(transformMatrix));
 
-	MeshProperties.Update(engine);
+	MeshProperties.Update();
 }
 
 void Mesh::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, bool RayTraceModeFlag)
@@ -281,7 +281,7 @@ void Mesh::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMa
 	TransformBuffer.CopyBufferToMemory(&FinalTransform, sizeof(FinalTransform));
 	TransformInverseBuffer.CopyBufferToMemory(&transformMatrix, sizeof(transformMatrix));
 
-	MeshProperties.Update(engine);
+	MeshProperties.Update();
 
 	/*if (RayTraceModeFlag)
 	{*/
@@ -342,7 +342,7 @@ void Mesh::Destory(std::shared_ptr<VulkanEngine> engine)
 	IndexBuffer.DestoryBuffer();
 	TransformBuffer.DestoryBuffer();
 	TransformInverseBuffer.DestoryBuffer();
-	MeshProperties.Destroy(engine);
+	MeshProperties.Destroy();
 
 	if (BoneTransformBuffer.BufferMemory != nullptr &&
 		BoneTransformBuffer.Buffer != nullptr)

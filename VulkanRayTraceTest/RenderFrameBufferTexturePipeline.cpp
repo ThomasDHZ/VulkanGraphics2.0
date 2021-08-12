@@ -52,7 +52,7 @@ void RenderFrameBufferTexturePipeline::SetUpDescriptorLayout()
 void RenderFrameBufferTexturePipeline::SetUpDescriptorSets()
 {
     DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-    AssetManagerPtr::GetAssetPtr()->SceneData->Update(EnginePtr::GetEnginePtr());
+    AssetManagerPtr::GetAssetPtr()->SceneData->Update();
 
     VkDescriptorBufferInfo SceneDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = AssetManagerPtr::GetAssetPtr()->GetMeshPropertiesListDescriptors();
@@ -219,7 +219,7 @@ void RenderFrameBufferTexturePipeline::SetUpShaderPipeLine(const VkRenderPass& r
 
 void RenderFrameBufferTexturePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
-    GraphicsPipeline::UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr());
+    GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);
