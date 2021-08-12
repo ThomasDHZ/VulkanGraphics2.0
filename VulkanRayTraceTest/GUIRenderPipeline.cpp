@@ -45,7 +45,7 @@ void GUIRenderPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(engine->AddBufferDescriptorSet(0, DescriptorSets, MaterialBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorList.emplace_back(engine->AddTextureDescriptorSet(1, DescriptorSets, TextureBufferInfo));
-    vkUpdateDescriptorSets(engine->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
 void GUIRenderPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
@@ -145,7 +145,7 @@ void GUIRenderPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
     pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 
-    if (vkCreatePipelineLayout(engine->Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(VulkanPtr::GetDevice(), &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create gbuffer pipeline layout.");
     }
 
@@ -171,7 +171,7 @@ void GUIRenderPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine
 
     for (auto& shader : PipelineShaderStageList)
     {
-        vkDestroyShaderModule(engine->Device, shader.module, nullptr);
+        vkDestroyShaderModule(VulkanPtr::GetDevice(), shader.module, nullptr);
     }
 }
 

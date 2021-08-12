@@ -7,7 +7,7 @@ ForwardRenderPass::ForwardRenderPass() : BaseRenderPass()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    DebugLightPipeline = std::make_shared<DebugLightRenderingPipeline>(DebugLightRenderingPipeline(RenderPass));
     forwardRenderingPipeline = std::make_shared<ForwardRenderingPipeline>(ForwardRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     pbrRenderingPipeline = std::make_shared<PBRPipeline>(PBRPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
     skyBoxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
@@ -136,7 +136,7 @@ void ForwardRenderPass::RebuildSwapChain()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    DebugLightPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);
+    DebugLightPipeline->UpdateGraphicsPipeLine(RenderPass);
     forwardRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);
     pbrRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);
     skyBoxRenderingPipeline->UpdateGraphicsPipeLine(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass);

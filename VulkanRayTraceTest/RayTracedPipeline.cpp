@@ -108,7 +108,7 @@ void RayTracedPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine
     DescriptorList.emplace_back(engine->AddTextureDescriptorSet(12, DescriptorSets, Texture3DBufferInfo));
     DescriptorList.emplace_back(engine->AddTextureDescriptorSet(13, DescriptorSets, CubeMapImage));
 
-    vkUpdateDescriptorSets(engine->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
 void RayTracedPipeline::SetUpPipeline(std::shared_ptr<VulkanEngine> engine)
@@ -188,11 +188,11 @@ void RayTracedPipeline::SetUpPipeline(std::shared_ptr<VulkanEngine> engine)
     RayTracingPipeline.pGroups = RayTraceShaders.data();
     RayTracingPipeline.maxPipelineRayRecursionDepth = 2;
     RayTracingPipeline.layout = ShaderPipelineLayout;
-    VkResult result = engine->vkCreateRayTracingPipelinesKHR(engine->Device, VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &ShaderPipeline);
+    VkResult result = engine->vkCreateRayTracingPipelinesKHR(VulkanPtr::GetDevice(), VK_NULL_HANDLE, VK_NULL_HANDLE, 1, &RayTracingPipeline, nullptr, &ShaderPipeline);
 
     for (auto shader : ShaderList)
     {
-        vkDestroyShaderModule(engine->Device, shader.module, nullptr);
+        vkDestroyShaderModule(VulkanPtr::GetDevice(), shader.module, nullptr);
     }
 }
 
@@ -204,7 +204,7 @@ void RayTracedPipeline::SetUpShaderBindingTable(std::shared_ptr<VulkanEngine> en
     const uint32_t sbtSize = groupCount * handleSizeAligned;
 
     std::vector<uint8_t> shaderHandleStorage(sbtSize);
-    engine->vkGetRayTracingShaderGroupHandlesKHR(engine->Device, ShaderPipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
+    engine->vkGetRayTracingShaderGroupHandlesKHR(VulkanPtr::GetDevice(), ShaderPipeline, 0, groupCount, sbtSize, shaderHandleStorage.data());
 
     raygenShaderBindingTable.CreateBuffer(handleSize, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data());
     missShaderBindingTable.CreateBuffer(handleSize * 2, VK_BUFFER_USAGE_SHADER_BINDING_TABLE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, shaderHandleStorage.data() + handleSizeAligned);
