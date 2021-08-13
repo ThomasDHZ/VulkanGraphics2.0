@@ -5,27 +5,27 @@ PrefilterRenderingPipeline::PrefilterRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-PrefilterRenderingPipeline::PrefilterRenderingPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+PrefilterRenderingPipeline::PrefilterRenderingPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }
 
 PrefilterRenderingPipeline::~PrefilterRenderingPipeline()
 {
 }
 
-void PrefilterRenderingPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PrefilterRenderingPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, assetManager->GetTextureBufferDescriptorCount()));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManagerPtr::GetAssetPtr()->GetTextureBufferDescriptorCount()));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void PrefilterRenderingPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PrefilterRenderingPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -36,13 +36,13 @@ void PrefilterRenderingPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEng
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->GetMaterialDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, assetManager->GetTextureBufferDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, assetManager->Get3DTextureBufferDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, AssetManagerPtr::GetAssetPtr()->GetTextureBufferDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, AssetManagerPtr::GetAssetPtr()->Get3DTextureBufferDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void PrefilterRenderingPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PrefilterRenderingPipeline::SetUpDescriptorSets()
 {
     DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -55,7 +55,7 @@ void PrefilterRenderingPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngin
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void PrefilterRenderingPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void PrefilterRenderingPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/PrefilterVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -193,11 +193,11 @@ void PrefilterRenderingPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngin
     }
 }
 
-void PrefilterRenderingPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void PrefilterRenderingPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }

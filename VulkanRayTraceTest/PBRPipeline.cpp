@@ -5,19 +5,19 @@ PBRPipeline::PBRPipeline() : GraphicsPipeline()
 {
 }
 
-PBRPipeline::PBRPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+PBRPipeline::PBRPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }
 
 PBRPipeline::~PBRPipeline()
 {
 }
 
-void PBRPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PBRPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
@@ -34,7 +34,7 @@ void PBRPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std:
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void PBRPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PBRPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -51,7 +51,7 @@ void PBRPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, st
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PBRPipeline::SetUpDescriptorSets()
 {
     DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -79,7 +79,7 @@ void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std:
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void PBRPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void PBRPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/PBRvert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -206,11 +206,11 @@ void PBRPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, cons
     }
 }
 
-void PBRPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void PBRPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }

@@ -12,8 +12,8 @@ RenderPass2D::RenderPass2D(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline = std::make_shared<Shader2DPipeline>(Shader2DPipeline(engine, assetManager, RenderPass));
-    wireFramePipeline = std::make_shared<WireFramePipeline>(WireFramePipeline(engine, assetManager, RenderPass));
+    TexturePipeline = std::make_shared<Shader2DPipeline>(Shader2DPipeline(RenderPass));
+    wireFramePipeline = std::make_shared<WireFramePipeline>(WireFramePipeline(RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -194,8 +194,8 @@ void RenderPass2D::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::s
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    wireFramePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    TexturePipeline->UpdateGraphicsPipeLine(RenderPass);
+    wireFramePipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 

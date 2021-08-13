@@ -5,19 +5,19 @@ WaterSurfacePipeline::WaterSurfacePipeline() : GraphicsPipeline()
 {
 }
 
-WaterSurfacePipeline::WaterSurfacePipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture) : GraphicsPipeline()
+WaterSurfacePipeline::WaterSurfacePipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, reflectionTexture, refractionTexture);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(reflectionTexture, refractionTexture);
 }
 
 WaterSurfacePipeline::~WaterSurfacePipeline()
 {
 }
 
-void WaterSurfacePipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void WaterSurfacePipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
@@ -35,7 +35,7 @@ void WaterSurfacePipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> eng
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void WaterSurfacePipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void WaterSurfacePipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -53,7 +53,7 @@ void WaterSurfacePipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> e
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void WaterSurfacePipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
+void WaterSurfacePipeline::SetUpDescriptorSets(std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
 {
     DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -89,7 +89,7 @@ void WaterSurfacePipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> eng
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void WaterSurfacePipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void WaterSurfacePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/WaterSurfaceShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -216,12 +216,12 @@ void WaterSurfacePipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> eng
     }
 }
 
-void WaterSurfacePipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
+void WaterSurfacePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> reflectionTexture, std::shared_ptr<Texture> refractionTexture)
 {
-    vkDestroyPipeline(engine->Device, ShaderPipeline, nullptr);
-    vkDestroyPipelineLayout(engine->Device, ShaderPipelineLayout, nullptr);
-    vkDestroyDescriptorPool(engine->Device, DescriptorPool, nullptr);
-    vkDestroyDescriptorSetLayout(engine->Device, DescriptorSetLayout, nullptr);
+    vkDestroyPipeline(VulkanPtr::GetDevice(), ShaderPipeline, nullptr);
+    vkDestroyPipelineLayout(VulkanPtr::GetDevice(), ShaderPipelineLayout, nullptr);
+    vkDestroyDescriptorPool(VulkanPtr::GetDevice(), DescriptorPool, nullptr);
+    vkDestroyDescriptorSetLayout(VulkanPtr::GetDevice(), DescriptorSetLayout, nullptr);
 
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
@@ -229,8 +229,8 @@ void WaterSurfacePipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> 
     DescriptorSetLayout = VK_NULL_HANDLE;
 
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, reflectionTexture, refractionTexture);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(reflectionTexture, refractionTexture);
 }

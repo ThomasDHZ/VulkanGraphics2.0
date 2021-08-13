@@ -6,19 +6,19 @@ GUIRenderPipeline::GUIRenderPipeline() : GraphicsPipeline()
 {
 }
 
-GUIRenderPipeline::GUIRenderPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+GUIRenderPipeline::GUIRenderPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }
 
 GUIRenderPipeline::~GUIRenderPipeline()
 {
 }
 
-void GUIRenderPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->GetMaterialDescriptorCount()));
@@ -26,7 +26,7 @@ void GUIRenderPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void GUIRenderPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->GetMaterialDescriptorCount() });
@@ -34,10 +34,10 @@ void GUIRenderPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engi
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void GUIRenderPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void GUIRenderPipeline::SetUpDescriptorSets()
 {
-    DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-    assetManager->SceneData->Update();
+    DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    AssetManagerPtr::GetAssetPtr()->SceneData->Update();
 
     std::vector<VkDescriptorBufferInfo> MaterialBufferList = AssetManagerPtr::GetAssetPtr()->GetMaterialBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->GetTextureBufferListDescriptor();
@@ -48,7 +48,7 @@ void GUIRenderPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void GUIRenderPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void GUIRenderPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/GUIShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -165,7 +165,7 @@ void GUIRenderPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(engine->Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
+    if (vkCreateGraphicsPipelines(VulkanPtr::GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create gbuffer pipeline.");
     }
 
@@ -175,11 +175,11 @@ void GUIRenderPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine
     }
 }
 
-void GUIRenderPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void GUIRenderPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }

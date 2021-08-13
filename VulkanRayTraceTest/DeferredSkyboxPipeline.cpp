@@ -5,19 +5,19 @@ DeferredSkyboxPipeline::DeferredSkyboxPipeline() : GraphicsPipeline()
 {
 }
 
-DeferredSkyboxPipeline::DeferredSkyboxPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+DeferredSkyboxPipeline::DeferredSkyboxPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }
 
 DeferredSkyboxPipeline::~DeferredSkyboxPipeline()
 {
 }
 
-void DeferredSkyboxPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void DeferredSkyboxPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
@@ -25,7 +25,7 @@ void DeferredSkyboxPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> e
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void DeferredSkyboxPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void DeferredSkyboxPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -39,15 +39,15 @@ void DeferredSkyboxPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine>
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, AssetManagerPtr::GetAssetPtr()->GetTextureBufferDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 9, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,  VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, AssetManagerPtr::GetAssetPtr()->Get3DTextureBufferDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
-    DescriptorSetLayout = engine->CreateDescriptorSetLayout(LayoutBindingInfo);
+    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void DeferredSkyboxPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void DeferredSkyboxPipeline::SetUpDescriptorSets()
 {
-    DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
     VkDescriptorBufferInfo SceneDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SkyUniformBuffer->VulkanBufferData);
-    VkDescriptorImageInfo TextureBufferInfo = assetManager->textureManager->GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorImageInfo TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->textureManager->GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
@@ -55,7 +55,7 @@ void DeferredSkyboxPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> e
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void DeferredSkyboxPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void DeferredSkyboxPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/DeferredSkyBoxFrameBufferShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -181,11 +181,11 @@ void DeferredSkyboxPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> e
     }
 }
 
-void DeferredSkyboxPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void DeferredSkyboxPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }

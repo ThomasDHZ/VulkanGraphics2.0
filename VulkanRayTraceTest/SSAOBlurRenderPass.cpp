@@ -10,7 +10,7 @@ SSAOBlurRenderPass::SSAOBlurRenderPass(std::shared_ptr<VulkanEngine> engine, std
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline = std::make_shared<SSAOBlurPipeline>(SSAOBlurPipeline(engine, assetManager, RenderPass, SSAOTexture));
+    RasterSSAOPipeline = std::make_shared<SSAOBlurPipeline>(SSAOBlurPipeline(RenderPass, SSAOTexture));
     SetUpCommandBuffers(engine);
 }
 
@@ -165,7 +165,7 @@ void SSAOBlurRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, 
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, SSAOTexture);
+    RasterSSAOPipeline->UpdateGraphicsPipeLine(RenderPass, SSAOTexture);
     SetUpCommandBuffers(engine);
 }
 

@@ -8,7 +8,7 @@ HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(std::shared_ptr<VulkanE
 {
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine); 
-    frameBufferPipeline = std::make_shared<HybridFrameBufferPipeline>(HybridFrameBufferPipeline(engine, assetManager, RenderPass, HybridTextures));
+    frameBufferPipeline = std::make_shared<HybridFrameBufferPipeline>(HybridFrameBufferPipeline(RenderPass, HybridTextures));
     SetUpCommandBuffers(engine);
 }
 
@@ -145,7 +145,7 @@ void HybridFrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine>
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    frameBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, HybridTextures);
+    frameBufferPipeline->UpdateGraphicsPipeLine(RenderPass, HybridTextures);
     SetUpCommandBuffers(engine);
 }
 

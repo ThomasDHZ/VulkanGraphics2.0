@@ -27,16 +27,16 @@ struct HybridFrameBufferTextures
 class HybridFrameBufferPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures);
-	void SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass);
+	void SetUpDescriptorPool();
+	void SetUpDescriptorLayout();
+	void SetUpDescriptorSets(const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures);
+	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 
 
 	HybridFrameBufferPipeline();
-	HybridFrameBufferPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures);
+	HybridFrameBufferPipeline(const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures);
 	~HybridFrameBufferPipeline();
 
-	void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, HybridFrameBufferTextures& HybridTextures);
 };

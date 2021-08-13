@@ -14,7 +14,7 @@ PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(RenderPass));
     SetUpCommandBuffers();
     BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();
@@ -299,7 +299,7 @@ void PrefilterRenderPass::RebuildSwapChain()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), RenderPass));
+    prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(RenderPass));
     SetUpCommandBuffers();
     BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();

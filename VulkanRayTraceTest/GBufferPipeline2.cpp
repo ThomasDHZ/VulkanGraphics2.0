@@ -5,19 +5,19 @@ GBufferPipeline2::GBufferPipeline2() : GraphicsPipeline()
 {
 }
 
-GBufferPipeline2::GBufferPipeline2(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+GBufferPipeline2::GBufferPipeline2(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }
 
 GBufferPipeline2::~GBufferPipeline2()
 {
 }
 
-void GBufferPipeline2::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void GBufferPipeline2::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
@@ -34,7 +34,7 @@ void GBufferPipeline2::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine,
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void GBufferPipeline2::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void GBufferPipeline2::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -51,19 +51,19 @@ void GBufferPipeline2::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engin
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void GBufferPipeline2::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void GBufferPipeline2::SetUpDescriptorSets()
 {
-    DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorBufferInfo SceneDataBufferInfo = engine->AddBufferDescriptor(assetManager->SceneData->VulkanBufferData);
-    std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = assetManager->GetMeshPropertiesListDescriptors();
-    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = assetManager->GetVertexBufferListDescriptors();
-    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = assetManager->GetIndexBufferListDescriptors();
-    std::vector<VkDescriptorBufferInfo> TransformBufferList = assetManager->GetTransformBufferListDescriptors();
-    std::vector<VkDescriptorBufferInfo> MaterialBufferList = assetManager->GetMaterialBufferListDescriptor();
-    std::vector<VkDescriptorImageInfo> TextureBufferInfo = assetManager->GetTextureBufferListDescriptor();
-    std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = assetManager->Get3DTextureBufferListDescriptor();
-    VkDescriptorImageInfo CubeMapImage = assetManager->GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorBufferInfo SceneDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
+    std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = AssetManagerPtr::GetAssetPtr()->GetMeshPropertiesListDescriptors();
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = AssetManagerPtr::GetAssetPtr()->GetVertexBufferListDescriptors();
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = AssetManagerPtr::GetAssetPtr()->GetIndexBufferListDescriptors();
+    std::vector<VkDescriptorBufferInfo> TransformBufferList = AssetManagerPtr::GetAssetPtr()->GetTransformBufferListDescriptors();
+    std::vector<VkDescriptorBufferInfo> MaterialBufferList = AssetManagerPtr::GetAssetPtr()->GetMaterialBufferListDescriptor();
+    std::vector<VkDescriptorImageInfo> TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->GetTextureBufferListDescriptor();
+    std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = AssetManagerPtr::GetAssetPtr()->Get3DTextureBufferListDescriptor();
+    VkDescriptorImageInfo CubeMapImage = AssetManagerPtr::GetAssetPtr()->GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(2, DescriptorSets, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
@@ -79,7 +79,7 @@ void GBufferPipeline2::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine,
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void GBufferPipeline2::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void GBufferPipeline2::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/GBuffer2Vert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -104,14 +104,14 @@ void GBufferPipeline2::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine,
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)engine->SwapChain.GetSwapChainResolution().width;
-    viewport.height = (float)engine->SwapChain.GetSwapChainResolution().height;
+    viewport.width = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    viewport.height = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = { 0, 0 };
-    scissor.extent = engine->SwapChain.GetSwapChainResolution();
+    scissor.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -191,7 +191,7 @@ void GBufferPipeline2::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine,
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
     pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 
-    if (vkCreatePipelineLayout(engine->Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(EnginePtr::GetEnginePtr()->Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create gbuffer pipeline layout.");
     }
 
@@ -221,11 +221,11 @@ void GBufferPipeline2::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine,
     }
 }
 
-void GBufferPipeline2::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void GBufferPipeline2::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }

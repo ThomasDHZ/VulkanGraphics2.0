@@ -5,31 +5,31 @@ SSAOPipeline::SSAOPipeline() : GraphicsPipeline()
 {
 }
 
-SSAOPipeline::SSAOPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, SSAOTextureList& textures) : GraphicsPipeline()
+SSAOPipeline::SSAOPipeline(const VkRenderPass& renderPass, SSAOTextureList& textures) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager, textures);
-    SetUpDescriptorLayout(engine, assetManager, textures);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, textures);
+    SetUpDescriptorPool(textures);
+    SetUpDescriptorLayout(textures);
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(textures);
 }
 
 SSAOPipeline::~SSAOPipeline()
 {
 }
 
-void SSAOPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+void SSAOPipeline::SetUpDescriptorPool(SSAOTextureList& textures)
 {
     uint32_t size = textures.KernalSampleBufferList.size();
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, size));
-    DescriptorPool = engine->CreateDescriptorPool(DescriptorPoolList);
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, size));
+    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void SSAOPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+void SSAOPipeline::SetUpDescriptorLayout(SSAOTextureList& textures)
 {
     uint32_t size = textures.KernalSampleBufferList.size();
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
@@ -38,7 +38,7 @@ void SSAOPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, s
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, size });
-    DescriptorSetLayout = engine->CreateDescriptorSetLayout(LayoutBindingInfo);
+    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 std::vector<VkDescriptorBufferInfo> SSAOPipeline::GetKernallBufferListDescriptor(std::vector<std::shared_ptr<VulkanBuffer>> SamplePoints)
 {
@@ -54,30 +54,30 @@ std::vector<VkDescriptorBufferInfo> SSAOPipeline::GetKernallBufferListDescriptor
 
     return SamplePointsBufferList;
 }
-void SSAOPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures)
+void SSAOPipeline::SetUpDescriptorSets(SSAOTextureList& textures)
 {
-    DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorImageInfo GPositionTextureBufferInfo = engine->AddTextureDescriptor(textures.GPositionTexture->View, textures.GPositionTexture->Sampler);
-    VkDescriptorImageInfo GNormalTextureBufferInfo = engine->AddTextureDescriptor(textures.GNormalTexture->View, textures.GNormalTexture->Sampler);
-    VkDescriptorImageInfo NormalMapTextureBufferInfo = engine->AddTextureDescriptor(textures.NormalMapTexture->View, textures.NormalMapTexture->Sampler);
-    VkDescriptorImageInfo NoiseTextureBufferInfo = engine->AddTextureDescriptor(textures.NoiseTexture->View, textures.NoiseTexture->Sampler);
+    VkDescriptorImageInfo GPositionTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(textures.GPositionTexture->View, textures.GPositionTexture->Sampler);
+    VkDescriptorImageInfo GNormalTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(textures.GNormalTexture->View, textures.GNormalTexture->Sampler);
+    VkDescriptorImageInfo NormalMapTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(textures.NormalMapTexture->View, textures.NormalMapTexture->Sampler);
+    VkDescriptorImageInfo NoiseTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(textures.NoiseTexture->View, textures.NoiseTexture->Sampler);
     std::vector<VkDescriptorBufferInfo> KernalBufferList = GetKernallBufferListDescriptor(textures.KernalSampleBufferList);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(0, DescriptorSets, GPositionTextureBufferInfo));
-    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(1, DescriptorSets, GNormalTextureBufferInfo));
-    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(2, DescriptorSets, NormalMapTextureBufferInfo));
-    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(3, DescriptorSets, NoiseTextureBufferInfo));
-    DescriptorList.emplace_back(engine->AddBufferDescriptorSet(4, DescriptorSets, KernalBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSets, GPositionTextureBufferInfo));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(1, DescriptorSets, GNormalTextureBufferInfo));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(2, DescriptorSets, NormalMapTextureBufferInfo));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(3, DescriptorSets, NoiseTextureBufferInfo));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(4, DescriptorSets, KernalBufferList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void SSAOPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void SSAOPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/SSAOShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/SSAOShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/SSAOShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/SSAOShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -91,14 +91,14 @@ void SSAOPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, con
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)engine->SwapChain.GetSwapChainResolution().width;
-    viewport.height = (float)engine->SwapChain.GetSwapChainResolution().height;
+    viewport.width = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    viewport.height = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor = {};
     scissor.offset = { 0, 0 };
-    scissor.extent = engine->SwapChain.GetSwapChainResolution();
+    scissor.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
 
     VkPipelineViewportStateCreateInfo viewportState = {};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -189,11 +189,11 @@ void SSAOPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, con
     }
 }
 
-void SSAOPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, SSAOTextureList& textures)
+void SSAOPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, SSAOTextureList& textures)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager, textures);
-    SetUpDescriptorLayout(engine, assetManager, textures);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, textures);
+    SetUpDescriptorPool(textures);
+    SetUpDescriptorLayout(textures);
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(textures);
 }

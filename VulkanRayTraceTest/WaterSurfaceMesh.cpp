@@ -38,7 +38,7 @@ WaterSurfaceMesh::WaterSurfaceMesh(std::shared_ptr<VulkanEngine> engine, std::sh
 	waterReflectionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
 	waterRefractionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
 
-	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(engine, assetManager, RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture));
+	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture));
 }
 
 WaterSurfaceMesh::~WaterSurfaceMesh()
@@ -77,7 +77,7 @@ void WaterSurfaceMesh::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, st
 {
 	waterReflectionRenderPass.RebuildSwapChain(engine, assetManager, sceneData);
 	waterRefractionRenderPass.RebuildSwapChain(engine, assetManager, sceneData);
-	waterSurfacePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
+	waterSurfacePipeline->UpdateGraphicsPipeLine(RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
 }
 
 void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, RenderPassID RendererID, int a)

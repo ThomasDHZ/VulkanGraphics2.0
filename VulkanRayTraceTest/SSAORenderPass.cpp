@@ -14,7 +14,7 @@ SSAORenderPass::SSAORenderPass(std::shared_ptr<VulkanEngine> engine, std::shared
     GenerateNoiseTexture(engine, textures);
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline = std::make_shared<SSAOPipeline>(SSAOPipeline(engine, assetManager, RenderPass, textures));
+    RasterSSAOPipeline = std::make_shared<SSAOPipeline>(SSAOPipeline(RenderPass, textures));
     SetUpCommandBuffers(engine);
 }
 
@@ -223,7 +223,7 @@ void SSAORenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
     GenerateNoiseTexture(engine, textures);
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    RasterSSAOPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass, textures);
+    RasterSSAOPipeline->UpdateGraphicsPipeLine(RenderPass, textures);
     SetUpCommandBuffers(engine);
 }
 

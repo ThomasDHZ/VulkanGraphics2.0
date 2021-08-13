@@ -26,16 +26,16 @@ struct SSAOTextureList
 class SSAOPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures);
-	void SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures);
-	void SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& textures);
-	void SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass);
+	void SetUpDescriptorPool(SSAOTextureList& textures);
+	void SetUpDescriptorLayout(SSAOTextureList& textures);
+	void SetUpDescriptorSets(SSAOTextureList& textures);
+	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 	std::vector<VkDescriptorBufferInfo> GetKernallBufferListDescriptor(std::vector<std::shared_ptr<VulkanBuffer>> SamplePoints);
 public:
 	SSAOPipeline();
-	SSAOPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, SSAOTextureList& textures);
+	SSAOPipeline(const VkRenderPass& renderPass, SSAOTextureList& textures);
 	~SSAOPipeline();
 
-	void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, SSAOTextureList& textures);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, SSAOTextureList& textures);
 };
 

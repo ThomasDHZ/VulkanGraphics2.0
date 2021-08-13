@@ -5,19 +5,19 @@ ForwardRenderingPipeline::ForwardRenderingPipeline() : GraphicsPipeline()
 {
 }
 
-ForwardRenderingPipeline::ForwardRenderingPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass) : GraphicsPipeline()
+ForwardRenderingPipeline::ForwardRenderingPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
-	SetUpDescriptorPool(engine, assetManager);
-	SetUpDescriptorLayout(engine, assetManager);
-	SetUpShaderPipeLine(engine, renderPass);
-	SetUpDescriptorSets(engine, assetManager);
+	SetUpDescriptorPool();
+	SetUpDescriptorLayout();
+	SetUpShaderPipeLine(renderPass);
+	SetUpDescriptorSets();
 }
 
 ForwardRenderingPipeline::~ForwardRenderingPipeline()
 {
 }
 
-void ForwardRenderingPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void ForwardRenderingPipeline::SetUpDescriptorPool()
 {
 	std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
 	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
@@ -34,7 +34,7 @@ void ForwardRenderingPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine>
 	DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void ForwardRenderingPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void ForwardRenderingPipeline::SetUpDescriptorLayout()
 {
 	std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
@@ -51,7 +51,7 @@ void ForwardRenderingPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngin
 	DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void ForwardRenderingPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void ForwardRenderingPipeline::SetUpDescriptorSets()
 {
 	DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -79,7 +79,7 @@ void ForwardRenderingPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine>
 	vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void ForwardRenderingPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void ForwardRenderingPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/vert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -206,11 +206,11 @@ void ForwardRenderingPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine>
     }
 }
 
-void ForwardRenderingPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass)
+void ForwardRenderingPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets();
 }

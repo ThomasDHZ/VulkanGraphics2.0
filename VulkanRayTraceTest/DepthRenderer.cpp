@@ -10,7 +10,7 @@ DepthRenderer::DepthRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_p
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    depthPipeline = std::make_shared<DepthPipeline>(DepthPipeline(engine, assetManager, RenderPass));
+    depthPipeline = std::make_shared<DepthPipeline>(DepthPipeline(RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -164,7 +164,7 @@ void DepthRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    depthPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    depthPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 

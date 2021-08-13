@@ -18,8 +18,8 @@ WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(std::shared_ptr<V
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    WaterTexturePipeline = std::make_shared<RenderWaterTexturePipeline>(RenderWaterTexturePipeline(engine, assetManager, RenderPass));
-    WaterSkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(engine, assetManager, RenderPass));
+    WaterTexturePipeline = std::make_shared<RenderWaterTexturePipeline>(RenderWaterTexturePipeline(RenderPass));
+    WaterSkyboxRenderingPipeline = std::make_shared<SkyBoxRenderingPipeline>(SkyBoxRenderingPipeline(RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -218,7 +218,7 @@ void WaterRenderToTextureRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngi
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    WaterTexturePipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    WaterTexturePipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 

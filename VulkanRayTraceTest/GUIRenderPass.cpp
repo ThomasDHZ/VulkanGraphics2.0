@@ -12,7 +12,7 @@ GUIRenderPass::GUIRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_p
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TextRenderingPipeline = std::make_shared<GUIRenderPipeline>(GUIRenderPipeline(engine, assetManager, RenderPass));
+    TextRenderingPipeline = std::make_shared<GUIRenderPipeline>(GUIRenderPipeline(RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -152,7 +152,7 @@ void GUIRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    TextRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    TextRenderingPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 

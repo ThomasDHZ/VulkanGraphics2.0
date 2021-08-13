@@ -21,8 +21,8 @@ GBufferRenderPass2::GBufferRenderPass2(std::shared_ptr<VulkanEngine> engine, std
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    gBufferPipeline = std::make_shared<GBufferPipeline2>(GBufferPipeline2(engine, assetManager, RenderPass));
-    skyBoxRenderingPipeline = std::make_shared<DeferredSkyboxPipeline>(DeferredSkyboxPipeline(engine, assetManager, RenderPass));
+    gBufferPipeline = std::make_shared<GBufferPipeline2>(GBufferPipeline2(RenderPass));
+    skyBoxRenderingPipeline = std::make_shared<DeferredSkyboxPipeline>(DeferredSkyboxPipeline(RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -301,8 +301,8 @@ void GBufferRenderPass2::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, 
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    gBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
-    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    gBufferPipeline->UpdateGraphicsPipeLine(RenderPass);
+    skyBoxRenderingPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 

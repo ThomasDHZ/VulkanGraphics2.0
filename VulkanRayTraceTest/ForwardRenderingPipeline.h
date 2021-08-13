@@ -6,14 +6,14 @@
 class ForwardRenderingPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass);
+	void SetUpDescriptorPool();
+	void SetUpDescriptorLayout();
+	void SetUpDescriptorSets();
+	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	ForwardRenderingPipeline();
-	ForwardRenderingPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass);
+	ForwardRenderingPipeline(const VkRenderPass& renderPass);
 	~ForwardRenderingPipeline();
 
-	void UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> renderer, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
 };

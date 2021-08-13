@@ -21,7 +21,7 @@ GBufferRenderPass::GBufferRenderPass(std::shared_ptr<VulkanEngine> engine, std::
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    gBufferPipeline = std::make_shared<GBufferPipeline>(GBufferPipeline(engine, assetManager, RenderPass));
+    gBufferPipeline = std::make_shared<GBufferPipeline>(GBufferPipeline(RenderPass));
     SetUpCommandBuffers(engine);
 }
 
@@ -295,7 +295,7 @@ void GBufferRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, s
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    gBufferPipeline->UpdateGraphicsPipeLine(engine, assetManager, RenderPass);
+    gBufferPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers(engine);
 }
 

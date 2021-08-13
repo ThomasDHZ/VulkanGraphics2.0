@@ -5,48 +5,48 @@ SSAOBlurPipeline::SSAOBlurPipeline() : GraphicsPipeline()
 {
 }
 
-SSAOBlurPipeline::SSAOBlurPipeline(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture) : GraphicsPipeline()
+SSAOBlurPipeline::SSAOBlurPipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture) : GraphicsPipeline()
 {
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, SSAOTexture);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(SSAOTexture);
 }
 
 SSAOBlurPipeline::~SSAOBlurPipeline()
 {
 }
 
-void SSAOBlurPipeline::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void SSAOBlurPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPool = engine->CreateDescriptorPool(DescriptorPoolList);
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void SSAOBlurPipeline::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void SSAOBlurPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    DescriptorSetLayout = engine->CreateDescriptorSetLayout(LayoutBindingInfo);
+    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void SSAOBlurPipeline::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture)
+void SSAOBlurPipeline::SetUpDescriptorSets(std::shared_ptr<Texture> SSAOTexture)
 {
-    DescriptorSets = engine->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    DescriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkDescriptorImageInfo RenderedTextureBufferInfo = engine->AddTextureDescriptor(SSAOTexture->View, SSAOTexture->Sampler);
+    VkDescriptorImageInfo RenderedTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(SSAOTexture->View, SSAOTexture->Sampler);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(engine->AddTextureDescriptorSet(0, DescriptorSets, RenderedTextureBufferInfo));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSets, RenderedTextureBufferInfo));
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void SSAOBlurPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine, const VkRenderPass& renderPass)
+void SSAOBlurPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/SSAOBlurShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(engine->CreateShader("Shader/SSAOBlurShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/SSAOBlurShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/SSAOBlurShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -60,14 +60,14 @@ void SSAOBlurPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine,
     VkViewport viewport = {};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)engine->SwapChain.GetSwapChainResolution().width;
-    viewport.height = (float)engine->SwapChain.GetSwapChainResolution().height;
+    viewport.width = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    viewport.height = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor = {};
     scissor.offset = { 0, 0 };
-    scissor.extent = engine->SwapChain.GetSwapChainResolution();
+    scissor.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
 
     VkPipelineViewportStateCreateInfo viewportState = {};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -151,11 +151,11 @@ void SSAOBlurPipeline::SetUpShaderPipeLine(std::shared_ptr<VulkanEngine> engine,
     }
 }
 
-void SSAOBlurPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture)
+void SSAOBlurPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> SSAOTexture)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool(engine, assetManager);
-    SetUpDescriptorLayout(engine, assetManager);
-    SetUpShaderPipeLine(engine, renderPass);
-    SetUpDescriptorSets(engine, assetManager, SSAOTexture);
+    SetUpDescriptorPool();
+    SetUpDescriptorLayout();
+    SetUpShaderPipeLine(renderPass);
+    SetUpDescriptorSets(SSAOTexture);
 }

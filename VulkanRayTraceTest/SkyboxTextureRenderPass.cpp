@@ -21,7 +21,7 @@ SkyboxTextureRenderPass::SkyboxTextureRenderPass(std::shared_ptr<VulkanEngine> e
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    pbrIrradiancePipeline = std::make_shared<PBRIrradiancePipeline>(PBRIrradiancePipeline(engine, assetManager, RenderPass, RendererID));
+    pbrIrradiancePipeline = std::make_shared<PBRIrradiancePipeline>(PBRIrradiancePipeline(RenderPass, RendererID));
     SetUpCommandBuffers(engine);
 }
 
@@ -176,7 +176,7 @@ void SkyboxTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngine> engi
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
-    pbrIrradiancePipeline->UpdateGraphicsPipeLine(engine, RenderPass, RendererID);
+    pbrIrradiancePipeline->UpdateGraphicsPipeLine(RenderPass, RendererID);
     SetUpCommandBuffers(engine);
 }
 
