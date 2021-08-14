@@ -7,20 +7,19 @@ ObjectManager::ObjectManager()
 {
 }
 
-ObjectManager::ObjectManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager)
+ObjectManager::ObjectManager(std::shared_ptr<VulkanEngine> Engine)
 {
-	engine = Engine;
 }
 
 ObjectManager::~ObjectManager()
 {
 }
 
-void ObjectManager::Update(std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
+void ObjectManager::Update()
 {
 	for (auto& obj : ObjectList)
 	{
-		obj->Update(engine, inputManager, materialManager);
+		obj->Update();
 	}
 }
 
@@ -30,7 +29,7 @@ void ObjectManager::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>&
 	{
 		if (obj->ObjType == ObjectType::Obj_GameObject)
 		{
-			static_cast<GameObject*>(obj.get())->SubmitAnimationToCommandBuffer(engine, CMDBufferList, imageIndex);
+			static_cast<GameObject*>(obj.get())->SubmitAnimationToCommandBuffer(CMDBufferList, imageIndex);
 		}
 	}
 }
@@ -61,7 +60,7 @@ void ObjectManager::Destory()
 {
 	for (auto& obj : ObjectList)
 	{
-		obj->Destory(engine);
+		obj->Destory();
 	}
 }
 

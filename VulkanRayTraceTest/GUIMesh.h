@@ -74,15 +74,15 @@ public:
 	glm::vec2 UVOffset = glm::vec2(0.0f);
 
 	GUIMesh();
-	GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList);
-	GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, glm::vec2 Position);
-	GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial);
-	GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial, glm::vec2 Position);
+	GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList);
+	GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, glm::vec2 Position);
+	GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial);
+	GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial, glm::vec2 Position);
 	~GUIMesh();
 
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, glm::vec2 objectPosition);
+	virtual void Update(glm::vec2 objectPosition);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
-	virtual void Destory(std::shared_ptr<VulkanEngine> engine);
+	virtual void Destory();
 	void AddChildMesh(std::shared_ptr<GUIMesh> mesh);
 };
 

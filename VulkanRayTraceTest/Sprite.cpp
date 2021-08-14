@@ -5,7 +5,7 @@ Sprite::Sprite() : Mesh()
 
 }
 
-Sprite::Sprite(std::shared_ptr<VulkanEngine> engine, glm::vec2 spriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
+Sprite::Sprite(glm::vec2 spriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
 {
     SpriteSize = spriteSize;
 
@@ -23,12 +23,12 @@ Sprite::Sprite(std::shared_ptr<VulkanEngine> engine, glm::vec2 spriteSize, glm::
         1, 2, 3
     };
 
-    MeshID = engine->GenerateID();
+    MeshID = EnginePtr::GetEnginePtr()->GenerateID();
     MeshType = MeshTypeFlag::Mesh_Type_2D_Sprite;
     MeshMaterial = material;
     AnimationPlayer = AnimationPlayer2D();
 
-    MeshProperties = MeshPropertiesUniformBuffer(engine);
+    MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
     ParentModelID = 0;
     VertexList = SpriteVertices;
 
@@ -44,8 +44,8 @@ Sprite::Sprite(std::shared_ptr<VulkanEngine> engine, glm::vec2 spriteSize, glm::
     tileCollider = TileCollider(SpriteVertices, SpriteIndices, Position);
     MeshTimer = std::make_shared<Timer>(Timer());
 
-    BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-    SetUpMesh(engine, VertexList, SpriteIndices);
+    BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+    SetUpMesh(VertexList, SpriteIndices);
 }
 
 Sprite::~Sprite()
@@ -68,7 +68,7 @@ void Sprite::SetAnimation(uint32_t AnimationIndex)
     AnimationPlayer.SetAnimation(AnimationIndex);
 }
 
-void Sprite::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
+void Sprite::Update(std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
     Velocity.y = -0.01f;
 
@@ -122,5 +122,5 @@ void Sprite::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputM
     MeshPosition.x += Velocity.x;
     MeshPosition.y += Velocity.y;
     UVOffset = AnimationPlayer.GetFrame();
-    Mesh::Update(engine, inputManager, materialManager);
+    Mesh::Update();
 }

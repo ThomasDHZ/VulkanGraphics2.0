@@ -9,7 +9,7 @@ private:
 protected:
 public:
 	GUIPanel();
-	GUIPanel(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Material> meshmaterial, GuiRectangle rectangle, glm::vec2 position);
+	GUIPanel(std::shared_ptr<Material> meshmaterial, GuiRectangle rectangle, glm::vec2 position);
 	~GUIPanel();
 };
 

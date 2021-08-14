@@ -74,8 +74,8 @@ SparkManStage::SparkManStage(std::shared_ptr<VulkanEngine> engine, std::shared_p
 					    14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 13 };
 	LightDirection = glm::vec3(0.12f, 0.035f, -0.279f);
 
-	AddSprite(engine, assetManager, std::make_shared<MegaMan>(MegaMan(engine, assetManager, glm::vec3(2.0f, 7.0f, 0.0f))));
-	LoadLevel(engine, assetManager, loadedmaterial);
+	AddSprite(std::make_shared<MegaMan>(MegaMan(glm::vec3(2.0f, 7.0f, 0.0f))));
+	LoadLevel(loadedmaterial);
 }
 
 SparkManStage::~SparkManStage()

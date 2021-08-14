@@ -9,11 +9,11 @@ class TextMesh : public GUIObject
 private:
 	std::shared_ptr<Font> font;
 	std::shared_ptr<Material> material;
-	void BuildTextMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string Text);
+	void BuildTextMesh(const std::string Text);
 public:
 
 	TextMesh();
-	TextMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position);
+	TextMesh(std::shared_ptr<Font> fontPTR, const std::string Text, glm::vec2 position);
 	~TextMesh();
 };
 

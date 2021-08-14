@@ -12,7 +12,7 @@ AssetManager::AssetManager(std::shared_ptr<VulkanEngine> engine)
     inputManager = InputManagerPtr::GetInputManagerPtr();
     textureManager = TextureManagerPtr::GetTextureManagerPtr();
     materialManager = MaterialManagerPtr::GetMaterialManagerPtr();
-    meshManager = MeshManagerPtr::GetCameraManagerPtr();
+    meshManager = MeshManagerPtr::GetMeshManagerPtr();
     lightManager = LightManagerPtr::GetLightManagerPtr();
     guiManager = GuiManagerPtr::GetGuiManagerPtr();
     ObjManager = ObjManagerPtr::GetObjManagerPtr();
@@ -41,7 +41,7 @@ void AssetManager::Update(bool RayTraceFlag)
     meshManager->Update(cameraManager->ActiveCamera);
     lightManager->Update();
     guiManager->Update();
-    ObjManager->Update(inputManager, materialManager);
+    ObjManager->Update();
     if (cameraManager->ActiveCamera->cameraType == CameraType::Perspective_Camera)
     {
        // SceneData->UniformDataInfo.sLight.direction = static_cast<PerspectiveCamera*>(ActiveCamera.get())->GetFront();
@@ -87,7 +87,7 @@ void AssetManager::Delete()
 
     TextureManagerPtr::GetTextureManagerPtr()->Destory();
     MaterialManagerPtr::GetMaterialManagerPtr()->Destory();
-    MeshManagerPtr::GetCameraManagerPtr()->Destroy();
+    MeshManagerPtr::GetMeshManagerPtr()->Destroy();
     LightManagerPtr::GetLightManagerPtr()->Destory();
     GuiManagerPtr::GetGuiManagerPtr()->Destory();
     ObjManagerPtr::GetObjManagerPtr()->Destory();

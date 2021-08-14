@@ -27,11 +27,11 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     MeshManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), InputManagerPtr::GetInputManagerPtr(), MaterialManagerPtr::GetMaterialManagerPtr());
     LightManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), CameraManagerPtr::GetCameraManagerPtr());
     GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
-    ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), MaterialManagerPtr::GetMaterialManagerPtr(), InputManagerPtr::GetInputManagerPtr(), TextureManagerPtr::GetTextureManagerPtr());
+    ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
     AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-    gameObject->AddChildModel(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<SparkManStage>(SparkManStage(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), glm::vec3(0.0f, 0.0f, 0.0f))));
+    gameObject->AddChildModel(std::make_shared<SparkManStage>(SparkManStage(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), glm::vec3(0.0f, 0.0f, 0.0f))));
     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
     //std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
@@ -39,7 +39,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject2);
 
     std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-    gameObject3->AddChildMesh(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
+    gameObject3->AddChildMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject3);
 
 
@@ -123,8 +123,8 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     rectangle.UpperRightVertex = glm::vec2(0.5f, -0.5f);
     rectangle.LowerRightVertex = glm::vec2(0.5f, 0.5f);
     rectangle.LowerLeftVertex = glm::vec2(-0.5f, 0.5f);
-    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(EnginePtr::GetEnginePtr(), materialPtr, rectangle, glm::vec2(0.0f))));
-    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr()->materialManager, AssetManagerPtr::GetAssetPtr()->textureManager, AssetManagerPtr::GetAssetPtr()->guiManager->FontList[0], "SparkMan", glm::vec2(0.0f))));
+    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(std::make_shared<GUIPanel>(GUIPanel(materialPtr, rectangle, glm::vec2(0.0f))));
+    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(std::make_shared<TextMesh>(TextMesh(AssetManagerPtr::GetAssetPtr()->guiManager->FontList[0], "SparkMan", glm::vec2(0.0f))));
 
     AssetManagerPtr::GetAssetPtr()->SceneData->UniformDataInfo.dlight.direction = glm::vec4(0.0f);
     AssetManagerPtr::GetAssetPtr()->SceneData->UniformDataInfo.dlight.ambient = glm::vec4(0.2f);
@@ -213,5 +213,5 @@ void Engine::LoadCubeMap(std::string CubeMapFiles[6])
 
 void Engine::LoadTerrain(const std::string& HeightMapPath, std::shared_ptr<Material> material)
 {
-    AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<TerrainMesh>(TerrainMesh(EnginePtr::GetEnginePtr(), HeightMapPath, material)));
+    AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<TerrainMesh>(TerrainMesh(HeightMapPath, material)));
 }

@@ -6,27 +6,27 @@ Model::Model()
 {
 }
 
-Model::Model(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
+Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
 {
-	ModelID = engine->GenerateID();
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, VertexList, IndexList, materialManager->GetDefaultMaterial(), DrawFlags)));
+	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, MaterialManagerPtr::GetMaterialManagerPtr()->GetDefaultMaterial(), DrawFlags)));
 	MeshList.back()->ParentModelID = ModelID;
 	MeshList.back()->VertexList = VertexList;
 	MeshList.back()->MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
+Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
 {
-	ModelID = engine->GenerateID();
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, VertexList, IndexList, material, DrawFlags)));
+	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, material, DrawFlags)));
 	MeshList.back()->ParentModelID = ModelID;
 	MeshList.back()->VertexList = VertexList;
 	MeshList.back()->MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags)
+Model::Model(const std::string& FilePath, MeshDrawFlags DrawFlags)
 {
-	ModelID = engine->GenerateID();
+	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
 	Assimp::Importer ModelImporter;
 
 	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -39,7 +39,7 @@ Model::Model(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManag
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(engine, materialManager, textureManager, FilePath, Scene->mRootNode, Scene, DrawFlags);
+	LoadMesh(FilePath, Scene->mRootNode, Scene, DrawFlags);
 
 	LoadMeshTransform(0, ModelTransform);
 
@@ -132,7 +132,7 @@ void Model::LoadAnimations(const aiScene* scene)
 	}
 }
 
-void Model::LoadBones(std::shared_ptr<VulkanEngine> engine, const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
+void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
 {
 	for (int x = 0; x < mesh->mNumBones; x++)
 	{
@@ -142,7 +142,7 @@ void Model::LoadBones(std::shared_ptr<VulkanEngine> engine, const aiNode* RootNo
 	}
 }
 
-void Model::LoadMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags)
+void Model::LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -154,11 +154,11 @@ void Model::LoadMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Mater
 		 auto vertices = LoadVertices(mesh);
 		 auto boneWeights = LoadBoneWeights(mesh, vertices);
 		 auto indices = LoadIndices(mesh);
-		 auto materialID = LoadMaterial(engine, materialManager, textureManager, FilePath, mesh, scene);
+		 auto materialID = LoadMaterial(FilePath, mesh, scene);
 		
-		LoadBones(engine, scene->mRootNode, mesh, vertices);
+		LoadBones(scene->mRootNode, mesh, vertices);
 
-		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(engine, vertices, indices, materialID, boneWeights, BoneList.size(), DrawFlags)));
+		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(vertices, indices, materialID, boneWeights, BoneList.size(), DrawFlags)));
 		MeshList.back()->ParentModelID = ModelID;
 		MeshList.back()->VertexList = vertices;
 		MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
@@ -176,7 +176,7 @@ void Model::LoadMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Mater
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(engine, materialManager, textureManager, FilePath, node->mChildren[i], scene, DrawFlags);
+		LoadMesh(FilePath, node->mChildren[i], scene, DrawFlags);
 	}
 }
 
@@ -269,9 +269,9 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-std::shared_ptr<Material> Model::LoadMaterial(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materailManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+std::shared_ptr<Material> Model::LoadMaterial(const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
-	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(Material(engine));
+	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(Material(EnginePtr::GetEnginePtr()));
 
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
@@ -307,59 +307,59 @@ std::shared_ptr<Material> Model::LoadMaterial(std::shared_ptr<VulkanEngine> engi
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
 	{
 		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-		ModelMaterial->materialTexture.DiffuseMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_SRGB);
+		ModelMaterial->materialTexture.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_SRGB);
 		ModelMaterial->materialTexture.AlbedoMap = ModelMaterial->materialTexture.DiffuseMap;
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_METALNESS); x++)
 	{
 		material->GetTexture(aiTextureType_METALNESS, x, &TextureLocation);
-		ModelMaterial->materialTexture.MatallicMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS); x++)
 	{
 		material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, x, &TextureLocation);
-		ModelMaterial->materialTexture.RoughnessMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION); x++)
 	{
 		material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, x, &TextureLocation);
-		ModelMaterial->materialTexture.AOMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
 	{
 		material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
-		ModelMaterial->materialTexture.SpecularMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.SpecularMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
 	{
 		material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
-		ModelMaterial->materialTexture.NormalMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
 	{
 		material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
-		ModelMaterial->materialTexture.DepthMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
 	{
 		material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
-		ModelMaterial->materialTexture.AlphaMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.AlphaMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
 	{
 		material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
-		ModelMaterial->materialTexture.EmissionMap = textureManager->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+		ModelMaterial->materialTexture.EmissionMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
 	}
 
-	return materailManager->LoadMaterial("sfsd", ModelMaterial);
+	return MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("sfsd", ModelMaterial);
 }
 
 void Model::BoneWeightPlacement(std::vector<MeshBoneWeights>& meshBoneWeight, unsigned int vertexID, unsigned int bone_id, float weight)
@@ -386,7 +386,7 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 	}
 }
 
-void Model::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, bool RayTraceFlag)
+void Model::Update(bool RayTraceFlag)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -402,19 +402,19 @@ void Model::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputMa
 
 	for (auto& mesh : MeshList)
 	{
-		mesh->Update(engine, ModelTransform, BoneList, inputManager, materialManager, RayTraceFlag);
+		mesh->Update(ModelTransform, BoneList, RayTraceFlag);
 	}
 }
 
-void Model::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
+void Model::Update()
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh->Update(engine, inputManager, materialManager);
+		mesh->Update();
 	}
 }
 
-void Model::SubmitAnimationToCommandBuffer(std::shared_ptr<VulkanEngine> engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+void Model::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
 {
 	if (AnimatedModel)
 	{
@@ -423,13 +423,13 @@ void Model::SubmitAnimationToCommandBuffer(std::shared_ptr<VulkanEngine> engine,
 	}
 }
 
-void Model::AddMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Mesh> mesh)
+void Model::AddMesh(std::shared_ptr<Mesh> mesh)
 {
 	mesh->ParentModelID = ModelID;
 	MeshList.emplace_back(mesh);
 }
 
-void Model::Destory(std::shared_ptr<VulkanEngine> engine)
+void Model::Destory()
 {
 	if (AnimatedModel)
 	{

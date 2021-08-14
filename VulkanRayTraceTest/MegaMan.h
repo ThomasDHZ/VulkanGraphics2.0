@@ -39,9 +39,9 @@ public:
 	static constexpr glm::vec2 SpriteUVSize = glm::vec2(.05882f, 1.0f);
 
 	MegaMan();
-	MegaMan(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position);
+	MegaMan(glm::vec3 Position);
 	~MegaMan();
 
-	void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList);
+	void Update(float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList);
 };
 

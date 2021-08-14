@@ -5,12 +5,12 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
+Mesh::Mesh(std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
 {
 	std::vector<uint32_t> indices{};
 
-	MeshID = engine->GenerateID();
-	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
+	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 	DrawFlags = MeshDrawFlags;
 
 	MeshTransform = glm::mat4(1.0f);
@@ -22,14 +22,14 @@ Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList
 	BoneCount = 0;
 	MeshTimer = std::make_shared<Timer>(Timer());
 
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	SetUpMesh(engine, VertexList, indices);
+	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+	SetUpMesh(VertexList, indices);
 }
 
-Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags)
+Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags)
 {
-	MeshID = engine->GenerateID();
-	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
+	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 	DrawFlags = MeshDrawFlags;
 
 	MeshTransform = glm::mat4(1.0f);
@@ -41,17 +41,17 @@ Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList
 	BoneCount = 0;
 	MeshTimer = std::make_shared<Timer>(Timer());
 
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	SetUpMesh(engine, VertexList, IndexList);
+	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+	SetUpMesh(VertexList, IndexList);
 }
 
-Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags)
+Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags)
 {
-	MeshID = engine->GenerateID();
+	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshMaterial = material;
 	DrawFlags = MeshDrawFlags;
 
-	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -62,18 +62,18 @@ Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList
 	BoneCount = 0;
 	MeshTimer = std::make_shared<Timer>(Timer());
 
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	SetUpMesh(engine, VertexList, IndexList);
+	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+	SetUpMesh(VertexList, IndexList);
 }
 
-Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag meshType, MeshDrawFlags MeshDrawFlags)
+Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag meshType, MeshDrawFlags MeshDrawFlags)
 {
-	MeshID = engine->GenerateID();
+	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshMaterial = material;
 	MeshType = meshType;
 	DrawFlags = MeshDrawFlags;
 
-	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -84,17 +84,17 @@ Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList
 	BoneCount = 0;
 	MeshTimer = std::make_shared<Timer>(Timer());
 
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	SetUpMesh(engine, VertexList, IndexList);
+	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+	SetUpMesh(VertexList, IndexList);
 }
 
-Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags)
+Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags)
 {
-	MeshID = engine->GenerateID();
+	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshMaterial = material;
 	DrawFlags = MeshDrawFlags;
 
-	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -107,8 +107,8 @@ Mesh::Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList
 	BoneWeightList = boneWeights;
 	MeshTimer = std::make_shared<Timer>(Timer());
 
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	SetUpMesh(engine, VertexList, IndexList);
+	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+	SetUpMesh(VertexList, IndexList);
 }
 
 Mesh::~Mesh()
@@ -116,7 +116,7 @@ Mesh::~Mesh()
 
 }
 
-void Mesh::MeshBottomLevelAccelerationStructure(std::shared_ptr<VulkanEngine> engine)
+void Mesh::MeshBottomLevelAccelerationStructure()
 {
 	std::vector<uint32_t> PrimitiveCountList{ PrimitiveCount };
 	std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList{ AccelerationStructureGeometry };
@@ -137,15 +137,15 @@ void Mesh::MeshBottomLevelAccelerationStructure(std::shared_ptr<VulkanEngine> en
 
 	VkAccelerationStructureBuildSizesInfoKHR AccelerationStructureBuildSizesInfo = {};
 	AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-	engine->vkGetAccelerationStructureBuildSizesKHR(engine->Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
+	EnginePtr::GetEnginePtr()->vkGetAccelerationStructureBuildSizesKHR(VulkanPtr::GetDevice(), VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
 
 	if (BottomLevelAccelerationBuffer.handle == VK_NULL_HANDLE)
 	{
-		BottomLevelAccelerationBuffer.CreateAccelerationStructure(engine, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
+		BottomLevelAccelerationBuffer.CreateAccelerationStructure(EnginePtr::GetEnginePtr(), VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
 	}
 
 	VulkanBuffer scratchBuffer = VulkanBuffer(AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	scratchBuffer.BufferDeviceAddress = engine->GetBufferDeviceAddress(scratchBuffer.Buffer);
+	scratchBuffer.BufferDeviceAddress = EnginePtr::GetEnginePtr()->GetBufferDeviceAddress(scratchBuffer.Buffer);
 
 	VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
 	AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
@@ -165,12 +165,12 @@ void Mesh::MeshBottomLevelAccelerationStructure(std::shared_ptr<VulkanEngine> en
 		AccelerationBuildGeometryInfo.dstAccelerationStructure = BottomLevelAccelerationBuffer.handle;
 	}
 
-	BottomLevelAccelerationBuffer.AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
+	BottomLevelAccelerationBuffer.AcclerationCommandBuffer(EnginePtr::GetEnginePtr(), AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
 
 	scratchBuffer.DestoryBuffer();
 }
 
-void Mesh::SetUpMesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+void Mesh::SetUpMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	VkDeviceOrHostAddressConstKHR VertexBufferDeviceAddress;
 	VkDeviceOrHostAddressConstKHR IndexBufferDeviceAddress;
@@ -180,7 +180,7 @@ void Mesh::SetUpMesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& 
 	if (IndexCount != 0)
 	{
 		IndexBuffer.CreateBuffer(IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
-		IndexBufferDeviceAddress.deviceAddress = engine->GetBufferDeviceAddress(IndexBuffer.Buffer);
+		IndexBufferDeviceAddress.deviceAddress = EnginePtr::GetEnginePtr()->GetBufferDeviceAddress(IndexBuffer.Buffer);
 	}
 	if (BoneCount != 0)
 	{
@@ -190,9 +190,9 @@ void Mesh::SetUpMesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& 
 	TransformBuffer.CreateBuffer(sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	TransformInverseBuffer.CreateBuffer(sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MeshTransform);
 	
-	VertexBufferDeviceAddress.deviceAddress = engine->GetBufferDeviceAddress(VertexBuffer.Buffer);
-	IndexBufferDeviceAddress.deviceAddress = engine->GetBufferDeviceAddress(IndexBuffer.Buffer);
-	TransformInverseBufferDeviceAddress.deviceAddress = engine->GetBufferDeviceAddress(TransformInverseBuffer.Buffer);
+	VertexBufferDeviceAddress.deviceAddress = EnginePtr::GetEnginePtr()->GetBufferDeviceAddress(VertexBuffer.Buffer);
+	IndexBufferDeviceAddress.deviceAddress = EnginePtr::GetEnginePtr()->GetBufferDeviceAddress(IndexBuffer.Buffer);
+	TransformInverseBufferDeviceAddress.deviceAddress = EnginePtr::GetEnginePtr()->GetBufferDeviceAddress(TransformInverseBuffer.Buffer);
 
 	PrimitiveCount = IndexCount / 3;
 
@@ -218,11 +218,11 @@ void Mesh::SetUpMesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& 
 
 	if (IndexCount != 0)
 	{
-		MeshBottomLevelAccelerationStructure(engine);
+		MeshBottomLevelAccelerationStructure();
 	}
 }
 
-void Mesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager)
+void Mesh::Update()
 {
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -249,7 +249,7 @@ void Mesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputMan
 	MeshProperties.Update();
 }
 
-void Mesh::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, bool RayTraceModeFlag)
+void Mesh::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, bool RayTraceModeFlag)
 {
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -283,13 +283,13 @@ void Mesh::Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMa
 
 	MeshProperties.Update();
 
-	/*if (RayTraceModeFlag)
-	{*/
+	if (RayTraceModeFlag)
+	{
 		if (IndexCount != 0)
 		{
-			MeshBottomLevelAccelerationStructure(engine);
+			MeshBottomLevelAccelerationStructure();
 		}
-	//}
+	}
 }
 
 void Mesh::Draw(VkCommandBuffer& commandBuffer)
@@ -336,7 +336,7 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::sh
 	}
 }
 
-void Mesh::Destory(std::shared_ptr<VulkanEngine> engine)
+void Mesh::Destory()
 {
 	VertexBuffer.DestoryBuffer();
 	IndexBuffer.DestoryBuffer();
@@ -351,6 +351,6 @@ void Mesh::Destory(std::shared_ptr<VulkanEngine> engine)
 	}
 	if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
 	{
-		BottomLevelAccelerationBuffer.Destroy(engine);
+		BottomLevelAccelerationBuffer.Destroy(EnginePtr::GetEnginePtr());
 	}
 }

@@ -4,7 +4,7 @@ GUIMesh::GUIMesh()
 {
 }
 
-GUIMesh::GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList)
+GUIMesh::GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	VertexCount = VertexList.size();
 	IndexCount = IndexList.size();
@@ -13,7 +13,7 @@ GUIMesh::GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& V
 	IndexBuffer.CreateBuffer(IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
 }
 
-GUIMesh::GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, glm::vec2 Position)
+GUIMesh::GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, glm::vec2 Position)
 {
 	MeshPosition = Position;
 
@@ -24,7 +24,7 @@ GUIMesh::GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& V
 	IndexBuffer.CreateBuffer(IndexList.size() * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, IndexList.data());
 }
 
-GUIMesh::GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial)
+GUIMesh::GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial)
 {
 	VertexCount = VertexList.size();
 	IndexCount = IndexList.size();
@@ -35,7 +35,7 @@ GUIMesh::GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& V
 	material = meshmaterial;
 }
 
-GUIMesh::GUIMesh(std::shared_ptr<VulkanEngine> engine, std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial, glm::vec2 Position)
+GUIMesh::GUIMesh(std::vector<GUIVertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> meshmaterial, glm::vec2 Position)
 {
 	MeshPosition = Position;
 
@@ -52,7 +52,7 @@ GUIMesh::~GUIMesh()
 {
 }
 
-void GUIMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, glm::vec2 objectPosition)
+void GUIMesh::Update(glm::vec2 objectPosition)
 {
 	ObjectPosition = objectPosition;
 }
@@ -79,7 +79,7 @@ void GUIMesh::AddChildMesh(std::shared_ptr<GUIMesh> mesh)
 	ChildrenMeshList.emplace_back(mesh);
 }
 
-void GUIMesh::Destory(std::shared_ptr<VulkanEngine> engine)
+void GUIMesh::Destory()
 {
 	VertexBuffer.DestoryBuffer();
 	IndexBuffer.DestoryBuffer();

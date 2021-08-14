@@ -34,12 +34,12 @@ class Model
 private:
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
-	void LoadMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags);
+	void LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<MeshBoneWeights> LoadBoneWeights(aiMesh* mesh, std::vector<Vertex>& VertexList);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
-	std::shared_ptr<Material> LoadMaterial(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materailManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
-	void LoadBones(std::shared_ptr<VulkanEngine> engine, const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
+	std::shared_ptr<Material> LoadMaterial(const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
 	void BoneWeightPlacement(std::vector<MeshBoneWeights>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight);
 	void LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix);
 
@@ -67,16 +67,16 @@ public:
 	glm::mat4 ModelTransform;
 
 	Model();
-	Model(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	Model(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	Model(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	Model(const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
 	~Model();
 
-	void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, bool RayTraceFlag);
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager);
-	void SubmitAnimationToCommandBuffer(std::shared_ptr<VulkanEngine> engine, std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
-	void AddMesh(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Mesh> mesh);
-	void Destory(std::shared_ptr<VulkanEngine> engine);
+	void Update(bool RayTraceFlag);
+	virtual void Update();
+	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
+	void AddMesh(std::shared_ptr<Mesh> mesh);
+	void Destory();
 	
 	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix);
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix);

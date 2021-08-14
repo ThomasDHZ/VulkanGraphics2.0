@@ -34,10 +34,10 @@ void MeshManager::Update(std::shared_ptr<Camera> camera)
         {
             switch (mesh->MeshType)
             {
-            case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(engine, inputManager, materialManager); break;
+            case MeshTypeFlag::Mesh_Type_Normal:  mesh->Update(); break;
             //case MeshTypeFlag::Mesh_Type_2D_Sprite: static_cast<Sprite*>(mesh.get())->Update(engine, inputManager, materialManager, timer, MeshList); break;
-            case MeshTypeFlag::Mesh_Type_Billboard: static_cast<BillboardMesh*>(mesh.get())->Update(engine, inputManager, materialManager, camera); break;
-            default: mesh->Update(engine, inputManager, materialManager);
+            case MeshTypeFlag::Mesh_Type_Billboard: static_cast<BillboardMesh*>(mesh.get())->Update(camera); break;
+            default: mesh->Update();
             };
            
         }
@@ -73,7 +73,7 @@ void MeshManager::Destroy()
 {
     for (auto mesh : MeshList)
     {
-        mesh->Destory(engine);
+        mesh->Destory();
     }
 }
 

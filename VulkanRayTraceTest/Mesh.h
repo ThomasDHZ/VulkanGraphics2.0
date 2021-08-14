@@ -44,7 +44,7 @@ private:
 protected:
 	std::shared_ptr<Timer> MeshTimer;
 
-	void MeshBottomLevelAccelerationStructure(std::shared_ptr<VulkanEngine> engine);
+	void MeshBottomLevelAccelerationStructure();
 	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
 	{
 		return VkTransformMatrixKHR
@@ -57,6 +57,7 @@ protected:
 public:
 	MeshDrawFlags DrawFlags = Mesh_Draw_All;
 	MeshTypeFlag MeshType = Mesh_Type_Normal;
+
 	uint32_t ParentModelID = 0;
 	uint32_t MeshID = 0;
 	uint32_t MeshBufferIndex = 0;
@@ -64,6 +65,7 @@ public:
 	uint32_t VertexCount = 0;
 	uint32_t IndexCount = 0;
 	uint32_t PrimitiveCount; //TriangleCount
+
 	glm::vec2 UVOffset = glm::vec2(0.0f);
 	glm::vec2 UVScale = glm::vec2(1.0f);
 	glm::vec2 UVFlip = glm::vec2(0.0f);
@@ -99,18 +101,18 @@ public:
 	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
 
 	Mesh();
-	Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType = Mesh_Type_Normal, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	Mesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType = Mesh_Type_Normal, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	~Mesh();
 
-	void SetUpMesh(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	void SetUpMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager);
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, std::shared_ptr<InputManager> inputManager, std::shared_ptr<MaterialManager> materialManager, bool RayTraceModeFlag);
+	virtual void Update();
+	virtual void Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, bool RayTraceModeFlag);
 	virtual void Draw(VkCommandBuffer& commandBuffer);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);
-	virtual void Destory(std::shared_ptr<VulkanEngine> engine);
+	virtual void Destory();
 };

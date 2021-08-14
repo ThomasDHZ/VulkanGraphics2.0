@@ -51,7 +51,7 @@ public:
 		}
 	}
 
-	static std::shared_ptr<MeshManager> GetCameraManagerPtr()
+	static std::shared_ptr<MeshManager> GetMeshManagerPtr()
 	{
 		return meshManager;
 	}

@@ -4,7 +4,7 @@ BillboardMesh::BillboardMesh() : Mesh()
 {
 }
 
-BillboardMesh::BillboardMesh(std::shared_ptr<VulkanEngine> engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
+BillboardMesh::BillboardMesh(glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material) : Mesh()
 {
     std::vector<Vertex> SpriteVertices =
     {
@@ -20,11 +20,11 @@ BillboardMesh::BillboardMesh(std::shared_ptr<VulkanEngine> engine, glm::vec2 Spr
         1, 2, 3
     };
 
-    MeshID = engine->GenerateID();
+    MeshID = EnginePtr::GetEnginePtr()->GenerateID();
     MeshMaterial = material;
     MeshType = Mesh_Type_Billboard;
 
-    MeshProperties = MeshPropertiesUniformBuffer(engine);
+    MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
     ParentModelID = 0;
     VertexList = SpriteVertices;
 
@@ -38,15 +38,15 @@ BillboardMesh::BillboardMesh(std::shared_ptr<VulkanEngine> engine, glm::vec2 Spr
     PrimitiveCount = static_cast<uint32_t>(SpriteIndices.size()) / 3;
 
     animator = Animator2D(10, 6, glm::vec2(0.1f, -0.166f));
-    BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-    SetUpMesh(engine, VertexList, SpriteIndices);
+    BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+    SetUpMesh(VertexList, SpriteIndices);
 }
 
 BillboardMesh::~BillboardMesh()
 {
 }
 
-void BillboardMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputmanager, std::shared_ptr<MaterialManager> materialmanager, std::shared_ptr<Camera> camera)
+void BillboardMesh::Update(std::shared_ptr<Camera> camera)
 {
     MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -72,6 +72,6 @@ void BillboardMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
     if (IndexCount != 0)
     {
-        MeshBottomLevelAccelerationStructure(engine);
+        MeshBottomLevelAccelerationStructure();
     }
 }

@@ -8,10 +8,10 @@ private:
 
 public:
 	BillboardMesh();
-	BillboardMesh(std::shared_ptr<VulkanEngine> engine, glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
+	BillboardMesh(glm::vec2 SpriteSize, glm::vec2 UVSize, glm::vec3 Position, std::shared_ptr<Material> material);
 	~BillboardMesh();
 
 	Animator2D animator;
-	virtual void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<InputManager> inputmanager, std::shared_ptr<MaterialManager> materialmanager, std::shared_ptr<Camera> camera);
+	virtual void Update(std::shared_ptr<Camera> camera);
 };
 

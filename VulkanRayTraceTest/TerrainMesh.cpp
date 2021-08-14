@@ -4,37 +4,37 @@ TerrainMesh::TerrainMesh() : Mesh()
 {
 }
 
-TerrainMesh::TerrainMesh(std::shared_ptr<VulkanEngine> engine, const std::string HeightMapLocation, std::shared_ptr<Material> material) : Mesh()
+TerrainMesh::TerrainMesh(const std::string HeightMapLocation, std::shared_ptr<Material> material) : Mesh()
 {
 
-	MeshID = engine->GenerateID();
-	MeshProperties = MeshPropertiesUniformBuffer(engine);
+	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
+	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 	DrawFlags = MeshDrawFlags::Mesh_Draw_All;
 	MeshMaterial = material;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
 
-	BuildTerrainMesh(engine, HeightMapLocation);
+	BuildTerrainMesh(HeightMapLocation);
 	VertexCount = VertexList.size();
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 	
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	SetUpMesh(engine, VertexList, IndexList);
+	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
+	SetUpMesh(VertexList, IndexList);
 }
 
 TerrainMesh::~TerrainMesh()
 {
 }
 
-void TerrainMesh::Destory(std::shared_ptr<VulkanEngine> engine)
+void TerrainMesh::Destory()
 {
 	HeightMap.Delete();
-	Mesh::Destory(engine);
+	Mesh::Destory();
 }
 
-void TerrainMesh::BuildTerrainMesh(std::shared_ptr<VulkanEngine> engine, const std::string HeightMapLocation)
+void TerrainMesh::BuildTerrainMesh(const std::string HeightMapLocation)
 {
 	HeightMap = HeightMapTexture(HeightMapLocation);
 	const uint32_t Width = HeightMap.Width;

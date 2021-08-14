@@ -19,7 +19,7 @@ void GUIManager::Update()
 {
 	for (auto& obj : GuiObjectList)
 	{
-		obj->Update(EnginePtr::GetEnginePtr(), InputManagerPtr::GetInputManagerPtr(), MaterialManagerPtr::GetMaterialManagerPtr());
+		obj->Update();
 	}
 }
 
@@ -35,7 +35,7 @@ void GUIManager::Destory()
 {
 	for (auto& obj : GuiObjectList)
 	{
-		obj->Destory(EnginePtr::GetEnginePtr());
+		obj->Destory();
 	}
 }
 
