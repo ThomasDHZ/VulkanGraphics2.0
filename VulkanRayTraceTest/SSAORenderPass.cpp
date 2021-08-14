@@ -2,11 +2,11 @@
 #include "GraphicsPipeline.h"
 #include <random>
 
-SSAORenderPass::SSAORenderPass()
+SSAORenderPass::SSAORenderPass() : BaseRenderPass()
 {
 }
 
-SSAORenderPass::SSAORenderPass(SSAOTextureList& textures)
+SSAORenderPass::SSAORenderPass(SSAOTextureList& textures) : BaseRenderPass()
 {
     SSAOTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
 
@@ -238,12 +238,5 @@ void SSAORenderPass::Destroy()
         SamplePoint->DestoryBuffer();
     }
 
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

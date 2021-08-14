@@ -4,8 +4,9 @@
 #include "RenderedColorTexture.h"
 #include "BloomPipeline.h"
 #include "brdfRenderingPipeline.h"
+#include "BaseRenderPass.h"
 
-class BRDFRenderPass
+class BRDFRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -19,10 +20,6 @@ public:
 
 	std::shared_ptr<RenderedColorTexture> BRDFTexture;
 	std::shared_ptr<brdfRenderingPipeline> BRDFPipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture);
 	void Draw();

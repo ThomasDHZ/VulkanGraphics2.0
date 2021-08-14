@@ -1,11 +1,11 @@
 #include "CubeMapRenderPass.h"
 #include "GraphicsPipeline.h"
 
-CubeMapRenderPass::CubeMapRenderPass()
+CubeMapRenderPass::CubeMapRenderPass() : BaseRenderPass()
 {
 }
 
-CubeMapRenderPass::CubeMapRenderPass(uint32_t cubeMapSize)
+CubeMapRenderPass::CubeMapRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
     CubeMapSize = cubeMapSize;
 
@@ -317,13 +317,5 @@ void CubeMapRenderPass::Destroy()
     BlurredSkyBoxTexture->Delete();
 
     CubeMapTexturePipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

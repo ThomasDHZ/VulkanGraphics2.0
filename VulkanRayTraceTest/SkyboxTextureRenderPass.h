@@ -5,8 +5,9 @@
 #include "AssetManager.h"
 #include "RenderedCubeMapTexture.h"
 #include "PBRIrradiancePipeline.h"
+#include "BaseRenderPass.h"
 
-class SkyboxTextureRenderPass
+class SkyboxTextureRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -22,10 +23,6 @@ public:
 
 	std::shared_ptr<PBRIrradiancePipeline> pbrIrradiancePipeline;
 	std::shared_ptr<RenderedCubeMapTexture> CubeMapTexture;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void UpdateSwapChain();
 	void Draw();

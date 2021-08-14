@@ -4,8 +4,9 @@
 #include "RenderedColorTexture.h"
 #include "RenderedDepthTexture.h"
 #include "GUIRenderPipeline.h"
+#include "BaseRenderPass.h"
 
-class GUIRenderPass
+class GUIRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -19,10 +20,6 @@ public:
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<GUIRenderPipeline> TextRenderingPipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
 	void UpdateSwapChain();

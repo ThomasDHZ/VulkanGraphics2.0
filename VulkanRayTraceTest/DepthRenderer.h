@@ -4,8 +4,9 @@
 #include "RenderedColorTexture.h"
 #include "DepthPipeline.h"
 #include "RenderedDepthTexture.h"
+#include "BaseRenderPass.h"
 
-class DepthRenderer
+class DepthRenderer : public BaseRenderPass
 {
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
@@ -18,10 +19,6 @@ public:
 
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 	std::shared_ptr<DepthPipeline> depthPipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
 	void Draw();

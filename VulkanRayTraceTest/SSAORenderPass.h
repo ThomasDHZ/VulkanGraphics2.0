@@ -5,8 +5,9 @@
 #include "AssetManager.h"
 #include "SSAOPipeline.h"
 #include "SSAOBlurPipeline.h"
+#include "BaseRenderPass.h"
 
-class SSAORenderPass
+class SSAORenderPass : public BaseRenderPass
 {
 private:
 
@@ -29,10 +30,6 @@ public:
 	float bias = 0.25f;
 	std::shared_ptr<RenderedColorTexture> SSAOTexture;
 	std::shared_ptr<SSAOPipeline> RasterSSAOPipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(SSAOTextureList& Textures);
 	void Draw();

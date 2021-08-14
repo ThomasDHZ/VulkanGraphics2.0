@@ -1,10 +1,10 @@
 #include "FrameBufferRenderPass.h"
 
-FrameBufferRenderPass::FrameBufferRenderPass()
+FrameBufferRenderPass::FrameBufferRenderPass() : BaseRenderPass()
 {
 }
 
-FrameBufferRenderPass::FrameBufferRenderPass(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
+FrameBufferRenderPass::FrameBufferRenderPass(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : BaseRenderPass()
 {
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -152,13 +152,5 @@ void FrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<Texture> RenderedTe
 void FrameBufferRenderPass::Destroy()
 {
     frameBufferPipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

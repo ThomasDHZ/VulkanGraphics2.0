@@ -3,8 +3,9 @@
 #include "AssetManager.h"
 #include "RenderedColorTexture.h"
 #include "BloomPipeline.h"
+#include "BaseRenderPass.h"
 
-class BloomRenderPass
+class BloomRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -19,10 +20,6 @@ public:
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<BloomPipeline> BloomPipelinePass1;
 	std::shared_ptr<BloomPipeline> BloomPipelinePass2;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture);
 	void Draw();

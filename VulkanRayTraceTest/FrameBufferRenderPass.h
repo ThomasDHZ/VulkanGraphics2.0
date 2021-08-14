@@ -1,7 +1,8 @@
 #pragma once
 #include "FrameBufferPipeline.h"
+#include "BaseRenderPass.h"
 
-class FrameBufferRenderPass
+class FrameBufferRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -14,10 +15,6 @@ public:
 	~FrameBufferRenderPass();
 
 	std::shared_ptr<FrameBufferPipeline> frameBufferPipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
 	void Draw();

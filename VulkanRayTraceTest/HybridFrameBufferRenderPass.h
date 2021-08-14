@@ -2,8 +2,9 @@
 #include "FrameBufferPipeline.h"
 #include "HybridFrameBufferPipeline.h"
 #include "RenderFrameBufferTexturePipeline.h"
+#include "BaseRenderPass.h"
 
-class HybridFrameBufferRenderPass
+class HybridFrameBufferRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -16,10 +17,6 @@ public:
 	~HybridFrameBufferRenderPass();
 
 	std::shared_ptr<HybridFrameBufferPipeline> frameBufferPipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain(HybridFrameBufferTextures& HybridTextures);
 	void Draw();

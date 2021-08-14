@@ -8,8 +8,9 @@
 #include "Skybox.h"
 #include "RenderedCubeMapTexture.h"
 #include "PrefilterRenderingPipeline.h"
+#include "BaseRenderPass.h"
 
-class PrefilterRenderPass
+class PrefilterRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -27,10 +28,6 @@ public:
 	std::shared_ptr<RenderedCubeMapTexture> BlurredSkyBoxTexture;
 
 	std::shared_ptr<PrefilterRenderingPipeline> prefilterRenderingPipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
 	void Draw();

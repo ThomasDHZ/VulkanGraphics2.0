@@ -2,11 +2,11 @@
 #include "GraphicsPipeline.h"
 #include "Skybox.h"
 
-GUIRenderPass::GUIRenderPass()
+GUIRenderPass::GUIRenderPass() : BaseRenderPass()
 {
 }
 
-GUIRenderPass::GUIRenderPass(std::shared_ptr<VulkanEngine> engine)
+GUIRenderPass::GUIRenderPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
 
@@ -160,14 +160,5 @@ void GUIRenderPass::Destroy()
 {
     RenderedTexture->Delete();
     TextRenderingPipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

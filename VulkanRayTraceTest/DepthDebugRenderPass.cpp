@@ -1,10 +1,10 @@
 #include "DepthDebugRenderPass.h"
 
-DepthDebugRenderPass::DepthDebugRenderPass()
+DepthDebugRenderPass::DepthDebugRenderPass() : BaseRenderPass()
 {
 }
 
-DepthDebugRenderPass::DepthDebugRenderPass(std::shared_ptr<Texture> InputBloomTexture)
+DepthDebugRenderPass::DepthDebugRenderPass(std::shared_ptr<Texture> InputBloomTexture) : BaseRenderPass()
 {
     DebugDepthTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
 
@@ -176,13 +176,5 @@ void DepthDebugRenderPass::Destroy()
 {
     DebugDepthTexture->Delete();
     DebugDepthPipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

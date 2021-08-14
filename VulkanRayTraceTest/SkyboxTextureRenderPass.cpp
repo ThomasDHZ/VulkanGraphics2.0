@@ -1,11 +1,11 @@
 #include "SkyboxTextureRenderPass.h"
 #include "GraphicsPipeline.h"
 
-SkyboxTextureRenderPass::SkyboxTextureRenderPass()
+SkyboxTextureRenderPass::SkyboxTextureRenderPass() : BaseRenderPass()
 {
 }
 
-SkyboxTextureRenderPass::SkyboxTextureRenderPass(std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera)
+SkyboxTextureRenderPass::SkyboxTextureRenderPass(std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera) : BaseRenderPass()
 {
     SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(EnginePtr::GetEnginePtr());
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
@@ -184,14 +184,5 @@ void SkyboxTextureRenderPass::Destroy()
 {
     CubeMapTexture->Delete();
     pbrIrradiancePipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

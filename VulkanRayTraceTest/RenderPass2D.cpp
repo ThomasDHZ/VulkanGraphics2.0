@@ -1,11 +1,11 @@
 #include "RenderPass2D.h"
 #include "GraphicsPipeline.h"
 
-RenderPass2D::RenderPass2D()
+RenderPass2D::RenderPass2D() : BaseRenderPass()
 {
 }
 
-RenderPass2D::RenderPass2D(std::shared_ptr<VulkanEngine> engine)
+RenderPass2D::RenderPass2D(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(engine);
     BloomTexture = std::make_shared<RenderedColorTexture>(engine);
@@ -207,12 +207,5 @@ void RenderPass2D::Destroy()
     TexturePipeline->Destroy();
     wireFramePipeline->Destroy();
 
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

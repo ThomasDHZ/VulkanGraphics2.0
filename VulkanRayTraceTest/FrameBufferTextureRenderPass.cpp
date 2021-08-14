@@ -2,7 +2,7 @@
 #include "GraphicsPipeline.h"
 #include "Skybox.h"
 
-FrameBufferTextureRenderPass::FrameBufferTextureRenderPass()
+FrameBufferTextureRenderPass::FrameBufferTextureRenderPass() : BaseRenderPass()
 {
 }
 
@@ -224,13 +224,5 @@ void FrameBufferTextureRenderPass::Destroy()
     TexturePipeline->Destroy();
     skyBoxRenderingPipeline->Destroy();
 
-    vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(EnginePtr::GetEnginePtr()->Device, framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

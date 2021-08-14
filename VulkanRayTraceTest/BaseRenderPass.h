@@ -15,5 +15,7 @@ public:
 	BaseRenderPass();
 	~BaseRenderPass();
 	virtual void Destroy();
+
+	VkCommandBuffer GetCommandBuffer() { return CommandBuffer; }
 };
 

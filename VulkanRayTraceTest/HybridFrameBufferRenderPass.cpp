@@ -1,10 +1,10 @@
 #include "HybridFrameBufferRenderPass.h"
 
-HybridFrameBufferRenderPass::HybridFrameBufferRenderPass()
+HybridFrameBufferRenderPass::HybridFrameBufferRenderPass() : BaseRenderPass()
 {
 }
 
-HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(HybridFrameBufferTextures& HybridTextures)
+HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(HybridFrameBufferTextures& HybridTextures) : BaseRenderPass()
 {
     CreateRenderPass();
     CreateRendererFramebuffers(); 
@@ -152,13 +152,5 @@ void HybridFrameBufferRenderPass::RebuildSwapChain(HybridFrameBufferTextures& Hy
 void HybridFrameBufferRenderPass::Destroy()
 {
     frameBufferPipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

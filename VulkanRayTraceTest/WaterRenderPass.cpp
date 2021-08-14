@@ -1,11 +1,11 @@
 #include "WaterRenderPass.h"
 #include "GraphicsPipeline.h"
 
-WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass()
+WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass() : BaseRenderPass()
 {
 }
 
-WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer)
+WaterRenderToTextureRenderPass::WaterRenderToTextureRenderPass(std::shared_ptr<SceneDataUniformBuffer> sceneDataptr, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer) : BaseRenderPass()
 {
 
     TextureCamera = std::make_shared<PerspectiveCamera>(glm::vec2(EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution.width, EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution.height), glm::vec3(0.0f, 0.0f, 5.0f));
@@ -233,12 +233,5 @@ void WaterRenderToTextureRenderPass::Destroy()
     WaterTexturePipeline->Destroy();
     WaterSkyboxRenderingPipeline->Destroy();
 
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

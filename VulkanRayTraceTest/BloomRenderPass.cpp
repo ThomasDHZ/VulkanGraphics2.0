@@ -2,11 +2,11 @@
 #include "GraphicsPipeline.h"
 #include "SSAOBlurRenderPass.h"
 
-BloomRenderPass::BloomRenderPass()
+BloomRenderPass::BloomRenderPass() : BaseRenderPass()
 {
 }
 
-BloomRenderPass::BloomRenderPass(std::shared_ptr<Texture> InputBloomTexture)
+BloomRenderPass::BloomRenderPass(std::shared_ptr<Texture> InputBloomTexture) : BaseRenderPass()
 {
     BloomTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
 
@@ -189,13 +189,5 @@ void BloomRenderPass::Destroy()
     BloomTexture->Delete();
     BloomPipelinePass1->Destroy();
     BloomPipelinePass2->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

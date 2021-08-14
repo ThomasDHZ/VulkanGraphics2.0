@@ -3,11 +3,11 @@
 
 #include "SSAOBlurRenderPass.h"
 
-BRDFRenderPass::BRDFRenderPass()
+BRDFRenderPass::BRDFRenderPass() : BaseRenderPass()
 {
 }
 
-BRDFRenderPass::BRDFRenderPass(std::shared_ptr<Texture> InputBloomTexture)
+BRDFRenderPass::BRDFRenderPass(std::shared_ptr<Texture> InputBloomTexture) : BaseRenderPass()
 {
     BRDFTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr()));
 
@@ -209,13 +209,5 @@ void BRDFRenderPass::Destroy()
 {
     BRDFTexture->Delete();
     BRDFPipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

@@ -8,8 +8,9 @@
 #include "AssetManager.h"
 #include "GBufferPipeline.h"
 #include "DeferredSkyboxPipeline.h"
+#include "BaseRenderPass.h"
 
-class GBufferRenderPass
+class GBufferRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -32,10 +33,6 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<GBufferPipeline> gBufferPipeline;
-
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
 	void Draw();

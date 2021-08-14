@@ -1,11 +1,11 @@
 #include "PrefilterRenderPass.h"
 #include "GraphicsPipeline.h"
 
-PrefilterRenderPass::PrefilterRenderPass()
+PrefilterRenderPass::PrefilterRenderPass() : BaseRenderPass()
 {
 }
 
-PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize)
+PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
     CubeMapSize = cubeMapSize;
 
@@ -326,12 +326,5 @@ void PrefilterRenderPass::Destroy()
 
     prefilterRenderingPipeline->Destroy();
 
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

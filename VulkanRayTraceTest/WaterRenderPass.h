@@ -5,8 +5,9 @@
 #include "AssetManager.h"
 #include "RenderWaterTexturePipeline.h"
 #include "Skybox.h"
+#include "BaseRenderPass.h"
 
-class WaterRenderToTextureRenderPass
+class WaterRenderToTextureRenderPass : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -29,9 +30,6 @@ public:
 	std::shared_ptr<RenderWaterTexturePipeline> WaterTexturePipeline;
 	std::shared_ptr<SkyBoxRenderingPipeline> WaterSkyboxRenderingPipeline;
 
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void Update(SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
 	void RebuildSwapChain(std::shared_ptr<SceneDataUniformBuffer> sceneData);

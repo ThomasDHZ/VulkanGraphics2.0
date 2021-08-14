@@ -115,9 +115,9 @@ void BlinnPhongRasterRenderer::Destroy()
 
 std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)
 {
-    CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.CommandBuffer);
-    CommandBufferSubmitList.emplace_back(BloomRenderer.CommandBuffer);
-   // CommandBufferSubmitList.emplace_back(DebugDepthRenderer.CommandBuffer);
+    CommandBufferSubmitList.emplace_back(FrameBufferTextureRenderer.GetCommandBuffer());
+    CommandBufferSubmitList.emplace_back(BloomRenderer.GetCommandBuffer());
+   // CommandBufferSubmitList.emplace_back(DebugDepthRenderer.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.CommandBuffer);
     //CommandBufferSubmitList.emplace_back(lightPathRenderer.CommandBuffer);
     return CommandBufferSubmitList;

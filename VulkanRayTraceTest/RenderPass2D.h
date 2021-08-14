@@ -6,8 +6,9 @@
 #include "RenderFrameBufferTexturePipeline.h"
 #include "Shader2DPipeline.h"
 #include "WireFramePipeline.h"
+#include "BaseRenderPass.h"
 
-class RenderPass2D
+class RenderPass2D : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -26,10 +27,6 @@ public:
 
 	std::shared_ptr<Shader2DPipeline> TexturePipeline;
 	std::shared_ptr<WireFramePipeline> wireFramePipeline;
-
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
 	void Draw();

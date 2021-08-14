@@ -2,11 +2,11 @@
 #include "GraphicsPipeline.h"
 #include "Skybox.h"
 
-GBufferRenderPass2::GBufferRenderPass2()
+GBufferRenderPass2::GBufferRenderPass2() : BaseRenderPass()
 {
 }
 
-GBufferRenderPass2::GBufferRenderPass2(std::shared_ptr<VulkanEngine> engine)
+GBufferRenderPass2::GBufferRenderPass2(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
 {
 
     GPositionTexture = std::make_shared<RenderedGBufferPositionTexture>(engine);
@@ -322,12 +322,5 @@ void GBufferRenderPass2::Destroy()
     gBufferPipeline->Destroy();
     skyBoxRenderingPipeline->Destroy();
 
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }

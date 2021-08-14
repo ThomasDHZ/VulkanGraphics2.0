@@ -10,8 +10,9 @@
 #include "DeferredSkyboxPipeline.h"
 #include "GBufferPipeline2.h"
 #include "RenderedGTBNTexture.h"
+#include "BaseRenderPass.h"
 
-class GBufferRenderPass2
+class GBufferRenderPass2 : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -35,10 +36,6 @@ public:
 
 	std::shared_ptr<GBufferPipeline2> gBufferPipeline;
 	std::shared_ptr<DeferredSkyboxPipeline> skyBoxRenderingPipeline;
-
-	std::vector<VkFramebuffer> SwapChainFramebuffers;
-	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
 	void Draw();

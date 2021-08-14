@@ -1,10 +1,10 @@
 #include "DepthRenderer.h"
 
-DepthRenderer::DepthRenderer()
+DepthRenderer::DepthRenderer() : BaseRenderPass()
 {
 }
 
-DepthRenderer::DepthRenderer(std::shared_ptr<VulkanEngine> engine)
+DepthRenderer::DepthRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
 {
     DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
 
@@ -172,13 +172,5 @@ void DepthRenderer::Destroy()
 {
     DepthTexture->Delete();
     depthPipeline->Destroy();
-
-    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
-    RenderPass = VK_NULL_HANDLE;
-
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    BaseRenderPass::Destroy();
 }
