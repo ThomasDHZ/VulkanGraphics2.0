@@ -7,7 +7,7 @@ SparkManStage::SparkManStage() : Level2D()
 
 SparkManStage::SparkManStage(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Level2D()
 {
-	std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+	std::shared_ptr<Material> material = std::make_shared<Material>(Material(engine));
 	material->materialTexture.DiffuseMap = assetManager->textureManager->LoadTexture2D("../texture/SparkMan_diffuseOriginal.bmp", VK_FORMAT_R8G8B8A8_SRGB);
 	material->materialTexture.SpecularMap = assetManager->textureManager->LoadTexture2D("../texture/SparkMan_Specular.png", VK_FORMAT_R8G8B8A8_UNORM);
 	material->materialTexture.NormalMap = assetManager->textureManager->LoadTexture2D("../texture/SparkMan_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);

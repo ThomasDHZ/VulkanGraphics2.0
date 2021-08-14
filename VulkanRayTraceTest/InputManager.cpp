@@ -6,10 +6,8 @@ InputManager::InputManager()
 {
 }
 
-InputManager::InputManager(std::shared_ptr<VulkanWindow> window, std::shared_ptr<CameraManager> cameramanager)
+InputManager::InputManager(std::shared_ptr<VulkanWindow> window)
 {
-	cameraManager = cameramanager;
-	Window = window;
 	keyboard = Keyboard();
 	mouse = Mouse();
 }
@@ -20,6 +18,6 @@ InputManager::~InputManager()
 
 void InputManager::Update()
 {
-	keyboard.Update(Window, cameraManager->ActiveCamera);
-	mouse.Update(Window, cameraManager->ActiveCamera);
+	keyboard.Update(WindowPtr::GetWindowPtr(), CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+	mouse.Update(WindowPtr::GetWindowPtr(), CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
 }

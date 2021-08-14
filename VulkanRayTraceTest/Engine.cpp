@@ -23,20 +23,20 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     CameraManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
     InputManagerPtr::SetUpPtr(WindowPtr::GetWindowPtr(), CameraManagerPtr::GetCameraManagerPtr());
     TextureManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
-    MaterialManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), TextureManagerPtr::GetTextureManagerPtr());
+    MaterialManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
     MeshManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), InputManagerPtr::GetInputManagerPtr(), MaterialManagerPtr::GetMaterialManagerPtr());
     LightManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), CameraManagerPtr::GetCameraManagerPtr());
-    GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), MaterialManagerPtr::GetMaterialManagerPtr(), InputManagerPtr::GetInputManagerPtr(), TextureManagerPtr::GetTextureManagerPtr());
+    GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
     ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), MaterialManagerPtr::GetMaterialManagerPtr(), InputManagerPtr::GetInputManagerPtr(), TextureManagerPtr::GetTextureManagerPtr());
-    AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
+    AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
     gameObject->AddChildModel(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<SparkManStage>(SparkManStage(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), glm::vec3(0.0f, 0.0f, 0.0f))));
     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-    std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-    gameObject2->AddChildModel(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<Model>(Model(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr()->materialManager, AssetManagerPtr::GetAssetPtr()->textureManager, "../Models/TestAnimModel/model.dae")));
-    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject2);
+    //std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+    //gameObject2->AddChildModel(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<Model>(Model(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr()->materialManager, AssetManagerPtr::GetAssetPtr()->textureManager, "../Models/TestAnimModel/model.dae")));
+    //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject2);
 
     std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
     gameObject3->AddChildMesh(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
@@ -54,9 +54,9 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
     std::shared_ptr<Material> materialPtr = LoadMaterial("TerrianMaterial", material);
 
-    std::shared_ptr<GameObject> gameObject4 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-    gameObject4->AddChildMesh(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<TerrainMesh>(TerrainMesh(EnginePtr::GetEnginePtr(), "../texture/perlin_noise.png", materialPtr)));
-    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject4);
+    //std::shared_ptr<GameObject> gameObject4 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+    //gameObject4->AddChildMesh(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<TerrainMesh>(TerrainMesh(EnginePtr::GetEnginePtr(), "../texture/perlin_noise.png", materialPtr)));
+    //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject4);
 
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[2]);
     ////assetManager->modelManager.ModelList.back()->AddMesh(engine, assetManager->meshManager.MeshList[3]);
@@ -165,7 +165,7 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
 
 Engine::~Engine()
 {
-    AssetManagerPtr::GetAssetPtr()->Delete(EnginePtr::GetEnginePtr());
+    AssetManagerPtr::GetAssetPtr()->Delete();
     renderer.Destroy(EnginePtr::GetEnginePtr());
     EnginePtr::GetEnginePtr()->Destroy();
     WindowPtr::GetWindowPtr()->Destroy();

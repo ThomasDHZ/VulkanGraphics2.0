@@ -7,16 +7,12 @@
 class GUIManager
 {
 private:
-	std::shared_ptr<VulkanEngine> engine;
-	std::shared_ptr<MaterialManager> materialManager;
-	std::shared_ptr<TextureManager> textureManager;
-	std::shared_ptr<InputManager> inputManager;
 public:
 	std::vector<std::shared_ptr<GUIObject>> GuiObjectList;
 	std::vector<std::shared_ptr<Font>> FontList;
 
 	GUIManager();
-	GUIManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<TextureManager> textureManager, std::shared_ptr<InputManager> inputManager);
+	GUIManager(std::shared_ptr<VulkanEngine> engine);
 	~GUIManager();
 
 	void Update();
@@ -31,11 +27,11 @@ class GuiManagerPtr
 private:
 	static std::shared_ptr<GUIManager> guiManager;
 public:
-	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materialManager, std::shared_ptr<InputManager> inputManager, std::shared_ptr<TextureManager> textureManager)
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
 	{
 		if (guiManager == nullptr)
 		{
-			guiManager = std::make_shared<GUIManager>(GUIManager(engine, materialManager, textureManager, inputManager));
+			guiManager = std::make_shared<GUIManager>(GUIManager(engine));
 		}
 		else
 		{

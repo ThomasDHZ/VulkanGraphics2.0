@@ -7,7 +7,7 @@ MegaMan::MegaMan() : Sprite()
 
 MegaMan::MegaMan(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, glm::vec3 Position) : Sprite(engine, SpriteSize, SpriteUVSize, Position, 0)
 {
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager->textureManager);
+    std::shared_ptr<Material> material = std::make_shared<Material>(Material(engine));
     material->materialTexture.DiffuseMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
     material->materialTexture.AlbedoMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_diffuse.bmp", VK_FORMAT_R8G8B8A8_SRGB);
     material->materialTexture.NormalMap = assetManager->textureManager->LoadTexture2D("../texture/MegaMan_normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);

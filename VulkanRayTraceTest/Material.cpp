@@ -5,43 +5,43 @@ Material::Material()
 
 }
 
-Material::Material(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<TextureManager> textureManager)
+Material::Material(std::shared_ptr<VulkanEngine> engine)
 {
-	materialTexture.DiffuseMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.SpecularMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.NormalMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.DepthMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.AlphaMap = textureManager->GetTextureByName("DefaultAlphaTexture");
-	materialTexture.EmissionMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.ShadowMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.AlbedoMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.MatallicMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.RoughnessMap = textureManager->GetTextureByName("DefaultTexture");
-	materialTexture.AOMap = textureManager->GetTextureByName("DefaultTexture");
+	materialTexture.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.SpecularMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.AlphaMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultAlphaTexture");
+	materialTexture.EmissionMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.ShadowMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	materialTexture.AOMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
 
 	MaterialBuffer.CreateBuffer(sizeof(MaterialData), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &materialData);
-	UpdateBufferIndexs(engine);
+	UpdateBufferIndexs();
 }
 
-Material::Material(std::shared_ptr<VulkanEngine> engine, MaterialTexture& MaterialInfo)
+Material::Material(MaterialTexture& MaterialInfo)
 {
 	materialTexture = MaterialInfo;
 
 	MaterialBuffer.CreateBuffer(sizeof(MaterialData), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &materialData);
-	UpdateBufferIndexs(engine);
+	UpdateBufferIndexs();
 }
 
 Material::~Material()
 {
 }
 
-void Material::UpdateBufferIndexs(std::shared_ptr<VulkanEngine> engine)
+void Material::UpdateBufferIndexs()
 {
 	materialData = materialTexture;
 	MaterialBuffer.CopyBufferToMemory(&materialData, sizeof(materialData));
 }
 
-void Material::Delete(std::shared_ptr<VulkanEngine> engine)
+void Material::Delete()
 {
 	MaterialBuffer.DestoryBuffer();
 } 

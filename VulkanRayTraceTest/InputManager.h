@@ -6,19 +6,18 @@
 class InputManager
 {
 private:
-	std::shared_ptr<VulkanWindow> Window;
-	std::shared_ptr<CameraManager> cameraManager;
+
 public:
 	Keyboard keyboard;
 	Mouse mouse;
 
 	InputManager();
-	InputManager(std::shared_ptr<VulkanWindow> window, std::shared_ptr<CameraManager> cameraManager);
+	InputManager(std::shared_ptr<VulkanWindow> window);
 	~InputManager();
 
 	void Update();
-	bool IsKeyPressed(KeyboardKey key) { return keyboard.IsKeyPressed(Window, key); }
-	bool IsKeyReleased(KeyboardKey key) { return keyboard.IsKeyReleased(Window, key); }
+	bool IsKeyPressed(KeyboardKey key) { return keyboard.IsKeyPressed(WindowPtr::GetWindowPtr(), key); }
+	bool IsKeyReleased(KeyboardKey key) { return keyboard.IsKeyReleased(WindowPtr::GetWindowPtr(), key); }
 };
 
 class InputManagerPtr
@@ -30,7 +29,7 @@ public:
 	{
 		if (inputManager == nullptr)
 		{
-			inputManager = std::make_shared<InputManager>(InputManager(window, camera));
+			inputManager = std::make_shared<InputManager>(InputManager(window));
 		}
 		else
 		{

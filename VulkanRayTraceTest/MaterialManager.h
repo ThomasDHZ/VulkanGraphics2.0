@@ -4,15 +4,13 @@
 class MaterialManager
 {
 private:
-	std::shared_ptr<VulkanEngine> engine;
-	std::shared_ptr<TextureManager> textureManager;
 	uint32_t IsMateralLoaded(std::string name);
 public:
 
 	std::vector<std::shared_ptr<Material>> MaterialList;
 
 	MaterialManager();
-	MaterialManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<TextureManager> textureManager);
+	MaterialManager(std::shared_ptr<VulkanEngine> engine);
 	~MaterialManager();
 
 	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
@@ -34,11 +32,11 @@ class MaterialManagerPtr
 private:
 	static std::shared_ptr<MaterialManager> materialManager;
 public:
-	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<TextureManager> textureManager)
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
 	{
 		if (materialManager == nullptr)
 		{
-			materialManager = std::make_shared<MaterialManager>(MaterialManager(engine, textureManager));
+			materialManager = std::make_shared<MaterialManager>(MaterialManager(engine));
 		}
 		else
 		{

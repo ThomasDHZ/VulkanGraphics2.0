@@ -6,14 +6,9 @@ GUIManager::GUIManager()
 {
 }
 
-GUIManager::GUIManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<MaterialManager> materialmanager, std::shared_ptr<TextureManager> texturemanager, std::shared_ptr<InputManager> inputmanager)
+GUIManager::GUIManager(std::shared_ptr<VulkanEngine> Engine)
 {
-	engine = Engine;
-	materialManager = materialmanager;
-	textureManager = texturemanager;
-	inputManager = inputmanager;
-
-	FontList.emplace_back(std::make_shared<Font>(Font(engine, materialManager, textureManager, "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf")));
+	FontList.emplace_back(std::make_shared<Font>(Font(EnginePtr::GetEnginePtr(), MaterialManagerPtr::GetMaterialManagerPtr(), TextureManagerPtr::GetTextureManagerPtr(), "C:/Users/dotha/source/repos/VulkanGraphics/fonts/Antonio-Regular.ttf")));
 }
 
 GUIManager::~GUIManager()
@@ -24,7 +19,7 @@ void GUIManager::Update()
 {
 	for (auto& obj : GuiObjectList)
 	{
-		obj->Update(engine, inputManager, materialManager);
+		obj->Update(EnginePtr::GetEnginePtr(), InputManagerPtr::GetInputManagerPtr(), MaterialManagerPtr::GetMaterialManagerPtr());
 	}
 }
 
@@ -40,11 +35,11 @@ void GUIManager::Destory()
 {
 	for (auto& obj : GuiObjectList)
 	{
-		obj->Destory(engine);
+		obj->Destory(EnginePtr::GetEnginePtr());
 	}
 }
 
 void GUIManager::LoadFont(const std::string FontLocation)
 {
-	FontList.emplace_back(std::make_shared<Font>(Font(engine, materialManager, textureManager, FontLocation)));
+	FontList.emplace_back(std::make_shared<Font>(Font(EnginePtr::GetEnginePtr(), MaterialManagerPtr::GetMaterialManagerPtr(), TextureManagerPtr::GetTextureManagerPtr(), FontLocation)));
 }

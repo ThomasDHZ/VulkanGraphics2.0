@@ -44,7 +44,7 @@ void Renderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::share
 
     vkDestroySwapchainKHR(engine->Device, engine->SwapChain.GetSwapChain(), nullptr);
 
-    AssetManagerPtr::GetAssetPtr()->Update(engine, window, RayTraceFlag);
+    AssetManagerPtr::GetAssetPtr()->Update(RayTraceFlag);
     engine->SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine->Device, engine->PhysicalDevice, engine->Surface);
 
     interfaceRenderPass.RebuildSwapChain();
@@ -65,7 +65,7 @@ void Renderer::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Vulk
         engine->UpdateRendererFlag = false;
     }
 
-    AssetManagerPtr::GetAssetPtr()->Update(engine, window, RayTraceFlag);
+    AssetManagerPtr::GetAssetPtr()->Update(RayTraceFlag);
     if (RayTraceFlag)
     {
        rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());

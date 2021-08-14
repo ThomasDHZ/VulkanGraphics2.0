@@ -6,11 +6,9 @@ MaterialManager::MaterialManager()
 {
 }
 
-MaterialManager::MaterialManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<TextureManager> texturemanager)
+MaterialManager::MaterialManager(std::shared_ptr<VulkanEngine> Engine)
 {
-	engine = Engine;
-	textureManager = texturemanager;
-	std::shared_ptr<Material> materialData = std::make_shared<Material>(engine, textureManager);
+	std::shared_ptr<Material> materialData = std::make_shared<Material>(Material(EnginePtr::GetEnginePtr()));
 	LoadMaterial("Default Material", materialData);
 }
 
@@ -36,24 +34,24 @@ uint32_t MaterialManager::IsMateralLoaded(std::string name)
 
 std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName, std::shared_ptr<Material> material)
 {
-	uint32_t MaterialID = engine->GenerateID();
+	uint32_t MaterialID = EnginePtr::GetEnginePtr()->GenerateID();
 	MaterialList.emplace_back(material);
 	MaterialList.back()->MaterialID = MaterialID;
 	MaterialList.back()->MaterialBufferIndex = MaterialList.size();
-	MaterialList.back()->UpdateBufferIndexs(engine);
+	MaterialList.back()->UpdateBufferIndexs();
 
 	return material;
 }
 
 std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName, MaterialTexture& material)
 {
-	std::shared_ptr<Material> materialData = std::make_shared<Material>(Material(engine, material));
+	std::shared_ptr<Material> materialData = std::make_shared<Material>(Material(EnginePtr::GetEnginePtr()));
 
-	uint32_t MaterialID = engine->GenerateID();
+	uint32_t MaterialID = EnginePtr::GetEnginePtr()->GenerateID();
 	MaterialList.emplace_back(materialData);
 	MaterialList.back()->MaterialID = MaterialID;
 	MaterialList.back()->MaterialBufferIndex = MaterialList.size();
-	MaterialList.back()->UpdateBufferIndexs(engine);
+	MaterialList.back()->UpdateBufferIndexs();
 
 	return MaterialList.back();
 }
@@ -141,14 +139,14 @@ void MaterialManager::Update()
 	for(int x = 0; x < MaterialList.size(); x++)
 	{
 		MaterialList[x]->MaterialBufferIndex = x;
-		MaterialList[x]->UpdateBufferIndexs(engine);
+		MaterialList[x]->UpdateBufferIndexs();
 	}
 }
 
 void MaterialManager::DeleteMaterial(uint32_t DeleteMaterialBufferIndex)
 {
 	auto material = GetMaterial(DeleteMaterialBufferIndex);
-	material->Delete(engine);
+	material->Delete();
 	MaterialList.erase(MaterialList.begin() + DeleteMaterialBufferIndex);
 
 	Update();
@@ -158,6 +156,6 @@ void MaterialManager::Destory()
 {
 	for (auto& material : MaterialList)
 	{
-		material->Delete(engine);
+		material->Delete();
 	}
 }

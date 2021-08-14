@@ -139,12 +139,12 @@ public:
 	MaterialTexture materialTexture;
 
 	Material();
-	Material(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<TextureManager> textureManager);
-	Material(std::shared_ptr<VulkanEngine> engine, MaterialTexture& MaterialInfo);
+	Material(std::shared_ptr<VulkanEngine> engine);
+	Material(MaterialTexture& MaterialInfo);
 	~Material();
 
-	void UpdateBufferIndexs(std::shared_ptr<VulkanEngine> engine);
-	void Delete(std::shared_ptr<VulkanEngine> engine);
+	void UpdateBufferIndexs();
+	void Delete();
 
 	VkBuffer GetMaterialBuffer() { return MaterialBuffer.Buffer; }
 };

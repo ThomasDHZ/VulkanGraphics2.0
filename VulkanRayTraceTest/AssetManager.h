@@ -28,7 +28,7 @@ public:
 	std::shared_ptr<ObjectManager> ObjManager;
 
 	AssetManager();
-	AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
+	AssetManager(std::shared_ptr<VulkanEngine> engine);
 	~AssetManager();
 
 	//void AddModel();
@@ -37,10 +37,10 @@ public:
 	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
 	void LoadFont(std::shared_ptr<VulkanEngine> engine, const std::string FontLocation);
 
-	void Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag);
+	void Update(bool RayTraceFlag);
 	void Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
-	void Delete(std::shared_ptr<VulkanEngine> engine);
+	void Delete();
 
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);
 
@@ -64,11 +64,11 @@ class AssetManagerPtr
 private:
 	static std::shared_ptr<AssetManager> assetPtr;
 public:
-	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
 	{
 		if (assetPtr == nullptr)
 		{
-			assetPtr = std::make_shared<AssetManager>(AssetManager(engine, window));
+			assetPtr = std::make_shared<AssetManager>(AssetManager(engine));
 		}
 		else
 		{

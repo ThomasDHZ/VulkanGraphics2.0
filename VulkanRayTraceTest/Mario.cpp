@@ -7,7 +7,7 @@ Mario::Mario()
 
 Mario::Mario(std::shared_ptr<VulkanEngine> engine, AssetManager& assetManager, glm::vec3 Position) : Sprite(engine, SpriteSize, UVSize, Position, 0)
 {
-    std::shared_ptr<Material> material = std::make_shared<Material>(engine, assetManager.textureManager);
+    std::shared_ptr<Material> material = std::make_shared<Material>(Material(engine));
     material->materialTexture.DiffuseMap = assetManager.textureManager->LoadTexture2D("../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB);
     material->materialTexture.AlbedoMap = assetManager.textureManager->LoadTexture2D("../texture/Mario_diffuse.png", VK_FORMAT_R8G8B8A8_SRGB);
     material->materialTexture.NormalMap = assetManager.textureManager->LoadTexture2D("../texture/MegaMan_normal.png", VK_FORMAT_R8G8B8A8_UNORM);

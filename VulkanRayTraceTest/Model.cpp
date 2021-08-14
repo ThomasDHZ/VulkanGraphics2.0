@@ -271,7 +271,7 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 
 std::shared_ptr<Material> Model::LoadMaterial(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager> materailManager, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
-	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(engine, textureManager);
+	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(Material(engine));
 
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';

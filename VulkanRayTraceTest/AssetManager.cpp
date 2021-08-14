@@ -6,7 +6,7 @@ AssetManager::AssetManager()
 {
 }
 
-AssetManager::AssetManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+AssetManager::AssetManager(std::shared_ptr<VulkanEngine> engine)
 {
     cameraManager = CameraManagerPtr::GetCameraManagerPtr();
     inputManager = InputManagerPtr::GetInputManagerPtr();
@@ -31,9 +31,9 @@ void AssetManager::LoadFont(std::shared_ptr<VulkanEngine> engine, const std::str
     guiManager->LoadFont(FontLocation);
 }
 
-void AssetManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, bool RayTraceFlag)
+void AssetManager::Update(bool RayTraceFlag)
 {
-    float timer = engine->VulkanTimer();
+    float timer = EnginePtr::GetEnginePtr()->VulkanTimer();
     cameraManager->Update();
     inputManager->Update();
     materialManager->Update();
@@ -61,10 +61,10 @@ void AssetManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<
     SceneData->Update();
 
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(cameraManager->ActiveCamera->GetViewMatrix())));
-    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(cameraManager->ActiveCamera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
+    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(cameraManager->ActiveCamera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
     SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.view = glm::mat4(glm::mat3(cameraManager->ActiveCamera->GetViewMatrix()));
-    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(cameraManager->ActiveCamera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
+    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(cameraManager->ActiveCamera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
     SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(cameraManager->ActiveCamera->GetPosition(), 0.0f);
     SkyUniformBuffer->Update();
@@ -80,7 +80,7 @@ void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layo
    ObjManager->GUIDraw(commandBuffer, layout);
 }
 
-void AssetManager::Delete(std::shared_ptr<VulkanEngine> engine)
+void AssetManager::Delete()
 {
     SceneData->Destroy();
     SkyUniformBuffer->Destroy();
