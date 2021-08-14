@@ -99,9 +99,9 @@ void BlinnPhongRasterRenderer::Draw()
 {
     FrameBufferTextureRenderer.Draw();
     BloomRenderer.Draw();
-    //DebugDepthRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);
+    //DebugDepthRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager);
     FrameBufferRenderer.Draw();
-   /* lightPathRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);*/
+   /* lightPathRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager);*/
 }
 
 void BlinnPhongRasterRenderer::Destroy()

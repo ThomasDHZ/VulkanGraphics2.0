@@ -249,7 +249,7 @@ void Mesh::Update()
 	MeshProperties.Update();
 }
 
-void Mesh::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, bool RayTraceModeFlag)
+void Mesh::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList)
 {
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -283,7 +283,7 @@ void Mesh::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_pt
 
 	MeshProperties.Update();
 
-	if (RayTraceModeFlag)
+	if (EnginePtr::GetEnginePtr()->RayTraceFlag)
 	{
 		if (IndexCount != 0)
 		{

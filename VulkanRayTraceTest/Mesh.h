@@ -111,7 +111,7 @@ public:
 	void SetUpMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 
 	virtual void Update();
-	virtual void Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, bool RayTraceModeFlag);
+	virtual void Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList);
 	virtual void Draw(VkCommandBuffer& commandBuffer);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);
 	virtual void Destory();

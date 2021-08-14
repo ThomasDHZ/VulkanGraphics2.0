@@ -11,16 +11,14 @@
 class Renderer
 {
 private:
-	bool FirstFrame = true;
-	bool RayTraceFlag = false;
 	int ActiveRenderer = 0;
 
 	BlinnPhongRasterRenderer blinnPhongRenderer;
-	PBRRenderer pbrRenderer;
-	RayTraceRenderer rayTraceRenderer;
-	RayTracePBRRenderer pbrRayTraceRenderer;
-	HybridRenderer hybridRenderer;
-	Renderer2D renderer2D;
+	//PBRRenderer pbrRenderer;
+	//RayTraceRenderer rayTraceRenderer;
+	//RayTracePBRRenderer pbrRayTraceRenderer;
+	//HybridRenderer hybridRenderer;
+	//Renderer2D renderer2D;
 	//GUIRenderer guiRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 

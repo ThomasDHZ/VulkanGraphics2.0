@@ -104,19 +104,19 @@ void GameObject::Update()
 	}
 }
 
-void GameObject::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, bool RayTraceModeFlag)
+void GameObject::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList)
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh->Update(ModelMatrix, BoneList, RayTraceModeFlag);
+		mesh->Update(ModelMatrix, BoneList);
 	}
 }
 
-void GameObject::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+void GameObject::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList)
 {
 	for (auto& model : ModelList)
 	{
-		model->SubmitAnimationToCommandBuffer(CMDBufferList, imageIndex);
+		model->SubmitAnimationToCommandBuffer(CMDBufferList);
 	}
 }
 

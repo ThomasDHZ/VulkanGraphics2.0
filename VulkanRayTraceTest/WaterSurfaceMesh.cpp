@@ -45,7 +45,7 @@ WaterSurfaceMesh::~WaterSurfaceMesh()
 {
 }
 
-void WaterSurfaceMesh::DrawWaterTexture(uint32_t imageIndex, Skybox skybox)
+void WaterSurfaceMesh::DrawWaterTexture(Skybox skybox)
 {
 	waterReflectionRenderPass.Draw(skybox);
 	waterRefractionRenderPass.Draw(skybox);
@@ -87,7 +87,7 @@ void WaterSurfaceMesh::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInf
 	//Mesh::Draw(commandBuffer);
 }
 
-void WaterSurfaceMesh::SubmitToCMDBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+void WaterSurfaceMesh::SubmitToCMDBuffer(std::vector<VkCommandBuffer>& CMDBufferList)
 {
 	CMDBufferList.emplace_back(waterReflectionRenderPass.CommandBuffer);
 	CMDBufferList.emplace_back(waterRefractionRenderPass.CommandBuffer);

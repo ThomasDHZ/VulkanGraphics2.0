@@ -31,7 +31,7 @@ void AssetManager::LoadFont(std::shared_ptr<VulkanEngine> engine, const std::str
     guiManager->LoadFont(FontLocation);
 }
 
-void AssetManager::Update(bool RayTraceFlag)
+void AssetManager::Update()
 {
     float timer = EnginePtr::GetEnginePtr()->VulkanTimer();
     cameraManager->Update();

@@ -110,6 +110,7 @@ public:
 
 	std::vector<VkLayerProperties> VulkanLayers;
 	bool UpdateRendererFlag = false;
+	bool RayTraceFlag = false;
 
 	VulkanEngine();
 	VulkanEngine(std::shared_ptr<VulkanWindow> window);

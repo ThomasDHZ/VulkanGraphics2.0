@@ -23,13 +23,13 @@ void ObjectManager::Update()
 	}
 }
 
-void ObjectManager::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+void ObjectManager::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList)
 {
 	for (auto& obj : ObjectList)
 	{
 		if (obj->ObjType == ObjectType::Obj_GameObject)
 		{
-			static_cast<GameObject*>(obj.get())->SubmitAnimationToCommandBuffer(CMDBufferList, imageIndex);
+			static_cast<GameObject*>(obj.get())->SubmitAnimationToCommandBuffer(CMDBufferList);
 		}
 	}
 }

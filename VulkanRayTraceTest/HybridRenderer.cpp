@@ -155,7 +155,7 @@ void HybridRenderer::Draw()
     FrameBufferTextureRenderer2.Draw();
     rayTraceRenderPass.Draw(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera, rendererID);
     bloomRenderPass.Draw();
-   // DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
+   // DebugDepthRenderer.Draw(engine, assetManager);
     if (ApplySSAO)
     {
         SSAORenderer.Draw();

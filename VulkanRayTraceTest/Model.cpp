@@ -402,7 +402,7 @@ void Model::Update(bool RayTraceFlag)
 
 	for (auto& mesh : MeshList)
 	{
-		mesh->Update(ModelTransform, BoneList, RayTraceFlag);
+		mesh->Update(ModelTransform, BoneList);
 	}
 }
 
@@ -414,7 +414,7 @@ void Model::Update()
 	}
 }
 
-void Model::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex)
+void Model::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList)
 {
 	if (AnimatedModel)
 	{

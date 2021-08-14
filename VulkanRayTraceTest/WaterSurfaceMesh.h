@@ -20,8 +20,8 @@ public:
 
 	void Update(SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera);
 	void RebuildSwapChain(VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> sceneData);
-	void DrawWaterTexture(uint32_t imageIndex, Skybox skybox);
+	void DrawWaterTexture(Skybox skybox);
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, int a);
-	void SubmitToCMDBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
+	void SubmitToCMDBuffer(std::vector<VkCommandBuffer>& CMDBufferList);
 	void Destory() override;
 };

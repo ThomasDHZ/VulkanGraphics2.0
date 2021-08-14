@@ -27,8 +27,8 @@ public:
 	void AddChildModel(const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
 
 	virtual void Update() override;
-	virtual void Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList, bool RayTraceModeFlag);
-	virtual void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
+	virtual void Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList);
+	virtual void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList);
 	virtual void Destory();
 
 	std::shared_ptr<Model> GetModel(uint32_t ModelID);

@@ -74,7 +74,7 @@ public:
 
 	void Update(bool RayTraceFlag);
 	virtual void Update();
-	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
+	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList);
 	void AddMesh(std::shared_ptr<Mesh> mesh);
 	void Destory();
 	

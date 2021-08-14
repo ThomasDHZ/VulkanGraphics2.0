@@ -15,7 +15,7 @@ public:
 	~ObjectManager();
 
 	void Update();
-	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList, int imageIndex);
+	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList);
 	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Destory();
