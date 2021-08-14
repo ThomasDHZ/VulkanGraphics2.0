@@ -10,14 +10,14 @@
 class LightPathRenderer : public BaseRenderer
 {
 private:
+	static constexpr RendererID rendererID = RendererID::LightPath_Renderer;
+
 	DepthRenderer lightRenderPass;
 	DepthDebugRenderPass DebugDepthRenderer;
 public:
 	LightPathRenderer();
 	LightPathRenderer(std::shared_ptr<VulkanEngine> engine);
 	~LightPathRenderer();
-
-	static constexpr RendererID rendererID = RendererID::LightPath_Renderer;
 
 	void RebuildSwapChain();
 	void GUIUpdate();

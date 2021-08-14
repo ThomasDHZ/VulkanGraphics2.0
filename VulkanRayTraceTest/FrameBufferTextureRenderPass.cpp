@@ -148,7 +148,7 @@ void FrameBufferTextureRenderPass::SetUpCommandBuffers()
     }
 }
 
-void FrameBufferTextureRenderPass::Draw(RendererID rendererID)
+void FrameBufferTextureRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -181,7 +181,7 @@ void FrameBufferTextureRenderPass::Draw(RendererID rendererID)
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
-    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, rendererPassID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer);
 

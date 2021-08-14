@@ -16,8 +16,6 @@ public:
 	DepthRenderer(std::shared_ptr<VulkanEngine> engine);
 	~DepthRenderer();
 
-	static constexpr RenderPassID rendererPassID = DebugDepth_Renderer;
-
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 	std::shared_ptr<DepthPipeline> depthPipeline;
 

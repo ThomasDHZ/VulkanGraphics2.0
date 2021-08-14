@@ -9,14 +9,14 @@
 class RayTracePBRRenderer : public BaseRenderer
 {
 private:
+	static constexpr RendererID rendererID = RendererID::PBR_RayTrace_Renderer;
+
 	FrameBufferRenderPass FrameBufferRenderer;
 	SSAOBlurRenderPass SSAOBlurRenderer;
 public:
 	RayTracePBRRenderer();
 	RayTracePBRRenderer(std::shared_ptr<VulkanEngine> engine);
 	~RayTracePBRRenderer();
-
-	static constexpr RendererID rendererID = RendererID::PBR_RayTrace_Renderer;
 
 	RayTraceRenderPass rayTraceRenderPass;
 	void RebuildSwapChain();

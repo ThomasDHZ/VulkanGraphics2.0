@@ -97,7 +97,7 @@ void BlinnPhongRasterRenderer::GUIUpdate()
 
 void BlinnPhongRasterRenderer::Draw()
 {
-    FrameBufferTextureRenderer.Draw(rendererID);
+    FrameBufferTextureRenderer.Draw();
     BloomRenderer.Draw();
     //DebugDepthRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);
     FrameBufferRenderer.Draw();

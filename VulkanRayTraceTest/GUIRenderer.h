@@ -11,14 +11,14 @@
 class GUIRenderer : public BaseRenderer
 {
 private:
+	static constexpr RendererID rendererID = RendererID::GUI_Renderer;
+
 	GUIRenderPass TextRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
 public:
 	GUIRenderer();
 	GUIRenderer(std::shared_ptr<VulkanEngine> engine);
 	~GUIRenderer();
-
-	static constexpr RendererID rendererID = RendererID::GUI_Renderer;
 
 	void RebuildSwapChain();
 	void GUIUpdate();

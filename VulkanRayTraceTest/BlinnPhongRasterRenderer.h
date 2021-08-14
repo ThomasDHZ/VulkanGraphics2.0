@@ -10,6 +10,8 @@
 class BlinnPhongRasterRenderer : public BaseRenderer
 {
 private:
+	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
+
 	FrameBufferTextureRenderPass FrameBufferTextureRenderer;
 	BloomRenderPass BloomRenderer;
 	//DepthDebugRenderPass DebugDepthRenderer;
@@ -19,8 +21,6 @@ public:
 	BlinnPhongRasterRenderer();
 	BlinnPhongRasterRenderer(std::shared_ptr<AssetManager> assetManagerPtr);
 	~BlinnPhongRasterRenderer();
-
-	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
 
 	void RebuildSwapChain();
 	void GUIUpdate();

@@ -76,7 +76,7 @@ void RayTracePBRRenderer::GUIUpdate()
 
 void RayTracePBRRenderer::Draw()
 {
-    rayTraceRenderPass.Draw(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), rendererID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+    rayTraceRenderPass.Draw(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera, rendererID);
     FrameBufferRenderer.Draw();
 }
 

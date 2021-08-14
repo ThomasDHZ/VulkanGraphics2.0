@@ -20,7 +20,6 @@ public:
 	~RenderPass2D();
 
 	bool WireFrameFlag = false;
-	static constexpr RenderPassID rendererPassID = Texture_Renderer;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
@@ -33,7 +32,7 @@ public:
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
 	void RebuildSwapChain();
-	void Draw(RendererID rendererID);
+	void Draw();
 	void Destroy();
 };
 

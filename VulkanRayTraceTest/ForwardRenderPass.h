@@ -25,8 +25,6 @@ public:
 	ForwardRenderPass();
 	~ForwardRenderPass();
 
-	static constexpr RenderPassID rendererPassID = Forward_Renderer;
-
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<DebugLightRenderingPipeline> DebugLightPipeline;

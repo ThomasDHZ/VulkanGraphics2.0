@@ -48,7 +48,7 @@ void Renderer2D::GUIUpdate()
 
 void Renderer2D::Draw()
 {
-    FrameBufferTextureRenderer.Draw(rendererID);
+    FrameBufferTextureRenderer.Draw();
     BloomRenderer.Draw();
     FrameBufferRenderer.Draw();
 }

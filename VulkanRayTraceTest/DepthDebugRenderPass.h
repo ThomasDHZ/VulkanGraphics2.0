@@ -16,8 +16,6 @@ public:
 	DepthDebugRenderPass(std::shared_ptr<Texture> DepthTexture);
 	~DepthDebugRenderPass();
 
-	static constexpr RenderPassID rendererPassID = DebugDepth_Renderer;
-
 	std::shared_ptr<RenderedColorTexture> DebugDepthTexture;
 	std::shared_ptr<DepthDebugPipeline> DebugDepthPipeline;
 

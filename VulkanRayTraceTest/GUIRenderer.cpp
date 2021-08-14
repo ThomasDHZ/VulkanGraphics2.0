@@ -29,7 +29,7 @@ void GUIRenderer::GUIUpdate()
 
 void GUIRenderer::Draw()
 {
-    TextRenderer.Draw(rendererID);
+    TextRenderer.Draw();
 }
 
 void GUIRenderer::Destroy()

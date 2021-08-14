@@ -17,8 +17,6 @@ public:
 	BRDFRenderPass(std::shared_ptr<Texture> InputBloomTexture);
 	~BRDFRenderPass();
 
-	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
-
 	std::shared_ptr<RenderedColorTexture> BRDFTexture;
 	std::shared_ptr<brdfRenderingPipeline> BRDFPipeline;
 

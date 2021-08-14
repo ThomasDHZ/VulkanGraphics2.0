@@ -5,11 +5,11 @@ PBRIrradiancePipeline::PBRIrradiancePipeline() : GraphicsPipeline()
 {
 }
 
-PBRIrradiancePipeline::PBRIrradiancePipeline(const VkRenderPass& renderPass, RenderPassID RendererID) : GraphicsPipeline()
+PBRIrradiancePipeline::PBRIrradiancePipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
-    SetUpShaderPipeLine(renderPass, RendererID);
+    SetUpShaderPipeLine(renderPass);
     SetUpDescriptorSets();
 }
 
@@ -55,7 +55,7 @@ void PBRIrradiancePipeline::SetUpDescriptorSets()
     vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void PBRIrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, RenderPassID RendererID)
+void PBRIrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shader/PBRIrradianceSkyboxShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -181,8 +181,8 @@ void PBRIrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, 
     }
 }
 
-void PBRIrradiancePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, RenderPassID RendererID)
+void PBRIrradiancePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpShaderPipeLine(renderPass, RendererID);
+    SetUpShaderPipeLine(renderPass);
 }

@@ -20,8 +20,6 @@ public:
 	FrameBufferTextureRenderPass(std::shared_ptr<AssetManager> assetManager);
 	~FrameBufferTextureRenderPass();
 
-	static constexpr RenderPassID rendererPassID = Texture_Renderer;
-
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
@@ -34,7 +32,7 @@ public:
 
 	void RebuildSwapChain();
 	void UpdateSwapChain();
-	void Draw(RendererID rendererID);
+	void Draw();
 	void Destroy();
 };
 

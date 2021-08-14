@@ -13,8 +13,6 @@ public:
 	FrameBufferRenderPass(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
 	~FrameBufferRenderPass();
 
-	static constexpr RenderPassID rendererPassID = FrameBuffer_Renderer;
-
 	std::shared_ptr<FrameBufferPipeline> frameBufferPipeline;
 
 	VkRenderPass RenderPass = VK_NULL_HANDLE;

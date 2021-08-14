@@ -53,13 +53,13 @@ void MeshManager::UpdateBufferIndex()
 	}
 }
 
-void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView)
+void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView)
 {
     for (auto& mesh : MeshList)
     {
         if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
         {
-            mesh->Draw(commandBuffer, layout, RendererID, CameraView);
+            mesh->Draw(commandBuffer, layout, CameraView);
         }
   /*      else if(mesh->DrawFlags == MeshDrawFlags::Mesh_Skip_Water_Renderer)
         {

@@ -97,7 +97,7 @@ void HybridFrameBufferRenderPass::CreateRendererFramebuffers()
     }
 }
 
-void HybridFrameBufferRenderPass::Draw(RendererID rendererID)
+void HybridFrameBufferRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

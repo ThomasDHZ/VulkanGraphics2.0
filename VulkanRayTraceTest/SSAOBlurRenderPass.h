@@ -17,8 +17,6 @@ public:
 	SSAOBlurRenderPass(std::shared_ptr<Texture> SSAOTexture);
 	~SSAOBlurRenderPass();
 
-	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
-
 	std::shared_ptr<RenderedColorTexture> SSAOBlurTexture;
 	std::shared_ptr<SSAOBlurPipeline> RasterSSAOPipeline;
 

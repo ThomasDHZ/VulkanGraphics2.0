@@ -20,8 +20,6 @@ public:
 	PBRFrameBufferTextureRenderPass(std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT);
 	~PBRFrameBufferTextureRenderPass();
 
-	static constexpr RenderPassID rendererPassID = Texture_Renderer;
-
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
@@ -34,7 +32,7 @@ public:
 
 	void RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT);
 	void UpdateSwapChain(std::shared_ptr<RenderedCubeMapTexture> irradianceMap, std::shared_ptr<RenderedCubeMapTexture> prefilterMap, std::shared_ptr<Texture> brdfLUT);
-	void Draw(RendererID rendererID);
+	void Draw();
 	void Destroy();
 };
 

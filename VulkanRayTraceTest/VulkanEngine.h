@@ -18,24 +18,6 @@
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-enum RenderPassID
-{
-	Forward_Renderer,
-	RayTrace_Renderer,
-	Interface_Renderer,
-	FrameBuffer_Renderer,
-    Deferred_Renderer,
-	Texture_Renderer,
-	Text_Renderer,
-	SSAO_Renderer,
-	BRDF_Renderer,
-	CubeTexture_Renderer,
-	Prefilter_Renderer,
-	Water_Renderer,
-	Bloom_Renderer,
-	Depth_Renderer,
-	DebugDepth_Renderer
-};
 enum RendererID
 {
 	BlinnPhong_Raster_Renderer,

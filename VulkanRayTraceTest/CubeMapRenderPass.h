@@ -20,8 +20,6 @@ public:
 	CubeMapRenderPass(uint32_t CubeMapSize);
 	~CubeMapRenderPass();
 
-	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
-
 	uint32_t CubeMapSize;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;

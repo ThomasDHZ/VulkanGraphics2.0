@@ -17,8 +17,6 @@ public:
 	GUIRenderPass(std::shared_ptr<VulkanEngine> engine);
 	~GUIRenderPass();
 
-	static constexpr RenderPassID rendererPassID = Texture_Renderer;
-
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<GUIRenderPipeline> TextRenderingPipeline;
 
@@ -28,6 +26,6 @@ public:
 
 	void RebuildSwapChain();
 	void UpdateSwapChain();
-	void Draw(RendererID rendererID);
+	void Draw();
 	void Destroy();
 };

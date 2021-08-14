@@ -18,8 +18,6 @@ public:
 	WaterRenderToTextureRenderPass(std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer);
 	~WaterRenderToTextureRenderPass();
 
-	static constexpr RenderPassID RendererID = Water_Renderer;
-
 	std::shared_ptr<PerspectiveCamera> TextureCamera;
 
 	std::shared_ptr<SceneDataUniformBuffer> SceneDataBuffer;

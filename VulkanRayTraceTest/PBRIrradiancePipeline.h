@@ -9,11 +9,11 @@ private:
 	void SetUpDescriptorPool();
 	void SetUpDescriptorLayout();
 	void SetUpDescriptorSets();
-	void SetUpShaderPipeLine(const VkRenderPass& renderPass, RenderPassID RendererID);
+	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	PBRIrradiancePipeline();
-	PBRIrradiancePipeline(const VkRenderPass& renderPass, RenderPassID RendererID);
+	PBRIrradiancePipeline(const VkRenderPass& renderPass);
 	~PBRIrradiancePipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, RenderPassID RendererID);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
 };

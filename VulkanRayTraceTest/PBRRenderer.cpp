@@ -87,7 +87,7 @@ void PBRRenderer::GUIUpdate()
 
 void PBRRenderer::Draw()
 {
-    FrameBufferTextureRenderer.Draw(rendererID);
+    FrameBufferTextureRenderer.Draw();
     DebugDepthRenderer.Draw();
     FrameBufferRenderer.Draw();
 }

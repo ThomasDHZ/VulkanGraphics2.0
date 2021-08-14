@@ -21,7 +21,7 @@ SkyboxTextureRenderPass::SkyboxTextureRenderPass(std::shared_ptr<SceneDataUnifor
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrIrradiancePipeline = std::make_shared<PBRIrradiancePipeline>(PBRIrradiancePipeline(RenderPass, RendererID));
+    pbrIrradiancePipeline = std::make_shared<PBRIrradiancePipeline>(PBRIrradiancePipeline(RenderPass));
     SetUpCommandBuffers();
 }
 
@@ -152,7 +152,7 @@ void SkyboxTextureRenderPass::Draw()
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipelineLayout, 0, 1, &pbrIrradiancePipeline->DescriptorSets, 0, nullptr);
 
-    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, RendererID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer);
 
@@ -176,7 +176,7 @@ void SkyboxTextureRenderPass::UpdateSwapChain()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrIrradiancePipeline->UpdateGraphicsPipeLine(RenderPass, RendererID);
+    pbrIrradiancePipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
 

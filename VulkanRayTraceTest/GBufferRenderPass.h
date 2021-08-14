@@ -21,9 +21,6 @@ public:
 	GBufferRenderPass(std::shared_ptr<VulkanEngine> engine);
 	~GBufferRenderPass();
 
-	static constexpr RenderPassID RendererID = Deferred_Renderer;
-	static constexpr RenderPassID rendererPassID = Texture_Renderer;
-
 	std::shared_ptr<RenderedGBufferPositionTexture> GPositionTexture;
 	std::shared_ptr<RenderedGBufferAlbedoTexture> GAlbedoTexture;
 	std::shared_ptr<RenderedGBufferNormalTexture> GNormalTexture;

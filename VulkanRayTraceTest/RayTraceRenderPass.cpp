@@ -142,10 +142,10 @@ void RayTraceRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engin
     }
 }
 
-void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID renderID, std::shared_ptr<Camera> ViewCamera)
+void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Camera> ViewCamera, RendererID rendererID)
 {
     std::shared_ptr<RayTracingGraphicsPipeline> ActivePipeline;
-    switch (renderID)
+    switch (rendererID)
     {
         case RendererID::BlinnPhong_RayTrace_Renderer: ActivePipeline = RTPipeline; break;
         case RendererID::PBR_RayTrace_Renderer: ActivePipeline = RTPBRPipeline; break;

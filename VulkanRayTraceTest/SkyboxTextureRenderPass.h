@@ -18,7 +18,6 @@ public:
 	SkyboxTextureRenderPass(std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera);
 	~SkyboxTextureRenderPass();
 
-	static constexpr RenderPassID RendererID = CubeTexture_Renderer;
 	SkyboxUniformBuffer sceneData;
 
 	std::shared_ptr<PBRIrradiancePipeline> pbrIrradiancePipeline;

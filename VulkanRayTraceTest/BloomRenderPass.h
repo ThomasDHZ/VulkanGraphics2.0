@@ -16,8 +16,6 @@ public:
 	BloomRenderPass(std::shared_ptr<Texture> InputBloomTexture);
 	~BloomRenderPass();
 
-	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
-
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<BloomPipeline> BloomPipelinePass1;
 	std::shared_ptr<BloomPipeline> BloomPipelinePass2;

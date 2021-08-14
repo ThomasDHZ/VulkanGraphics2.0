@@ -22,7 +22,7 @@ public:
 	void AddMesh(std::shared_ptr<Mesh> mesh);
 	void Update(std::shared_ptr<Camera> camera);
 	void UpdateBufferIndex();
-	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView);
+	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);
 	void Destroy();
 		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();

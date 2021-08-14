@@ -11,6 +11,8 @@
 class Renderer2D : public BaseRenderer
 {
 private:
+	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
+
 	RenderPass2D FrameBufferTextureRenderer;
 	BloomRenderPass BloomRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
@@ -18,8 +20,6 @@ public:
 	Renderer2D();
 	Renderer2D(std::shared_ptr<VulkanEngine> engine);
 	~Renderer2D();
-
-	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
 
 	void RebuildSwapChain();
 	void GUIUpdate();

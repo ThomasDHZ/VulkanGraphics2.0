@@ -15,6 +15,8 @@
 class HybridRenderer : public BaseRenderer
 {
 private:
+	static constexpr RendererID rendererID = RendererID::Hybrid_Renderer;
+
 	int CurrentSSAOSampleRate;
 	GBufferRenderPass FrameBufferTextureRenderer;
 	GBufferRenderPass2 FrameBufferTextureRenderer2;
@@ -29,8 +31,6 @@ public:
 	HybridRenderer();
 	HybridRenderer(std::shared_ptr<VulkanEngine> engine);
 	~HybridRenderer();
-
-	static constexpr RendererID rendererID = RendererID::Hybrid_Renderer;
 
 	RayTraceRenderPass rayTraceRenderPass;
 	void RebuildSwapChain();

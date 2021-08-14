@@ -310,7 +310,7 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer)
 	}
 }
 
-void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, RenderPassID RendererID, std::shared_ptr<Camera> CameraView)
+void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView)
 {
     if (ShowMesh)
 	{

@@ -102,7 +102,7 @@ void GUIRenderPass::SetUpCommandBuffers()
     }
 }
 
-void GUIRenderPass::Draw( RendererID rendererID)
+void GUIRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

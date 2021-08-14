@@ -153,7 +153,7 @@ void HybridRenderer::Draw()
 {
     FrameBufferTextureRenderer.Draw();
     FrameBufferTextureRenderer2.Draw();
-    rayTraceRenderPass.Draw(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), rendererID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+    rayTraceRenderPass.Draw(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera, rendererID);
     bloomRenderPass.Draw();
    // DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     if (ApplySSAO)
@@ -161,7 +161,7 @@ void HybridRenderer::Draw()
         SSAORenderer.Draw();
         SSAOBlurRenderer.Draw();
     }
-    FrameBufferRenderer.Draw(rendererID);
+    FrameBufferRenderer.Draw();
 }
 
 void HybridRenderer::Destroy()
