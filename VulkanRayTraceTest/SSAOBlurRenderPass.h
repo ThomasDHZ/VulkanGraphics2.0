@@ -8,13 +8,13 @@
 class SSAOBlurRenderPass
 {
 private:
-	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
-	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
-	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
+	void CreateRenderPass();
+	void CreateRendererFramebuffers();
+	void SetUpCommandBuffers();
 
 public:
 	SSAOBlurRenderPass();
-	SSAOBlurRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<Texture> SSAOTexture);
+	SSAOBlurRenderPass(std::shared_ptr<Texture> SSAOTexture);
 	~SSAOBlurRenderPass();
 
 	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
@@ -26,7 +26,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManage, std::shared_ptr<Texture> SSAOTexture);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void RebuildSwapChain(std::shared_ptr<Texture> SSAOTexture);
+	void Draw();
+	void Destroy();
 };

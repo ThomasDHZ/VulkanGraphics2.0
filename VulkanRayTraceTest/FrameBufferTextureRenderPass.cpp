@@ -148,7 +148,7 @@ void FrameBufferTextureRenderPass::SetUpCommandBuffers()
     }
 }
 
-void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManager, RendererID rendererID)
+void FrameBufferTextureRenderPass::Draw(RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -176,12 +176,12 @@ void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManag
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skyBoxRenderingPipeline->ShaderPipelineLayout, 0, 1, &skyBoxRenderingPipeline->DescriptorSets, 0, nullptr);
-    static_cast<Skybox*>(assetManager->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
+    static_cast<Skybox*>(AssetManagerPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer);
 
 
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSets, 0, nullptr);
-    assetManager->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, rendererPassID, assetManager->cameraManager->ActiveCamera);
+    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, TexturePipeline->ShaderPipelineLayout, rendererPassID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer);
 
@@ -190,7 +190,7 @@ void FrameBufferTextureRenderPass::Draw(std::shared_ptr<AssetManager> assetManag
     }
 }
 
-void FrameBufferTextureRenderPass::RebuildSwapChain(std::shared_ptr<AssetManager> assetManager)
+void FrameBufferTextureRenderPass::RebuildSwapChain()
 {
     RenderedTexture->RecreateRendererTexture();
     BloomTexture->RecreateRendererTexture();

@@ -32,9 +32,9 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(std::shared_ptr<AssetManager> assetManager);
-	void UpdateSwapChain(std::shared_ptr<AssetManager> assetManager);
-	void Draw(std::shared_ptr<AssetManager> assetManager, RendererID rendererID);
+	void RebuildSwapChain();
+	void UpdateSwapChain();
+	void Draw(RendererID rendererID);
 	void Destroy();
 };
 

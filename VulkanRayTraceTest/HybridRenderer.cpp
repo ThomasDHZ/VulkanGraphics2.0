@@ -4,11 +4,11 @@ HybridRenderer::HybridRenderer() : BaseRenderer()
 {
 }
 
-HybridRenderer::HybridRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+HybridRenderer::HybridRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
-    FrameBufferTextureRenderer = GBufferRenderPass(engine, assetManager);
-    FrameBufferTextureRenderer2 = GBufferRenderPass2(engine, assetManager);
-    rayTraceRenderPass = RayTraceRenderPass(engine, assetManager);
+    FrameBufferTextureRenderer = GBufferRenderPass(engine);
+    FrameBufferTextureRenderer2 = GBufferRenderPass2(engine);
+    rayTraceRenderPass = RayTraceRenderPass(engine, AssetManagerPtr::GetAssetPtr());
     bloomRenderPass = BloomRenderPass(FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
 
@@ -16,8 +16,8 @@ HybridRenderer::HybridRenderer(std::shared_ptr<VulkanEngine> engine, std::shared
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
     textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
     textures.NormalMapTexture = FrameBufferTextureRenderer.NormalMapTexture;
-    SSAORenderer = SSAORenderPass(engine, assetManager, textures);
-    SSAOBlurRenderer = SSAOBlurRenderPass(engine, assetManager, SSAORenderer.SSAOTexture);
+    SSAORenderer = SSAORenderPass(textures);
+    SSAOBlurRenderer = SSAOBlurRenderPass(SSAORenderer.SSAOTexture);
 
     HybridFrameBufferTextures frameBufferTextures{};
     frameBufferTextures.AlebdoTexture = FrameBufferTextureRenderer.GAlbedoTexture;
@@ -34,7 +34,7 @@ HybridRenderer::HybridRenderer(std::shared_ptr<VulkanEngine> engine, std::shared
     frameBufferTextures.TBNTangentTexture = FrameBufferTextureRenderer2.GTBN_TangentTexture;
     frameBufferTextures.TBNBiTangentTexture = FrameBufferTextureRenderer2.GTBN_BiTangentTexture;
     frameBufferTextures.TBNNormalMapTexture = FrameBufferTextureRenderer2.GTBN_NormalTexture;
-    FrameBufferRenderer = HybridFrameBufferRenderPass(engine, assetManager, frameBufferTextures);
+    FrameBufferRenderer = HybridFrameBufferRenderPass(frameBufferTextures);
 
     CurrentSSAOSampleRate = SSAORenderer.KernalSampleSize;
 }
@@ -43,7 +43,7 @@ HybridRenderer::~HybridRenderer()
 {
 }
 
-void HybridRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+void HybridRenderer::RebuildSwapChain()
 {
     SSAOTextureList textures = {};
     textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
@@ -65,60 +65,60 @@ void HybridRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std:
     frameBufferTextures.TBNTangentTexture = FrameBufferTextureRenderer2.GTBN_TangentTexture;
     frameBufferTextures.TBNBiTangentTexture = FrameBufferTextureRenderer2.GTBN_BiTangentTexture;
     frameBufferTextures.TBNNormalMapTexture = FrameBufferTextureRenderer2.GTBN_NormalTexture;
-    FrameBufferTextureRenderer.RebuildSwapChain(engine, assetManager);
-    FrameBufferTextureRenderer2.RebuildSwapChain(engine, assetManager);
-    rayTraceRenderPass.RebuildSwapChain(engine, assetManager);
+    FrameBufferTextureRenderer.RebuildSwapChain();
+    FrameBufferTextureRenderer2.RebuildSwapChain();
+    rayTraceRenderPass.RebuildSwapChain(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr());
     bloomRenderPass.RebuildSwapChain(FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer.RebuildSwapChain(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
-    SSAORenderer.RebuildSwapChain(engine, assetManager, textures);
-    SSAOBlurRenderer.RebuildSwapChain(engine, assetManager, SSAORenderer.SSAOTexture);
-    FrameBufferRenderer.RebuildSwapChain(engine, assetManager, frameBufferTextures);
+    SSAORenderer.RebuildSwapChain(textures);
+    SSAOBlurRenderer.RebuildSwapChain(SSAORenderer.SSAOTexture);
+    FrameBufferRenderer.RebuildSwapChain(frameBufferTextures);
 }
 
-void HybridRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
+void HybridRenderer::GUIUpdate()
 {
     rayTraceRenderPass.GUIUpdate();
 
     ImGui::Image(FrameBufferTextureRenderer2.NormalMapTexture->ImGuiDescriptorSet, ImVec2(180.0f, 180.0f));
     ImGui::LabelText("Directional Light", "Directional Light");
-    for (int x = 0; x < assetManager->lightManager->DirectionalLightList.size(); x++)
+    for (int x = 0; x < AssetManagerPtr::GetAssetPtr()->lightManager->DirectionalLightList.size(); x++)
     {
-        ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &assetManager->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
-        ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &assetManager->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &assetManager->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &assetManager->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 
     ImGui::LabelText("Point Light", "Point Light");
-    for (int x = 0; x < assetManager->lightManager->PointLightList.size(); x++)
+    for (int x = 0; x < AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList.size(); x++)
     {
-        ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &assetManager->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
-        ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &assetManager->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &assetManager->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &assetManager->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &assetManager->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-        ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &assetManager->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-        ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &assetManager->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
+        ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 
     ImGui::LabelText("SpotLight Light", "Directional Light");
-    for (int x = 0; x < assetManager->lightManager->SpotLightList.size(); x++)
+    for (int x = 0; x < AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList.size(); x++)
     {
-        ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -10.0f, 10.0f);
-        ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
-        ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-        ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-        ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &assetManager->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->lightManager->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 
     ImGui::Checkbox("Apply SSAO", &ApplySSAO);
-    ImGui::SliderInt("Apply SSAO", &assetManager->SceneData->UniformDataInfo.temp, 0, 1);
+    ImGui::SliderInt("Apply SSAO", &AssetManagerPtr::GetAssetPtr()->SceneData->UniformDataInfo.temp, 0, 1);
    // ImGui::SliderFloat3("DirectionalLight", &assetManager->SceneData->UniformDataInfo.dlight.direction.x, -1.0f, 1.0f);
     ImGui::SliderInt("SSAOSample", &SSAORenderer.KernalSampleSize, 0, 2550);
     ImGui::SliderFloat("SSAOBias", &SSAORenderer.bias, 0.0f, 100.0f);
@@ -143,37 +143,37 @@ void HybridRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         SSAOTextureList textures = {};
         textures.GPositionTexture = FrameBufferTextureRenderer.GPositionTexture;
         textures.GNormalTexture = FrameBufferTextureRenderer.GNormalTexture;
-        SSAORenderer.RebuildSwapChain(engine, assetManager, textures);
+        SSAORenderer.RebuildSwapChain(textures);
 
         CurrentSSAOSampleRate = SSAORenderer.KernalSampleSize;
     }
 }
 
-void HybridRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+void HybridRenderer::Draw()
 {
-    FrameBufferTextureRenderer.Draw(engine, assetManager);
-    FrameBufferTextureRenderer2.Draw(engine, assetManager);
-    rayTraceRenderPass.Draw(engine, assetManager, rendererID, assetManager->cameraManager->ActiveCamera);
+    FrameBufferTextureRenderer.Draw();
+    FrameBufferTextureRenderer2.Draw();
+    rayTraceRenderPass.Draw(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), rendererID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
     bloomRenderPass.Draw();
    // DebugDepthRenderer.Draw(engine, assetManager, imageIndex);
     if (ApplySSAO)
     {
-        SSAORenderer.Draw(engine, assetManager);
-        SSAOBlurRenderer.Draw(engine, assetManager);
+        SSAORenderer.Draw();
+        SSAOBlurRenderer.Draw();
     }
-    FrameBufferRenderer.Draw(engine, assetManager, rendererID);
+    FrameBufferRenderer.Draw(rendererID);
 }
 
-void HybridRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
+void HybridRenderer::Destroy()
 {
-    FrameBufferTextureRenderer.Destroy(engine);
-    FrameBufferTextureRenderer2.Destroy(engine);
-    rayTraceRenderPass.Destroy(engine);
+    FrameBufferTextureRenderer.Destroy();
+    FrameBufferTextureRenderer2.Destroy();
+    rayTraceRenderPass.Destroy(EnginePtr::GetEnginePtr());
     bloomRenderPass.Destroy();
     //DebugDepthRenderer.Destroy(engine);
-    SSAORenderer.Destroy(engine);
-    SSAOBlurRenderer.Destroy(engine);
-    FrameBufferRenderer.Destroy(engine);
+    SSAORenderer.Destroy();
+    SSAOBlurRenderer.Destroy();
+    FrameBufferRenderer.Destroy();
 }
 
 std::vector<VkCommandBuffer> HybridRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)

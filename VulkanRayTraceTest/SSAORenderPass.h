@@ -10,18 +10,18 @@ class SSAORenderPass
 {
 private:
 
-	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
-	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
-	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
-	void GenerateKernal(std::shared_ptr<VulkanEngine> engine, SSAOTextureList& Textures);
-	void GenerateNoiseTexture(std::shared_ptr<VulkanEngine> engine, SSAOTextureList& textures);
+	void CreateRenderPass();
+	void CreateRendererFramebuffers();
+	void SetUpCommandBuffers();
+	void GenerateKernal(SSAOTextureList& Textures);
+	void GenerateNoiseTexture(SSAOTextureList& textures);
 	float Lerp(float a, float b, float f);
 
 	std::vector<std::shared_ptr<VulkanBuffer>> SamplePointBufferList;
 	std::shared_ptr<Texture2D> NoiseTexture;
 public:
 	SSAORenderPass();
-	SSAORenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& Textures);
+	SSAORenderPass(SSAOTextureList& Textures);
 	~SSAORenderPass();
 
 	static constexpr RenderPassID rendererPassID = SSAO_Renderer;
@@ -35,7 +35,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SSAOTextureList& Textures);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void RebuildSwapChain(SSAOTextureList& Textures);
+	void Draw();
+	void Destroy();
 };

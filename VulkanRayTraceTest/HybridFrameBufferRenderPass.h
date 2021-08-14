@@ -6,13 +6,13 @@
 class HybridFrameBufferRenderPass
 {
 private:
-	void CreateRenderPass(std::shared_ptr<VulkanEngine> engine);
-	void CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine);
-	void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
+	void CreateRenderPass();
+	void CreateRendererFramebuffers();
+	void SetUpCommandBuffers();
 
 public:
 	HybridFrameBufferRenderPass();
-	HybridFrameBufferRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures);
+	HybridFrameBufferRenderPass(HybridFrameBufferTextures& HybridTextures);
 	~HybridFrameBufferRenderPass();
 
 	static constexpr RenderPassID rendererPassID = FrameBuffer_Renderer;
@@ -23,7 +23,7 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID rendererID);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void RebuildSwapChain(HybridFrameBufferTextures& HybridTextures);
+	void Draw(RendererID rendererID);
+	void Destroy();
 };

@@ -14,15 +14,15 @@ private:
 	DepthDebugRenderPass DebugDepthRenderer;
 public:
 	LightPathRenderer();
-	LightPathRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr);
+	LightPathRenderer(std::shared_ptr<VulkanEngine> engine);
 	~LightPathRenderer();
 
 	static constexpr RendererID rendererID = RendererID::LightPath_Renderer;
 
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
-	void GUIUpdate(std::shared_ptr<VulkanEngine> engine);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void RebuildSwapChain();
+	void GUIUpdate();
+	void Draw();
+	void Destroy();
 
 	std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);
 };

@@ -7,22 +7,22 @@ AnimatorCompute::AnimatorCompute()
 {
 }
 
-AnimatorCompute::AnimatorCompute(std::shared_ptr<VulkanEngine> engine,  std::shared_ptr<Mesh> meshptr)
+AnimatorCompute::AnimatorCompute(std::shared_ptr<Mesh> meshptr)
 {
 	mesh = meshptr;
 
-	SetUpDescriptorPool(engine);
-	SetUpDescriptorLayout(engine);
-	SetUpDescriptorSets(engine);
-	CreateShaderPipeLine(engine);
+	SetUpDescriptorPool();
+	SetUpDescriptorLayout();
+	SetUpDescriptorSets();
+	CreateShaderPipeLine();
 
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = engine->CommandPool;
+	allocInfo.commandPool = VulkanPtr::GetCommandPool();
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = 1;
 
-	if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &commandBuffer) != VK_SUCCESS) {
+	if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &commandBuffer) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate command buffers!");
 	}
 }
@@ -31,18 +31,18 @@ AnimatorCompute::~AnimatorCompute()
 {
 }
 
-void AnimatorCompute::SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine)
+void AnimatorCompute::SetUpDescriptorPool()
 {
 	std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-	DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	DescriptorPoolList.emplace_back(engine->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	descriptorPool = engine->CreateDescriptorPool(DescriptorPoolList);
+	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+	descriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void AnimatorCompute::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine)
+void AnimatorCompute::SetUpDescriptorLayout()
 {
 	std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
@@ -50,33 +50,33 @@ void AnimatorCompute::SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
 	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-	descriptorLayout = engine->CreateDescriptorSetLayout(LayoutBindingInfo);
+	descriptorLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 	
-void AnimatorCompute::SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine)
+void AnimatorCompute::SetUpDescriptorSets()
 {
 	VertexBufferCopy = std::make_shared<VulkanBuffer>(mesh->VertexBuffer);
 
-	descriptorSets = engine->CreateDescriptorSets(descriptorPool, descriptorLayout);
+	descriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(descriptorPool, descriptorLayout);
 
-	VkDescriptorBufferInfo VertexBufferInfo = engine->AddBufferDescriptor(mesh->VertexBuffer);
-	VkDescriptorBufferInfo BoneWeightBufferInfo = engine->AddBufferDescriptor(mesh->BoneWeightBuffer);
-	VkDescriptorBufferInfo MeshDataBufferInfo = engine->AddBufferDescriptor(mesh->MeshProperties.VulkanBufferData);
-	VkDescriptorBufferInfo BoneTransformBufferInfo = engine->AddBufferDescriptor(mesh->BoneTransformBuffer);
-	VkDescriptorBufferInfo TransformDataBufferInfo = engine->AddBufferDescriptor(mesh->TransformBuffer);
+	VkDescriptorBufferInfo VertexBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->VertexBuffer);
+	VkDescriptorBufferInfo BoneWeightBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->BoneWeightBuffer);
+	VkDescriptorBufferInfo MeshDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->MeshProperties.VulkanBufferData);
+	VkDescriptorBufferInfo BoneTransformBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->BoneTransformBuffer);
+	VkDescriptorBufferInfo TransformDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->TransformBuffer);
 
 	std::vector<VkWriteDescriptorSet> DescriptorList;
-	DescriptorList.emplace_back(engine->AddBufferDescriptorSet(0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(engine->AddBufferDescriptorSet(1, descriptorSets, BoneWeightBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(engine->AddBufferDescriptorSet(3, descriptorSets, MeshDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(engine->AddBufferDescriptorSet(5, descriptorSets, BoneTransformBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(engine->AddBufferDescriptorSet(6, descriptorSets, TransformDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	vkUpdateDescriptorSets(engine->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(1, descriptorSets, BoneWeightBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(3, descriptorSets, MeshDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(5, descriptorSets, BoneTransformBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(6, descriptorSets, TransformDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+	vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void AnimatorCompute::CreateShaderPipeLine(std::shared_ptr<VulkanEngine> engine)
+void AnimatorCompute::CreateShaderPipeLine()
 {
-	auto ComputeShaderCode = engine->CreateShader("Shader/animate.spv", VK_SHADER_STAGE_COMPUTE_BIT);
+	auto ComputeShaderCode = EnginePtr::GetEnginePtr()->CreateShader("Shader/animate.spv", VK_SHADER_STAGE_COMPUTE_BIT);
 
 	VkPushConstantRange pushConstantRange{};
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
@@ -89,11 +89,11 @@ void AnimatorCompute::CreateShaderPipeLine(std::shared_ptr<VulkanEngine> engine)
 	pipelineLayoutInfo.pushConstantRangeCount = 1;
 	pipelineLayoutInfo.pSetLayouts = &descriptorLayout;
 	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-	vkCreatePipelineLayout(engine->Device, &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout);
+	vkCreatePipelineLayout(VulkanPtr::GetDevice(), &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout);
 
 	VkPipelineCacheCreateInfo pipelineCacheInfo{};
 	pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-	vkCreatePipelineCache(engine->Device, &pipelineCacheInfo, nullptr, &PipelineCache);
+	vkCreatePipelineCache(VulkanPtr::GetDevice(), &pipelineCacheInfo, nullptr, &PipelineCache);
 
 	VkComputePipelineCreateInfo ComputePipelineInfo{};
 	ComputePipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
@@ -101,14 +101,14 @@ void AnimatorCompute::CreateShaderPipeLine(std::shared_ptr<VulkanEngine> engine)
 	ComputePipelineInfo.flags = 0;
 	ComputePipelineInfo.stage = ComputeShaderCode;
 
-	if (vkCreateComputePipelines(engine->Device, PipelineCache, 1, &ComputePipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
+	if (vkCreateComputePipelines(VulkanPtr::GetDevice(), PipelineCache, 1, &ComputePipelineInfo, nullptr, &ShaderPipeline) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create compute pipeline!");
 	}
 
-	vkDestroyShaderModule(engine->Device, ComputeShaderCode.module, nullptr);
+	vkDestroyShaderModule(VulkanPtr::GetDevice(), ComputeShaderCode.module, nullptr);
 }
 
-void AnimatorCompute::Compute(std::shared_ptr<VulkanEngine> engine)
+void AnimatorCompute::Compute()
 {
 	ConstMeshInfo meshInfo;
 	meshInfo.MeshIndex = 0;
@@ -161,13 +161,13 @@ void AnimatorCompute::Compute(std::shared_ptr<VulkanEngine> engine)
 	vkEndCommandBuffer(commandBuffer);
 }
 
-void AnimatorCompute::Destroy(std::shared_ptr<VulkanEngine> engine)
+void AnimatorCompute::Destroy()
 {
-	vkDestroyPipeline(engine->Device, ShaderPipeline, nullptr);
-	vkDestroyPipelineLayout(engine->Device, ShaderPipelineLayout, nullptr);
-	vkDestroyPipelineCache(engine->Device, PipelineCache, nullptr);
-	vkDestroyDescriptorSetLayout(engine->Device, descriptorLayout, nullptr);
-	vkDestroyDescriptorPool(engine->Device, descriptorPool, nullptr);
+	vkDestroyPipeline(VulkanPtr::GetDevice(), ShaderPipeline, nullptr);
+	vkDestroyPipelineLayout(VulkanPtr::GetDevice(), ShaderPipelineLayout, nullptr);
+	vkDestroyPipelineCache(VulkanPtr::GetDevice(), PipelineCache, nullptr);
+	vkDestroyDescriptorSetLayout(VulkanPtr::GetDevice(), descriptorLayout, nullptr);
+	vkDestroyDescriptorPool(VulkanPtr::GetDevice(), descriptorPool, nullptr);
 
 	ShaderPipeline = VK_NULL_HANDLE;
 	ShaderPipelineLayout = VK_NULL_HANDLE;

@@ -47,7 +47,7 @@ Model::Model(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManag
 	{
 		AnimatedModel = true;
 		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
-		AnimationRenderer = AnimatorCompute(engine, MeshList[0]);
+		AnimationRenderer = AnimatorCompute(MeshList[0]);
 	}
 
 	ModelTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
@@ -418,7 +418,7 @@ void Model::SubmitAnimationToCommandBuffer(std::shared_ptr<VulkanEngine> engine,
 {
 	if (AnimatedModel)
 	{
-		AnimationRenderer.Compute(EnginePtr::GetEnginePtr());
+		AnimationRenderer.Compute();
 		CMDBufferList.emplace_back(AnimationRenderer.commandBuffer);
 	}
 }
@@ -433,7 +433,7 @@ void Model::Destory(std::shared_ptr<VulkanEngine> engine)
 {
 	if (AnimatedModel)
 	{
-		AnimationRenderer.Destroy(engine);
+		AnimationRenderer.Destroy();
 	}
 }
 

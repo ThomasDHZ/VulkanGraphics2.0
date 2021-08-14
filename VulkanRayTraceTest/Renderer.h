@@ -31,7 +31,6 @@ private:
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
 public:
-	std::shared_ptr<AssetManager> assetManager;
 
 	Renderer();
 	Renderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPTR);

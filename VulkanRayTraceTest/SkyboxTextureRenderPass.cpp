@@ -5,31 +5,31 @@ SkyboxTextureRenderPass::SkyboxTextureRenderPass()
 {
 }
 
-SkyboxTextureRenderPass::SkyboxTextureRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera)
+SkyboxTextureRenderPass::SkyboxTextureRenderPass(std::shared_ptr<SceneDataUniformBuffer> sceneData, std::shared_ptr<PerspectiveCamera> camera)
 {
-    SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
+    SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(EnginePtr::GetEnginePtr());
     SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(camera->GetViewMatrix())));
-    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
+    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(camera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
     SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.view = glm::mat4(glm::mat3(camera->GetViewMatrix()));
-    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(camera->GetZoom()), engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
+    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(camera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
     SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(camera->GetPosition(), 0.0f);
     SkyUniformBuffer->Update();
 
-    CubeMapTexture = std::make_shared<RenderedCubeMapTexture>(engine);
+    CubeMapTexture = std::make_shared<RenderedCubeMapTexture>(EnginePtr::GetEnginePtr());
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
     pbrIrradiancePipeline = std::make_shared<PBRIrradiancePipeline>(PBRIrradiancePipeline(RenderPass, RendererID));
-    SetUpCommandBuffers(engine);
+    SetUpCommandBuffers();
 }
 
 SkyboxTextureRenderPass::~SkyboxTextureRenderPass()
 {
 }
 
-void SkyboxTextureRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void SkyboxTextureRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -83,17 +83,17 @@ void SkyboxTextureRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> eng
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(VulkanPtr::GetDevice(), &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
 }
 
-void SkyboxTextureRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void SkyboxTextureRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++)
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(CubeMapTexture->View);
@@ -103,31 +103,31 @@ void SkyboxTextureRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanE
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = engine->SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = engine->SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+        frameBufferCreateInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
         frameBufferCreateInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
+        if (vkCreateFramebuffer(VulkanPtr::GetDevice(), &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
         {
             throw std::runtime_error("Failed to create Gbuffer FrameBuffer.");
         }
     }
 }
 
-void SkyboxTextureRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void SkyboxTextureRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void SkyboxTextureRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -144,7 +144,7 @@ void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::sh
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine->SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -152,7 +152,7 @@ void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::sh
     vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pbrIrradiancePipeline->ShaderPipelineLayout, 0, 1, &pbrIrradiancePipeline->DescriptorSets, 0, nullptr);
 
-    assetManager->Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, RendererID, assetManager->cameraManager->ActiveCamera);
+    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer, renderPassInfo, pbrIrradiancePipeline->ShaderPipelineLayout, RendererID, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer);
 
@@ -161,37 +161,37 @@ void SkyboxTextureRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::sh
     }
 }
 
-void SkyboxTextureRenderPass::UpdateSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManage)
+void SkyboxTextureRenderPass::UpdateSwapChain()
 {
     CubeMapTexture->RecreateRendererTexture();
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
     pbrIrradiancePipeline->UpdateGraphicsPipeLine(RenderPass, RendererID);
-    SetUpCommandBuffers(engine);
+    SetUpCommandBuffers();
 }
 
-void SkyboxTextureRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void SkyboxTextureRenderPass::Destroy()
 {
     CubeMapTexture->Delete();
     pbrIrradiancePipeline->Destroy();
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

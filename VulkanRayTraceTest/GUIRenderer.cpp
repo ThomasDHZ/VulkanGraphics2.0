@@ -4,37 +4,37 @@ GUIRenderer::GUIRenderer() : BaseRenderer()
 {
 }
 
-GUIRenderer::GUIRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(engine, window, assetManagerPtr)
+GUIRenderer::GUIRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
-    TextRenderer = GUIRenderPass(engine, assetManager);
+    TextRenderer = GUIRenderPass(engine);
 }
 
 GUIRenderer::~GUIRenderer()
 {
 }
 
-void GUIRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+void GUIRenderer::RebuildSwapChain()
 {
-    TextRenderer.RebuildSwapChain(engine, assetManager);
+    TextRenderer.RebuildSwapChain();
 }
 
-void GUIRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
+void GUIRenderer::GUIUpdate()
 {
     ImGui::LabelText("Mesh", "Mesh");
-    for (int x = 0; x < assetManager->guiManager->GuiObjectList.size(); x++)
+    for (int x = 0; x < AssetManagerPtr::GetAssetPtr()->guiManager->GuiObjectList.size(); x++)
     {
-        ImGui::SliderFloat2(("Obj Pos " + std::to_string(x)).c_str(), & assetManager->guiManager->GuiObjectList[x]->Position.x, -2.0f, 2.0f);
+        ImGui::SliderFloat2(("Obj Pos " + std::to_string(x)).c_str(), &AssetManagerPtr::GetAssetPtr()->guiManager->GuiObjectList[x]->Position.x, -2.0f, 2.0f);
     }
 }
 
-void GUIRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+void GUIRenderer::Draw()
 {
-    TextRenderer.Draw(engine, assetManager, rendererID);
+    TextRenderer.Draw(rendererID);
 }
 
-void GUIRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
+void GUIRenderer::Destroy()
 {
-    TextRenderer.Destroy(engine);
+    TextRenderer.Destroy();
 }
 
 std::vector<VkCommandBuffer> GUIRenderer::AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList)

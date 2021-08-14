@@ -14,18 +14,18 @@ private:
 	std::shared_ptr<VulkanBuffer> VertexBufferCopy;
 	std::shared_ptr<Mesh> mesh;
 
-	void SetUpDescriptorPool(std::shared_ptr<VulkanEngine> engine);
-	void SetUpDescriptorLayout(std::shared_ptr<VulkanEngine> engine);
-	void SetUpDescriptorSets(std::shared_ptr<VulkanEngine> engine);
-	void CreateShaderPipeLine(std::shared_ptr<VulkanEngine> engine);
+	void SetUpDescriptorPool();
+	void SetUpDescriptorLayout();
+	void SetUpDescriptorSets();
+	void CreateShaderPipeLine();
 
 public:
 	AnimatorCompute();
-	AnimatorCompute(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<Mesh> meshptr);
+	AnimatorCompute(std::shared_ptr<Mesh> meshptr);
 	~AnimatorCompute();
 
 	VkCommandBuffer commandBuffer;
 
-	void Compute(std::shared_ptr<VulkanEngine> engine);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void Compute();
+	void Destroy();
 };

@@ -4,28 +4,23 @@ BaseRenderer::BaseRenderer()
 {
 }
 
-BaseRenderer::BaseRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr)
-{
-	assetManager = assetManagerPtr;
-}
-
 BaseRenderer::~BaseRenderer()
 {
 }
 
-void BaseRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+void BaseRenderer::RebuildSwapChain()
 {
 }
 
-void BaseRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
+void BaseRenderer::GUIUpdate()
 {
 }
 
-void BaseRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, Skybox skybox)
+void BaseRenderer::Draw(Skybox skybox)
 {
 }
 
-void BaseRenderer::Destroy(std::shared_ptr<VulkanEngine> engine)
+void BaseRenderer::Destroy()
 {
 }
 

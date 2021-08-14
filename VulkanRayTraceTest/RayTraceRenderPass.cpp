@@ -80,7 +80,7 @@ void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(std::shared_ptr<Vulk
 
     VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
     accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-    engine->vkGetAccelerationStructureBuildSizesKHR(engine->Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, &PrimitiveCount, &accelerationStructureBuildSizesInfo);
+    engine->vkGetAccelerationStructureBuildSizesKHR(VulkanPtr::GetDevice(), VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, &PrimitiveCount, &accelerationStructureBuildSizesInfo);
 
     if (topLevelAS.handle == VK_NULL_HANDLE)
     {
@@ -233,9 +233,9 @@ void RayTraceRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, 
 void RayTraceRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     {
-        vkFreeMemory(engine->Device, topLevelAS.AccelerationBuffer.BufferMemory, nullptr);
-        vkDestroyBuffer(engine->Device, topLevelAS.AccelerationBuffer.Buffer, nullptr);
-        engine->vkDestroyAccelerationStructureKHR(engine->Device, topLevelAS.handle, nullptr);
+        vkFreeMemory(VulkanPtr::GetDevice(), topLevelAS.AccelerationBuffer.BufferMemory, nullptr);
+        vkDestroyBuffer(VulkanPtr::GetDevice(), topLevelAS.AccelerationBuffer.Buffer, nullptr);
+        engine->vkDestroyAccelerationStructureKHR(VulkanPtr::GetDevice(), topLevelAS.handle, nullptr);
 
         topLevelAS.AccelerationBuffer.BufferMemory = VK_NULL_HANDLE;
         topLevelAS.AccelerationBuffer.Buffer = VK_NULL_HANDLE;

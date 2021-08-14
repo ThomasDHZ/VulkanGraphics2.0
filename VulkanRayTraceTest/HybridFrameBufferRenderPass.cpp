@@ -4,19 +4,19 @@ HybridFrameBufferRenderPass::HybridFrameBufferRenderPass()
 {
 }
 
-HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures)
+HybridFrameBufferRenderPass::HybridFrameBufferRenderPass(HybridFrameBufferTextures& HybridTextures)
 {
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine); 
+    CreateRenderPass();
+    CreateRendererFramebuffers(); 
     frameBufferPipeline = std::make_shared<HybridFrameBufferPipeline>(HybridFrameBufferPipeline(RenderPass, HybridTextures));
-    SetUpCommandBuffers(engine);
+    SetUpCommandBuffers();
 }
 
 HybridFrameBufferRenderPass::~HybridFrameBufferRenderPass()
 {
 }
 
-void HybridFrameBufferRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine> engine)
+void HybridFrameBufferRenderPass::CreateRenderPass()
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
@@ -55,31 +55,31 @@ void HybridFrameBufferRenderPass::CreateRenderPass(std::shared_ptr<VulkanEngine>
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(engine->Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(VulkanPtr::GetDevice(), &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
 }
 
-void HybridFrameBufferRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void HybridFrameBufferRenderPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = engine->CommandPool;
+    allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(engine->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void HybridFrameBufferRenderPass::CreateRendererFramebuffers(std::shared_ptr<VulkanEngine> engine)
+void HybridFrameBufferRenderPass::CreateRendererFramebuffers()
 {
-    SwapChainFramebuffers.resize(engine->SwapChain.GetSwapChainImageCount());
+    SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
-    for (size_t i = 0; i < engine->SwapChain.GetSwapChainImageCount(); i++) {
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++) {
         std::array<VkImageView, 1> attachments = {
-            engine->SwapChain.GetSwapChainImageViews()[i]
+            EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageViews()[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
@@ -87,17 +87,17 @@ void HybridFrameBufferRenderPass::CreateRendererFramebuffers(std::shared_ptr<Vul
         framebufferInfo.renderPass = RenderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = engine->SwapChain.GetSwapChainResolution().width;
-        framebufferInfo.height = engine->SwapChain.GetSwapChainResolution().height;
+        framebufferInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+        framebufferInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(engine->Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(VulkanPtr::GetDevice(), &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
 }
 
-void HybridFrameBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID rendererID)
+void HybridFrameBufferRenderPass::Draw(RendererID rendererID)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -115,7 +115,7 @@ void HybridFrameBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = engine->SwapChain.GetSwapChainResolution();
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -130,35 +130,35 @@ void HybridFrameBufferRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std
     }
 }
 
-void HybridFrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, HybridFrameBufferTextures& HybridTextures)
+void HybridFrameBufferRenderPass::RebuildSwapChain(HybridFrameBufferTextures& HybridTextures)
 {
     frameBufferPipeline->Destroy();
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(engine);
-    CreateRendererFramebuffers(engine);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
     frameBufferPipeline->UpdateGraphicsPipeLine(RenderPass, HybridTextures);
-    SetUpCommandBuffers(engine);
+    SetUpCommandBuffers();
 }
 
-void HybridFrameBufferRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void HybridFrameBufferRenderPass::Destroy()
 {
     frameBufferPipeline->Destroy();
 
-    vkDestroyRenderPass(engine->Device, RenderPass, nullptr);
+    vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(engine->Device, framebuffer, nullptr);
+        vkDestroyFramebuffer(VulkanPtr::GetDevice(), framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 }

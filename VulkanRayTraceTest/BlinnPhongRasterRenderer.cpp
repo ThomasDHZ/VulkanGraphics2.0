@@ -5,9 +5,9 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 {
 }
 
-BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr(), assetManagerPtr)
+BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<AssetManager> assetManagerPtr) : BaseRenderer()
 {
-    FrameBufferTextureRenderer = FrameBufferTextureRenderPass(assetManager);
+    FrameBufferTextureRenderer = FrameBufferTextureRenderPass(AssetManagerPtr::GetAssetPtr());
     BloomRenderer = BloomRenderPass(FrameBufferTextureRenderer.BloomTexture);
   //  DebugDepthRenderer = DepthDebugRenderPass(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(FrameBufferTextureRenderer.RenderedTexture, FrameBufferTextureRenderer.BloomTexture);
@@ -20,7 +20,7 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 
 void BlinnPhongRasterRenderer::RebuildSwapChain()
 {
-    FrameBufferTextureRenderer.RebuildSwapChain(assetManager);
+    FrameBufferTextureRenderer.RebuildSwapChain();
     BloomRenderer.RebuildSwapChain(FrameBufferTextureRenderer.BloomTexture);
     //DebugDepthRenderer.RebuildSwapChain(EnginePtr::GetEnginePtr(), assetManager, FrameBufferTextureRenderer.DepthTexture);
     FrameBufferRenderer.RebuildSwapChain(FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
@@ -97,7 +97,7 @@ void BlinnPhongRasterRenderer::GUIUpdate()
 
 void BlinnPhongRasterRenderer::Draw()
 {
-    FrameBufferTextureRenderer.Draw(assetManager, rendererID);
+    FrameBufferTextureRenderer.Draw(rendererID);
     BloomRenderer.Draw();
     //DebugDepthRenderer.Draw(EnginePtr::GetEnginePtr(), assetManager, imageIndex);
     FrameBufferRenderer.Draw();

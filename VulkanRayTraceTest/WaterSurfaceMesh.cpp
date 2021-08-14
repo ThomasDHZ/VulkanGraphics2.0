@@ -35,8 +35,8 @@ WaterSurfaceMesh::WaterSurfaceMesh(std::shared_ptr<VulkanEngine> engine, std::sh
 	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
 	SetUpMesh(engine, WaterVertices, WaterIndices);
 
-	waterReflectionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
-	waterRefractionRenderPass = WaterRenderToTextureRenderPass(engine, assetManager, SceneData, SkyUniformBuffer);
+	waterReflectionRenderPass = WaterRenderToTextureRenderPass(SceneData, SkyUniformBuffer);
+	waterRefractionRenderPass = WaterRenderToTextureRenderPass(SceneData, SkyUniformBuffer);
 
 	waterSurfacePipeline = std::make_shared<WaterSurfacePipeline>(WaterSurfacePipeline(RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture));
 }
@@ -47,14 +47,14 @@ WaterSurfaceMesh::~WaterSurfaceMesh()
 
 void WaterSurfaceMesh::DrawWaterTexture(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, uint32_t imageIndex, Skybox skybox)
 {
-	waterReflectionRenderPass.Draw(engine, assetManager, skybox);
-	waterRefractionRenderPass.Draw(engine, assetManager, skybox);
+	waterReflectionRenderPass.Draw(skybox);
+	waterRefractionRenderPass.Draw(skybox);
 }
 
 void WaterSurfaceMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, SceneDataUniformBuffer& copysceneData, std::shared_ptr<PerspectiveCamera> camera)
 {
-	waterReflectionRenderPass.Update(engine, assetManager, copysceneData, camera);
-	waterRefractionRenderPass.Update(engine, assetManager, copysceneData, camera);
+	waterReflectionRenderPass.Update(copysceneData, camera);
+	waterRefractionRenderPass.Update(copysceneData, camera);
 
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->MaterialBufferIndex;
 
@@ -75,8 +75,8 @@ void WaterSurfaceMesh::Update(std::shared_ptr<VulkanEngine> engine, std::shared_
 
 void WaterSurfaceMesh::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, VkRenderPass& RenderPass, std::shared_ptr<SceneDataUniformBuffer> sceneData)
 {
-	waterReflectionRenderPass.RebuildSwapChain(engine, assetManager, sceneData);
-	waterRefractionRenderPass.RebuildSwapChain(engine, assetManager, sceneData);
+	waterReflectionRenderPass.RebuildSwapChain(sceneData);
+	waterRefractionRenderPass.RebuildSwapChain(sceneData);
 	waterSurfacePipeline->UpdateGraphicsPipeLine(RenderPass, waterReflectionRenderPass.RenderedTexture, waterRefractionRenderPass.RenderedTexture);
 }
 
@@ -96,7 +96,7 @@ void WaterSurfaceMesh::SubmitToCMDBuffer(std::shared_ptr<VulkanEngine> engine, s
 void WaterSurfaceMesh::Destory(std::shared_ptr<VulkanEngine> engine)
 {
 	waterSurfacePipeline->Destroy();
-	waterReflectionRenderPass.Destroy(engine);
-	waterRefractionRenderPass.Destroy(engine);
+	waterReflectionRenderPass.Destroy();
+	waterRefractionRenderPass.Destroy();
 	Mesh::Destory(engine);
 }

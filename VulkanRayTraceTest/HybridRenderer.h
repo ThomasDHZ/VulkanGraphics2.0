@@ -27,16 +27,16 @@ private:
 	bool ApplySSAO = true;
 public:
 	HybridRenderer();
-	HybridRenderer(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, std::shared_ptr<AssetManager> assetManagerPtr);
+	HybridRenderer(std::shared_ptr<VulkanEngine> engine);
 	~HybridRenderer();
 
 	static constexpr RendererID rendererID = RendererID::Hybrid_Renderer;
 
 	RayTraceRenderPass rayTraceRenderPass;
-	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
-	void GUIUpdate(std::shared_ptr<VulkanEngine> engine);
-	void Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
-	void Destroy(std::shared_ptr<VulkanEngine> engine);
+	void RebuildSwapChain();
+	void GUIUpdate();
+	void Draw();
+	void Destroy();
 
 	std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);
 };
