@@ -6,23 +6,23 @@ Texture2D::Texture2D() : Texture()
 {
 }
 
-Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, TextureType textureType) : Texture(textureType, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, TextureType textureType) : Texture(textureType)
 {
 }
 
-Texture2D::Texture2D(const std::string TextureLocation, VkFormat format) : Texture(TextureLocation, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
-{
-	CreateTextureView(format);
-	CreateTextureSampler();
-}
-
-Texture2D::Texture2D(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format) : Texture (width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(const std::string TextureLocation, VkFormat format) : Texture(TextureLocation, format, TextureType::vkTexture2D)
 {
 	CreateTextureView(format);
 	CreateTextureSampler();
 }
 
-Texture2D::Texture2D(unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format) : Texture(width, height, PixelList, format, TextureType::vkTexture2D, VK_IMAGE_LAYOUT_UNDEFINED)
+Texture2D::Texture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format) : Texture(TextureResolution, PixelList, format, TextureType::vkTexture2D)
+{
+	CreateTextureView(format);
+	CreateTextureSampler();
+}
+
+Texture2D::Texture2D(glm::ivec2 TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format) : Texture (TextureResolution, PixelList, format, TextureType::vkTexture2D)
 {
 	CreateTextureView(format);
 	CreateTextureSampler();

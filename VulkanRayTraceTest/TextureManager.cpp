@@ -51,9 +51,9 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(const std::string Textu
 	return texture;
 }
 
-std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format)
+std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format)
 {
-	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(width, height, PixelList, format));
+	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureResolution, PixelList, format));
 	TextureList.emplace_back(texture);
 	TextureList.back()->TextureID;
 	return texture;
@@ -81,10 +81,10 @@ uint32_t TextureManager::Load3DTexture(const std::string TextureLocation, VkForm
 	return Texture3DList.back()->TextureID;
 }
 
-uint32_t TextureManager::LoadTexture3D(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format)
+uint32_t TextureManager::LoadTexture3D(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format)
 {
 	unsigned int TextureID = Texture3DList.size();
-	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(width, height, depth, PixelList, format)));
+	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(TextureResolution, PixelList, format)));
 	return TextureID;
 }
 

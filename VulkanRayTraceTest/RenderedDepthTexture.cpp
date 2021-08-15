@@ -5,7 +5,7 @@ RenderedDepthTexture::RenderedDepthTexture() : Texture()
 {
 }
 
-RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine, VkImageLayout imageLayout) : Texture(TextureType::vkRenderedTexture, imageLayout)
+RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedTexture)
 {
     Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
     Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
@@ -16,15 +16,7 @@ RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine,
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedDepthTexture::RenderedDepthTexture(glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(TextureResolution, TextureType::vkRenderedTexture, imageLayout)
-{
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-RenderedDepthTexture::RenderedDepthTexture(int width, int height, VkImageLayout imageLayout) : Texture(width, height, TextureType::vkRenderedTexture, imageLayout)
+RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     CreateTextureImage();
     CreateTextureView();

@@ -9,8 +9,7 @@ private:
 public:
     RenderedCubeMapTexture();
     RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine);
-    RenderedCubeMapTexture(glm::vec2 TextureResolution);
-    RenderedCubeMapTexture(int width, int Height);
+    RenderedCubeMapTexture(glm::ivec2 TextureResolution);
     ~RenderedCubeMapTexture();
 
     void RecreateRendererTexture();

@@ -4,7 +4,7 @@ RenderedCubeMapTexture::RenderedCubeMapTexture() : Texture()
 {
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
+RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedCubeMap)
 {
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
@@ -14,14 +14,7 @@ RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> eng
     CreateTextureSampler();
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(glm::vec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
-{
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-}
-
-RenderedCubeMapTexture::RenderedCubeMapTexture(int width, int height) : Texture(width, height, TextureType::vkRenderedCubeMap, VK_IMAGE_LAYOUT_UNDEFINED)
+RenderedCubeMapTexture::RenderedCubeMapTexture(glm::ivec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedCubeMap)
 {
     CreateTextureImage();
     CreateTextureView();

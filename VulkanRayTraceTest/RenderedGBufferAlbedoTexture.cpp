@@ -5,7 +5,7 @@ RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture() : Texture()
 {
 }
 
-RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(std::shared_ptr<VulkanEngine> engine, VkImageLayout imageLayout) : Texture(TextureType::vkRenderedTexture, imageLayout)
+RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedTexture)
 {
     Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
     Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
@@ -16,15 +16,7 @@ RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(std::shared_ptr<Vulka
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(TextureResolution, TextureType::vkRenderedTexture, imageLayout)
-{
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(int width, int height, VkImageLayout imageLayout) : Texture(width, height, TextureType::vkRenderedTexture, imageLayout)
+RenderedGBufferAlbedoTexture::RenderedGBufferAlbedoTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     CreateTextureImage();
     CreateTextureView();

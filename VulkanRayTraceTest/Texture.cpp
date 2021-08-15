@@ -16,114 +16,66 @@ Texture::Texture()
 	TextureBufferIndex = 0;
 }
 
-Texture::Texture(TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(TextureType textureType)
 {
 	Width = 0;
 	Height = 0;
 	Depth = 1;
 	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
 	TextureBufferIndex = 0;
-	ImageLayout = imageLayout;
+	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TypeOfTexture = textureType;
 }
 
-Texture::Texture(glm::vec2& TextureResolution, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(glm::ivec2& TextureResolution, TextureType textureType)
 {
 	Width = TextureResolution.x;
 	Height = TextureResolution.y;
 	Depth = 1;
 	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
 	TextureBufferIndex = 0;
-	ImageLayout = imageLayout;
+	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TypeOfTexture = textureType;
 }
 
-Texture::Texture(unsigned int width, unsigned int height, TextureType textureType, VkImageLayout imageLayout)
-{
-	Width = width;
-	Height = height;
-	Depth = 1;
-	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
-	TextureBufferIndex = 0;
-	ImageLayout = imageLayout;
-	TypeOfTexture = textureType;
-}
-
-Texture::Texture(glm::vec3& TextureResolution, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(glm::ivec3& TextureResolution, TextureType textureType)
 {
 	Width = TextureResolution.x;
 	Height = TextureResolution.y;
 	Depth = TextureResolution.z;
 	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
 	TextureBufferIndex = 0;
-	ImageLayout = imageLayout;
+	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TypeOfTexture = textureType;
 }
 
-Texture::Texture(unsigned int width, unsigned int height, unsigned int depth, TextureType textureType, VkImageLayout imageLayout)
-{
-	Width = width;
-	Height = height;
-	Depth = depth;
-	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
-	TextureBufferIndex = 0;
-	ImageLayout = imageLayout;
-	TypeOfTexture = textureType;
-}
-
-Texture::Texture(glm::vec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(glm::ivec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType)
 {
 	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
 	EnginePtr::GetEnginePtr() = 0;
 	Width = TextureResolution.x;
 	Height = TextureResolution.y;
 	Depth = 1;
-	ImageLayout = imageLayout;
+	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TypeOfTexture = textureType;
 
 	CreateTexture(PixelList, format);
 }
 
-Texture::Texture(glm::vec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(glm::ivec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType)
 {
 	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
 	TextureBufferIndex = 0;
 	Width = TextureResolution.x;
 	Height = TextureResolution.y;
 	Depth = 1;
-	ImageLayout = imageLayout;
+	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TypeOfTexture = textureType;
 
 	CreateTexture(PixelList, format);
 }
 
-Texture::Texture(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
-{
-	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
-	TextureBufferIndex = 0;
-	Width = width;
-	Height = height;
-	Depth = 1;
-	ImageLayout = imageLayout;
-	TypeOfTexture = textureType;
-
-	CreateTexture(PixelList, format);
-}
-
-Texture::Texture(unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
-{
-	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
-	TextureBufferIndex = 0;
-	Width = width;
-	Height = height;
-	Depth = 1;
-	ImageLayout = imageLayout;
-	TypeOfTexture = textureType;
-
-	CreateTexture(PixelList, format);
-}
-
-Texture::Texture(glm::vec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType)
 {
 	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
 	TextureBufferIndex = 0;
@@ -131,27 +83,13 @@ Texture::Texture(glm::vec3& TextureResolution, std::vector<Pixel>& PixelList, Vk
 	Height = TextureResolution.y;
 	Depth = TextureResolution.z;
 	TextureFormat = format;
-	ImageLayout = imageLayout;
+	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TypeOfTexture = textureType;
 
 	CreateTexture3D(PixelList, format);
 }
 
-Texture::Texture(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
-{
-	TextureID = EnginePtr::GetEnginePtr()->GenerateID();
-	TextureBufferIndex = 0;
-	Width = width;
-	Height = height;
-	Depth = depth;
-	TextureFormat = format;
-	ImageLayout = imageLayout;
-	TypeOfTexture = textureType;
-
-	CreateTexture3D(PixelList, format);
-}
-
-Texture::Texture(std::string TextureLocation, VkFormat format, TextureType textureType, VkImageLayout imageLayout)
+Texture::Texture(std::string TextureLocation, VkFormat format, TextureType textureType)
 {
 	Width = 0;
 	Height = 0;
@@ -160,7 +98,7 @@ Texture::Texture(std::string TextureLocation, VkFormat format, TextureType textu
 	TextureBufferIndex = 0;
 	FileName = TextureLocation;
 	TextureFormat = format;
-	ImageLayout = imageLayout;
+	ImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	TypeOfTexture = textureType;
 
 	LoadTexture(TextureLocation, format);

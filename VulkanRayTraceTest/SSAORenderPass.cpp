@@ -8,7 +8,7 @@ SSAORenderPass::SSAORenderPass() : BaseRenderPass()
 
 SSAORenderPass::SSAORenderPass(SSAOTextureList& textures) : BaseRenderPass()
 {
-    SSAOTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
+    SSAOTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr()));
 
     GenerateKernal(textures);
     GenerateNoiseTexture(textures);
@@ -149,7 +149,8 @@ void SSAORenderPass::GenerateNoiseTexture(SSAOTextureList& textures)
     {
         pixelList.emplace_back(glm::vec4(randomBits(generator) * 2.0 - 1.0, randomBits(generator) * 2.0 - 1.0, 0.0f, 1.0f));
     }
-    NoiseTexture = std::make_shared<Texture2D>(Texture2D(4, 4, pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
+    Texture2D(glm::ivec2(4, 4), pixelList, VK_FORMAT_R32G32B32A32_SFLOAT);
+    NoiseTexture = std::make_shared<Texture2D>(Texture2D(glm::ivec2(4, 4), pixelList, VK_FORMAT_R32G32B32A32_SFLOAT));
     textures.NoiseTexture = NoiseTexture;
 }
 

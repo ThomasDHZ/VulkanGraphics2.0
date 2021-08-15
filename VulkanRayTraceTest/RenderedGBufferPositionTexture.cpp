@@ -5,7 +5,7 @@ RenderedGBufferPositionTexture::RenderedGBufferPositionTexture() : Texture()
 {
 }
 
-RenderedGBufferPositionTexture::RenderedGBufferPositionTexture(std::shared_ptr<VulkanEngine> engine, VkImageLayout imageLayout) : Texture(TextureType::vkRenderedTexture, imageLayout)
+RenderedGBufferPositionTexture::RenderedGBufferPositionTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedTexture)
 {
     Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
     Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
@@ -16,15 +16,7 @@ RenderedGBufferPositionTexture::RenderedGBufferPositionTexture(std::shared_ptr<V
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedGBufferPositionTexture::RenderedGBufferPositionTexture(glm::vec2& TextureResolution, VkImageLayout imageLayout) : Texture(TextureResolution, TextureType::vkRenderedTexture, imageLayout)
-{
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-RenderedGBufferPositionTexture::RenderedGBufferPositionTexture(int width, int height, VkImageLayout imageLayout) : Texture(width, height, TextureType::vkRenderedTexture, imageLayout)
+RenderedGBufferPositionTexture::RenderedGBufferPositionTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     CreateTextureImage();
     CreateTextureView();

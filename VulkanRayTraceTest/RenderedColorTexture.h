@@ -10,8 +10,7 @@ private:
 public:
     RenderedColorTexture();
     RenderedColorTexture(std::shared_ptr<VulkanEngine> engine);
-    RenderedColorTexture(glm::vec2 TextureResolution);
-    RenderedColorTexture(int width, int Height);
+    RenderedColorTexture(glm::ivec2 TextureResolution);
     ~RenderedColorTexture();
 
     void RecreateRendererTexture();

@@ -51,18 +51,17 @@ public:
     int Depth;
 
     Texture();
-    Texture(TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(glm::vec2& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(unsigned int width, unsigned int height, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(glm::vec3& TextureResolution, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(unsigned int width, unsigned int height, unsigned int depth, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(glm::vec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(glm::vec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(unsigned int width, unsigned int height, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(glm::vec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
-    Texture(std::string TextureLocation, VkFormat format, TextureType textureType, VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED);
+    Texture(TextureType textureType);
+
+    Texture(glm::ivec2& TextureResolution, TextureType textureType);
+    Texture(glm::ivec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
+    Texture(glm::ivec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType);
+
+    Texture(glm::ivec3& TextureResolution, TextureType textureType);
+    Texture(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
+
+    Texture(std::string TextureLocation, VkFormat format, TextureType textureType);
+
     ~Texture();
 
     void Update(uint32_t NewTextureBufferIndex);

@@ -9,7 +9,7 @@ private:
     void CreateTextureSampler();
 public:
     Texture3D();
-    Texture3D( const std::string TextureLocation, VkFormat format);
-    Texture3D(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format);
+    Texture3D(const std::string TextureLocation, VkFormat format);
+    Texture3D(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
     ~Texture3D();
 };

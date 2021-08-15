@@ -25,11 +25,11 @@ public:
 	~TextureManager();
 
 	std::shared_ptr<Texture2D> LoadTexture2D(const std::string TextureLocation, VkFormat format);
-	std::shared_ptr<Texture2D> LoadTexture2D(unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, VkFormat format);
+	std::shared_ptr<Texture2D> LoadTexture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
 	uint32_t LoadTexture2D(std::shared_ptr<Texture> RenderedTexture);
 	std::shared_ptr<FontTexture> LoadTextTexture(void* GlyphData, uint32_t width, uint32_t height);
 	uint32_t Load3DTexture(const std::string TextureLocation, VkFormat format);
-	uint32_t LoadTexture3D(int width, int height, int depth, std::vector<Pixel>& PixelList, VkFormat format);
+	uint32_t LoadTexture3D(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
 	void DeleteTexture(uint32_t TextureBufferIndex);
 	void LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
 	void LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);

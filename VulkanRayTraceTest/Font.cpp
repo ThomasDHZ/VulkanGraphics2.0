@@ -49,7 +49,7 @@ Font::Font(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<MaterialManager
 
 				Character character =
 				{
-					textureManager->LoadTexture2D(face->glyph->bitmap.width, face->glyph->bitmap.rows, PixelList, VK_FORMAT_R8G8B8A8_SRGB),
+					textureManager->LoadTexture2D(glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows), PixelList, VK_FORMAT_R8G8B8A8_SRGB),
 					glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
 					glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
 					static_cast<unsigned int>(face->glyph->advance.x)
