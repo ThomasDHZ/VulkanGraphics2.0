@@ -2,12 +2,14 @@
 #include "CameraManager.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "GameController.h"
 
 class InputManager
 {
 private:
 
 public:
+	GameController controller;
 	Keyboard keyboard;
 	Mouse mouse;
 

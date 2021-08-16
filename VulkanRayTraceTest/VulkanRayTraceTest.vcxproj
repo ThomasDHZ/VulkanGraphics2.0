@@ -173,6 +173,7 @@
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DebugLightRenderingPipeline.cpp" />
     <ClCompile Include="Font.cpp" />
+    <ClCompile Include="GameController.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GUIManager.cpp" />
     <ClCompile Include="GUIMesh.cpp" />
@@ -404,6 +405,7 @@
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DebugLightRenderingPipeline.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="GameController.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GUIManager.h" />
     <ClInclude Include="GUIMesh.h" />
