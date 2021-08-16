@@ -109,6 +109,8 @@ public:
 	uint32_t DrawFrame = 0;
 
 	std::vector<VkLayerProperties> VulkanLayers;
+
+	glm::ivec2 ScreenResoulation;
 	bool UpdateRendererFlag = false;
 	bool RayTraceFlag = false;
 

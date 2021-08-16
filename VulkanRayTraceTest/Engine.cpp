@@ -30,6 +30,8 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
     AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
+    EnginePtr::GetEnginePtr()->ScreenResoulation = glm::ivec2(800, 600);
+
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
     gameObject->AddChildModel(std::make_shared<SparkManStage>(SparkManStage(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), glm::vec3(0.0f, 0.0f, 0.0f))));
     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);

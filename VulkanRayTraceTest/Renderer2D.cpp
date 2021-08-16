@@ -7,8 +7,8 @@ Renderer2D::Renderer2D() : BaseRenderer()
 Renderer2D::Renderer2D(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
     FrameBufferTextureRenderer = RenderPass2D(engine);
-    BloomRenderer = BloomRenderPass(FrameBufferTextureRenderer.BloomTexture);
-    FrameBufferRenderer = FrameBufferRenderPass(FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
+   // BloomRenderer = BloomRenderPass(FrameBufferTextureRenderer.BloomTexture//);
+  //  FrameBufferRenderer = FrameBufferRenderPass(FrameBufferTextureRenderer.RenderedTexture, BloomRenderer.BloomTexture);
 }
 
 Renderer2D::~Renderer2D()

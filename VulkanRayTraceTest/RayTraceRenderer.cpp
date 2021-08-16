@@ -7,7 +7,7 @@ RayTraceRenderer::RayTraceRenderer() : BaseRenderer()
 RayTraceRenderer::RayTraceRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
     rayTraceRenderPass = RayTraceRenderPass(engine, AssetManagerPtr::GetAssetPtr());
-    FrameBufferRenderer = FrameBufferRenderPass(rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
+   // FrameBufferRenderer = FrameBufferRenderPass(rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
 RayTraceRenderer::~RayTraceRenderer()

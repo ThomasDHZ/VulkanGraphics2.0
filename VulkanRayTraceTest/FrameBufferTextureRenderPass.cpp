@@ -6,11 +6,11 @@ FrameBufferTextureRenderPass::FrameBufferTextureRenderPass() : BaseRenderPass()
 {
 }
 
-FrameBufferTextureRenderPass::FrameBufferTextureRenderPass(std::shared_ptr<AssetManager> assetManager)
+FrameBufferTextureRenderPass::FrameBufferTextureRenderPass(glm::ivec2 renderPassResolution) : BaseRenderPass(renderPassResolution)
 {
-    RenderedTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
-    BloomTexture = std::make_shared<RenderedColorTexture>(EnginePtr::GetEnginePtr());
-    DepthTexture = std::make_shared<RenderedDepthTexture>(EnginePtr::GetEnginePtr());
+    RenderedTexture = std::make_shared<RenderedColorTexture>(renderPassResolution);
+    BloomTexture = std::make_shared<RenderedColorTexture>(renderPassResolution);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(renderPassResolution);
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -124,8 +124,8 @@ void FrameBufferTextureRenderPass::CreateRendererFramebuffers()
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = RenderPassResolution.x;
+        frameBufferCreateInfo.height = RenderPassResolution.y;
         frameBufferCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
@@ -157,12 +157,18 @@ void FrameBufferTextureRenderPass::Draw()
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    VkRect2D rect{};
+    rect.extent.width = RenderPassResolution.x;
+    rect.extent.height = RenderPassResolution.y;
+    rect.offset.x = 0;
+    rect.offset.y = 0;
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
+    renderPassInfo.renderArea.offset = rect.offset;
+    renderPassInfo.renderArea.extent = rect.extent;
 
     std::array<VkClearValue, 3> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };

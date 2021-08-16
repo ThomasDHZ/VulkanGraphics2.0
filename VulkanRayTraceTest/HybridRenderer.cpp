@@ -9,7 +9,7 @@ HybridRenderer::HybridRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRende
     FrameBufferTextureRenderer = GBufferRenderPass(engine);
     FrameBufferTextureRenderer2 = GBufferRenderPass2(engine);
     rayTraceRenderPass = RayTraceRenderPass(engine, AssetManagerPtr::GetAssetPtr());
-    bloomRenderPass = BloomRenderPass(FrameBufferTextureRenderer.GBloomTexture);
+   // bloomRenderPass = BloomRenderPass(FrameBufferTextureRenderer.GBloomTexture);
    // DebugDepthRenderer = DepthDebugRenderPass(engine, assetManager, FrameBufferTextureRenderer.DepthTexture);
 
     SSAOTextureList textures = {};

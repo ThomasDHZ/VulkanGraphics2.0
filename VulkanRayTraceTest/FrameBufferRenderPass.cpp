@@ -4,7 +4,7 @@ FrameBufferRenderPass::FrameBufferRenderPass() : BaseRenderPass()
 {
 }
 
-FrameBufferRenderPass::FrameBufferRenderPass(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : BaseRenderPass()
+FrameBufferRenderPass::FrameBufferRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : BaseRenderPass(renderPassResolution)
 {
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -87,8 +87,8 @@ void FrameBufferRenderPass::CreateRendererFramebuffers()
         framebufferInfo.renderPass = RenderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-        framebufferInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+        framebufferInfo.width = RenderPassResolution.x;
+        framebufferInfo.height = RenderPassResolution.y;
         framebufferInfo.layers = 1;
 
         if (vkCreateFramebuffer(VulkanPtr::GetDevice(), &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
@@ -110,12 +110,18 @@ void FrameBufferRenderPass::Draw()
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
     clearValues[1].depthStencil = { 1.0f, 0 };
 
+    VkRect2D rect{};
+    rect.extent.width = RenderPassResolution.x;
+    rect.extent.height = RenderPassResolution.y;
+    rect.offset.x = 0;
+    rect.offset.y = 0;
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->DrawFrame];
-    renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
+    renderPassInfo.renderArea.offset = rect.offset;
+    renderPassInfo.renderArea.extent = rect.extent;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 

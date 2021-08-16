@@ -7,12 +7,15 @@ class BaseRenderPass
 {
 private:
 protected:
+	glm::ivec2 RenderPassResolution;
+
 public:
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	VkCommandBuffer CommandBuffer = VK_NULL_HANDLE;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	BaseRenderPass();
+	BaseRenderPass(glm::ivec2 renderPassResolution);
 	~BaseRenderPass();
 	virtual void Destroy();
 

@@ -14,7 +14,7 @@ private:
 
 public:
 	BloomRenderPass();
-	BloomRenderPass(std::shared_ptr<Texture> InputBloomTexture);
+	BloomRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<Texture> InputBloomTexture);
 	~BloomRenderPass();
 
 	std::shared_ptr<RenderedColorTexture> BloomTexture;

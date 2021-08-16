@@ -18,7 +18,7 @@ private:
 
 public:
 	FrameBufferTextureRenderPass();
-	FrameBufferTextureRenderPass(std::shared_ptr<AssetManager> assetManager);
+	FrameBufferTextureRenderPass(glm::ivec2 renderPassResolution);
 	~FrameBufferTextureRenderPass();
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;

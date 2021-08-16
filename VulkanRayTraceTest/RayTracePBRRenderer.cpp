@@ -8,7 +8,7 @@ RayTracePBRRenderer::RayTracePBRRenderer(std::shared_ptr<VulkanEngine> engine) :
 {
     rayTraceRenderPass = RayTraceRenderPass(engine, AssetManagerPtr::GetAssetPtr());
     SSAOBlurRenderer = SSAOBlurRenderPass(rayTraceRenderPass.RayTracedTexture);
-    FrameBufferRenderer = FrameBufferRenderPass(rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
+   // FrameBufferRenderer = FrameBufferRenderPass(rayTraceRenderPass.RayTracedTexture, rayTraceRenderPass.RayTracedTexture);
 }
 
 RayTracePBRRenderer::~RayTracePBRRenderer()

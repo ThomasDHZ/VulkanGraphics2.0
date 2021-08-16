@@ -106,14 +106,14 @@ void RenderFrameBufferTexturePipeline::SetUpShaderPipeLine(const VkRenderPass& r
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-    viewport.height = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+    viewport.width = (float)EnginePtr::GetEnginePtr()->ScreenResoulation.x;
+    viewport.height = (float)EnginePtr::GetEnginePtr()->ScreenResoulation.y;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = { 0, 0 };
-    scissor.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
+    scissor.extent = { (uint32_t)EnginePtr::GetEnginePtr()->ScreenResoulation.x, (uint32_t)EnginePtr::GetEnginePtr()->ScreenResoulation.y };
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;

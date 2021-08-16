@@ -11,7 +11,7 @@ private:
 
 public:
 	FrameBufferRenderPass();
-	FrameBufferRenderPass(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
+	FrameBufferRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
 	~FrameBufferRenderPass();
 
 	std::shared_ptr<FrameBufferPipeline> frameBufferPipeline;

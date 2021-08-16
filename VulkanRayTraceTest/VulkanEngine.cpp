@@ -10,6 +10,8 @@ VulkanEngine::VulkanEngine()
 
 VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 {
+	ScreenResoulation = glm::ivec2(WindowPtr::GetWindowPtr()->GetWindowWidth(), WindowPtr::GetWindowPtr()->GetWindowHeight());
+
 	ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
 
 	DeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
