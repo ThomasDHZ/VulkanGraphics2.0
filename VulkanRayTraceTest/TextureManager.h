@@ -31,6 +31,7 @@ public:
 	uint32_t Load3DTexture(const std::string TextureLocation, VkFormat format);
 	uint32_t LoadTexture3D(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
 	void DeleteTexture(uint32_t TextureBufferIndex);
+	void Delete3DTexture(uint32_t Texture3DBufferIndex);
 	void LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
 	void LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);
 	void LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat);
@@ -45,6 +46,7 @@ public:
 	std::shared_ptr<Texture3D> Get3DTextureByName(const std::string TextureName);
 
 	std::shared_ptr<Texture> GetTextureByBufferIndex(unsigned int TextureBufferIndex) { return TextureList[TextureBufferIndex]; };
+	std::shared_ptr<Texture> GetTexture3DByBufferIndex(unsigned int Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
 	std::shared_ptr<Texture> Get3DTexture(unsigned int TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
 	std::vector<std::shared_ptr<Texture>> GetTextureList() { return TextureList; }
 	std::vector<std::shared_ptr<Texture3D>> Get3DTextureList() { return Texture3DList; }

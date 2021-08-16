@@ -56,31 +56,37 @@ void LightManager::UpdateImGui()
 void LightManager::AddDirectionalLight(std::shared_ptr<DirectionalLight> light)
 {
 	DirectionalLightList.emplace_back(light);
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::AddDirectionalLight(std::shared_ptr<CameraManager> cameraManager, DirectionalLightBuffer light)
 {
 	DirectionalLightList.emplace_back(std::make_shared<DirectionalLight>(DirectionalLight(engine, cameraManager, light)));
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::AddPointLight(std::shared_ptr<PointLight> light)
 {
 	PointLightList.emplace_back(light);
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::AddPointLight(PointLightBuffer light)
 {
 	PointLightList.emplace_back(std::make_shared<PointLight>(PointLight(engine, light)));
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::AddSpotLight(std::shared_ptr<SpotLight> light)
 {
 	SpotLightList.emplace_back(light);
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::AddSpotLight(SpotLightBuffer light)
 {
 	SpotLightList.emplace_back(std::make_shared<SpotLight>(SpotLight(engine, light)));
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::DeleteDirectionalLight(uint32_t LightBufferIndex)
@@ -88,6 +94,7 @@ void LightManager::DeleteDirectionalLight(uint32_t LightBufferIndex)
 	DirectionalLightList[LightBufferIndex]->Destroy(engine);
 	DirectionalLightList.erase(DirectionalLightList.begin() + LightBufferIndex);
 	Update();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::DeletePointLight(uint32_t LightBufferIndex)
@@ -95,15 +102,15 @@ void LightManager::DeletePointLight(uint32_t LightBufferIndex)
 	PointLightList[LightBufferIndex]->Destroy(engine);
 	PointLightList.erase(PointLightList.begin() + LightBufferIndex);
 	Update();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::DeleteSpotLight(uint32_t LightBufferIndex)
 {
 	SpotLightList[LightBufferIndex]->Destroy(engine);
-
-	SpotLightList[LightBufferIndex]->Destroy(engine);
 	SpotLightList.erase(SpotLightList.begin() + LightBufferIndex);
 	Update();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 std::vector<VkDescriptorBufferInfo> LightManager::GetDirectionalLightBufferListDescriptor()

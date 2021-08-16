@@ -20,6 +20,8 @@ public:
 	~MeshManager();
 
 	void AddMesh(std::shared_ptr<Mesh> mesh);
+	void DeleteMesh(uint32_t MeshBufferIndex);
+
 	void Update(std::shared_ptr<Camera> camera);
 	void UpdateBufferIndex();
 	void Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& renderPassInfo, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView);

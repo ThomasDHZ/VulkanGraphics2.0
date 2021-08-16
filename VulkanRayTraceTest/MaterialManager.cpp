@@ -40,6 +40,7 @@ std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName
 	MaterialList.back()->MaterialBufferIndex = MaterialList.size();
 	MaterialList.back()->UpdateBufferIndexs();
 
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return material;
 }
 
@@ -53,6 +54,7 @@ std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName
 	MaterialList.back()->MaterialBufferIndex = MaterialList.size();
 	MaterialList.back()->UpdateBufferIndexs();
 
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return MaterialList.back();
 }
 
@@ -150,6 +152,7 @@ void MaterialManager::DeleteMaterial(uint32_t DeleteMaterialBufferIndex)
 	MaterialList.erase(MaterialList.begin() + DeleteMaterialBufferIndex);
 
 	Update();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void MaterialManager::Destory()

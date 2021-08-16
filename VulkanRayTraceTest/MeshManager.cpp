@@ -24,6 +24,14 @@ MeshManager::~MeshManager()
 void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 {
 	MeshList.emplace_back(mesh);
+    EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void MeshManager::DeleteMesh(uint32_t MeshBufferIndex)
+{
+    MeshList[MeshBufferIndex]->Destory();
+    MeshList.erase(MeshList.begin() + MeshBufferIndex);
+    EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void MeshManager::Update(std::shared_ptr<Camera> camera)
@@ -61,11 +69,6 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkRenderPassBeginInfo& re
         {
             mesh->Draw(commandBuffer, layout, CameraView);
         }
-  /*      else if(mesh->DrawFlags == MeshDrawFlags::Mesh_Skip_Water_Renderer)
-        {
-            auto water = static_cast<WaterSurfaceMesh*>(mesh.get());
-            water->Draw(commandBuffer, renderPassInfo, RendererID, 1);
-        }*/
     }
 }
 

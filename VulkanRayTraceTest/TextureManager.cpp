@@ -48,6 +48,7 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(const std::string Textu
 {
 	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureLocation, format));
 	TextureList.emplace_back(texture);
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
@@ -56,6 +57,7 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(glm::ivec2 TextureResol
 	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureResolution, PixelList, format));
 	TextureList.emplace_back(texture);
 	TextureList.back()->TextureID;
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
@@ -64,6 +66,7 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 	unsigned int TextureID = TextureList.size();
 	TextureList.emplace_back(RenderedTexture);
 	TextureList.back()->TextureBufferIndex = TextureList.size();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return TextureID;
 }
 
@@ -72,12 +75,14 @@ std::shared_ptr<FontTexture> TextureManager::LoadTextTexture(void* GlyphData, ui
 	std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(GlyphData, width, height));
 	TextureList.emplace_back(texture);
 	TextureList.back()->TextureID;
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
 uint32_t TextureManager::Load3DTexture(const std::string TextureLocation, VkFormat format)
 {
 	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(TextureLocation, format)));
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return Texture3DList.back()->TextureID;
 }
 
@@ -85,6 +90,7 @@ uint32_t TextureManager::LoadTexture3D(glm::ivec3& TextureResolution, std::vecto
 {
 	unsigned int TextureID = Texture3DList.size();
 	Texture3DList.emplace_back(std::make_shared<Texture3D>(Texture3D(TextureResolution, PixelList, format)));
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return TextureID;
 }
 
@@ -118,6 +124,20 @@ void TextureManager::DeleteTexture(uint32_t TextureBufferIndex)
 	{
 		TextureList[x]->TextureBufferIndex = x;
 	}
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::Delete3DTexture(uint32_t Texture3DBufferIndex)
+{
+	auto texture = GetTextureByBufferIndex(Texture3DBufferIndex);
+	texture->Delete();
+	Texture3DList.erase(Texture3DList.begin() + Texture3DBufferIndex);
+
+	for (int x = 0; x < Texture3DList.size(); x++)
+	{
+		Texture3DList[x]->TextureBufferIndex = x;
+	}
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void TextureManager::UnloadAllTextures()

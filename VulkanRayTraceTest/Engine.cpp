@@ -30,15 +30,16 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
     AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
-    EnginePtr::GetEnginePtr()->ScreenResoulation = glm::ivec2(800, 600);
+    EnginePtr::GetEnginePtr()->ScreenResoulation = glm::ivec2(1280, 720);
+    renderer = Renderer(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr(), AssetManagerPtr::GetAssetPtr());
 
     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
     gameObject->AddChildModel(std::make_shared<SparkManStage>(SparkManStage(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr(), glm::vec3(0.0f, 0.0f, 0.0f))));
     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-    //std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-    //gameObject2->AddChildModel(AssetManagerPtr::GetAssetPtr()->meshManager, std::make_shared<Model>(Model(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr()->materialManager, AssetManagerPtr::GetAssetPtr()->textureManager, "../Models/TestAnimModel/model.dae")));
-    //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject2);
+    std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+    gameObject2->AddChildModel(std::make_shared<Model>("../Models/TestAnimModel/model.dae"));
+    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject2);
 
     std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
     gameObject3->AddChildMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
@@ -161,8 +162,6 @@ Engine::Engine(unsigned int width, unsigned int height, const char* WindowName)
     AssetManagerPtr::GetAssetPtr()->SceneData->UniformDataInfo.sLight.ambient = glm::vec4(0.0f);
     AssetManagerPtr::GetAssetPtr()->SceneData->UniformDataInfo.sLight.diffuse = glm::vec4(1.0f);
     AssetManagerPtr::GetAssetPtr()->SceneData->UniformDataInfo.sLight.specular = glm::vec4(1.0f);
-
-    renderer = Renderer(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr(), AssetManagerPtr::GetAssetPtr());
 }
 
 Engine::~Engine()
