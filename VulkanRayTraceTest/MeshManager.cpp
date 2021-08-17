@@ -50,7 +50,6 @@ void MeshManager::Update(std::shared_ptr<Camera> camera)
            
         }
     }
-    UpdateBufferIndex();
 }
 
 void MeshManager::UpdateBufferIndex()

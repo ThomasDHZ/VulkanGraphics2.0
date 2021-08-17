@@ -136,7 +136,7 @@ uint32_t MaterialManager::GetMaterialBufferIDByMaterialID(uint32_t MaterialID)
 	return BufferIndex;
 }
 
-void MaterialManager::Update()
+void MaterialManager::UpdateBufferIndex()
 {
 	for(int x = 0; x < MaterialList.size(); x++)
 	{
@@ -150,8 +150,6 @@ void MaterialManager::DeleteMaterial(uint32_t DeleteMaterialBufferIndex)
 	auto material = GetMaterial(DeleteMaterialBufferIndex);
 	material->Delete();
 	MaterialList.erase(MaterialList.begin() + DeleteMaterialBufferIndex);
-
-	Update();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 

@@ -202,7 +202,6 @@ void SSAORenderPass::Draw()
 
 void SSAORenderPass::RebuildSwapChain(SSAOTextureList& textures)
 {
-    NoiseTexture->Update(0);
     SSAOTexture->RecreateRendererTexture();
     RasterSSAOPipeline->Destroy();
 

@@ -36,8 +36,6 @@ void AssetManager::Update()
     float timer = EnginePtr::GetEnginePtr()->VulkanTimer();
     cameraManager->Update();
     inputManager->Update();
-    materialManager->Update();
-    textureManager->Update();
     meshManager->Update(cameraManager->ActiveCamera);
     lightManager->Update();
     guiManager->Update();
@@ -68,6 +66,13 @@ void AssetManager::Update()
     SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
     SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(cameraManager->ActiveCamera->GetPosition(), 0.0f);
     SkyUniformBuffer->Update();
+}
+
+void AssetManager::UpdateBufferIndex()
+{
+    TextureManagerPtr::GetTextureManagerPtr()->UpdateBufferIndex();
+    MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
+    MeshManagerPtr::GetMeshManagerPtr()->UpdateBufferIndex();
 }
 
 void AssetManager::Draw(VkCommandBuffer commandBuffer, VkRenderPassBeginInfo renderPassInfo, VkPipelineLayout layout, std::shared_ptr<Camera> CameraView)

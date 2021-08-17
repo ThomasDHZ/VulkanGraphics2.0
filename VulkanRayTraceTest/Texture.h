@@ -64,7 +64,6 @@ public:
 
     ~Texture();
 
-    void Update(uint32_t NewTextureBufferIndex);
     void UpdateImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int facecount);
     void UpdateImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);

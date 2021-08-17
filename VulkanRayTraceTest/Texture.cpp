@@ -573,11 +573,6 @@ void Texture::CopyTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Textur
 	vkCmdCopyImage(commandBuffer, Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, CopyToTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 }
 
-void Texture::Update(uint32_t NewTextureBufferIndex)
-{
-	TextureBufferIndex = NewTextureBufferIndex;
-}
-
 void Texture::Delete()
 {
 	vkDestroyImageView(VulkanPtr::GetDevice(), View, nullptr);

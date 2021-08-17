@@ -14,7 +14,7 @@ public:
 	~MaterialManager();
 
 	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
-	void Update();
+	void UpdateBufferIndex();
 	void DeleteMaterial(uint32_t DeleteMaterialBufferIndex);
 	void Destory();
 

@@ -120,10 +120,6 @@ void TextureManager::DeleteTexture(uint32_t TextureBufferIndex)
 	texture->Delete();
 	TextureList.erase(TextureList.begin() + TextureBufferIndex);
 
-	for(int x = 0; x < TextureList.size(); x++)
-	{
-		TextureList[x]->TextureBufferIndex = x;
-	}
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
@@ -133,10 +129,6 @@ void TextureManager::Delete3DTexture(uint32_t Texture3DBufferIndex)
 	texture->Delete();
 	Texture3DList.erase(Texture3DList.begin() + Texture3DBufferIndex);
 
-	for (int x = 0; x < Texture3DList.size(); x++)
-	{
-		Texture3DList[x]->TextureBufferIndex = x;
-	}
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
@@ -170,11 +162,16 @@ void TextureManager::Destory()
 	UnloadCubeMap();
 }
 
-void TextureManager::Update()
+void TextureManager::UpdateBufferIndex()
 {
 	for (int x = 0; x < TextureList.size(); x++)
 	{
-		TextureList[x]->Update(x);
+		TextureList[x]->TextureBufferIndex = x;
+	}
+
+	for (int x = 0; x < Texture3DList.size(); x++)
+	{
+		Texture3DList[x]->TextureBufferIndex = x;
 	}
 }
 

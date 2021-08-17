@@ -12,7 +12,7 @@ class TextureManager
 private:
 	std::shared_ptr<VulkanEngine> engine;
 
-	void UpdateTexture2DBufferIndex(std::shared_ptr<VulkanEngine> engine);
+
 	uint32_t IsTextureLoaded(std::string name);
 
 	VkSampler NullSampler;
@@ -38,7 +38,7 @@ public:
 	void LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture);
 	void UnloadAllTextures();
 	void UnloadCubeMap();
-	void Update();
+	void UpdateBufferIndex();
 	void Destory();
 
 
