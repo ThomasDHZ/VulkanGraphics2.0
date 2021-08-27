@@ -6,12 +6,12 @@ BlinnPhongPipeline::BlinnPhongPipeline() : GraphicsPipeline()
 {
 }
 
-BlinnPhongPipeline::BlinnPhongPipeline(const VkRenderPass& renderPass, Texture2D texture, VkBuffer ubo) : GraphicsPipeline()
+BlinnPhongPipeline::BlinnPhongPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(texture, ubo);
+    SetUpDescriptorSets();
 }
 
 BlinnPhongPipeline::~BlinnPhongPipeline()
@@ -49,15 +49,10 @@ void BlinnPhongPipeline::SetUpDescriptorLayout()
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void BlinnPhongPipeline::SetUpDescriptorSets(Texture2D texture, VkBuffer ubo)
+void BlinnPhongPipeline::SetUpDescriptorSets()
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     AssetManagerPtr::GetAssetPtr()->SceneData->Update();
-
-    VkDescriptorImageInfo imageInfo{};
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = texture.View;
-    imageInfo.sampler = texture.Sampler;
 
     VkDescriptorBufferInfo SceneDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = AssetManagerPtr::GetAssetPtr()->GetMeshPropertiesListDescriptors();
@@ -222,11 +217,11 @@ void BlinnPhongPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void BlinnPhongPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, Texture2D texture, VkBuffer ubo)
+void BlinnPhongPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(texture, ubo);
+    SetUpDescriptorSets();
 }

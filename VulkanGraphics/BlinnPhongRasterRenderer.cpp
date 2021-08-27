@@ -5,9 +5,9 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 {
 }
 
-BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<Mesh> mesh, Texture2D texture, VkBuffer ubo) : BaseRenderer()
+BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
-    BlinnRenderPass = BlinnPhongRasterPass(mesh, texture, ubo);
+    BlinnRenderPass = BlinnPhongRasterPass(engine);
     FrameBufferRenderer = FrameBufferRenderPass(EnginePtr::GetEnginePtr()->ScreenResoulation, BlinnRenderPass.RenderedTexture, BlinnRenderPass.BloomTexture);
 
 }
@@ -16,9 +16,9 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 {
 }
 
-void BlinnPhongRasterRenderer::RebuildSwapChain(std::shared_ptr<Mesh> mesh, Texture2D texture, VkBuffer ubo)
+void BlinnPhongRasterRenderer::RebuildSwapChain()
 {
-    BlinnRenderPass.RebuildSwapChain(mesh, texture, ubo);
+    BlinnRenderPass.RebuildSwapChain();
     FrameBufferRenderer.RebuildSwapChain(EnginePtr::GetEnginePtr()->ScreenResoulation, BlinnRenderPass.RenderedTexture, BlinnRenderPass.BloomTexture);
 
 }

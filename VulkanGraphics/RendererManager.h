@@ -51,14 +51,7 @@ private:
 	bool framebufferResized = false;
 
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;
-
-	std::shared_ptr<Mesh> mesh;
-	Texture2D texture;
-
 public:
-	VkBuffer uniformBuffers;
-	VkDeviceMemory uniformBuffersMemory;
-
 	RendererManager();
 	RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
 	~RendererManager();

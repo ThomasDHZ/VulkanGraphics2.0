@@ -13,14 +13,14 @@ public:
 
 	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
 	void UpdateBufferIndex();
-	void DeleteMaterial(uint32_t DeleteMaterialBufferIndex);
+	void DeleteMaterial(uint32_t MaterialID);
 	void Destory();
 
 	std::shared_ptr<Material> LoadMaterial(std::string MaterialName, std::shared_ptr<Material> material);
 	std::shared_ptr<Material> LoadMaterial(std::string MaterialName, MaterialTexture& materialData);
 	std::shared_ptr<Material> GetDefaultMaterial();
-	std::shared_ptr<Material> GetMaterial(uint32_t MaterialID);
-
+	std::shared_ptr<Material> GetMaterialByID(uint32_t MaterialID);
+	std::shared_ptr<Material> GetMaterialByName(const std::string MaterialName);
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
 	uint32_t GetMaterialDescriptorCount();
 };

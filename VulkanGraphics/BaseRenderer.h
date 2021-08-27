@@ -12,7 +12,7 @@ public:
 	BaseRenderer();
 	~BaseRenderer();
 
-	virtual void RebuildSwapChain(std::shared_ptr<Mesh> mesh, Texture2D texture, VkBuffer ubo) = 0;
+	virtual void RebuildSwapChain() = 0;
 	virtual void GUIUpdate() = 0;
 	virtual void Destroy() = 0;
 

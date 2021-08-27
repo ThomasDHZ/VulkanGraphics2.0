@@ -21,7 +21,6 @@ std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName
 	MaterialList.emplace_back(material);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-
 	return material;
 }
 
@@ -30,34 +29,46 @@ std::shared_ptr<Material> MaterialManager::LoadMaterial(std::string MaterialName
 	MaterialList.emplace_back(std::make_shared<Material>(Material(MaterialName, material)));
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-
 	return MaterialList.back();
 }
 
 std::shared_ptr<Material> MaterialManager::GetDefaultMaterial()
 {
-	auto returnMaterial = MaterialList[0];
 	for (auto& material : MaterialList)
 	{
-		if (material->GetMaterialID() == 0)
+		if (material->GetMaterialName() == "DefaultMaterial")
 		{
-			returnMaterial = material;
+			return material;
 		}
 	}
-	return returnMaterial;
+	std::cout << "DefaultMaterial not found." << std::endl;
+	return nullptr;
 }
 
-std::shared_ptr<Material> MaterialManager::GetMaterial(uint32_t MaterialID)
+std::shared_ptr<Material> MaterialManager::GetMaterialByID(uint32_t MaterialID)
 {
-	auto returnMaterial = GetDefaultMaterial();
 	for (auto& material : MaterialList)
 	{
 		if (material->GetMaterialID() == MaterialID)
 		{
-			returnMaterial = material;
+			return material;
 		}
 	}
-	return returnMaterial;
+	std::cout << "Material with ID: " << MaterialID << "not found." << std::endl;
+	return nullptr;
+}
+
+std::shared_ptr<Material> MaterialManager::GetMaterialByName(const std::string MaterialName)
+{
+	for (auto& material : MaterialList)
+	{
+		if (material->GetMaterialName() == MaterialName)
+		{
+			return material;
+		}
+	}
+	std::cout << "Material with name: " << MaterialName << "not found." << std::endl;
+	return nullptr;
 }
 
 std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescriptor()
@@ -121,11 +132,11 @@ void MaterialManager::UpdateBufferIndex()
 	}
 }
 
-void MaterialManager::DeleteMaterial(uint32_t DeleteMaterialBufferIndex)
+void MaterialManager::DeleteMaterial(uint32_t MaterialID)
 {
-	auto material = GetMaterial(DeleteMaterialBufferIndex);
+	auto material = GetMaterialByID(MaterialID);
+	MaterialList.erase(MaterialList.begin() + material->GetMaterialBufferIndex());
 	material->Delete();
-	MaterialList.erase(MaterialList.begin() + DeleteMaterialBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }

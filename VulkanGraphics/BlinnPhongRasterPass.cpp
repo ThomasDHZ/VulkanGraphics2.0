@@ -6,7 +6,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass() : BaseRenderPass()
 {
 }
 
-BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<Mesh> mesh, Texture2D texture, VkBuffer ubo) : BaseRenderPass()
+BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
 {
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr()));
     BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr()));
@@ -14,8 +14,8 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<Mesh> mesh, Texture2D
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass, texture, ubo));
-    SetUpCommandBuffers(mesh);
+    blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass));
+    SetUpCommandBuffers();
 }
 
 BlinnPhongRasterPass::~BlinnPhongRasterPass()
@@ -134,7 +134,7 @@ void BlinnPhongRasterPass::CreateRendererFramebuffers()
     }
 }
 
-void BlinnPhongRasterPass::SetUpCommandBuffers(std::shared_ptr<Mesh> mesh)
+void BlinnPhongRasterPass::SetUpCommandBuffers()
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -147,7 +147,7 @@ void BlinnPhongRasterPass::SetUpCommandBuffers(std::shared_ptr<Mesh> mesh)
     }
 }
 
-void BlinnPhongRasterPass::RebuildSwapChain(std::shared_ptr<Mesh> mesh, Texture2D texture, VkBuffer ubo)
+void BlinnPhongRasterPass::RebuildSwapChain()
 {
     RenderedTexture->RecreateRendererTexture();
     BloomTexture->RecreateRendererTexture();
@@ -166,8 +166,8 @@ void BlinnPhongRasterPass::RebuildSwapChain(std::shared_ptr<Mesh> mesh, Texture2
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass, texture, ubo);
-    SetUpCommandBuffers(mesh);
+    blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass);
+    SetUpCommandBuffers();
 }
 
 void BlinnPhongRasterPass::Draw()

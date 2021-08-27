@@ -13,10 +13,10 @@ private:
 
 public:
 	BlinnPhongRasterRenderer();
-	BlinnPhongRasterRenderer(std::shared_ptr<Mesh> mesh, Texture2D texture, VkBuffer ubo);
+	BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine> engine);
 	~BlinnPhongRasterRenderer();
 
-	void RebuildSwapChain(std::shared_ptr<Mesh> mesh, Texture2D texture, VkBuffer ubo);
+	void RebuildSwapChain();
 	void GUIUpdate();
 	void Draw(int currentFrame);
 	void Destroy();

@@ -29,7 +29,7 @@ public:
 	std::shared_ptr<Texture2D> LoadTexture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
 	std::shared_ptr<Texture3D> LoadTexture3D(const std::string TextureLocation, VkFormat format);
 	std::shared_ptr<Texture3D> LoadTexture3D(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
-	std::shared_ptr<FontTexture> LoadTextTexture(void* GlyphData, uint32_t width, uint32_t height);
+	std::shared_ptr<FontTexture> LoadFontTexture(void* GlyphData, uint32_t width, uint32_t height);
 	void LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
 	void LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);
 	void LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat);
@@ -45,8 +45,6 @@ public:
 	std::shared_ptr<Texture3D> GetTexture3DByID(uint32_t TextureID);
 	std::shared_ptr<Texture> GetTextureByBufferIndex(unsigned int TextureBufferIndex) { return TextureList[TextureBufferIndex]; };
 	std::shared_ptr<Texture> GetTexture3DByBufferIndex(unsigned int Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
-	std::vector<std::shared_ptr<Texture>> GetTextureList() { return TextureList; }
-	std::vector<std::shared_ptr<Texture3D>> Get3DTextureList() { return Texture3DList; }
 	std::shared_ptr<Texture> Get3DTexture(unsigned int TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
 	std::shared_ptr<Texture> GetCubeMapTexture() { return CubeMap; }
 

@@ -19,15 +19,15 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
     //renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
 
 
-    auto texture2 = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(std::make_shared<Texture2D>(Texture2D("../texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB)));
+
     MaterialTexture material;
-    material.DiffuseMap = texture2;
+    material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(std::make_shared<Texture2D>(Texture2D("../texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB)));
     auto a = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("aza", material);
     MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
 
     MeshManagerPtr::GetMeshManagerPtr()->AddMesh(std::make_shared<Mesh>(Mesh(vertices, indices, a, Mesh_Draw_All)));
 
-    BlinnRenderer = BlinnPhongRasterRenderer(mesh, texture, uniformBuffers);
+    BlinnRenderer = BlinnPhongRasterRenderer(engine);
 }
 
 RendererManager::~RendererManager()
@@ -58,7 +58,7 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
     engine->SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine->Device, engine->PhysicalDevice, engine->Surface);
 
     interfaceRenderPass.RebuildSwapChain();
-    BlinnRenderer.RebuildSwapChain(mesh, texture, uniformBuffers);
+    BlinnRenderer.RebuildSwapChain();
 
    //blinnPhongRenderer.RebuildSwapChain();
     //pbrRenderer.RebuildSwapChain();
@@ -198,13 +198,9 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
 void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    mesh->Destory();
-    texture.Delete();
     BlinnRenderer.Destroy();
 
     interfaceRenderPass.Destroy();
-    vkDestroyBuffer(EnginePtr::GetEnginePtr()->Device, uniformBuffers, nullptr);
-    vkFreeMemory(EnginePtr::GetEnginePtr()->Device, uniformBuffersMemory, nullptr);
 
    // blinnPhongRenderer.Destroy();
     //pbrRenderer.Destroy();

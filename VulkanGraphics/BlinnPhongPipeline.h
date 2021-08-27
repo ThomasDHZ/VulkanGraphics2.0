@@ -13,13 +13,13 @@ class BlinnPhongPipeline : public GraphicsPipeline
 private:
 	void SetUpDescriptorPool();
 	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets(Texture2D texture, VkBuffer ubo);
+	void SetUpDescriptorSets();
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	BlinnPhongPipeline();
-	BlinnPhongPipeline(const VkRenderPass& renderPass, Texture2D texture, VkBuffer ubo);
+	BlinnPhongPipeline(const VkRenderPass& renderPass);
 	~BlinnPhongPipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, Texture2D texture, VkBuffer ubo);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
 };
 
