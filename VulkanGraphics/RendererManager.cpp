@@ -67,6 +67,8 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
     //hybridRenderer.RebuildSwapChain();
     //renderer2D.RebuildSwapChain();
     //guiRenderer.RebuildSwapChain(engine, window);
+
+    WaitSixFramesFlag = true;
 }
 
 void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
@@ -122,7 +124,18 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
 void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-  // vkDeviceWaitIdle(engine->Device);
+    if (WaitSixFramesFlag)
+    {
+        vkDeviceWaitIdle(engine->Device);
+
+        FirstSixFrames++;
+        if (FirstSixFrames == 6)
+        {
+            FirstSixFrames = 0;
+            WaitSixFramesFlag = false;
+        }
+
+    }
     vkWaitForFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
     VkResult result = vkAcquireNextImageKHR(EnginePtr::GetEnginePtr()->Device, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChain(), UINT64_MAX, EnginePtr::GetEnginePtr()->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &EnginePtr::GetEnginePtr()->DrawFrame);
 
