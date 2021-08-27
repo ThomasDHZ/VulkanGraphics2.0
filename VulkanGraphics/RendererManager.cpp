@@ -21,7 +21,7 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
 
     auto texture2 = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(std::make_shared<Texture2D>(Texture2D("../texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB)));
     MaterialTexture material;
-    material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->TextureList[texture2];
+    material.DiffuseMap = texture2;
     auto a = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("aza", material);
     MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
 
