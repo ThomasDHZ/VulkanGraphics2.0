@@ -48,6 +48,7 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(const std::string Textu
 {
 	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureLocation, format));
 	TextureList.emplace_back(texture);
+	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
@@ -57,6 +58,7 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(glm::ivec2 TextureResol
 	std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureResolution, PixelList, format));
 	TextureList.emplace_back(texture);
 	TextureList.back()->TextureID;
+	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
@@ -65,7 +67,7 @@ uint32_t TextureManager::LoadTexture2D(std::shared_ptr<Texture> RenderedTexture)
 {
 	unsigned int TextureID = TextureList.size();
 	TextureList.emplace_back(RenderedTexture);
-	TextureList.back()->TextureBufferIndex = TextureList.size();
+	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return TextureID;
 }

@@ -71,12 +71,12 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
 
 void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
 {
-    if(engine->UpdateRendererFlag)
+  /*  if(engine->UpdateRendererFlag)
     {
         AssetManagerPtr::GetAssetPtr()->UpdateBufferIndex();
         RebuildSwapChain(engine, window);
         engine->UpdateRendererFlag = false;
-    }
+    }*/
 
     AssetManagerPtr::GetAssetPtr()->Update();
     //if (EnginePtr::GetEnginePtr()->RayTraceFlag)

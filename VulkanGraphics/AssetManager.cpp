@@ -68,7 +68,6 @@ void AssetManager::Update()
 void AssetManager::UpdateBufferIndex()
 {
     TextureManagerPtr::GetTextureManagerPtr()->UpdateBufferIndex();
-    MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
     MeshManagerPtr::GetMeshManagerPtr()->UpdateBufferIndex();
 }
 
