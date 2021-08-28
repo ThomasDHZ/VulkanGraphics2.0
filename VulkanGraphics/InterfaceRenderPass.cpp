@@ -157,14 +157,8 @@ void InterfaceRenderPass::CreateRendererFramebuffers()
 }
 
 
-void InterfaceRenderPass::Draw(int currentFrame, int drawframe)
+void InterfaceRenderPass::Draw()
 {
-    if (EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] != VK_NULL_HANDLE)
-    {
-        vkWaitForFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame], VK_TRUE, UINT64_MAX);
-    }
-    EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] = EnginePtr::GetEnginePtr()->inFlightFences[currentFrame];
-
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
@@ -176,7 +170,7 @@ void InterfaceRenderPass::Draw(int currentFrame, int drawframe)
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[drawframe];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->GetSwapChainResolution();
 
@@ -194,7 +188,6 @@ void InterfaceRenderPass::Draw(int currentFrame, int drawframe)
     if (vkEndCommandBuffer(ImGuiCommandBuffers) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-    vkResetFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[currentFrame]);
 }
 
 void InterfaceRenderPass::RebuildSwapChain()

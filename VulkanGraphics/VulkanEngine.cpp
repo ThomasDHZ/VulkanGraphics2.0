@@ -397,10 +397,20 @@ void VulkanEngine::InitializeSyncObjects()
 {
 	vulkanSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-	imagesInFlight.resize(SwapChain.GetSwapChainImageCount(), VK_NULL_HANDLE);
+
+	CMDSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	AcquireImageSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	PresentImageSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+
+	VkSemaphoreTypeCreateInfo timelineCreateInfo;
+	timelineCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
+	timelineCreateInfo.pNext = NULL;
+	timelineCreateInfo.semaphoreType = VK_SEMAPHORE_TYPE_BINARY;
+	timelineCreateInfo.initialValue = 0;
 
 	VkSemaphoreCreateInfo semaphoreInfo{};
 	semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	semaphoreInfo.pNext = &timelineCreateInfo;
 
 	VkFenceCreateInfo fenceInfo{};
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -409,7 +419,15 @@ void VulkanEngine::InitializeSyncObjects()
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		if (vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &vulkanSemaphores[i].ImageAcquiredSemaphore) != VK_SUCCESS ||
 			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &vulkanSemaphores[i].RenderCompleteSemaphore) != VK_SUCCESS ||
-			vkCreateFence(Device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+			vkCreateFence(Device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) 
+		{
+			throw std::runtime_error("failed to create synchronization objects for a frame!");
+		}
+
+		if (vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &CMDSemaphores[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &AcquireImageSemaphores[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &PresentImageSemaphores[i]) != VK_SUCCESS)
+		{
 			throw std::runtime_error("failed to create synchronization objects for a frame!");
 		}
 	}

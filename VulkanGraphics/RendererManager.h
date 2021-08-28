@@ -15,7 +15,7 @@
 class RendererManager
 {
 private:
-	size_t currentFrame = 0;
+	uint32_t currentFrame = 0;
 	uint32_t FirstSixFrames = 0;
 	bool WaitSixFramesFlag = true;
 	bool framebufferResized = false;

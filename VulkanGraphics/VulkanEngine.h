@@ -16,7 +16,7 @@
 
 #define VKB_VALIDATION_LAYERS
 
-const int MAX_FRAMES_IN_FLIGHT = 2;
+const int MAX_FRAMES_IN_FLIGHT = 3;
 
 enum RendererID
 {
@@ -102,11 +102,17 @@ public:
 
 	std::vector<VulkanSemaphores> vulkanSemaphores;
 	std::vector<VkFence> inFlightFences;
-	std::vector<VkFence> imagesInFlight;
+
+	std::vector<VkSemaphore> CMDSemaphores;
+	uint32_t CMDIndex = 0;
+
+	std::vector<VkSemaphore> AcquireImageSemaphores;
+	std::vector<VkSemaphore> PresentImageSemaphores;
+	uint32_t ImageIndex = 0;
 
 	int GraphicsFamily = -1;
 	int PresentFamily = -1;
-	uint32_t DrawFrame = 0;
+//	uint32_t DrawFrame = 0;
 
 	std::vector<VkLayerProperties> VulkanLayers;
 

@@ -29,13 +29,7 @@ void BlinnPhongRasterRenderer::GUIUpdate()
 
 void BlinnPhongRasterRenderer::Draw(int currentFrame)
 {
-    if (EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] != VK_NULL_HANDLE)
-    {
-        vkWaitForFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame], VK_TRUE, UINT64_MAX);
-    }
-    EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] = EnginePtr::GetEnginePtr()->inFlightFences[currentFrame];
-
-    BlinnRenderPass.Draw();
+    BlinnRenderPass.Draw(currentFrame);
     FrameBufferRenderer.Draw();
 }
 

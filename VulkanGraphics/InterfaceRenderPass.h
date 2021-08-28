@@ -30,7 +30,7 @@ public:
 	VkCommandBuffer ImGuiCommandBuffers;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
-	void Draw(int currentFrame, int drawframe);
+	void Draw();
 	void RebuildSwapChain();
 	void Destroy();
 

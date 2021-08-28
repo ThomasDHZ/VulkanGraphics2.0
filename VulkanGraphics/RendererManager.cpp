@@ -124,22 +124,14 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
 void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
-    if (WaitSixFramesFlag)
+    EnginePtr::GetEnginePtr()->CMDIndex = (EnginePtr::GetEnginePtr()->CMDIndex + 1) % MAX_FRAMES_IN_FLIGHT;
+
+    vkWaitForFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex], VK_TRUE, UINT64_MAX);
+    vkResetFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex]);
+
+    VkResult result = vkAcquireNextImageKHR(EnginePtr::GetEnginePtr()->Device, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChain(), UINT64_MAX, EnginePtr::GetEnginePtr()->AcquireImageSemaphores[EnginePtr::GetEnginePtr()->CMDIndex], VK_NULL_HANDLE, &EnginePtr::GetEnginePtr()->ImageIndex);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
-        vkDeviceWaitIdle(engine->Device);
-
-        FirstSixFrames++;
-        if (FirstSixFrames == 6)
-        {
-            FirstSixFrames = 0;
-            WaitSixFramesFlag = false;
-        }
-
-    }
-    vkWaitForFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-    VkResult result = vkAcquireNextImageKHR(EnginePtr::GetEnginePtr()->Device, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChain(), UINT64_MAX, EnginePtr::GetEnginePtr()->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore, VK_NULL_HANDLE, &EnginePtr::GetEnginePtr()->DrawFrame);
-
-    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         RebuildSwapChain(engine, window);
         return;
     }
@@ -147,66 +139,41 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         throw std::runtime_error("failed to acquire swap chain image!");
     }
 
-    Update(engine, window, EnginePtr::GetEnginePtr()->DrawFrame);
-
-    VkSemaphore waitSemaphores[] = { EnginePtr::GetEnginePtr()->vulkanSemaphores[currentFrame].ImageAcquiredSemaphore };
-    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-
-    if (EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] != VK_NULL_HANDLE) {
-        vkWaitForFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame], VK_TRUE, UINT64_MAX);
-    }
-    EnginePtr::GetEnginePtr()->imagesInFlight[EnginePtr::GetEnginePtr()->DrawFrame] = EnginePtr::GetEnginePtr()->inFlightFences[currentFrame];
-
-    VkSemaphore signalSemaphores[] = { EnginePtr::GetEnginePtr()->vulkanSemaphores[currentFrame].RenderCompleteSemaphore };
+    Update(engine, window, EnginePtr::GetEnginePtr()->CMDIndex);
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
-   
-    BlinnRenderer.Draw(currentFrame);
-    BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
 
-    interfaceRenderPass.Draw(currentFrame, EnginePtr::GetEnginePtr()->DrawFrame);
+    //BlinnRenderer.Draw(currentFrame);
+    //BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+
+    interfaceRenderPass.Draw();
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
+
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = waitSemaphores;
+    submitInfo.pWaitSemaphores = &EnginePtr::GetEnginePtr()->AcquireImageSemaphores[EnginePtr::GetEnginePtr()->CMDIndex];
     submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
     submitInfo.commandBufferCount = static_cast<uint32_t>(CommandBufferSubmitList.size());
     submitInfo.pCommandBuffers = CommandBufferSubmitList.data();
     submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = signalSemaphores;
-
-    vkResetFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[currentFrame]);
-
-    if (vkQueueSubmit(EnginePtr::GetEnginePtr()->GraphicsQueue, 1, &submitInfo, EnginePtr::GetEnginePtr()->inFlightFences[currentFrame]) != VK_SUCCESS) {
+    submitInfo.pSignalSemaphores = &EnginePtr::GetEnginePtr()->PresentImageSemaphores[EnginePtr::GetEnginePtr()->ImageIndex];
+    if (vkQueueSubmit(EnginePtr::GetEnginePtr()->GraphicsQueue, 1, &submitInfo, EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
+    VkSwapchainKHR swapChains[] = { EnginePtr::GetEnginePtr()->SwapChain.GetSwapChain() };
+
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
     presentInfo.waitSemaphoreCount = 1;
-    presentInfo.pWaitSemaphores = signalSemaphores;
-
-    VkSwapchainKHR swapChains[] = { EnginePtr::GetEnginePtr()->SwapChain.GetSwapChain() };
+    presentInfo.pWaitSemaphores = &EnginePtr::GetEnginePtr()->PresentImageSemaphores[EnginePtr::GetEnginePtr()->ImageIndex];
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
-
-    presentInfo.pImageIndices = &EnginePtr::GetEnginePtr()->DrawFrame;
-
-    result = vkQueuePresentKHR(EnginePtr::GetEnginePtr()->PresentQueue, &presentInfo);
-
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-        framebufferResized = false;
-        RebuildSwapChain(engine, window);
-    }
-    else if (result != VK_SUCCESS) {
-        throw std::runtime_error("failed to present swap chain image!");
-    }
-
-    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    presentInfo.pImageIndices = &EnginePtr::GetEnginePtr()->ImageIndex;
+    vkQueuePresentKHR(EnginePtr::GetEnginePtr()->PresentQueue, &presentInfo);
 }
 
 void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)

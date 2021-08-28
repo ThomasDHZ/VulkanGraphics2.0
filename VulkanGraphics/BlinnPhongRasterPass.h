@@ -24,7 +24,7 @@ public:
 
 	void RebuildSwapChain();
 
-	void Draw();
+	void Draw(int currentFrame);
 	void Destroy();
 };
 
