@@ -135,8 +135,9 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         RebuildSwapChain(engine, window);
         return;
     }
-    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-        throw std::runtime_error("failed to acquire swap chain image!");
+    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
+    {
+        throw std::runtime_error("Failed to acquire swap chain image!");
     }
 
     Update(engine, window, EnginePtr::GetEnginePtr()->CMDIndex);
@@ -164,16 +165,23 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
-    VkSwapchainKHR swapChains[] = { EnginePtr::GetEnginePtr()->SwapChain.GetSwapChain() };
-
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = &EnginePtr::GetEnginePtr()->PresentImageSemaphores[EnginePtr::GetEnginePtr()->ImageIndex];
     presentInfo.swapchainCount = 1;
-    presentInfo.pSwapchains = swapChains;
+    presentInfo.pSwapchains = &EnginePtr::GetEnginePtr()->SwapChain.Swapchain;
     presentInfo.pImageIndices = &EnginePtr::GetEnginePtr()->ImageIndex;
-    vkQueuePresentKHR(EnginePtr::GetEnginePtr()->PresentQueue, &presentInfo);
+    result = vkQueuePresentKHR(EnginePtr::GetEnginePtr()->PresentQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        RebuildSwapChain(engine, window);
+        return;
+    }
+    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
+    {
+        throw std::runtime_error("Failed to present swap chain image!");
+    }
 }
 
 void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)

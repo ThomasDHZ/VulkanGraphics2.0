@@ -41,21 +41,6 @@ class VulkanEngine
 {
 private:
 
-	struct VulkanSemaphores
-	{
-		VkSemaphore ImageAcquiredSemaphore;
-		VkSemaphore RenderCompleteSemaphore;
-
-		void Destory(VkDevice device)
-		{
-			vkDestroySemaphore(device, RenderCompleteSemaphore, nullptr);
-			vkDestroySemaphore(device, ImageAcquiredSemaphore, nullptr);
-
-			RenderCompleteSemaphore = VK_NULL_HANDLE;
-			ImageAcquiredSemaphore = VK_NULL_HANDLE;
-		}
-	};
-
 	std::vector<const char*> ValidationLayers;
 	std::vector<const char*> DeviceExtensions;
 
@@ -100,19 +85,14 @@ public:
 	PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
 	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
 
-	std::vector<VulkanSemaphores> vulkanSemaphores;
 	std::vector<VkFence> inFlightFences;
-
-	std::vector<VkSemaphore> CMDSemaphores;
-	uint32_t CMDIndex = 0;
-
 	std::vector<VkSemaphore> AcquireImageSemaphores;
 	std::vector<VkSemaphore> PresentImageSemaphores;
 	uint32_t ImageIndex = 0;
+	uint32_t CMDIndex = 0;
 
 	int GraphicsFamily = -1;
 	int PresentFamily = -1;
-//	uint32_t DrawFrame = 0;
 
 	std::vector<VkLayerProperties> VulkanLayers;
 

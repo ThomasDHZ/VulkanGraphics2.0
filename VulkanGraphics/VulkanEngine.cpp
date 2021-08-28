@@ -395,10 +395,7 @@ void VulkanEngine::InitializeCommandPool()
 
 void VulkanEngine::InitializeSyncObjects()
 {
-	vulkanSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-
-	CMDSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	AcquireImageSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	PresentImageSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -416,17 +413,11 @@ void VulkanEngine::InitializeSyncObjects()
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		if (vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &vulkanSemaphores[i].ImageAcquiredSemaphore) != VK_SUCCESS ||
-			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &vulkanSemaphores[i].RenderCompleteSemaphore) != VK_SUCCESS ||
-			vkCreateFence(Device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) 
-		{
-			throw std::runtime_error("failed to create synchronization objects for a frame!");
-		}
-
-		if (vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &CMDSemaphores[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &AcquireImageSemaphores[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &PresentImageSemaphores[i]) != VK_SUCCESS)
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		if (vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &AcquireImageSemaphores[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &PresentImageSemaphores[i]) != VK_SUCCESS ||
+			vkCreateFence(Device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create synchronization objects for a frame!");
 		}
@@ -469,12 +460,15 @@ void VulkanEngine::Destroy()
 	vkDestroyCommandPool(Device, CommandPool, nullptr);
 	CommandPool = VK_NULL_HANDLE;
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	for (size_t x = 0; x < MAX_FRAMES_IN_FLIGHT; x++)
 	{
-		vulkanSemaphores[i].Destory(Device);
-		vkDestroyFence(Device, inFlightFences[i], nullptr);
+		vkDestroySemaphore(Device, AcquireImageSemaphores[x], nullptr);
+		vkDestroySemaphore(Device, PresentImageSemaphores[x], nullptr);
+		vkDestroyFence(Device, inFlightFences[x], nullptr);
 
-		inFlightFences[i] = VK_NULL_HANDLE;
+		AcquireImageSemaphores[x] = VK_NULL_HANDLE;
+		PresentImageSemaphores[x] = VK_NULL_HANDLE;
+		inFlightFences[x] = VK_NULL_HANDLE;
 	}
 
 	vkDestroyDevice(Device, nullptr);
