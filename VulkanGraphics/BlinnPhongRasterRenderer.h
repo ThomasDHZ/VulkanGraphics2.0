@@ -18,7 +18,7 @@ public:
 
 	void RebuildSwapChain();
 	void GUIUpdate();
-	void Draw(int currentFrame);
+	void Draw();
 	void Destroy();
 
 	std::vector<VkCommandBuffer> AddToCommandBufferSubmitList(std::vector<VkCommandBuffer>& CommandBufferSubmitList);

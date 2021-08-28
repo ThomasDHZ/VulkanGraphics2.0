@@ -27,9 +27,9 @@ void BlinnPhongRasterRenderer::GUIUpdate()
 {
 }
 
-void BlinnPhongRasterRenderer::Draw(int currentFrame)
+void BlinnPhongRasterRenderer::Draw()
 {
-    BlinnRenderPass.Draw(currentFrame);
+    BlinnRenderPass.Draw();
     FrameBufferRenderer.Draw();
 }
 

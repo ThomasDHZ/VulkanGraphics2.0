@@ -136,14 +136,18 @@ void BlinnPhongRasterPass::CreateRendererFramebuffers()
 
 void BlinnPhongRasterPass::SetUpCommandBuffers()
 {
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 1;
+    CommandBuffer.resize(3);
+    for (size_t i = 0; i < 3; i++)
+    {
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
+        if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate command buffers!");
+        }
     }
 }
 
@@ -170,13 +174,13 @@ void BlinnPhongRasterPass::RebuildSwapChain()
     SetUpCommandBuffers();
 }
 
-void BlinnPhongRasterPass::Draw(int currentFrame)
+void BlinnPhongRasterPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    if (vkBeginCommandBuffer(CommandBuffer, &beginInfo) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
@@ -195,12 +199,12 @@ void BlinnPhongRasterPass::Draw(int currentFrame)
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    vkCmdBeginRenderPass(CommandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipelineLayout, 0, 1, &blinnphongPipeline->DescriptorSet, 0, nullptr);
-    MeshManagerPtr::GetMeshManagerPtr()->Draw(CommandBuffer, blinnphongPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
-    vkCmdEndRenderPass(CommandBuffer);
-    if (vkEndCommandBuffer(CommandBuffer) != VK_SUCCESS) {
+    vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipelineLayout, 0, 1, &blinnphongPipeline->DescriptorSet, 0, nullptr);
+    MeshManagerPtr::GetMeshManagerPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], blinnphongPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+    vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+    if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }

@@ -27,7 +27,7 @@ public:
 	InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine);
 	~InterfaceRenderPass();
 
-	VkCommandBuffer ImGuiCommandBuffers;
+	std::vector<VkCommandBuffer> ImGuiCommandBuffers;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	void Draw();

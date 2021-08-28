@@ -9,7 +9,7 @@ protected:
 
 public:
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
-	VkCommandBuffer CommandBuffer;
+	std::vector<VkCommandBuffer> CommandBuffer;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	BaseRenderPass();
@@ -17,5 +17,5 @@ public:
 	~BaseRenderPass();
 	virtual void Destroy();
 
-	VkCommandBuffer GetCommandBuffer() { return CommandBuffer; }
+	VkCommandBuffer GetCommandBuffer() { return CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]; }
 };

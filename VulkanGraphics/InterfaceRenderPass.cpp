@@ -59,14 +59,18 @@ InterfaceRenderPass::InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine)
     }
 
 
-    VkCommandBufferAllocateInfo allocInfo2{};
-    allocInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo2.commandPool = ImGuiCommandPool;
-    allocInfo2.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo2.commandBufferCount = 1;
+    ImGuiCommandBuffers.resize(3);
+    for (size_t i = 0; i < 3; i++)
+    {
+        VkCommandBufferAllocateInfo allocInfo2{};
+        allocInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo2.commandPool = ImGuiCommandPool;
+        allocInfo2.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo2.commandBufferCount = 1;
 
-    if (vkAllocateCommandBuffers(init_info.Device, &allocInfo2, &ImGuiCommandBuffers) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
+        if (vkAllocateCommandBuffers(init_info.Device, &allocInfo2, &ImGuiCommandBuffers[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate command buffers!");
+        }
     }
 
     IMGUI_CHECKVERSION();
@@ -163,7 +167,7 @@ void InterfaceRenderPass::Draw()
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 
-    if (vkBeginCommandBuffer(ImGuiCommandBuffers, &beginInfo) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex], &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
@@ -181,11 +185,11 @@ void InterfaceRenderPass::Draw()
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    vkCmdBeginRenderPass(ImGuiCommandBuffers, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers);
-    vkCmdEndRenderPass(ImGuiCommandBuffers);
+    vkCmdBeginRenderPass(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
+    vkCmdEndRenderPass(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-    if (vkEndCommandBuffer(ImGuiCommandBuffers) != VK_SUCCESS) {
+    if (vkEndCommandBuffer(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }
@@ -217,7 +221,7 @@ void InterfaceRenderPass::Destroy()
     }
 
     vkDestroyDescriptorPool(EnginePtr::GetEnginePtr()->Device, ImGuiDescriptorPool, nullptr);
-    vkFreeCommandBuffers(EnginePtr::GetEnginePtr()->Device, ImGuiCommandPool, 1, &ImGuiCommandBuffers);
+    vkFreeCommandBuffers(EnginePtr::GetEnginePtr()->Device, ImGuiCommandPool, 1, &ImGuiCommandBuffers[0]);
     vkDestroyCommandPool(EnginePtr::GetEnginePtr()->Device, ImGuiCommandPool, nullptr);
 
     ImGui_ImplVulkan_Shutdown();

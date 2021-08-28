@@ -143,11 +143,11 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    //BlinnRenderer.Draw(currentFrame);
-    //BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    BlinnRenderer.Draw();
+    BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
 
     interfaceRenderPass.Draw();
-    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers);
+    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
 
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
