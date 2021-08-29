@@ -71,6 +71,41 @@ private:
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
+        std::vector<Vertex> vertices =
+        {
+           {{-0.5f, -0.5f, 0.0f}, { 0.0f }, {1.0f, 0.0f, 0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
+           {{0.5f, -0.5f, 0.0f}, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
+           {{0.5f, 0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
+           {{-0.5f, 0.5f, 0.0f}, { 0.0f }, {1.0f, 1.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
+
+           {{-0.5f, -0.5f, -0.5f}, { 0.0f }, {1.0f, 0.0f, 0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
+           {{0.5f, -0.5f, -0.5f}, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
+           {{0.5f, 0.5f, -0.5f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
+           {{-0.5f, 0.5f, -0.5f}, { 0.0f }, {1.0f, 1.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }}
+        };
+
+        std::vector<uint32_t> indices = {
+           0, 1, 2, 2, 3, 0,
+           4, 5, 6, 6, 7, 4
+        };
+
+        MaterialTexture material;
+        material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(std::make_shared<Texture2D>(Texture2D("../texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB)));
+        auto a = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("aza", material);
+        MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
+
+        MeshManagerPtr::GetMeshManagerPtr()->AddMesh(std::make_shared<Mesh>(Mesh(vertices, indices, a, Mesh_Draw_All)));
+
+
+        std::string CubeMapFiles[6];
+        CubeMapFiles[0] = "../texture/skybox/right.jpg";
+        CubeMapFiles[1] = "../texture/skybox/left.jpg";
+        CubeMapFiles[2] = "../texture/skybox/top.jpg";
+        CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
+        CubeMapFiles[4] = "../texture/skybox/back.jpg";
+        CubeMapFiles[5] = "../texture/skybox/front.jpg";
+        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
     }
 
@@ -81,7 +116,7 @@ private:
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
             {
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                renderer.GUIUpdate(EnginePtr::GetEnginePtr());
             }
             ImGui::Render();
             renderer.Draw(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());

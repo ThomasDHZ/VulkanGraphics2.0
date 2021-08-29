@@ -91,8 +91,8 @@ void FrameBufferRenderPass::CreateRendererFramebuffers()
         framebufferInfo.renderPass = RenderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = RenderPassResolution.x;
-        framebufferInfo.height = RenderPassResolution.y;
+        framebufferInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+        framebufferInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
         framebufferInfo.layers = 1;
 
         if (vkCreateFramebuffer(VulkanPtr::GetDevice(), &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {

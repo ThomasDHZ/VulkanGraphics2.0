@@ -9,6 +9,8 @@ RendererManager::RendererManager()
 RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     interfaceRenderPass = InterfaceRenderPass(engine);
+    BlinnRenderer = BlinnPhongRasterRenderer(engine);
+    rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
 
     // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
     // pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
@@ -17,28 +19,6 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
     //hybridRenderer = HybridRenderer(EnginePtr::GetEnginePtr());
     ////guiRenderer = GUIRenderer(EnginePtr::GetEnginePtr());
     //renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
-
-
-
-    MaterialTexture material;
-    material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(std::make_shared<Texture2D>(Texture2D("../texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB)));
-    auto a = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("aza", material);
-    MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
-
-    MeshManagerPtr::GetMeshManagerPtr()->AddMesh(std::make_shared<Mesh>(Mesh(vertices, indices, a, Mesh_Draw_All)));
-
-
-    std::string CubeMapFiles[6];
-    CubeMapFiles[0] = "../texture/skybox/right.jpg";
-    CubeMapFiles[1] = "../texture/skybox/left.jpg";
-    CubeMapFiles[2] = "../texture/skybox/top.jpg";
-    CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
-    CubeMapFiles[4] = "../texture/skybox/back.jpg";
-    CubeMapFiles[5] = "../texture/skybox/front.jpg";
-    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
-
-    BlinnRenderer = BlinnPhongRasterRenderer(engine);
-    rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
 }
 
 RendererManager::~RendererManager()
@@ -78,8 +58,6 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
     //hybridRenderer.RebuildSwapChain();
     //renderer2D.RebuildSwapChain();
     //guiRenderer.RebuildSwapChain(engine, window);
-
-    WaitSixFramesFlag = true;
 }
 
 void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
@@ -102,8 +80,8 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
 
 void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
-    //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    //ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     //ImGui::SliderInt("Active Camera", &AssetManagerPtr::GetAssetPtr()->cameraManager->cameraIndex, 0, AssetManagerPtr::GetAssetPtr()->cameraManager->CameraList.size());
 
     //if (ActiveRenderer == 0)
@@ -154,13 +132,17 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
     Update(engine, window, EnginePtr::GetEnginePtr()->CMDIndex);
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
-
-    //BlinnRenderer.Draw();
-    //BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-
-    EnginePtr::GetEnginePtr()->RayTraceFlag = true;
-    rayTraceRenderer.Draw(engine, window);
-    rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    if (ActiveRenderer == 0)
+    {
+        BlinnRenderer.Draw();
+        BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 1)
+    {
+        EnginePtr::GetEnginePtr()->RayTraceFlag = true;
+        rayTraceRenderer.Draw(engine, window);
+        rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
 
     interfaceRenderPass.Draw();
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
@@ -201,13 +183,12 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
 void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
-    BlinnRenderer.Destroy();
-
     interfaceRenderPass.Destroy();
+    BlinnRenderer.Destroy();
+    rayTraceRenderer.Destroy(engine);
 
    // blinnPhongRenderer.Destroy();
     //pbrRenderer.Destroy();
-    //rayTraceRenderer.Destroy();
     //pbrRayTraceRenderer.Destroy();
     //hybridRenderer.Destroy();
     //renderer2D.Destroy();

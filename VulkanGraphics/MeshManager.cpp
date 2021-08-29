@@ -82,13 +82,24 @@ void MeshManager::Destroy()
 std::vector<VkDescriptorBufferInfo> MeshManager::GetVertexBufferListDescriptors()
 {
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
-    for (auto& mesh : MeshList)
+    if (MeshList.size() == 0)
     {
-        VkDescriptorBufferInfo VertexBufferInfo = {};
-        VertexBufferInfo.buffer = mesh->VertexBuffer.Buffer;
-        VertexBufferInfo.offset = 0;
-        VertexBufferInfo.range = VK_WHOLE_SIZE;
-        VertexBufferInfoList.emplace_back(VertexBufferInfo);
+        VkDescriptorBufferInfo nullBuffer;
+        nullBuffer.buffer = VK_NULL_HANDLE;
+        nullBuffer.offset = 0;
+        nullBuffer.range = VK_WHOLE_SIZE;
+        VertexBufferInfoList.emplace_back(nullBuffer);
+    }
+    else
+    {
+        for (auto& mesh : MeshList)
+        {
+            VkDescriptorBufferInfo VertexBufferInfo = {};
+            VertexBufferInfo.buffer = mesh->VertexBuffer.Buffer;
+            VertexBufferInfo.offset = 0;
+            VertexBufferInfo.range = VK_WHOLE_SIZE;
+            VertexBufferInfoList.emplace_back(VertexBufferInfo);
+        }
     }
     return VertexBufferInfoList;
 }

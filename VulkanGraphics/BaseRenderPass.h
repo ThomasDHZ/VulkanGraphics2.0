@@ -5,8 +5,6 @@ class BaseRenderPass
 {
 private:
 protected:
-	glm::ivec2 RenderPassResolution;
-
 public:
 	VkRenderPass RenderPass = VK_NULL_HANDLE;
 	std::vector<VkCommandBuffer> CommandBuffer;
