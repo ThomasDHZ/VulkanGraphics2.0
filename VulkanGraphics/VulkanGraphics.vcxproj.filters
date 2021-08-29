@@ -31,6 +31,15 @@
     <Filter Include="Source Files\managers">
       <UniqueIdentifier>{e759b138-6253-486c-9b75-78d68913d866}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\RaytraceShaders">
+      <UniqueIdentifier>{34bc8d69-3b75-4a37-85aa-d33c2d5772f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\RasterShaders">
+      <UniqueIdentifier>{488dbe2d-6ee0-4a9e-8cf7-af001059482d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Include">
+      <UniqueIdentifier>{6d157526-4733-4834-9408-dcc0b256f4cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -247,6 +256,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FrameBufferRenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracedPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTraceRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTraceRenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracingGraphicsPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -479,22 +500,76 @@
     <ClInclude Include="FrameBufferPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RayTracedPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTraceRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTraceRenderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracingGraphicsPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Shaders\frag.frag">
-      <Filter>Shader</Filter>
+    <None Include="Shaders\closesthit.rchit">
+      <Filter>Shader\RaytraceShaders</Filter>
     </None>
-    <None Include="Shaders\vert.vert">
-      <Filter>Shader</Filter>
+    <None Include="Shaders\anyhit.rahit">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\anyhit1.rahit">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\miss.rmiss">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\raygen.rgen">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\frag.frag">
+      <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\FrameBuffer.frag">
-      <Filter>Shader</Filter>
+      <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\FrameBuffer.vert">
-      <Filter>Shader</Filter>
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\vert.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\Material.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\MaterialBuilder.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\Lighting.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\PBRFunctions.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\RTVertexBuilder.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\RTXRandom.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\BlinePhongLighting.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\Vertex.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\shadow.rmiss">
+      <Filter>Shader\RaytraceShaders</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -197,6 +197,10 @@
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="RayTracedPipeline.cpp" />
+    <ClCompile Include="RayTraceRenderer.cpp" />
+    <ClCompile Include="RayTraceRenderPass.cpp" />
+    <ClCompile Include="RayTracingGraphicsPipeline.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
@@ -273,6 +277,10 @@
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="RayTracedPipeline.h" />
+    <ClInclude Include="RayTraceRenderer.h" />
+    <ClInclude Include="RayTraceRenderPass.h" />
+    <ClInclude Include="RayTracingGraphicsPipeline.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedCubeMapTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
@@ -299,10 +307,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
+    <None Include="Shaders\anyhit.rahit" />
+    <None Include="Shaders\anyhit1.rahit" />
+    <None Include="Shaders\BlinePhongLighting.glsl" />
+    <None Include="Shaders\closesthit.rchit" />
     <None Include="Shaders\frag.frag" />
     <None Include="Shaders\FrameBuffer.frag" />
     <None Include="Shaders\FrameBuffer.vert" />
+    <None Include="Shaders\Lighting.glsl" />
+    <None Include="Shaders\Material.glsl" />
+    <None Include="Shaders\MaterialBuilder.glsl" />
+    <None Include="Shaders\miss.rmiss" />
+    <None Include="Shaders\PBRFunctions.glsl" />
+    <None Include="Shaders\raygen.rgen" />
+    <None Include="Shaders\RTVertexBuilder.glsl" />
+    <None Include="Shaders\RTXRandom.glsl" />
+    <None Include="Shaders\shadow.rmiss" />
     <None Include="Shaders\vert.vert" />
+    <None Include="Shaders\Vertex.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

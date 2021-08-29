@@ -6,7 +6,7 @@
 #include "FrameBufferRenderPass.h"
 //#include "PBRRenderer.h"
 //#include "BlinnPhongRasterRenderer.h"
-//#include "RayTraceRenderer.h"
+#include "RayTraceRenderer.h"
 //#include "RayTracePBRRenderer.h"
 //#include "HybridRenderer.h"
 //#include "Renderer2D.h"
@@ -40,7 +40,7 @@ private:
 
 	//BlinnPhongRasterRenderer blinnPhongRenderer;
 	//PBRRenderer pbrRenderer;
-	//RayTraceRenderer rayTraceRenderer;
+	RayTraceRenderer rayTraceRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;
 	//HybridRenderer hybridRenderer;
 	//Renderer2D renderer2D;

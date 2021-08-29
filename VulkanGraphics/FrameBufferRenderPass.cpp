@@ -4,7 +4,7 @@ FrameBufferRenderPass::FrameBufferRenderPass() : BaseRenderPass()
 {
 }
 
-FrameBufferRenderPass::FrameBufferRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : BaseRenderPass(renderPassResolution)
+FrameBufferRenderPass::FrameBufferRenderPass(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : BaseRenderPass()
 {
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -62,8 +62,8 @@ void FrameBufferRenderPass::CreateRenderPass()
 
 void FrameBufferRenderPass::SetUpCommandBuffers()
 {
-    CommandBuffer.resize(3);
-    for (size_t i = 0; i < 3; i++)
+    CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -103,10 +103,8 @@ void FrameBufferRenderPass::CreateRendererFramebuffers()
 
 }
 
-void FrameBufferRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
+void FrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
-    RenderPassResolution = renderPassResolution;
-
     frameBufferPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);
@@ -139,8 +137,6 @@ void FrameBufferRenderPass::Draw()
     clearValues[1].depthStencil = { 1.0f, 0 };
 
     VkRect2D rect{};
-    rect.extent.width = RenderPassResolution.x;
-    rect.extent.height = RenderPassResolution.y;
     rect.offset.x = 0;
     rect.offset.y = 0;
 
@@ -149,7 +145,7 @@ void FrameBufferRenderPass::Draw()
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = rect.offset;
-    renderPassInfo.renderArea.extent = rect.extent;
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 

@@ -12,7 +12,7 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
 
     // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
     // pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
-    //rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr());
+
     //pbrRayTraceRenderer = RayTracePBRRenderer(EnginePtr::GetEnginePtr());
     //hybridRenderer = HybridRenderer(EnginePtr::GetEnginePtr());
     ////guiRenderer = GUIRenderer(EnginePtr::GetEnginePtr());
@@ -27,7 +27,18 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
 
     MeshManagerPtr::GetMeshManagerPtr()->AddMesh(std::make_shared<Mesh>(Mesh(vertices, indices, a, Mesh_Draw_All)));
 
+
+    std::string CubeMapFiles[6];
+    CubeMapFiles[0] = "../texture/skybox/right.jpg";
+    CubeMapFiles[1] = "../texture/skybox/left.jpg";
+    CubeMapFiles[2] = "../texture/skybox/top.jpg";
+    CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
+    CubeMapFiles[4] = "../texture/skybox/back.jpg";
+    CubeMapFiles[5] = "../texture/skybox/front.jpg";
+    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+
     BlinnRenderer = BlinnPhongRasterRenderer(engine);
+    rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
 }
 
 RendererManager::~RendererManager()
@@ -62,7 +73,7 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
 
    //blinnPhongRenderer.RebuildSwapChain();
     //pbrRenderer.RebuildSwapChain();
-    //rayTraceRenderer.RebuildSwapChain();
+    rayTraceRenderer.RebuildSwapChain(engine,window);
     //pbrRayTraceRenderer.RebuildSwapChain();
     //hybridRenderer.RebuildSwapChain();
     //renderer2D.RebuildSwapChain();
@@ -83,7 +94,7 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
     AssetManagerPtr::GetAssetPtr()->Update();
     //if (EnginePtr::GetEnginePtr()->RayTraceFlag)
     //{
-       //rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
+       rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
        // pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
        // hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
    // }
@@ -144,8 +155,12 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    BlinnRenderer.Draw();
-    BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //BlinnRenderer.Draw();
+    //BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+
+    EnginePtr::GetEnginePtr()->RayTraceFlag = true;
+    rayTraceRenderer.Draw(engine, window);
+    rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
 
     interfaceRenderPass.Draw();
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);

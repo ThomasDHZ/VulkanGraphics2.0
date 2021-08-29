@@ -13,7 +13,6 @@ public:
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
 	BaseRenderPass();
-	BaseRenderPass(glm::ivec2 renderPassResolution);
 	~BaseRenderPass();
 	virtual void Destroy();
 

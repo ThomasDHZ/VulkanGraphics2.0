@@ -4,11 +4,6 @@ BaseRenderPass::BaseRenderPass()
 {
 }
 
-BaseRenderPass::BaseRenderPass(glm::ivec2 renderPassResolution)
-{
-    RenderPassResolution = renderPassResolution;
-}
-
 BaseRenderPass::~BaseRenderPass()
 {
 }

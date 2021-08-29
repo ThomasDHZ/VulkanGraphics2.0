@@ -136,8 +136,8 @@ void BlinnPhongRasterPass::CreateRendererFramebuffers()
 
 void BlinnPhongRasterPass::SetUpCommandBuffers()
 {
-    CommandBuffer.resize(3);
-    for (size_t i = 0; i < 3; i++)
+    CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
+    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
