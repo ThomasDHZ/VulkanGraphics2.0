@@ -45,6 +45,7 @@ public:
     std::string FileName;
     TextureType TypeOfTexture;
     VkImageLayout ImageLayout;
+    VkSampleCountFlagBits SampleCount = VK_SAMPLE_COUNT_1_BIT;
     uint32_t MipMapLevels = 1;
 
     int Width;

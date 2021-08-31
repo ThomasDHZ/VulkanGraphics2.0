@@ -16,6 +16,19 @@ RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine)
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
+RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount)
+{
+    Width = engine->SwapChain.GetSwapChainResolution().width;
+    Height = engine->SwapChain.GetSwapChainResolution().height;
+
+    SampleCount = sampleCount;
+
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
 RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     CreateTextureImage();
@@ -41,7 +54,7 @@ void RenderedColorTexture::CreateTextureImage()
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
     TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    TextureInfo.samples = SampleCount;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 

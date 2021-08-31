@@ -8,7 +8,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
     BlinnRenderPass = BlinnPhongRasterPass(engine);
-    FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.BloomTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 
 }
 
@@ -19,7 +19,7 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 void BlinnPhongRasterRenderer::RebuildSwapChain()
 {
     BlinnRenderPass.RebuildSwapChain();
-    FrameBufferRenderer.RebuildSwapChain(BlinnRenderPass.RenderedTexture, BlinnRenderPass.BloomTexture);
+    FrameBufferRenderer.RebuildSwapChain(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 
 }
 

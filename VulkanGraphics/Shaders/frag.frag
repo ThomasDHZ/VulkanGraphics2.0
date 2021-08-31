@@ -50,10 +50,10 @@ layout(binding = 9) uniform samplerCube CubeMap;
 layout(location = 0) in vec2 fragTexCoord;
 
 layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec4 outBloom;
+//layout(location = 1) out vec4 outBloom;
 
 void main() {
     MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
     outColor = texture(TextureMap[material.DiffuseMapID], fragTexCoord);
-    outBloom = texture(TextureMap[material.DiffuseMapID], fragTexCoord);
+  //  outBloom = texture(TextureMap[material.DiffuseMapID], fragTexCoord);
 }

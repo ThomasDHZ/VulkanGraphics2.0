@@ -16,6 +16,19 @@ RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine)
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
+RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount) : Texture(TextureType::vkRenderedTexture)
+{
+    Width = engine->SwapChain.GetSwapChainResolution().width;
+    Height = engine->SwapChain.GetSwapChainResolution().height;
+
+    SampleCount = sampleCount;
+
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
 RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     CreateTextureImage();
@@ -42,7 +55,7 @@ void RenderedDepthTexture::CreateTextureImage()
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.initialLayout = ImageLayout;
     TextureInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    TextureInfo.samples = SampleCount;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     Texture::CreateTextureImage(TextureInfo);

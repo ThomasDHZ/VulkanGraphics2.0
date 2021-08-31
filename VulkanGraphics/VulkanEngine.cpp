@@ -236,7 +236,7 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	deviceFeatures.wideLines = VK_TRUE;
 	deviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
 	deviceFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
-
+	deviceFeatures.sampleRateShading = VK_TRUE;
 
 	VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
 	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;

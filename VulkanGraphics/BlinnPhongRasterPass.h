@@ -17,8 +17,9 @@ public:
 	BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine);
 	~BlinnPhongRasterPass();
 
+	std::shared_ptr<RenderedColorTexture> ColorTexture;
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<RenderedColorTexture> BloomTexture;
+	//std::shared_ptr<RenderedColorTexture> BloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 	std::shared_ptr<BlinnPhongPipeline> blinnphongPipeline;
 

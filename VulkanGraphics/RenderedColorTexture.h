@@ -10,6 +10,7 @@ private:
 public:
     RenderedColorTexture();
     RenderedColorTexture(std::shared_ptr<VulkanEngine> engine);
+    RenderedColorTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT);
     RenderedColorTexture(glm::ivec2 TextureResolution);
     ~RenderedColorTexture();
 
