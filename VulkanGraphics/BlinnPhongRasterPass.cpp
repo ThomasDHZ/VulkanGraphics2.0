@@ -8,11 +8,11 @@ BlinnPhongRasterPass::BlinnPhongRasterPass() : BaseRenderPass()
 
 BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
 {
-    ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_8_BIT));
+    ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
-    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_8_BIT));
+    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedBloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
-    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_8_BIT));
+    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -30,7 +30,7 @@ void BlinnPhongRasterPass::CreateRenderPass()
 
     VkAttachmentDescription AlebdoAttachment = {};
     AlebdoAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    AlebdoAttachment.samples = VK_SAMPLE_COUNT_8_BIT;
+    AlebdoAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
     AlebdoAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     AlebdoAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     AlebdoAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -41,7 +41,7 @@ void BlinnPhongRasterPass::CreateRenderPass()
 
     VkAttachmentDescription BloomAttachment = {};
     BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    BloomAttachment.samples = VK_SAMPLE_COUNT_8_BIT;
+    BloomAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
     BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -74,7 +74,7 @@ void BlinnPhongRasterPass::CreateRenderPass()
 
     VkAttachmentDescription DepthAttachment = {};
     DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
-    DepthAttachment.samples = VK_SAMPLE_COUNT_8_BIT;
+    DepthAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
     DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;

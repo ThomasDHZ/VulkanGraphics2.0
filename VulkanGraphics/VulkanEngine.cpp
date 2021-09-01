@@ -94,6 +94,7 @@ VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 		if (isDeviceSuitable(gpudevice))
 		{
 			PhysicalDevice = gpudevice;
+			MaxSampleCount = GetMaxUsableSampleCount(gpudevice);
 			break;
 		}
 	}
@@ -154,33 +155,20 @@ float VulkanEngine::VulkanTimer()
 	return std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 }
 
-void VulkanEngine::GetInstanceLayerProperties()
+VkSampleCountFlagBits VulkanEngine::GetMaxUsableSampleCount(VkPhysicalDevice GPUDevice)
 {
-	uint32_t LayerCount;
-	vkEnumerateInstanceLayerProperties(&LayerCount, nullptr);
-	VulkanLayers.resize(LayerCount);
-	vkEnumerateInstanceLayerProperties(&LayerCount, VulkanLayers.data());
-}
+	VkPhysicalDeviceProperties physicalDeviceProperties;
+	vkGetPhysicalDeviceProperties(GPUDevice, &physicalDeviceProperties);
 
-void VulkanEngine::GetPhysicalDevice()
-{
-	uint32_t deviceCount = 0;
-	vkEnumeratePhysicalDevices(Instance, &deviceCount, nullptr);
+	VkSampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts & physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+	if (counts & VK_SAMPLE_COUNT_64_BIT) { return VK_SAMPLE_COUNT_64_BIT; }
+	if (counts & VK_SAMPLE_COUNT_32_BIT) { return VK_SAMPLE_COUNT_32_BIT; }
+	if (counts & VK_SAMPLE_COUNT_16_BIT) { return VK_SAMPLE_COUNT_16_BIT; }
+	if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
+	if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
+	if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
 
-	if (deviceCount == 0) {
-		throw std::runtime_error("failed to find GPUs with Vulkan support!");
-	}
-
-	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(Instance, &deviceCount, devices.data());
-
-	for (const auto& gpudevice : devices) {
-		if (isDeviceSuitable(gpudevice))
-		{
-			PhysicalDevice = gpudevice;
-			break;
-		}
-	}
+	return VK_SAMPLE_COUNT_1_BIT;
 }
 
 void VulkanEngine::FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface)

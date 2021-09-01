@@ -54,8 +54,8 @@ private:
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
     bool checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
 
-	void GetInstanceLayerProperties();
-	void GetPhysicalDevice();
+	VkSampleCountFlagBits GetMaxUsableSampleCount(VkPhysicalDevice GPUDevice);
+
 	bool isDeviceSuitable(VkPhysicalDevice GPUDevice);
 	std::vector<const char*> getRequiredExtensions();
 
@@ -97,6 +97,7 @@ public:
 	std::vector<VkLayerProperties> VulkanLayers;
 
 	glm::ivec2 ScreenResoulation;
+	VkSampleCountFlagBits MaxSampleCount = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
 	bool UpdateRendererFlag = false;
 	bool RayTraceFlag = false;
 
