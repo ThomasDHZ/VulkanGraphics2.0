@@ -41,6 +41,7 @@
 #include "GUIManager.h"
 #include "ObjectManager.h"
 #include "AssetManager.h"
+#include "GameObject.h"
 
 class HelloTriangleApplication {
 public:
@@ -71,31 +72,9 @@ private:
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
-        std::vector<Vertex> vertices =
-        {
-           {{-0.5f, -0.5f, 0.0f}, { 0.0f }, {1.0f, 0.0f, 0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
-           {{0.5f, -0.5f, 0.0f}, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
-           {{0.5f, 0.5f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
-           {{-0.5f, 0.5f, 0.0f}, { 0.0f }, {1.0f, 1.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
-
-           {{-0.5f, -0.5f, -0.5f}, { 0.0f }, {1.0f, 0.0f, 0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
-           {{0.5f, -0.5f, -0.5f}, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
-           {{0.5f, 0.5f, -0.5f}, { 0.0f }, {0.0f, 0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }},
-           {{-0.5f, 0.5f, -0.5f}, { 0.0f }, {1.0f, 1.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {-1.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, -1.0f, 0.0f}, { 0.0f }}
-        };
-
-        std::vector<uint32_t> indices = {
-           0, 1, 2, 2, 3, 0,
-           4, 5, 6, 6, 7, 4
-        };
-
-        MaterialTexture material;
-        material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(std::make_shared<Texture2D>(Texture2D("../texture/texture.jpg", VK_FORMAT_R8G8B8A8_SRGB)));
-        auto a = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("aza", material);
-        MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
-
-        MeshManagerPtr::GetMeshManagerPtr()->AddMesh(std::make_shared<Mesh>(Mesh(vertices, indices, a, Mesh_Draw_All)));
-
+        std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("C:/Users/dotha/source/repos/VulkanGraphics - Copy/Models/TestAnimModel/model.dae")));
+        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
         std::string CubeMapFiles[6];
         CubeMapFiles[0] = "../texture/skybox/right.jpg";

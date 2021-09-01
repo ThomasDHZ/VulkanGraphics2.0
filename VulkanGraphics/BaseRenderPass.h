@@ -1,5 +1,6 @@
 #pragma once
 #include "Vulkanengine.h"
+#include "AssetManager.h"
 
 class BaseRenderPass
 {

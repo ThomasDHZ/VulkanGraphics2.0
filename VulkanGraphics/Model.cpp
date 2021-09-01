@@ -47,7 +47,7 @@ Model::Model(const std::string& FilePath, MeshDrawFlags DrawFlags)
 	{
 		AnimatedModel = true;
 		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
-		AnimationRenderer = AnimatorCompute(MeshList[0]);
+		//AnimationRenderer = AnimatorCompute(MeshList[0]);
 	}
 
 	ModelTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
@@ -271,95 +271,94 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 
 std::shared_ptr<Material> Model::LoadMaterial(const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
-	std::shared_ptr<Material> ModelMaterial = std::make_shared<Material>(Material("ModelMaterial"));
+	MaterialTexture MaterialInfo;
 
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
-	//aiColor3D color(0.f, 0.f, 0.f);
-	//material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	//ModelMaterial->materialTexture.Ambient.r = color.r;
-	//ModelMaterial->materialTexture.Ambient.g = color.g;
-	//ModelMaterial->materialTexture.Ambient.b = color.b;
+	aiColor3D color(0.f, 0.f, 0.f);
+	material->Get(AI_MATKEY_COLOR_AMBIENT, color);
+	MaterialInfo.Ambient.r = color.r;
+	MaterialInfo.Ambient.g = color.g;
+	MaterialInfo.Ambient.b = color.b;
 
-	//material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	//ModelMaterial->materialTexture.Diffuse.r = color.r;
-	//ModelMaterial->materialTexture.Diffuse.g = color.g;
-	//ModelMaterial->materialTexture.Diffuse.b = color.b;
+	material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+	MaterialInfo.Diffuse.r = color.r;
+	MaterialInfo.Diffuse.g = color.g;
+	MaterialInfo.Diffuse.b = color.b;
 
-	//material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	//ModelMaterial->materialTexture.Specular.r = color.r;
-	//ModelMaterial->materialTexture.Specular.g = color.g;
-	//ModelMaterial->materialTexture.Specular.b = color.b;
+	material->Get(AI_MATKEY_COLOR_SPECULAR, color);
+	MaterialInfo.Specular.r = color.r;
+	MaterialInfo.Specular.g = color.g;
+	MaterialInfo.Specular.b = color.b;
 
+	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &MaterialInfo.Shininess))
+	{
+		MaterialInfo.Shininess = 32.0f;
+	}
 
-	//if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &ModelMaterial->materialTexture.Shininess))
-	//{
-	//	ModelMaterial->materialTexture.Shininess = 32.0f;
-	//}
+	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &MaterialInfo.Reflectivness))
+	{
+		MaterialInfo.Reflectivness = 0.0f;
+	}
 
-	//if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &ModelMaterial->materialTexture.Reflectivness))
-	//{
-	//	ModelMaterial->materialTexture.Reflectivness = 0.0f;
-	//}
+	aiString TextureLocation;
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
+	{
+		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
+		MaterialInfo.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_SRGB);
+		MaterialInfo.AlbedoMap = MaterialInfo.DiffuseMap;
+	}
 
-	//aiString TextureLocation;
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
-	//{
-	//	material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_SRGB);
-	//	ModelMaterial->materialTexture.AlbedoMap = ModelMaterial->materialTexture.DiffuseMap;
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_METALNESS); x++)
+	{
+		material->GetTexture(aiTextureType_METALNESS, x, &TextureLocation);
+		MaterialInfo.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_METALNESS); x++)
-	//{
-	//	material->GetTexture(aiTextureType_METALNESS, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS); x++)
+	{
+		material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, x, &TextureLocation);
+		MaterialInfo.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS); x++)
-	//{
-	//	material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION); x++)
+	{
+		material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, x, &TextureLocation);
+		MaterialInfo.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION); x++)
-	//{
-	//	material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
+	{
+		material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
+		MaterialInfo.SpecularMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
-	//{
-	//	material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.SpecularMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
+	{
+		material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
+		MaterialInfo.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
-	//{
-	//	material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
+	{
+		material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
+		MaterialInfo.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
-	//{
-	//	material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
+	{
+		material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
+		MaterialInfo.AlphaMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
-	//{
-	//	material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.AlphaMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
+	{
+		material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
+		MaterialInfo.EmissionMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
-	//{
-	//	material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
-	//	ModelMaterial->materialTexture.EmissionMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
-
-	return MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("sfsd", ModelMaterial);
+	return MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("ModelMaterial", MaterialInfo);
 }
 
 void Model::BoneWeightPlacement(std::vector<MeshBoneWeights>& meshBoneWeight, unsigned int vertexID, unsigned int bone_id, float weight)
