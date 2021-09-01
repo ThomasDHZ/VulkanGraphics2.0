@@ -65,12 +65,6 @@ void AssetManager::Update()
     SkyUniformBuffer->Update();
 }
 
-void AssetManager::UpdateBufferIndex()
-{
-   // TextureManagerPtr::GetTextureManagerPtr()->UpdateBufferIndex();
-    MeshManagerPtr::GetMeshManagerPtr()->UpdateBufferIndex();
-}
-
 void AssetManager::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView)
 {
    meshManager->Draw(commandBuffer, ShaderLayout, CameraView);

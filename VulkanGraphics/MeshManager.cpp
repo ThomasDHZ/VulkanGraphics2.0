@@ -25,6 +25,7 @@ void MeshManager::AddMesh(std::shared_ptr<Mesh> mesh)
 {
 	MeshList.emplace_back(mesh);
     EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+    UpdateBufferIndex();
 }
 
 void MeshManager::DeleteMesh(uint32_t MeshBufferIndex)
@@ -32,6 +33,7 @@ void MeshManager::DeleteMesh(uint32_t MeshBufferIndex)
     MeshList[MeshBufferIndex]->Destory();
     MeshList.erase(MeshList.begin() + MeshBufferIndex);
     EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+    UpdateBufferIndex();
 }
 
 void MeshManager::Update(std::shared_ptr<Camera> camera)

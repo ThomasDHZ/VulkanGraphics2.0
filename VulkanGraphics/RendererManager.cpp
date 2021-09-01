@@ -64,7 +64,6 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
 {
     if(engine->UpdateRendererFlag)
     {
-        AssetManagerPtr::GetAssetPtr()->UpdateBufferIndex();
         RebuildSwapChain(engine, window);
         engine->UpdateRendererFlag = false;
     }

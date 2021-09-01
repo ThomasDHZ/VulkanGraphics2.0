@@ -71,7 +71,8 @@ private:
         GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
-
+        renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
+    
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         gameObject->AddChildModel(std::make_shared<Model>(Model("C:/Users/dotha/source/repos/VulkanGraphics - Copy/Models/TestAnimModel/model.dae")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
@@ -84,8 +85,6 @@ private:
         CubeMapFiles[4] = "../texture/skybox/back.jpg";
         CubeMapFiles[5] = "../texture/skybox/front.jpg";
         AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
-
-        renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
     }
 
     void mainLoop() {

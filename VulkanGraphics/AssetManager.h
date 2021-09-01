@@ -31,14 +31,9 @@ public:
 	AssetManager(std::shared_ptr<VulkanEngine> engine);
 	~AssetManager();
 
-	//void AddModel();
-	//void AddModel(std::shared_ptr<VulkanEngine> engine, const std::string& FilePath);
-	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	//void AddModel(std::shared_ptr<VulkanEngine> engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material>);
 	void LoadFont(std::shared_ptr<VulkanEngine> engine, const std::string FontLocation);
 
 	void Update();
-	void UpdateBufferIndex();
 	void Draw(VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Delete();
