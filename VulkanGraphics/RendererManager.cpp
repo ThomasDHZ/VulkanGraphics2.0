@@ -132,6 +132,8 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
     Update(engine, window, EnginePtr::GetEnginePtr()->CMDIndex);
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
+
+    AssetManagerPtr::GetAssetPtr()->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList);
     if (ActiveRenderer == 0)
     {
         BlinnRenderer.Draw();

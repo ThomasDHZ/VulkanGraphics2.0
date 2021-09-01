@@ -76,7 +76,7 @@ void AnimatorCompute::SetUpDescriptorSets()
 
 void AnimatorCompute::CreateShaderPipeLine()
 {
-	auto ComputeShaderCode = EnginePtr::GetEnginePtr()->CreateShader("Shader/animate.spv", VK_SHADER_STAGE_COMPUTE_BIT);
+	auto ComputeShaderCode = EnginePtr::GetEnginePtr()->CreateShader("Shaders/animate.spv", VK_SHADER_STAGE_COMPUTE_BIT);
 
 	VkPushConstantRange pushConstantRange{};
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;

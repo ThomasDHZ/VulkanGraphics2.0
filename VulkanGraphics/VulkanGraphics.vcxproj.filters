@@ -40,6 +40,9 @@
     <Filter Include="Shader\Include">
       <UniqueIdentifier>{6d157526-4733-4834-9408-dcc0b256f4cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\ComputeShader">
+      <UniqueIdentifier>{c88e54cf-50d4-474f-b3d8-69b729fe4c9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -570,6 +573,9 @@
     </None>
     <None Include="Shaders\shadow.rmiss">
       <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\animate.comp">
+      <Filter>Shader\ComputeShader</Filter>
     </None>
   </ItemGroup>
 </Project>

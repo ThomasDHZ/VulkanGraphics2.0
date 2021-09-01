@@ -8,4 +8,5 @@ C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 raygen.rgen -o raygen.rgen.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 miss.rmiss -o miss.rmiss.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.1 --target-spv=spv1.4 shadow.rmiss -o shadow.rmiss.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe animate.comp -o animate.spv
 pause

@@ -47,7 +47,7 @@ Model::Model(const std::string& FilePath, MeshDrawFlags DrawFlags)
 	{
 		AnimatedModel = true;
 		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
-		//AnimationRenderer = AnimatorCompute(MeshList[0]);
+		AnimationRenderer = AnimatorCompute(MeshList[0]);
 	}
 
 	ModelTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());

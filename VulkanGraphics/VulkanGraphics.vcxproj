@@ -307,6 +307,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
+    <None Include="Shaders\animate.comp" />
     <None Include="Shaders\anyhit.rahit" />
     <None Include="Shaders\anyhit1.rahit" />
     <None Include="Shaders\BlinePhongLighting.glsl" />
