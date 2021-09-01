@@ -346,6 +346,7 @@ void Mesh::Destory()
 	if (BoneTransformBuffer.BufferMemory != nullptr &&
 		BoneTransformBuffer.Buffer != nullptr)
 	{
+		BoneWeightBuffer.DestoryBuffer();
 		BoneTransformBuffer.DestoryBuffer();
 	}
 	if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)

@@ -226,6 +226,7 @@ void BlinnPhongRasterPass::Draw()
 void BlinnPhongRasterPass::Destroy()
 {
     ColorTexture->Delete();
+    RenderedTexture->Delete();
    // BloomTexture->Delete();
     DepthTexture->Delete();
 
