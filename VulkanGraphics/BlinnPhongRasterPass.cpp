@@ -10,7 +10,8 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine)
 {
     ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_8_BIT));
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
-  //  BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr()));
+    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_8_BIT));
+    RenderedBloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
     DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_8_BIT));
 
     CreateRenderPass();
@@ -38,6 +39,17 @@ void BlinnPhongRasterPass::CreateRenderPass()
     AlebdoAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     AttachmentDescriptionList.emplace_back(AlebdoAttachment);
 
+    VkAttachmentDescription BloomAttachment = {};
+    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomAttachment.samples = VK_SAMPLE_COUNT_8_BIT;
+    BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BloomAttachment);
+
     VkAttachmentDescription MultiSampledAttachment = {};
     MultiSampledAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
     MultiSampledAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -48,16 +60,17 @@ void BlinnPhongRasterPass::CreateRenderPass()
     MultiSampledAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     MultiSampledAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     AttachmentDescriptionList.emplace_back(MultiSampledAttachment);
-    //VkAttachmentDescription BloomAttachment = {};
-    //BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    //BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    //BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    //BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    //BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    //BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    //BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    //BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    //AttachmentDescriptionList.emplace_back(BloomAttachment);
+
+    VkAttachmentDescription BloomMultiSampledTexture = {};
+    BloomMultiSampledTexture.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomMultiSampledTexture.samples = VK_SAMPLE_COUNT_1_BIT;
+    BloomMultiSampledTexture.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomMultiSampledTexture.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BloomMultiSampledTexture.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomMultiSampledTexture.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BloomMultiSampledTexture.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BloomMultiSampledTexture.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BloomMultiSampledTexture);
 
     VkAttachmentDescription DepthAttachment = {};
     DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
@@ -72,16 +85,20 @@ void BlinnPhongRasterPass::CreateRenderPass()
 
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-   // ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-    VkAttachmentReference MultiSampleReference = { 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL };
-    VkAttachmentReference depthReference = { 2, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+    ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+
+    std::vector<VkAttachmentReference> MultiSampleReferenceList;
+    MultiSampleReferenceList.emplace_back(VkAttachmentReference {2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    MultiSampleReferenceList.emplace_back(VkAttachmentReference{ 3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    
+    VkAttachmentReference depthReference = { 4, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDescription.colorAttachmentCount = static_cast<uint32_t>(ColorRefsList.size());
     subpassDescription.pColorAttachments = ColorRefsList.data();
     subpassDescription.pDepthStencilAttachment = &depthReference;
-    subpassDescription.pResolveAttachments = &MultiSampleReference;
+    subpassDescription.pResolveAttachments = MultiSampleReferenceList.data();
 
     std::vector<VkSubpassDependency> DependencyList;
 
@@ -128,8 +145,9 @@ void BlinnPhongRasterPass::CreateRendererFramebuffers()
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(ColorTexture->View);
+        AttachmentList.emplace_back(BloomTexture->View);
         AttachmentList.emplace_back(RenderedTexture->View);
-       // AttachmentList.emplace_back(BloomTexture->View);
+        AttachmentList.emplace_back(RenderedBloomTexture->View);
         AttachmentList.emplace_back(DepthTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
@@ -168,7 +186,9 @@ void BlinnPhongRasterPass::SetUpCommandBuffers()
 void BlinnPhongRasterPass::RebuildSwapChain()
 {
     ColorTexture->RecreateRendererTexture();
-    //BloomTexture->RecreateRendererTexture();
+    RenderedTexture->RecreateRendererTexture();
+    BloomTexture->RecreateRendererTexture();
+    RenderedBloomTexture->RecreateRendererTexture();
     DepthTexture->RecreateRendererTexture();
 
     blinnphongPipeline->Destroy();
@@ -205,10 +225,12 @@ void BlinnPhongRasterPass::Draw()
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
 
-    std::array<VkClearValue, 3> clearValues{};
+    std::array<VkClearValue, 5> clearValues{};
     clearValues[0].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
     clearValues[1].color = { {1.0f, 1.0f, 0.0f, 1.0f} };
-    clearValues[2].depthStencil = { 1.0f, 0 };
+    clearValues[2].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[3].color = { {1.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[4].depthStencil = { 1.0f, 0 };
 
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
@@ -227,7 +249,8 @@ void BlinnPhongRasterPass::Destroy()
 {
     ColorTexture->Delete();
     RenderedTexture->Delete();
-   // BloomTexture->Delete();
+    BloomTexture->Delete();
+    RenderedBloomTexture->Delete();
     DepthTexture->Delete();
 
     blinnphongPipeline->Destroy();

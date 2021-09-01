@@ -12,15 +12,18 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
+	std::shared_ptr<RenderedColorTexture> ColorTexture;
+	std::shared_ptr<RenderedColorTexture> BloomTexture;
+
 public:
 	BlinnPhongRasterPass();
 	BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine);
 	~BlinnPhongRasterPass();
 
-	std::shared_ptr<RenderedColorTexture> ColorTexture;
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	//std::shared_ptr<RenderedColorTexture> BloomTexture;
+	std::shared_ptr<RenderedColorTexture> RenderedBloomTexture;
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
+
 	std::shared_ptr<BlinnPhongPipeline> blinnphongPipeline;
 
 	void RebuildSwapChain();
