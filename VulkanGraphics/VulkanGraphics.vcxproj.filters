@@ -43,6 +43,30 @@
     <Filter Include="Shader\ComputeShader">
       <UniqueIdentifier>{c88e54cf-50d4-474f-b3d8-69b729fe4c9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{51c984f2-a129-4191-8066-7d5c3d2a34e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\Pipelines">
+      <UniqueIdentifier>{f8d88d74-7d07-4fb7-a1d3-92e896685c90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\RenderPass">
+      <UniqueIdentifier>{203b892f-e9b9-4ff8-a3ee-e14dd721f8f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\Renderer">
+      <UniqueIdentifier>{a9487c41-f4f5-4a10-8188-f05440aabda6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{6fdd6d28-5d5a-4c55-b52b-a7a24e3b4930}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\RenderPass">
+      <UniqueIdentifier>{b1a5d079-2e40-48c7-9521-4fd51564cf41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Pipeline">
+      <UniqueIdentifier>{5f1538db-0c2b-4ded-ba8e-9145152747ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Renderer">
+      <UniqueIdentifier>{ac818faa-14ca-4fd8-abaa-c6208afbd580}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -75,9 +99,6 @@
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InterfaceRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
@@ -98,24 +119,6 @@
     </ClCompile>
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="BlinnPhongRasterRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BlinnPhongRasterPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BaseRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BlinnPhongPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsPipeline.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameController.cpp">
       <Filter>Source Files</Filter>
@@ -255,23 +258,44 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FrameBufferPipeline.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="BaseRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="FrameBufferRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RayTracedPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RayTraceRenderer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="RayTraceRenderPass.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracedPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
     <ClCompile Include="RayTracingGraphicsPipeline.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnPhongRasterPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnPhongPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnPhongRasterRenderer.cpp">
+      <Filter>Source Files\Rendering\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTraceRenderer.cpp">
+      <Filter>Source Files\Rendering\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRenderer.cpp">
+      <Filter>Source Files\Rendering\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="InterfaceRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -302,9 +326,6 @@
     <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InterfaceRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
       <Filter>ImGui</Filter>
     </ClInclude>
@@ -328,27 +349,6 @@
     </ClInclude>
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="BlinnPhongRasterRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BlinnPhongRasterPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedDepthTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BlinnPhongPipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsPipeline.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameController.h">
       <Filter>Header Files</Filter>
@@ -497,23 +497,47 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FrameBufferRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBufferPipeline.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="RayTracingGraphicsPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="RayTracedPipeline.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRenderer.h">
+      <Filter>Header Files\Rendering\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="RayTraceRenderer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Rendering\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongRasterRenderer.h">
+      <Filter>Header Files\Rendering\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRenderPass.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="RayTraceRenderPass.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="RayTracingGraphicsPipeline.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="BlinnPhongRasterPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedDepthTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="InterfaceRenderPass.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
