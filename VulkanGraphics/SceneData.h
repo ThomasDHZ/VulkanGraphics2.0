@@ -32,12 +32,6 @@ struct SpotLightBuffer {
 };
 
 struct SceneDataBuffer {
-	alignas(16) glm::mat4 model = glm::mat4(1.0f);
-	alignas(16) glm::mat4 viewInverse = glm::mat4(1.0f);
-	alignas(16) glm::mat4 projInverse = glm::mat4(1.0f);
-	alignas(16) glm::mat4 view = glm::mat4(1.0f);
-	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
-	alignas(16) glm::vec3 viewPos = glm::vec3(0.0f);
 	alignas(4)  uint32_t DirectionalLightCount = 0;
 	alignas(4)  uint32_t PointLightCount = 0;
 	alignas(4)  uint32_t SpotLightCount = 0;

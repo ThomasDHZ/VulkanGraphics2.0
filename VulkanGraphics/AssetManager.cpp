@@ -41,17 +41,9 @@ void AssetManager::Update()
     guiManager->Update();
     ObjManager->Update();
 
-    SceneData->UniformDataInfo.model = glm::rotate(glm::mat4(1.0f), timer * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     SceneData->UniformDataInfo.DirectionalLightCount = lightManager->GetDirectionalLightDescriptorCount();
     SceneData->UniformDataInfo.PointLightCount = lightManager->GetPointLightDescriptorCount();
     SceneData->UniformDataInfo.SpotLightCount = lightManager->GetSpotLightDescriptorCount();
-    SceneData->UniformDataInfo.viewInverse = glm::inverse(cameraManager->ActiveCamera->GetViewMatrix());
-    SceneData->UniformDataInfo.projInverse = glm::inverse(cameraManager->ActiveCamera->GetProjectionMatrix());
-    SceneData->UniformDataInfo.projInverse[1][1] *= -1;
-    SceneData->UniformDataInfo.view = cameraManager->ActiveCamera->GetViewMatrix();
-    SceneData->UniformDataInfo.proj = cameraManager->ActiveCamera->GetProjectionMatrix();
-    SceneData->UniformDataInfo.proj[1][1] *= -1;
-    SceneData->UniformDataInfo.viewPos = glm::vec4(cameraManager->ActiveCamera->GetPosition(), 0.0f);
     SceneData->UniformDataInfo.timer = timer;
     SceneData->Update();
 

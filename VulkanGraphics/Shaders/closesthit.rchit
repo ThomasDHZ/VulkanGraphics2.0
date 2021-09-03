@@ -33,11 +33,6 @@ hitAttributeEXT vec2 attribs;
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
@@ -112,24 +107,36 @@ void main()
 {
    vertex = BuildVertexInfo();
    material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-    
-   MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-   vec2 UVOffset = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
-   UVOffset *= meshProperties[gl_InstanceCustomIndexEXT].UVScale;
-   if(meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
+   	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.x == 1.0f)
+	{
+		vertex.uv.x = 1.0f - vertex.uv.x;
+	}
+	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
+	{
+		vertex.uv.y = 1.0f - vertex.uv.y;
+	}
+
+   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+   TBN = transpose(mat3(T, B, N));
+
+    vec3 result = vec3(0.0f);
+    vec3 baseColor = vec3(0.0f);
+    vec3 normal = vertex.normal;
+    vec3 ViewPos  = ConstMesh.CameraPos;
+    vec3 FragPos2  = vertex.pos;
+
+   for(int x = 0; x < scenedata.DirectionalLightCount; x++)
    {
-        UVOffset.y = 1.0f - UVOffset.y;
+        result += CalcNormalDirLight(FragPos2, normal, vertex.uv, x);
    }
-   if(meshProperties[gl_InstanceCustomIndexEXT].UVFlip.x == 1.0f)
+   for(int x = 0; x < scenedata.PointLightCount; x++)
    {
-        UVOffset.x = 1.0f - UVOffset.x;
+        result += CalcNormalPointLight(FragPos2, normal, vertex.uv, x);   
    }
-   if(meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
-   {
-        UVOffset.y = 1.0f - UVOffset.y;
-   }
-    
-    rayHitInfo.color = texture(TextureMap[material.DiffuseMapID], UVOffset).xyz;
+
+    rayHitInfo.color = result;
 	//rayHitInfo.distance = 10000.0f;
 	rayHitInfo.normal = vertex.normal;
 }

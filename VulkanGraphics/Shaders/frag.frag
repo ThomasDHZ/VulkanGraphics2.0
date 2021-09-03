@@ -15,12 +15,6 @@ layout(push_constant) uniform MeshInfo
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject {
-    mat4 model;
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
@@ -125,11 +119,11 @@ void main()
    
    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
    {
-        result += CalcNormalDirLight(FragPos, normal, texCoords, x);
+        result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
    }
    for(int x = 0; x < scenedata.PointLightCount; x++)
    {
-        result += CalcNormalPointLight(FragPos, normal, texCoords, x);   
+        result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
    }
 
     vec3 I = normalize(FragPos2 - ViewPos);
