@@ -67,6 +67,12 @@
     <Filter Include="Header Files\Rendering\Renderer">
       <UniqueIdentifier>{ac818faa-14ca-4fd8-abaa-c6208afbd580}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Lights">
+      <UniqueIdentifier>{42bc0bdc-c627-4b2d-b296-706ef1b8fc6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lights">
+      <UniqueIdentifier>{0f63c4fe-b3a0-4b17-bbf0-c2de46a4f794}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -228,9 +234,6 @@
     <ClCompile Include="Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AnimationPlayer3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -244,12 +247,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LightViewCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
@@ -296,6 +293,15 @@
     </ClCompile>
     <ClCompile Include="InterfaceRenderPass.cpp">
       <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files\Lights</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -458,13 +464,7 @@
     <ClInclude Include="Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Font.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Model.h">
@@ -485,12 +485,6 @@
     <ClInclude Include="LightViewCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SpotLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -501,9 +495,6 @@
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="RayTracedPipeline.h">
-      <Filter>Header Files\Rendering\Pipeline</Filter>
-    </ClInclude>
-    <ClInclude Include="BlinnPhongPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="BaseRenderer.h">
@@ -518,17 +509,11 @@
     <ClInclude Include="BaseRenderPass.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="RayTraceRenderPass.h">
-      <Filter>Header Files\Rendering\Pipeline</Filter>
-    </ClInclude>
     <ClInclude Include="BlinnPhongRasterPass.h">
       <Filter>Header Files\Rendering\RenderPass</Filter>
     </ClInclude>
     <ClInclude Include="FrameBufferRenderPass.h">
       <Filter>Header Files\Rendering\RenderPass</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBufferPipeline.h">
-      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
@@ -536,8 +521,29 @@
     <ClInclude Include="RenderedDepthTexture.h">
       <Filter>Header Files\texture</Filter>
     </ClInclude>
+    <ClInclude Include="RayTraceRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
     <ClInclude Include="InterfaceRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongPipeline.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Lights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

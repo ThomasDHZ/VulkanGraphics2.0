@@ -73,8 +73,26 @@ private:
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
     
+        DirectionalLightBuffer dlight = DirectionalLightBuffer();
+        dlight.direction = glm::vec4(1.0f);
+        dlight.ambient = glm::vec4(0.2f);
+        dlight.diffuse = glm::vec4(0.5f);
+        dlight.specular = glm::vec4(1.0f);
+        LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
+        LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
+
+        PointLightBuffer plight = PointLightBuffer();
+        plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
+        plight.ambient = glm::vec4(0.2f);
+        plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
+        plight.specular = glm::vec4(1.0f);
+
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
+        LightManagerPtr::GetLightManagerPtr()->AddSpotLight(SpotLightBuffer());
+
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("C:/Users/dotha/source/repos/VulkanGraphics - Copy/Models/TestAnimModel/model.dae")));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("C:/Users/dotha/source/repos/VulkanGraphics - Copy/Models/suzanne.obj")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
         std::string CubeMapFiles[6];

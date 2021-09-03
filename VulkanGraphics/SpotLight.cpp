@@ -8,10 +8,10 @@ SpotLight::SpotLight(std::shared_ptr<VulkanEngine> engine) : Light<SpotLightBuff
 {
 }
 
-SpotLight::SpotLight(std::shared_ptr<VulkanEngine> engine, SpotLightBuffer light) : Light<SpotLightBuffer>(engine)
+SpotLight::SpotLight(SpotLightBuffer light) : Light<SpotLightBuffer>(EnginePtr::GetEnginePtr())
 {
 	LightBuffer.UniformDataInfo = light;
-	Update(engine);
+	Update();
 }
 
 SpotLight::~SpotLight()

@@ -8,10 +8,10 @@ PointLight::PointLight(std::shared_ptr<VulkanEngine> engine) : Light<PointLightB
 {
 }
 
-PointLight::PointLight(std::shared_ptr<VulkanEngine> engine, PointLightBuffer light) : Light<PointLightBuffer>(engine)
+PointLight::PointLight(PointLightBuffer light) : Light<PointLightBuffer>(EnginePtr::GetEnginePtr())
 {
 	LightBuffer.UniformDataInfo = light;
-	Update(engine);
+	Update();
 }
 
 PointLight::~PointLight()

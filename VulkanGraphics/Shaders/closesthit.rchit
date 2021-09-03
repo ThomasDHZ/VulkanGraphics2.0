@@ -112,7 +112,24 @@ void main()
 {
    vertex = BuildVertexInfo();
    material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-    rayHitInfo.color = texture(TextureMap[material.DiffuseMapID], vertex.uv).xyz;
+    
+   MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+   vec2 UVOffset = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
+   UVOffset *= meshProperties[gl_InstanceCustomIndexEXT].UVScale;
+   if(meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
+   {
+        UVOffset.y = 1.0f - UVOffset.y;
+   }
+   if(meshProperties[gl_InstanceCustomIndexEXT].UVFlip.x == 1.0f)
+   {
+        UVOffset.x = 1.0f - UVOffset.x;
+   }
+   if(meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
+   {
+        UVOffset.y = 1.0f - UVOffset.y;
+   }
+    
+    rayHitInfo.color = texture(TextureMap[material.DiffuseMapID], UVOffset).xyz;
 	//rayHitInfo.distance = 10000.0f;
 	rayHitInfo.normal = vertex.normal;
 }

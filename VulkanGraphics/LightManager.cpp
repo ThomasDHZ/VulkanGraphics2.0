@@ -9,24 +9,6 @@ LightManager::LightManager()
 LightManager::LightManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<CameraManager> cameraManager)
 {
 	engine = Engine;
-
-	DirectionalLightBuffer dlight = DirectionalLightBuffer();
-	dlight.direction = glm::vec4(1.0f);
-	dlight.ambient = glm::vec4(0.2f);
-	dlight.diffuse = glm::vec4(0.5f);
-	dlight.specular = glm::vec4(1.0f);
-	AddDirectionalLight(cameraManager, dlight);
-	AddDirectionalLight(cameraManager, dlight);
-
-	PointLightBuffer plight = PointLightBuffer();
-	plight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
-	plight.ambient = glm::vec4(0.2f);
-	plight.diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 0.0f);
-	plight.specular = glm::vec4(1.0f);
-
-	AddPointLight(plight);
-	AddPointLight(plight);
-	AddSpotLight(SpotLightBuffer());
 }
 
 LightManager::~LightManager()
@@ -37,15 +19,15 @@ void LightManager::Update()
 {
 	for (auto& directionalLight : DirectionalLightList)
 	{
-		directionalLight->Update(engine);
+		directionalLight->Update();
 	}
 	for (auto& pointLight : PointLightList)
 	{
-		pointLight->Update(engine);
+		pointLight->Update();
 	}
 	for (auto& spotLight : SpotLightList)
 	{
-		spotLight->Update(engine);
+		spotLight->Update();
 	}
 }
 
@@ -61,7 +43,7 @@ void LightManager::AddDirectionalLight(std::shared_ptr<DirectionalLight> light)
 
 void LightManager::AddDirectionalLight(std::shared_ptr<CameraManager> cameraManager, DirectionalLightBuffer light)
 {
-	DirectionalLightList.emplace_back(std::make_shared<DirectionalLight>(DirectionalLight(engine, cameraManager, light)));
+	DirectionalLightList.emplace_back(std::make_shared<DirectionalLight>(DirectionalLight(light)));
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
@@ -73,7 +55,7 @@ void LightManager::AddPointLight(std::shared_ptr<PointLight> light)
 
 void LightManager::AddPointLight(PointLightBuffer light)
 {
-	PointLightList.emplace_back(std::make_shared<PointLight>(PointLight(engine, light)));
+	PointLightList.emplace_back(std::make_shared<PointLight>(PointLight(light)));
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
@@ -85,13 +67,13 @@ void LightManager::AddSpotLight(std::shared_ptr<SpotLight> light)
 
 void LightManager::AddSpotLight(SpotLightBuffer light)
 {
-	SpotLightList.emplace_back(std::make_shared<SpotLight>(SpotLight(engine, light)));
+	SpotLightList.emplace_back(std::make_shared<SpotLight>(SpotLight(light)));
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
 void LightManager::DeleteDirectionalLight(uint32_t LightBufferIndex)
 {
-	DirectionalLightList[LightBufferIndex]->Destroy(engine);
+	DirectionalLightList[LightBufferIndex]->Destroy();
 	DirectionalLightList.erase(DirectionalLightList.begin() + LightBufferIndex);
 	Update();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
@@ -99,7 +81,7 @@ void LightManager::DeleteDirectionalLight(uint32_t LightBufferIndex)
 
 void LightManager::DeletePointLight(uint32_t LightBufferIndex)
 {
-	PointLightList[LightBufferIndex]->Destroy(engine);
+	PointLightList[LightBufferIndex]->Destroy();
 	PointLightList.erase(PointLightList.begin() + LightBufferIndex);
 	Update();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
@@ -107,7 +89,7 @@ void LightManager::DeletePointLight(uint32_t LightBufferIndex)
 
 void LightManager::DeleteSpotLight(uint32_t LightBufferIndex)
 {
-	SpotLightList[LightBufferIndex]->Destroy(engine);
+	SpotLightList[LightBufferIndex]->Destroy();
 	SpotLightList.erase(SpotLightList.begin() + LightBufferIndex);
 	Update();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
@@ -195,17 +177,18 @@ void LightManager::Destory()
 {
 	for (auto& directionalLight : DirectionalLightList)
 	{
-		directionalLight->Destroy(engine);
+		directionalLight->Destroy();
 	}
 	for (auto& pointLight : PointLightList)
 	{
-		pointLight->Destroy(engine);
+		pointLight->Destroy();
 	}
 	for (auto& spotLight : SpotLightList)
 	{
-		spotLight->Destroy(engine);
+		spotLight->Destroy();
 	}
 }
+
 uint32_t LightManager::GetDirectionalLightDescriptorCount() 
 {
 	if (DirectionalLightList.size() > 0)

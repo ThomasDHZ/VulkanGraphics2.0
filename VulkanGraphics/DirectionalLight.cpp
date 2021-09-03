@@ -9,26 +9,26 @@ DirectionalLight::DirectionalLight(std::shared_ptr<VulkanEngine> engine) : Light
 {
 }
 
-DirectionalLight::DirectionalLight(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<CameraManager> cameraManager, DirectionalLightBuffer light) : Light<DirectionalLightBuffer>(engine)
+DirectionalLight::DirectionalLight(DirectionalLightBuffer light) : Light<DirectionalLightBuffer>(EnginePtr::GetEnginePtr())
 {
-	lightViewCamera = std::make_shared<LightViewCamera>(LightViewCamera(engine, glm::vec3(0.0f, 10.0f, 0.0f), LightBuffer.UniformDataInfo.direction));
-	cameraManager->CameraList.emplace_back(lightViewCamera);
+	lightViewCamera = std::make_shared<LightViewCamera>(LightViewCamera(EnginePtr::GetEnginePtr(), glm::vec3(0.0f, 10.0f, 0.0f), LightBuffer.UniformDataInfo.direction));
+	CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(lightViewCamera);
 
 	LightBuffer.UniformDataInfo = light;
-	Update(engine);
+	Update();
 }
 
 DirectionalLight::~DirectionalLight()
 {
 }
 
-void DirectionalLight::Update(std::shared_ptr<VulkanEngine> engine)
+void DirectionalLight::Update()
 {
-	Light::Update(engine);
-	lightViewCamera->Update(engine, glm::vec3(0.0f, 100.0f, 0.0f), LightBuffer.UniformDataInfo.direction);
+	Light::Update();
+	lightViewCamera->Update(EnginePtr::GetEnginePtr(), glm::vec3(0.0f, 100.0f, 0.0f), LightBuffer.UniformDataInfo.direction);
 }
 
-void DirectionalLight::Destroy(std::shared_ptr<VulkanEngine> engine)
+void DirectionalLight::Destroy()
 {
-	Light::Destroy(engine);
+	Light::Destroy();
 }

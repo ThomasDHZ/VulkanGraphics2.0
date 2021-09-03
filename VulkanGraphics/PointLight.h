@@ -6,7 +6,7 @@ private:
 public:
 	PointLight();
 	PointLight(std::shared_ptr<VulkanEngine> engine);
-	PointLight(std::shared_ptr<VulkanEngine> engine, PointLightBuffer light);
+	PointLight(PointLightBuffer light);
 	~PointLight();
 };
 

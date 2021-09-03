@@ -19,7 +19,7 @@ public:
 	Light(std::shared_ptr<VulkanEngine> engine)
 	{
 		LightBuffer = UniformData<T>(engine);
-		Update(engine);
+		Update();
 	}
 
 	~Light()
@@ -27,12 +27,12 @@ public:
 
 	}
 
-	virtual void Update(std::shared_ptr<VulkanEngine> engine)
+	virtual void Update()
 	{
 		LightBuffer.Update();
 	}
 
-	virtual void Destroy(std::shared_ptr<VulkanEngine> engine)
+	virtual void Destroy()
 	{
 		LightBuffer.Destroy();
 	}

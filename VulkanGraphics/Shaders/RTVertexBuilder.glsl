@@ -2,8 +2,8 @@ Vertex BuildVertexInfo()
 {
 	Vertex vertex;
 	const ivec3 index = ivec3(indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID],
-		indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1],
-		indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
+						      indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 1],
+							  indices[gl_InstanceCustomIndexEXT].i[3 * gl_PrimitiveID + 2]);
 
 	const Vertex v0 = vertices[gl_InstanceCustomIndexEXT].v[index.x];
 	const Vertex v1 = vertices[gl_InstanceCustomIndexEXT].v[index.y];

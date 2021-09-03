@@ -29,6 +29,18 @@ layout(binding = 0) uniform UniformBufferObject {
     int temp;
 } ubo;
 
+layout(binding = 1) buffer MeshProperties 
+{
+	mat4 ModelTransform;
+	vec2 UVOffset;
+    vec2 UVScale;
+    vec2 UVFlip;
+    uint MaterialIndex;
+    float heightScale;
+	float minLayers;
+	float maxLayers;
+} meshProperties[];
+
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
@@ -41,9 +53,20 @@ layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec4 aTangent;
 layout (location = 4) in vec4 aBitangent;
 
-layout(location = 0) out vec2 fragTexCoord;
+layout(location = 0) out vec3 FragPos;
+layout(location = 1) out vec2 TexCoords;
+layout(location = 2) out vec3 Normal;
+layout(location = 3) out vec3 Tangent;
+layout(location = 4) out vec3 BiTangent;
 
-void main() {
-    gl_Position = Mesh.proj * Mesh.view * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
-    fragTexCoord = aTexCoords;
+void main() 
+{
+    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0));    
+    TexCoords = aTexCoords;
+    Normal = aNormal;
+	Tangent = aTangent.rgb;
+	BiTangent = aBitangent.rgb;
+
+    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
+
 }
