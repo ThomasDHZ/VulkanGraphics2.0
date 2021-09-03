@@ -42,6 +42,7 @@
 #include "ObjectManager.h"
 #include "AssetManager.h"
 #include "GameObject.h"
+#include "Skybox.h"
 
 class HelloTriangleApplication {
 public:
@@ -103,6 +104,7 @@ private:
         CubeMapFiles[4] = "../texture/skybox/back.jpg";
         CubeMapFiles[5] = "../texture/skybox/front.jpg";
         AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+        AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
     }
 
     void mainLoop() {

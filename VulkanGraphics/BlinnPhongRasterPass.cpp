@@ -1,5 +1,6 @@
 #include "BlinnPhongRasterPass.h"
 #include "GraphicsPipeline.h"
+#include "Skybox.h"
 
 
 BlinnPhongRasterPass::BlinnPhongRasterPass() : BaseRenderPass()
@@ -17,6 +18,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine)
     CreateRenderPass();
     CreateRendererFramebuffers();
     blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass));
+    skyboxPipeline = std::make_shared<SkyBoxFrameBufferRenderingPipeline>(RenderPass);
     SetUpCommandBuffers();
 }
 
@@ -192,6 +194,7 @@ void BlinnPhongRasterPass::RebuildSwapChain()
     DepthTexture->RecreateRendererTexture();
 
     blinnphongPipeline->Destroy();
+    skyboxPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -205,6 +208,7 @@ void BlinnPhongRasterPass::RebuildSwapChain()
     CreateRenderPass();
     CreateRendererFramebuffers();
     blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass);
+    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
 
@@ -236,9 +240,15 @@ void BlinnPhongRasterPass::Draw()
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
+    static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipelineLayout, 0, 1, &blinnphongPipeline->DescriptorSet, 0, nullptr);
     AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], blinnphongPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");

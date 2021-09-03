@@ -34,6 +34,8 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors();
 
 	std::shared_ptr<Mesh> GetMeshIndex(uint32_t MeshID);
+	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);
+
 	uint32_t GetMeshDescriptorCount();
 };
 

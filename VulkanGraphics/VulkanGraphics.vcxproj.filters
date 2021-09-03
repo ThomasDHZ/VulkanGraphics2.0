@@ -303,6 +303,12 @@
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -545,6 +551,12 @@
     <ClInclude Include="DirectionalLight.h">
       <Filter>Header Files\Lights</Filter>
     </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -606,6 +618,12 @@
     </None>
     <None Include="Shaders\animate.comp">
       <Filter>Shader\ComputeShader</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxFrameBufferShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxFrameBufferShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>
 </Project>

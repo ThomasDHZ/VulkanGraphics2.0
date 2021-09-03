@@ -195,6 +195,19 @@ std::shared_ptr<Mesh> MeshManager::GetMeshIndex(uint32_t MeshID)
     return meshptr;
 }
 
+std::vector<std::shared_ptr<Mesh>> MeshManager::GetMeshByType(MeshTypeFlag type)
+{
+    std::vector<std::shared_ptr<Mesh>> ReturnMeshs;
+    for (auto mesh : MeshList)
+    {
+        if (mesh->MeshType == type)
+        {
+            ReturnMeshs.emplace_back(mesh);
+        }
+    }
+    return ReturnMeshs;
+}
+
 uint32_t MeshManager::GetMeshDescriptorCount()
 {
     if (MeshList.size() > 0)

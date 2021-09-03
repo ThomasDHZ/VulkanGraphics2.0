@@ -210,6 +210,8 @@
     <ClCompile Include="RenderedGTBNTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="RendererManager.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Texture2D.cpp" />
@@ -291,6 +293,8 @@
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="RendererManager.h" />
     <ClInclude Include="SceneData.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Texture2D.h" />
@@ -324,6 +328,8 @@
     <None Include="Shaders\RTVertexBuilder.glsl" />
     <None Include="Shaders\RTXRandom.glsl" />
     <None Include="Shaders\shadow.rmiss" />
+    <None Include="Shaders\SkyBoxFrameBufferShader.frag" />
+    <None Include="Shaders\SkyBoxFrameBufferShader.vert" />
     <None Include="Shaders\vert.vert" />
     <None Include="Shaders\Vertex.glsl" />
   </ItemGroup>
