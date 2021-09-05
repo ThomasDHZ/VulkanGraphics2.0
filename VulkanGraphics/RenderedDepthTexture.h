@@ -4,14 +4,17 @@
 class RenderedDepthTexture : public Texture
 {
 private:
-    void CreateTextureImage(VulkanEngine& engine);
-    void CreateTextureView(VulkanEngine& engine);
-    void CreateTextureSampler(VulkanEngine& engine);
+    void CreateTextureImage();
+    void CreateTextureView();
+    void CreateTextureSampler();
 public:
     RenderedDepthTexture();
-    RenderedDepthTexture(VulkanEngine& engine);
+    RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine);
+    RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount);
+    RenderedDepthTexture(glm::ivec2& TextureResolution);
+    RenderedDepthTexture(int width, int Height);
     ~RenderedDepthTexture();
 
-    void RecreateRendererTexture(VulkanEngine& engine);
+    void RecreateRendererTexture();
 };
 

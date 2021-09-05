@@ -14,7 +14,7 @@ Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
     //   0,1
     //};
 
-    textureManager = TextureManager(engine);
+    textureManager = TextureManager(EnginePtr::GetEnginePtr());
     modelRenderManager = ModelRenderManager(engine);
 //    modelRenderManager.AddModel(engine, textureManager, "../Models/vulkanscene_shadowWhole.obj");
     modelRenderManager.AddModel(engine, textureManager, "../Models/suzanne.obj");
@@ -27,7 +27,7 @@ Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
     CubeMapFiles[4] = "../texture/skybox/back.jpg";
     CubeMapFiles[5] = "../texture/skybox/front.jpg";
 
-    textureManager.LoadCubeMap(engine, CubeMapFiles);
+   // textureManager.LoadCubeMap(CubeMapFiles);
 
     SceneData = std::make_shared<SceneDataStruct>(SceneDataStruct(engine));
 
@@ -107,7 +107,7 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
     VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->SceneDataBuffer.Buffer, SceneData->SceneDataBuffer.BufferSize);
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor(textureManager);
-    VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(textureManager.GetCubeMapTexture()));
+//    VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(Texture(textureManager.GetCubeMapTexture()));
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(AddAccelerationBuffer(engine, 0, AccelerationDescriptorStructure));
@@ -118,7 +118,7 @@ void Renderer::SetUpDescriptorSets(VulkanEngine& engine)
     DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, TransformBufferList));
     DescriptorList.emplace_back(AddStorageBuffer(engine, 6, descriptorSets, MaterialBufferList));
     DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 7, descriptorSets, TextureBufferInfo));
-    DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 10, descriptorSets, CubeMapImage));
+ //   DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 10, descriptorSets, CubeMapImage));
 
     vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -376,7 +376,7 @@ void Renderer::Destroy(VulkanEngine& engine)
         model.Destory(engine);
     }
 
-    textureManager.Destory(engine);
+    textureManager.Destory();
     interfaceRenderPass.Destroy(engine.Device);
     RenderPass.Destroy(engine);
     SceneData->Destroy(engine);
@@ -418,7 +418,7 @@ VkDescriptorPoolSize Renderer::AddDsecriptorPoolBinding(VulkanEngine& engine, Vk
 std::vector<VkDescriptorImageInfo> Renderer::AddTextureDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout)
 {
     std::vector<VkDescriptorImageInfo> DescriptorImageList;
-    for (auto texture : textureManager.GetTextureList())
+    for (auto texture : textureManager.TextureList)
     {
         VkDescriptorImageInfo DescriptorImage{};
         DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

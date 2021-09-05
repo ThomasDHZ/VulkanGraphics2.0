@@ -183,6 +183,18 @@ class EnginePtr
 private:
 	static std::shared_ptr<VulkanEngine> enginePtr;
 public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
+	{
+		if (enginePtr == nullptr)
+		{
+			enginePtr = engine;
+		}
+		else
+		{
+			std::cout << "Engine has already been initialized." << std::endl;
+		}
+	}
+
 	static void SetUpPtr(std::shared_ptr<VulkanWindow> window)
 	{
 		if (enginePtr == nullptr)

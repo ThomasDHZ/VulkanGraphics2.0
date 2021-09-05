@@ -6,7 +6,7 @@ MainRenderPass::MainRenderPass()
 
 MainRenderPass::MainRenderPass(VulkanEngine& engine)
 {
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -107,7 +107,7 @@ void MainRenderPass::StartPipeline(VulkanEngine& engine, VkDescriptorSetLayout& 
 
 void MainRenderPass::UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout& DescriptorLayout)
 {
-    DepthTexture->RecreateRendererTexture(engine);
+    DepthTexture->RecreateRendererTexture();
 
     forwardRendereringPipeline->UpdateGraphicsPipeLine(engine, RenderPass, DescriptorLayout);
 
@@ -126,7 +126,7 @@ void MainRenderPass::UpdateSwapChain(VulkanEngine& engine, VkDescriptorSetLayout
 
 void MainRenderPass::Destroy(VulkanEngine& engine)
 {
-    DepthTexture->Delete(engine);
+    DepthTexture->Delete();
 
     forwardRendereringPipeline->Destroy(engine);
 

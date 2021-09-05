@@ -112,7 +112,7 @@ std::vector<VkDescriptorBufferInfo> ModelRenderManager::GetTransformBufferListDe
 std::vector<VkDescriptorImageInfo> ModelRenderManager::GetTextureBufferListDescriptor(TextureManager& textureManager)
 {
     std::vector<VkDescriptorImageInfo> DescriptorImageList;
-    for (auto texture : textureManager.GetTextureList())
+    for (auto texture : textureManager.TextureList)
     {
         VkDescriptorImageInfo DescriptorImage{};
         DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -177,5 +177,5 @@ uint32_t ModelRenderManager::GetMaterialBufferListDescriptorCount()
 
 uint32_t ModelRenderManager::GetTextureBufferListDescriptorCount(TextureManager& textureManager)
 {
-    return textureManager.GetTextureList().size();
+    return textureManager.TextureList.size();
 }

@@ -5,39 +5,63 @@ RenderedDepthTexture::RenderedDepthTexture() : Texture()
 {
 }
 
-RenderedDepthTexture::RenderedDepthTexture(VulkanEngine& renderer) : Texture(renderer, TextureType::vkRenderedTexture)
+RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedTexture)
 {
-    CreateTextureImage(renderer);
-    CreateTextureView(renderer);
-    CreateTextureSampler(renderer);
-    // ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
+  // ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount) : Texture(TextureType::vkRenderedTexture)
+{
+    Width = engine->SwapChain.GetSwapChainResolution().width;
+    Height = engine->SwapChain.GetSwapChainResolution().height;
+
+    SampleCount = sampleCount;
+
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
+ //   ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
+{
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedDepthTexture::~RenderedDepthTexture()
 {
 }
 
-void RenderedDepthTexture::CreateTextureImage(VulkanEngine& renderer)
+void RenderedDepthTexture::CreateTextureImage()
 {
     VkImageCreateInfo TextureInfo{};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
-    TextureInfo.extent.width = renderer.SwapChain.GetSwapChainResolution().width;
-    TextureInfo.extent.height = renderer.SwapChain.GetSwapChainResolution().height;
+    TextureInfo.extent.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    TextureInfo.extent.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
     TextureInfo.format = VK_FORMAT_D32_SFLOAT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    TextureInfo.initialLayout = ImageLayout;
     TextureInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    TextureInfo.samples = SampleCount;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    Texture::CreateTextureImage(renderer, TextureInfo);
+    Texture::CreateTextureImage(TextureInfo);
 }
 
-void RenderedDepthTexture::CreateTextureView(VulkanEngine& engine)
+void RenderedDepthTexture::CreateTextureView()
 {
     VkImageViewCreateInfo TextureImageViewInfo{};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -50,12 +74,12 @@ void RenderedDepthTexture::CreateTextureView(VulkanEngine& engine)
     TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
     TextureImageViewInfo.subresourceRange.layerCount = 1;
 
-    if (vkCreateImageView(engine.Device, &TextureImageViewInfo, nullptr, &View)) {
+    if (vkCreateImageView(VulkanPtr::GetDevice(), &TextureImageViewInfo, nullptr, &View)) {
         throw std::runtime_error("Failed to create Image View.");
     }
 }
 
-void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& engine)
+void RenderedDepthTexture::CreateTextureSampler()
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -71,17 +95,20 @@ void RenderedDepthTexture::CreateTextureSampler(VulkanEngine& engine)
     TextureImageSamplerInfo.maxLod = 1.0f;
     TextureImageSamplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    if (vkCreateSampler(engine.Device, &TextureImageSamplerInfo, nullptr, &Sampler))
+    if (vkCreateSampler(VulkanPtr::GetDevice(), &TextureImageSamplerInfo, nullptr, &Sampler))
     {
         throw std::runtime_error("Failed to create Sampler.");
     }
 }
 
-void RenderedDepthTexture::RecreateRendererTexture(VulkanEngine& engine)
+void RenderedDepthTexture::RecreateRendererTexture()
 {
-    Texture::Delete(engine);
-    CreateTextureImage(engine);
-    CreateTextureView(engine);
-    CreateTextureSampler(engine);
+    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+
+    Texture::Delete();
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }

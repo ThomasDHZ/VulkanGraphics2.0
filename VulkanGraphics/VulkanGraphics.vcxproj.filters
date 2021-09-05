@@ -39,9 +39,6 @@
     <ClCompile Include="ImGui\imgui_impl_glfw.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AccelerationStructure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +46,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CubeMapTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FontTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ForwardRenderingPipeline.cpp">
@@ -99,10 +102,28 @@
     <ClCompile Include="RenderedColorTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderedCubeMapTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="RenderedDepthTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferNormalTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferPositionTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGTBNTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="RenderedRayTracedColorTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SceneRenderingPipeline.cpp">
@@ -114,10 +135,13 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
+    <ClCompile Include="Texture2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Texuture2D.cpp">
+    <ClCompile Include="Texture3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VulkanBuffer.cpp">
@@ -129,13 +153,13 @@
     <ClCompile Include="VulkanEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="VulkanSwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VulkanWindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanPtr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -244,6 +268,9 @@
     <ClInclude Include="Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="AccelerationStructure.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -251,6 +278,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="CubeMapTexture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FontTexture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="ForwardRenderingPipeline.h">
@@ -292,13 +325,31 @@
     <ClInclude Include="PerspectiveCamera.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Pixel.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="RayTraceRenderer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderedColorTexture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="RenderedCubeMapTexture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="RenderedDepthTexture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferAlbedoTexture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferNormalTexture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferPositionTexture.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGTBNTexture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RenderedRayTracedColorTexture.h">
@@ -316,10 +367,13 @@
     <ClInclude Include="Texture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextureManager.h">
+    <ClInclude Include="Texture2D.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Texuture2D.h">
+    <ClInclude Include="Texture3D.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
@@ -342,9 +396,6 @@
     </ClInclude>
     <ClInclude Include="VulkanWindow.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanPtr.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

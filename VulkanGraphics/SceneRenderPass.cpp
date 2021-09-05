@@ -10,9 +10,9 @@ SceneRenderPass::SceneRenderPass()
 
 SceneRenderPass::SceneRenderPass(VulkanEngine& engine, VkDescriptorSetLayout& descriptorSetLayout)
 {
-    ColorTexture = std::make_shared<RenderedColorTexture>(engine);
-    BloomTexture = std::make_shared<RenderedColorTexture>(engine);
-    DepthTexture = std::make_shared<RenderedDepthTexture>(engine);
+    ColorTexture = std::make_shared<RenderedColorTexture>();
+    BloomTexture = std::make_shared<RenderedColorTexture>();
+    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass(engine);
     CreateRendererFramebuffers(engine);
@@ -133,9 +133,9 @@ void SceneRenderPass::FrameDebug()
 
 void SceneRenderPass::Destroy(VulkanEngine& engine)
 {
-    ColorTexture->Delete(engine);
-    BloomTexture->Delete(engine);
-    DepthTexture->Delete(engine);
+    ColorTexture->Delete();
+    BloomTexture->Delete();
+    DepthTexture->Delete();
 
     sceneRenderingPipeline->Destroy(engine);
 

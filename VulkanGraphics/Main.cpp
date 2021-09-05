@@ -50,6 +50,8 @@ private:
     {
         window = std::make_shared<VulkanWindow>(VulkanWindow(WIDTH, HEIGHT, "VulkanEngine"));
         engine = VulkanEngine(window);
+        EnginePtr::SetUpPtr(std::make_shared<VulkanEngine>(engine));
+
         renderer = Renderer(engine, window);
 
         //renderer.AddModel(engine, window, textureManager, "");

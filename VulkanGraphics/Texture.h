@@ -1,12 +1,17 @@
 #pragma once
 #include <vulkan/vulkan.h>
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
+#include "DDSTextureLoader.h"
+#include "Pixel.h"
 
 enum TextureType
 {
     vkTexture2D,
+    vkTexture3D,
     vkTextureCube,
-    vkRenderedTexture
+    vkHeightMap,
+    vkRenderedTexture,
+    vkRenderedCubeMap
 };
 
 class Texture
@@ -14,18 +19,19 @@ class Texture
 private:
 
 protected:
+    void TransitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
+    void CopyBufferToImage(VkBuffer buffer);
+    void GenerateMipmaps(VkFormat imageFormat);
+    void UpdateImageLayout(VkCommandBuffer buffer, VkImageLayout newImageLayout);
 
-
-    void KTXTransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void KTXCopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
-    void TransitionImageLayout(VulkanEngine& engine, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void CopyBufferToImage(VulkanEngine& engine, VkBuffer buffer);
-
-    virtual void LoadKTXTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
-    virtual void LoadTexture(VulkanEngine& engine, std::string TextureLocation, VkFormat format);
-    //virtual void CreateTexture(VulkanEngine& engine, std::vector<Pixel>& Pixels, VkFormat format);
-    virtual void CreateTextureImage(VulkanEngine& engine, VkImageCreateInfo TextureInfo);
-    void UpdateColorFormat(VulkanEngine& engine, VkCommandBuffer buffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    virtual void LoadKTXTexture(std::string TextureLocation, VkFormat format);
+    virtual void LoadDDSTexture(std::string TextureLocation, VkFormat format);
+    virtual void LoadTexture(std::string TextureLocation, VkFormat format);
+    virtual void CreateTexture(std::vector<Pixel>& Pixels, VkFormat format);
+    virtual void CreateTexture(std::vector<glm::vec4>& Pixels, VkFormat format);
+    virtual void CreateTexture3D(std::vector<Pixel>& Pixels, VkFormat format);
+    virtual void CreateTextureImage(VkImageCreateInfo TextureInfo);
+   
 public:
     VkImage Image = VK_NULL_HANDLE;
     VkImageView View = VK_NULL_HANDLE;
@@ -34,22 +40,40 @@ public:
     VkFormat TextureFormat;
     VkDescriptorSet ImGuiDescriptorSet = VK_NULL_HANDLE;
 
-    unsigned int TextureID = 0;
+    uint32_t TextureID = 0;
+    uint32_t TextureBufferIndex = 0;
     std::string FileName;
     TextureType TypeOfTexture;
+    VkImageLayout ImageLayout;
+    VkSampleCountFlagBits SampleCount = VK_SAMPLE_COUNT_1_BIT;
+    uint32_t MipMapLevels = 1;
 
     int Width;
     int Height;
+    int Depth;
 
     Texture();
-    Texture(VulkanEngine& engine, std::string TextureLocation, unsigned int textureID, VkFormat format, TextureType textureType);
-    Texture(VulkanEngine& engine, std::string TextureLocation, VkFormat format, TextureType textureType);
-    Texture(VulkanEngine& engine, unsigned int textureID, TextureType textureType);
-    //Texture(VulkanEngine& engine, unsigned int width, unsigned int height, std::vector<Pixel>& PixelList, TextureType textureType, VkFormat format);
-    Texture(VulkanEngine& engine, TextureType textureType);
+    Texture(TextureType textureType);
+
+    Texture(glm::ivec2& TextureResolution, TextureType textureType);
+    Texture(glm::ivec2& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
+    Texture(glm::ivec2& TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format, TextureType textureType);
+
+    Texture(glm::ivec3& TextureResolution, TextureType textureType);
+    Texture(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format, TextureType textureType);
+
+    Texture(std::string TextureLocation, VkFormat format, TextureType textureType);
+
     ~Texture();
 
-    virtual void Delete(VulkanEngine& engine);
+    void UpdateImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int facecount);
+    void UpdateImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void CopyTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
+    void CopyTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture, int FaceCopy);
+    virtual void Delete();
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }
 };

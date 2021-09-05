@@ -1,17 +1,17 @@
 #pragma once
-#include "Texture.h"
+#include "Texture2D.h"
 
-class RenderedRayTracedColorTexture : public Texture
+class RenderedRayTracedColorTexture : public Texture2D
 {
 private:
-    void CreateTextureImage(VulkanEngine& renderer);
-    void CreateTextureView(VulkanEngine& renderer);
-    void CreateTextureSampler(VulkanEngine& renderer);
-    void SendTextureToGPU(VulkanEngine& renderer);
+    void CreateTextureImage();
+    void CreateTextureView();
+    void CreateTextureSampler();
+    void SendTextureToGPU();
 public:
     RenderedRayTracedColorTexture();
-    RenderedRayTracedColorTexture(VulkanEngine& renderer);
+    RenderedRayTracedColorTexture(std::shared_ptr<VulkanEngine> engine);
     ~RenderedRayTracedColorTexture();
 
-    void RecreateRendererTexture(VulkanEngine& renderer);
+    void RecreateRendererTexture();
 };

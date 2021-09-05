@@ -1,48 +1,58 @@
-#include "RenderedRayTracedColorTexture.h"
+#include "RenderedGBufferNormalTexture.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
-RenderedRayTracedColorTexture::RenderedRayTracedColorTexture() : Texture2D()
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture() : Texture()
 {
 }
 
-RenderedRayTracedColorTexture::RenderedRayTracedColorTexture(std::shared_ptr<VulkanEngine> engine) : Texture2D(engine, TextureType::vkRenderedTexture)
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedTexture)
+{
+    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+RenderedGBufferNormalTexture::RenderedGBufferNormalTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();
-    SendTextureToGPU();
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedRayTracedColorTexture::~RenderedRayTracedColorTexture()
+RenderedGBufferNormalTexture::~RenderedGBufferNormalTexture()
 {
 }
 
-void RenderedRayTracedColorTexture::CreateTextureImage()
+void RenderedGBufferNormalTexture::CreateTextureImage()
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     TextureInfo.imageType = VK_IMAGE_TYPE_2D;
-    TextureInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
+    TextureInfo.format = VK_FORMAT_R16G16B16A16_SFLOAT;
     TextureInfo.extent.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
     TextureInfo.extent.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
     TextureInfo.extent.depth = 1;
     TextureInfo.mipLevels = 1;
     TextureInfo.arrayLayers = 1;
-    TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    TextureInfo.initialLayout = ImageLayout;
     TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    TextureInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
     Texture::CreateTextureImage(TextureInfo);
 }
 
-void RenderedRayTracedColorTexture::CreateTextureView()
+void RenderedGBufferNormalTexture::CreateTextureView()
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    TextureImageViewInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
+    TextureImageViewInfo.format = VK_FORMAT_R16G16B16A16_SFLOAT;
     TextureImageViewInfo.subresourceRange = {};
     TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
@@ -56,7 +66,7 @@ void RenderedRayTracedColorTexture::CreateTextureView()
     }
 }
 
-void RenderedRayTracedColorTexture::CreateTextureSampler()
+void RenderedGBufferNormalTexture::CreateTextureSampler()
 {
     VkSamplerCreateInfo TextureImageSamplerInfo = {};
     TextureImageSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -78,50 +88,14 @@ void RenderedRayTracedColorTexture::CreateTextureSampler()
     }
 }
 
-void RenderedRayTracedColorTexture::SendTextureToGPU()
+void RenderedGBufferNormalTexture::RecreateRendererTexture()
 {
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = VulkanPtr::GetCommandPool();
-    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    commandBufferAllocateInfo.commandBufferCount = 1;
-    VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &commandBufferAllocateInfo, &cmdBuffer);
+    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
+    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
 
-    VkCommandBufferBeginInfo cmdBufferBeginInfo{};
-    cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-    vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    UpdateImageLayout(cmdBuffer, VK_IMAGE_LAYOUT_GENERAL);
-    vkEndCommandBuffer(cmdBuffer);
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &cmdBuffer;
-
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, INT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-
-    vkFreeCommandBuffers(VulkanPtr::GetDevice(), VulkanPtr::GetCommandPool(), 1, &cmdBuffer);
-
-    UpdateImageLayout(VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-void RenderedRayTracedColorTexture::RecreateRendererTexture()
-{
     Texture::Delete();
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();
-    UpdateImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
