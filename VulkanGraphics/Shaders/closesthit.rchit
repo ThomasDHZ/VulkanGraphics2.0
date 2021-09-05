@@ -1,202 +1,121 @@
+
+
 #version 460
 #extension GL_EXT_ray_tracing : require
 #extension GL_EXT_nonuniform_qualifier : enable
-#extension GL_EXT_scalar_block_layout : enable
-#extension GL_EXT_debug_printf : enable
 
-#include "Vertex.glsl"
-#include "Lighting.glsl"
-#include "Material.glsl"
-
-layout(push_constant) uniform RayTraceConstants
-{
-    mat4 proj;
-    mat4 view;
-    vec3 CameraPos;
-    uint frame;
-    int AntiAliasingCount;
-    int MaxRefeflectCount;
-    int  ApplyAntiAliasing;
-} ConstMesh;
-
-struct RayPayload {
-	vec3 color;
-	float seed;
-	vec3 normal;
-    int reflectCount;
-};
-
-layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
-layout(location = 1) rayPayloadEXT bool shadowed;
-hitAttributeEXT vec2 attribs;
+layout(location = 0) rayPayloadInEXT vec3 hitValue;
+layout(location = 2) rayPayloadEXT bool shadowed;
+hitAttributeEXT vec3 attribs;
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 2) uniform UBO 
+layout(binding = 2, set = 0) uniform UBO 
 {
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
-layout(binding = 3) buffer MeshProperties 
+	mat4 viewInverse;
+	mat4 projInverse;
+	mat4 modelInverse;
+	vec4 lightPos;
+	vec4 viewPos;
+	int vertexSize;
+} ubo;
+layout(binding = 3, set = 0) buffer Vertices { vec4 v[]; } vertices[];
+layout(binding = 4, set = 0) buffer Indices { uint i[]; } indices[];
+layout(binding = 5, set = 0) uniform sampler2D DiffuseMap;
+layout(binding = 6, set = 0) uniform sampler2D NormalMap;
+
+struct Vertex
 {
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
+  vec3 pos;
+  vec3 normal;
+  vec2 uv;
+  vec4 tangent;
+  vec4 BiTangant;
+  vec4 Color;
+  vec4 BoneID;
+  vec4 BoneWeights;
+ };
 
-layout(binding = 4) buffer DirectionalLight2
-{ 
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-} DLight[];
+Vertex unpack(uint index)
+{
+	// Unpack the vertices from the SSBO using the glTF vertex structure
+	// The multiplier is the size of the vertex divided by four float components (=16 bytes)
+	const int m = ubo.vertexSize / 16;
 
-layout(binding = 5) buffer PointLight2
-{ 
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float constant;
-    float linear;
-    float quadratic;
-} PLight[];
+	vec4 d0 = vertices[2].v[m * index + 0];
+	vec4 d1 = vertices[2].v[m * index + 1];
+	vec4 d2 = vertices[2].v[m * index + 2];
 
-layout(binding = 6) buffer SpotLight2
-{ 
-   vec3 position;
-   vec3 direction;
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
+	Vertex v;
+	v.pos = d0.xyz;
+	v.normal = vec3(d0.w, d1.x, d1.y);
+	v.Color = vec4(d2.x, d2.y, d2.z, 1.0);
+	v.uv = vec2(d0.x, d0.y);
+	v.tangent = vec4(d0.w, d1.y, d1.y, 0.0f);
 
-   float cutOff;
-   float outerCutOff;
-   float constant;
-   float linear;
-   float quadratic;
-} SLight[];
-
-layout(binding = 7, scalar) buffer Vertices { Vertex v[]; } vertices[];
-layout(binding = 8) buffer Indices { uint i[]; } indices[];
-layout(binding = 9) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
-layout(binding = 11) uniform sampler2D TextureMap[];
-layout(binding = 12) uniform sampler3D Texture3DMap[];
-
-Vertex vertex;
-MaterialInfo material;
-mat3 TBN;
-
-#include "RTVertexBuilder.glsl"
-#include "MaterialBuilder.glsl"
-#include "BlinePhongLighting.glsl"
-vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
-vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir);
+	return v;
+}
 
 void main()
 {
-   vertex = BuildVertexInfo();
-   material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-   	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.x == 1.0f)
-	{
-		vertex.uv.x = 1.0f - vertex.uv.x;
-	}
-	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
-	{
-		vertex.uv.y = 1.0f - vertex.uv.y;
-	}
+	ivec3 index = ivec3(indices[2].i[3 * gl_PrimitiveID], 
+						indices[2].i[3 * gl_PrimitiveID + 1], 
+						indices[2].i[3 * gl_PrimitiveID + 2]);
 
-   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-   TBN = transpose(mat3(T, B, N));
+	Vertex v0 = unpack(index.x);
+	Vertex v1 = unpack(index.y);
+	Vertex v2 = unpack(index.z);
 
-    vec3 result = vec3(0.0f);
-    vec3 baseColor = vec3(0.0f);
-    vec3 normal = vertex.normal;
-    vec3 ViewPos  = ConstMesh.CameraPos;
-    vec3 FragPos2  = vertex.pos;
+	const vec3 barycentricCoords = vec3(1.0f - attribs.x - attribs.y, attribs.x, attribs.y);
+	vec3 worldPos = v0.pos * barycentricCoords.x + v1.pos * barycentricCoords.y + v2.pos * barycentricCoords.z;
+	vec3 normal2 = normalize(v0.normal * barycentricCoords.x + v1.normal * barycentricCoords.y + v2.normal * barycentricCoords.z);
+	vec2 texCoord = v0.uv * barycentricCoords.x + v1.uv * barycentricCoords.y + v2.uv * barycentricCoords.z;
+	vec3 tangent = v0.tangent.xyz * barycentricCoords.x + v1.tangent.xyz * barycentricCoords.y + v2.tangent.xyz * barycentricCoords.z;
 
-   for(int x = 0; x < scenedata.DirectionalLightCount; x++)
-   {
-        result += CalcNormalDirLight(FragPos2, normal, vertex.uv, x);
-   }
-   for(int x = 0; x < scenedata.PointLightCount; x++)
-   {
-        result += CalcNormalPointLight(FragPos2, normal, vertex.uv, x);   
-   }
-
-    rayHitInfo.color = result;
-	//rayHitInfo.distance = 10000.0f;
-	rayHitInfo.normal = vertex.normal;
-}
-
-vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
-{
-     if(scenedata.Shadowed == 1)
-     {
-        float tmin = 0.001;
-	    float tmax = LightDistance;
-	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	    shadowed = true;  
-	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
-	    if (shadowed) 
-        {
-            LightResult *= 0.3f;
-	    }
-        else
-        {
-           LightResult += LightSpecular;
-        }
-    }
-    else
-    {
-           LightResult += LightSpecular;
-    }
-    return LightResult;
-}
-
-vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir)
-{ 
-    const float heightScale = meshProperties[gl_InstanceCustomIndexEXT].heightScale;
-    const float minLayers = meshProperties[gl_InstanceCustomIndexEXT].minLayers;
-    const float maxLayers = meshProperties[gl_InstanceCustomIndexEXT].maxLayers;
-
-    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
-    float layerDepth = 1.0 / numLayers;
-    float currentLayerDepth = 0.0;
-
-    viewDir.y = -viewDir.y; 
-    vec2 P = viewDir.xy / viewDir.z * heightScale; 
-    vec2 deltaTexCoords = P / numLayers;
-  
-    vec2  currentTexCoords     = texCoords;
-    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
-      
-    while(currentLayerDepth < currentDepthMapValue)
-    {
-        currentTexCoords -= deltaTexCoords;
-        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;  
-        currentLayerDepth += layerDepth;  
-    }
+	mat3 normalMatrix = transpose(inverse(mat3(ubo.modelInverse)));
+    vec3 T = normalize(normalMatrix * tangent);
+    vec3 N = normalize(normalMatrix * normal2);
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = cross(N, T);
     
-    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+    mat3 TBN = transpose(mat3(T, B, N));    
+    vec3 TangentLightPos = TBN * ubo.lightPos.xyz;
+    vec3 TangentViewPos  = TBN * ubo.viewPos.xyz;
+    vec3 TangentFragPos  = TBN * worldPos;
 
-    float afterDepth  = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
- 
-    float weight = afterDepth / (afterDepth - beforeDepth);
-    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+	vec3 normal = texture(NormalMap, texCoord).rgb;
+	normal = normalize(normal * 2.0 - 1.0);  
+  
 
-    return finalTexCoords;
+	vec3 color = texture(DiffuseMap, texCoord).rgb;
+	vec3 ambient = 0.1 * color;
+
+	vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
+    float diff = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = diff * color;
+
+	//vec3 lightVector = normalize(ubo.lightPos.xyz);
+	//float dot_product = max(dot(lightVector, normal), 0.2);
+	hitValue = ambient + diffuse;
+
+	// Shadow casting
+	float tmin = 0.001;
+	float tmax = 10000.0;
+	vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	shadowed = true;  
+	// Trace shadow ray and offset indices to match shadow hit/miss shader group indices
+	traceRayEXT(topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT | gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, lightDir, tmax, 2);
+	if (shadowed) {
+		hitValue *= 0.3;
+	}
+	else
+	{
+		vec3 viewDir = normalize(TangentLightPos - TangentFragPos);
+		vec3 reflectDir = reflect(-lightDir, normal);
+		vec3 halfwayDir = normalize(lightDir + viewDir);  
+		float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
+
+		vec3 specular = vec3(0.2) * spec;
+
+		hitValue += specular;
+	}
 }
