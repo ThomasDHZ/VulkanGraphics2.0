@@ -43,16 +43,16 @@ struct SceneDataStruct
 
 	SceneDataStruct(VulkanEngine& engine)
 	{
-		SceneDataBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(SceneDataBufferData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		SceneDataBuffer.CreateBuffer(sizeof(SceneDataBufferData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 	}
 
 	void Update(VulkanEngine& engine)
 	{
-		SceneDataBuffer.CopyBufferToMemory(engine.Device, &SceneData, sizeof(SceneDataBufferData));
+		SceneDataBuffer.CopyBufferToMemory(&SceneData, sizeof(SceneDataBufferData));
 	}
 
 	void Destroy(VulkanEngine& engine)
 	{
-		SceneDataBuffer.DestoryBuffer(engine.Device);
+		SceneDataBuffer.DestoryBuffer();
 	}
 };

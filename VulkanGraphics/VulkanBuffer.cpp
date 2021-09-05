@@ -1,10 +1,10 @@
 #include "VulkanBuffer.h"
 #include <stdexcept>
 
-uint32_t VulkanBuffer::GetMemoryType(VkPhysicalDevice& physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+uint32_t VulkanBuffer::GetMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+	vkGetPhysicalDeviceMemoryProperties(VulkanPtr::GetPhysicalDevice(), &memProperties);
 
 	for (uint32_t x = 0; x < memProperties.memoryTypeCount; x++)
 	{
@@ -20,16 +20,16 @@ VulkanBuffer::VulkanBuffer()
 {
 }
 
-VulkanBuffer::VulkanBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
+VulkanBuffer::VulkanBuffer(VkDeviceSize BufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
 {
-	CreateBuffer(device, physicalDevice, BufferSize, usage, properties, BufferData);
+	CreateBuffer(BufferSize, usage, properties, BufferData);
 }
 
 VulkanBuffer::~VulkanBuffer()
 {
 }
 
-VkResult VulkanBuffer::CreateBuffer(VkDevice& device, VkPhysicalDevice& physicalDevice, VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
+VkResult VulkanBuffer::CreateBuffer(VkDeviceSize bufferSize, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, void* BufferData)
 {
 	BufferSize = bufferSize;
 
@@ -38,76 +38,83 @@ VkResult VulkanBuffer::CreateBuffer(VkDevice& device, VkPhysicalDevice& physical
 	buffer.size = BufferSize;
 	buffer.usage = usage;
 	buffer.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	if (vkCreateBuffer(device, &buffer, nullptr, &Buffer) != VK_SUCCESS)
+	if (vkCreateBuffer(VulkanPtr::GetDevice(), &buffer, nullptr, &Buffer) != VK_SUCCESS)
 	{
 		throw std::runtime_error("Failed to create buffer!");
 	}
 
 	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(device, Buffer, &memRequirements);
+	vkGetBufferMemoryRequirements(VulkanPtr::GetDevice(), Buffer, &memRequirements);
+
+	VkMemoryAllocateFlagsInfoKHR ExtendedAllocFlagsInfo{};
+	ExtendedAllocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
+	ExtendedAllocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
 
 	VkMemoryAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = GetMemoryType(physicalDevice, memRequirements.memoryTypeBits, properties);
-	if (usage & VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT)
-	{
-		VkMemoryAllocateFlagsInfoKHR ExtendedAllocFlagsInfo{};
-		ExtendedAllocFlagsInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHR;
-		ExtendedAllocFlagsInfo.flags = VK_MEMORY_ALLOCATE_DEVICE_ADDRESS_BIT_KHR;
-		allocInfo.pNext = &ExtendedAllocFlagsInfo;
-	}
-	if (vkAllocateMemory(device, &allocInfo, nullptr, &BufferMemory) != VK_SUCCESS) {
+	allocInfo.memoryTypeIndex = GetMemoryType(memRequirements.memoryTypeBits, properties);
+	allocInfo.pNext = &ExtendedAllocFlagsInfo;
+
+	if (vkAllocateMemory(VulkanPtr::GetDevice(), &allocInfo, nullptr, &BufferMemory) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to allocate buffer memory!");
 	}
 
 	if (BufferData != nullptr)
 	{
-		CopyBufferToMemory(device, BufferData, bufferSize);
+		CopyBufferToMemory(BufferData, bufferSize);
 	}
 
-	return vkBindBufferMemory(device, Buffer, BufferMemory, 0);
+	return vkBindBufferMemory(VulkanPtr::GetDevice(), Buffer, BufferMemory, 0);
 }
 
-void VulkanBuffer::CopyBuffer(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+void VulkanBuffer::CopyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
 {
-	VkCommandBuffer commandBuffer = BeginSingleTimeCommand(device, renderCommandPool);
+	VkCommandBuffer commandBuffer = BeginSingleTimeCommand();
 
 	VkBufferCopy copyRegion = {};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	EndSingleTimeCommand(device, GraphicsQueue, renderCommandPool, commandBuffer);
+	EndSingleTimeCommand(commandBuffer);
 }
 
-void VulkanBuffer::CopyBufferToMemory(VkDevice& device, void* DataToCopy, VkDeviceSize BufferSize)
+void VulkanBuffer::CopyBufferToMemory(void* DataToCopy, VkDeviceSize BufferSize)
 {
 	void* data;
-	vkMapMemory(device, BufferMemory, 0, BufferSize, 0, &data);
+	vkMapMemory(VulkanPtr::GetDevice(), BufferMemory, 0, BufferSize, 0, &data);
 	memcpy(data, DataToCopy, (size_t)BufferSize);
-	vkUnmapMemory(device, BufferMemory);
+	vkUnmapMemory(VulkanPtr::GetDevice(), BufferMemory);
 }
 
-void VulkanBuffer::DestoryBuffer(VkDevice& device)
+void VulkanBuffer::DestoryBuffer()
 {
-	vkDestroyBuffer(device, Buffer, nullptr);
-	vkFreeMemory(device, BufferMemory, nullptr);
+	if (Buffer != nullptr &&
+		BufferMemory != nullptr)
+	{
+		vkDestroyBuffer(VulkanPtr::GetDevice(), Buffer, nullptr);
+		vkFreeMemory(VulkanPtr::GetDevice(), BufferMemory, nullptr);
 
-	Buffer = VK_NULL_HANDLE;
-	BufferMemory = VK_NULL_HANDLE;
+		Buffer = VK_NULL_HANDLE;
+		BufferMemory = VK_NULL_HANDLE;
+	}
+	else
+	{
+		std::cout << "Buffer already destoryed." << std::endl;
+	}
 }
 
 
-VkCommandBuffer VulkanBuffer::BeginSingleTimeCommand(VkDevice& device, VkCommandPool& renderCommandPool)
+VkCommandBuffer VulkanBuffer::BeginSingleTimeCommand()
 {
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = renderCommandPool;
+	allocInfo.commandPool = VulkanPtr::GetCommandPool();
 	allocInfo.commandBufferCount = 1;
 
 	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+	vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &commandBuffer);
 
 	VkCommandBufferBeginInfo beginInfo = {};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -118,7 +125,7 @@ VkCommandBuffer VulkanBuffer::BeginSingleTimeCommand(VkDevice& device, VkCommand
 	return commandBuffer;
 }
 
-void VulkanBuffer::EndSingleTimeCommand(VkDevice& device, VkQueue& GraphicsQueue, VkCommandPool& renderCommandPool, VkCommandBuffer commandBuffer)
+void VulkanBuffer::EndSingleTimeCommand(VkCommandBuffer commandBuffer)
 {
 	vkEndCommandBuffer(commandBuffer);
 
@@ -127,8 +134,8 @@ void VulkanBuffer::EndSingleTimeCommand(VkDevice& device, VkQueue& GraphicsQueue
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
-	vkQueueSubmit(GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(GraphicsQueue);
+	vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(VulkanPtr::GetGraphicsQueue());
 
-	vkFreeCommandBuffers(device, renderCommandPool, 1, &commandBuffer);
+	vkFreeCommandBuffers(VulkanPtr::GetDevice(), VulkanPtr::GetCommandPool(), 1, &commandBuffer);
 }

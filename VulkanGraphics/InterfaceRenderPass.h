@@ -1,8 +1,9 @@
 #pragma once
-#include "Vulkanengine.h"
+#include <array>
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_vulkan.h"
 #include "ImGui/imgui_impl_glfw.h"
+#include <vector>
 
 static void check_vk_result(VkResult err)
 {
@@ -19,20 +20,21 @@ private:
 	VkDescriptorPool ImGuiDescriptorPool;
 	VkCommandPool ImGuiCommandPool;
 
-	void CreateRenderPass();
-	void CreateRendererFramebuffers();
+	void CreateRenderPass(VkDevice device);
+	void CreateRendererFramebuffers(VkDevice device, std::vector<VkImageView> view, VkExtent2D rect);
 
 public:
 	InterfaceRenderPass();
-	InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine);
+	InterfaceRenderPass(VkDevice device, VkInstance Instance, VkPhysicalDevice PhysicalDevice, VkQueue GraphicsQueue, GLFWwindow* window, std::vector<VkImageView> view, VkExtent2D rect);
 	~InterfaceRenderPass();
 
 	std::vector<VkCommandBuffer> ImGuiCommandBuffers;
 	std::vector<VkFramebuffer> SwapChainFramebuffers;
 
-	void Draw();
-	void RebuildSwapChain();
-	void Destroy();
+	void Draw(VkDevice device, int frame, VkExtent2D rect);
+	void UpdateSwapChain(VkDevice& device, std::vector<VkImageView>& view, VkExtent2D& rect);
+	void Destroy(VkDevice device);
 
 	VkRenderPass GetRenderPass() { return RenderPass; }
 };
+

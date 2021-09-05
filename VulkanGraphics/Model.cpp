@@ -53,9 +53,9 @@ Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::st
 	ModelIndexCount = ModelIndices.size();
 	ModelTriangleCount = static_cast<uint32_t>(ModelIndices.size()) / 3;
 
-	ModelVertexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelVertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelVertices.data());
-	ModelIndexBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, ModelIndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelIndices.data());
-	ModelTransformBuffer.CreateBuffer(engine.Device, engine.PhysicalDevice, sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelTransform);
+	ModelVertexBuffer.CreateBuffer(ModelVertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelVertices.data());
+	ModelIndexBuffer.CreateBuffer(ModelIndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelIndices.data());
+	ModelTransformBuffer.CreateBuffer(sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelTransform);
 
 	ModelVertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelVertexBuffer.Buffer);
 	ModelIndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelIndexBuffer.Buffer);
@@ -119,7 +119,7 @@ void Model::BottomLevelAccelerationStructure(VulkanEngine& engine)
 
 	BottomLevelAccelerationBuffer.CreateAccelerationStructure(engine, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
 
-	VulkanBuffer scratchBuffer = VulkanBuffer(engine.Device, engine.PhysicalDevice, AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	VulkanBuffer scratchBuffer = VulkanBuffer(AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 	scratchBuffer.BufferDeviceAddress = engine.GetBufferDeviceAddress(scratchBuffer.Buffer);
 
 	VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
@@ -135,7 +135,7 @@ void Model::BottomLevelAccelerationStructure(VulkanEngine& engine)
 
 	BottomLevelAccelerationBuffer.AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
 
-	scratchBuffer.DestoryBuffer(engine.Device);
+	scratchBuffer.DestoryBuffer();
 }
 
 void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
@@ -174,14 +174,14 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.Position = glm::vec3{ mesh->mVertices[x].x, mesh->mVertices[x].y, mesh->mVertices[x].z };
 		vertex.Normal = glm::vec3{ mesh->mNormals[x].x, mesh->mNormals[x].y, mesh->mNormals[x].z };
 
-		/*if(mesh->mColors[0])
+		if(mesh->mColors[0])
 		{
 			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
 		}
 		else
 		{
 			vertex.Color = glm::vec4{ 0.6f, 0.6f, 0.6f, 1.0f };
-		}*/
+		}
 		if (mesh->mTangents)
 		{
 			vertex.Tangant = glm::vec4{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z, 0.0f };
@@ -202,8 +202,8 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 			vertex.TexureCoord = glm::vec2{ 0.0f, 0.0f };
 		}
 
-	/*	vertex.BoneID = glm::vec4(0.0f);
-		vertex.BoneWeights = glm::vec4(0.0f);*/
+		vertex.BoneID = glm::vec4(0.0f);
+		vertex.BoneWeights = glm::vec4(0.0f);
 
 		VertexList.emplace_back(vertex);
 		ModelVertices.emplace_back(vertex);
@@ -333,9 +333,9 @@ void Model::Destory(VulkanEngine& engine)
 		mesh.Destory(engine);
 	}
 
-	 ModelIndexBuffer.DestoryBuffer(engine.Device);
-	 ModelVertexBuffer.DestoryBuffer(engine.Device);
-	 ModelTransformBuffer.DestoryBuffer(engine.Device);
+	 ModelIndexBuffer.DestoryBuffer();
+	 ModelVertexBuffer.DestoryBuffer();
+	 ModelTransformBuffer.DestoryBuffer();
 
 	 if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
 	 {
