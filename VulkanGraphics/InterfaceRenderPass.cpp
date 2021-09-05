@@ -1,24 +1,21 @@
 #include "InterfaceRenderPass.h"
 #include <stdexcept>
-#include "../VulkanGraphics/VulkanBufferManager.h"
 
 InterfaceRenderPass::InterfaceRenderPass()
 {
 }
 
-InterfaceRenderPass::InterfaceRenderPass(VkDevice device, VkInstance Instance, VkPhysicalDevice PhysicalDevice, VkQueue GraphicsQueue, GLFWwindow* window, std::vector<VkImageView> view, VkExtent2D rect)
+InterfaceRenderPass::InterfaceRenderPass(std::shared_ptr<VulkanEngine> engine)
 {
-    CreateRenderPass(device);
-    CreateRendererFramebuffers(device, view, rect);
-
-    ImGuiCommandBuffers.resize(3);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
 
     ImGui_ImplVulkan_InitInfo init_info = {};
-    init_info.Instance = Instance;
-    init_info.PhysicalDevice = PhysicalDevice;
-    init_info.Device = device;
+    init_info.Instance = EnginePtr::GetEnginePtr()->Instance;
+    init_info.PhysicalDevice = EnginePtr::GetEnginePtr()->PhysicalDevice;
+    init_info.Device = EnginePtr::GetEnginePtr()->Device;
     init_info.QueueFamily = 0;
-    init_info.Queue = GraphicsQueue;
+    init_info.Queue = EnginePtr::GetEnginePtr()->GraphicsQueue;
     init_info.PipelineCache = VK_NULL_HANDLE;
     init_info.Allocator = nullptr;
     init_info.MinImageCount = 3;
@@ -61,14 +58,19 @@ InterfaceRenderPass::InterfaceRenderPass(VkDevice device, VkInstance Instance, V
         throw std::runtime_error("failed to create descriptor pool!");
     }
 
-    VkCommandBufferAllocateInfo allocInfo2{};
-    allocInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo2.commandPool = ImGuiCommandPool;
-    allocInfo2.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo2.commandBufferCount = (uint32_t)ImGuiCommandBuffers.size();
 
-    if (vkAllocateCommandBuffers(init_info.Device, &allocInfo2, ImGuiCommandBuffers.data()) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate command buffers!");
+    ImGuiCommandBuffers.resize(3);
+    for (size_t i = 0; i < 3; i++)
+    {
+        VkCommandBufferAllocateInfo allocInfo2{};
+        allocInfo2.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo2.commandPool = ImGuiCommandPool;
+        allocInfo2.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo2.commandBufferCount = 1;
+
+        if (vkAllocateCommandBuffers(init_info.Device, &allocInfo2, &ImGuiCommandBuffers[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate command buffers!");
+        }
     }
 
     IMGUI_CHECKVERSION();
@@ -77,30 +79,30 @@ InterfaceRenderPass::InterfaceRenderPass(VkDevice device, VkInstance Instance, V
 
     ImGui::StyleColorsDark();
 
-    ImGui_ImplGlfw_InitForVulkan(window, true);
+    ImGui_ImplGlfw_InitForVulkan(WindowPtr::GetWindowPtr()->GLFWindow, true);
     init_info.DescriptorPool = ImGuiDescriptorPool;
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info, RenderPass);
 
-    VkCommandBuffer command_buffer = VulkanBufferManager::beginSingleTimeCommands(device, ImGuiCommandPool);
+    VkCommandBuffer command_buffer = EnginePtr::GetEnginePtr()->beginSingleTimeCommands(ImGuiCommandPool);
     ImGui_ImplVulkan_CreateFontsTexture(command_buffer);
-    VulkanBufferManager::endSingleTimeCommands(device, command_buffer, GraphicsQueue, ImGuiCommandPool);
+    EnginePtr::GetEnginePtr()->endSingleTimeCommands(command_buffer, ImGuiCommandPool);
 }
 
 InterfaceRenderPass::~InterfaceRenderPass()
 {
 }
 
-void InterfaceRenderPass::CreateRenderPass(VkDevice device)
+void InterfaceRenderPass::CreateRenderPass()
 {
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
+    colorAttachment.format = VK_FORMAT_B8G8R8A8_SRGB;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
     VkAttachmentReference colorAttachmentRef{};
@@ -129,18 +131,18 @@ void InterfaceRenderPass::CreateRenderPass(VkDevice device)
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(EnginePtr::GetEnginePtr()->Device, &renderPassInfo, nullptr, &RenderPass) != VK_SUCCESS) {
         throw std::runtime_error("failed to create render pass!");
     }
 }
 
-void InterfaceRenderPass::CreateRendererFramebuffers(VkDevice device, std::vector<VkImageView> view, VkExtent2D rect)
+void InterfaceRenderPass::CreateRendererFramebuffers()
 {
     SwapChainFramebuffers.resize(3);
 
     for (size_t i = 0; i < 3; i++) {
         std::array<VkImageView, 1> attachments = {
-            view[i]
+            EnginePtr::GetEnginePtr()->GetSwapChainImageViews()[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
@@ -148,32 +150,33 @@ void InterfaceRenderPass::CreateRendererFramebuffers(VkDevice device, std::vecto
         framebufferInfo.renderPass = RenderPass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
-        framebufferInfo.width = rect.width;
-        framebufferInfo.height = rect.height;
+        framebufferInfo.width = EnginePtr::GetEnginePtr()->GetSwapChainResolution().width;
+        framebufferInfo.height = EnginePtr::GetEnginePtr()->GetSwapChainResolution().height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &framebufferInfo, nullptr, &SwapChainFramebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to create framebuffer!");
         }
     }
 }
 
 
-void InterfaceRenderPass::Draw(VkDevice device, int frame, VkExtent2D rect)
+void InterfaceRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 
-    if (vkBeginCommandBuffer(ImGuiCommandBuffers[frame], &beginInfo) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex], &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[frame];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = rect;
+    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->GetSwapChainResolution();
 
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -182,45 +185,44 @@ void InterfaceRenderPass::Draw(VkDevice device, int frame, VkExtent2D rect)
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    vkCmdBeginRenderPass(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
+    vkCmdEndRenderPass(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-    vkCmdBeginRenderPass(ImGuiCommandBuffers[frame], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), ImGuiCommandBuffers[frame]);
-    vkCmdEndRenderPass(ImGuiCommandBuffers[frame]);
-
-    if (vkEndCommandBuffer(ImGuiCommandBuffers[frame]) != VK_SUCCESS) {
+    if (vkEndCommandBuffer(ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }
 
-void InterfaceRenderPass::UpdateSwapChain(VkDevice& device, std::vector<VkImageView>& view, VkExtent2D& rect)
+void InterfaceRenderPass::RebuildSwapChain()
 {
-    vkDestroyRenderPass(device, RenderPass, nullptr);
+    vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(device, framebuffer, nullptr);
+        vkDestroyFramebuffer(EnginePtr::GetEnginePtr()->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    CreateRenderPass(device);
-    CreateRendererFramebuffers(device, view, rect);
+    CreateRenderPass();
+    CreateRendererFramebuffers();
 }
 
-void InterfaceRenderPass::Destroy(VkDevice device)
+void InterfaceRenderPass::Destroy()
 {
-    vkDestroyRenderPass(device, RenderPass, nullptr);
+    vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
     for (auto& framebuffer : SwapChainFramebuffers)
     {
-        vkDestroyFramebuffer(device, framebuffer, nullptr);
+        vkDestroyFramebuffer(EnginePtr::GetEnginePtr()->Device, framebuffer, nullptr);
         framebuffer = VK_NULL_HANDLE;
     }
 
-    vkDestroyDescriptorPool(device, ImGuiDescriptorPool, nullptr);
-    vkFreeCommandBuffers(device, ImGuiCommandPool, static_cast<uint32_t>(ImGuiCommandBuffers.size()), ImGuiCommandBuffers.data());
-    vkDestroyCommandPool(device, ImGuiCommandPool, nullptr);
+    vkDestroyDescriptorPool(EnginePtr::GetEnginePtr()->Device, ImGuiDescriptorPool, nullptr);
+    vkFreeCommandBuffers(EnginePtr::GetEnginePtr()->Device, ImGuiCommandPool, 1, &ImGuiCommandBuffers[0]);
+    vkDestroyCommandPool(EnginePtr::GetEnginePtr()->Device, ImGuiCommandPool, nullptr);
 
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();

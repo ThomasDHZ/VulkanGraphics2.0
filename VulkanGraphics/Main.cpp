@@ -27,6 +27,7 @@
 #include "VulkanEngine.h"
 #include "MainRenderPass.h"
 #include "Renderer.h"
+#include "RendererManager.h"
 
 const uint32_t WIDTH = 1280;
 const uint32_t HEIGHT = 720;
@@ -42,7 +43,8 @@ public:
 private:
     std::shared_ptr<VulkanWindow> window;
     VulkanEngine engine;
-    Renderer renderer;
+    RendererManager renderer;
+//    Renderer renderer;
 
     std::vector<Model> ModelList;
 
@@ -50,9 +52,12 @@ private:
     {
         window = std::make_shared<VulkanWindow>(VulkanWindow(WIDTH, HEIGHT, "VulkanEngine"));
         engine = VulkanEngine(window);
+
+        WindowPtr::SetUpPtr(window);
         EnginePtr::SetUpPtr(std::make_shared<VulkanEngine>(engine));
 
-        renderer = Renderer(engine, window);
+        renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
+//        renderer = Renderer(engine, window);
 
         //renderer.AddModel(engine, window, textureManager, "");
     }
@@ -65,11 +70,13 @@ private:
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
             {
-                renderer.GUIUpdate(engine);
+                //renderer.GUIUpdate(engine);
+                renderer.GUIUpdate(EnginePtr::GetEnginePtr());
             }
             ImGui::Render();
 
-            renderer.Draw(engine, window);
+           // renderer.Draw(engine, window);
+            renderer.Draw(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
         }
 
         vkDeviceWaitIdle(engine.Device);
@@ -77,7 +84,8 @@ private:
 
     void cleanup() 
     {
-        renderer.Destroy(engine);
+       // renderer.Destroy(engine);
+        renderer.Destroy(EnginePtr::GetEnginePtr());
         engine.Destroy();
         window->Destroy();
     }

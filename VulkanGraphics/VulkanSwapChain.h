@@ -23,17 +23,12 @@ private:
 	std::vector<VkSurfaceFormatKHR> CompatibleSwapChainFormatList;
 	std::vector<VkPresentModeKHR> CompatiblePresentModesList;
 
-	VkSwapchainKHR Swapchain;
-
-
-
-
 	VkSurfaceFormatKHR FindSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR FindSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
 
 public:
-
+	VkSwapchainKHR Swapchain;
 	int GraphicsFamily = -1;
 	int PresentFamily = -1;
 
