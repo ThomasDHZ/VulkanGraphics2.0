@@ -1,0 +1,244 @@
+#include "RendererManager.h"
+#include <stb_image.h>
+//#include "BlinnPhongPipeline.h"
+
+RendererManager::RendererManager()
+{
+}
+
+RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+{
+    interfaceRenderPass = InterfaceRenderPass(engine);
+   // BlinnRenderer = BlinnPhongRasterRenderer(engine);
+   // rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
+
+    // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
+    // pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
+
+    //pbrRayTraceRenderer = RayTracePBRRenderer(EnginePtr::GetEnginePtr());
+    //hybridRenderer = HybridRenderer(EnginePtr::GetEnginePtr());
+    ////guiRenderer = GUIRenderer(EnginePtr::GetEnginePtr());
+    //renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
+}
+
+RendererManager::~RendererManager()
+{
+
+}
+
+void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+{
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window->GetWindowPtr(), &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(window->GetWindowPtr(), &width, &height);
+        glfwWaitEvents();
+    }
+    EnginePtr::GetEnginePtr()->ScreenResoulation = glm::ivec2(width, height);
+
+
+    vkDeviceWaitIdle(engine->Device);
+
+    for (auto imageView : engine->SwapChain.GetSwapChainImageViews()) {
+        vkDestroyImageView(engine->Device, imageView, nullptr);
+    }
+
+    vkDestroySwapchainKHR(engine->Device, engine->SwapChain.GetSwapChain(), nullptr);
+
+    // AssetManagerPtr::GetAssetPtr()->Update();
+    //engine->SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine->Device, engine->PhysicalDevice, engine->Surface);
+
+    //interfaceRenderPass.RebuildSwapChain();
+    //BlinnRenderer.RebuildSwapChain();
+
+    ////blinnPhongRenderer.RebuildSwapChain();
+    // //pbrRenderer.RebuildSwapChain();
+    //rayTraceRenderer.RebuildSwapChain(engine, window);
+    //pbrRayTraceRenderer.RebuildSwapChain();
+    //hybridRenderer.RebuildSwapChain();
+    //renderer2D.RebuildSwapChain();
+    //guiRenderer.RebuildSwapChain(engine, window);
+}
+
+void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
+{
+    //if (engine->UpdateRendererFlag)
+    //{
+    //    RebuildSwapChain(engine, window);
+    //    engine->UpdateRendererFlag = false;
+    //}
+
+  //  AssetManagerPtr::GetAssetPtr()->Update();
+    ////if (EnginePtr::GetEnginePtr()->RayTraceFlag)
+    ////{
+    //rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
+    // pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
+    // hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
+// }
+}
+
+void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
+{
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    //ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
+    //ImGui::SliderInt("Active Camera", &AssetManagerPtr::GetAssetPtr()->cameraManager->cameraIndex, 0, AssetManagerPtr::GetAssetPtr()->cameraManager->CameraList.size());
+
+    //ImGui::LabelText("Directional Light", "Directional Light");
+    //for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
+    //{
+    //    ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+    //    ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+    //    ImGui::LabelText("______", "______");
+    //}
+
+    //ImGui::LabelText("Point Light", "Point Light");
+    //for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->PointLightList.size(); x++)
+    //{
+    //    ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
+    //    ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+    //    ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+    //    ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+    //    ImGui::LabelText("______", "______");
+    //}
+
+    //ImGui::LabelText("SpotLight Light", "Directional Light");
+    //for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->SpotLightList.size(); x++)
+    //{
+    //    ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -10.0f, 10.0f);
+    //    ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+    //    ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+    //    ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+    //    ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+    //    ImGui::LabelText("______", "______");
+    //}
+
+    //for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
+    //{
+    //    ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
+    //    ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
+    //    ImGui::SliderFloat2(("UV " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+    //    ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVScale.x, 0.0f, 2.0f);
+    //    ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
+    //    ImGui::LabelText("______", "______");
+    //}
+
+    //if (ActiveRenderer == 0)
+    //{
+    //    BlinnRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 1)
+    //{
+    //    pbrRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 2)
+    //{
+    //    rayTraceRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 3)
+    //{
+    //    pbrRayTraceRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 4)
+    //{
+    //    hybridRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 5)
+    //{
+    //    renderer2D.GUIUpdate();
+    //}
+   /* guiRenderer.GUIUpdate();*/
+}
+
+void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+{
+    EnginePtr::GetEnginePtr()->CMDIndex = (EnginePtr::GetEnginePtr()->CMDIndex + 1) % MAX_FRAMES_IN_FLIGHT;
+
+    vkWaitForFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex], VK_TRUE, UINT64_MAX);
+    vkResetFences(EnginePtr::GetEnginePtr()->Device, 1, &EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex]);
+
+    VkResult result = vkAcquireNextImageKHR(EnginePtr::GetEnginePtr()->Device, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChain(), UINT64_MAX, EnginePtr::GetEnginePtr()->AcquireImageSemaphores[EnginePtr::GetEnginePtr()->CMDIndex], VK_NULL_HANDLE, &EnginePtr::GetEnginePtr()->ImageIndex);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        RebuildSwapChain(engine, window);
+        return;
+    }
+    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+    {
+        throw std::runtime_error("Failed to acquire swap chain image!");
+    }
+
+    Update(engine, window, EnginePtr::GetEnginePtr()->CMDIndex);
+
+    std::vector<VkCommandBuffer> CommandBufferSubmitList;
+
+    //AssetManagerPtr::GetAssetPtr()->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList);
+    //if (ActiveRenderer == 0)
+    //{
+    //    BlinnRenderer.Draw();
+    //    BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
+    //else if (ActiveRenderer == 1)
+    //{
+    //    EnginePtr::GetEnginePtr()->RayTraceFlag = true;
+    //    rayTraceRenderer.Draw(engine, window);
+    //    rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    //}
+
+    interfaceRenderPass.Draw();
+    CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
+
+    VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = &EnginePtr::GetEnginePtr()->AcquireImageSemaphores[EnginePtr::GetEnginePtr()->CMDIndex];
+    submitInfo.pWaitDstStageMask = waitStages;
+    submitInfo.commandBufferCount = static_cast<uint32_t>(CommandBufferSubmitList.size());
+    submitInfo.pCommandBuffers = CommandBufferSubmitList.data();
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &EnginePtr::GetEnginePtr()->PresentImageSemaphores[EnginePtr::GetEnginePtr()->ImageIndex];
+    if (vkQueueSubmit(EnginePtr::GetEnginePtr()->GraphicsQueue, 1, &submitInfo, EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
+        throw std::runtime_error("failed to submit draw command buffer!");
+    }
+
+    VkPresentInfoKHR presentInfo{};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = &EnginePtr::GetEnginePtr()->PresentImageSemaphores[EnginePtr::GetEnginePtr()->ImageIndex];
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = &EnginePtr::GetEnginePtr()->SwapChain.Swapchain;
+    presentInfo.pImageIndices = &EnginePtr::GetEnginePtr()->ImageIndex;
+    result = vkQueuePresentKHR(EnginePtr::GetEnginePtr()->PresentQueue, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        RebuildSwapChain(engine, window);
+        return;
+    }
+    else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+    {
+        throw std::runtime_error("Failed to present swap chain image!");
+    }
+}
+
+void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)
+{
+    interfaceRenderPass.Destroy();
+    //BlinnRenderer.Destroy();
+   // rayTraceRenderer.Destroy(engine);
+
+    // blinnPhongRenderer.Destroy();
+     //pbrRenderer.Destroy();
+     //pbrRayTraceRenderer.Destroy();
+     //hybridRenderer.Destroy();
+     //renderer2D.Destroy();
+     //guiRenderer.Destroy();
+}

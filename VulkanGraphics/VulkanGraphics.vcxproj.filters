@@ -138,6 +138,9 @@
     <ClCompile Include="VulkanPtr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RendererManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\PBR_BloomOutput.frag">
@@ -344,6 +347,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="VulkanPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

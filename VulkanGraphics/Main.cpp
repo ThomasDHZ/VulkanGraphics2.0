@@ -27,6 +27,7 @@
 #include "VulkanEngine.h"
 #include "MainRenderPass.h"
 #include "Renderer.h"
+#include "RendererManager.h"
 
 const uint32_t WIDTH = 1280;
 const uint32_t HEIGHT = 720;
@@ -36,48 +37,46 @@ public:
     void run() {
         initVulkan();
         mainLoop();
-        cleanup();
+
+     //   AssetManagerPtr::GetAssetPtr()->Delete();
+        renderer.Destroy(EnginePtr::GetEnginePtr());
+        EnginePtr::GetEnginePtr()->Destroy();
+        WindowPtr::GetWindowPtr()->Destroy();
     }
 
 private:
-    std::shared_ptr<VulkanWindow> window;
-    VulkanEngine engine;
-    Renderer renderer;
+    RendererManager renderer;
 
-    std::vector<Model> ModelList;
+    void initVulkan() {
 
-    void initVulkan() 
-    {
-        window = std::make_shared<VulkanWindow>(VulkanWindow(WIDTH, HEIGHT, "VulkanEngine"));
-        engine = VulkanEngine(window);
-        renderer = Renderer(engine, window);
-
-        //renderer.AddModel(engine, window, textureManager, "");
+        WindowPtr::SetUpPtr(1280, 720, "VulkanEngine");
+        EnginePtr::SetUpPtr(WindowPtr::GetWindowPtr());
+        //CameraManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+        //InputManagerPtr::SetUpPtr(WindowPtr::GetWindowPtr(), CameraManagerPtr::GetCameraManagerPtr());
+        //TextureManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+        //MaterialManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+        //MeshManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), InputManagerPtr::GetInputManagerPtr(), MaterialManagerPtr::GetMaterialManagerPtr());
+        //LightManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr(), CameraManagerPtr::GetCameraManagerPtr());
+        //GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+        //ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+        //AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+        renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
     }
 
     void mainLoop() {
-        while (!glfwWindowShouldClose(window->GetWindowPtr())) {
+        while (!glfwWindowShouldClose(WindowPtr::GetWindowPtr()->GetWindowPtr())) {
             glfwPollEvents();
-
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
             {
-                renderer.GUIUpdate(engine);
+                renderer.GUIUpdate(EnginePtr::GetEnginePtr());
             }
             ImGui::Render();
-
-            renderer.Draw(engine, window);
+            renderer.Draw(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
         }
 
-        vkDeviceWaitIdle(engine.Device);
-    }
-
-    void cleanup() 
-    {
-        renderer.Destroy(engine);
-        engine.Destroy();
-        window->Destroy();
+        vkDeviceWaitIdle(EnginePtr::GetEnginePtr()->Device);
     }
 };
 
@@ -94,4 +93,3 @@ int main() {
 
     return EXIT_SUCCESS;
 }
-

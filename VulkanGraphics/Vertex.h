@@ -7,13 +7,15 @@
 struct Vertex
 {
 	glm::vec3 Position = glm::vec3(0.0f);
+	float	  Padding1 = 0.0f;
 	glm::vec3 Normal = glm::vec3(0.0f);
+	float	  Padding2 = 0.0f;
 	glm::vec2 TexureCoord = glm::vec2(0.0f);
-	glm::vec4 Tangant = glm::vec4(0.0f);
-	glm::vec4 BiTangant = glm::vec4(0.0f);
-	glm::vec4 Color = glm::vec4(0.0f);
-	glm::ivec4 BoneID = glm::ivec4(0);
-	glm::vec4 BoneWeights = glm::vec4(0.0f);
+	glm::vec2 Padding3 = glm::vec2(0.0f);
+	glm::vec3 Tangant = glm::vec3(0.0f);
+	float	  Padding4 = 0.0f;
+	glm::vec3 BiTangant = glm::vec3(0.0f);
+	float	  Padding5 = 0.0f;
 
 	static VkVertexInputBindingDescription GetBindingDescription()
 	{
@@ -51,32 +53,14 @@ struct Vertex
 
 		AttributeDescription.binding = 0;
 		AttributeDescription.location = 3;
-		AttributeDescription.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+		AttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
 		AttributeDescription.offset = offsetof(Vertex, Tangant);
 		AttributeDescriptions.emplace_back(AttributeDescription);
 
 		AttributeDescription.binding = 0;
 		AttributeDescription.location = 4;
-		AttributeDescription.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		AttributeDescription.offset = offsetof(Vertex, BiTangant);
-		AttributeDescriptions.emplace_back(AttributeDescription);
-
-		AttributeDescription.binding = 0;
-		AttributeDescription.location = 5;
 		AttributeDescription.format = VK_FORMAT_R32G32B32_SFLOAT;
-		AttributeDescription.offset = offsetof(Vertex, Color);
-		AttributeDescriptions.emplace_back(AttributeDescription);
-
-		AttributeDescription.binding = 0;
-		AttributeDescription.location = 6;
-		AttributeDescription.format = VK_FORMAT_R32G32B32A32_SINT;
-		AttributeDescription.offset = offsetof(Vertex, BoneID);
-		AttributeDescriptions.emplace_back(AttributeDescription);
-
-		AttributeDescription.binding = 0;
-		AttributeDescription.location = 7;
-		AttributeDescription.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		AttributeDescription.offset = offsetof(Vertex, BoneWeights);
+		AttributeDescription.offset = offsetof(Vertex, BiTangant);
 		AttributeDescriptions.emplace_back(AttributeDescription);
 
 		return AttributeDescriptions;

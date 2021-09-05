@@ -175,6 +175,7 @@
     <ClCompile Include="RenderedDepthTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RendererManager.cpp" />
     <ClCompile Include="SceneRenderingPipeline.cpp" />
     <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="RenderedDepthTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RendererManager.h" />
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="SceneRenderingPipeline.h" />
     <ClInclude Include="SceneRenderPass.h" />
