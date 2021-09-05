@@ -3,7 +3,7 @@ Renderer::Renderer()
 {
 }
 
-Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
+Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     //std::vector<Vertex> vertices =
     //{
@@ -34,7 +34,7 @@ Renderer::Renderer(VulkanEngine& engine, VulkanWindow& window)
 
     RenderPass = MainRenderPass(engine);
     //frameBufferRenderPass = FrameBufferRenderPass(engine, textureManager.GetTexture(3));
-    interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window.GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
+    interfaceRenderPass = InterfaceRenderPass(engine.Device, engine.Instance, engine.PhysicalDevice, engine.GraphicsQueue, window->GetWindowPtr(), engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
     
     SetUpDescriptorPool(engine);
     RayRenderer = RayTraceRenderer(engine, textureManager, modelRenderManager.ModelList);
@@ -68,15 +68,15 @@ Renderer::~Renderer()
 void Renderer::SetUpDescriptorPool(VulkanEngine& engine)
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
-    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
 }
 
@@ -177,18 +177,18 @@ void Renderer::SetUpCommandBuffers(VulkanEngine& engine)
 }
 
 
-void Renderer::AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath)
+void Renderer::AddModel(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, const std::string& FilePath)
 {
     modelRenderManager.ModelList.emplace_back(Model(engine, textureManager, FilePath));
     UpdateSwapChain(engine, window);
 }
 
-void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
+void Renderer::UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     int width = 0, height = 0;
-    glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
+    glfwGetFramebufferSize(window->GetWindowPtr(), &width, &height);
     while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(window.GetWindowPtr(), &width, &height);
+        glfwGetFramebufferSize(window->GetWindowPtr(), &width, &height);
         glfwWaitEvents();
     }
 
@@ -201,7 +201,7 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     vkDestroySwapchainKHR(engine.Device, engine.SwapChain.GetSwapChain(), nullptr);
     vkDestroyDescriptorPool(engine.Device, descriptorPool, nullptr);
 
-    engine.SwapChain.UpdateSwapChain(window.GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
+    engine.SwapChain.UpdateSwapChain(window->GetWindowPtr(), engine.Device, engine.PhysicalDevice, engine.Surface);
     RenderPass.UpdateSwapChain(engine, descriptorSetLayout);
     interfaceRenderPass.UpdateSwapChain(engine.Device, engine.SwapChain.SwapChainImageViews, engine.SwapChain.SwapChainResolution);
 
@@ -218,15 +218,15 @@ void Renderer::UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window)
     SetUpCommandBuffers(engine);
 }
 
-void Renderer::Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage)
+void Renderer::Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
 {
     if (UpdateRenderer)
     {
         UpdateSwapChain(engine, window);
     }
 
-    keyboard.Update(window.GetWindowPtr(), camera);
-    mouse.Update(window.GetWindowPtr(), camera);
+    keyboard.Update(window->GetWindowPtr(), camera);
+    mouse.Update(window->GetWindowPtr(), camera);
     camera->Update(engine.SwapChain.SwapChainResolution.width, engine.SwapChain.SwapChainResolution.height);
 
     static auto startTime = std::chrono::high_resolution_clock::now();
@@ -287,7 +287,7 @@ void Renderer::GUIUpdate(VulkanEngine& engine)
     ImGui::SliderFloat("quadratic", &SceneData->SceneData.plight.quadratic, 0.0f, 100.0f);
 }
 
-void Renderer::Draw(VulkanEngine& engine, VulkanWindow& window)
+void Renderer::Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
 {
     vkWaitForFences(engine.Device, 1, &engine.inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 

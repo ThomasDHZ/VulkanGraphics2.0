@@ -2,6 +2,8 @@
 #include <exception>
 #include <iostream>
 
+std::shared_ptr<VulkanWindow> WindowPtr::windowPtr = nullptr;
+
 VulkanWindow::VulkanWindow()
 {
 	FramebufferResized = false;

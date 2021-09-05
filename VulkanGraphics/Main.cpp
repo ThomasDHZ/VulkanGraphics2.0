@@ -40,7 +40,7 @@ public:
     }
 
 private:
-    VulkanWindow window;
+    std::shared_ptr<VulkanWindow> window;
     VulkanEngine engine;
     Renderer renderer;
 
@@ -48,15 +48,15 @@ private:
 
     void initVulkan() 
     {
-        window = VulkanWindow(WIDTH, HEIGHT, "VulkanEngine");
-        engine = VulkanEngine(window.GetWindowPtr());
+        window = std::make_shared<VulkanWindow>(VulkanWindow(WIDTH, HEIGHT, "VulkanEngine"));
+        engine = VulkanEngine(window);
         renderer = Renderer(engine, window);
 
         //renderer.AddModel(engine, window, textureManager, "");
     }
 
     void mainLoop() {
-        while (!glfwWindowShouldClose(window.GetWindowPtr())) {
+        while (!glfwWindowShouldClose(window->GetWindowPtr())) {
             glfwPollEvents();
 
             ImGui_ImplVulkan_NewFrame();
@@ -77,7 +77,7 @@ private:
     {
         renderer.Destroy(engine);
         engine.Destroy();
-        window.Destroy();
+        window->Destroy();
     }
 };
 

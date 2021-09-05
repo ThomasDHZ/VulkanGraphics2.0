@@ -64,13 +64,13 @@ public:
 	ModelRenderManager modelRenderManager;
 
 	Renderer();
-	Renderer(VulkanEngine& engine, VulkanWindow& window);
+	Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
 	~Renderer();
 
-	void AddModel(VulkanEngine& engine, VulkanWindow& window, const std::string& FilePath);
-	void UpdateSwapChain(VulkanEngine& engine, VulkanWindow& window);
-	void Update(VulkanEngine& engine, VulkanWindow& window, uint32_t currentImage);
+	void AddModel(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, const std::string& FilePath);
+	void UpdateSwapChain(VulkanEngine& engine, std::shared_ptr<VulkanWindow>window);
+	void Update(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage);
 	void GUIUpdate(VulkanEngine& engine);
-	void Draw(VulkanEngine& engine, VulkanWindow& window);
+	void Draw(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window);
 	void Destroy(VulkanEngine& engine);
 };

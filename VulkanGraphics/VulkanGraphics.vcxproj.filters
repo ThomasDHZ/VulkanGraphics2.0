@@ -135,6 +135,9 @@
     <ClCompile Include="VulkanWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulkanPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\PBR_BloomOutput.frag">
@@ -339,6 +342,9 @@
     </ClInclude>
     <ClInclude Include="VulkanWindow.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPtr.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
