@@ -16,6 +16,7 @@ private:
 
 	VkSampler NullSampler;
 public:
+
 	std::vector<std::shared_ptr<Texture>> TextureList;
 	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
 	std::shared_ptr<Texture> CubeMap;

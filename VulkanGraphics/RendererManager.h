@@ -27,11 +27,11 @@ private:
 
 	//BlinnPhongRasterRenderer BlinnRenderer;
 	InterfaceRenderPass interfaceRenderPass;
-
+//	RayTraceRenderer rayTraceRenderer;
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;
 public:
 	RendererManager();
-	RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
+	RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, TextureManager textureManager, ModelRenderManager modelrenderer, std::vector<Model> modelList, std::shared_ptr<SceneDataStruct> scene);
 	~RendererManager();
 
 	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);

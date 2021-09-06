@@ -17,7 +17,7 @@ Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<
 	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, 0));
 }
 
-Model::Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath)
+Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath)
 {
 	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(engine.Device, "vkCmdBuildAccelerationStructuresKHR"));
@@ -138,7 +138,7 @@ void Model::BottomLevelAccelerationStructure(VulkanEngine& engine)
 	scratchBuffer.DestoryBuffer();
 }
 
-void Model::LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -229,7 +229,7 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-Material Model::LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+Material Model::LoadMaterial(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
 	Material ModelMaterial;
 

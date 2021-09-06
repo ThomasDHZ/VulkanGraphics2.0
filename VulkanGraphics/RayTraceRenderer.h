@@ -69,7 +69,6 @@ private:
 
 public:
     ModelRenderManager modelRenderManager;
-    TextureManager textureManager;
     StorageImage storageImage;
 
     VkPipeline            RayTracePipeline = VK_NULL_HANDLE;
@@ -85,7 +84,7 @@ public:
     VkDescriptorSet descriptorSets;
 
     RayTraceRenderer();
-    RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, ModelRenderManager& modelRenderManagerz, std::vector<Model>& modelList);
+    RayTraceRenderer(VulkanEngine& engine, ModelRenderManager& modelRenderManagerz, std::vector<Model>& modelList, std::shared_ptr<SceneDataStruct> SceneData);
     ~RayTraceRenderer();
 
     void Destory(VulkanEngine& engine);
@@ -95,7 +94,7 @@ public:
     void createBottomLevelAccelerationStructure(VulkanEngine& engine, Model& model);
     void createTopLevelAccelerationStructure(VulkanEngine& engine, std::vector<Model>& model);
     void createStorageImage(VulkanEngine& engine, StorageImage& image);
-    void createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout);
+    void createRayTracingPipeline(VulkanEngine& engine);
     void createShaderBindingTable(VulkanEngine& engine);
     void buildCommandBuffers(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, VkDescriptorSet& set);
     void Resize(VulkanEngine& engine, int swapChainFramebuffersSize, std::vector<VkImage>& swapChainImages, uint32_t width, uint32_t height, VkDescriptorSet& set);

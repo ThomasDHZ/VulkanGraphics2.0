@@ -55,6 +55,7 @@ private:
 
         WindowPtr::SetUpPtr(window);
         EnginePtr::SetUpPtr(std::make_shared<VulkanEngine>(engine));
+        TextureManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
        // renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
         renderer = Renderer(engine, window);
@@ -66,14 +67,14 @@ private:
         while (!glfwWindowShouldClose(window->GetWindowPtr())) {
             glfwPollEvents();
 
-            //ImGui_ImplVulkan_NewFrame();
-            //ImGui_ImplGlfw_NewFrame();
-            //ImGui::NewFrame();
-            //{
-            //    renderer.GUIUpdate(engine);
-            //   // renderer.GUIUpdate(EnginePtr::GetEnginePtr());
-            //}
-            //ImGui::Render();
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            {
+                renderer.GUIUpdate(engine);
+               // renderer.GUIUpdate(EnginePtr::GetEnginePtr());
+            }
+            ImGui::Render();
 
             renderer.Draw(engine, window);
             //renderer.Draw(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());

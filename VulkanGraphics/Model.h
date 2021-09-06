@@ -26,10 +26,10 @@ private:
 
 	void BottomLevelAccelerationStructure(VulkanEngine& engine);
 	void TopLevelAccelerationStructure(VulkanEngine& engine);
-	void LoadMesh(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
-	Material LoadMaterial(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	Material LoadMaterial(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
 
 public:
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
@@ -62,7 +62,7 @@ public:
 	Model();
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
 	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
-	Model(VulkanEngine& engine, TextureManager& textureManager, const std::string& FilePath);
+	Model(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath);
 	~Model();
 
 	void Update(VulkanEngine& engine);

@@ -6,11 +6,11 @@ RendererManager::RendererManager()
 {
 }
 
-RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
+RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, TextureManager textureManager, ModelRenderManager modelrenderer, std::vector<Model> modelList, std::shared_ptr<SceneDataStruct> scene)
 {
     interfaceRenderPass = InterfaceRenderPass(engine);
    // BlinnRenderer = BlinnPhongRasterRenderer(engine);
-  //  rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
+   // rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), textureManager, modelrenderer, modelList, scene);
 
     // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
     // pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());

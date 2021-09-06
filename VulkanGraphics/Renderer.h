@@ -21,7 +21,7 @@ private:
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	//FrameBufferRenderPass frameBufferRenderPass;
-	//InterfaceRenderPass interfaceRenderPass;
+	InterfaceRenderPass interfaceRenderPass;
 	MainRenderPass RenderPass;
 	RayTraceRenderer RayRenderer;
 
@@ -60,7 +60,6 @@ private:
 
 
 public:
-	TextureManager textureManager;
 	ModelRenderManager modelRenderManager;
 
 	Renderer();

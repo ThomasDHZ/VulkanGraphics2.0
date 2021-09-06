@@ -9,9 +9,8 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, ModelRenderManager& modelRenderManagerz, std::vector<Model>& model)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, ModelRenderManager& modelRenderManagerz, std::vector<Model>& model, std::shared_ptr<SceneDataStruct> SceneData)
 {
-    textureManager = textureManagerz;
     modelRenderManager = modelRenderManagerz;
 
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
@@ -37,9 +36,15 @@ RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& texture
     vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetRayTracingShaderGroupHandlesKHR"));
     vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(engine.Device, "vkCreateRayTracingPipelinesKHR"));
 
+   SetUpDescriptorPool(engine);
    topLevelAS = AccelerationStructure(engine);
    createTopLevelAccelerationStructure(engine, model);
    createStorageImage(engine, storageImage);
+   SetUpDescriptorLayout(engine);
+   createRayTracingPipeline(engine);
+   createShaderBindingTable(engine);
+   SetUpDescriptorSets(engine, SceneData);
+   buildCommandBuffers(engine, engine.SwapChain.SwapChainImages.size(), engine.SwapChain.SwapChainImages, descriptorSets);
 }
 RayTraceRenderer::~RayTraceRenderer()
 {
@@ -215,7 +220,7 @@ void RayTraceRenderer::SetUpDescriptorLayout(VulkanEngine& engine)
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount(textureManager) });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount(TextureManagerPtr::GetTextureManagerPtr()) });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
 }
@@ -231,7 +236,7 @@ void RayTraceRenderer::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr
     std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
     VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->SceneDataBuffer.Buffer, SceneData->SceneDataBuffer.BufferSize);
-    std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor(textureManager);
+    std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor(TextureManagerPtr::GetTextureManagerPtr());
     //    VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(Texture(textureManager.GetCubeMapTexture()));
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
@@ -343,14 +348,14 @@ void RayTraceRenderer::setImageLayout(
         1, &imageMemoryBarrier);
 }
 
-void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine, VkDescriptorSetLayout& layout)
+void RayTraceRenderer::createRayTracingPipeline(VulkanEngine& engine)
 {
     std::vector<VkPipelineShaderStageCreateInfo> ShaderList;
 
     VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo = {};
     PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     PipelineLayoutCreateInfo.setLayoutCount = 1;
-    PipelineLayoutCreateInfo.pSetLayouts = &layout;
+    PipelineLayoutCreateInfo.pSetLayouts = &descriptorSetLayout;
     vkCreatePipelineLayout(engine.Device, &PipelineLayoutCreateInfo, nullptr, &RayTracePipelineLayout);
 
     ShaderList.emplace_back(loadShader(engine, "Shader/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
