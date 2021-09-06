@@ -1,5 +1,5 @@
 #pragma once
-#include "VulkanEngine.h"
+#include "Vulkanengine.h"
 #include "VulkanBuffer.h"
 
 struct AccelerationStructure
@@ -21,11 +21,11 @@ public:
 	VulkanBuffer AccelerationBuffer;
 
 	AccelerationStructure();
-	AccelerationStructure(VulkanEngine& engine);
+	AccelerationStructure(std::shared_ptr<VulkanEngine> engine);
 	~AccelerationStructure();
 
-	void AcclerationCommandBuffer(VulkanEngine& engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo);
-	void CreateAccelerationStructure(VulkanEngine& engine, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR& buildSizeInfo);
-	void Destroy(VulkanEngine& engine);
+	void AcclerationCommandBuffer(std::shared_ptr<VulkanEngine> engine, VkAccelerationStructureBuildGeometryInfoKHR& AccelerationStructureBuildGeometryInfo, std::vector<VkAccelerationStructureBuildRangeInfoKHR>& AccelerationStructureBuildRangeInfo);
+	void CreateAccelerationStructure(std::shared_ptr<VulkanEngine> engine, VkAccelerationStructureTypeKHR type, VkAccelerationStructureBuildSizesInfoKHR& buildSizeInfo);
+	void Destroy(std::shared_ptr<VulkanEngine> engine);
 };
 

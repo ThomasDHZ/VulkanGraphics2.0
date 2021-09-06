@@ -11,8 +11,6 @@ private:
 	uint32_t PresentModeCount;
 	uint32_t SwapChainImageCount;
 
-	
-
 	VkSurfaceFormatKHR SwapChainImageFormat;
 	VkPresentModeKHR SwapChainPresentMode;
 
@@ -28,7 +26,9 @@ private:
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
 
 public:
+
 	VkSwapchainKHR Swapchain;
+
 	int GraphicsFamily = -1;
 	int PresentFamily = -1;
 
@@ -40,7 +40,7 @@ public:
 	void SetUpSwapChainImageViews(const VkDevice& device);
 	void Destroy(VkDevice device);
 
-	void UpdateSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
+	void RebuildSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface);
 
 	std::vector<VkImage> SwapChainImages;
 	std::vector<VkImageView> SwapChainImageViews;

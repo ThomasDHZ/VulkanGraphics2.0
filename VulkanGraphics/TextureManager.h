@@ -11,15 +11,14 @@
 class TextureManager
 {
 private:
+	std::vector<std::shared_ptr<Texture>> TextureList;
+	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
+	std::shared_ptr<Texture> CubeMap;
 
 	uint32_t IsTextureLoaded(std::string name);
 
 	VkSampler NullSampler;
 public:
-
-	std::vector<std::shared_ptr<Texture>> TextureList;
-	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
-	std::shared_ptr<Texture> CubeMap;
 
 	TextureManager();
 	TextureManager(std::shared_ptr<VulkanEngine> Engine);

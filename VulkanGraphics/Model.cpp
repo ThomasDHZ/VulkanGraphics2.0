@@ -6,32 +6,28 @@ Model::Model()
 {
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, 0));
-
+	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, MaterialManagerPtr::GetMaterialManagerPtr()->GetDefaultMaterial(), DrawFlags)));
+	MeshList.back()->ParentModelID = ModelID;
+	MeshList.back()->VertexList = VertexList;
+	MeshList.back()->MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material)
+Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
 {
-	MeshList.emplace_back(Mesh(engine, VertexList, IndexList, material, 0));
+	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, material, DrawFlags)));
+	MeshList.back()->ParentModelID = ModelID;
+	MeshList.back()->VertexList = VertexList;
+	MeshList.back()->MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath)
+Model::Model(const std::string& FilePath, MeshDrawFlags DrawFlags)
 {
-	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
-	vkCmdBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkCmdBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(engine.Device, "vkCmdBuildAccelerationStructuresKHR"));
-	vkBuildAccelerationStructuresKHR = reinterpret_cast<PFN_vkBuildAccelerationStructuresKHR>(vkGetDeviceProcAddr(engine.Device, "vkBuildAccelerationStructuresKHR"));
-	vkCreateAccelerationStructureKHR = reinterpret_cast<PFN_vkCreateAccelerationStructureKHR>(vkGetDeviceProcAddr(engine.Device, "vkCreateAccelerationStructureKHR"));
-	vkDestroyAccelerationStructureKHR = reinterpret_cast<PFN_vkDestroyAccelerationStructureKHR>(vkGetDeviceProcAddr(engine.Device, "vkDestroyAccelerationStructureKHR"));
-	vkGetAccelerationStructureBuildSizesKHR = reinterpret_cast<PFN_vkGetAccelerationStructureBuildSizesKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetAccelerationStructureBuildSizesKHR"));
-	vkGetAccelerationStructureDeviceAddressKHR = reinterpret_cast<PFN_vkGetAccelerationStructureDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetAccelerationStructureDeviceAddressKHR"));
-	vkCmdTraceRaysKHR = reinterpret_cast<PFN_vkCmdTraceRaysKHR>(vkGetDeviceProcAddr(engine.Device, "vkCmdTraceRaysKHR"));
-	vkGetRayTracingShaderGroupHandlesKHR = reinterpret_cast<PFN_vkGetRayTracingShaderGroupHandlesKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetRayTracingShaderGroupHandlesKHR"));
-	vkCreateRayTracingPipelinesKHR = reinterpret_cast<PFN_vkCreateRayTracingPipelinesKHR>(vkGetDeviceProcAddr(engine.Device, "vkCreateRayTracingPipelinesKHR"));
-
+	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
 	Assimp::Importer ModelImporter;
-	vkGetBufferDeviceAddressKHR = reinterpret_cast<PFN_vkGetBufferDeviceAddressKHR>(vkGetDeviceProcAddr(engine.Device, "vkGetBufferDeviceAddressKHR"));
 
 	const aiScene* Scene = ModelImporter.ReadFile(FilePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
@@ -40,105 +36,113 @@ Model::Model(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManage
 		return;
 	}
 
-	LoadMesh(engine, textureManager, FilePath, Scene->mRootNode, Scene);
+	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
+	LoadNodeTree(Scene->mRootNode);
+	LoadAnimations(Scene);
+	LoadMesh(FilePath, Scene->mRootNode, Scene, DrawFlags);
 
-	ModelTransform = glm::mat4(1.0f);
-	ModelTransform = glm::translate(ModelTransform, ModelPosition);
-	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	ModelTransform = glm::scale(ModelTransform, ModelScale);
+	LoadMeshTransform(0, ModelTransform);
 
-	ModelVertexCount = ModelVertices.size();
-	ModelIndexCount = ModelIndices.size();
-	ModelTriangleCount = static_cast<uint32_t>(ModelIndices.size()) / 3;
+	if (AnimationList.size() > 0)
+	{
+		AnimatedModel = true;
+		AnimationPlayer = AnimationPlayer3D(BoneList, NodeMapList, GlobalInverseTransformMatrix, AnimationList[0]);
+		AnimationRenderer = AnimatorCompute(MeshList[0]);
+	}
 
-	ModelVertexBuffer.CreateBuffer(ModelVertexCount * sizeof(Vertex), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelVertices.data());
-	ModelIndexBuffer.CreateBuffer(ModelIndexCount * sizeof(uint32_t), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ModelIndices.data());
-	ModelTransformBuffer.CreateBuffer(sizeof(glm::mat4), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &ModelTransform);
-
-	ModelVertexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelVertexBuffer.Buffer);
-	ModelIndexBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelIndexBuffer.Buffer);
-	ModelTransformBufferDeviceAddress.deviceAddress = engine.GetBufferDeviceAddress(ModelTransformBuffer.Buffer);
-
-	BottomLevelAccelerationBuffer = AccelerationStructure(engine);
-	BottomLevelAccelerationStructure(engine);
+	ModelTransform = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 }
 
 Model::~Model()
 {
 }
 
-void Model::BottomLevelAccelerationStructure(VulkanEngine& engine)
+void Model::LoadNodeTree(const aiNode* Node, int parentNodeID)
 {
-	std::vector<uint32_t> PrimitiveCountList;
-	std::vector<VkAccelerationStructureGeometryKHR> AccelerationStructureGeometryList;
-	std::vector<VkAccelerationStructureBuildRangeInfoKHR> AccelerationBuildStructureRangeInfos;
-	for (auto x = 0; x < MeshList.size(); x++)
+	NodeMap node;
+	node.NodeID = NodeMapList.size();
+	node.ParentNodeID = parentNodeID;
+	node.NodeString = Node->mName.C_Str();
+	node.NodeTransform = Node->mTransformation;
+	if (parentNodeID != -1)
 	{
-		const Mesh mesh = MeshList[x];
-		PrimitiveCountList.emplace_back(mesh.IndexCount / 3);
-
-		VkAccelerationStructureGeometryKHR AccelerationStructureGeometry = {};
-		AccelerationStructureGeometry.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR;
-		AccelerationStructureGeometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-		AccelerationStructureGeometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-		AccelerationStructureGeometry.geometry.triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-		AccelerationStructureGeometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-		AccelerationStructureGeometry.geometry.triangles.vertexData = ModelVertexBufferDeviceAddress;
-		AccelerationStructureGeometry.geometry.triangles.maxVertex = mesh.VertexCount;
-		AccelerationStructureGeometry.geometry.triangles.vertexStride = sizeof(Vertex);
-		AccelerationStructureGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-		AccelerationStructureGeometry.geometry.triangles.indexData = ModelIndexBufferDeviceAddress;
-		AccelerationStructureGeometryList.emplace_back(AccelerationStructureGeometry);
-
-		VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
-		AccelerationStructureBuildRangeInfo.primitiveCount = PrimitiveCountList[x];
-		AccelerationStructureBuildRangeInfo.primitiveOffset = mesh.FirstIndex * sizeof(uint32_t);
-		AccelerationStructureBuildRangeInfo.firstVertex = mesh.VertexOffset;
-		AccelerationStructureBuildRangeInfo.transformOffset = 0;
-		AccelerationBuildStructureRangeInfos.emplace_back(AccelerationStructureBuildRangeInfo);
+		NodeMapList[parentNodeID].ChildNodeList.emplace_back(node.NodeID);
 	}
+	NodeMapList.emplace_back(node);
 
-	VkAccelerationStructureBuildGeometryInfoKHR AccelerationStructureBuildGeometryInfo = {};
-	AccelerationStructureBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
-	AccelerationStructureBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-	AccelerationStructureBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-	AccelerationStructureBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
-	AccelerationStructureBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
-
-	PrimitiveCountList.resize(AccelerationBuildStructureRangeInfos.size());
-	for (auto x = 0; x < AccelerationBuildStructureRangeInfos.size(); x++)
+	for (int x = 0; x < Node->mNumChildren; x++)
 	{
-		PrimitiveCountList[x] = AccelerationBuildStructureRangeInfos[x].primitiveCount;
+		LoadNodeTree(Node->mChildren[x], node.NodeID);
 	}
-
-	VkAccelerationStructureBuildSizesInfoKHR AccelerationStructureBuildSizesInfo = {};
-	AccelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
-	vkGetAccelerationStructureBuildSizesKHR(engine.Device, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &AccelerationStructureBuildGeometryInfo, PrimitiveCountList.data(), &AccelerationStructureBuildSizesInfo);
-
-	BottomLevelAccelerationBuffer.CreateAccelerationStructure(engine, VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, AccelerationStructureBuildSizesInfo);
-
-	VulkanBuffer scratchBuffer = VulkanBuffer(AccelerationStructureBuildSizesInfo.buildScratchSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	scratchBuffer.BufferDeviceAddress = engine.GetBufferDeviceAddress(scratchBuffer.Buffer);
-
-	VkAccelerationStructureBuildGeometryInfoKHR AccelerationBuildGeometryInfo = {};
-	AccelerationBuildGeometryInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR;
-	AccelerationBuildGeometryInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
-	AccelerationBuildGeometryInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR;
-	AccelerationBuildGeometryInfo.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_BUILD_KHR;
-	AccelerationBuildGeometryInfo.dstAccelerationStructure = BottomLevelAccelerationBuffer.handle;
-	AccelerationBuildGeometryInfo.geometryCount = static_cast<uint32_t>(AccelerationStructureGeometryList.size());
-	AccelerationBuildGeometryInfo.pGeometries = AccelerationStructureGeometryList.data();
-	AccelerationBuildGeometryInfo.srcAccelerationStructure = nullptr;
-	AccelerationBuildGeometryInfo.scratchData.deviceAddress = scratchBuffer.BufferDeviceAddress;
-
-	BottomLevelAccelerationBuffer.AcclerationCommandBuffer(engine, AccelerationBuildGeometryInfo, AccelerationBuildStructureRangeInfos);
-
-	scratchBuffer.DestoryBuffer();
 }
 
-void Model::LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadAnimations(const aiScene* scene)
+{
+	for (int x = 0; x < scene->mNumAnimations; x++)
+	{
+		aiAnimation* assImpAnimation = scene->mAnimations[x];
+
+		Animation3D animation = Animation3D();
+		animation.TicksPerSec = assImpAnimation->mTicksPerSecond;
+		animation.AnimationTime = assImpAnimation->mDuration * animation.TicksPerSec;
+
+		for (int y = 0; y < assImpAnimation->mNumChannels; y++)
+		{
+			KeyFrame keyframe;
+			aiNodeAnim* channel = assImpAnimation->mChannels[y];
+
+			for (auto bone : BoneList)
+			{
+				if (channel->mNodeName.C_Str() == bone->BoneName)
+				{
+					keyframe.BoneName = channel->mNodeName.C_Str();
+					keyframe.BoneId = bone->BoneID;
+					break;
+				}
+			}
+
+			for (int z = 0; z < channel->mNumPositionKeys; z++)
+			{
+				KeyFrameInfo PosKeyFrame;
+				PosKeyFrame.Time = channel->mPositionKeys[z].mTime;
+				PosKeyFrame.AnimationInfo = aiVector3D(channel->mPositionKeys[z].mValue.x, channel->mPositionKeys[z].mValue.y, channel->mPositionKeys[z].mValue.z);
+				keyframe.BonePosition.emplace_back(PosKeyFrame);
+			}
+
+			for (int z = 0; z < channel->mNumRotationKeys; z++)
+			{
+				KeyFrameRotationInfo RotKeyFrame;
+				RotKeyFrame.Time = channel->mRotationKeys[z].mTime;
+				RotKeyFrame.AnimationInfo = aiQuaternion(channel->mRotationKeys[z].mValue.w, channel->mRotationKeys[z].mValue.x, channel->mRotationKeys[z].mValue.y, channel->mRotationKeys[z].mValue.z);
+				keyframe.BoneRotation.emplace_back(RotKeyFrame);
+			}
+
+			for (int z = 0; z < channel->mNumScalingKeys; z++)
+			{
+				KeyFrameInfo ScaleKeyFrame;
+				ScaleKeyFrame.Time = channel->mScalingKeys[z].mTime;
+				ScaleKeyFrame.AnimationInfo = aiVector3D(channel->mScalingKeys[z].mValue.x, channel->mScalingKeys[z].mValue.y, channel->mScalingKeys[z].mValue.z);
+				keyframe.BoneScale.emplace_back(ScaleKeyFrame);
+			}
+
+			animation.AddBoneKeyFrame(keyframe);
+		}
+
+		AnimationList.emplace_back(animation);
+	}
+}
+
+void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList)
+{
+	for (int x = 0; x < mesh->mNumBones; x++)
+	{
+		bool Exists = false;
+		auto node = RootNode->FindNode(mesh->mBones[x]->mName.data);
+		BoneList.emplace_back(std::make_shared<Bone>(mesh->mBones[x]->mName.data, x, AssimpToGLMMatrixConverter(mesh->mBones[x]->mOffsetMatrix)));
+	}
+}
+
+void Model::LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -147,20 +151,32 @@ void Model::LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textu
 	{
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-		auto vertices = LoadVertices(mesh);
-		auto indices = LoadIndices(mesh);
-		auto material = LoadMaterial(engine, textureManager, FilePath, mesh, scene);
+		 auto vertices = LoadVertices(mesh);
+		 auto boneWeights = LoadBoneWeights(mesh, vertices);
+		 auto indices = LoadIndices(mesh);
+		 auto materialID = LoadMaterial(FilePath, mesh, scene);
 		
-		MeshList.emplace_back(Mesh(engine, vertices, indices, material, MeshList.size()));
-		MeshList.back().VertexOffset = TotalVertex;
-		MeshList.back().FirstIndex = TotalIndex;
-		TotalVertex += MeshList.back().VertexCount;
-		TotalIndex += MeshList.back().IndexCount;
+		LoadBones(scene->mRootNode, mesh, vertices);
+
+		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(vertices, indices, materialID, boneWeights, BoneList.size(), DrawFlags)));
+		MeshList.back()->ParentModelID = ModelID;
+		MeshList.back()->VertexList = vertices;
+		MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
+
+		TotalVertex += MeshList.back()->VertexCount;
+		TotalIndex += MeshList.back()->IndexCount;
+		for (auto nodeMap : NodeMapList)
+		{
+			if (nodeMap.NodeString == node->mName.C_Str())
+			{
+				MeshList.back()->MeshID = nodeMap.NodeID;
+			}
+		}
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(engine, textureManager, FilePath, node->mChildren[i], scene);
+		LoadMesh(FilePath, node->mChildren[i], scene, DrawFlags);
 	}
 }
 
@@ -174,14 +190,6 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 		vertex.Position = glm::vec3{ mesh->mVertices[x].x, mesh->mVertices[x].y, mesh->mVertices[x].z };
 		vertex.Normal = glm::vec3{ mesh->mNormals[x].x, mesh->mNormals[x].y, mesh->mNormals[x].z };
 
-		if(mesh->mColors[0])
-		{
-			vertex.Color = glm::vec4{ mesh->mColors[x]->r, mesh->mColors[x]->g, mesh->mColors[x]->b, mesh->mColors[x]->a };
-		}
-		else
-		{
-			vertex.Color = glm::vec4{ 0.6f, 0.6f, 0.6f, 1.0f };
-		}
 		if (mesh->mTangents)
 		{
 			vertex.Tangant = glm::vec4{ mesh->mTangents[x].x, mesh->mTangents[x].y, mesh->mTangents[x].z, 0.0f };
@@ -192,7 +200,6 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 			vertex.Tangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
 			vertex.BiTangant = glm::vec4{ 0.0f, 0.0f, 0.0f, 0.0f };
 		}
-
 		if (mesh->mTextureCoords[0])
 		{
 			vertex.TexureCoord = glm::vec2{ mesh->mTextureCoords[0][x].x, mesh->mTextureCoords[0][x].y };
@@ -202,14 +209,47 @@ std::vector<Vertex> Model::LoadVertices(aiMesh* mesh)
 			vertex.TexureCoord = glm::vec2{ 0.0f, 0.0f };
 		}
 
-		vertex.BoneID = glm::vec4(0.0f);
-		vertex.BoneWeights = glm::vec4(0.0f);
-
 		VertexList.emplace_back(vertex);
 		ModelVertices.emplace_back(vertex);
 	}
 
 	return VertexList;
+}
+
+std::vector<MeshBoneWeights> Model::LoadBoneWeights(aiMesh* mesh, std::vector<Vertex>& VertexList)
+{
+	std::vector<MeshBoneWeights> BoneWeightList(VertexList.size());
+	for (int x = 0; x < mesh->mNumBones; x++)
+	{
+		std::vector<unsigned int> AffectedVertices;
+		AffectedVertices.resize(BoneWeightList.size(), 0);
+
+		aiBone* bone = mesh->mBones[x];
+		for (int y = 0; y < bone->mNumWeights; y++)
+		{
+			unsigned int vertexID = bone->mWeights[y].mVertexId;
+			float weight = bone->mWeights[y].mWeight;
+			BoneWeightPlacement(BoneWeightList, vertexID, x, weight);
+		}
+	}
+
+	for (int x = 0; x < BoneWeightList.size(); x++)
+	{
+		float Weight = BoneWeightList[x].BoneWeights.x +
+			BoneWeightList[x].BoneWeights.y +
+			BoneWeightList[x].BoneWeights.z +
+			BoneWeightList[x].BoneWeights.w;
+		if (Weight != 1.0f)
+		{
+			BoneWeightList[x].BoneWeights = glm::vec4(
+				BoneWeightList[x].BoneWeights.x / Weight,
+				BoneWeightList[x].BoneWeights.y / Weight,
+				BoneWeightList[x].BoneWeights.z / Weight,
+				BoneWeightList[x].BoneWeights.w / Weight);
+		}
+	}
+
+	return BoneWeightList;
 }
 
 std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
@@ -229,81 +269,123 @@ std::vector<uint32_t> Model::LoadIndices(aiMesh* mesh)
 	return IndexList;
 }
 
-Material Model::LoadMaterial(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
+std::shared_ptr<Material> Model::LoadMaterial(const std::string& FilePath, aiMesh* mesh, const aiScene* scene)
 {
-	Material ModelMaterial;
+	MaterialTexture MaterialInfo;
 
 	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 	auto directory = FilePath.substr(0, FilePath.find_last_of('/')) + '/';
 
 	aiColor3D color(0.f, 0.f, 0.f);
 	material->Get(AI_MATKEY_COLOR_AMBIENT, color);
-	ModelMaterial.Ambient.r = color.r;
-	ModelMaterial.Ambient.g = color.g;
-	ModelMaterial.Ambient.b = color.b;
+	MaterialInfo.Ambient.r = color.r;
+	MaterialInfo.Ambient.g = color.g;
+	MaterialInfo.Ambient.b = color.b;
 
 	material->Get(AI_MATKEY_COLOR_DIFFUSE, color);
-	ModelMaterial.Diffuse.r = color.r;
-	ModelMaterial.Diffuse.g = color.g;
-	ModelMaterial.Diffuse.b = color.b;
+	MaterialInfo.Diffuse.r = color.r;
+	MaterialInfo.Diffuse.g = color.g;
+	MaterialInfo.Diffuse.b = color.b;
 
 	material->Get(AI_MATKEY_COLOR_SPECULAR, color);
-	ModelMaterial.Specular.r = color.r;
-	ModelMaterial.Specular.g = color.g;
-	ModelMaterial.Specular.b = color.b;
+	MaterialInfo.Specular.r = color.r;
+	MaterialInfo.Specular.g = color.g;
+	MaterialInfo.Specular.b = color.b;
 
-
-	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &ModelMaterial.Shininess))
+	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &MaterialInfo.Shininess))
 	{
-		ModelMaterial.Shininess = 32.0f;
+		MaterialInfo.Shininess = 32.0f;
 	}
 
-	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &ModelMaterial.Reflectivness))
+	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &MaterialInfo.Reflectivness))
 	{
-		ModelMaterial.Reflectivness = 0.0f;
+		MaterialInfo.Reflectivness = 0.0f;
 	}
 
 	aiString TextureLocation;
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
-	//{
-	//	material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
-	//	ModelMaterial.DiffuseMapID = textureManager.LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE); x++)
+	{
+		material->GetTexture(aiTextureType_DIFFUSE, x, &TextureLocation);
+		MaterialInfo.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_SRGB);
+		MaterialInfo.AlbedoMap = MaterialInfo.DiffuseMap;
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
-	//{
-	//	material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
-	//	ModelMaterial.SpecularMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_METALNESS); x++)
+	{
+		material->GetTexture(aiTextureType_METALNESS, x, &TextureLocation);
+		MaterialInfo.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
-	//{
-	//	material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
-	//	ModelMaterial.NormalMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_DIFFUSE_ROUGHNESS); x++)
+	{
+		material->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, x, &TextureLocation);
+		MaterialInfo.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
-	//{
-	//	material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
-	//	ModelMaterial.DepthMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_AMBIENT_OCCLUSION); x++)
+	{
+		material->GetTexture(aiTextureType_AMBIENT_OCCLUSION, x, &TextureLocation);
+		MaterialInfo.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
-	//{
-	//	material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
-	//	ModelMaterial.AlphaMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_SPECULAR); x++)
+	{
+		material->GetTexture(aiTextureType_SPECULAR, x, &TextureLocation);
+		MaterialInfo.SpecularMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	//for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
-	//{
-	//	material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
-	//	ModelMaterial.EmissionMapID = textureManager.LoadTexture2D(engine, directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
-	//}
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_NORMALS); x++)
+	{
+		material->GetTexture(aiTextureType_NORMALS, x, &TextureLocation);
+		MaterialInfo.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
 
-	return ModelMaterial;
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_HEIGHT); x++)
+	{
+		material->GetTexture(aiTextureType_HEIGHT, x, &TextureLocation);
+		MaterialInfo.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_OPACITY); x++)
+	{
+		material->GetTexture(aiTextureType_OPACITY, x, &TextureLocation);
+		MaterialInfo.AlphaMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	for (unsigned int x = 0; x < material->GetTextureCount(aiTextureType_EMISSIVE); x++)
+	{
+		material->GetTexture(aiTextureType_EMISSIVE, x, &TextureLocation);
+		MaterialInfo.EmissionMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(directory + TextureLocation.C_Str(), VK_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	return MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("ModelMaterial", MaterialInfo);
 }
 
-void Model::Update(VulkanEngine& engine)
+void Model::BoneWeightPlacement(std::vector<MeshBoneWeights>& meshBoneWeight, unsigned int vertexID, unsigned int bone_id, float weight)
+{
+	for (unsigned int i = 0; i < MAX_BONE_VERTEX_COUNT; i++)
+	{
+		if (meshBoneWeight[vertexID].BoneWeights[i] == 0.0)
+		{
+			meshBoneWeight[vertexID].BoneID[i] = bone_id;
+			meshBoneWeight[vertexID].BoneWeights[i] = weight;
+			return;
+		}
+	}
+}
+
+void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
+{
+	glm::mat4 glmTransform = AssimpToGLMMatrixConverter(NodeMapList[NodeID].NodeTransform);
+	glm::mat4 GlobalTransform = ParentMatrix * glmTransform;
+
+	for (int x = 0; x < NodeMapList[NodeID].ChildNodeList.size(); x++)
+	{
+		LoadMeshTransform(NodeMapList[NodeID].ChildNodeList[x], GlobalTransform);
+	}
+}
+
+void Model::Update(bool RayTraceFlag)
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -312,34 +394,67 @@ void Model::Update(VulkanEngine& engine)
 	ModelTransform = glm::rotate(ModelTransform, glm::radians(ModelRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	ModelTransform = glm::scale(ModelTransform, ModelScale);
 
-	for(auto& mesh : MeshList)
+	if (BoneList.size() > 0)
 	{
-		mesh.Update(engine, ModelTransform);
+		AnimationPlayer.Update();
+	}
+
+	for (auto& mesh : MeshList)
+	{
+		mesh->Update(ModelTransform, BoneList);
 	}
 }
 
-void Model::Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline)
-{
-	for (auto mesh : MeshList)
-	{
-		mesh.Draw(commandBuffer, pipeline);
-	}
-}
-
-void Model::Destory(VulkanEngine& engine)
+void Model::Update()
 {
 	for (auto& mesh : MeshList)
 	{
-		mesh.Destory(engine);
+		mesh->Update();
 	}
-
-	 ModelIndexBuffer.DestoryBuffer();
-	 ModelVertexBuffer.DestoryBuffer();
-	 ModelTransformBuffer.DestoryBuffer();
-
-	 if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
-	 {
-		 BottomLevelAccelerationBuffer.Destroy(engine);
-	 }
 }
 
+void Model::SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList)
+{
+	if (AnimatedModel)
+	{
+		AnimationRenderer.Compute();
+		CMDBufferList.emplace_back(AnimationRenderer.commandBuffer);
+	}
+}
+
+void Model::AddMesh(std::shared_ptr<Mesh> mesh)
+{
+	mesh->ParentModelID = ModelID;
+	MeshList.emplace_back(mesh);
+}
+
+void Model::Destory()
+{
+	if (AnimatedModel)
+	{
+		AnimationRenderer.Destroy();
+	}
+}
+
+glm::mat4 Model::AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix)
+{
+	glm::mat4 GLMMatrix;
+	for (int y = 0; y < 4; y++)
+	{
+		for (int x = 0; x < 4; x++)
+		{
+			GLMMatrix[x][y] = AssMatrix[y][x];
+		}
+	}
+	return GLMMatrix;
+}
+
+VkTransformMatrixKHR Model::GLMToVkTransformMatrix(glm::mat4 matrix)
+{
+	return VkTransformMatrixKHR
+	{
+		matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+		matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+		matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+	};
+}

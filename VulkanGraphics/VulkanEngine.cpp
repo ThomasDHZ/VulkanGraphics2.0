@@ -10,7 +10,7 @@ VulkanEngine::VulkanEngine()
 
 VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 {
-	ScreenResoulation = glm::ivec2(window->GetWindowWidth(), window->GetWindowHeight());
+	ScreenResoulation = glm::ivec2(WindowPtr::GetWindowPtr()->GetWindowWidth(), WindowPtr::GetWindowPtr()->GetWindowHeight());
 
 	ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
 
@@ -229,7 +229,7 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
 	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
 	BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
-
+	
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
 	RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 	RayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
@@ -387,9 +387,6 @@ void VulkanEngine::InitializeSyncObjects()
 	AcquireImageSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 	PresentImageSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 
-	vulkanSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-	imagesInFlight.resize(MAX_FRAMES_IN_FLIGHT);
-
 	VkSemaphoreTypeCreateInfo timelineCreateInfo;
 	timelineCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_TYPE_CREATE_INFO;
 	timelineCreateInfo.pNext = NULL;
@@ -408,9 +405,6 @@ void VulkanEngine::InitializeSyncObjects()
 	{
 		if (vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &AcquireImageSemaphores[i]) != VK_SUCCESS ||
 			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &PresentImageSemaphores[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &vulkanSemaphores[i].ImageAcquiredSemaphore) != VK_SUCCESS ||
-			vkCreateSemaphore(Device, &semaphoreInfo, nullptr, &vulkanSemaphores[i].RenderCompleteSemaphore) != VK_SUCCESS ||
-			vkCreateFence(Device, &fenceInfo, nullptr, &imagesInFlight[i]) != VK_SUCCESS||
 			vkCreateFence(Device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create synchronization objects for a frame!");
@@ -622,7 +616,7 @@ VkDescriptorSetLayout VulkanEngine::CreateDescriptorSetLayout(std::vector<Descri
 	if (vkCreateDescriptorSetLayout(Device, &layoutInfo, nullptr, &descriptorSet) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor set layout!");
 	}
-
+	
 	return descriptorSet;
 }
 

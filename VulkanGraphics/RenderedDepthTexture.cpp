@@ -13,7 +13,7 @@ RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine)
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();
-  // ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount) : Texture(TextureType::vkRenderedTexture)
@@ -26,7 +26,7 @@ RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine,
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();
- //   ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)

@@ -9,74 +9,76 @@
 #include "TextureManager.h"
 #include "Vertex.h"
 #include "Mesh.h"
+#include <unordered_map>
+#include "Animation3D.h"
+#include "AnimationPlayer3D.h"
+#include "AnimatorCompute.h"
+
+const unsigned int MAX_BONE_VERTEX_COUNT = 4;
+
+enum ModelTypeEnum
+{
+	Model_Type_Normal = 0x00,
+	Model_Type_2D_Level = 0x01
+};
+
+class Node
+{
+	unsigned int NodeID;
+	std::shared_ptr<Node> ParentNode;
+	std::vector<std::shared_ptr<Node>> Children;
+};
 
 class Model
 {
 private:
-	PFN_vkGetBufferDeviceAddressKHR vkGetBufferDeviceAddressKHR;
-	PFN_vkCreateAccelerationStructureKHR vkCreateAccelerationStructureKHR;
-	PFN_vkDestroyAccelerationStructureKHR vkDestroyAccelerationStructureKHR;
-	PFN_vkGetAccelerationStructureBuildSizesKHR vkGetAccelerationStructureBuildSizesKHR;
-	PFN_vkGetAccelerationStructureDeviceAddressKHR vkGetAccelerationStructureDeviceAddressKHR;
-	PFN_vkCmdBuildAccelerationStructuresKHR vkCmdBuildAccelerationStructuresKHR;
-	PFN_vkBuildAccelerationStructuresKHR vkBuildAccelerationStructuresKHR;
-	PFN_vkCmdTraceRaysKHR vkCmdTraceRaysKHR;
-	PFN_vkGetRayTracingShaderGroupHandlesKHR vkGetRayTracingShaderGroupHandlesKHR;
-	PFN_vkCreateRayTracingPipelinesKHR vkCreateRayTracingPipelinesKHR;
-
-	void BottomLevelAccelerationStructure(VulkanEngine& engine);
-	void TopLevelAccelerationStructure(VulkanEngine& engine);
-	void LoadMesh(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
+	void LoadAnimations(const aiScene* scene);
+	void LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
+	std::vector<MeshBoneWeights> LoadBoneWeights(aiMesh* mesh, std::vector<Vertex>& VertexList);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
-	Material LoadMaterial(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	std::shared_ptr<Material> LoadMaterial(const std::string& FilePath, aiMesh* mesh, const aiScene* scene);
+	void LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Vertex>& VertexList);
+	void BoneWeightPlacement(std::vector<MeshBoneWeights>& VertexList, unsigned int vertexID, unsigned int bone_id, float weight);
+	void LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix);
+
+	std::vector<Animation3D> AnimationList;
+	std::vector<NodeMap> NodeMapList;
+	glm::mat4 GlobalInverseTransformMatrix;
+	AnimationPlayer3D AnimationPlayer;
+	AnimatorCompute AnimationRenderer;
+
+	bool AnimatedModel = false;
 
 public:
+	uint32_t ModelID = 0;
+	ModelTypeEnum ModelType = ModelTypeEnum::Model_Type_Normal;
+
 	glm::vec3 ModelPosition = glm::vec3(0.0f);
 	glm::vec3 ModelRotation = glm::vec3(0.0f);
 	glm::vec3 ModelScale = glm::vec3(1.0f);
 
-	std::vector<Mesh> MeshList;
+	std::vector<std::shared_ptr<Mesh>> MeshList;
+	std::vector<std::shared_ptr<Bone>> BoneList;
 
 	std::vector<Vertex> ModelVertices;
 	std::vector<uint32_t> ModelIndices;
 	glm::mat4 ModelTransform;
 
-	VulkanBuffer ModelIndexBuffer;
-	VulkanBuffer ModelVertexBuffer;
-	VulkanBuffer ModelTransformBuffer;
-
-	uint32_t ModelTriangleCount;
-	uint32_t ModelVertexCount;
-	uint32_t ModelIndexCount;
-
-	AccelerationStructure BottomLevelAccelerationBuffer;
-	AccelerationStructure TopLevelAccelerationBuffer;
-
-	VkDeviceOrHostAddressConstKHR ModelVertexBufferDeviceAddress{};
-	VkDeviceOrHostAddressConstKHR ModelIndexBufferDeviceAddress{};
-	VkDeviceOrHostAddressConstKHR ModelTransformBufferDeviceAddress{};
-
-	std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
-
 	Model();
-	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	Model(VulkanEngine& engine, std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Material& material);
-	Model(VulkanEngine& engine, std::shared_ptr<TextureManager> textureManager, const std::string& FilePath);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	Model(const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
 	~Model();
 
-	void Update(VulkanEngine& engine);
-	void Draw(VkCommandBuffer commandBuffer, std::shared_ptr<GraphicsPipeline> pipeline);
-	void Destory(VulkanEngine& engine);
-
-	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix)
-	{
-		return VkTransformMatrixKHR
-		{
-			matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
-			matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
-			matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
-		};
-	}
+	void Update(bool RayTraceFlag);
+	virtual void Update();
+	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList);
+	void AddMesh(std::shared_ptr<Mesh> mesh);
+	void Destory();
+	
+	glm::mat4 AssimpToGLMMatrixConverter(aiMatrix4x4 AssMatrix);
+	VkTransformMatrixKHR GLMToVkTransformMatrix(glm::mat4 matrix);
 };
 

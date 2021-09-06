@@ -13,7 +13,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "VulkanBuffer.h"
 #include <chrono>
-#include "VulkanPtr.h"
 
 #define VKB_VALIDATION_LAYERS
 
@@ -41,20 +40,6 @@ struct DescriptorSetLayoutBindingInfo
 class VulkanEngine
 {
 private:
-	struct VulkanSemaphores
-	{
-		VkSemaphore ImageAcquiredSemaphore;
-		VkSemaphore RenderCompleteSemaphore;
-
-		void Destory(VkDevice device)
-		{
-			vkDestroySemaphore(device, RenderCompleteSemaphore, nullptr);
-			vkDestroySemaphore(device, ImageAcquiredSemaphore, nullptr);
-
-			RenderCompleteSemaphore = VK_NULL_HANDLE;
-			ImageAcquiredSemaphore = VK_NULL_HANDLE;
-		}
-	};
 
 	std::vector<const char*> ValidationLayers;
 	std::vector<const char*> DeviceExtensions;
@@ -64,10 +49,10 @@ private:
 	uint32_t NextObjID = 1;
 	uint32_t NextID = 0;
 
-	void SetUpDeviceFeatures(GLFWwindow* window);
+    void SetUpDeviceFeatures(GLFWwindow* window);
 
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
-	bool checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
+    bool checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
 
 	VkSampleCountFlagBits GetMaxUsableSampleCount(VkPhysicalDevice GPUDevice);
 
@@ -103,10 +88,6 @@ public:
 	std::vector<VkFence> inFlightFences;
 	std::vector<VkSemaphore> AcquireImageSemaphores;
 	std::vector<VkSemaphore> PresentImageSemaphores;
-
-	std::vector<VulkanSemaphores> vulkanSemaphores;
-	std::vector<VkFence> imagesInFlight;
-
 	uint32_t ImageIndex = 0;
 	uint32_t CMDIndex = 0;
 
@@ -183,18 +164,6 @@ class EnginePtr
 private:
 	static std::shared_ptr<VulkanEngine> enginePtr;
 public:
-	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
-	{
-		if (enginePtr == nullptr)
-		{
-			enginePtr = engine;
-		}
-		else
-		{
-			std::cout << "Engine has already been initialized." << std::endl;
-		}
-	}
-
 	static void SetUpPtr(std::shared_ptr<VulkanWindow> window)
 	{
 		if (enginePtr == nullptr)

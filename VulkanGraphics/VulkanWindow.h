@@ -45,18 +45,6 @@ public:
 		}
 	}
 
-	static void SetUpPtr(std::shared_ptr<VulkanWindow> window)
-	{
-		if (windowPtr == nullptr)
-		{
-			windowPtr = window;
-		}
-		else
-		{
-			std::cout << "Window has already been initialized." << std::endl;
-		}
-	}
-
 	static std::shared_ptr<VulkanWindow> GetWindowPtr()
 	{
 		return windowPtr;

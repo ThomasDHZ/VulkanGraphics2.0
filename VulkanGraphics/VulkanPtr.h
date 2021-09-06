@@ -88,7 +88,7 @@ public:
 			std::cout << "Present Queue already Set" << std::endl;
 		}
 	}
-
+	
 	static void SetCommandPool(VkCommandPool commandPool)
 	{
 		if (CommandPool == VK_NULL_HANDLE)
@@ -109,3 +109,4 @@ public:
 	static VkQueue GetPresentQueue() { return PresentQueue; };
 	static VkCommandPool GetCommandPool() { return CommandPool; };
 };
+

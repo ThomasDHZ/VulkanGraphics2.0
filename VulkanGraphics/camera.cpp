@@ -8,10 +8,6 @@ Camera::~Camera()
 {
 }
 
-void Camera::Update()
-{
-}
-
 void Camera::UpdateScreenSize(int NewWidth, int NewHeight)
 {
 }

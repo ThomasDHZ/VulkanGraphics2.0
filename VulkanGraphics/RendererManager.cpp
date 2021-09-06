@@ -1,16 +1,16 @@
 #include "RendererManager.h"
 #include <stb_image.h>
-//#include "BlinnPhongPipeline.h"
+#include "BlinnPhongPipeline.h"
 
 RendererManager::RendererManager()
 {
 }
 
-RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, TextureManager textureManager, ModelRenderManager modelrenderer, std::vector<Model> modelList, std::shared_ptr<SceneDataStruct> scene)
+RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     interfaceRenderPass = InterfaceRenderPass(engine);
-   // BlinnRenderer = BlinnPhongRasterRenderer(engine);
-   // rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), textureManager, modelrenderer, modelList, scene);
+    BlinnRenderer = BlinnPhongRasterRenderer(engine);
+    rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
 
     // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
     // pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
@@ -46,14 +46,14 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
     vkDestroySwapchainKHR(engine->Device, engine->SwapChain.GetSwapChain(), nullptr);
 
    // AssetManagerPtr::GetAssetPtr()->Update();
-   // engine->SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine->Device, engine->PhysicalDevice, engine->Surface);
+    engine->SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine->Device, engine->PhysicalDevice, engine->Surface);
 
-   // interfaceRenderPass.RebuildSwapChain();
-   // BlinnRenderer.RebuildSwapChain();
+    interfaceRenderPass.RebuildSwapChain();
+    BlinnRenderer.RebuildSwapChain();
 
    //blinnPhongRenderer.RebuildSwapChain();
     //pbrRenderer.RebuildSwapChain();
-  //  rayTraceRenderer.RebuildSwapChain(engine,window);
+    rayTraceRenderer.RebuildSwapChain(engine,window);
     //pbrRayTraceRenderer.RebuildSwapChain();
     //hybridRenderer.RebuildSwapChain();
     //renderer2D.RebuildSwapChain();
@@ -68,10 +68,10 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
         engine->UpdateRendererFlag = false;
     }
 
-   //AssetManagerPtr::GetAssetPtr()->Update();
+    AssetManagerPtr::GetAssetPtr()->Update();
     //if (EnginePtr::GetEnginePtr()->RayTraceFlag)
     //{
-     //  rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
+       rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
        // pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
        // hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
    // }
@@ -83,78 +83,78 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
     //ImGui::SliderInt("Active Camera", &AssetManagerPtr::GetAssetPtr()->cameraManager->cameraIndex, 0, AssetManagerPtr::GetAssetPtr()->cameraManager->CameraList.size());
 
-   // ImGui::LabelText("Directional Light", "Directional Light");
-   // for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
-   // {
-   //     ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
-   //     ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-   //     ImGui::LabelText("______", "______");
-   // }
+    ImGui::LabelText("Directional Light", "Directional Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
+    {
+        ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
 
-   // ImGui::LabelText("Point Light", "Point Light");
-   // for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->PointLightList.size(); x++)
-   // {
-   //     ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
-   //     ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-   //     ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-   //     ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
-   //     ImGui::LabelText("______", "______");
-   // }
+    ImGui::LabelText("Point Light", "Point Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->PointLightList.size(); x++)
+    {
+        ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
+        ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
 
-   // ImGui::LabelText("SpotLight Light", "Directional Light");
-   // for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->SpotLightList.size(); x++)
-   // {
-   //     ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -10.0f, 10.0f);
-   //     ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
-   //     ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-   //     ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-   //     ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
-   //     ImGui::LabelText("______", "______");
-   // }
+    ImGui::LabelText("SpotLight Light", "Directional Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->SpotLightList.size(); x++)
+    {
+        ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+        ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
 
-   // for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
-   // {
-   //     ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
-   //     ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
-   //     ImGui::SliderFloat2(("UV " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-   //     ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVScale.x, 0.0f, 2.0f);
-   //     ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
-   //     ImGui::LabelText("______", "______");
-   // }
+    for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
+    {
+        ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
+        ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
+        ImGui::SliderFloat2(("UV " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+        ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVScale.x, 0.0f, 2.0f);
+        ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
 
-   // if (ActiveRenderer == 0)
-   // {
-   //     BlinnRenderer.GUIUpdate();
-   // }
-   // //else if (ActiveRenderer == 1)
-   // //{
-   // //    pbrRenderer.GUIUpdate();
-   // //}
-   // //else if (ActiveRenderer == 2)
-   // //{
-   // //    rayTraceRenderer.GUIUpdate();
-   // //}
-   // //else if (ActiveRenderer == 3)
-   // //{
-   // //    pbrRayTraceRenderer.GUIUpdate();
-   // //}
-   // //else if (ActiveRenderer == 4)
-   // //{
-   // //    hybridRenderer.GUIUpdate();
-   // //}
-   // //else if (ActiveRenderer == 5)
-   // //{
-   // //    renderer2D.GUIUpdate();
-   // //}
-   ///* guiRenderer.GUIUpdate();*/
+    if (ActiveRenderer == 0)
+    {
+        BlinnRenderer.GUIUpdate();
+    }
+    //else if (ActiveRenderer == 1)
+    //{
+    //    pbrRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 2)
+    //{
+    //    rayTraceRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 3)
+    //{
+    //    pbrRayTraceRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 4)
+    //{
+    //    hybridRenderer.GUIUpdate();
+    //}
+    //else if (ActiveRenderer == 5)
+    //{
+    //    renderer2D.GUIUpdate();
+    //}
+   /* guiRenderer.GUIUpdate();*/
 }
 
 void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
@@ -179,18 +179,18 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 
     std::vector<VkCommandBuffer> CommandBufferSubmitList;
 
-    //AssetManagerPtr::GetAssetPtr()->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList);
-    //if (ActiveRenderer == 0)
-    //{
-    //    BlinnRenderer.Draw();
-    //    BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    //}
-    //else if (ActiveRenderer == 1)
-    //{
-    //    EnginePtr::GetEnginePtr()->RayTraceFlag = true;
-    //    rayTraceRenderer.Draw(engine, window);
-    //    rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    //}
+    AssetManagerPtr::GetAssetPtr()->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList);
+    if (ActiveRenderer == 0)
+    {
+        BlinnRenderer.Draw();
+        BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 1)
+    {
+        EnginePtr::GetEnginePtr()->RayTraceFlag = true;
+        rayTraceRenderer.Draw(engine, window);
+        rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
 
     interfaceRenderPass.Draw();
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
@@ -232,8 +232,8 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
 void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     interfaceRenderPass.Destroy();
-    //BlinnRenderer.Destroy();
-    //rayTraceRenderer.Destroy(engine);
+    BlinnRenderer.Destroy();
+    rayTraceRenderer.Destroy(engine);
 
    // blinnPhongRenderer.Destroy();
     //pbrRenderer.Destroy();

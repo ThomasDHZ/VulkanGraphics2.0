@@ -20,10 +20,9 @@ VulkanSwapChain::~VulkanSwapChain()
 
 VkSurfaceFormatKHR VulkanSwapChain::FindSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
-	for (const auto& availableFormat : availableFormats)
+	for (const auto& availableFormat : availableFormats) 
 	{
-		if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
-			availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) 
 		{
 			return availableFormat;
 		}
@@ -116,7 +115,7 @@ void VulkanSwapChain::SetUpSwapChain(GLFWwindow* window, const VkDevice& device,
 	SwapChainCreateInfo.imageColorSpace = SwapChainImageFormat.colorSpace;
 	SwapChainCreateInfo.imageExtent = SwapChainResolution;
 	SwapChainCreateInfo.imageArrayLayers = 1;
-	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	SwapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	SwapChainCreateInfo.preTransform = SwapChainCapabilities.currentTransform;
 	SwapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	SwapChainCreateInfo.presentMode = SwapChainPresentMode;
@@ -180,7 +179,7 @@ void VulkanSwapChain::Destroy(VkDevice device)
 	Swapchain = VK_NULL_HANDLE;
 }
 
-void VulkanSwapChain::UpdateSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface)
+void VulkanSwapChain::RebuildSwapChain(GLFWwindow* window, const VkDevice& device, const VkPhysicalDevice& physicalDevice, const VkSurfaceKHR& surface)
 {
 	SetUpSwapChain(window, device, physicalDevice, surface);
 	SetUpSwapChainImageViews(device);

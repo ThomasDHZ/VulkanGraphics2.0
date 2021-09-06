@@ -1,8 +1,8 @@
 #pragma once
 #include "Vulkanengine.h"
 #include "InterfaceRenderPass.h"
-//#include "BlinnPhongRasterPass.h"
-//#include "BlinnPhongRasterRenderer.h"
+#include "BlinnPhongRasterPass.h"
+#include "BlinnPhongRasterRenderer.h"
 #include "FrameBufferRenderPass.h"
 //#include "PBRRenderer.h"
 //#include "BlinnPhongRasterRenderer.h"
@@ -19,19 +19,19 @@ private:
 
 	//BlinnPhongRasterRenderer blinnPhongRenderer;
 	//PBRRenderer pbrRenderer;
-	//RayTraceRenderer rayTraceRenderer;
+	RayTraceRenderer rayTraceRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;
 	//HybridRenderer hybridRenderer;
 	//Renderer2D renderer2D;
 	//GUIRenderer guiRenderer;
 
-	//BlinnPhongRasterRenderer BlinnRenderer;
+	BlinnPhongRasterRenderer BlinnRenderer;
 	InterfaceRenderPass interfaceRenderPass;
-//	RayTraceRenderer rayTraceRenderer;
+
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;
 public:
 	RendererManager();
-	RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, TextureManager textureManager, ModelRenderManager modelrenderer, std::vector<Model> modelList, std::shared_ptr<SceneDataStruct> scene);
+	RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);
 	~RendererManager();
 
 	void RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window);

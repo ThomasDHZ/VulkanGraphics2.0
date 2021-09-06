@@ -1,31 +1,49 @@
 #pragma once
-#include "VulkanEngine.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-struct Material
-{
-	alignas(16) glm::vec3 Ambient = glm::vec3(0.2f);
-	alignas(16) glm::vec3 Diffuse = glm::vec3(0.6f);
-	alignas(16) glm::vec3 Specular = glm::vec3(1.0f);
-	alignas(4) float Shininess = 32;
-	alignas(4) float Reflectivness = 0;
-
-	alignas(4) uint32_t DiffuseMapID = 0;
-	alignas(4) uint32_t SpecularMapID = 0;
-	alignas(4) uint32_t NormalMapID = 0;
-	alignas(4) uint32_t DepthMapID = 0;
-	alignas(4) uint32_t AlphaMapID = 0;
-	alignas(4) uint32_t EmissionMapID = 0;
-	alignas(4) uint32_t ShadowMapID = 0;
-};
+#include "Material.h"
 
 class MaterialManager
 {
 private:
-	std::vector<Material> MaterialList;
+	std::vector<std::shared_ptr<Material>> MaterialList;
 
-	uint32_t IsMateralLoaded(std::string name);
 public:
+	MaterialManager();
+	MaterialManager(std::shared_ptr<VulkanEngine> engine);
+	~MaterialManager();
+
+	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
+	void UpdateBufferIndex();
+	void DeleteMaterial(uint32_t MaterialID);
+	void Destory();
+
+	std::shared_ptr<Material> LoadMaterial(std::string MaterialName, std::shared_ptr<Material> material);
+	std::shared_ptr<Material> LoadMaterial(std::string MaterialName, MaterialTexture& materialData);
+	std::shared_ptr<Material> GetDefaultMaterial();
+	std::shared_ptr<Material> GetMaterialByID(uint32_t MaterialID);
+	std::shared_ptr<Material> GetMaterialByName(const std::string MaterialName);
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
+	uint32_t GetMaterialDescriptorCount();
 };
 
+class MaterialManagerPtr
+{
+private:
+	static std::shared_ptr<MaterialManager> materialManager;
+public:
+	static void SetUpPtr(std::shared_ptr<VulkanEngine> engine)
+	{
+		if (materialManager == nullptr)
+		{
+			materialManager = std::make_shared<MaterialManager>(MaterialManager(engine));
+		}
+		else
+		{
+			std::cout << "Material Manager has already been initialized." << std::endl;
+		}
+	}
+
+	static std::shared_ptr<MaterialManager> GetMaterialManagerPtr()
+	{
+		return materialManager;
+	}
+};

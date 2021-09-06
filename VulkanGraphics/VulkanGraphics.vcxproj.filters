@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
@@ -19,129 +15,70 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{5675aa2a-079a-4ff1-a593-64b98353056d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files\texture">
+      <UniqueIdentifier>{28ccf9ec-8f77-40d8-9e7a-bc0914943421}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\texture">
+      <UniqueIdentifier>{15e1ca3b-21a2-4158-8374-675b78d16116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\managers">
+      <UniqueIdentifier>{d15993a4-c650-4485-a9a1-8ffc22043325}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\managers">
+      <UniqueIdentifier>{e759b138-6253-486c-9b75-78d68913d866}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\RaytraceShaders">
+      <UniqueIdentifier>{34bc8d69-3b75-4a37-85aa-d33c2d5772f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\RasterShaders">
+      <UniqueIdentifier>{488dbe2d-6ee0-4a9e-8cf7-af001059482d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Include">
+      <UniqueIdentifier>{6d157526-4733-4834-9408-dcc0b256f4cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\ComputeShader">
+      <UniqueIdentifier>{c88e54cf-50d4-474f-b3d8-69b729fe4c9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{51c984f2-a129-4191-8066-7d5c3d2a34e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\Pipelines">
+      <UniqueIdentifier>{f8d88d74-7d07-4fb7-a1d3-92e896685c90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\RenderPass">
+      <UniqueIdentifier>{203b892f-e9b9-4ff8-a3ee-e14dd721f8f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering\Renderer">
+      <UniqueIdentifier>{a9487c41-f4f5-4a10-8188-f05440aabda6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{6fdd6d28-5d5a-4c55-b52b-a7a24e3b4930}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\RenderPass">
+      <UniqueIdentifier>{b1a5d079-2e40-48c7-9521-4fd51564cf41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Pipeline">
+      <UniqueIdentifier>{5f1538db-0c2b-4ded-ba8e-9145152747ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering\Renderer">
+      <UniqueIdentifier>{ac818faa-14ca-4fd8-abaa-c6208afbd580}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lights">
+      <UniqueIdentifier>{42bc0bdc-c627-4b2d-b296-706ef1b8fc6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lights">
+      <UniqueIdentifier>{0f63c4fe-b3a0-4b17-bbf0-c2de46a4f794}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_vulkan.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_glfw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="AccelerationStructure.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeMapTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DDSTextureLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FontTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ForwardRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FrameBufferRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FrameBufferRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="InterfaceRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MainRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MaterialManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelRenderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PerspectiveCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RayTraceRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedColorTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedCubeMapTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedDepthTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedGBufferNormalTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedGBufferPositionTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedGTBNTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedRayTracedColorTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
+    <ClCompile Include="VulkanWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VulkanBuffer.cpp">
@@ -159,86 +96,255 @@
     <ClCompile Include="VulkanSwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanWindow.cpp">
+    <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_glfw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_vulkan.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="GameController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Keyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PerspectiveCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OrthographicCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DDSTextureLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FontTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMapTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="HeightMapTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedColorTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedCubeMapTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferNormalTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGBufferPositionTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedGTBNTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedRayTracedColorTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedDepthTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Source Files\managers</Filter>
     </ClCompile>
     <ClCompile Include="RendererManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AccelerationStructure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="LightManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="GUIObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationPlayer3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Bone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimatorCompute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LightViewCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTraceRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBufferPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracedPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracingGraphicsPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnPhongRasterPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnPhongPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="BlinnPhongRasterRenderer.cpp">
+      <Filter>Source Files\Rendering\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTraceRenderer.cpp">
+      <Filter>Source Files\Rendering\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseRenderer.cpp">
+      <Filter>Source Files\Rendering\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="InterfaceRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\PBR_BloomOutput.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\PBR_BloomOutput.vert">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\Structs.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\VertexStructs.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\PBR.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\closesthit.rchit">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\miss.rmiss">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shaders\raygen.rgen">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="shadow.rmiss">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\closesthit.rchit">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\compile.bat">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\Lighting.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\Material.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\miss.rmiss">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\pathtrace.rgen">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\RasterShadowClosestHit.rchit">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\raygen.rgen">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\shader.frag">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\shader.vert">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Shader\shadow.rmiss">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="alpha.rahit">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="imgui.ini">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="VulkanWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanDebugger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanSwapChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
       <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_glfw.h">
       <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imgui_impl_vulkan.h">
@@ -256,152 +362,268 @@
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_glfw.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="RayTraceVertexBuffer.h">
+    <ClInclude Include="GameController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RayTraceIndicesBuffer.h">
+    <ClInclude Include="Keyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RayTraceTexture.h">
+    <ClInclude Include="Mouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
+    <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanPtr.h">
+    <ClInclude Include="PerspectiveCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OrthographicCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pixel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DDSTextureLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture3D.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedRayTracedColorTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGTBNTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferPositionTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferNormalTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedGBufferAlbedoTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedCubeMapTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedColorTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMapTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="FontTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="HeightMapTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Header Files\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.h">
+      <Filter>Header Files\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Header Files\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="RendererManager.h">
+      <Filter>Header Files\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialManager.h">
+      <Filter>Header Files\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshManager.h">
+      <Filter>Header Files\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="GUIMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AccelerationStructure.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeMapTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DDSTextureLoader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FontTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ForwardRenderingPipeline.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBufferRenderingPipeline.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBufferRenderPass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsPipeline.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InterfaceRenderPass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MainRenderPass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialManager.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelRenderManager.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mouse.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PerspectiveCamera.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Pixel.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RayTraceRenderer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedColorTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedCubeMapTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedDepthTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGBufferAlbedoTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGBufferNormalTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGBufferPositionTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGTBNTexture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedRayTracedColorTexture.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SceneData.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SceneRenderingPipeline.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>Header Files\managers</Filter>
     </ClInclude>
-    <ClInclude Include="SceneRenderPass.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="LightManager.h">
+      <Filter>Header Files\managers</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="GUIManager.h">
+      <Filter>Header Files\managers</Filter>
     </ClInclude>
-    <ClInclude Include="Texture2D.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Header Files\managers</Filter>
     </ClInclude>
-    <ClInclude Include="Texture3D.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="GUIObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextureManager.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Object.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Font.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanBuffer.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanBufferManager.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Animation3D.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanDebugger.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="AnimationPlayer3D.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanEngine.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="bone.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanSwapChain.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="AnimatorCompute.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanWindow.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="LightViewCamera.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RendererManager.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracingGraphicsPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracedPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRenderer.h">
+      <Filter>Header Files\Rendering\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTraceRenderer.h">
+      <Filter>Header Files\Rendering\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongRasterRenderer.h">
+      <Filter>Header Files\Rendering\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseRenderPass.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongRasterPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedDepthTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTraceRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="InterfaceRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongPipeline.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBufferPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="imgui.ini">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Shaders\closesthit.rchit">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\anyhit.rahit">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\anyhit1.rahit">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\miss.rmiss">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\raygen.rgen">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\frag.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBuffer.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBuffer.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\vert.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\Material.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\MaterialBuilder.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\Lighting.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\PBRFunctions.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\RTVertexBuilder.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\RTXRandom.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\BlinePhongLighting.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\Vertex.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\shadow.rmiss">
+      <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\animate.comp">
+      <Filter>Shader\ComputeShader</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxFrameBufferShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxFrameBufferShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
