@@ -44,7 +44,9 @@ layout(location = 0) rayPayloadEXT RayPayload rayPayload;
 
 void main() 
 {
-
+	//debugPrintfEXT("AntiAlis: %i \n", Camera.ApplyAntiAliasing);
+	if(Camera.ApplyAntiAliasing == 0)
+	{
 		const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
 		const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
 		vec2 d = inUV * 2.0 - 1.0;
@@ -66,4 +68,44 @@ void main()
 		traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
 
 		imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(rayPayload.color, 0.0));
+	}
+	else
+	{
+		rayPayload.color = vec3(1.0f);
+		rayPayload.reflectCount = 0;
+
+		vec3 HitValues = vec3(0.0f);
+		vec3 FinalColor = vec3(0.0f);
+		uint seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, Camera.frame);
+		uint rayFlags = gl_RayFlagsOpaqueEXT;
+		uint cullMask = 0xff;
+		float tmin = 0.001f;
+		float tmax = 10000.0f;
+
+		for(int x = 0; x < Camera.AntiAliasingCount; x++)
+		{
+			float r1 = rnd(seed);
+			float r2 = rnd(seed);
+			vec2 subPixel = vec2(0.5f);
+			if(Camera.frame != 0);
+			{
+				subPixel = vec2(r1, r2);
+			}
+
+			const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + subPixel;
+			const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
+			vec2 d = inUV * 2.0 - 1.0;
+
+			vec4 origin = Camera.view * vec4(0,0,0,1);
+			vec4 target = Camera.proj * vec4(d.x, d.y, 1, 1) ;
+			vec4 direction = Camera.view*vec4(normalize(target.xyz / target.w), 0);
+
+			rayPayload.seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, Camera.frame);
+			traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, cullMask, 0, 0, 0, origin.xyz, tmin, direction.xyz, tmax, 0);
+			HitValues += rayPayload.color;
+		}
+		FinalColor = HitValues / Camera.AntiAliasingCount;
+
+		imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(FinalColor, 1.0f));
+  }
 }
