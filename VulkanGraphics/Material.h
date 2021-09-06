@@ -132,11 +132,12 @@ private:
 	std::string MaterialName;
 	uint32_t MaterialID = 0;
 	uint32_t MaterialBufferIndex = 0;
-	MaterialTexture MaterialTextureData;
 	MaterialData MaterialBufferData;
 	VulkanBuffer MaterialBuffer;
 
 public:
+	MaterialTexture MaterialTextureData;
+
 	Material();
 	Material(const std::string materialName);
 	Material(const std::string materialName, MaterialTexture& MaterialInfo);

@@ -264,6 +264,7 @@ void BlinnPhongRasterPass::Destroy()
     DepthTexture->Delete();
 
     blinnphongPipeline->Destroy();
+    skyboxPipeline->Destroy();
 
     BaseRenderPass::Destroy();
 }

@@ -166,7 +166,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     const float diff = max(dot(normal, lightDir), 0.0);
 
     const vec3 halfwayDir = normalize(lightDir + ViewDir);
-    const float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    const float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = DLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = DLight[index].diffuse * diff * material.Diffuse.rgb;
@@ -201,7 +201,7 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + ViewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = PLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = PLight[index].diffuse * diff * material.Diffuse.rgb;

@@ -3,6 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
+#extension GL_NV_ray_tracing : enable
 
 #include "Vertex.glsl"
 #include "Lighting.glsl"
@@ -107,15 +108,6 @@ void main()
 {
    vertex = BuildVertexInfo();
    material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-   	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.x == 1.0f)
-	{
-		vertex.uv.x = 1.0f - vertex.uv.x;
-	}
-	if (meshProperties[gl_InstanceCustomIndexEXT].UVFlip.y == 1.0f)
-	{
-		vertex.uv.y = 1.0f - vertex.uv.y;
-	}
-
    const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
    const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
    const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
@@ -125,19 +117,55 @@ void main()
     vec3 baseColor = vec3(0.0f);
     vec3 normal = vertex.normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
-    vec3 FragPos2  = vertex.pos;
+    vec3 FragPos  = vertex.pos;
+    if(material.NormalMapID != 0)
+    {
+        ViewPos  = TBN * ConstMesh.CameraPos;
+        FragPos  = TBN * vertex.pos;
+    }
+    const vec3 viewDir = normalize(ViewPos - FragPos);
 
-   for(int x = 0; x < scenedata.DirectionalLightCount; x++)
-   {
-        result += CalcNormalDirLight(FragPos2, normal, vertex.uv, x);
-   }
-   for(int x = 0; x < scenedata.PointLightCount; x++)
-   {
-        result += CalcNormalPointLight(FragPos2, normal, vertex.uv, x);   
-   }
+    if(material.NormalMapID != 0)
+    {
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, texCoords,  viewDir);       
+//            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
+        normal = texture(TextureMap[material.NormalMapID], vertex.uv).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+     }
+     for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+     {
+        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
+     }
+     for(int x = 0; x < scenedata.PointLightCount; x++)
+     {
+        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+     }
+     //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
+       if(material.Reflectivness > 0.0f &&
+       rayHitInfo.reflectCount != 13)
+    {
+        vec3 hitPos = gl_WorldRayOriginNV + gl_WorldRayDirectionNV * gl_RayTmaxNV;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
+
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneNV, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+		result = mix(baseColor, rayHitInfo.color, material.Reflectivness); 
+    }
+    else
+	{
+        result = baseColor;
+        rayHitInfo.reflectCount = 20;
+	}
 
     rayHitInfo.color = result;
-	//rayHitInfo.distance = 10000.0f;
+	//rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
 }
 

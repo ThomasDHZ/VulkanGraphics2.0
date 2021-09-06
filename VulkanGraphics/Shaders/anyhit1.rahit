@@ -25,6 +25,7 @@ struct RayPayload {
 	uint seed;
 	vec3 normal;
     int reflectCount;
+    bool hitGeo;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
