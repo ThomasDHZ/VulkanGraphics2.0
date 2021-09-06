@@ -37,7 +37,7 @@ Renderer::Renderer(VulkanEngine& engine, std::shared_ptr<VulkanWindow> window)
   //  interfaceRenderPass = InterfaceRenderPass(engine);
     
     SetUpDescriptorPool(engine);
-    RayRenderer = RayTraceRenderer(engine, textureManager, modelRenderManager.ModelList);
+    RayRenderer = RayTraceRenderer(engine, textureManager, modelRenderManager, modelRenderManager.ModelList);
     SetUpDescriptorLayout(engine);
     RayRenderer.createRayTracingPipeline(engine, descriptorSetLayout);
     RenderPass.StartPipeline(engine, descriptorSetLayout);

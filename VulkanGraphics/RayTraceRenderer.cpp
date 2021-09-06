@@ -9,8 +9,11 @@ RayTraceRenderer::RayTraceRenderer()
 {
 
 }
-RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, std::vector<Model>& model)
+RayTraceRenderer::RayTraceRenderer(VulkanEngine& engine, TextureManager& textureManagerz, ModelRenderManager& modelRenderManagerz, std::vector<Model>& model)
 {
+    textureManager = textureManagerz;
+    modelRenderManager = modelRenderManagerz;
+
     rayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
     VkPhysicalDeviceProperties2 deviceProperties2{};
     deviceProperties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
@@ -185,6 +188,64 @@ void RayTraceRenderer::createTopLevelAccelerationStructure(VulkanEngine& engine,
 
     scratchBuffer.DestoryBuffer();
     instancesBuffer.DestoryBuffer();
+}
+
+void RayTraceRenderer::SetUpDescriptorPool(VulkanEngine& engine)
+{
+    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(engine.AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    descriptorPool = engine.CreateDescriptorPool(DescriptorPoolList);
+}
+
+void RayTraceRenderer::SetUpDescriptorLayout(VulkanEngine& engine)
+{
+    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_RAYGEN_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetVertexBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 4, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetIndexBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 5, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTransformBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 6, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetMaterialBufferListDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 7, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, modelRenderManager.GetTextureBufferListDescriptorCount(textureManager) });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
+    descriptorSetLayout = engine.CreateDescriptorSetLayout(LayoutBindingInfo);
+}
+
+void RayTraceRenderer::SetUpDescriptorSets(VulkanEngine& engine, std::shared_ptr<SceneDataStruct> SceneData)
+{
+    descriptorSets = engine.CreateDescriptorSets(descriptorPool, descriptorSetLayout);
+
+    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = AddAcclerationStructureBinding(engine, topLevelAS.handle);
+    VkDescriptorImageInfo RayTraceImageDescriptor = AddRayTraceReturnImageDescriptor(engine, VK_IMAGE_LAYOUT_GENERAL, storageImage);
+    std::vector<VkDescriptorBufferInfo> VertexBufferInfoList = modelRenderManager.GetVertexBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> IndexBufferInfoList = modelRenderManager.GetIndexBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> MaterialBufferList = modelRenderManager.GetMaterialBufferListDescriptor();
+    std::vector<VkDescriptorBufferInfo> TransformBufferList = modelRenderManager.GetTransformBufferListDescriptor();
+    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(engine, SceneData->SceneDataBuffer.Buffer, SceneData->SceneDataBuffer.BufferSize);
+    std::vector<VkDescriptorImageInfo> TextureBufferInfo = modelRenderManager.GetTextureBufferListDescriptor(textureManager);
+    //    VkDescriptorImageInfo CubeMapImage = AddTextureDescriptor(engine, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, std::make_shared<Texture>(Texture(textureManager.GetCubeMapTexture()));
+
+    std::vector<VkWriteDescriptorSet> DescriptorList;
+    DescriptorList.emplace_back(AddAccelerationBuffer(engine, 0, AccelerationDescriptorStructure));
+    DescriptorList.emplace_back(AddStorageImageBuffer(engine, 1, descriptorSets, RayTraceImageDescriptor));
+    DescriptorList.emplace_back(AddDescriptorSetBuffer(engine, 2, descriptorSets, SceneDataBufferInfo));
+    DescriptorList.emplace_back(AddStorageBuffer(engine, 3, descriptorSets, VertexBufferInfoList));
+    DescriptorList.emplace_back(AddStorageBuffer(engine, 4, descriptorSets, IndexBufferInfoList));
+    DescriptorList.emplace_back(AddStorageBuffer(engine, 5, descriptorSets, TransformBufferList));
+    DescriptorList.emplace_back(AddStorageBuffer(engine, 6, descriptorSets, MaterialBufferList));
+    DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 7, descriptorSets, TextureBufferInfo));
+    //   DescriptorList.emplace_back(AddDescriptorSetTexture(engine, 10, descriptorSets, CubeMapImage));
+
+    vkUpdateDescriptorSets(engine.Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
 void RayTraceRenderer::createStorageImage(VulkanEngine& engine, StorageImage& StoreImage)
@@ -511,27 +572,11 @@ uint32_t RayTraceRenderer::getMemoryType(VulkanEngine& engine, uint32_t typeBits
     }
 }
 
-VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin)
-{
-    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
-    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    commandBufferAllocateInfo.commandPool = pool;
-    commandBufferAllocateInfo.level = level;
-    commandBufferAllocateInfo.commandBufferCount = 1;
-    VkCommandBuffer cmdBuffer;
-    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
-    if (begin)
-    {
-        VkCommandBufferBeginInfo cmdBufferBeginInfo{};
-        cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
-    }
-    return cmdBuffer;
-}
 
-VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin)
+
+uint32_t RayTraceRenderer::alignedSize(uint32_t value, uint32_t alignment)
 {
-    return createCommandBuffer(engine, level, engine.CommandPool, begin);
+    return (value + alignment - 1) & ~(alignment - 1);
 }
 
 VkPipelineShaderStageCreateInfo RayTraceRenderer::loadShader(VulkanEngine& engine, std::string fileName, VkShaderStageFlagBits stage)
@@ -580,8 +625,163 @@ VkShaderModule RayTraceRenderer::loadShader(VulkanEngine& engine, const char* fi
     }
 }
 
-uint32_t RayTraceRenderer::alignedSize(uint32_t value, uint32_t alignment)
+VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, VkCommandPool pool, bool begin)
 {
-    return (value + alignment - 1) & ~(alignment - 1);
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo{};
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.commandPool = pool;
+    commandBufferAllocateInfo.level = level;
+    commandBufferAllocateInfo.commandBufferCount = 1;
+    VkCommandBuffer cmdBuffer;
+    vkAllocateCommandBuffers(engine.Device, &commandBufferAllocateInfo, &cmdBuffer);
+    if (begin)
+    {
+        VkCommandBufferBeginInfo cmdBufferBeginInfo{};
+        cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
+    }
+    return cmdBuffer;
 }
 
+VkCommandBuffer RayTraceRenderer::createCommandBuffer(VulkanEngine& engine, VkCommandBufferLevel level, bool begin)
+{
+    return createCommandBuffer(engine, level, engine.CommandPool, begin);
+}
+
+VkWriteDescriptorSet RayTraceRenderer::AddAccelerationBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure)
+{
+    VkWriteDescriptorSet AccelerationDesciptorSet = {};
+    AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    AccelerationDesciptorSet.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+    AccelerationDesciptorSet.dstSet = descriptorSets;
+    AccelerationDesciptorSet.dstBinding = BindingNumber;
+    AccelerationDesciptorSet.descriptorCount = 1;
+    AccelerationDesciptorSet.pNext = &accelerationStructure;
+    return AccelerationDesciptorSet;
+}
+
+VkWriteDescriptorSetAccelerationStructureKHR RayTraceRenderer::AddAcclerationStructureBinding(VulkanEngine& engine, VkAccelerationStructureKHR& handle)
+{
+    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
+    AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+    AccelerationDescriptorStructure.accelerationStructureCount = 1;
+    AccelerationDescriptorStructure.pAccelerationStructures = &handle;
+    return AccelerationDescriptorStructure;
+}
+
+VkDescriptorImageInfo RayTraceRenderer::AddRayTraceReturnImageDescriptor(VulkanEngine& engine, VkImageLayout ImageLayout, StorageImage& texture)
+{
+    VkDescriptorImageInfo RayTraceImageDescriptor{};
+    RayTraceImageDescriptor.imageView = texture.view;
+    RayTraceImageDescriptor.imageLayout = ImageLayout;
+    return RayTraceImageDescriptor;
+}
+
+VkDescriptorBufferInfo RayTraceRenderer::AddBufferDescriptor(VulkanEngine& engine, VkBuffer Buffer, VkDeviceSize BufferSize)
+{
+    VkDescriptorBufferInfo BufferInfo = {};
+    BufferInfo.buffer = Buffer;
+    BufferInfo.offset = 0;
+    BufferInfo.range = BufferSize;
+    return BufferInfo;
+}
+
+VkWriteDescriptorSet RayTraceRenderer::AddDescriptorSetBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
+{
+    VkWriteDescriptorSet BufferDescriptor = {};
+    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    BufferDescriptor.dstSet = DescriptorSet;
+    BufferDescriptor.dstBinding = BindingNumber;
+    BufferDescriptor.dstArrayElement = 0;
+    BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    BufferDescriptor.descriptorCount = 1;
+    BufferDescriptor.pBufferInfo = &BufferInfo;
+    return BufferDescriptor;
+}
+
+VkWriteDescriptorSet RayTraceRenderer::AddStorageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo)
+{
+    VkWriteDescriptorSet BufferDescriptor = {};
+    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    BufferDescriptor.dstSet = DescriptorSet;
+    BufferDescriptor.dstBinding = BindingNumber;
+    BufferDescriptor.dstArrayElement = 0;
+    BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    BufferDescriptor.descriptorCount = 1;
+    BufferDescriptor.pBufferInfo = &BufferInfo;
+    return BufferDescriptor;
+}
+
+VkWriteDescriptorSet RayTraceRenderer::AddStorageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList)
+{
+    VkWriteDescriptorSet BufferDescriptor = {};
+    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    BufferDescriptor.dstSet = DescriptorSet;
+    BufferDescriptor.dstBinding = BindingNumber;
+    BufferDescriptor.dstArrayElement = 0;
+    BufferDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+    BufferDescriptor.descriptorCount = static_cast<uint32_t>(BufferInfoList.size());
+    BufferDescriptor.pBufferInfo = BufferInfoList.data();
+    return BufferDescriptor;
+}
+
+VkDescriptorBufferInfo RayTraceRenderer::AddStorageDescriptor(VulkanEngine& engine, VulkanBuffer BufferList)
+{
+    VkDescriptorBufferInfo BufferInfo = {};
+    BufferInfo.buffer = BufferList.Buffer;
+    BufferInfo.offset = 0;
+    BufferInfo.range = VK_WHOLE_SIZE;
+    return BufferInfo;
+}
+
+std::vector<VkDescriptorBufferInfo> RayTraceRenderer::AddStorageDescriptor(VulkanEngine& engine, std::vector<VulkanBuffer> BufferList)
+{
+    std::vector<VkDescriptorBufferInfo> BufferInfoList;
+    for (int x = 0; x < BufferInfoList.size(); x++)
+    {
+        VkDescriptorBufferInfo BufferInfo = {};
+        BufferInfo.buffer = BufferInfoList[x].buffer;
+        BufferInfo.offset = 0;
+        BufferInfo.range = VK_WHOLE_SIZE;
+        BufferInfoList.emplace_back(BufferInfo);
+    }
+    return BufferInfoList;
+}
+
+VkWriteDescriptorSet RayTraceRenderer::AddStorageImageBuffer(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+{
+    VkWriteDescriptorSet ImageDescriptor{};
+    ImageDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    ImageDescriptor.dstSet = DescriptorSet;
+    ImageDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+    ImageDescriptor.dstBinding = BindingNumber;
+    ImageDescriptor.pImageInfo = &TextureImageInfo;
+    ImageDescriptor.descriptorCount = 1;
+    return ImageDescriptor;
+}
+
+VkWriteDescriptorSet RayTraceRenderer::AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+{
+    VkWriteDescriptorSet TextureDescriptor = {};
+    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    TextureDescriptor.dstSet = DescriptorSet;
+    TextureDescriptor.dstBinding = BindingNumber;
+    TextureDescriptor.dstArrayElement = 0;
+    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    TextureDescriptor.descriptorCount = 1;
+    TextureDescriptor.pImageInfo = &TextureImageInfo;
+    return TextureDescriptor;
+}
+
+VkWriteDescriptorSet RayTraceRenderer::AddDescriptorSetTexture(VulkanEngine& engine, unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo)
+{
+    VkWriteDescriptorSet TextureDescriptor = {};
+    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    TextureDescriptor.dstSet = DescriptorSet;
+    TextureDescriptor.dstBinding = BindingNumber;
+    TextureDescriptor.dstArrayElement = 0;
+    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    TextureDescriptor.descriptorCount = static_cast<uint32_t>(TextureImageInfo.size());
+    TextureDescriptor.pImageInfo = TextureImageInfo.data();
+    return TextureDescriptor;
+}
