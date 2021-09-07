@@ -1,6 +1,5 @@
 #version 460
 #extension GL_EXT_ray_tracing : enable
-#extension SPV_KHR_ray_tracing : enable
 
 layout(push_constant) uniform RayTraceConstants
 {

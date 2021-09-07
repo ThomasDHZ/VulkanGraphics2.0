@@ -3,7 +3,6 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
-#extension SPV_KHR_ray_tracing : enable
 
 #include "Vertex.glsl"
 #include "Lighting.glsl"
@@ -147,8 +146,8 @@ void main()
         baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
      }
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
-       if(material.Reflectivness > 0.0f &&
-       rayHitInfo.reflectCount != 13)
+    if(material.Reflectivness > 0.0f &&
+       rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
     {
         vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
@@ -161,7 +160,7 @@ void main()
     else
 	{
         result = baseColor;
-        rayHitInfo.reflectCount = 20;
+        rayHitInfo.reflectCount = ConstMesh.MaxRefeflectCount;
 	}
 
     rayHitInfo.color = result;
