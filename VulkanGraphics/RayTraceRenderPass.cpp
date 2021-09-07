@@ -182,21 +182,16 @@ void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
 
     VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 
+    Frame++;
+    if (Frame > RTXConst.AntiAliasingCount)
+    {
+        Frame = 0;
+    }
     RTXConst.proj = glm::inverse(ViewCamera->GetProjectionMatrix());
     RTXConst.proj[1][1] *= -1;
     RTXConst.view = glm::inverse(ViewCamera->GetViewMatrix());
     RTXConst.CameraPos = ViewCamera->GetPosition();
-    RTXConst.frame = Frame++;
-
-    if (RTXConst.proj != LastCameraProjection)
-    {
-        Frame = 0;
-    }
-    if (RTXConst.view != LastCameraView)
-    {
-        Frame = 0;
-    }
-
+    RTXConst.frame = Frame;
     LastCameraProjection = RTXConst.proj;
     LastCameraView = RTXConst.view;
 

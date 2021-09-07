@@ -19,13 +19,13 @@ private:
 
 	//BlinnPhongRasterRenderer blinnPhongRenderer;
 	//PBRRenderer pbrRenderer;
-	RayTraceRenderer rayTraceRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;
 	//HybridRenderer hybridRenderer;
 	//Renderer2D renderer2D;
 	//GUIRenderer guiRenderer;
 
 	BlinnPhongRasterRenderer BlinnRenderer;
+	RayTraceRenderer rayTraceRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;

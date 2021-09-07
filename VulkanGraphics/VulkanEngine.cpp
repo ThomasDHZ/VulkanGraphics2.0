@@ -21,8 +21,6 @@ VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 	DeviceExtensions.emplace_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_SPIRV_1_4_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_SHADER_FLOAT_CONTROLS_EXTENSION_NAME);
@@ -218,27 +216,27 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 		queueCreateInfos.push_back(queueCreateInfo);
 	}
 
-	VkPhysicalDeviceFeatures deviceFeatures = {};
-	deviceFeatures.samplerAnisotropy = VK_TRUE;
-	deviceFeatures.fillModeNonSolid = VK_TRUE;
-	deviceFeatures.wideLines = VK_TRUE;
-	deviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
-	deviceFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
-	deviceFeatures.sampleRateShading = VK_TRUE;
-
 	VkPhysicalDeviceBufferDeviceAddressFeatures BufferDeviceAddresFeatures{};
 	BufferDeviceAddresFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
 	BufferDeviceAddresFeatures.bufferDeviceAddress = VK_TRUE;
-	
+
 	VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
 	RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
 	RayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
 	RayTracingPipelineFeatures.pNext = &BufferDeviceAddresFeatures;
 
+	VkPhysicalDeviceRayTracingPipelinePropertiesKHR RayTracingPipelineProperties = {};
+	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
+	RayTracingPipelineProperties.pNext = &RayTracingPipelineFeatures;
+
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR RayTracinDeviceProperties = {};
+	RayTracinDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+	RayTracinDeviceProperties.pNext = &RayTracingPipelineProperties;
+
 	VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
 	AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 	AccelerationStructureFeatures.accelerationStructure = VK_TRUE;
-	AccelerationStructureFeatures.pNext = &RayTracingPipelineFeatures;
+	AccelerationStructureFeatures.pNext = &RayTracinDeviceProperties;
 
 	VkPhysicalDeviceDescriptorIndexingFeatures PhysicalDeviceDescriptorIndexingFeatures{};
 	PhysicalDeviceDescriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
@@ -248,17 +246,18 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	PhysicalDeviceDescriptorIndexingFeatures.descriptorBindingVariableDescriptorCount = VK_TRUE;
 	PhysicalDeviceDescriptorIndexingFeatures.pNext = &AccelerationStructureFeatures;
 
-	VkPhysicalDeviceRayTracingPipelinePropertiesKHR RayTracingPipelineProperties = {};
-	RayTracingPipelineProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR;
-
-	VkPhysicalDeviceAccelerationStructureFeaturesKHR RayTracinDeviceProperties = {};
-	RayTracinDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
-	RayTracinDeviceProperties.pNext = &RayTracingPipelineProperties;
-
-	VkPhysicalDeviceRobustness2FeaturesEXT  PhysicalDeviceRobustness2Features;
+	VkPhysicalDeviceRobustness2FeaturesEXT  PhysicalDeviceRobustness2Features{};
 	PhysicalDeviceRobustness2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
 	PhysicalDeviceRobustness2Features.nullDescriptor = VK_TRUE;
 	PhysicalDeviceRobustness2Features.pNext = &PhysicalDeviceDescriptorIndexingFeatures;
+
+	VkPhysicalDeviceFeatures deviceFeatures = {};
+	deviceFeatures.samplerAnisotropy = VK_TRUE;
+	deviceFeatures.fillModeNonSolid = VK_TRUE;
+	deviceFeatures.wideLines = VK_TRUE;
+	deviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
+	deviceFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
+	deviceFeatures.sampleRateShading = VK_TRUE;
 
 	VkPhysicalDeviceFeatures2 deviceFeatures2{};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
