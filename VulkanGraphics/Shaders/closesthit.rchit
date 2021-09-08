@@ -160,7 +160,7 @@ void main()
     else
 	{
         result = baseColor;
-        rayHitInfo.reflectCount = ConstMesh.MaxRefeflectCount;
+        rayHitInfo.reflectCount = ConstMesh.MaxRefeflectCount + 1;
 	}
 
     rayHitInfo.color = result;

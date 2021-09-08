@@ -16,7 +16,7 @@ class RendererManager
 {
 private:
 	int ActiveRenderer = 0;
-
+	bool GUIChanged = false;
 	//BlinnPhongRasterRenderer blinnPhongRenderer;
 	//PBRRenderer pbrRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;

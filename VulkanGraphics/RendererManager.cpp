@@ -85,64 +85,64 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
     for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
     {
-        ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
-        ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
-        ImGui::SliderFloat3(("Mesh Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshScale.x,  0.0f, 3.0f);
-        ImGui::SliderFloat2(("UV Ofset" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
-        ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVScale.x, 0.0f, 2.0f);
-        ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
-        ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("Ambient " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
-        ImGui::SliderFloat3(("Diffuse " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Diffuse.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("Specular" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Specular.x, 0.0f, 1.0f);
-        ImGui::SliderFloat(("Reflect " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Reflectivness, 0.0f, 1.0f);
-        ImGui::SliderFloat(("Shininess " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Shininess, 0.0f, 255.0f);
-        ImGui::SliderFloat(("Alpha " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Alpha, 0.0f, 1.0f);
-        MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->UpdateTextureIndexs();
-        ImGui::LabelText("______", "______");
-    }
-
-    for (int x = 0; x < MaterialManagerPtr::GetMaterialManagerPtr()->GetMaterialDescriptorCount(); x++)
-    {
-
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshScale.x, 0.0f, 3.0f);
+        GUIChanged |= ImGui::SliderFloat2(("UV Ofset" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVScale.x, 0.0f, 2.0f);
+        GUIChanged |= ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Ambient " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Diffuse " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Specular" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("Reflect " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Reflectivness, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("Shininess " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Shininess, 0.0f, 255.0f);
+        GUIChanged |= ImGui::SliderFloat(("Alpha " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Alpha, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 
     ImGui::LabelText("Directional Light", "Directional Light");
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
     {
-        ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
-        ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 
     ImGui::LabelText("Point Light", "Point Light");
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->PointLightList.size(); x++)
     {
-        ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
-        ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-        ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-        ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 
     ImGui::LabelText("SpotLight Light", "Directional Light");
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->SpotLightList.size(); x++)
     {
-        ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -10.0f, 10.0f);
-        ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
-        ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-        ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-        ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -10.0f, 10.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -1.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
+    }
+
+    if (GUIChanged)
+    {
+        MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
+        rayTraceRenderer.rayTraceRenderPass.Frame = 0;
+        GUIChanged = false;
     }
 
     if (ActiveRenderer == 0)

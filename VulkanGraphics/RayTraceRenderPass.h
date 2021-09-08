@@ -10,10 +10,11 @@ private:
     RayTraceConstants RTXConst;
     VulkanBuffer instancesBuffer;
     void SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine);
-    uint32_t Frame = 0;
+
     glm::mat4 LastCameraView = glm::mat4(1.0f);
     glm::mat4 LastCameraProjection = glm::mat4(1.0f);
 public:
+    uint32_t Frame = 0;
 
     AccelerationStructure topLevelAS{};
     std::shared_ptr<RenderedRayTracedColorTexture> RayTracedTexture;

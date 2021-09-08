@@ -107,7 +107,8 @@ void main()
 		}
 		FinalColor = HitValues / Camera.AntiAliasingCount;
 
-	  if(Camera.frame > 0)
+	   if(Camera.frame > 0 ||
+		  Camera.frame > Camera.AntiAliasingCount)
 	  {
 			float a         = 1.0f / float(Camera.frame + 1);
 			vec3  old_color = imageLoad(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy)).xyz;
@@ -115,7 +116,6 @@ void main()
 	  }
 	  else
 	  {
-	//  debugPrintfEXT("AntiAliasingCount: %i \n", Camera.AntiAliasingCount);
 		imageStore(RayTracedTexture, ivec2(gl_LaunchIDEXT.xy),  vec4(FinalColor, 1.0));
 	  }
   }
