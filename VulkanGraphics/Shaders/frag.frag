@@ -41,6 +41,7 @@ layout(binding = 2) buffer DirectionalLight
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float Luminosity;
 } DLight[];
 
 layout(binding = 3) buffer PointLight
@@ -52,6 +53,7 @@ layout(binding = 3) buffer PointLight
     float constant;
     float linear;
     float quadratic;
+    float Luminosity;
 } PLight[];
 
 layout(binding = 4) buffer SpotLight
@@ -67,6 +69,7 @@ layout(binding = 4) buffer SpotLight
    float constant;
    float linear;
    float quadratic;
+   float Luminosity;
 } SLight[];
 
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
@@ -181,7 +184,10 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
         specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
-    return vec3(ambient + diffuse + specular);
+    float LightDistance = length(LightPos - FragPos2);
+    float LightIntencity = DLight[index].Luminosity / (LightDistance * LightDistance);
+
+    return (ambient + diffuse + specular) * LightIntencity;
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
@@ -218,9 +224,8 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
 
     float distance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (PLight[index].constant + PLight[index].linear * distance + PLight[index].quadratic * (distance * distance));
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
+    float LightDistance = length(LightPos - FragPos2);
+    float LightIntencity = PLight[index].Luminosity / (LightDistance * LightDistance);
 
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * attenuation * LightIntencity;
 }

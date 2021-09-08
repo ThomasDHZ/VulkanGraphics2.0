@@ -5,6 +5,7 @@ struct DirectionalLightBuffer {
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
+	alignas(4)  float Luminosity = 1.0f;
 };
 
 struct PointLightBuffer {
@@ -15,6 +16,7 @@ struct PointLightBuffer {
 	alignas(4) float constant = 1.0f;
 	alignas(4) float linear = 0.09f;
 	alignas(4) float quadratic = 0.032f;
+	alignas(4) float Luminosity = 1.0f;
 };
 
 struct SpotLightBuffer {
@@ -29,6 +31,7 @@ struct SpotLightBuffer {
 	alignas(4) float constant = 1.0f;
 	alignas(4) float linear = 0.09f;
 	alignas(4) float quadratic = 0.032f;
+	alignas(4)  float Luminosity;
 };
 
 struct SceneDataBuffer {
@@ -39,6 +42,7 @@ struct SceneDataBuffer {
 	alignas(4)  int Shadowed = 1;
 	alignas(4)  int temp = 0;
 	alignas(4)  float temp2 = 1.0f;
+	alignas(4)  float Luminosity = 1.0f;
 };
 
 struct SkyboxUniformBuffer

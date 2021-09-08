@@ -58,6 +58,7 @@ layout(binding = 4) buffer DirectionalLight2
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    float Luminosity;
 } DLight[];
 
 layout(binding = 5) buffer PointLight2
@@ -69,6 +70,7 @@ layout(binding = 5) buffer PointLight2
     float constant;
     float linear;
     float quadratic;
+    float Luminosity;
 } PLight[];
 
 layout(binding = 6) buffer SpotLight2
@@ -84,6 +86,7 @@ layout(binding = 6) buffer SpotLight2
    float constant;
    float linear;
    float quadratic;
+   float Luminosity;
 } SLight[];
 
 layout(binding = 7, scalar) buffer Vertices { Vertex v[]; } vertices[];

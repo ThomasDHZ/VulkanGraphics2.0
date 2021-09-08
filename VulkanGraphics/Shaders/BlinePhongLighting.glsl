@@ -30,8 +30,10 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     {
         specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
+    float LightDistance = length(LightPos - FragPos2);
+    float LightIntencity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
-    return vec3(ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * LightIntencity;
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
@@ -68,11 +70,10 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
 
     float distance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (PLight[index].constant + PLight[index].linear * distance + PLight[index].quadratic * (distance * distance));
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
+    float LightDistance = length(LightPos - FragPos2);
+    float LightIntencity = PLight[index].Luminosity / (LightDistance * LightDistance);
 
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * attenuation * LightIntencity;
 }
 
 vec3 CalcNormalSpotLight(vec3 FragPos, SpotLight light, vec3 normal, vec2 uv)
@@ -113,10 +114,12 @@ vec3 CalcNormalSpotLight(vec3 FragPos, SpotLight light, vec3 normal, vec2 uv)
     {
         specular = light.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
-    ambient *= attenuation * intensity;
-    diffuse *= attenuation * intensity;
-    specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
+    //float distance = length(LightPos - FragPos2);
+    //float attenuation = 1.0 / (PLight[index].constant + PLight[index].linear * distance + PLight[index].quadratic * (distance * distance));
+    //float LightDistance = length(LightPos - FragPos2);
+    //float LightIntencity = SLight[index].Luminosity / (LightDistance * LightDistance);
+
+    return (ambient + diffuse + specular) * attenuation * 1.0f;
 }
 //
 //vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
