@@ -18,6 +18,9 @@ layout(binding = 0) uniform UniformBufferObject {
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
+    uint SphereAreaLightCount;
+    uint TubeAreaLightCount;
+    uint RectangleAreaLightCount;
 	float timer;
     int Shadowed;
     int temp;
@@ -78,6 +81,36 @@ layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
 layout(binding = 9) uniform samplerCube CubeMap;
 
+layout(binding = 10) buffer SphereAreaLightBuffer {
+	vec3 position;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	vec3 SphereRadius;
+	float Luminosity;
+} SphereLight[];
+
+layout(binding = 11) buffer TubeAreaLightBuffer {
+	vec3 StartPos;
+	vec3 EndPos;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float Luminosity;
+} TubeLight[];
+
+layout(binding = 12) buffer RectangleAreaLightBuffer
+{
+	vec3 VertexPos1;
+	vec3 VertexPos2;
+	vec3 VertexPos3;
+	vec3 VertexPos4;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float Luminosity;
+} RectangleLight[];
+
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec3 Normal;
@@ -127,6 +160,22 @@ void main()
    for(int x = 0; x < scenedata.PointLightCount; x++)
    {
         result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
+   }
+//      for(int x = 0; x < scenedata.PointLightCount; x++)
+//   {
+//        result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
+//   }
+   for(int x = 0; x < scenedata.SphereAreaLightCount; x++)
+   {
+        //result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
+   }
+   for(int x = 0; x < scenedata.TubeAreaLightCount; x++)
+   {
+       // result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
+   }
+      for(int x = 0; x < scenedata.RectangleAreaLightCount; x++)
+   {
+      //  result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
    }
 
     vec3 I = normalize(FragPos2 - ViewPos);

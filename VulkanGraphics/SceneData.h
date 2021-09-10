@@ -34,15 +34,47 @@ struct SpotLightBuffer {
 	alignas(4)  float Luminosity;
 };
 
+struct SphereAreaLightBuffer {
+	alignas(16) glm::vec3 position;
+	alignas(16) glm::vec3 ambient;
+	alignas(16) glm::vec3 diffuse;
+	alignas(16) glm::vec3 specular;
+	alignas(4) glm::vec3 SphereRadius;
+	alignas(4) float Luminosity = 1.0f;
+};
+
+struct TubeAreaLightBuffer {
+	alignas(16) glm::vec3 StartPos;
+	alignas(16) glm::vec3 EndPos;
+	alignas(16) glm::vec3 ambient;
+	alignas(16) glm::vec3 diffuse;
+	alignas(16) glm::vec3 specular;
+	alignas(4) float Luminosity = 1.0f;
+};
+
+struct RectangleAreaLightBuffer
+{
+	alignas(16) glm::vec3 VertexPos1;
+	alignas(16) glm::vec3 VertexPos2;
+	alignas(16) glm::vec3 VertexPos3;
+	alignas(16) glm::vec3 VertexPos4;
+	alignas(16) glm::vec3 ambient;
+	alignas(16) glm::vec3 diffuse;
+	alignas(16) glm::vec3 specular;
+	alignas(4) float Luminosity = 1.0f;
+};
+
 struct SceneDataBuffer {
 	alignas(4)  uint32_t DirectionalLightCount = 0;
 	alignas(4)  uint32_t PointLightCount = 0;
 	alignas(4)  uint32_t SpotLightCount = 0;
+	alignas(4)  uint32_t SphereAreaLightCount = 0;
+	alignas(4)  uint32_t TubeAreaLightCount = 0;
+	alignas(4)  uint32_t RectangleAreaLightCount = 0;
 	alignas(4)  float timer = 0.0f;
 	alignas(4)  int Shadowed = 1;
 	alignas(4)  int temp = 0;
 	alignas(4)  float temp2 = 1.0f;
-	alignas(4)  float Luminosity = 1.0f;
 };
 
 struct SkyboxUniformBuffer

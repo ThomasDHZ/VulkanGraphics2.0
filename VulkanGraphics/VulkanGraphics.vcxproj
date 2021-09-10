@@ -201,6 +201,7 @@
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
     <ClCompile Include="RayTracingGraphicsPipeline.cpp" />
+    <ClCompile Include="RectangleAreaLight.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
@@ -212,12 +213,14 @@
     <ClCompile Include="RendererManager.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp" />
+    <ClCompile Include="SphereAreaLight.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="TubeAreaLight.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
     <ClCompile Include="VulkanDebugger.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
@@ -283,6 +286,7 @@
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RayTraceRenderPass.h" />
     <ClInclude Include="RayTracingGraphicsPipeline.h" />
+    <ClInclude Include="RectangleAreaLight.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedCubeMapTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
@@ -295,12 +299,14 @@
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h" />
+    <ClInclude Include="SphereAreaLight.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Texture3D.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="TubeAreaLight.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanBuffer.h" />
     <ClInclude Include="VulkanDebugger.h" />
