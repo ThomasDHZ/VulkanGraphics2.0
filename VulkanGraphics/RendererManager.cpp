@@ -101,6 +101,18 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     //    ImGui::LabelText("______", "______");
     //}
 
+    ImGui::LabelText("Sphere Light", "Sphere Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList.size(); x++)
+    {
+        GUIChanged |= ImGui::SliderFloat3(("Sphere direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.position.x, -1.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Sphere ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Sphere Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Sphere specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("Sphere Radius " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.SphereRadius, 0.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat(("Sphere Alumin " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.Luminosity, 0.0f, 100000.0f);
+        ImGui::LabelText("______", "______");
+    }
+
     ImGui::LabelText("Directional Light", "Directional Light");
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
     {

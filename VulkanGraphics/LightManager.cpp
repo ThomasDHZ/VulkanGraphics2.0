@@ -29,6 +29,18 @@ void LightManager::Update()
 	{
 		spotLight->Update();
 	}
+	for (auto& SphereAreaLight : SphereAreaLightList)
+	{
+		SphereAreaLight->Update();
+	}
+	for (auto& TubeAreaLight : TubeAreaLightList)
+	{
+		TubeAreaLight->Update();
+	}
+	for (auto& RectangleAreaLight : RectangleAreaLightList)
+	{
+		RectangleAreaLight->Update();
+	}
 }
 
 void LightManager::UpdateImGui()
@@ -77,7 +89,7 @@ void LightManager::AddSphereAreaLight(std::shared_ptr<SphereAreaLight> light)
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
-void LightManager::AddSphereAreaLight(std::shared_ptr<CameraManager> cameraManager, SphereAreaLightBuffer light)
+void LightManager::AddSphereAreaLight(SphereAreaLightBuffer light)
 {
 	SphereAreaLightList.emplace_back(std::make_shared<SphereAreaLight>(SphereAreaLight(light)));
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
@@ -236,7 +248,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetSpotLightBufferListDescript
 std::vector<VkDescriptorBufferInfo> LightManager::GetSphereAreaLightDescriptor()
 {
 	std::vector<VkDescriptorBufferInfo> SphereAreaLightBufferList{};
-	if (SpotLightList.size() == 0)
+	if (SphereAreaLightList.size() == 0)
 	{
 		VkDescriptorBufferInfo nullBuffer;
 		nullBuffer.buffer = VK_NULL_HANDLE;
@@ -246,10 +258,10 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetSphereAreaLightDescriptor()
 	}
 	else
 	{
-		for (int x = 0; x < SpotLightList.size(); x++)
+		for (int x = 0; x < SphereAreaLightList.size(); x++)
 		{
 			VkDescriptorBufferInfo SphereLightBufferInfo = {};
-			SphereLightBufferInfo.buffer = SpotLightList[x]->GetLightBuffer();
+			SphereLightBufferInfo.buffer = SphereAreaLightList[x]->GetLightBuffer();
 			SphereLightBufferInfo.offset = 0;
 			SphereLightBufferInfo.range = VK_WHOLE_SIZE;
 			SphereAreaLightBufferList.emplace_back(SphereLightBufferInfo);
@@ -262,7 +274,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetSphereAreaLightDescriptor()
 std::vector<VkDescriptorBufferInfo> LightManager::GetTubeAreaLightDescriptor()
 {
 	std::vector<VkDescriptorBufferInfo> TubeAreaLightBufferList{};
-	if (SpotLightList.size() == 0)
+	if (TubeAreaLightList.size() == 0)
 	{
 		VkDescriptorBufferInfo nullBuffer;
 		nullBuffer.buffer = VK_NULL_HANDLE;
@@ -272,10 +284,10 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetTubeAreaLightDescriptor()
 	}
 	else
 	{
-		for (int x = 0; x < SpotLightList.size(); x++)
+		for (int x = 0; x < TubeAreaLightList.size(); x++)
 		{
 			VkDescriptorBufferInfo TubeAreaBufferInfo = {};
-			TubeAreaBufferInfo.buffer = SpotLightList[x]->GetLightBuffer();
+			TubeAreaBufferInfo.buffer = TubeAreaLightList[x]->GetLightBuffer();
 			TubeAreaBufferInfo.offset = 0;
 			TubeAreaBufferInfo.range = VK_WHOLE_SIZE;
 			TubeAreaLightBufferList.emplace_back(TubeAreaBufferInfo);
@@ -288,7 +300,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetTubeAreaLightDescriptor()
 std::vector<VkDescriptorBufferInfo> LightManager::GetRectangleAreaLightDescriptor()
 {
 	std::vector<VkDescriptorBufferInfo> RectangleAreaLightBufferList{};
-	if (SpotLightList.size() == 0)
+	if (RectangleAreaLightList.size() == 0)
 	{
 		VkDescriptorBufferInfo nullBuffer;
 		nullBuffer.buffer = VK_NULL_HANDLE;
@@ -298,10 +310,10 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetRectangleAreaLightDescripto
 	}
 	else
 	{
-		for (int x = 0; x < SpotLightList.size(); x++)
+		for (int x = 0; x < RectangleAreaLightList.size(); x++)
 		{
 			VkDescriptorBufferInfo RectangleAreaLightBufferInfo = {};
-			RectangleAreaLightBufferInfo.buffer = SpotLightList[x]->GetLightBuffer();
+			RectangleAreaLightBufferInfo.buffer = RectangleAreaLightList[x]->GetLightBuffer();
 			RectangleAreaLightBufferInfo.offset = 0;
 			RectangleAreaLightBufferInfo.range = VK_WHOLE_SIZE;
 			RectangleAreaLightBufferList.emplace_back(RectangleAreaLightBufferInfo);
@@ -324,6 +336,18 @@ void LightManager::Destory()
 	for (auto& spotLight : SpotLightList)
 	{
 		spotLight->Destroy();
+	}
+	for (auto& SphereAreaLight : SphereAreaLightList)
+	{
+		SphereAreaLight->Destroy();
+	}
+	for (auto& TubeAreaLight : TubeAreaLightList)
+	{
+		TubeAreaLight->Destroy();
+	}
+	for (auto& RectangleAreaLight : RectangleAreaLightList)
+	{
+		RectangleAreaLight->Destroy();
 	}
 }
 

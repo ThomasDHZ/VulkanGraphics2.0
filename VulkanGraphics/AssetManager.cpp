@@ -44,9 +44,9 @@ void AssetManager::Update()
     SceneData->UniformDataInfo.DirectionalLightCount = lightManager->GetDirectionalLightDescriptorCount();
     SceneData->UniformDataInfo.PointLightCount = lightManager->GetPointLightDescriptorCount();
     SceneData->UniformDataInfo.SpotLightCount = lightManager->GetSpotLightDescriptorCount();
-    SceneData->UniformDataInfo.SphereAreaLightCount = lightManager->GetDirectionalLightDescriptorCount();
-    SceneData->UniformDataInfo.TubeAreaLightCount = lightManager->GetPointLightDescriptorCount();
-    SceneData->UniformDataInfo.RectangleAreaLightCount = lightManager->GetSpotLightDescriptorCount();
+    SceneData->UniformDataInfo.SphereAreaLightCount = lightManager->GetSphereAreaLightDescriptorCount();
+    SceneData->UniformDataInfo.TubeAreaLightCount = lightManager->GetTubeAreaLightDescriptorCount();
+    SceneData->UniformDataInfo.RectangleAreaLightCount = lightManager->GetRectangleAreaLightDescriptorCount();
     SceneData->UniformDataInfo.timer = timer;
     SceneData->Update();
 

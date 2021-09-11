@@ -43,7 +43,7 @@ public:
 	void AddSpotLight(std::shared_ptr<SpotLight> light);
 	void AddSpotLight(SpotLightBuffer light);
 	void AddSphereAreaLight(std::shared_ptr<SphereAreaLight> light);
-	void AddSphereAreaLight(std::shared_ptr<CameraManager> cameraManager, SphereAreaLightBuffer light);
+	void AddSphereAreaLight(SphereAreaLightBuffer light);
 	void AddTubeAreaLight(std::shared_ptr<TubeAreaLight> light);
 	void AddTubeAreaLight(TubeAreaLightBuffer light);
 	void AddRectangleAreaLight(std::shared_ptr<RectangleAreaLight> light);
