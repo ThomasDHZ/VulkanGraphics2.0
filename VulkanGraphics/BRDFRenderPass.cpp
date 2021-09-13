@@ -13,24 +13,21 @@ BRDFRenderPass::BRDFRenderPass(std::shared_ptr<Texture> InputBloomTexture) : Bas
     CreateRendererFramebuffers();
     BRDFPipeline = std::make_shared<brdfRenderingPipeline>(brdfRenderingPipeline(RenderPass));
     SetUpCommandBuffers();
+    Draw();
 
-    for (int x = 0; x < CommandBuffer.size(); x++)
-    {
-        Draw(x);
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[0];
 
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &CommandBuffer[x];
-        VkFenceCreateInfo fenceCreateInfo{};
-        fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fenceCreateInfo.flags = 0;
-        VkFence fence;
-        vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-        vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-        vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-        vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-    }
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 BRDFRenderPass::~BRDFRenderPass()
@@ -124,26 +121,25 @@ void BRDFRenderPass::CreateRendererFramebuffers()
 
 void BRDFRenderPass::SetUpCommandBuffers()
 {
+    CommandBuffer.resize(1);
+
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 3;
+    allocInfo.commandBufferCount = 1;
 
-    for (int x = 0; x < CommandBuffer.size(); x++)
-    {
-        if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer[x]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer[0]) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void BRDFRenderPass::Draw(int x)
+void BRDFRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    if (vkBeginCommandBuffer(CommandBuffer[x], &beginInfo) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(CommandBuffer[0], &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
@@ -153,7 +149,7 @@ void BRDFRenderPass::Draw(int x)
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[x];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -162,14 +158,14 @@ void BRDFRenderPass::Draw(int x)
     ConstBloomProperites bloomProperites = {};
     bloomProperites.BloomPass = 0;
 
-    vkCmdBeginRenderPass(CommandBuffer[x], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdPushConstants(CommandBuffer[x], BRDFPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
-    vkCmdBindPipeline(CommandBuffer[x], VK_PIPELINE_BIND_POINT_GRAPHICS, BRDFPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer[x], VK_PIPELINE_BIND_POINT_GRAPHICS, BRDFPipeline->ShaderPipelineLayout, 0, 1, &BRDFPipeline->DescriptorSet, 0, nullptr);
-    vkCmdDraw(CommandBuffer[x], 6, 1, 0, 0);
-    vkCmdEndRenderPass(CommandBuffer[x]);
+    vkCmdBeginRenderPass(CommandBuffer[0], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdPushConstants(CommandBuffer[0], BRDFPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBloomProperites), &bloomProperites);
+    vkCmdBindPipeline(CommandBuffer[0], VK_PIPELINE_BIND_POINT_GRAPHICS, BRDFPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer[0], VK_PIPELINE_BIND_POINT_GRAPHICS, BRDFPipeline->ShaderPipelineLayout, 0, 1, &BRDFPipeline->DescriptorSet, 0, nullptr);
+    vkCmdDraw(CommandBuffer[0], 6, 1, 0, 0);
+    vkCmdEndRenderPass(CommandBuffer[0]);
 
-    if (vkEndCommandBuffer(CommandBuffer[x]) != VK_SUCCESS) {
+    if (vkEndCommandBuffer(CommandBuffer[0]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }
@@ -192,24 +188,21 @@ void BRDFRenderPass::RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture
     CreateRendererFramebuffers();
     BRDFPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
+    Draw();
 
-    for (int x = 0; x < CommandBuffer.size(); x++)
-    {
-        Draw(x);
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[0];
 
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &CommandBuffer[x];
-        VkFenceCreateInfo fenceCreateInfo{};
-        fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fenceCreateInfo.flags = 0;
-        VkFence fence;
-        vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-        vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-        vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-        vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-    }
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 void BRDFRenderPass::Destroy()

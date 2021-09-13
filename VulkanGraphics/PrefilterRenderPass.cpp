@@ -1,6 +1,5 @@
 #include "PrefilterRenderPass.h"
 #include "GraphicsPipeline.h"
-#include "Skybox.h"
 
 PrefilterRenderPass::PrefilterRenderPass() : BaseRenderPass()
 {
@@ -18,24 +17,21 @@ PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize) : BaseRenderPass(
     prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(RenderPass));
     SetUpCommandBuffers();
     BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-   
-    for (int x = 0; x < CommandBuffer.size(); x++)
-    {
-        Draw(x);
+    Draw();
 
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &CommandBuffer[x];
-        VkFenceCreateInfo fenceCreateInfo{};
-        fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fenceCreateInfo.flags = 0;
-        VkFence fence;
-        vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-        vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-        vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-        vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-    }
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[0];
+
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 PrefilterRenderPass::~PrefilterRenderPass()
@@ -129,26 +125,25 @@ void PrefilterRenderPass::CreateRendererFramebuffers()
 
 void PrefilterRenderPass::SetUpCommandBuffers()
 {
+    CommandBuffer.resize(1);
+
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 3;
+    allocInfo.commandBufferCount = 1;
 
-    for (int x = 0; x < CommandBuffer.size(); x++)
-    {
-        if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer[x]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
+    if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer[0]) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
     }
 }
 
-void PrefilterRenderPass::Draw(int x)
+void PrefilterRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    if (vkBeginCommandBuffer(CommandBuffer[x], &beginInfo) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(CommandBuffer[0], &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
@@ -159,7 +154,7 @@ void PrefilterRenderPass::Draw(int x)
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
-    renderPassInfo.framebuffer = SwapChainFramebuffers[x];
+    renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = rectextent;
 
@@ -201,7 +196,7 @@ void PrefilterRenderPass::Draw(int x)
     SkyBoxBarrierStart.subresourceRange = SkyBoxSubresourceRange;
     SkyBoxBarrierStart.srcAccessMask = 0;
     SkyBoxBarrierStart.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-    vkCmdPipelineBarrier(CommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierStart);
+    vkCmdPipelineBarrier(CommandBuffer[0], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierStart);
 
   /*  for (int m = 0; m < 9; m++)
     {*/
@@ -221,14 +216,14 @@ void PrefilterRenderPass::Draw(int x)
             prefilterConst.FaceSize = CubeMapSize;
             prefilterConst.SampleCount = 1024;
 
-            vkCmdSetViewport(CommandBuffer[x], 0, 1, &viewport);
-            vkCmdSetScissor(CommandBuffer[x], 0, 1, &rect2D);
-            vkCmdBindPipeline(CommandBuffer[x], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipeline);
-            vkCmdBindDescriptorSets(CommandBuffer[x], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipelineLayout, 0, 1, &prefilterRenderingPipeline->DescriptorSet, 0, nullptr);
-            vkCmdPushConstants(CommandBuffer[x], prefilterRenderingPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterConst), &prefilterConst);
-            vkCmdBeginRenderPass(CommandBuffer[x], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            static_cast<Skybox*>(AssetManagerPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[x]);
-            vkCmdEndRenderPass(CommandBuffer[x]);
+            vkCmdSetViewport(CommandBuffer[0], 0, 1, &viewport);
+            vkCmdSetScissor(CommandBuffer[0], 0, 1, &rect2D);
+            vkCmdBindPipeline(CommandBuffer[0], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipeline);
+            vkCmdBindDescriptorSets(CommandBuffer[0], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterRenderingPipeline->ShaderPipelineLayout, 0, 1, &prefilterRenderingPipeline->DescriptorSet, 0, nullptr);
+            vkCmdPushConstants(CommandBuffer[0], prefilterRenderingPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterConst), &prefilterConst);
+            vkCmdBeginRenderPass(CommandBuffer[0], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+            static_cast<Skybox*>(AssetManagerPtr::GetAssetPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[0]);
+            vkCmdEndRenderPass(CommandBuffer[0]);
 
             VkImageSubresourceRange ImageSubresourceRange{};
             ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -244,7 +239,7 @@ void PrefilterRenderPass::Draw(int x)
             MemoryBarrior.subresourceRange = ImageSubresourceRange;
             MemoryBarrior.srcAccessMask = 0;
             MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-            vkCmdPipelineBarrier(CommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
+            vkCmdPipelineBarrier(CommandBuffer[0], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
 
             VkImageCopy copyRegion = {};
             copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -262,7 +257,7 @@ void PrefilterRenderPass::Draw(int x)
             copyRegion.extent.width = (uint32_t)RenderedTexture->Width;
             copyRegion.extent.height = (uint32_t)RenderedTexture->Height;
             copyRegion.extent.depth = 1;
-            vkCmdCopyImage(CommandBuffer[x], RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, BlurredSkyBoxTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+            vkCmdCopyImage(CommandBuffer[0], RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, BlurredSkyBoxTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
             VkImageMemoryBarrier ReturnMemoryBarrior{};
             ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -272,7 +267,7 @@ void PrefilterRenderPass::Draw(int x)
             ReturnMemoryBarrior.subresourceRange = ImageSubresourceRange;
             ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
             ReturnMemoryBarrior.dstAccessMask = 0;
-            vkCmdPipelineBarrier(CommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
+            vkCmdPipelineBarrier(CommandBuffer[0], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
         }
     //}
     VkImageMemoryBarrier SkyBoxBarrierEnd = {};
@@ -283,9 +278,9 @@ void PrefilterRenderPass::Draw(int x)
     SkyBoxBarrierEnd.subresourceRange = SkyBoxSubresourceRange;
     SkyBoxBarrierEnd.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     SkyBoxBarrierEnd.dstAccessMask = 0;
-    vkCmdPipelineBarrier(CommandBuffer[x], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierEnd);
+    vkCmdPipelineBarrier(CommandBuffer[0], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierEnd);
 
-    if (vkEndCommandBuffer(CommandBuffer[x]) != VK_SUCCESS) {
+    if (vkEndCommandBuffer(CommandBuffer[0]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }
@@ -309,24 +304,21 @@ void PrefilterRenderPass::RebuildSwapChain()
     prefilterRenderingPipeline = std::make_shared<PrefilterRenderingPipeline>(PrefilterRenderingPipeline(RenderPass));
     SetUpCommandBuffers();
     BlurredSkyBoxTexture->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    
-    for (int x = 0; x < CommandBuffer.size(); x++)
-    {
-        Draw(x);
+    Draw();
 
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &CommandBuffer[x];
-        VkFenceCreateInfo fenceCreateInfo{};
-        fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fenceCreateInfo.flags = 0;
-        VkFence fence;
-        vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-        vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-        vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-        vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-    }
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[0];
+
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 void PrefilterRenderPass::Destroy()

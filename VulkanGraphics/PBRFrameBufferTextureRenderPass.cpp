@@ -136,13 +136,15 @@ void PBRFrameBufferTextureRenderPass::CreateRendererFramebuffers()
 
 void PBRFrameBufferTextureRenderPass::SetUpCommandBuffers()
 {
+    CommandBuffer.resize(MAX_FRAMES_IN_FLIGHT, VK_NULL_HANDLE);
+
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = VulkanPtr::GetCommandPool();
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 3;
+    allocInfo.commandBufferCount = MAX_FRAMES_IN_FLIGHT;
 
-    for (int x = 0; x < CommandBuffer.size(); x++)
+    for (int x = 0; x < MAX_FRAMES_IN_FLIGHT; x++)
     {
         if (vkAllocateCommandBuffers(VulkanPtr::GetDevice(), &allocInfo, &CommandBuffer[x]) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate command buffers!");

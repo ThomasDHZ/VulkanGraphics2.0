@@ -21,6 +21,6 @@ public:
 	std::shared_ptr<brdfRenderingPipeline> BRDFPipeline;
 
 	void RebuildSwapChain(std::shared_ptr<Texture> InputBloomTexture);
-	void Draw(int x);
+	void Draw();
 	void Destroy();
 };

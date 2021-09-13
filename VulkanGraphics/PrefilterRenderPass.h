@@ -1,10 +1,13 @@
 #pragma once
 #include "Vulkanengine.h"
-#include "BaseRenderPass.h"
-#include "PrefilterRenderingPipeline.h"
+#include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
+#include "AssetManager.h"
+#include "CubeMapRenderingPipeline.h"
+#include "Skybox.h"
 #include "RenderedCubeMapTexture.h"
-
+#include "PrefilterRenderingPipeline.h"
+#include "BaseRenderPass.h"
 
 class PrefilterRenderPass : public BaseRenderPass
 {
@@ -26,7 +29,7 @@ public:
 	std::shared_ptr<PrefilterRenderingPipeline> prefilterRenderingPipeline;
 
 	void RebuildSwapChain();
-	void Draw(int x);
+	void Draw();
 	void Destroy();
 };
 

@@ -72,6 +72,17 @@ private:
         GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+
+        std::string CubeMapFiles[6];
+        CubeMapFiles[0] = "../texture/skybox/right.jpg";
+        CubeMapFiles[1] = "../texture/skybox/left.jpg";
+        CubeMapFiles[2] = "../texture/skybox/top.jpg";
+        CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
+        CubeMapFiles[4] = "../texture/skybox/back.jpg";
+        CubeMapFiles[5] = "../texture/skybox/front.jpg";
+        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+        AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
+
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
     
         DirectionalLightBuffer dlight = DirectionalLightBuffer();
@@ -103,16 +114,6 @@ private:
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/RayReflectionTest.obj")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
-
-        std::string CubeMapFiles[6];
-        CubeMapFiles[0] = "../texture/skybox/right.jpg";
-        CubeMapFiles[1] = "../texture/skybox/left.jpg";
-        CubeMapFiles[2] = "../texture/skybox/top.jpg";
-        CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
-        CubeMapFiles[4] = "../texture/skybox/back.jpg";
-        CubeMapFiles[5] = "../texture/skybox/front.jpg";
-        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
-        AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
     }
 
     void mainLoop() {

@@ -28,7 +28,7 @@ public:
 	std::shared_ptr<CubeMapRenderingPipeline> CubeMapTexturePipeline;
 
 	void RebuildSwapChain();
-	void Draw(int x);
+	void Draw();
 	void Destroy();
 };
 
