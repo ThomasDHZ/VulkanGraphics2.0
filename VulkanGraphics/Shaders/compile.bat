@@ -4,6 +4,14 @@ C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe FrameBuffer.vert -o FrameBufferVert.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe FrameBuffer.frag -o FrameBufferFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe SkyBoxFrameBufferShader.vert -o SkyBoxFrameBufferShaderVert.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe SkyBoxFrameBufferShader.frag -o SkyBoxFrameBufferShaderFrag.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe SkyboxTextureRenderer.vert -o SkyboxTextureRendererVert.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe SkyboxTextureRenderer.frag -o SkyboxTextureRendererFrag.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe Prefilter.vert -o PrefilterVert.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe Prefilter.frag -o PrefilterFrag.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe BRDFRenderer.vert -o BRDFRendererShaderVert.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe BRDFRenderer.frag -o BRDFRendererShaderFrag.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe PBRTextureRendererShader.vert -o PBRTextureRendererShaderVert.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe PBRTextureRendererShader.frag -o PBRTextureRendererShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 anyhit.rahit -o anyhit.rahit.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 anyhit1.rahit -o anyhit1.rahit.spv

@@ -39,7 +39,7 @@ struct SphereAreaLightBuffer {
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
-	alignas(4) float SphereRadius;
+	alignas(4) float SphereRadius = 1.0f;
 	alignas(4) float Luminosity = 1.0f;
 };
 
@@ -49,6 +49,7 @@ struct TubeAreaLightBuffer {
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
+	alignas(4) float TubeRadius = 1.0f;
 	alignas(4) float Luminosity = 1.0f;
 };
 

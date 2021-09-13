@@ -4,7 +4,7 @@
 #include "BlinnPhongRasterPass.h"
 #include "BlinnPhongRasterRenderer.h"
 #include "FrameBufferRenderPass.h"
-//#include "PBRRenderer.h"
+#include "PBRRenderer.h"
 //#include "BlinnPhongRasterRenderer.h"
 #include "RayTraceRenderer.h"
 //#include "RayTracePBRRenderer.h"
@@ -18,7 +18,6 @@ private:
 	int ActiveRenderer = 0;
 	bool GUIChanged = false;
 	//BlinnPhongRasterRenderer blinnPhongRenderer;
-	//PBRRenderer pbrRenderer;
 	//RayTracePBRRenderer pbrRayTraceRenderer;
 	//HybridRenderer hybridRenderer;
 	//Renderer2D renderer2D;
@@ -26,6 +25,7 @@ private:
 
 	BlinnPhongRasterRenderer BlinnRenderer;
 	RayTraceRenderer rayTraceRenderer;
+	PBRRenderer pbrRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;

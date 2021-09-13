@@ -36,6 +36,9 @@ layout(binding = 2) uniform UBO
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
+    uint SphereAreaLightCount;
+    uint TubeAreaLightCount;
+    uint RectangleAreaLightCount;
 	float timer;
     int Shadowed;
     int temp;
@@ -96,6 +99,37 @@ layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialLis
 layout(binding = 11) uniform sampler2D TextureMap[];
 layout(binding = 12) uniform sampler3D Texture3DMap[];
 
+layout(binding = 14) buffer SphereAreaLightBuffer {
+	vec3 position;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float SphereRadius;
+	float Luminosity;
+} SphereLight[];
+
+layout(binding = 15) buffer TubeAreaLightBuffer {
+	vec3 StartPos;
+	vec3 EndPos;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+    float TubeRadius;
+	float Luminosity;
+} TubeLight[];
+
+layout(binding = 16) buffer RectangleAreaLightBuffer
+{
+	vec3 VertexPos1;
+	vec3 VertexPos2;
+	vec3 VertexPos3;
+	vec3 VertexPos4;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float Luminosity;
+} RectangleLight[];
+
 Vertex vertex;
 MaterialInfo material;
 mat3 TBN;
@@ -103,6 +137,8 @@ mat3 TBN;
 #include "RTVertexBuilder.glsl"
 #include "MaterialBuilder.glsl"
 #include "BlinePhongLighting.glsl"
+
+vec3 CalcSphereAreaLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
 vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
 vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
@@ -142,12 +178,15 @@ void main()
      }
      for(int x = 0; x < scenedata.DirectionalLightCount; x++)
      {
-        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
+      //  baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
      }
      for(int x = 0; x < scenedata.PointLightCount; x++)
      {
-        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+       // baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
      }
+      
+            result += CalcSphereAreaLight(FragPos, normal, vertex.uv, 0);
+       
      //result +=  CalcNormalSpotLight(FragPos, scenedata.sLight, normal, texCoords);
     if(material.Reflectivness > 0.0f &&
        rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
@@ -166,7 +205,7 @@ void main()
         rayHitInfo.reflectCount = ConstMesh.MaxRefeflectCount + 1;
 	}
 
-    rayHitInfo.color = result;
+    rayHitInfo.color = CalcSphereAreaLight(FragPos, normal, vertex.uv, 0);
 	//rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
 }
@@ -194,6 +233,49 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
            LightResult += LightSpecular;
     }
     return LightResult;
+}
+
+vec3 CalcSphereAreaLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
+{
+    vec3 LightPos = SphereLight[index].position;
+    vec3 ViewPos = ConstMesh.CameraPos;
+    vec3 FragPos2 = FragPos;
+    if (material.NormalMapID != 0)
+    {
+        LightPos = TBN * SphereLight[index].position;
+        ViewPos = TBN * ConstMesh.CameraPos;
+        FragPos2 = TBN * FragPos;
+    }
+
+    vec3 R = reflect(-ViewPos, normal);
+    vec3 L = normalize(ViewPos - FragPos2);
+    vec3 CenterToRay = (dot(L,R)*R)-L;
+    vec3 ClosestPoint = L + CenterToRay * clamp(SphereLight[index].SphereRadius / length(CenterToRay), 0.0f, 1.0f);
+    L = ClosestPoint;
+    float DistLight = length(ClosestPoint);
+
+    vec3 lightDir = normalize(LightPos - FragPos2);
+    vec3 H = normalize(lightDir + L);
+    float spec = pow(max(dot(normal, H), 0.0), material.Shininess);
+
+    vec3 ambient = SphereLight[index].ambient * material.Diffuse.rgb;
+    vec3 diffuse = SphereLight[index].diffuse * DistLight * material.Diffuse.rgb;
+    vec3 specular = SphereLight[index].specular * spec * material.Specular;
+    if (material.DiffuseMapID != 0)
+    {
+        ambient = SphereLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        diffuse = SphereLight[index].diffuse * DistLight * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+    }
+    if (material.SpecularMapID != 0)
+    {
+        specular = SphereLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+    }
+
+    float LightDistance = length(LightPos - FragPos2);
+    float falloff = pow(clamp(1.0 - pow(LightDistance/(SphereLight[index].SphereRadius), 4), 0.0, 1.0f), 2) / ((LightDistance * LightDistance) + 1.0);	
+    float LightIntensity = PLight[index].Luminosity / (LightDistance * LightDistance);
+
+    return (ambient + diffuse + specular) * falloff * LightIntensity;
 }
 
 vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir)

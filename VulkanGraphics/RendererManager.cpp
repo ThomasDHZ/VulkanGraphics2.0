@@ -11,9 +11,10 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
     interfaceRenderPass = InterfaceRenderPass(engine);
     BlinnRenderer = BlinnPhongRasterRenderer(engine);
     rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
+    pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
 
     // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
-    // pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
+   
 
     //pbrRayTraceRenderer = RayTracePBRRenderer(EnginePtr::GetEnginePtr());
     //hybridRenderer = HybridRenderer(EnginePtr::GetEnginePtr());
@@ -108,8 +109,21 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         GUIChanged |= ImGui::SliderFloat3(("Sphere ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat3(("Sphere Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat3(("Sphere specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("Sphere Radius " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.SphereRadius, 0.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat(("Sphere Radius " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.SphereRadius, 0.0f, INT32_MAX);
         GUIChanged |= ImGui::SliderFloat(("Sphere Alumin " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SphereAreaLightList[x]->LightBuffer.UniformDataInfo.Luminosity, 0.0f, 100000.0f);
+        ImGui::LabelText("______", "______");
+    }
+
+    ImGui::LabelText("Tube Light", "Tube Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList.size(); x++)
+    {
+        GUIChanged |= ImGui::SliderFloat3(("Tube StartPos " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.StartPos.x, -100.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Tube EndPos " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.EndPos.x, -100.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Tube ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Tube Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Tube specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("Tube Radius " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.TubeRadius, 0.0f, INT32_MAX);
+        GUIChanged |= ImGui::SliderFloat(("Tube Alumin " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.Luminosity, 0.0f, 100000.0f);
         ImGui::LabelText("______", "______");
     }
 
@@ -221,6 +235,12 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         EnginePtr::GetEnginePtr()->RayTraceFlag = true;
         rayTraceRenderer.Draw(engine, window);
         rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
+    else if (ActiveRenderer == 2)
+    {
+        EnginePtr::GetEnginePtr()->RayTraceFlag = false;
+        pbrRenderer.Draw();
+        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
 
     interfaceRenderPass.Draw();
