@@ -7,7 +7,7 @@ Renderer2D::Renderer2D() : BaseRenderer()
 Renderer2D::Renderer2D(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
     rendererPass2D = RenderPass2D(engine);
-    FrameBufferRenderer = FrameBufferRenderPass(rendererPass2D.RenderedTexture, rendererPass2D.RenderedTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(rendererPass2D.RenderedTexture, rendererPass2D.RenderedBloomTexture);
 }
 
 Renderer2D::~Renderer2D()
@@ -17,7 +17,7 @@ Renderer2D::~Renderer2D()
 void Renderer2D::RebuildSwapChain()
 {
     rendererPass2D.RebuildSwapChain();
-    FrameBufferRenderer.RebuildSwapChain(rendererPass2D.RenderedTexture, rendererPass2D.BloomTexture);
+    FrameBufferRenderer.RebuildSwapChain(rendererPass2D.RenderedTexture, rendererPass2D.RenderedBloomTexture);
 }
 
 void Renderer2D::GUIUpdate()

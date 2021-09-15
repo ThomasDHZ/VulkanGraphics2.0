@@ -7,8 +7,11 @@ RenderPass2D::RenderPass2D() : BaseRenderPass()
 
 RenderPass2D::RenderPass2D(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
 {
-    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, VK_SAMPLE_COUNT_1_BIT));
-    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(engine, VK_SAMPLE_COUNT_1_BIT));
+    ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
+    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
+    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
+    RenderedBloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
+    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -27,34 +30,75 @@ void RenderPass2D::CreateRenderPass()
 
     VkAttachmentDescription AlebdoAttachment = {};
     AlebdoAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    AlebdoAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    AlebdoAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
     AlebdoAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     AlebdoAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     AlebdoAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     AlebdoAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     AlebdoAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    AlebdoAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AlebdoAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     AttachmentDescriptionList.emplace_back(AlebdoAttachment);
 
     VkAttachmentDescription BloomAttachment = {};
     BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    BloomAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
     BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     AttachmentDescriptionList.emplace_back(BloomAttachment);
+
+    VkAttachmentDescription MultiSampledAttachment = {};
+    MultiSampledAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    MultiSampledAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    MultiSampledAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    MultiSampledAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    MultiSampledAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    MultiSampledAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    MultiSampledAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    MultiSampledAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(MultiSampledAttachment);
+
+    VkAttachmentDescription BloomMultiSampledTexture = {};
+    BloomMultiSampledTexture.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomMultiSampledTexture.samples = VK_SAMPLE_COUNT_1_BIT;
+    BloomMultiSampledTexture.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomMultiSampledTexture.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BloomMultiSampledTexture.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomMultiSampledTexture.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BloomMultiSampledTexture.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BloomMultiSampledTexture.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BloomMultiSampledTexture);
+
+    VkAttachmentDescription DepthAttachment = {};
+    DepthAttachment.format = VK_FORMAT_D32_SFLOAT;
+    DepthAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
+    DepthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    DepthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    DepthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    DepthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    DepthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    DepthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(DepthAttachment);
 
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 
+    std::vector<VkAttachmentReference> MultiSampleReferenceList;
+    MultiSampleReferenceList.emplace_back(VkAttachmentReference{ 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    MultiSampleReferenceList.emplace_back(VkAttachmentReference{ 3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+
+    VkAttachmentReference depthReference = { 4, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
+
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDescription.colorAttachmentCount = static_cast<uint32_t>(ColorRefsList.size());
     subpassDescription.pColorAttachments = ColorRefsList.data();
+    subpassDescription.pDepthStencilAttachment = &depthReference;
+    subpassDescription.pResolveAttachments = MultiSampleReferenceList.data();
 
     std::vector<VkSubpassDependency> DependencyList;
 
@@ -87,7 +131,7 @@ void RenderPass2D::CreateRenderPass()
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
 
-    if (vkCreateRenderPass(VulkanPtr::GetDevice(), &renderPassInfo, nullptr, &RenderPass))
+    if (vkCreateRenderPass(EnginePtr::GetEnginePtr()->Device, &renderPassInfo, nullptr, &RenderPass))
     {
         throw std::runtime_error("failed to create GBuffer RenderPass!");
     }
@@ -100,8 +144,11 @@ void RenderPass2D::CreateRendererFramebuffers()
     for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(RenderedTexture->View);
+        AttachmentList.emplace_back(ColorTexture->View);
         AttachmentList.emplace_back(BloomTexture->View);
+        AttachmentList.emplace_back(RenderedTexture->View);
+        AttachmentList.emplace_back(RenderedBloomTexture->View);
+        AttachmentList.emplace_back(DepthTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -152,9 +199,12 @@ void RenderPass2D::Draw()
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.SwapChainResolution;
 
-    std::array<VkClearValue, 3> clearValues{};
-    clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-    clearValues[1].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+    std::array<VkClearValue, 5> clearValues{};
+    clearValues[0].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[1].color = { {1.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[2].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[3].color = { {1.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[4].depthStencil = { 1.0f, 0 };
 
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
@@ -181,8 +231,11 @@ void RenderPass2D::Draw()
 
 void RenderPass2D::RebuildSwapChain()
 {
+    ColorTexture->RecreateRendererTexture();
     RenderedTexture->RecreateRendererTexture();
     BloomTexture->RecreateRendererTexture();
+    RenderedBloomTexture->RecreateRendererTexture();
+    DepthTexture->RecreateRendererTexture();
 
     TexturePipeline->Destroy();
     wireFramePipeline->Destroy();
@@ -205,8 +258,11 @@ void RenderPass2D::RebuildSwapChain()
 
 void RenderPass2D::Destroy()
 {
+    ColorTexture->Delete();
     RenderedTexture->Delete();
     BloomTexture->Delete();
+    RenderedBloomTexture->Delete();
+    DepthTexture->Delete();
 
     TexturePipeline->Destroy();
     wireFramePipeline->Destroy();

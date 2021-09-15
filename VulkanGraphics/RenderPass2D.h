@@ -14,6 +14,9 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
+	std::shared_ptr<RenderedColorTexture> ColorTexture;
+	std::shared_ptr<RenderedColorTexture> BloomTexture;
+
 public:
 	RenderPass2D();
 	RenderPass2D(std::shared_ptr<VulkanEngine> engine);
@@ -22,7 +25,8 @@ public:
 	bool WireFrameFlag = false;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<RenderedColorTexture> BloomTexture;
+	std::shared_ptr<RenderedColorTexture> RenderedBloomTexture;
+	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<Shader2DPipeline> TexturePipeline;
 	std::shared_ptr<WireFramePipeline> wireFramePipeline;
