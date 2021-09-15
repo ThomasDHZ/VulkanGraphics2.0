@@ -147,8 +147,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AccelerationStructure.cpp" />
+    <ClCompile Include="AnimatedTileMesh.cpp" />
+    <ClCompile Include="Animation2D.cpp" />
     <ClCompile Include="Animation3D.cpp" />
+    <ClCompile Include="AnimationPlayer2D.cpp" />
     <ClCompile Include="AnimationPlayer3D.cpp" />
+    <ClCompile Include="Animaton2D.cpp" />
     <ClCompile Include="AnimatorCompute.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="BaseRenderer.cpp" />
@@ -183,11 +187,14 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="InterfaceRenderPass.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Level2D.cpp" />
+    <ClCompile Include="LevelTile.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="LightViewCamera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
+    <ClCompile Include="MegaMan.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshManager.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -216,12 +223,17 @@
     <ClCompile Include="Shader2DPipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp" />
+    <ClCompile Include="SparkManStage.cpp" />
     <ClCompile Include="SphereAreaLight.cpp" />
     <ClCompile Include="SpotLight.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Texture3D.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TileCollider.cpp" />
+    <ClCompile Include="TileMesh.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="TubeAreaLight.cpp" />
     <ClCompile Include="VulkanBuffer.cpp" />
@@ -234,8 +246,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
+    <ClInclude Include="AnimatedTileMesh.h" />
+    <ClInclude Include="Animation2D.h" />
     <ClInclude Include="Animation3D.h" />
+    <ClInclude Include="AnimationPlayer2D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />
+    <ClInclude Include="Animaton2D.h" />
     <ClInclude Include="AnimatorCompute.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="BaseRenderer.h" />
@@ -271,11 +287,14 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="InterfaceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Level2D.h" />
+    <ClInclude Include="LevelTile.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="LightViewCamera.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
+    <ClInclude Include="MegaMan.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshManager.h" />
     <ClInclude Include="Model.h" />
@@ -306,12 +325,17 @@
     <ClInclude Include="Shader2DPipeline.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h" />
+    <ClInclude Include="SparkManStage.h" />
     <ClInclude Include="SphereAreaLight.h" />
     <ClInclude Include="SpotLight.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Texture3D.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Tile.h" />
+    <ClInclude Include="TileCollider.h" />
+    <ClInclude Include="TileMesh.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="TubeAreaLight.h" />
     <ClInclude Include="Vertex.h" />

@@ -112,7 +112,7 @@ private:
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(SpotLightBuffer());
 
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/RayReflectionTest.obj")));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/TestAnimModel/model.dae")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
     }
 

@@ -158,7 +158,7 @@ void main()
    
    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
    {
-      //  result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
+        result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
    }
    for(int x = 0; x < scenedata.PointLightCount; x++)
    {
@@ -170,7 +170,7 @@ void main()
 //   }
    for(int x = 0; x < scenedata.SphereAreaLightCount; x++)
    {
-        result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);
+     //   result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);
    }
    for(int x = 0; x < scenedata.TubeAreaLightCount; x++)
    {
@@ -186,7 +186,7 @@ void main()
     vec3 Reflection = texture(CubeMap, R).rgb;
     vec3 finalMix = mix(result, Reflection, material.Reflectivness);
 
-    outColor = vec4(result, 1.0f);
+    outColor = vec4(texture(TextureMap[material.DiffuseMapID], texCoords).rgb, 1.0f);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     if(material.DiffuseMapID != 0)
     {
