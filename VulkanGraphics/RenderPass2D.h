@@ -3,12 +3,11 @@
 #include "RenderedDepthTexture.h"
 #include "RenderedColorTexture.h"
 #include "AssetManager.h"
-#include "CubeMapRenderingPipeline.h"
-#include "Skybox.h"
-#include "RenderedCubeMapTexture.h"
+#include "Shader2DPipeline.h"
 #include "BaseRenderPass.h"
+#include "WireFramePipeline.h"
 
-class CubeMapRenderPass : public BaseRenderPass
+class RenderPass2D : public BaseRenderPass
 {
 private:
 	void CreateRenderPass();
@@ -16,16 +15,17 @@ private:
 	void SetUpCommandBuffers();
 
 public:
-	CubeMapRenderPass();
-	CubeMapRenderPass(uint32_t CubeMapSize);
-	~CubeMapRenderPass();
+	RenderPass2D();
+	RenderPass2D(std::shared_ptr<VulkanEngine> engine);
+	~RenderPass2D();
 
-	uint32_t CubeMapSize;
+	bool WireFrameFlag = false;
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<RenderedCubeMapTexture> BlurredSkyBoxTexture;
+	std::shared_ptr<RenderedColorTexture> BloomTexture;
 
-	std::shared_ptr<CubeMapRenderingPipeline> CubeMapTexturePipeline;
+	std::shared_ptr<Shader2DPipeline> TexturePipeline;
+	std::shared_ptr<WireFramePipeline> wireFramePipeline;
 
 	void RebuildSwapChain();
 	void Draw();

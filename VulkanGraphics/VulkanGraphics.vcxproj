@@ -157,12 +157,8 @@
     <ClCompile Include="BlinnPhongRasterPass.cpp" />
     <ClCompile Include="BlinnPhongRasterRenderer.cpp" />
     <ClCompile Include="Bone.cpp" />
-    <ClCompile Include="brdfRenderingPipeline.cpp" />
-    <ClCompile Include="BRDFRenderPass.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="CameraManager.cpp" />
-    <ClCompile Include="CubeMapRenderingPipeline.cpp" />
-    <ClCompile Include="CubeMapRenderPass.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
@@ -199,14 +195,8 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
-    <ClCompile Include="PBRFrameBufferTextureRenderPass.cpp" />
-    <ClCompile Include="PBRIrradiancePipeline.cpp" />
-    <ClCompile Include="PBRPipeline.cpp" />
-    <ClCompile Include="PBRRenderer.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="PointLight.cpp" />
-    <ClCompile Include="PrefilterRenderingPipeline.cpp" />
-    <ClCompile Include="PrefilterRenderPass.cpp" />
     <ClCompile Include="RayTracedPipeline.cpp" />
     <ClCompile Include="RayTraceRenderer.cpp" />
     <ClCompile Include="RayTraceRenderPass.cpp" />
@@ -220,8 +210,10 @@
     <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
     <ClCompile Include="RenderedGTBNTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
+    <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="RendererManager.cpp" />
-    <ClCompile Include="RenderPBRFrameBufferTexturePipeline.cpp" />
+    <ClCompile Include="RenderPass2D.cpp" />
+    <ClCompile Include="Shader2DPipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp" />
     <ClCompile Include="SphereAreaLight.cpp" />
@@ -238,6 +230,7 @@
     <ClCompile Include="VulkanPtr.cpp" />
     <ClCompile Include="VulkanSwapChain.cpp" />
     <ClCompile Include="VulkanWindow.cpp" />
+    <ClCompile Include="WireFramePipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AccelerationStructure.h" />
@@ -251,12 +244,8 @@
     <ClInclude Include="BlinnPhongRasterPass.h" />
     <ClInclude Include="BlinnPhongRasterRenderer.h" />
     <ClInclude Include="bone.h" />
-    <ClInclude Include="brdfRenderingPipeline.h" />
-    <ClInclude Include="BRDFRenderPass.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraManager.h" />
-    <ClInclude Include="CubeMapRenderingPipeline.h" />
-    <ClInclude Include="CubeMapRenderPass.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="DirectionalLight.h" />
@@ -294,15 +283,9 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="OrthographicCamera.h" />
-    <ClInclude Include="PBRFrameBufferTextureRenderPass.h" />
-    <ClInclude Include="PBRIrradiancePipeline.h" />
-    <ClInclude Include="PBRPipeline.h" />
-    <ClInclude Include="PBRRenderer.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="PointLight.h" />
-    <ClInclude Include="PrefilterRenderingPipeline.h" />
-    <ClInclude Include="PrefilterRenderPass.h" />
     <ClInclude Include="RayTracedPipeline.h" />
     <ClInclude Include="RayTraceRenderer.h" />
     <ClInclude Include="RayTraceRenderPass.h" />
@@ -316,9 +299,11 @@
     <ClInclude Include="RenderedGBufferPositionTexture.h" />
     <ClInclude Include="RenderedGTBNTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
+    <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="RendererManager.h" />
-    <ClInclude Include="RenderPBRFrameBufferTexturePipeline.h" />
+    <ClInclude Include="RenderPass2D.h" />
     <ClInclude Include="SceneData.h" />
+    <ClInclude Include="Shader2DPipeline.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h" />
     <ClInclude Include="SphereAreaLight.h" />
@@ -336,6 +321,7 @@
     <ClInclude Include="VulkanPtr.h" />
     <ClInclude Include="VulkanSwapChain.h" />
     <ClInclude Include="VulkanWindow.h" />
+    <ClInclude Include="WireFramePipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
@@ -356,11 +342,15 @@
     <None Include="Shaders\raygen.rgen" />
     <None Include="Shaders\RTVertexBuilder.glsl" />
     <None Include="Shaders\RTXRandom.glsl" />
+    <None Include="Shaders\Shader2D.frag" />
+    <None Include="Shaders\Shader2D.vert" />
     <None Include="Shaders\shadow.rmiss" />
     <None Include="Shaders\SkyBoxFrameBufferShader.frag" />
     <None Include="Shaders\SkyBoxFrameBufferShader.vert" />
     <None Include="Shaders\vert.vert" />
     <None Include="Shaders\Vertex.glsl" />
+    <None Include="Shaders\WireframeShader.frag" />
+    <None Include="Shaders\WireframeShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

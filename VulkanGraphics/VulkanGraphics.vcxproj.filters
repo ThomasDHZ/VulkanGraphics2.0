@@ -318,38 +318,17 @@
     <ClCompile Include="TubeAreaLight.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
-    <ClCompile Include="PBRRenderer.cpp">
+    <ClCompile Include="Renderer2D.cpp">
       <Filter>Source Files\Rendering\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="PBRFrameBufferTextureRenderPass.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="RenderPass2D.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="PBRIrradiancePipeline.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Shader2DPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
-    <ClCompile Include="PBRPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeMapRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CubeMapRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PrefilterRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PrefilterRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="brdfRenderingPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BRDFRenderPass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderPBRFrameBufferTexturePipeline.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="WireFramePipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -608,38 +587,17 @@
     <ClInclude Include="TubeAreaLight.h">
       <Filter>Header Files\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="PBRRenderer.h">
+    <ClInclude Include="RenderPass2D.h">
       <Filter>Header Files\Rendering\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="PBRFrameBufferTextureRenderPass.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Shader2DPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="PBRIrradiancePipeline.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Renderer2D.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="PBRPipeline.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeMapRenderingPipeline.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CubeMapRenderPass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PrefilterRenderingPipeline.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PrefilterRenderPass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="brdfRenderingPipeline.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BRDFRenderPass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPBRFrameBufferTexturePipeline.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="WireFramePipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -711,6 +669,18 @@
     </None>
     <None Include="Shaders\compile.bat">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Shaders\Shader2D.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\Shader2D.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\WireframeShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\WireframeShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>
 </Project>

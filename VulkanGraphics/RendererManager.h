@@ -4,12 +4,12 @@
 #include "BlinnPhongRasterPass.h"
 #include "BlinnPhongRasterRenderer.h"
 #include "FrameBufferRenderPass.h"
-#include "PBRRenderer.h"
+
 //#include "BlinnPhongRasterRenderer.h"
 #include "RayTraceRenderer.h"
 //#include "RayTracePBRRenderer.h"
 //#include "HybridRenderer.h"
-//#include "Renderer2D.h"
+#include "Renderer2D.h"
 //#include "GUIRenderer.h"
 
 class RendererManager
@@ -25,7 +25,8 @@ private:
 
 	BlinnPhongRasterRenderer BlinnRenderer;
 	RayTraceRenderer rayTraceRenderer;
-	PBRRenderer pbrRenderer;
+	Renderer2D renderer2D;
+	//PBRRenderer pbrRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;

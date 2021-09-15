@@ -1,9 +1,8 @@
 #pragma once
-#include "Vulkanengine.h"
-#include "AssetManager.h"
 #include "GraphicsPipeline.h"
+#include "AssetManager.h"
 
-class PBRPipeline : public GraphicsPipeline
+class Shader2DPipeline : public GraphicsPipeline
 {
 private:
 	void SetUpDescriptorPool();
@@ -11,9 +10,10 @@ private:
 	void SetUpDescriptorSets();
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
-	PBRPipeline();
-	PBRPipeline(const VkRenderPass& renderPass);
-	~PBRPipeline();
+	Shader2DPipeline();
+	Shader2DPipeline(const VkRenderPass& renderPass);
+	~Shader2DPipeline();
 
 	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
 };
+
