@@ -126,6 +126,7 @@ mat3 TBN;
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
+vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
 
 void main() 
 {
@@ -161,6 +162,10 @@ void main()
    for(int x = 0; x < scenedata.PointLightCount; x++)
    {
         result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
+   }
+   for(int x = 0; x < scenedata.SpotLightCount; x++)
+   {
+        result += CalcNormalSpotLight(FragPos2, normal, texCoords, x);   
    }
 
     vec3 I = normalize(FragPos2 - ViewPos);
@@ -203,7 +208,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     const float diff = max(dot(normal, lightDir), 0.0);
 
     const vec3 halfwayDir = normalize(lightDir + ViewDir);
-    const float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    const float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = DLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = DLight[index].diffuse * diff * material.Diffuse.rgb;
@@ -218,7 +223,10 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
         specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
-    return vec3(ambient + diffuse + specular);
+    float LightDistance = length(LightPos - FragPos2);
+    float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
+
+    return (ambient + diffuse + specular) * LightIntensity;
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
@@ -253,11 +261,50 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
         specular = PLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
-    float distance = length(LightPos - FragPos2);
-    float attenuation = 1.0 / (PLight[index].constant + PLight[index].linear * distance + PLight[index].quadratic * (distance * distance));
-    ambient *= attenuation;
-    diffuse *= attenuation;
-    specular *= attenuation;
+    float LightDistance = length(LightPos - FragPos2);
+    float attenuation = 1.0 / (1.0f + PLight[index].linear * LightDistance + PLight[index].quadratic * (LightDistance * LightDistance));
 
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse + specular) * attenuation;
+}
+
+vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
+{
+    vec3 LightPos = SLight[index].position;
+    vec3 ViewPos = Mesh.CameraPos;
+    vec3 FragPos2 = FragPos;
+    if (material.NormalMapID != 0)
+    {
+        LightPos = TBN * SLight[index].position;
+        ViewPos = TBN * Mesh.CameraPos;
+        FragPos2 = TBN * FragPos;
+    }
+    vec3 ViewDir = normalize(ViewPos - FragPos2);
+
+    vec3 lightDir = normalize(LightPos - FragPos2);
+    float diff = max(dot(normal, lightDir), 0.0);
+
+    vec3 halfwayDir = normalize(lightDir + ViewDir);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+
+    vec3 ambient = SLight[index].ambient * material.Diffuse.rgb;
+    vec3 diffuse = SLight[index].diffuse * diff * material.Diffuse.rgb;
+    vec3 specular = SLight[index].specular * spec * material.Specular;
+    if (material.DiffuseMapID != 0)
+    {
+        ambient = SLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        diffuse = SLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+    }
+    if (material.SpecularMapID != 0)
+    {
+        specular = SLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+    }
+
+    float theta = dot(lightDir, normalize(-SLight[index].direction)); 
+    float epsilon = SLight[index].cutOff - SLight[index].outerCutOff;
+    float intensity = clamp((theta - SLight[index].outerCutOff) / epsilon, 0.0, 1.0);
+
+    float LightDistance = length(LightPos - FragPos2);
+    float attenuation = 1.0 / (1.0f + SLight[index].linear * LightDistance + SLight[index].quadratic * (LightDistance * LightDistance));
+
+    return (ambient + diffuse + specular) * attenuation * intensity;
 }

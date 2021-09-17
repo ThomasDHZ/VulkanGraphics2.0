@@ -5,7 +5,7 @@ struct DirectionalLightBuffer {
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
-	alignas(4)  float Luminosity = 1.0f;
+	alignas(4)  float Luminosity = 100.0f;
 };
 
 struct PointLightBuffer {
@@ -14,9 +14,9 @@ struct PointLightBuffer {
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
 	alignas(4) float constant = 1.0f;
-	alignas(4) float linear = 0.09f;
-	alignas(4) float quadratic = 0.032f;
-	alignas(4) float Luminosity = 1.0f;
+	alignas(4) float linear = 0.022f;
+	alignas(4) float quadratic = 0.0019f;
+	alignas(4) float Luminosity = 100.0f;
 };
 
 struct SpotLightBuffer {
@@ -29,9 +29,9 @@ struct SpotLightBuffer {
 	alignas(4) float cutOff = glm::cos(glm::radians(12.5f));
 	alignas(4) float outerCutOff = glm::cos(glm::radians(15.0f));
 	alignas(4) float constant = 1.0f;
-	alignas(4) float linear = 0.09f;
-	alignas(4) float quadratic = 0.032f;
-	alignas(4)  float Luminosity;
+	alignas(4) float linear = 0.022f;
+	alignas(4) float quadratic = 0.0019f;
+	alignas(4)  float Luminosity = 100.0f;
 };
 
 struct SphereAreaLightBuffer {
@@ -40,7 +40,7 @@ struct SphereAreaLightBuffer {
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
 	alignas(4) float SphereRadius = 1.0f;
-	alignas(4) float Luminosity = 1.0f;
+	alignas(4) float Luminosity = 100.0f;
 };
 
 struct TubeAreaLightBuffer {
@@ -50,7 +50,7 @@ struct TubeAreaLightBuffer {
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
 	alignas(4) float TubeRadius = 1.0f;
-	alignas(4) float Luminosity = 1.0f;
+	alignas(4) float Luminosity = 100.0f;
 };
 
 struct RectangleAreaLightBuffer
@@ -62,7 +62,7 @@ struct RectangleAreaLightBuffer
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
-	alignas(4) float Luminosity = 1.0f;
+	alignas(4) float Luminosity = 100.0f;
 };
 
 struct SceneDataBuffer {

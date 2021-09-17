@@ -106,13 +106,19 @@ private:
         spherelight.specular = glm::vec4(1.0f);
         spherelight.SphereRadius = 10.0f;
 
+        SpotLightBuffer slight = SpotLightBuffer();
+        slight.position = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+        slight.ambient = glm::vec4(0.2f);
+        slight.diffuse = glm::vec4(0.8f, 0.0f, 0.0f, 1.0f);
+        slight.specular = glm::vec4(1.0f);
+
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
-        LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
-        LightManagerPtr::GetLightManagerPtr()->AddSpotLight(SpotLightBuffer());
+       // LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
+        LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/suzanne.obj")));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.obj")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
     }
 

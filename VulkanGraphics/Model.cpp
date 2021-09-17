@@ -292,9 +292,10 @@ std::shared_ptr<Material> Model::LoadMaterial(const std::string& FilePath, aiMes
 	MaterialInfo.Specular.g = color.g;
 	MaterialInfo.Specular.b = color.b;
 
-	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &MaterialInfo.Shininess))
+	if (AI_SUCCESS != aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &MaterialInfo.Shininess) ||
+		MaterialInfo.Shininess == 0.0f)
 	{
-		MaterialInfo.Shininess = 32.0f;
+		MaterialInfo.Shininess = 0.1f;
 	}
 
 	if (AI_SUCCESS == aiGetMaterialFloat(material, AI_MATKEY_REFLECTIVITY, &MaterialInfo.Reflectivness))

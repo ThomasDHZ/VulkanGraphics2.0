@@ -70,6 +70,13 @@ public:
 	uint32_t GetTubeAreaLightDescriptorCount();
 	uint32_t GetRectangleAreaLightDescriptorCount();
 
+	uint32_t GetDirectionalLightCount(){ return DirectionalLightList.size();	}
+	uint32_t GetPointLightCount() { return PointLightList.size(); }
+	uint32_t GetSpotLightCount() { return SpotLightList.size(); }
+	uint32_t GetSphereAreaLightCount() { return SphereAreaLightList.size(); }
+	uint32_t GetTubeAreaLightCount() { return TubeAreaLightList.size(); }
+	uint32_t GetRectangleAreaLightCount() { return RectangleAreaLightList.size(); }
+
 	void Destory();
 };
 
