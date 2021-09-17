@@ -11,7 +11,7 @@
 class TextureManager
 {
 private:
-	std::vector<std::shared_ptr<Texture>> TextureList;
+	std::vector<std::shared_ptr<Texture2D>> Texture2DList;
 	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
 	std::shared_ptr<Texture> CubeMap;
 
@@ -29,7 +29,7 @@ public:
 	std::shared_ptr<Texture2D> LoadTexture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
 	std::shared_ptr<Texture3D> LoadTexture3D(const std::string TextureLocation, VkFormat format);
 	std::shared_ptr<Texture3D> LoadTexture3D(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
-	std::shared_ptr<FontTexture> LoadFontTexture(void* GlyphData, uint32_t width, uint32_t height);
+	//std::shared_ptr<FontTexture> LoadFontTexture(void* GlyphData, uint32_t width, uint32_t height);
 	void LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
 	void LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);
 	void LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat);
@@ -39,11 +39,11 @@ public:
 	void DeleteTexture2DByBufferIndex(uint32_t Texture2DBufferIndex);
 	void DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex);
 
-	std::shared_ptr<Texture> GetTextureByName(const std::string TextureName);
+	std::shared_ptr<Texture2D> GetTexture2DByName(const std::string TextureName);
 	std::shared_ptr<Texture3D> Get3DTextureByName(const std::string TextureName);
-	std::shared_ptr<Texture> GetTextureByID(uint32_t TextureID);
+	std::shared_ptr<Texture2D> GetTextureByID(uint32_t TextureID);
 	std::shared_ptr<Texture3D> GetTexture3DByID(uint32_t TextureID);
-	std::shared_ptr<Texture> GetTextureByBufferIndex(unsigned int TextureBufferIndex) { return TextureList[TextureBufferIndex]; };
+	std::shared_ptr<Texture2D> GetTextureByBufferIndex(unsigned int TextureBufferIndex) { return Texture2DList[TextureBufferIndex]; };
 	std::shared_ptr<Texture> GetTexture3DByBufferIndex(unsigned int Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
 	std::shared_ptr<Texture> Get3DTexture(unsigned int TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
 	std::shared_ptr<Texture> GetCubeMapTexture() { return CubeMap; }

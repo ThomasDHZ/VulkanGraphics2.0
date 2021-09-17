@@ -364,7 +364,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SparkManStage.cpp">
-      <Filter>Source Files\Rendering</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -669,7 +669,7 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="SparkManStage.h">
-      <Filter>Source Files\Rendering</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

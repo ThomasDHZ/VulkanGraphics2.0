@@ -226,7 +226,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
-    return (ambient + diffuse + specular) * LightIntensity;
+    return (ambient + diffuse + specular);
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)

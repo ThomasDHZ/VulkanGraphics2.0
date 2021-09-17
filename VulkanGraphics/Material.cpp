@@ -10,17 +10,17 @@ Material::Material(const std::string materialName)
 	MaterialID = EnginePtr::GetEnginePtr()->GenerateID();
 	MaterialName = materialName;
 
-	MaterialTextureData.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.SpecularMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.AlphaMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultAlphaTexture");
-	MaterialTextureData.EmissionMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.ShadowMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
-	MaterialTextureData.AOMap = TextureManagerPtr::GetTextureManagerPtr()->GetTextureByName("DefaultTexture");
+	MaterialTextureData.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.SpecularMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.AlphaMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultAlphaTexture");
+	MaterialTextureData.EmissionMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.ShadowMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
+	MaterialTextureData.AOMap = TextureManagerPtr::GetTextureManagerPtr()->GetTexture2DByName("DefaultTexture");
 
 	MaterialBuffer.CreateBuffer(sizeof(MaterialData), VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &MaterialBufferData);
 	UpdateTextureIndexs();

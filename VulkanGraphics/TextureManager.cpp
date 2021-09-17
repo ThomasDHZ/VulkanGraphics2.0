@@ -10,10 +10,10 @@ TextureManager::TextureManager()
 TextureManager::TextureManager(std::shared_ptr<VulkanEngine> Engine)
 {
 	LoadTexture2D("../texture/DefaultTexture.png", VK_FORMAT_R8G8B8A8_UNORM);
-	TextureList.back()->FileName = "DefaultTexture";
+	Texture2DList.back()->FileName = "DefaultTexture";
 	
 	LoadTexture2D("../texture/AlphaDefault.png", VK_FORMAT_R8G8B8A8_UNORM);
-	TextureList.back()->FileName = "DefaultAlphaTexture";
+	Texture2DList.back()->FileName = "DefaultAlphaTexture";
 
 	VkSamplerCreateInfo NullSamplerInfo = {};
 	NullSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -44,7 +44,7 @@ TextureManager::~TextureManager()
 
 std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(std::shared_ptr<Texture2D> texture)
 {
-	TextureList.emplace_back(texture);
+	Texture2DList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
@@ -52,8 +52,15 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(std::shared_ptr<Texture
 
 std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(const std::string TextureLocation, VkFormat format)
 {
+	uint32_t isTextureLoaded = IsTextureLoaded(TextureLocation);
+	if (isTextureLoaded != -1)
+	{
+		return GetTextureByID(isTextureLoaded);
+	}
+
+	IsTextureLoaded(TextureLocation);
 	const std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureLocation, format));
-	TextureList.emplace_back(texture);
+	Texture2DList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
@@ -62,7 +69,7 @@ std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(const std::string Textu
 std::shared_ptr<Texture2D> TextureManager::LoadTexture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format)
 {
 	const std::shared_ptr<Texture2D> texture = std::make_shared<Texture2D>(Texture2D(TextureResolution, PixelList, format));
-	TextureList.emplace_back(texture);
+	Texture2DList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
@@ -86,14 +93,14 @@ std::shared_ptr<Texture3D> TextureManager::LoadTexture3D(glm::ivec3& TextureReso
 	return texture;
 }
 
-std::shared_ptr<FontTexture> TextureManager::LoadFontTexture(void* GlyphData, uint32_t width, uint32_t height)
-{
-	const std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(GlyphData, width, height));
-	TextureList.emplace_back(texture);
-	UpdateBufferIndex();
-	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-	return texture;
-}
+//std::shared_ptr<FontTexture> TextureManager::LoadFontTexture(void* GlyphData, uint32_t width, uint32_t height)
+//{
+//	const std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(GlyphData, width, height));
+//	Texture2DList.emplace_back(texture);
+//	UpdateBufferIndex();
+//	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+//	return texture;
+//}
 
 void TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
@@ -123,7 +130,7 @@ void TextureManager::DeleteTexture2DByID(uint32_t TextureID)
 {
 	auto texture = GetTextureByID(TextureID);
 	texture->Delete();
-	TextureList.erase(TextureList.begin() + texture->TextureBufferIndex);
+	Texture2DList.erase(Texture2DList.begin() + texture->TextureBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
@@ -141,7 +148,7 @@ void TextureManager::DeleteTexture2DByBufferIndex(uint32_t Texture2DBufferIndex)
 {
 	auto texture = GetTextureByBufferIndex(Texture2DBufferIndex);
 	texture->Delete();
-	TextureList.erase(TextureList.begin() + Texture2DBufferIndex);
+	Texture2DList.erase(Texture2DList.begin() + Texture2DBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
@@ -157,7 +164,7 @@ void TextureManager::DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex)
 
 void TextureManager::UnloadAllTextures()
 {
-	for (auto& texture : TextureList)
+	for (auto& texture : Texture2DList)
 	{
 		texture->Delete();
 	}
@@ -185,9 +192,9 @@ void TextureManager::Destory()
 	UnloadCubeMap();
 }
 
-std::shared_ptr<Texture> TextureManager::GetTextureByID(uint32_t TextureID)
+std::shared_ptr<Texture2D> TextureManager::GetTextureByID(uint32_t TextureID)
 {
-	for (auto& texture : TextureList)
+	for (auto& texture : Texture2DList)
 	{
 		if (texture->TextureID == TextureID)
 		{
@@ -215,9 +222,9 @@ std::shared_ptr<Texture3D> TextureManager::GetTexture3DByID(uint32_t TextureID)
 
 void TextureManager::UpdateBufferIndex()
 {
-	for (int x = 0; x < TextureList.size(); x++)
+	for (int x = 0; x < Texture2DList.size(); x++)
 	{
-		TextureList[x]->TextureBufferIndex = x;
+		Texture2DList[x]->TextureBufferIndex = x;
 	}
 
 	for (int x = 0; x < Texture3DList.size(); x++)
@@ -229,7 +236,7 @@ void TextureManager::UpdateBufferIndex()
 uint32_t TextureManager::IsTextureLoaded(std::string name)
 {
 	uint32_t textureID = -1;
-	for (auto texture : TextureList)
+	for (auto texture : Texture2DList)
 	{
 		if (texture->FileName == name)
 		{
@@ -241,9 +248,9 @@ uint32_t TextureManager::IsTextureLoaded(std::string name)
 	return textureID;
 }
 
-std::shared_ptr<Texture> TextureManager::GetTextureByName(const std::string TextureName)
+std::shared_ptr<Texture2D> TextureManager::GetTexture2DByName(const std::string TextureName)
 {
-	for (auto texture : TextureList)
+	for (auto texture : Texture2DList)
 	{
 		if (texture->FileName == TextureName)
 		{
@@ -251,7 +258,7 @@ std::shared_ptr<Texture> TextureManager::GetTextureByName(const std::string Text
 		}
 	}
 
-	return TextureList[0];
+	return Texture2DList[0];
 }
 
 std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string TextureName)
@@ -270,17 +277,17 @@ std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string 
 std::vector<VkDescriptorImageInfo> TextureManager::GetTextureBufferListDescriptor()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
-	if (TextureList.size() == 0)
+	if (Texture2DList.size() == 0)
 	{
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		nullBuffer.imageView = VK_NULL_HANDLE;
-		nullBuffer.sampler = TextureList[0]->Sampler;
+		nullBuffer.sampler = Texture2DList[0]->Sampler;
 		DescriptorImageList.emplace_back(nullBuffer);
 	}
 	else
 	{
-		for (auto texture : TextureList)
+		for (auto texture : Texture2DList)
 		{
 			VkDescriptorImageInfo DescriptorImage{};
 			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -300,7 +307,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescrip
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		nullBuffer.imageView = VK_NULL_HANDLE;
-		nullBuffer.sampler = TextureList[0]->Sampler;
+		nullBuffer.sampler = Texture2DList[0]->Sampler;
 		DescriptorImageList.emplace_back(nullBuffer);
 	}
 	else
@@ -330,16 +337,16 @@ VkDescriptorImageInfo TextureManager::GetSkyBoxTextureBufferListDescriptor()
 	{
 		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		DescriptorImage.imageView = VK_NULL_HANDLE;
-		DescriptorImage.sampler = TextureList[0]->Sampler;
+		DescriptorImage.sampler = Texture2DList[0]->Sampler;
 	}
 	return DescriptorImage;
 }
 
 uint32_t TextureManager::GetTextureBufferDescriptorCount()
 {
-	if (TextureList.size() > 0)
+	if (Texture2DList.size() > 0)
 	{
-		return TextureList.size();
+		return Texture2DList.size();
 	}
 	else
 	{
