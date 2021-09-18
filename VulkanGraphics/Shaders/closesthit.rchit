@@ -157,12 +157,27 @@ void main()
     vec3 normal = vertex.normal;
     vec3 ViewPos  = ConstMesh.CameraPos;
     vec3 FragPos  = vertex.pos;
+    const vec3 viewDir = normalize(ViewPos - FragPos);
+
     if(material.NormalMapID != 0)
     {
         ViewPos  = TBN * ConstMesh.CameraPos;
-        FragPos  = TBN * vertex.pos;
+        FragPos  = TBN * FragPos;
     }
-    const vec3 viewDir = normalize(ViewPos - FragPos);
+
+    if(material.NormalMapID != 0)
+    {
+//        if(material.DepthMapID != 0)
+//        {
+//            texCoords = ParallaxMapping(material, vertex.uv,  viewDir);       
+//            if(vertex.uv.x > 1.0 || vertex.uv.y > 1.0 || vertex.uv.x < 0.0 || vertex.uv.y < 0.0)
+//            {
+//              discard;
+//            }
+//        }
+        normal = texture(TextureMap[material.NormalMapID], vertex.uv).rgb;
+        normal = normalize(normal * 2.0 - 1.0);
+     }
 
     for(int x = 0; x < scenedata.DirectionalLightCount; x++)
      {
@@ -176,6 +191,7 @@ void main()
        {
             baseColor += CalcNormalSpotLight(FragPos, normal, vertex.uv, x);   
        }
+
 
     if(material.Reflectivness > 0.0f &&
        rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
