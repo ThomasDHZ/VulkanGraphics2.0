@@ -40,6 +40,8 @@ struct SphereAreaLightBuffer {
 	alignas(16) glm::vec3 diffuse;
 	alignas(16) glm::vec3 specular;
 	alignas(4) float SphereRadius = 1.0f;
+	alignas(4) float linear = 0.022f;
+	alignas(4) float quadratic = 0.0019f;
 	alignas(4) float Luminosity = 100.0f;
 };
 

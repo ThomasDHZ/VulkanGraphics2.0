@@ -87,6 +87,8 @@ layout(binding = 10) buffer SphereAreaLightBuffer {
 	vec3 diffuse;
 	vec3 specular;
 	float SphereRadius;
+    float linear;
+    float quadratic;
 	float Luminosity;
 } SphereLight[];
 
@@ -127,6 +129,8 @@ mat3 TBN;
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
 vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
+vec3 CalcSphereAreaLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
+vec3 CalcTubeAreaLight(vec3 normal, vec2 uv, int index);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
 void main() 
@@ -184,15 +188,23 @@ void main()
 
    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
    {
-        result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
+     //   result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
    }
    for(int x = 0; x < scenedata.PointLightCount; x++)
    {
-        result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
+      //  result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
    }
    for(int x = 0; x < scenedata.SpotLightCount; x++)
    {
-        result += CalcNormalSpotLight(FragPos2, normal, texCoords, x);   
+      //  result += CalcNormalSpotLight(FragPos2, normal, texCoords, x);   
+   }
+   for(int x = 0; x < scenedata.SphereAreaLightCount; x++)
+   {
+        result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);
+   }
+   for(int x = 0; x < scenedata.TubeAreaLightCount; x++)
+   {
+       // result += CalcTubeAreaLight(normal, texCoords, x);   
    }
 
     vec3 I = normalize(FragPos2 - ViewPos);
@@ -200,7 +212,7 @@ void main()
     vec3 Reflection = texture(CubeMap, R).rgb;
     vec3 finalMix = mix(result, Reflection, material.Reflectivness);
 
-    outColor = vec4(finalMix, 1.0f);
+    outColor = vec4(finalMix, material.Alpha);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     if(material.DiffuseMapID != 0)
     {
@@ -273,7 +285,7 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + ViewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = PLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = PLight[index].diffuse * diff * material.Diffuse.rgb;
@@ -311,7 +323,7 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + ViewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = SLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = SLight[index].diffuse * diff * material.Diffuse.rgb;
@@ -335,6 +347,109 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
 
     return (ambient + diffuse + specular) * attenuation * intensity;
 }
+
+vec3 CalcSphereAreaLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
+{
+    vec3 LightPos = SphereLight[index].position;
+    vec3 ViewPos = Mesh.CameraPos;
+    vec3 FragPos2 = FragPos;
+    if (material.NormalMapID != 0)
+    {
+        LightPos = TBN * SphereLight[index].position;
+        ViewPos = TBN * Mesh.CameraPos;
+        FragPos2 = TBN * FragPos;
+    }
+
+    vec3 R = reflect(-ViewPos, normal);
+
+    vec3 L = normalize(ViewPos - FragPos2);
+    vec3 CenterToRay = (dot(L,R)*R)-L;
+    vec3 ClosestPoint = L + CenterToRay * clamp(SphereLight[index].SphereRadius / length(CenterToRay), 0.0f, 1.0f);
+    L = ClosestPoint;
+    float DistLight = length(ClosestPoint);
+
+    vec3 lightDir = normalize(LightPos - FragPos2);
+    vec3 H = normalize(lightDir + L);
+    float spec = pow(max(dot(normal, H), 0.0), material.Shininess);
+
+    vec3 ambient = SphereLight[index].ambient * material.Diffuse.rgb;
+    vec3 diffuse = SphereLight[index].diffuse * DistLight * material.Diffuse.rgb;
+    vec3 specular = SphereLight[index].specular * spec * material.Specular;
+    if (material.DiffuseMapID != 0)
+    {
+        ambient = SphereLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        diffuse = SphereLight[index].diffuse * DistLight * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+    }
+    if (material.SpecularMapID != 0)
+    {
+        specular = SphereLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+    }
+
+    float LightDistance = length((LightPos + (SphereLight[index].SphereRadius/2)) - FragPos2);
+    float attenuation = 1.0 / (1.0f + SphereLight[index].linear * LightDistance + SphereLight[index].quadratic * (LightDistance * LightDistance));
+
+    return (ambient + diffuse + specular) * attenuation;
+}
+
+//vec3 CalcTubeAreaLight(vec3 normal, vec2 uv, int index)
+//{
+//    vec3 StartPos = TubeLight[index].StartPos;
+//    vec3 EndPos = TubeLight[index].EndPos;
+//    vec3 ViewPos = Mesh.CameraPos;
+//    vec3 FragPos2 = FragPos;
+//    if (material.NormalMapID != 0)
+//    {
+//        ViewPos = TBN * Mesh.CameraPos;
+//        FragPos2 = TBN * FragPos;
+//        StartPos = TBN * StartPos;
+//        EndPos = TBN * EndPos;
+//    }
+//    vec3 R = reflect(-ViewPos, normal);
+//    
+//    vec3 LightStartPos = StartPos - ViewPos;
+//    vec3 LightEndPos = EndPos - ViewPos;
+//
+//    float StartPosDistance = length(LightStartPos);
+//    float EndPosDistance = length(LightEndPos);
+//
+//    float StartPosNOL = dot(LightStartPos, normal)/(2.0f*StartPosDistance);
+//    float EndPosNOL = dot(LightEndPos, normal)/(2.0f*EndPosDistance);
+//    float NoL = ( 2.0 * clamp( StartPosNOL + EndPosNOL, 0.0f, 1.0f)) / ( StartPosNOL * EndPosNOL + dot( StartPosDistance, EndPosDistance ) + 2.0 );
+//    vec3 LightDistance = LightEndPos - LightStartPos;
+//    
+//    float RoLd = dot(R, LightDistance);
+//    float DistLD = length(LightDistance);
+//    float t = ( dot(R, LightStartPos ) * RoLd - dot( LightStartPos, LightDistance) ) / ( DistLD * DistLD - RoLd * RoLd );
+//
+//    vec3 ClosestPoint = LightStartPos + LightDistance * clamp(t, 0.0f, 1.0f);
+//    vec3 CenterToRay = dot(ClosestPoint, R) * R - ClosestPoint;
+//    CenterToRay = CenterToRay * clamp(CenterToRay / length(CenterToRay), 0.0f, 1.0f);
+//    
+//    vec3 L = normalize(ClosestPoint);
+//    float DistLight = length(ClosestPoint);
+//
+//    vec3 lightDir = normalize(L - FragPos2);
+//    vec3 H = normalize(lightDir + L);
+//    float spec = pow(max(dot(normal, H), 0.0), material.Shininess);
+//
+//    vec3 ambient = SphereLight[index].ambient * material.Diffuse.rgb;
+//    vec3 diffuse = SphereLight[index].diffuse * DistLight * material.Diffuse.rgb;
+//    vec3 specular = SphereLight[index].specular * spec * material.Specular;
+//    if (material.DiffuseMapID != 0)
+//    {
+//        ambient = SphereLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+//        diffuse = SphereLight[index].diffuse * DistLight * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+//    }
+//    if (material.SpecularMapID != 0)
+//    {
+//        specular = SphereLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+//    }
+//
+//    float falloff = pow(clamp(1.0 - pow(DistLD/(TubeLight[index].TubeRadius), 4), 0.0, 1.0f), 2) / ((DistLD * DistLD) + 1.0);	
+//    float LightIntensity = TubeLight[index].Luminosity / (DistLD * DistLD);
+////
+//    return (ambient + diffuse + specular) * falloff * LightIntensity;
+//}
 
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
 {

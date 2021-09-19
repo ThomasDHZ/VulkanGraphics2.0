@@ -114,7 +114,7 @@ private:
 
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
-       // LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
+        LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
