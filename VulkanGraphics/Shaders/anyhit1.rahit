@@ -126,7 +126,8 @@ void main()
         if(material.DepthMapID != 0)
         {
             texCoords = ParallaxMapping(material, texCoords,  viewDir);       
-            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+            if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0||
+               texture(TextureMap[material.DiffuseMapID], texCoords).a == 0.0f)
             {
               ignoreIntersectionEXT;
             }

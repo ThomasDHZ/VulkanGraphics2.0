@@ -118,7 +118,7 @@ private:
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.obj")));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.gltf")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
     }
 

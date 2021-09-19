@@ -132,7 +132,8 @@ void main()
             }
         }
   
-   if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f)
+   if(texture(TextureMap[material.AlphaMapID], vertex.uv).r == 0.0f||
+      texture(TextureMap[material.DiffuseMapID], texCoords).a == 0.0f)
    {
 	 ignoreIntersectionEXT;
    }

@@ -167,14 +167,6 @@ void main()
 
     if(material.NormalMapID != 0)
     {
-//        if(material.DepthMapID != 0)
-//        {
-//            texCoords = ParallaxMapping(material, vertex.uv,  viewDir);       
-//            if(vertex.uv.x > 1.0 || vertex.uv.y > 1.0 || vertex.uv.x < 0.0 || vertex.uv.y < 0.0)
-//            {
-//              discard;
-//            }
-//        }
         normal = texture(TextureMap[material.NormalMapID], vertex.uv).rgb;
         normal = normalize(normal * 2.0 - 1.0);
      }
@@ -292,7 +284,7 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + ViewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = PLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = PLight[index].diffuse * diff * material.Diffuse.rgb;
@@ -330,7 +322,7 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float diff = max(dot(normal, lightDir), 0.0);
 
     vec3 halfwayDir = normalize(lightDir + ViewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), material.Shininess);
 
     vec3 ambient = SLight[index].ambient * material.Diffuse.rgb;
     vec3 diffuse = SLight[index].diffuse * diff * material.Diffuse.rgb;

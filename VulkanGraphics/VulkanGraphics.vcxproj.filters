@@ -635,41 +635,41 @@
     <ClInclude Include="WireFramePipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="Animation2D.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationPlayer2D.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Animaton2D.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="TileMesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TileCollider.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TileMesh.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Level2D.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelTile.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="Tile.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimatedTileMesh.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MegaMan.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SparkManStage.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MegaMan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelTile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedTileMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animaton2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationPlayer2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation2D.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
