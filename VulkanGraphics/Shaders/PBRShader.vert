@@ -4,9 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
-#include "Lighting.glsl"
 #include "material.glsl"
-#include "vertex.glsl"
 
 layout(push_constant) uniform MeshInfo
 {
@@ -16,11 +14,8 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject 
-{
-	DirectionalLight dlight;
-	PointLight plight[5];
-	SpotLight sLight;
+layout(binding = 0) uniform UniformBufferObject {
+    mat4 model;
     mat4 viewInverse;
 	mat4 projInverse;
 	mat4 view;
@@ -33,6 +28,7 @@ layout(binding = 0) uniform UniformBufferObject
     int Shadowed;
     int temp;
 } ubo;
+
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;
@@ -46,9 +42,12 @@ layout(binding = 1) buffer MeshProperties
 } meshProperties[];
 
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
+layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
+layout(binding = 7) uniform sampler2D TextureMap[];
+layout(binding = 8) uniform sampler3D Texture3DMap[];
+layout(binding = 9) uniform samplerCube CubeMap;
 
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec4 aTangent;
@@ -57,22 +56,17 @@ layout (location = 4) in vec4 aBitangent;
 layout(location = 0) out vec3 FragPos;
 layout(location = 1) out vec2 TexCoords;
 layout(location = 2) out vec3 Normal;
-layout(location = 3) out vec4 Tangent;
-layout(location = 4) out vec4 BiTangent;
+layout(location = 3) out vec3 Tangent;
+layout(location = 4) out vec3 BiTangent;
 
 void main() 
 {
-//if(gl_VertexIndex == 0)
-//{
-//    debugPrintfEXT("Temp: %i \n", ubo.temp);
-//}
-//
-    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
+    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
-	Normal = aNormal;
-	Tangent = aTangent;
-	BiTangent = aBitangent;
+	Tangent = aTangent.rgb;
+	BiTangent = aBitangent.rgb;
 
-    gl_Position = ubo.proj * ubo.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
+    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
+
 }

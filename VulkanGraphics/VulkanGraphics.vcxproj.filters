@@ -297,7 +297,7 @@
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp">
+    <ClCompile Include="SkyBoxRenderPipeline.cpp">
       <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
     <ClCompile Include="Texture3D.cpp">
@@ -605,7 +605,7 @@
     <ClInclude Include="Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h">
+    <ClInclude Include="SkyBoxRenderPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
@@ -712,9 +712,6 @@
     <None Include="Shaders\Lighting.glsl">
       <Filter>Shader\Include</Filter>
     </None>
-    <None Include="Shaders\PBRFunctions.glsl">
-      <Filter>Shader\Include</Filter>
-    </None>
     <None Include="Shaders\RTVertexBuilder.glsl">
       <Filter>Shader\Include</Filter>
     </None>
@@ -733,12 +730,6 @@
     <None Include="Shaders\animate.comp">
       <Filter>Shader\ComputeShader</Filter>
     </None>
-    <None Include="Shaders\SkyBoxFrameBufferShader.frag">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
-    <None Include="Shaders\SkyBoxFrameBufferShader.vert">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
     <None Include="Shaders\compile.bat">
       <Filter>Resource Files</Filter>
     </None>
@@ -752,6 +743,18 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\WireframeShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\PBRShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\PBRShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxRenderShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\SkyBoxRenderShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

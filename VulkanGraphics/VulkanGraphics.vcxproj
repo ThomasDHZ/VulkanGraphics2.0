@@ -222,7 +222,7 @@
     <ClCompile Include="RenderPass2D.cpp" />
     <ClCompile Include="Shader2DPipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="SkyBoxFrameBufferRenderingPipeline.cpp" />
+    <ClCompile Include="SkyBoxRenderPipeline.cpp" />
     <ClCompile Include="SparkManStage.cpp" />
     <ClCompile Include="SphereAreaLight.cpp" />
     <ClCompile Include="SpotLight.cpp" />
@@ -324,7 +324,7 @@
     <ClInclude Include="SceneData.h" />
     <ClInclude Include="Shader2DPipeline.h" />
     <ClInclude Include="Skybox.h" />
-    <ClInclude Include="SkyBoxFrameBufferRenderingPipeline.h" />
+    <ClInclude Include="SkyBoxRenderPipeline.h" />
     <ClInclude Include="SparkManStage.h" />
     <ClInclude Include="SphereAreaLight.h" />
     <ClInclude Include="SpotLight.h" />
@@ -362,15 +362,16 @@
     <None Include="Shaders\Material.glsl" />
     <None Include="Shaders\MaterialBuilder.glsl" />
     <None Include="Shaders\miss.rmiss" />
-    <None Include="Shaders\PBRFunctions.glsl" />
+    <None Include="Shaders\PBRShader.frag" />
+    <None Include="Shaders\PBRShader.vert" />
     <None Include="Shaders\raygen.rgen" />
     <None Include="Shaders\RTVertexBuilder.glsl" />
     <None Include="Shaders\RTXRandom.glsl" />
     <None Include="Shaders\Shader2D.frag" />
     <None Include="Shaders\Shader2D.vert" />
     <None Include="Shaders\shadow.rmiss" />
-    <None Include="Shaders\SkyBoxFrameBufferShader.frag" />
-    <None Include="Shaders\SkyBoxFrameBufferShader.vert" />
+    <None Include="Shaders\SkyBoxRenderShader.frag" />
+    <None Include="Shaders\SkyBoxRenderShader.vert" />
     <None Include="Shaders\vert.vert" />
     <None Include="Shaders\Vertex.glsl" />
     <None Include="Shaders\WireframeShader.frag" />

@@ -3,7 +3,7 @@
 #include "AssetManager.h"
 #include "GraphicsPipeline.h"
 
-class SkyBoxFrameBufferRenderingPipeline : public GraphicsPipeline
+class SkyBoxRenderPipeline : public GraphicsPipeline
 {
 private:
 	void SetUpDescriptorPool();
@@ -11,9 +11,9 @@ private:
 	void SetUpDescriptorSets();
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
-	SkyBoxFrameBufferRenderingPipeline();
-	SkyBoxFrameBufferRenderingPipeline(const VkRenderPass& renderPass);
-	~SkyBoxFrameBufferRenderingPipeline();
+	SkyBoxRenderPipeline();
+	SkyBoxRenderPipeline(const VkRenderPass& renderPass);
+	~SkyBoxRenderPipeline();
 
 	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
 };

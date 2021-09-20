@@ -16,24 +16,7 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject 
-{
-	DirectionalLight dlight;
-	PointLight plight[5];
-	SpotLight sLight;
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} ubo;
-layout(binding = 1) buffer MeshProperties 
+layout(binding = 0) buffer MeshProperties 
 {
 	mat4 ModelTransform;
 	vec2 UVOffset;
@@ -44,8 +27,7 @@ layout(binding = 1) buffer MeshProperties
 	float minLayers;
 	float maxLayers;
 } meshProperties[];
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer MaterialInfos2 { MaterialInfo material; } MaterialList[];
+layout(binding = 1) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
