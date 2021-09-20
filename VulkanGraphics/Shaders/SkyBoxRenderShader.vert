@@ -5,7 +5,7 @@
 #include "material.glsl"
 #include "vertex.glsl"
 
-layout(binding = 2) uniform UniformBufferObject 
+layout(binding = 0) uniform UniformBufferObject 
 {
     mat4 viewInverse;
 	mat4 projInverse;

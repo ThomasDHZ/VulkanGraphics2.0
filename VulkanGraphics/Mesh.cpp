@@ -246,6 +246,14 @@ void Mesh::Update()
 	TransformInverseBuffer.CopyBufferToMemory(&transformMatrix, sizeof(transformMatrix));
 
 	MeshProperties.Update();
+
+	if (EnginePtr::GetEnginePtr()->RayTraceFlag)
+	{
+		if (IndexCount != 0)
+		{
+			MeshBottomLevelAccelerationStructure();
+		}
+	}
 }
 
 void Mesh::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList)
