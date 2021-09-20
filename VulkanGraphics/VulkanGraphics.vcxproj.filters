@@ -366,6 +366,15 @@
     <ClCompile Include="SparkManStage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PBRRenderer.cpp">
+      <Filter>Source Files\Rendering\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="PBRRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="PBRPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -584,9 +593,6 @@
     <ClInclude Include="InterfaceRenderPass.h">
       <Filter>Header Files\Rendering\RenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="BlinnPhongPipeline.h">
-      <Filter>Header Files\Rendering\RenderPass</Filter>
-    </ClInclude>
     <ClInclude Include="FrameBufferPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
@@ -670,6 +676,18 @@
     </ClInclude>
     <ClInclude Include="Animation2D.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRRenderer.h">
+      <Filter>Header Files\Rendering\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="BlinnPhongPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

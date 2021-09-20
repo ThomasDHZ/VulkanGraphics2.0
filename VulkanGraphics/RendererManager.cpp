@@ -12,8 +12,7 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
     BlinnRenderer = BlinnPhongRasterRenderer(engine);
     rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
     renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
-
-  //  pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
+    pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
 
     // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
    
@@ -54,7 +53,7 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
     BlinnRenderer.RebuildSwapChain();
 
    //blinnPhongRenderer.RebuildSwapChain();
-    //pbrRenderer.RebuildSwapChain();
+    pbrRenderer.RebuildSwapChain();
     rayTraceRenderer.RebuildSwapChain(engine,window);
     //pbrRayTraceRenderer.RebuildSwapChain();
     //hybridRenderer.RebuildSwapChain();
@@ -180,18 +179,18 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     {
         BlinnRenderer.GUIUpdate();
     }
-    else if (ActiveRenderer == 2)
+    else if (ActiveRenderer == 1)
     {
         rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
     }    
-    else if (ActiveRenderer == 5)
+    else if (ActiveRenderer == 2)
     {
         renderer2D.GUIUpdate();
     }
-    //else if (ActiveRenderer == 1)
-    //{
-    //    pbrRenderer.GUIUpdate();
-    //}
+    else if (ActiveRenderer == 3)
+    {
+        pbrRenderer.GUIUpdate();
+    }
     //else if (ActiveRenderer == 3)
     //{
     //    pbrRayTraceRenderer.GUIUpdate();
@@ -247,6 +246,12 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         renderer2D.Draw();
         renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
+    else if (ActiveRenderer == 3)
+    {
+        EnginePtr::GetEnginePtr()->RayTraceFlag = false;
+        pbrRenderer.Draw();
+        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+    }
 
     interfaceRenderPass.Draw();
     CommandBufferSubmitList.emplace_back(interfaceRenderPass.ImGuiCommandBuffers[EnginePtr::GetEnginePtr()->CMDIndex]);
@@ -291,9 +296,9 @@ void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)
     BlinnRenderer.Destroy();
     rayTraceRenderer.Destroy(engine);
     renderer2D.Destroy();
+    pbrRenderer.Destroy();
 
    // blinnPhongRenderer.Destroy();
-    //pbrRenderer.Destroy();
     //pbrRayTraceRenderer.Destroy();
     //hybridRenderer.Destroy();
     //guiRenderer.Destroy();

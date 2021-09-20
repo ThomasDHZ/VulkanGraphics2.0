@@ -180,6 +180,26 @@ void main()
         float NdotL = max(dot(N, L), 0.0);        
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }   
+
+    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 color = ambient + Lo;
+
+    outColor = vec4(color, material.Alpha);
+    outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    if(material.DiffuseMapID != 0)
+    {
+        if(texture(TextureMap[material.DiffuseMapID], texCoords).r >= 0.8f)
+        {
+          outBloom = vec4(texture(TextureMap[material.DiffuseMapID], texCoords).rgb, 1.0f);
+        }
+    }
+    else
+    {
+        if(material.Diffuse.r >= 0.8f)
+        {
+           outBloom = vec4(material.Diffuse, material.Alpha);
+        }
+    }
 }
 
 vec3 getNormalFromMap(MaterialInfo material, vec2 uv)

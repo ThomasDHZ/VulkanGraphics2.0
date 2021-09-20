@@ -10,6 +10,7 @@
 //#include "RayTracePBRRenderer.h"
 //#include "HybridRenderer.h"
 #include "Renderer2D.h"
+#include "PBRRenderer.h"
 //#include "GUIRenderer.h"
 
 class RendererManager
@@ -26,7 +27,7 @@ private:
 	BlinnPhongRasterRenderer BlinnRenderer;
 	RayTraceRenderer rayTraceRenderer;
 	Renderer2D renderer2D;
-	//PBRRenderer pbrRenderer;
+	PBRRenderer pbrRenderer;
 	InterfaceRenderPass interfaceRenderPass;
 
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;

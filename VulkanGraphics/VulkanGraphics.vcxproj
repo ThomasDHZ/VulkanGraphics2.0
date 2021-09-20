@@ -202,6 +202,9 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
+    <ClCompile Include="PBRPipeline.cpp" />
+    <ClCompile Include="PBRRenderer.cpp" />
+    <ClCompile Include="PBRRenderPass.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RayTracedPipeline.cpp" />
@@ -302,6 +305,9 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="OrthographicCamera.h" />
+    <ClInclude Include="PBRPipeline.h" />
+    <ClInclude Include="PBRRenderer.h" />
+    <ClInclude Include="PBRRenderPass.h" />
     <ClInclude Include="PerspectiveCamera.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="PointLight.h" />

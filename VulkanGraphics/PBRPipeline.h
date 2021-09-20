@@ -2,7 +2,7 @@
 #include "GraphicsPipeline.h"
 #include "Texture2D.h"
 
-class BlinnPhongPipeline : public GraphicsPipeline
+class PBRPipeline : public GraphicsPipeline
 {
 private:
 	void SetUpDescriptorPool();
@@ -10,9 +10,9 @@ private:
 	void SetUpDescriptorSets();
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
-	BlinnPhongPipeline();
-	BlinnPhongPipeline(const VkRenderPass& renderPass);
-	~BlinnPhongPipeline();
+	PBRPipeline();
+	PBRPipeline(const VkRenderPass& renderPass);
+	~PBRPipeline();
 
 	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
 };
