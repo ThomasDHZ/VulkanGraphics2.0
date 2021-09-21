@@ -81,7 +81,9 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
 void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 5);
+    ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 2);
+    ImGui::Checkbox("Ray Tracing:", &EnginePtr::GetEnginePtr()->RayTraceFlag);
+
     //ImGui::SliderInt("Active Camera", &AssetManagerPtr::GetAssetPtr()->cameraManager->cameraIndex, 0, AssetManagerPtr::GetAssetPtr()->cameraManager->CameraList.size());
 
     //for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
@@ -177,32 +179,30 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
     if (ActiveRenderer == 0)
     {
-        BlinnRenderer.GUIUpdate();
+        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
+        {
+            BlinnRenderer.GUIUpdate();
+        }
+        else
+        {
+            rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
+        }
     }
     else if (ActiveRenderer == 1)
     {
-        rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
+        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
+        {
+            pbrRenderer.GUIUpdate();
+        }
+        else
+        {
+        }
     }    
     else if (ActiveRenderer == 2)
     {
         renderer2D.GUIUpdate();
     }
-    else if (ActiveRenderer == 3)
-    {
-        pbrRenderer.GUIUpdate();
-    }
-    //else if (ActiveRenderer == 3)
-    //{
-    //    pbrRayTraceRenderer.GUIUpdate();
-    //}
-    //else if (ActiveRenderer == 4)
-    //{
-    //    hybridRenderer.GUIUpdate();
-    //}
-    //else if (ActiveRenderer == 5)
-    //{
-    //    renderer2D.GUIUpdate();
-    //}
+
    /* guiRenderer.GUIUpdate();*/
 }
 
@@ -231,26 +231,33 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
     AssetManagerPtr::GetAssetPtr()->ObjManager->SubmitAnimationToCommandBuffer(CommandBufferSubmitList);
     if (ActiveRenderer == 0)
     {
-        BlinnRenderer.Draw();
-        BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
+        {
+            BlinnRenderer.Draw();
+            BlinnRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        }
+        else
+        {
+            rayTraceRenderer.Draw(engine, window);
+            rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        }
     }
     else if (ActiveRenderer == 1)
     {
-        EnginePtr::GetEnginePtr()->RayTraceFlag = true;
-        rayTraceRenderer.Draw(engine, window);
-        rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
+        {
+            pbrRenderer.Draw();
+            pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+        }
+        else
+        {
+        }
     }
     else if (ActiveRenderer == 2)
     {
         EnginePtr::GetEnginePtr()->RayTraceFlag = false;
         renderer2D.Draw();
         renderer2D.AddToCommandBufferSubmitList(CommandBufferSubmitList);
-    }
-    else if (ActiveRenderer == 3)
-    {
-        EnginePtr::GetEnginePtr()->RayTraceFlag = false;
-        pbrRenderer.Draw();
-        pbrRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
     }
 
     interfaceRenderPass.Draw();
