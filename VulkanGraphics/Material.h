@@ -111,17 +111,36 @@ struct MaterialData
 		{
 			AlbedoMapID = materialTexture.AlbedoMap->TextureBufferIndex;
 		}
+		else
+		{
+			AlbedoMapID = 0;
+		}
+
 		if (materialTexture.MatallicMap != nullptr)
 		{
 			MatallicMapID = materialTexture.MatallicMap->TextureBufferIndex;
 		}
+		else
+		{
+			MatallicMapID = 0;
+		}
+
 		if (materialTexture.RoughnessMap != nullptr)
 		{
 			RoughnessMapID = materialTexture.RoughnessMap->TextureBufferIndex;
 		}
+		else
+		{
+			RoughnessMapID = 0;
+		}
+
 		if (materialTexture.AOMap != nullptr)
 		{
 			AOMapID = materialTexture.AOMap->TextureBufferIndex;
+		}
+		else
+		{
+			AOMapID = 0;
 		}
 	}
 };

@@ -145,17 +145,42 @@ void main()
 	 discard;
    }
 
-   vec3 albedo     = texture(TextureMap[material.AlbedoMapID], TexCoords).rgb;
-   float metallic  = texture(TextureMap[material.MatallicMapID], TexCoords).r;
-   float roughness = texture(TextureMap[material.RoughnessMapID], TexCoords).r;
-   float ao        = texture(TextureMap[material.AOMapID], TexCoords).r;
+    vec3 Albedo = material.Albedo;
+    if (material.AlbedoMapID != 0)
+    {
+        Albedo = texture(TextureMap[material.AlbedoMapID], texCoords).rgb;
+    }
+
+    float Metallic = material.Matallic;
+    if (material.MatallicMapID != 0)
+    {
+        Metallic = texture(TextureMap[material.MatallicMapID], texCoords).r;
+    }
+
+   float Roughness = material.Roughness;
+    if (material.RoughnessMapID != 0)
+    {
+        Roughness = texture(TextureMap[material.RoughnessMapID], texCoords).r;
+    }
+
+    float AmbientOcclusion = material.AmbientOcclusion;
+    if (material.AOMapID != 0)
+    {
+        AmbientOcclusion = texture(TextureMap[material.AOMapID], texCoords).r;
+    }
+
+    float Alpha = material.Alpha;
+    if (material.AlphaMapID != 0)
+    {
+       Alpha = texture(TextureMap[material.AlphaMapID], texCoords).r;
+    }
 
    vec3 N = getNormalFromMap(material, TexCoords);
    vec3 V = normalize(Mesh.CameraPos - FragPos);
    vec3 R = reflect(-V, N); 
 
    vec3 F0 = vec3(0.04); 
-   F0 = mix(F0, albedo, metallic);
+   F0 = mix(F0, Albedo, Metallic);
 
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < 1; ++i) 
@@ -165,8 +190,8 @@ void main()
 
        vec3 radiance = DLight[i].diffuse;
 
-        float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);    
+        float NDF = DistributionGGX(N, H, Roughness);   
+        float G   = GeometrySmith(N, V, L, Roughness);    
         vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);        
         
         vec3 nominator    = NDF * G * F;
@@ -175,13 +200,13 @@ void main()
         
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic;	                
+        kD *= 1.0 - Metallic;	                
             
         float NdotL = max(dot(N, L), 0.0);        
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+        Lo += (kD * Albedo / PI + specular) * radiance * NdotL;
     }   
 
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 ambient = vec3(0.03) * Albedo * AmbientOcclusion;
     vec3 color = ambient + Lo;
 
     outColor = vec4(color, material.Alpha);

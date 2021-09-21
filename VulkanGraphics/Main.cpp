@@ -118,8 +118,19 @@ private:
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/reflectionPBR.dae")));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sphere.obj")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+
+        
+        MaterialTexture material;
+        material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+        material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+       
+        auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
+        gameObject->MeshList[0]->MeshMaterial = mat;
     }
 
     void mainLoop() {
