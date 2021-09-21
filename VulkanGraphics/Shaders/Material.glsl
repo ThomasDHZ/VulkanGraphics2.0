@@ -32,6 +32,7 @@ struct PBRMaterial
     vec3 Normal;
     vec3 Depth;
     vec3 Emission;
+	vec2 UV;
     float Metallic;
     float Roughness;
     float AmbientOcclusion;

@@ -126,10 +126,10 @@ layout(location = 1) out vec4 outBloom;
 MaterialInfo material;
 mat3 TBN;
 
-vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
-vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
-vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
-vec3 CalcSphereAreaLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
+vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index);
+vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index);
+vec3 CalcNormalSpotLight(vec3 normal, vec2 uv, int index);
+vec3 CalcSphereAreaLight(vec3 normal, vec2 uv, int index);
 vec3 CalcTubeAreaLight(vec3 normal, vec2 uv, int index);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
@@ -188,19 +188,19 @@ void main()
 
    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
    {
-     //   result += CalcNormalDirLight(FragPos2, normal, texCoords, x);
+       // result += CalcNormalDirLight(normal, texCoords, x);
    }
    for(int x = 0; x < scenedata.PointLightCount; x++)
    {
-      //  result += CalcNormalPointLight(FragPos2, normal, texCoords, x);   
+      //  result += CalcNormalPointLight(normal, texCoords, x);   
    }
    for(int x = 0; x < scenedata.SpotLightCount; x++)
    {
-      //  result += CalcNormalSpotLight(FragPos2, normal, texCoords, x);   
+        result += CalcNormalSpotLight(normal, texCoords, x);   
    }
    for(int x = 0; x < scenedata.SphereAreaLightCount; x++)
    {
-        result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);
+       // result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);
    }
    for(int x = 0; x < scenedata.TubeAreaLightCount; x++)
    {
@@ -230,7 +230,7 @@ void main()
     }
 }
 
-vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
+vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
 {
     vec3 LightPos = DLight[index].direction;
     vec3 ViewPos = Mesh.CameraPos;
@@ -268,7 +268,7 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     return (ambient + diffuse + specular);
 }
 
-vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
+vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
 {
     vec3 LightPos = PLight[index].position;
     vec3 ViewPos = Mesh.CameraPos;
@@ -306,7 +306,7 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     return (ambient + diffuse + specular) * attenuation;
 }
 
-vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
+vec3 CalcNormalSpotLight(vec3 normal, vec2 uv, int index)
 {
     vec3 LightPos = SLight[index].position;
     vec3 ViewPos = Mesh.CameraPos;
@@ -348,7 +348,7 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     return (ambient + diffuse + specular) * attenuation * intensity;
 }
 
-vec3 CalcSphereAreaLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
+vec3 CalcSphereAreaLight(vec3 normal, vec2 uv, int index)
 {
     vec3 LightPos = SphereLight[index].position;
     vec3 ViewPos = Mesh.CameraPos;
