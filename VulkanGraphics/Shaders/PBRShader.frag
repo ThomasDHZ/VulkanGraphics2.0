@@ -124,7 +124,7 @@ layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
 
 
-MaterialInfo material;
+//MaterialInfo material;
 mat3 TBN;
 
 const float PI = 3.14159265359;
@@ -137,9 +137,98 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index);
 
+PBRMaterial PBRMaterialProperties(uint MeshID)
+{
+   PBRMaterial material;
+   const MaterialInfo materialInfo = MaterialList[meshProperties[MeshID].MaterialIndex].material;
+
+   material.UV = TexCoords + meshProperties[MeshID].UVOffset;
+   if(texture(TextureMap[materialInfo.AlphaMapID],  material.UV).r == 0.0f ||
+      texture(TextureMap[materialInfo.DiffuseMapID],  material.UV).a == 0.0f)
+   {
+	 discard;
+   }
+   material.UV *= meshProperties[Mesh.MeshIndex].UVScale;
+   if(meshProperties[Mesh.MeshIndex].UVFlip.y == 1.0f)
+   {
+        material.UV.y = 1.0f - material.UV.y;
+   }
+   if(meshProperties[Mesh.MeshIndex].UVFlip.x == 1.0f)
+   {
+        material.UV.x = 1.0f - material.UV.x;
+   }
+   if(meshProperties[Mesh.MeshIndex].UVFlip.y == 1.0f)
+   {
+        material.UV.y = 1.0f - material.UV.y;
+   }
+
+   vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
+   vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
+   vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
+   TBN = transpose(mat3(T, B, N));
+   
+   vec3 result = vec3(0.0f);
+   vec3 normal = Normal;
+   vec3 ViewPos  = Mesh.CameraPos;
+   vec3 FragPos2  = FragPos;
+   vec3 viewDir = normalize(ViewPos - FragPos2);
+    if(materialInfo.NormalMapID != 0)
+    {
+        ViewPos  = TBN * Mesh.CameraPos;
+        FragPos2  = TBN * FragPos;
+    }
+
+    if(materialInfo.NormalMapID != 0)
+    {
+        if(materialInfo.DepthMapID != 0)
+        {
+             material.UV = ParallaxMapping(materialInfo,  material.UV,  viewDir);       
+            if( material.UV.x > 1.0 ||  material.UV.y > 1.0 ||  material.UV.x < 0.0 ||  material.UV.y < 0.0)
+            {
+              discard;
+            }
+        }
+        material.Normal = texture(TextureMap[materialInfo.NormalMapID],  material.UV).rgb;
+        material.Normal = normalize(normal * 2.0 - 1.0);
+     }
+
+
+    material.Albedo = material.Albedo;
+    if (materialInfo.AlbedoMapID != 0)
+    {
+        material.Albedo = texture(TextureMap[materialInfo.AlbedoMapID],  material.UV).rgb;
+    }
+
+    material.Metallic = materialInfo.Matallic;
+    if (materialInfo.MatallicMapID != 0)
+    {
+        material.Metallic = texture(TextureMap[materialInfo.MatallicMapID],  material.UV).r;
+    }
+
+    material.Roughness = material.Roughness;
+    if (materialInfo.RoughnessMapID != 0)
+    {
+        material.Roughness = texture(TextureMap[materialInfo.RoughnessMapID],  material.UV).r;
+    }
+
+    material.AmbientOcclusion = material.AmbientOcclusion;
+    if (materialInfo.AOMapID != 0)
+    {
+        material.AmbientOcclusion = texture(TextureMap[materialInfo.AOMapID],  material.UV).r;
+    }
+
+    material.Alpha = material.Alpha;
+    if (materialInfo.AlphaMapID != 0)
+    {
+       material.Alpha = texture(TextureMap[materialInfo.AlphaMapID], material.UV).r;
+    }
+
+    return material;
+}
+
 void main() 
 {
-   material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
+   MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
    vec2 texCoords = TexCoords + meshProperties[Mesh.MeshIndex].UVOffset;
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f ||
       texture(TextureMap[material.DiffuseMapID], texCoords).a == 0.0f)
@@ -209,6 +298,7 @@ void main()
 
 vec3 CalcNormalDirLight(vec3 N, vec2 uv, int index)
 {
+   MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
    vec3 albedo     = texture(TextureMap[material.AlbedoMapID], TexCoords).rgb;
    float metallic  = texture(TextureMap[material.MatallicMapID], TexCoords).r;
    float roughness = texture(TextureMap[material.RoughnessMapID], TexCoords).r;
