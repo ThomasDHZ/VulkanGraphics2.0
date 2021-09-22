@@ -1,8 +1,8 @@
 #pragma once
 #include "Vulkanengine.h"
-#include "RayTracedPipeline.h"
+#include "PBRRayTracedPipeline.h"
 
-class RayTraceRenderPass
+class PBRRayTraceRenderPass
 {
 private:
     RayTraceConstants RTXConst;
@@ -21,12 +21,12 @@ public:
     std::shared_ptr<RenderedRayTracedColorTexture> ReflectionTexture;
     std::shared_ptr<RenderedRayTracedColorTexture> SSAOTexture;
 
-    std::shared_ptr<RayTracedPipeline> RayTracePipeline;
+    std::shared_ptr<PBRRayTracedPipeline> PBRRayTracePipeline;
     VkCommandBuffer RayTraceCommandBuffer;
 
-    RayTraceRenderPass();
-    RayTraceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
-    ~RayTraceRenderPass();
+    PBRRayTraceRenderPass();
+    PBRRayTraceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
+    ~PBRRayTraceRenderPass();
 
     void SetUpTopLevelAccelerationStructure(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager);
     void GUIUpdate();

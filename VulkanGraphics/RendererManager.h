@@ -4,30 +4,24 @@
 #include "BlinnPhongRasterPass.h"
 #include "BlinnPhongRasterRenderer.h"
 #include "FrameBufferRenderPass.h"
-
-//#include "BlinnPhongRasterRenderer.h"
 #include "RayTraceRenderer.h"
-//#include "RayTracePBRRenderer.h"
-//#include "HybridRenderer.h"
 #include "Renderer2D.h"
 #include "PBRRenderer.h"
-//#include "GUIRenderer.h"
+#include "PBRRayTraceRenderer.h"
 
 class RendererManager
 {
 private:
 	int ActiveRenderer = 0;
 	bool GUIChanged = false;
-	//BlinnPhongRasterRenderer blinnPhongRenderer;
-	//RayTracePBRRenderer pbrRayTraceRenderer;
-	//HybridRenderer hybridRenderer;
-	//Renderer2D renderer2D;
-	//GUIRenderer guiRenderer;
 
 	BlinnPhongRasterRenderer BlinnRenderer;
-	RayTraceRenderer rayTraceRenderer;
-	Renderer2D renderer2D;
 	PBRRenderer pbrRenderer;
+	Renderer2D renderer2D;
+
+	RayTraceRenderer rayTraceRenderer;
+	PBRRayTraceRenderer pbrRayTraceRenderer;
+
 	InterfaceRenderPass interfaceRenderPass;
 
 	std::vector<VkCommandBuffer> CommandBufferSubmitList;

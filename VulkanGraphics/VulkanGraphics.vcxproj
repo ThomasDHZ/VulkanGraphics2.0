@@ -203,6 +203,9 @@
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="PBRPipeline.cpp" />
+    <ClCompile Include="PBRRayTracedPipeline.cpp" />
+    <ClCompile Include="PBRRayTraceRenderer.cpp" />
+    <ClCompile Include="PBRRayTraceRenderPass.cpp" />
     <ClCompile Include="PBRRenderer.cpp" />
     <ClCompile Include="PBRRenderPass.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
@@ -306,6 +309,9 @@
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="PBRPipeline.h" />
+    <ClInclude Include="PBRRayTracedPipeline.h" />
+    <ClInclude Include="PBRRayTraceRenderer.h" />
+    <ClInclude Include="PBRRayTraceRenderPass.h" />
     <ClInclude Include="PBRRenderer.h" />
     <ClInclude Include="PBRRenderPass.h" />
     <ClInclude Include="PerspectiveCamera.h" />
@@ -368,6 +374,11 @@
     <None Include="Shaders\Material.glsl" />
     <None Include="Shaders\MaterialBuilder.glsl" />
     <None Include="Shaders\miss.rmiss" />
+    <None Include="Shaders\pbranyhit.rahit" />
+    <None Include="Shaders\pbranyhit1.rahit" />
+    <None Include="Shaders\pbrClosesthit.rchit" />
+    <None Include="Shaders\pbrmiss.rmiss" />
+    <None Include="Shaders\pbrraygen.rgen" />
     <None Include="Shaders\PBRShader.frag" />
     <None Include="Shaders\PBRShader.vert" />
     <None Include="Shaders\raygen.rgen" />

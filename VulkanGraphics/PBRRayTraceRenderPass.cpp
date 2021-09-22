@@ -1,4 +1,4 @@
-#include "RayTraceRenderPass.h"
+#include "PBRRayTraceRenderPass.h"
 #include <stdexcept>
 #include <chrono>
 #include <iostream>
@@ -6,12 +6,11 @@
 #include "SceneData.h"
 #include "ImGui/imgui.h"
 
-RayTraceRenderPass::RayTraceRenderPass()
+PBRRayTraceRenderPass::PBRRayTraceRenderPass()
 {
 
 }
-
-RayTraceRenderPass::RayTraceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+PBRRayTraceRenderPass::PBRRayTraceRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     RayTracedTexture = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
     ShadowTextureMask = std::make_shared<RenderedRayTracedColorTexture>(RenderedRayTracedColorTexture(engine));
@@ -21,17 +20,17 @@ RayTraceRenderPass::RayTraceRenderPass(std::shared_ptr<VulkanEngine> engine, std
 
     topLevelAS = AccelerationStructure(engine);
     SetUpTopLevelAccelerationStructure(engine, assetManager);
-    RayTracePipeline = std::make_shared<RayTracedPipeline>(RayTracedPipeline(engine, assetManager, topLevelAS, RayTracedTexture));
+    PBRRayTracePipeline = std::make_shared<PBRRayTracedPipeline>(PBRRayTracedPipeline(engine, assetManager, topLevelAS, RayTracedTexture));
 
     SetUpCommandBuffers(engine);
 }
 
-RayTraceRenderPass::~RayTraceRenderPass()
+PBRRayTraceRenderPass::~PBRRayTraceRenderPass()
 {
 
 }
 
-void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PBRRayTraceRenderPass::SetUpTopLevelAccelerationStructure(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     uint32_t PrimitiveCount = 1;
     std::vector<VkAccelerationStructureInstanceKHR> AccelerationStructureInstanceList = {};
@@ -125,14 +124,14 @@ void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(std::shared_ptr<Vulk
     instancesBuffer.DestoryBuffer();
 }
 
-void RayTraceRenderPass::GUIUpdate()
+void PBRRayTraceRenderPass::GUIUpdate()
 {
     ImGui::SliderInt("Apply Anti-Aliasing:", &RTXConst.ApplyAntiAliasing, 0, 1);
     ImGui::SliderInt("Max Anti-Aliasing Coun", &RTXConst.AntiAliasingCount, 0, 15);
     ImGui::SliderInt("Max Refeflect Count", &RTXConst.MaxRefeflectCount, 0, 1024);
 }
 
-void RayTraceRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
+void PBRRayTraceRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engine)
 {
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -145,7 +144,7 @@ void RayTraceRenderPass::SetUpCommandBuffers(std::shared_ptr<VulkanEngine> engin
     }
 }
 
-void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID renderID, std::shared_ptr<Camera> ViewCamera)
+void PBRRayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, RendererID renderID, std::shared_ptr<Camera> ViewCamera)
 {
     VkCommandBufferBeginInfo cmdBufInfo{};
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -153,20 +152,20 @@ void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
     VkImageSubresourceRange subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 
     vkBeginCommandBuffer(RayTraceCommandBuffer, &cmdBufInfo);
-    const uint32_t handleSizeAligned = engine->GetAlignedSize(RayTracePipeline->rayTracingPipelineProperties.shaderGroupHandleSize, RayTracePipeline->rayTracingPipelineProperties.shaderGroupHandleAlignment);
+    const uint32_t handleSizeAligned = engine->GetAlignedSize(PBRRayTracePipeline->rayTracingPipelineProperties.shaderGroupHandleSize, PBRRayTracePipeline->rayTracingPipelineProperties.shaderGroupHandleAlignment);
 
     VkStridedDeviceAddressRegionKHR raygenShaderSbtEntry{};
-    raygenShaderSbtEntry.deviceAddress = engine->GetBufferDeviceAddress(RayTracePipeline->raygenShaderBindingTable.Buffer);
+    raygenShaderSbtEntry.deviceAddress = engine->GetBufferDeviceAddress(PBRRayTracePipeline->raygenShaderBindingTable.Buffer);
     raygenShaderSbtEntry.stride = handleSizeAligned;
     raygenShaderSbtEntry.size = handleSizeAligned;
 
     VkStridedDeviceAddressRegionKHR missShaderSbtEntry{};
-    missShaderSbtEntry.deviceAddress = engine->GetBufferDeviceAddress(RayTracePipeline->missShaderBindingTable.Buffer);
+    missShaderSbtEntry.deviceAddress = engine->GetBufferDeviceAddress(PBRRayTracePipeline->missShaderBindingTable.Buffer);
     missShaderSbtEntry.stride = handleSizeAligned;
     missShaderSbtEntry.size = handleSizeAligned;
 
     VkStridedDeviceAddressRegionKHR hitShaderSbtEntry{};
-    hitShaderSbtEntry.deviceAddress = engine->GetBufferDeviceAddress(RayTracePipeline->hitShaderBindingTable.Buffer);
+    hitShaderSbtEntry.deviceAddress = engine->GetBufferDeviceAddress(PBRRayTracePipeline->hitShaderBindingTable.Buffer);
     hitShaderSbtEntry.stride = handleSizeAligned;
     hitShaderSbtEntry.size = handleSizeAligned;
 
@@ -190,9 +189,9 @@ void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
     LastCameraProjection = RTXConst.proj;
     LastCameraView = RTXConst.view;
 
-    vkCmdPushConstants(RayTraceCommandBuffer, RayTracePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 0, sizeof(RayTraceConstants), &RTXConst);
-    vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, RayTracePipeline->ShaderPipelineLayout, 0, 1, &RayTracePipeline->DescriptorSet, 0, 0);
+    vkCmdPushConstants(RayTraceCommandBuffer, PBRRayTracePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_RAYGEN_BIT_KHR | VK_SHADER_STAGE_MISS_BIT_KHR | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 0, sizeof(RayTraceConstants), &RTXConst);
+    vkCmdBindPipeline(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, PBRRayTracePipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(RayTraceCommandBuffer, VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR, PBRRayTracePipeline->ShaderPipelineLayout, 0, 1, &PBRRayTracePipeline->DescriptorSet, 0, 0);
 
     RayTracedTexture->UpdateImageLayout(RayTraceCommandBuffer, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_GENERAL);
     engine->vkCmdTraceRaysKHR(RayTraceCommandBuffer, &raygenShaderSbtEntry, &missShaderSbtEntry, &hitShaderSbtEntry, &callableShaderSbtEntry, engine->SwapChain.SwapChainResolution.width, engine->SwapChain.SwapChainResolution.height, 1);
@@ -201,7 +200,7 @@ void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
     vkEndCommandBuffer(RayTraceCommandBuffer);
 }
 
-void RayTraceRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
+void PBRRayTraceRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager)
 {
     RayTracedTexture->RecreateRendererTexture();
     ShadowTextureMask->RecreateRendererTexture();
@@ -209,10 +208,10 @@ void RayTraceRenderPass::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, 
     ReflectionTexture->RecreateRendererTexture();
     SSAOTexture->RecreateRendererTexture();
 
-    RayTracePipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, RayTracedTexture);
+    PBRRayTracePipeline->UpdateGraphicsPipeLine(engine, assetManager, topLevelAS, RayTracedTexture);
 }
 
-void RayTraceRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
+void PBRRayTraceRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
 {
     {
         vkFreeMemory(engine->Device, topLevelAS.AccelerationBuffer.BufferMemory, nullptr);
@@ -231,5 +230,5 @@ void RayTraceRenderPass::Destroy(std::shared_ptr<VulkanEngine> engine)
         ReflectionTexture->Delete();
         SSAOTexture->Delete();
     }
-    RayTracePipeline->Destroy();
+    PBRRayTracePipeline->Destroy();
 }

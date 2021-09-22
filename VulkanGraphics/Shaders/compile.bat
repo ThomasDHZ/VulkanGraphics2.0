@@ -16,5 +16,11 @@ C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 raygen.rgen -o raygen.rgen.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 miss.rmiss -o miss.rmiss.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 shadow.rmiss -o shadow.rmiss.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 pbrclosesthit.rchit -o pbrclosesthit.rchit.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 pbranyhit.rahit -o pbranyhit.rahit.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 pbranyhit1.rahit -o pbranyhit1.rahit.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 pbrraygen.rgen -o pbrraygen.rgen.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 pbrmiss.rmiss -o pbrmiss.rmiss.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 pbrshadow.rmiss -o pbrshadow.rmiss.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe animate.comp -o animate.spv
 pause

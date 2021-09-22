@@ -9,17 +9,13 @@ RendererManager::RendererManager()
 RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)
 {
     interfaceRenderPass = InterfaceRenderPass(engine);
+
     BlinnRenderer = BlinnPhongRasterRenderer(engine);
-    rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
     renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
     pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
 
-    // blinnPhongRenderer = BlinnPhongRasterRenderer(AssetManagerPtr::GetAssetPtr());
-   
-
-    //pbrRayTraceRenderer = RayTracePBRRenderer(EnginePtr::GetEnginePtr());
-    //hybridRenderer = HybridRenderer(EnginePtr::GetEnginePtr());
-    ////guiRenderer = GUIRenderer(EnginePtr::GetEnginePtr());
+    rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
+    pbrRayTraceRenderer = PBRRayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
 }
 
 RendererManager::~RendererManager()
@@ -51,14 +47,11 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
 
     interfaceRenderPass.RebuildSwapChain();
     BlinnRenderer.RebuildSwapChain();
-
-   //blinnPhongRenderer.RebuildSwapChain();
     pbrRenderer.RebuildSwapChain();
-    rayTraceRenderer.RebuildSwapChain(engine,window);
-    //pbrRayTraceRenderer.RebuildSwapChain();
-    //hybridRenderer.RebuildSwapChain();
     renderer2D.RebuildSwapChain();
-    //guiRenderer.RebuildSwapChain(engine, window);
+
+    rayTraceRenderer.RebuildSwapChain(engine, window);
+    pbrRayTraceRenderer.RebuildSwapChain(engine, window);
 }
 
 void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
@@ -73,7 +66,7 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
     //if (EnginePtr::GetEnginePtr()->RayTraceFlag)
     //{
        rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
-       // pbrRayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
+       pbrRayTraceRenderer.pbrRayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
        // hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
    // }
 }
@@ -196,6 +189,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         }
         else
         {
+            pbrRayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
         }
     }    
     else if (ActiveRenderer == 2)
@@ -251,6 +245,8 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         }
         else
         {
+            pbrRayTraceRenderer.Draw(engine, window);
+            pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
         }
     }
     else if (ActiveRenderer == 2)
