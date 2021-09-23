@@ -236,12 +236,12 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
 {
     vec3 LightPos = DLight[index].direction;
     vec3 ViewPos = ConstMesh.CameraPos;
-    vec3 FragPos2 = FragPos;
+    vec3 FragPos2 = vertex.pos;
     if (material.NormalMapID != 0)
     {
         LightPos = TBN * DLight[index].direction;
         ViewPos = TBN * ConstMesh.CameraPos;
-        FragPos2 = TBN * FragPos;
+        FragPos2 = TBN * vertex.pos;
     }
     vec3 ViewDir = normalize(ViewPos - FragPos2);
 
@@ -256,13 +256,16 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     vec3 specular = DLight[index].specular * spec * material.Specular;
     if (material.DiffuseMapID != 0)
     {
-        ambient = DLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
-        diffuse = DLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        ambient = DLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+        diffuse = DLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
     }
     if (material.SpecularMapID != 0)
     {
-        specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+        specular = DLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], vertex.uv));
     }
+
+    float LightDistance = length(LightPos - FragPos2);
+    float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
     return (ambient + diffuse + specular);
 }
@@ -271,12 +274,12 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
 {
     vec3 LightPos = PLight[index].position;
     vec3 ViewPos = ConstMesh.CameraPos;
-    vec3 FragPos2 = FragPos;
+    vec3 FragPos2 = vertex.pos;
     if (material.NormalMapID != 0)
     {
         LightPos = TBN * PLight[index].position;
         ViewPos = TBN * ConstMesh.CameraPos;
-        FragPos2 = TBN * FragPos;
+        FragPos2 = TBN * vertex.pos;
     }
     vec3 ViewDir = normalize(ViewPos - FragPos2);
 
@@ -291,12 +294,12 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     vec3 specular = PLight[index].specular * spec * material.Specular;
     if (material.DiffuseMapID != 0)
     {
-        ambient = PLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
-        diffuse = PLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        ambient = PLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+        diffuse = PLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
     }
     if (material.SpecularMapID != 0)
     {
-        specular = PLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+        specular = PLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], vertex.uv));
     }
 
     float LightDistance = length(LightPos - FragPos2);
@@ -309,12 +312,12 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
 {
     vec3 LightPos = SLight[index].position;
     vec3 ViewPos = ConstMesh.CameraPos;
-    vec3 FragPos2 = FragPos;
+    vec3 FragPos2 = vertex.pos;
     if (material.NormalMapID != 0)
     {
         LightPos = TBN * SLight[index].position;
         ViewPos = TBN * ConstMesh.CameraPos;
-        FragPos2 = TBN * FragPos;
+        FragPos2 = TBN * vertex.pos;
     }
     vec3 ViewDir = normalize(ViewPos - FragPos2);
 
@@ -329,12 +332,12 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     vec3 specular = SLight[index].specular * spec * material.Specular;
     if (material.DiffuseMapID != 0)
     {
-        ambient = SLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
-        diffuse = SLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        ambient = SLight[index].ambient * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
+        diffuse = SLight[index].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], vertex.uv));
     }
     if (material.SpecularMapID != 0)
     {
-        specular = SLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+        specular = SLight[index].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], vertex.uv));
     }
 
     float theta = dot(lightDir, normalize(-SLight[index].direction)); 

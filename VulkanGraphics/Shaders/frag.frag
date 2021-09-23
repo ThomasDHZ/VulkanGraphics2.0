@@ -192,11 +192,11 @@ void main()
    }
    for(int x = 0; x < scenedata.PointLightCount; x++)
    {
-        //result += CalcNormalPointLight(normal, texCoords, x);   
+        result += CalcNormalPointLight(normal, texCoords, x);   
    }
    for(int x = 0; x < scenedata.SpotLightCount; x++)
    {
-       /// result += CalcNormalSpotLight(normal, texCoords, x);   
+        result += CalcNormalSpotLight(normal, texCoords, x);   
    }
    for(int x = 0; x < scenedata.SphereAreaLightCount; x++)
    {
