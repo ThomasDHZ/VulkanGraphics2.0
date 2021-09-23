@@ -149,6 +149,7 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index);
 
 void main() 
 {
+   vertex = BuildVertexInfo();
    MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
    vertex.uv = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
    vertex.uv *= meshProperties[gl_InstanceCustomIndexEXT].UVScale;
