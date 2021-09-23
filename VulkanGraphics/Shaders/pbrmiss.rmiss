@@ -18,7 +18,10 @@ struct RayHitInfo
 	uint seed;
 	vec3 normal;
     int reflectCount;
-    bool hitGeo;
+    float domeSampleDelta;
+    float domePhi;
+    float domeTheta;
+    float domeSampleCount;
 };
 
 layout(location = 0) rayPayloadInEXT RayHitInfo rayPayload;

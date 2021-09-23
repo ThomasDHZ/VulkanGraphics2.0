@@ -21,7 +21,10 @@ struct RayPayload {
 	uint seed;
 	vec3 normal;
     int reflectCount;
-	bool hitGeo;
+    float domeSampleDelta;
+    float domePhi;
+    float domeTheta;
+    float domeSampleCount;
 };
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
@@ -63,6 +66,10 @@ void main()
 
 		rayPayload.color = vec3(1.0f);
 		rayPayload.reflectCount = 0;
+		rayPayload.domeSampleDelta = 0.0025f;
+		rayPayload.domePhi = 0.0f;
+		rayPayload.domeTheta = 0.0f;
+		rayPayload.domeSampleCount = 0.0f;
 
 		vec3 BaseColor = vec3(0.0f);
 		vec3 finalColor = vec3(0.0f);
@@ -74,6 +81,10 @@ void main()
 	{
 		rayPayload.color = vec3(1.0f);
 		rayPayload.reflectCount = 0;
+		rayPayload.domeSampleDelta = 0.0025f;
+		rayPayload.domePhi = 0.0f;
+		rayPayload.domeTheta = 0.0f;
+		rayPayload.domeSampleCount = 0.0f;
 
 		vec3 HitValues = vec3(0.0f);
 		vec3 FinalColor = vec3(0.0f);

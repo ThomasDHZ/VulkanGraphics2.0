@@ -24,6 +24,10 @@ struct RayPayload {
 	float seed;
 	vec3 normal;
     int reflectCount;
+    float domeSampleDelta;
+    float domePhi;
+    float domeTheta;
+    float domeSampleCount;
 };
 
 layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
@@ -147,6 +151,36 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index);
 
+#include "RTXRandom.glsl"
+vec3 Irradiate(Vertex vertex)
+{
+    vec3 irradiance = vec3(0.0f);
+    vec3 up    = vec3(0.0, 1.0, 0.0);
+    vec3 right = normalize(cross(up, vertex.normal));
+    up         = normalize(cross(vertex.normal, right));
+
+    if(rayHitInfo.domePhi < 2.0f * PI)
+    {
+        if(rayHitInfo.domeTheta < 0.5 * PI)
+        {
+            vec3 raySamplePoint = vec3(sin(rayHitInfo.domeTheta) * cos(rayHitInfo.domePhi),  sin(rayHitInfo.domeTheta) * sin(rayHitInfo.domePhi), cos(rayHitInfo.domeTheta));
+            vec3 sampleVec = raySamplePoint.x * right + raySamplePoint.y * up + raySamplePoint.z * vertex.normal; 
+
+            vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+            vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+            vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, sampleVec) * cos(rayHitInfo.domeTheta) * sin(rayHitInfo.domeTheta);
+
+            rayHitInfo.domeSampleCount++;
+            traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+		    irradiance += rayHitInfo.color;
+            rayHitInfo.domeTheta += rayHitInfo.domeSampleDelta;
+          }
+        rayHitInfo.domePhi += rayHitInfo.domeSampleDelta;
+    }
+    irradiance = PI * irradiance * (1.0 / float(rayHitInfo.domeSampleCount));
+    return irradiance;
+}
+
 void main() 
 {
    vertex = BuildVertexInfo();
@@ -207,10 +241,27 @@ void main()
         Lo += CalcNormalDirLight(normal, vertex.uv, x);
    }
 
-    vec3 ambient = vec3(0.03) * albedo * ao;
-    vec3 color = ambient + Lo;
+    vec3 V = ConstMesh.CameraPos;
+    if (material.NormalMapID != 0)
+    {
 
-    rayHitInfo.color = color;
+        V = TBN * ConstMesh.CameraPos;
+    }
+
+        vec3 F0 = vec3(0.04); 
+    F0 = mix(F0, albedo, metallic);
+    vec3 kS = fresnelSchlick(max(dot(normal, V), 0.0), F0); 
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;
+
+    vec3 irradiance = Irradiate(vertex);
+    vec3 diffuse      = irradiance * albedo;
+    vec3 ambient = (kD * diffuse) * ao;
+//    // vec3 ambient = vec3(0.002);
+//    
+     vec3 color = ambient + Lo;
+//
+    rayHitInfo.color = Irradiate(vertex);
 	//rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
 }
@@ -352,3 +403,26 @@ vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
 
     return finalTexCoords;
 }
+
+//
+//vec3 Irradiate(Vertex vertex)
+//{
+//    vec3 irradiance = vec3(0.0f);
+//    float Samples = 0.0f;
+//    float sampleDelta = 0.025;
+//    for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta)
+//    {
+//        for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta)
+//        {
+//            vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+//            vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+//            vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal) * cos(theta) * sin(theta);
+//
+//            rayHitInfo.reflectCount++;
+//            traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+//		    irradiance += rayHitInfo.color;
+//        }
+//    }
+//    irradiance = PI * irradiance * (1.0 / float(Samples));
+//    return irradiance;
+//}
