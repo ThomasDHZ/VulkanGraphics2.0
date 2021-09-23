@@ -159,23 +159,27 @@ vec3 Irradiate(Vertex vertex)
     vec3 right = normalize(cross(up, vertex.normal));
     up         = normalize(cross(vertex.normal, right));
 
-    if(rayHitInfo.domePhi < 2.0f * PI)
+    if(rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
     {
-        if(rayHitInfo.domeTheta < 0.5 * PI)
+        if(rayHitInfo.domePhi < 2.0f * PI)
         {
-            vec3 raySamplePoint = vec3(sin(rayHitInfo.domeTheta) * cos(rayHitInfo.domePhi),  sin(rayHitInfo.domeTheta) * sin(rayHitInfo.domePhi), cos(rayHitInfo.domeTheta));
-            vec3 sampleVec = raySamplePoint.x * right + raySamplePoint.y * up + raySamplePoint.z * vertex.normal; 
+            if(rayHitInfo.domeTheta < 0.5 * PI)
+            {
+                vec3 raySamplePoint = vec3(sin(rayHitInfo.domeTheta) * cos(rayHitInfo.domePhi),  sin(rayHitInfo.domeTheta) * sin(rayHitInfo.domePhi), cos(rayHitInfo.domeTheta));
+                vec3 sampleVec = raySamplePoint.x * right + raySamplePoint.y * up + raySamplePoint.z * vertex.normal; 
 
-            vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
-            vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-            vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, sampleVec) * cos(rayHitInfo.domeTheta) * sin(rayHitInfo.domeTheta);
+                vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+                vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+                vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, sampleVec) * cos(rayHitInfo.domeTheta) * sin(rayHitInfo.domeTheta);
 
-            rayHitInfo.domeSampleCount++;
-            traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-		    irradiance += rayHitInfo.color;
-            rayHitInfo.domeTheta += rayHitInfo.domeSampleDelta;
-          }
-        rayHitInfo.domePhi += rayHitInfo.domeSampleDelta;
+                rayHitInfo.domeSampleCount++;
+                traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+		        irradiance += rayHitInfo.color;
+                rayHitInfo.domeTheta += rayHitInfo.domeSampleDelta;
+              }
+            rayHitInfo.domePhi += rayHitInfo.domeSampleDelta;
+        }
+        rayHitInfo.reflectCount++;
     }
     irradiance = PI * irradiance * (1.0 / float(rayHitInfo.domeSampleCount));
     return irradiance;
