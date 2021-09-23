@@ -186,6 +186,8 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="InterfaceRenderPass.cpp" />
+    <ClCompile Include="IrradiancePipeline.cpp" />
+    <ClCompile Include="IrradianceRenderPass.cpp" />
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Level2D.cpp" />
     <ClCompile Include="LevelTile.cpp" />
@@ -292,6 +294,8 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="InterfaceRenderPass.h" />
+    <ClInclude Include="IrradiancePipeline.h" />
+    <ClInclude Include="IrradianceRenderPass.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Level2D.h" />
     <ClInclude Include="LevelTile.h" />

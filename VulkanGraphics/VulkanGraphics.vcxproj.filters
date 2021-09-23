@@ -384,6 +384,12 @@
     <ClCompile Include="PBRRayTracedPipeline.cpp">
       <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="IrradianceRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="IrradiancePipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -705,6 +711,12 @@
       <Filter>Header Files\Rendering\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="PBRRayTracedPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="IrradianceRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="IrradiancePipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>

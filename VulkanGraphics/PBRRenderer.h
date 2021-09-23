@@ -2,13 +2,16 @@
 #include "BaseRenderer.h"
 #include "PBRRenderPass.h"
 #include "FrameBufferRenderPass.h"
+#include "IrradianceRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
 private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
+	int frameCount = 0;
 
 	PBRRenderPass pbrRenderer;
+	IrradianceRenderPass irradianceRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
 
 public:
