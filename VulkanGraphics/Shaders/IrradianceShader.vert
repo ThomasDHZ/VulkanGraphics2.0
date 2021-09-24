@@ -9,6 +9,7 @@ layout(push_constant) uniform CubeMapView
 {
     mat4 proj;
     mat4 view;
+    vec3 CameraView;
 } view;
 
 layout (location = 0) in vec3 aPos;
