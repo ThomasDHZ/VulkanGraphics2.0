@@ -8,6 +8,8 @@ C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe SkyBoxRenderShader.vert -o SkyBoxRenderSh
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe SkyBoxRenderShader.frag -o SkyBoxRenderShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe Shader2D.vert -o Shader2DVert.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe Shader2D.frag -o Shader2DFrag.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe IrradianceShader.vert -o IrradianceShaderVert.spv
+C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe IrradianceShader.frag -o IrradianceShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe WireFrameShader.vert -o WireFrameShaderVert.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe WireFrameShader.frag -o WireFrameShaderFrag.spv
 C:/VulkanSDK/1.2.176.1/Bin32/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv

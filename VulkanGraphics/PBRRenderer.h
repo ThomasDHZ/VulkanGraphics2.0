@@ -3,6 +3,9 @@
 #include "PBRRenderPass.h"
 #include "FrameBufferRenderPass.h"
 #include "IrradianceRenderPass.h"
+#include "EquirectangularToCubemapRenderPass.h"
+#include "PrefilterRenderPass.h"
+#include "BRDFRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
@@ -12,6 +15,9 @@ private:
 
 	PBRRenderPass pbrRenderer;
 	IrradianceRenderPass irradianceRenderPass;
+	EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
+	PrefilterRenderPass prefilterRenderPass;
+	BRDFRenderPass brdfRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
 
 public:

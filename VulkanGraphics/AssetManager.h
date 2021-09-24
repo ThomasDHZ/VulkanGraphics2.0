@@ -16,7 +16,6 @@ private:
 
 public:
 	std::shared_ptr<SceneDataUniformBuffer> SceneData;
-	std::shared_ptr<UniformData<SkyboxUniformBuffer>> SkyUniformBuffer;
 
 	std::shared_ptr<InputManager> inputManager;
 	std::shared_ptr<CameraManager> cameraManager;

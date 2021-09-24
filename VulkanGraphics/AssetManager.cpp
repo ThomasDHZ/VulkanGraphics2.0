@@ -18,8 +18,6 @@ AssetManager::AssetManager(std::shared_ptr<VulkanEngine> engine)
     ObjManager = ObjManagerPtr::GetObjManagerPtr();
 
     SceneData = std::make_shared<SceneDataUniformBuffer>(SceneDataUniformBuffer(engine));
-    SkyUniformBuffer = std::make_shared<UniformData<SkyboxUniformBuffer>>(engine);
-
 }
 
 AssetManager::~AssetManager()
@@ -49,15 +47,6 @@ void AssetManager::Update()
     SceneData->UniformDataInfo.RectangleAreaLightCount = lightManager->GetRectangleAreaLightCount();
     SceneData->UniformDataInfo.timer = timer;
     SceneData->Update();
-
-    SkyUniformBuffer->UniformDataInfo.viewInverse = glm::inverse(glm::mat4(glm::mat3(cameraManager->ActiveCamera->GetViewMatrix())));
-    SkyUniformBuffer->UniformDataInfo.projInverse = glm::inverse(glm::perspective(glm::radians(cameraManager->ActiveCamera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f));
-    SkyUniformBuffer->UniformDataInfo.projInverse[1][1] *= -1;
-    SkyUniformBuffer->UniformDataInfo.view = glm::mat4(glm::mat3(cameraManager->ActiveCamera->GetViewMatrix()));
-    SkyUniformBuffer->UniformDataInfo.proj = glm::perspective(glm::radians(cameraManager->ActiveCamera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
-    SkyUniformBuffer->UniformDataInfo.proj[1][1] *= -1;
-    SkyUniformBuffer->UniformDataInfo.viewPos = glm::vec4(cameraManager->ActiveCamera->GetPosition(), 0.0f);
-    SkyUniformBuffer->Update();
 }
 
 void AssetManager::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView)
@@ -73,7 +62,6 @@ void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layo
 void AssetManager::Delete()
 {
     SceneData->Destroy();
-    SkyUniformBuffer->Destroy();
 
     TextureManagerPtr::GetTextureManagerPtr()->Destory();
     MaterialManagerPtr::GetMaterialManagerPtr()->Destory();

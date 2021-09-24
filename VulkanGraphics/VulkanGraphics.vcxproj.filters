@@ -390,6 +390,24 @@
     <ClCompile Include="IrradiancePipeline.cpp">
       <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="PrefilterRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="EquirectangularToCubemapRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="BRDFRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="PrefilterPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="EquirectangularToCubemapPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="BRDFPipeline.cpp">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -719,6 +737,24 @@
     <ClInclude Include="IrradiancePipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="PrefilterRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="EquirectangularToCubemapRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="BRDFRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="PrefilterPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="EquirectangularToCubemapPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="BRDFPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -819,6 +855,12 @@
     </None>
     <None Include="Shaders\pbrraygen.rgen">
       <Filter>Shader\RaytraceShaders</Filter>
+    </None>
+    <None Include="Shaders\IrradianceShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\IrradianceShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>
 </Project>
