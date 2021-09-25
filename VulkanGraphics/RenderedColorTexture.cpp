@@ -29,8 +29,23 @@ RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine,
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
+RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Texture(TextureType::vkRenderedTexture)
 {
+    Width = TextureResolution.x;
+    Height = TextureResolution.y;
+
+    CreateTextureImage();
+    CreateTextureView();
+    CreateTextureSampler();
+    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount) : Texture(TextureType::vkRenderedTexture)
+{
+    Width = TextureResolution.x;
+    Height = TextureResolution.y;
+    SampleCount = sampleCount;
+
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();

@@ -10,6 +10,8 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     irradianceRenderPass = IrradianceRenderPass(engine);
     prefilterRenderPass = PrefilterRenderPass();
     brdfRenderPass = BRDFRenderPass();
+
+    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(irradianceRenderPass.BlurredSkyBoxTexture);
     pbrRenderer = PBRRenderPass(engine);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
 
@@ -22,7 +24,7 @@ PBRRenderer::~PBRRenderer()
 void PBRRenderer::RebuildSwapChain()
 {
     //equirectangularToCubemapRenderPass.RebuildSwapChain();
-    irradianceRenderPass.RebuildSwapChain();
+    //irradianceRenderPass.RebuildSwapChain();
     //prefilterRenderPass.RebuildSwapChain();
     //brdfRenderPass.RebuildSwapChain();
     pbrRenderer.RebuildSwapChain();
@@ -40,7 +42,7 @@ void PBRRenderer::Draw()
     if (frameCount % 60 == 0)
     {
         //equirectangularToCubemapRenderPass.Draw();
-        irradianceRenderPass.Draw();
+     //   irradianceRenderPass.Draw();
         //prefilterRenderPass.Draw();
         //brdfRenderPass.Draw();
     }
@@ -60,7 +62,7 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
     if (frameCount % 60 == 0)
     {
       //  CommandBufferSubmitList.emplace_back(equirectangularToCubemapRenderPass.GetCommandBuffer());
-        CommandBufferSubmitList.emplace_back(irradianceRenderPass.GetCommandBuffer());
+      //  CommandBufferSubmitList.emplace_back(irradianceRenderPass.GetCommandBuffer());
        // CommandBufferSubmitList.emplace_back(prefilterRenderPass.GetCommandBuffer());
       //  CommandBufferSubmitList.emplace_back(brdfRenderPass.GetCommandBuffer());
     }

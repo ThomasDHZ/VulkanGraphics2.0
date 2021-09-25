@@ -5,6 +5,8 @@
 #include "RenderedColorTexture.h"
 #include "SkyBoxRenderPipeline.h"
 #include "PBRPipeline.h"
+#include "IrradiancePipeline.h"
+#include "RenderedCubeMapTexture.h"
 
 class IrradianceRenderPass : public BaseRenderPass
 {
@@ -13,6 +15,7 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
+	uint32_t CubeMapSize;
 	std::shared_ptr<RenderedColorTexture> ColorTexture;
 
 public:
@@ -21,7 +24,9 @@ public:
 	~IrradianceRenderPass();
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<PBRPipeline> pbrPipeline;
+	std::shared_ptr<RenderedCubeMapTexture> BlurredSkyBoxTexture;
+
+	std::shared_ptr<IrradiancePipeline> irradiancePipeline;
 
 	void RebuildSwapChain();
 
