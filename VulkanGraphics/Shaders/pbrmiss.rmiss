@@ -10,6 +10,7 @@ layout(push_constant) uniform RayTraceConstants
     int AntiAliasingCount;
     int MaxRefeflectCount;
     int  ApplyAntiAliasing;
+        float TestRoughness;
 } ConstData;
 
 struct RayHitInfo

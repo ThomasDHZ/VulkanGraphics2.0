@@ -23,6 +23,7 @@ void PBRRayTraceRenderer::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine,
 
 void PBRRayTraceRenderer::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 {
+    pbrRayTraceRenderPass.GUIUpdate();
 }
 
 void PBRRayTraceRenderer::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window)

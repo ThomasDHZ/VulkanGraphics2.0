@@ -17,6 +17,7 @@ layout(push_constant) uniform RayTraceConstants
     int AntiAliasingCount;
     int MaxRefeflectCount;
     int  ApplyAntiAliasing;
+    float TestRoughness;
 } ConstMesh;
 
 struct RayPayload {
@@ -189,67 +190,53 @@ void main()
     vertex = BuildVertexInfo();
     MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
 
+   vertex = BuildVertexInfo();
+   material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+
     vec3 albedo     = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
     float metallic  = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
     float roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
     float ao        = texture(TextureMap[material.AOMapID], vertex.uv).r;
+    vec3 normal = texture(TextureMap[material.NormalMapID],  vertex.uv).xyz;
+    normal = normalize(normal * 2.0 - 1.0);
 
-    vec3 N = getNormalFromMap(material, vertex.uv);
-    vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
-    vec3 R = reflect(-V, N); 
+   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * normal);
+   TBN = transpose(mat3(T, B, N));
 
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-    vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, albedo, metallic);
+    vec3 result = vec3(0.0f);
+    vec3 baseColor = vec3(0.0f);
+    vec3 ViewPos  = ConstMesh.CameraPos;
+    vec3 FragPos  = vertex.pos;
+    const vec3 viewDir = normalize(ViewPos - FragPos);
 
-    // reflectance equation
-    vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 1; ++i) 
+    ViewPos  = TBN * ConstMesh.CameraPos;
+    FragPos  = TBN * FragPos;
+   
+    vec3 irradiance = vec3(0.0f);
+    if(rayHitInfo.reflectCount != 50)
     {
-        // calculate per-light radiance
-        vec3 L = normalize(-DLight[i].direction);
-        vec3 H = normalize(V + L);
-        vec3 radiance = DLight[i].diffuse;
+        vec3 oldColor = irradiance;
 
-        // Cook-Torrance BRDF
-        float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);      
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
-           
-        vec3 numerator    = NDF * G * F; 
-        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
-        vec3 specular = numerator / denominator;
+    	uint seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, ConstMesh.frame);
+        float r1        = rnd(seed);
+        float r2        = rnd(seed);
+        float sq        = sqrt(1.0 - r2);
+        float phi       = 2 * PI * r1;
+ 
+        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+
+        vec3 rayReflectionOffest = ((vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2))) * ConstMesh.TestRoughness) + .000001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT * rayReflectionOffest, vertex.normal);
         
-        // kS is equal to Fresnel
-        vec3 kS = F;
-        // for energy conservation, the diffuse and specular light can't
-        // be above 1.0 (unless the surface emits light); to preserve this
-        // relationship the diffuse component (kD) should equal 1.0 - kS.
-        vec3 kD = vec3(1.0) - kS;
-        // multiply kD by the inverse metalness such that only non-metals 
-        // have diffuse lighting, or a linear blend if partly metal (pure metals
-        // have no diffuse light).
-        kD *= 1.0 - metallic;	  
-
-        // scale light by NdotL
-        float NdotL = max(dot(N, L), 0.0);        
-
-        // add to outgoing radiance Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-    }   
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+        irradiance = mix(irradiance, rayHitInfo.color, .5f); 
+    }
     
-    // ambient lighting (we now use IBL as the ambient term)
-    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	  
-    vec3 irradiance = Irradiate(vertex, metallic);
-    vec3 diffuse      = irradiance * albedo;
-    vec3 ambient = (kD * diffuse) * ao;
-    // vec3 ambient = vec3(0.002);
-    
-    vec3 color = ambient + Lo;
-    rayHitInfo.color = color;
+    rayHitInfo.color = irradiance;
 	//rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
 }
