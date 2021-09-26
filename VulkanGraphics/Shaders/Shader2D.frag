@@ -138,7 +138,6 @@ vec3 CalcNormalDirLight(MaterialInfo material, vec3 FragPos, vec3 normal, vec2 u
     return vec3(ambient + diffuse + specular);
 }
 
-vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 void main() 
 {
    MaterialInfo material = MaterialList[meshProperties[ConstMesh.MeshIndex].MaterialIndex].material;
