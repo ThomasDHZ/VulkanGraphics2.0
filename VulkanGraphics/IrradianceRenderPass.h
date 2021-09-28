@@ -6,6 +6,7 @@
 #include "RenderedColorTexture.h"
 #include "SkyBoxRenderPipeline.h"
 #include "RenderedCubeMapTexture.h"
+#include "IrradiancePipeline.h"
 
 class IrradianceRenderPass : public BaseRenderPass
 {
@@ -25,7 +26,7 @@ public:
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
 
-	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
+	std::shared_ptr<IrradiancePipeline> irradiancePipeline;
 
 	void RebuildSwapChain();
 

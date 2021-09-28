@@ -12,11 +12,28 @@ IrradianceRenderPass::IrradianceRenderPass(std::shared_ptr<VulkanEngine> engine)
     CubeMapSize = 512.0f;
     ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(EnginePtr::GetEnginePtr()));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
+    irradiancePipeline = std::make_shared<IrradiancePipeline>(IrradiancePipeline(RenderPass));
     SetUpCommandBuffers();
+    RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    Draw();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 IrradianceRenderPass::~IrradianceRenderPass()
@@ -146,7 +163,7 @@ void IrradianceRenderPass::RebuildSwapChain()
 {
     ColorTexture->RecreateRendererTexture();
     RenderedTexture->RecreateRendererTexture();
-    skyboxPipeline->Destroy();
+    irradiancePipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -159,7 +176,7 @@ void IrradianceRenderPass::RebuildSwapChain()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
+    irradiancePipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
 
@@ -187,8 +204,6 @@ void IrradianceRenderPass::Draw()
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
     std::vector<glm::mat4> SkyboxViews =
     {
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
@@ -199,17 +214,115 @@ void IrradianceRenderPass::Draw()
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    ConstSkyBoxView skyboxView;
-    skyboxView.view = SkyboxViews[0];
-    skyboxView.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
-    skyboxView.proj[1][1] *= -1;
+    VkImageSubresourceRange SkyBoxSubresourceRange{};
+    SkyBoxSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    SkyBoxSubresourceRange.baseMipLevel = 0;
+    SkyBoxSubresourceRange.levelCount = 1;
+    SkyBoxSubresourceRange.layerCount = 6;
 
-    vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], skyboxPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &skyboxView);
-    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
-    static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+    VkImageMemoryBarrier SkyBoxBarrierStart = {};
+    SkyBoxBarrierStart.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    SkyBoxBarrierStart.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    SkyBoxBarrierStart.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    SkyBoxBarrierStart.image = RenderedCubeMap->Image;
+    SkyBoxBarrierStart.subresourceRange = SkyBoxSubresourceRange;
+    SkyBoxBarrierStart.srcAccessMask = 0;
+    SkyBoxBarrierStart.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierStart);
 
-    vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+    for (int x = 0; x < 6; x++)
+    {
+        ConstSkyBoxView skyboxView;
+        skyboxView.view = SkyboxViews[x];
+        skyboxView.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
+        skyboxView.proj[1][1] *= -1;
+
+
+        vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, irradiancePipeline->ShaderPipeline);
+        vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, irradiancePipeline->ShaderPipelineLayout, 0, 1, &irradiancePipeline->DescriptorSet, 0, nullptr);
+        vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], irradiancePipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &skyboxView);
+        vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+        vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+
+        VkImageSubresourceRange ImageSubresourceRange{};
+        ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        ImageSubresourceRange.baseMipLevel = 0;
+        ImageSubresourceRange.levelCount = 1;
+        ImageSubresourceRange.layerCount = 1;
+
+        VkImageMemoryBarrier MemoryBarrior{};
+        MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        MemoryBarrior.image = RenderedTexture->Image;
+        MemoryBarrior.subresourceRange = ImageSubresourceRange;
+        MemoryBarrior.srcAccessMask = 0;
+        MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
+
+        VkImageCopy copyRegion = {};
+        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.srcSubresource.baseArrayLayer = 0;
+        copyRegion.srcSubresource.mipLevel = 0;
+        copyRegion.srcSubresource.layerCount = 1;
+        copyRegion.srcOffset = { 0, 0, 0 };
+
+        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.dstSubresource.baseArrayLayer = x;
+        copyRegion.dstSubresource.mipLevel = 0;
+        copyRegion.dstSubresource.layerCount = 1;
+        copyRegion.dstOffset = { 0, 0, 0 };
+
+        copyRegion.extent.width = (uint32_t)RenderedTexture->Width;
+        copyRegion.extent.height = (uint32_t)RenderedTexture->Height;
+        copyRegion.extent.depth = 1;
+        vkCmdCopyImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], RenderedTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, RenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+        VkImageMemoryBarrier ReturnMemoryBarrior{};
+        ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        ReturnMemoryBarrior.image = RenderedTexture->Image;
+        ReturnMemoryBarrior.subresourceRange = ImageSubresourceRange;
+        ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        ReturnMemoryBarrior.dstAccessMask = 0;
+        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
+    }
+
+    VkImageMemoryBarrier SkyBoxBarrierEnd = {};
+    SkyBoxBarrierEnd.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    SkyBoxBarrierEnd.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    SkyBoxBarrierEnd.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    SkyBoxBarrierEnd.image = RenderedCubeMap->Image;
+    SkyBoxBarrierEnd.subresourceRange = SkyBoxSubresourceRange;
+    SkyBoxBarrierEnd.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    SkyBoxBarrierEnd.dstAccessMask = 0;
+    vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierEnd);
+
+
+    //vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    //std::vector<glm::mat4> SkyboxViews =
+    //{
+    //    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+    //    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+    //    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+    //    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+    //    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+    //    glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+    //};
+
+    //ConstSkyBoxView skyboxView;
+    //skyboxView.view = SkyboxViews[3];
+    //skyboxView.proj = glm::perspective(glm::radians(-90.0f), 1.0f, 0.1f, 10.0f);
+    //skyboxView.proj[1][1] *= -1;
+
+    //vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], skyboxPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &skyboxView);
+    //vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipeline);
+    //vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
+    //static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
@@ -219,7 +332,7 @@ void IrradianceRenderPass::Destroy()
 {
     ColorTexture->Delete();
     RenderedTexture->Delete();
-    skyboxPipeline->Destroy();
+    irradiancePipeline->Destroy();
 
     BaseRenderPass::Destroy();
 }
