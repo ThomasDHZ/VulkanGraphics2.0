@@ -1,9 +1,9 @@
-#include <Engine.h>
+#include "Game.h"
 int main() {
-    Engine app;
+
 
     try {
-        app.run();
+        Game game;
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

@@ -140,7 +140,7 @@ void RayTracedPipeline::SetUpPipeline(std::shared_ptr<VulkanEngine> engine)
     PipelineLayoutCreateInfo.pPushConstantRanges = &pushConstantRange;
     vkCreatePipelineLayout(EnginePtr::GetEnginePtr()->Device, &PipelineLayoutCreateInfo, nullptr, &ShaderPipelineLayout);
 
-    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("../Shaders/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
+    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shaders/raygen.rgen.spv", VK_SHADER_STAGE_RAYGEN_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR RayGeneratorShaderInfo = {};
     RayGeneratorShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     RayGeneratorShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
@@ -150,7 +150,7 @@ void RayTracedPipeline::SetUpPipeline(std::shared_ptr<VulkanEngine> engine)
     RayGeneratorShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(RayGeneratorShaderInfo);
 
-    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("../Shaders/miss.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
+    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shaders/miss.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR MissShaderInfo = {};
     MissShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     MissShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
@@ -160,7 +160,7 @@ void RayTracedPipeline::SetUpPipeline(std::shared_ptr<VulkanEngine> engine)
     MissShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(MissShaderInfo);
 
-    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("../Shaders/shadow.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
+    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shaders/shadow.rmiss.spv", VK_SHADER_STAGE_MISS_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ShadowShaderInfo = {};
     ShadowShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     ShadowShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_GENERAL_KHR;
@@ -170,19 +170,19 @@ void RayTracedPipeline::SetUpPipeline(std::shared_ptr<VulkanEngine> engine)
     ShadowShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(ShadowShaderInfo);
 
-    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("../Shaders/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
+    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shaders/closesthit.rchit.spv", VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ClosestHitShaderInfo = {};
     ClosestHitShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     ClosestHitShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
     ClosestHitShaderInfo.generalShader = VK_SHADER_UNUSED_KHR;
     ClosestHitShaderInfo.closestHitShader = static_cast<uint32_t>(ShaderList.size()) - 1;
 
-    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("../Shaders/anyhit.rahit.spv", VK_SHADER_STAGE_ANY_HIT_BIT_KHR));
+    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shaders/anyhit.rahit.spv", VK_SHADER_STAGE_ANY_HIT_BIT_KHR));
     ClosestHitShaderInfo.anyHitShader = static_cast<uint32_t>(ShaderList.size()) - 1;
     ClosestHitShaderInfo.intersectionShader = VK_SHADER_UNUSED_KHR;
     RayTraceShaders.emplace_back(ClosestHitShaderInfo);
 
-    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("../Shaders/anyhit1.rahit.spv", VK_SHADER_STAGE_ANY_HIT_BIT_KHR));
+    ShaderList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shaders/anyhit1.rahit.spv", VK_SHADER_STAGE_ANY_HIT_BIT_KHR));
     VkRayTracingShaderGroupCreateInfoKHR ShadwoHitShaderInfo = {};
     ShadwoHitShaderInfo.sType = VK_STRUCTURE_TYPE_RAY_TRACING_SHADER_GROUP_CREATE_INFO_KHR;
     ShadwoHitShaderInfo.type = VK_RAY_TRACING_SHADER_GROUP_TYPE_TRIANGLES_HIT_GROUP_KHR;
