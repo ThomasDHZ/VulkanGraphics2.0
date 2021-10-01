@@ -1,5 +1,6 @@
 #pragma once
 #include "GraphicsPipeline.h"
+#include "SceneData.h"
 #include "Texture2D.h"
 
 class IrradiancePipeline : public GraphicsPipeline

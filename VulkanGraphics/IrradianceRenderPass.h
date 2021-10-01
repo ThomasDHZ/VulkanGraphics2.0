@@ -1,12 +1,12 @@
 #pragma once
 #include "BaseRenderPass.h"
 #include "RenderedDepthTexture.h"
+#include "BlinnPhongPipeline.h"
 #include "MeshManager.h"
 #include "RenderedColorTexture.h"
 #include "SkyBoxRenderPipeline.h"
-#include "PBRPipeline.h"
-#include "IrradiancePipeline.h"
 #include "RenderedCubeMapTexture.h"
+#include "IrradiancePipeline.h"
 
 class IrradianceRenderPass : public BaseRenderPass
 {
@@ -16,16 +16,15 @@ private:
 	void SetUpCommandBuffers();
 
 	uint32_t CubeMapSize;
-	std::shared_ptr<RenderedColorTexture> ColorTexture;
+	VkFramebuffer IrradianceMapFrameBuffer;
 
 public:
 	IrradianceRenderPass();
 	IrradianceRenderPass(std::shared_ptr<VulkanEngine> engine);
 	~IrradianceRenderPass();
 
-	std::shared_ptr<RenderedColorTexture> RenderedTexture;
-	std::shared_ptr<RenderedCubeMapTexture> BlurredSkyBoxTexture;
-
+	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
+	std::shared_ptr<RenderedCubeMapTexture> FullRenderedCubeMap;
 	std::shared_ptr<IrradiancePipeline> irradiancePipeline;
 
 	void RebuildSwapChain();
