@@ -124,8 +124,8 @@ void IrradianceRenderPass::CreateRendererFramebuffers()
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = CubeMapSize;
+        frameBufferCreateInfo.height = CubeMapSize;
         frameBufferCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
@@ -190,8 +190,8 @@ void IrradianceRenderPass::Draw()
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-    renderPassInfo.renderArea.extent.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+    renderPassInfo.renderArea.extent.width = CubeMapSize;
+    renderPassInfo.renderArea.extent.height = CubeMapSize;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -201,54 +201,54 @@ void IrradianceRenderPass::Draw()
     static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-    for (int x = 0; x < 6; x++)
-    {
-        VkImageSubresourceRange ImageSubresourceRange{};
-        ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        ImageSubresourceRange.baseMipLevel = 0;
-        ImageSubresourceRange.levelCount = 1;
-        ImageSubresourceRange.layerCount = 1;
+    //for (int x = 0; x < 6; x++)
+    //{
+    //    VkImageSubresourceRange ImageSubresourceRange{};
+    //    ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    //    ImageSubresourceRange.baseMipLevel = 0;
+    //    ImageSubresourceRange.levelCount = 1;
+    //    ImageSubresourceRange.layerCount = 1;
 
-        VkImageMemoryBarrier MemoryBarrior{};
-        MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        MemoryBarrior.image = RenderedCubeMap->Image;
-        MemoryBarrior.subresourceRange = ImageSubresourceRange;
-        MemoryBarrior.srcAccessMask = 0;
-        MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
+    //    VkImageMemoryBarrier MemoryBarrior{};
+    //    MemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    //    MemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    //    MemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    //    MemoryBarrior.image = RenderedCubeMap->Image;
+    //    MemoryBarrior.subresourceRange = ImageSubresourceRange;
+    //    MemoryBarrior.srcAccessMask = 0;
+    //    MemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    //    vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &MemoryBarrior);
 
-        VkImageBlit blit{};
-        blit.srcOffsets[0] = { 0, 0, 0 };
-        blit.srcOffsets[1] = { (int)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, (int)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 1 };
-        blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        blit.srcSubresource.mipLevel = 0;
-        blit.srcSubresource.baseArrayLayer = x;
-        blit.srcSubresource.layerCount = 1;
-        blit.dstOffsets[0] = { 0, 0, 0 };
-        blit.dstOffsets[1] = { (int)CubeMapSize, (int)CubeMapSize, 1 };
-        blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        blit.dstSubresource.mipLevel = 0;
-        blit.dstSubresource.baseArrayLayer = x;
-        blit.dstSubresource.layerCount = 1;
+    //    VkImageBlit blit{};
+    //    blit.srcOffsets[0] = { 0, 0, 0 };
+    //    blit.srcOffsets[1] = { (int)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, (int)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 1 };
+    //    blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    //    blit.srcSubresource.mipLevel = 0;
+    //    blit.srcSubresource.baseArrayLayer = x;
+    //    blit.srcSubresource.layerCount = 1;
+    //    blit.dstOffsets[0] = { 0, 0, 0 };
+    //    blit.dstOffsets[1] = { (int)CubeMapSize, (int)CubeMapSize, 1 };
+    //    blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    //    blit.dstSubresource.mipLevel = 0;
+    //    blit.dstSubresource.baseArrayLayer = x;
+    //    blit.dstSubresource.layerCount = 1;
 
-        vkCmdBlitImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex],
-            RenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            FullRenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            1, &blit,
-            VK_FILTER_LINEAR);
+    //    vkCmdBlitImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex],
+    //        RenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+    //        FullRenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+    //        1, &blit,
+    //        VK_FILTER_LINEAR);
 
-        VkImageMemoryBarrier ReturnMemoryBarrior{};
-        ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        ReturnMemoryBarrior.image = RenderedCubeMap->Image;
-        ReturnMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        ReturnMemoryBarrior.dstAccessMask = 0;
-        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
-    }
+    //    VkImageMemoryBarrier ReturnMemoryBarrior{};
+    //    ReturnMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    //    ReturnMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+    //    ReturnMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    //    ReturnMemoryBarrior.image = RenderedCubeMap->Image;
+    //    ReturnMemoryBarrior.subresourceRange = ImageSubresourceRange;
+    //    ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    //    ReturnMemoryBarrior.dstAccessMask = 0;
+    //    vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
+    //}
 
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {

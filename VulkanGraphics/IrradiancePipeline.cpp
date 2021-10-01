@@ -68,14 +68,14 @@ void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)EnginePtr::GetEnginePtr()->ScreenResoulation.x;
-    viewport.height = (float)EnginePtr::GetEnginePtr()->ScreenResoulation.y;
+    viewport.width = (float)512.0f;
+    viewport.height = (float)512.0f;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = { 0, 0 };
-    scissor.extent = { (uint32_t)EnginePtr::GetEnginePtr()->ScreenResoulation.x, (uint32_t)EnginePtr::GetEnginePtr()->ScreenResoulation.y };
+    scissor.extent = { (int)512.0f, (int)512.0f };
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
