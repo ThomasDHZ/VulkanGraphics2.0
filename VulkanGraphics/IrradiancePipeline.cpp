@@ -21,7 +21,6 @@ IrradiancePipeline::~IrradiancePipeline()
 void IrradiancePipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
@@ -36,6 +35,7 @@ void IrradiancePipeline::SetUpDescriptorLayout()
 void IrradiancePipeline::SetUpDescriptorSets()
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+
     VkDescriptorImageInfo TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->textureManager->GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
@@ -97,7 +97,7 @@ void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     VkPipelineMultisampleStateCreateInfo multisampling{};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling.sampleShadingEnable = VK_TRUE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    multisampling.rasterizationSamples = EnginePtr::GetEnginePtr()->MaxSampleCount;
 
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
@@ -128,9 +128,16 @@ void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
 
+    VkPushConstantRange pushConstantRange{};
+    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    pushConstantRange.offset = 0;
+    pushConstantRange.size = sizeof(ConstSkyBoxView);
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pushConstantRangeCount = 1;
+    pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
     pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 
     if (vkCreatePipelineLayout(VulkanPtr::GetDevice(), &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS) {
