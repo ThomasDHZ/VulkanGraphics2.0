@@ -6,11 +6,11 @@ IrradiancePipeline::IrradiancePipeline() : GraphicsPipeline()
 {
 }
 
-IrradiancePipeline::IrradiancePipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
+IrradiancePipeline::IrradiancePipeline(const VkRenderPass& renderPass, float CubeMapSize) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
-    SetUpShaderPipeLine(renderPass);
+    SetUpShaderPipeLine(renderPass, CubeMapSize);
     SetUpDescriptorSets();
 }
 
@@ -43,7 +43,7 @@ void IrradiancePipeline::SetUpDescriptorSets()
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
+void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/IrradianceShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -68,14 +68,14 @@ void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)512.0f;
-    viewport.height = (float)512.0f;
+    viewport.width = CubeMapSize;
+    viewport.height = CubeMapSize;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = { 0, 0 };
-    scissor.extent = { (int)512.0f, (int)512.0f };
+    scissor.extent = { (uint32_t)CubeMapSize, (uint32_t)CubeMapSize };
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -163,11 +163,11 @@ void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void IrradiancePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
+void IrradiancePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
-    SetUpShaderPipeLine(renderPass);
+    SetUpShaderPipeLine(renderPass, CubeMapSize);
     SetUpDescriptorSets();
 }

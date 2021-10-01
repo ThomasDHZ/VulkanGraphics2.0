@@ -9,12 +9,12 @@ private:
 	void SetUpDescriptorPool();
 	void SetUpDescriptorLayout();
 	void SetUpDescriptorSets();
-	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
+	void SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
 public:
 	IrradiancePipeline();
-	IrradiancePipeline(const VkRenderPass& renderPass);
+	IrradiancePipeline(const VkRenderPass& renderPass, float CubeMapSize);
 	~IrradiancePipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
 };
 

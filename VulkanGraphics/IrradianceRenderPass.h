@@ -24,7 +24,6 @@ public:
 	~IrradianceRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
-	std::shared_ptr<RenderedCubeMapTexture> FullRenderedCubeMap;
 	std::shared_ptr<IrradiancePipeline> irradiancePipeline;
 
 	void RebuildSwapChain();
