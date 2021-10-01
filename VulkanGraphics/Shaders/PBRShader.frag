@@ -79,7 +79,7 @@ layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
-layout(binding = 9) uniform samplerCube CubeMap;
+layout(binding = 9) uniform samplerCube CubeMap[];
 
 layout(binding = 10) buffer SphereAreaLightBuffer {
 	vec3 position;
@@ -284,7 +284,7 @@ void main()
     vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	  
-    vec3 irradiance = texture(CubeMap, N).rgb;
+    vec3 irradiance = texture(CubeMap[0], N).rgb;
     vec3 diffuse      = irradiance * albedo;
     vec3 ambient = (kD * diffuse) * ao;
     // vec3 ambient = vec3(0.002);

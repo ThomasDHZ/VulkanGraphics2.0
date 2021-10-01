@@ -45,7 +45,7 @@ layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
-layout(binding = 9) uniform samplerCube CubeMap;
+layout(binding = 9) uniform samplerCube CubeMap[];
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;

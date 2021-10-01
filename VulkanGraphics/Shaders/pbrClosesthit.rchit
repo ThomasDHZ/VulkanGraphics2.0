@@ -103,7 +103,7 @@ layout(binding = 9) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 11) uniform sampler2D TextureMap[];
 layout(binding = 12) uniform sampler3D Texture3DMap[];
-layout(binding = 13, set = 0) uniform samplerCube CubeMap;
+layout(binding = 13, set = 0) uniform samplerCube CubeMap[];
 
 layout(binding = 14) buffer SphereAreaLightBuffer {
 	vec3 position;

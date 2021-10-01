@@ -79,7 +79,7 @@ layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
-layout(binding = 9) uniform samplerCube CubeMap;
+layout(binding = 9) uniform samplerCube CubeMap[];
 
 layout(binding = 10) buffer SphereAreaLightBuffer {
 	vec3 position;
@@ -209,7 +209,7 @@ void main()
 
     vec3 I = normalize(FragPos2 - ViewPos);
     vec3 R = reflect(I, normalize(normal));
-    vec3 Reflection = texture(CubeMap, R).rgb;
+    vec3 Reflection = texture(CubeMap[0], R).rgb;
     vec3 finalMix = mix(result, Reflection, material.Reflectivness);
 
     outColor = vec4(finalMix, material.Alpha);
