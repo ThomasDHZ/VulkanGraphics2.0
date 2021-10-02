@@ -18,7 +18,7 @@ private:
 
 public:
 	PBRRenderPass();
-	PBRRenderPass(std::shared_ptr<VulkanEngine> engine);
+	PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap);
 	~PBRRenderPass();
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
@@ -28,7 +28,7 @@ public:
 	std::shared_ptr<PBRPipeline> pbrPipeline;
 	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
 
-	void RebuildSwapChain();
+	void RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap);
 
 	void Draw();
 	void Destroy();

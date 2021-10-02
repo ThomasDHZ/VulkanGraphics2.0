@@ -102,39 +102,28 @@ std::shared_ptr<Texture3D> TextureManager::LoadTexture3D(glm::ivec3& TextureReso
 //	return texture;
 //}
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+void TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
-	CubeMapList.emplace_back(texture);
-	UpdateBufferIndex();
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-	return texture;
 }
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
+void TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
-	CubeMapList.emplace_back(texture);
-	UpdateBufferIndex();
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-	return texture;
 }
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
+void TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
 {
-	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
-	CubeMapList.emplace_back(texture);
-	UpdateBufferIndex();
+	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-	return texture;
 }
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::shared_ptr<CubeMapTexture> cubeMapTexture)
+void TextureManager::LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture)
 {
-	CubeMapList.emplace_back(cubeMapTexture);
-	UpdateBufferIndex();
+	CubeMap = cubeMapTexture;
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-	return cubeMapTexture;
 }
 
 void TextureManager::DeleteTexture2DByID(uint32_t TextureID)
@@ -148,18 +137,9 @@ void TextureManager::DeleteTexture2DByID(uint32_t TextureID)
 
 void TextureManager::DeleteTexture3DByID(uint32_t TextureID)
 {
-	auto texture = GetTexture3DByID(TextureID);
+	auto texture = GetTextureByID(TextureID);
 	texture->Delete();
 	Texture3DList.erase(Texture3DList.begin() + texture->TextureBufferIndex);
-	UpdateBufferIndex();
-	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-}
-
-void TextureManager::DeleteCubeMapTextureByID(uint32_t CubeMapID)
-{
-	auto texture = GetCubeMapTextureByID(CubeMapID);
-	texture->Delete();
-	CubeMapList.erase(CubeMapList.begin() + texture->TextureBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
@@ -182,15 +162,6 @@ void TextureManager::DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex)
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
-void TextureManager::DeleteCubeMapTextureByBufferIndex(uint32_t TextureCubeMapBufferIndex)
-{
-	auto texture = GetCubeMapTextureByBufferIndex(TextureCubeMapBufferIndex);
-	texture->Delete();
-	CubeMapList.erase(CubeMapList.begin() + TextureCubeMapBufferIndex);
-	UpdateBufferIndex();
-	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
-}
-
 void TextureManager::UnloadAllTextures()
 {
 	for (auto& texture : Texture2DList)
@@ -202,13 +173,15 @@ void TextureManager::UnloadAllTextures()
 	{
 		texture->Delete();
 	}
-
-	for (auto& texture : CubeMapList)
-	{
-		texture->Delete();
-	}
 }
 
+void TextureManager::UnloadCubeMap()
+{
+	if (CubeMap != nullptr)
+	{
+		CubeMap->Delete();
+	}
+}
 
 void TextureManager::Destory()
 {
@@ -216,6 +189,7 @@ void TextureManager::Destory()
 	NullSampler = VK_NULL_HANDLE;
 
 	UnloadAllTextures();
+	UnloadCubeMap();
 }
 
 std::shared_ptr<Texture2D> TextureManager::GetTextureByID(uint32_t TextureID)
@@ -228,7 +202,7 @@ std::shared_ptr<Texture2D> TextureManager::GetTextureByID(uint32_t TextureID)
 		}
 	}
 
-	std::cout << "Texture2D with ID: " << TextureID << "not found." << std::endl;
+	std::cout << "Texture with ID: " << TextureID << "not found." << std::endl;
 	return nullptr;
 }
 
@@ -242,21 +216,7 @@ std::shared_ptr<Texture3D> TextureManager::GetTexture3DByID(uint32_t TextureID)
 		}
 	}
 
-	std::cout << "Texture3D with ID: " << TextureID << "not found." << std::endl;
-	return nullptr;
-}
-
-std::shared_ptr<CubeMapTexture> TextureManager::GetCubeMapTextureByID(uint32_t TextureID)
-{
-	for (auto& texture : CubeMapList)
-	{
-		if (texture->TextureID == TextureID)
-		{
-			return texture;
-		}
-	}
-
-	std::cout << "CubeMap with ID: " << TextureID << "not found." << std::endl;
+	std::cout << "Texture with ID: " << TextureID << "not found." << std::endl;
 	return nullptr;
 }
 
@@ -270,11 +230,6 @@ void TextureManager::UpdateBufferIndex()
 	for (int x = 0; x < Texture3DList.size(); x++)
 	{
 		Texture3DList[x]->TextureBufferIndex = x;
-	}
-
-	for (int x = 0; x < CubeMapList.size(); x++)
-	{
-		CubeMapList[x]->TextureBufferIndex = x;
 	}
 }
 
@@ -306,7 +261,7 @@ std::shared_ptr<Texture2D> TextureManager::GetTexture2DByName(const std::string 
 	return Texture2DList[0];
 }
 
-std::shared_ptr<Texture3D> TextureManager::GetTexture3DByName(const std::string TextureName)
+std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string TextureName)
 {
 	for (auto texture : Texture3DList)
 	{
@@ -369,29 +324,22 @@ std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescrip
 	return DescriptorImageList;
 }
 
-std::vector<VkDescriptorImageInfo> TextureManager::GetSkyBoxTextureBufferListDescriptor()
+VkDescriptorImageInfo TextureManager::GetSkyBoxTextureBufferListDescriptor()
 {
-	std::vector<VkDescriptorImageInfo> DescriptorImageList{};
-	if (CubeMapList.size() == 0)
+	VkDescriptorImageInfo DescriptorImage{};
+	if (CubeMap.get() != nullptr)
 	{
-		VkDescriptorImageInfo  nullBuffer;
-		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		nullBuffer.imageView = VK_NULL_HANDLE;
-		nullBuffer.sampler = CubeMapList[0]->Sampler;
-		DescriptorImageList.emplace_back(nullBuffer);
+		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		DescriptorImage.imageView = CubeMap->GetTextureView();
+		DescriptorImage.sampler = CubeMap->GetTextureSampler();
 	}
 	else
 	{
-		for (auto texture : CubeMapList)
-		{
-			VkDescriptorImageInfo DescriptorImage{};
-			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			DescriptorImage.imageView = texture->GetTextureView();
-			DescriptorImage.sampler = texture->GetTextureSampler();
-			DescriptorImageList.emplace_back(DescriptorImage);
-		}
+		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		DescriptorImage.imageView = VK_NULL_HANDLE;
+		DescriptorImage.sampler = Texture2DList[0]->Sampler;
 	}
-	return DescriptorImageList;
+	return DescriptorImage;
 }
 
 uint32_t TextureManager::GetTextureBufferDescriptorCount()
@@ -410,18 +358,6 @@ uint32_t TextureManager::Get3DTextureBufferDescriptorCount()
 	if (Texture3DList.size() > 0)
 	{
 		return Texture3DList.size();
-	}
-	else
-	{
-		return 1;
-	}
-}
-
-uint32_t TextureManager::GetCubeMapTextureBufferDescriptorCount()
-{
-	if (CubeMapList.size() > 0)
-	{
-		return CubeMapList.size();
 	}
 	else
 	{

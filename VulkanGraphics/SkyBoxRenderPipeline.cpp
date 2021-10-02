@@ -20,14 +20,14 @@ SkyBoxRenderPipeline::~SkyBoxRenderPipeline()
 void SkyBoxRenderPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {}; 
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManagerPtr::GetAssetPtr()->GetCubeMapTextureBufferDescriptorCount()));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
 void SkyBoxRenderPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, AssetManagerPtr::GetAssetPtr()->GetCubeMapTextureBufferDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
@@ -35,7 +35,7 @@ void SkyBoxRenderPipeline::SetUpDescriptorSets()
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    std::vector<VkDescriptorImageInfo> TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->textureManager->GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorImageInfo TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->textureManager->GetSkyBoxTextureBufferListDescriptor();
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, TextureBufferInfo));

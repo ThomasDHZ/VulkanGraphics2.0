@@ -49,9 +49,7 @@ struct MaterialData
 	alignas(4) uint32_t AlphaMapID = DefaultAlphaTextureID;
 	alignas(4) uint32_t EmissionMapID = DefaultTextureID;
 	alignas(4) uint32_t ShadowMapID = DefaultTextureID;
-	alignas(4) uint32_t CubeMapID = DefaultTextureID;
-	alignas(4) uint32_t IrradianceMapID = DefaultTextureID;
-	alignas(4) uint32_t PrefilterMapID = DefaultTextureID;
+
 
 	//PBR
 	alignas(16) glm::vec3 Albedo = glm::vec3(0.5, 0.0f, 0.0f);

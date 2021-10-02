@@ -114,6 +114,8 @@ layout(binding = 12) buffer RectangleAreaLightBuffer
 	float Luminosity;
 } RectangleLight[];
 
+layout(binding = 13) uniform samplerCube IrradianceMap;
+
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec3 Normal;
@@ -128,106 +130,61 @@ layout(location = 1) out vec4 outBloom;
 mat3 TBN;
 
 const float PI = 3.14159265359;
-vec3 getNormalFromMap(MaterialInfo material, vec2 uv);
-float DistributionGGX(vec3 N, vec3 H, float roughness);
-float GeometrySchlickGGX(float NdotV, float roughness);
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
-vec3 fresnelSchlick(float cosTheta, vec3 F0);
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
-vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
-vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index);
-
-PBRMaterial PBRMaterialProperties(uint MeshID)
+// ----------------------------------------------------------------------------
+float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
-   PBRMaterial material;
-   const MaterialInfo materialInfo = MaterialList[meshProperties[MeshID].MaterialIndex].material;
+    float a = roughness*roughness;
+    float a2 = a*a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
 
-   material.UV = TexCoords + meshProperties[MeshID].UVOffset;
-   if(texture(TextureMap[materialInfo.AlphaMapID],  material.UV).r == 0.0f ||
-      texture(TextureMap[materialInfo.DiffuseMapID],  material.UV).a == 0.0f)
-   {
-	 discard;
-   }
-   material.UV *= meshProperties[Mesh.MeshIndex].UVScale;
-   if(meshProperties[Mesh.MeshIndex].UVFlip.y == 1.0f)
-   {
-        material.UV.y = 1.0f - material.UV.y;
-   }
-   if(meshProperties[Mesh.MeshIndex].UVFlip.x == 1.0f)
-   {
-        material.UV.x = 1.0f - material.UV.x;
-   }
-   if(meshProperties[Mesh.MeshIndex].UVFlip.y == 1.0f)
-   {
-        material.UV.y = 1.0f - material.UV.y;
-   }
+    float nom   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
 
-   vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
-   vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
-   vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
-   TBN = transpose(mat3(T, B, N));
-   
-   vec3 result = vec3(0.0f);
-   vec3 normal = Normal;
-   vec3 ViewPos  = Mesh.CameraPos;
-   vec3 FragPos2  = FragPos;
-   vec3 viewDir = normalize(ViewPos - FragPos2);
-    if(materialInfo.NormalMapID != 0)
-    {
-        ViewPos  = TBN * Mesh.CameraPos;
-        FragPos2  = TBN * FragPos;
-    }
-
-    if(materialInfo.NormalMapID != 0)
-    {
-        if(materialInfo.DepthMapID != 0)
-        {
-             material.UV = ParallaxMapping(materialInfo,  material.UV,  viewDir);       
-            if( material.UV.x > 1.0 ||  material.UV.y > 1.0 ||  material.UV.x < 0.0 ||  material.UV.y < 0.0)
-            {
-              discard;
-            }
-        }
-        material.Normal = texture(TextureMap[materialInfo.NormalMapID],  material.UV).rgb;
-        material.Normal = normalize(normal * 2.0 - 1.0);
-     }
-
-
-    material.Albedo = material.Albedo;
-    if (materialInfo.AlbedoMapID != 0)
-    {
-        material.Albedo = texture(TextureMap[materialInfo.AlbedoMapID],  material.UV).rgb;
-    }
-
-    material.Metallic = materialInfo.Matallic;
-    if (materialInfo.MatallicMapID != 0)
-    {
-        material.Metallic = texture(TextureMap[materialInfo.MatallicMapID],  material.UV).r;
-    }
-
-    material.Roughness = material.Roughness;
-    if (materialInfo.RoughnessMapID != 0)
-    {
-        material.Roughness = texture(TextureMap[materialInfo.RoughnessMapID],  material.UV).r;
-    }
-
-    material.AmbientOcclusion = material.AmbientOcclusion;
-    if (materialInfo.AOMapID != 0)
-    {
-        material.AmbientOcclusion = texture(TextureMap[materialInfo.AOMapID],  material.UV).r;
-    }
-
-    material.Alpha = material.Alpha;
-    if (materialInfo.AlphaMapID != 0)
-    {
-       material.Alpha = texture(TextureMap[materialInfo.AlphaMapID], material.UV).r;
-    }
-
-    return material;
+    return nom / denom;
 }
-
-void main() 
+// ----------------------------------------------------------------------------
+float GeometrySchlickGGX(float NdotV, float roughness)
 {
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+// ----------------------------------------------------------------------------
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+// ----------------------------------------------------------------------------
+vec3 getNormalFromMap(MaterialInfo material, vec2 uv)
+{
+    vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
+    vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
+    vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
+    mat3 TBN = transpose(mat3(T, B, N));
+
+    vec3 normal = texture(TextureMap[material.NormalMapID], uv).xyz;
+         normal = normalize(normal * 2.0 - 1.0);
+    
+    return TBN * normal;
+}
+void main()
+{		
     MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
 
     vec3 albedo     = texture(TextureMap[material.AlbedoMapID], TexCoords).rgb;
@@ -284,149 +241,11 @@ void main()
     vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;	  
-    vec3 irradiance = texture(CubeMap[0], N).rgb;
+    vec3 irradiance = texture(IrradianceMap, N).rgb;
     vec3 diffuse      = irradiance * albedo;
     vec3 ambient = (kD * diffuse) * ao;
     // vec3 ambient = vec3(0.002);
     
     vec3 color = ambient + Lo;
-    outColor = vec4(color, material.Alpha);
-}
-
-vec3 CalcNormalDirLight(vec3 N, vec2 uv, int index)
-{
-   MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
-   vec3 albedo     = texture(TextureMap[material.AlbedoMapID], TexCoords).rgb;
-   float metallic  = texture(TextureMap[material.MatallicMapID], TexCoords).r;
-   float roughness = texture(TextureMap[material.RoughnessMapID], TexCoords).r;
-   float ao        = texture(TextureMap[material.AOMapID], TexCoords).r;
-
-    vec3 LightPos = DLight[index].direction;
-    vec3 V = Mesh.CameraPos;
-    vec3 FragPos2 = FragPos;
-    if (material.NormalMapID != 0)
-    {
-        LightPos = TBN * DLight[index].direction;
-        V = TBN * Mesh.CameraPos;
-        FragPos2 = TBN * FragPos;
-    }
-    vec3 ViewDir = normalize(V - FragPos2);
-
-    vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, albedo, metallic);
-
-    vec3 Lo = vec3(0.0);
-    vec3 L = normalize(-DLight[index].direction);
-    vec3 H = normalize(V + L);
-
-    vec3 radiance = DLight[index].diffuse;
-
-    float NDF = DistributionGGX(N, H, roughness);   
-    float G   = GeometrySmith(N, V, L, roughness);    
-    vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);        
-        
-    vec3 nominator    = NDF * G * F;
-    float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
-    vec3 specular = nominator / denominator;
-        
-    vec3 kS = F;
-    vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - metallic;	                
-            
-    float NdotL = max(dot(N, L), 0.0);        
-    Lo += (kD * albedo / PI + specular) * radiance * NdotL;
-
-    return Lo;
-}
-
-vec3 getNormalFromMap(MaterialInfo material, vec2 uv)
-{
-    vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
-    vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
-    vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
-    mat3 TBN = transpose(mat3(T, B, N));
-
-    vec3 normal = texture(TextureMap[material.NormalMapID], uv).xyz;
-         normal = normalize(normal * 2.0 - 1.0);
-    
-    return TBN * normal;
-}
-
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-    float a = roughness*roughness;
-    float a2 = a*a;
-    float NdotH = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH*NdotH;
-
-    float nom   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-
-    return nom / denom;
-}
-
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
-
-    float nom   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-
-    return nom / denom;
-}
-
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
-
-    return ggx1 * ggx2;
-}
-
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
-    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
-}
-
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
-}  
-
-vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
-{
-    const float heightScale = meshProperties[Mesh.MeshIndex].heightScale;
-    const float minLayers = meshProperties[Mesh.MeshIndex].minLayers;
-    const float maxLayers = meshProperties[Mesh.MeshIndex].maxLayers;
-    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
-    float layerDepth = 1.0 / numLayers;
-    float currentLayerDepth = 0.0;
-
-    viewDir.y = -viewDir.y;
-    vec2 P = viewDir.xy / viewDir.z * heightScale;
-    vec2 deltaTexCoords = P / numLayers;
-
-    vec2  currentTexCoords = texCoords;
-    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
-
-    while (currentLayerDepth < currentDepthMapValue)
-    {
-        currentTexCoords -= deltaTexCoords;
-        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
-        currentLayerDepth += layerDepth;
-    }
-
-    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
-
-    float afterDepth = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
-
-    float weight = afterDepth / (afterDepth - beforeDepth);
-    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
-
-    return finalTexCoords;
+    outColor = vec4(ambient, material.Alpha);
 }

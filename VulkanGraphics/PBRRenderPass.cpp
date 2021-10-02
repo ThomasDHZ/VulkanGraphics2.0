@@ -7,7 +7,7 @@ PBRRenderPass::PBRRenderPass() : BaseRenderPass()
 {
 }
 
-PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
+PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap) : BaseRenderPass()
 {
     ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
@@ -17,7 +17,7 @@ PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderP
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline = std::make_shared<PBRPipeline>(PBRPipeline(RenderPass));
+    pbrPipeline = std::make_shared<PBRPipeline>(PBRPipeline(RenderPass, IrradianceMap));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
     SetUpCommandBuffers();
 }
@@ -185,7 +185,7 @@ void PBRRenderPass::SetUpCommandBuffers()
     }
 }
 
-void PBRRenderPass::RebuildSwapChain()
+void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap)
 {
     ColorTexture->RecreateRendererTexture();
     RenderedTexture->RecreateRendererTexture();
@@ -207,7 +207,7 @@ void PBRRenderPass::RebuildSwapChain()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline->UpdateGraphicsPipeLine(RenderPass);
+    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
@@ -244,9 +244,6 @@ void PBRRenderPass::Draw()
     ConstSkyBoxView cubeMapInfo;
     cubeMapInfo.view = glm::mat4(glm::mat3(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix()));
     cubeMapInfo.proj = glm::perspective(glm::radians(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
-    //ConstSkyBoxView cubeMapInfo;
-    //cubeMapInfo.view = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix();
-    //cubeMapInfo.proj = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetProjectionMatrix();
     cubeMapInfo.proj[1][1] *= -1;
 
     vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], skyboxPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &cubeMapInfo);

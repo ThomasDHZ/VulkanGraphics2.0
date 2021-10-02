@@ -6,12 +6,12 @@ PBRPipeline::PBRPipeline() : GraphicsPipeline()
 {
 }
 
-PBRPipeline::PBRPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
+PBRPipeline::PBRPipeline(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets();
+    SetUpDescriptorSets(IrradianceMap);
 }
 
 PBRPipeline::~PBRPipeline()
@@ -34,6 +34,7 @@ void PBRPipeline::SetUpDescriptorPool()
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptorCount()));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptorCount()));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptorCount()));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
@@ -53,10 +54,11 @@ void PBRPipeline::SetUpDescriptorLayout()
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 11, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 12, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 13, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void PBRPipeline::SetUpDescriptorSets()
+void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap)
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     AssetManagerPtr::GetAssetPtr()->SceneData->Update();
@@ -71,10 +73,11 @@ void PBRPipeline::SetUpDescriptorSets()
     std::vector<VkDescriptorBufferInfo> MaterialBufferList = AssetManagerPtr::GetAssetPtr()->GetMaterialBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->GetTextureBufferListDescriptor();
     std::vector<VkDescriptorImageInfo> Texture3DBufferInfo = AssetManagerPtr::GetAssetPtr()->Get3DTextureBufferListDescriptor();
-    std::vector<VkDescriptorImageInfo> CubeMapImage = AssetManagerPtr::GetAssetPtr()->GetSkyBoxTextureBufferListDescriptor();
+    VkDescriptorImageInfo CubeMapImage = AssetManagerPtr::GetAssetPtr()->GetSkyBoxTextureBufferListDescriptor();
     std::vector<VkDescriptorBufferInfo> SphereAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptor();
     std::vector<VkDescriptorBufferInfo> TubeAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptor();
     std::vector<VkDescriptorBufferInfo> RectangleAreaBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptor();
+    VkDescriptorImageInfo IrradianceMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(IrradianceMap->View, IrradianceMap->Sampler);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(0, DescriptorSet, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
@@ -90,6 +93,7 @@ void PBRPipeline::SetUpDescriptorSets()
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(10, DescriptorSet, SphereAreaLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(11, DescriptorSet, TubeAreaLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(12, DescriptorSet, RectangleAreaBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(13, DescriptorSet, IrradianceMapImage));
 
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -230,11 +234,11 @@ void PBRPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void PBRPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
+void PBRPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets();
+    SetUpDescriptorSets(IrradianceMap);
 }
