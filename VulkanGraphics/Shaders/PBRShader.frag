@@ -247,5 +247,5 @@ void main()
     // vec3 ambient = vec3(0.002);
     
     vec3 color = ambient + Lo;
-    outColor = vec4(ambient, material.Alpha);
+    outColor = vec4(color, material.Alpha);
 }
