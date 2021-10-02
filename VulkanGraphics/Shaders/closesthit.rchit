@@ -189,8 +189,8 @@ void main()
        rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
     {
         vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
-        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal);
+        vec3 origin   = hitPos.xyz + normal * 0.001f;
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, normal);
 
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
