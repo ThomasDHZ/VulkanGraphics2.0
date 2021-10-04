@@ -67,10 +67,6 @@ void main()
 
 		rayPayload.color = vec3(1.0f);
 		rayPayload.reflectCount = 0;
-		rayPayload.domeSampleDelta = 0.00125f;
-		rayPayload.domePhi = 0.0f;
-		rayPayload.domeTheta = 0.0f;
-		rayPayload.domeSampleCount = 0.0f;
 
 		vec3 BaseColor = vec3(0.0f);
 		vec3 finalColor = vec3(0.0f);
@@ -82,10 +78,6 @@ void main()
 	{
 		rayPayload.color = vec3(1.0f);
 		rayPayload.reflectCount = 0;
-		rayPayload.domeSampleDelta = 0.00125f;
-		rayPayload.domePhi = 0.0f;
-		rayPayload.domeTheta = 0.0f;
-		rayPayload.domeSampleCount = 0.0f;
 
 		vec3 HitValues = vec3(0.0f);
 		vec3 FinalColor = vec3(0.0f);

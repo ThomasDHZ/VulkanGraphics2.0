@@ -221,6 +221,39 @@ vec3 Irradiate()
     return irradiance;
 }
 
+vec3 PrefilterColor(Vertex vertex)
+{
+    vec3 N = getNormalFromMap(material, vertex.normal);
+    vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
+
+    vec3 prefilteredColor  = vec3(0.0f);
+    if(rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
+    {
+        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
+
+        uint seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, ConstMesh.frame);
+        float r1        = rnd(seed);
+        float r2        = rnd(seed);
+        float sq        = sqrt(1.0 - r2);
+        float phi       = 2 * PI * r1;
+
+        vec3 L = normalize(gl_WorldRayDirectionEXT);
+        vec3 R = reflect(L), vertex.normal) * NdotL;
+        vec3 H = normalize(V + L);
+        
+        float NdotL = max(dot(N, L), 0.0);
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal) * NdotL;
+        
+        rayHitInfo.reflectCount++;
+        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+        prefilteredColor = mix(prefilteredColor, rayHitInfo.color, .5f); 
+    }
+
+    return prefilteredColor;
+}
+
+
 void main() 
 {
     vertex = BuildVertexInfo();
@@ -287,7 +320,7 @@ void main()
     // vec3 ambient = vec3(0.002);
     
     vec3 color = ambient + Lo;
-    rayHitInfo.color = color;
+    rayHitInfo.color = vec3(1.0f, 0.0f, 0.0f);
 //	//rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
 }
