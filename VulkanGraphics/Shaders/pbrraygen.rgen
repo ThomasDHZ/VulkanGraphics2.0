@@ -15,11 +15,12 @@ layout(push_constant) uniform RayTraceConstants
     int MaxRefeflectCount;
     int ApplyAntiAliasing;
 	float TestRoughness;
+    float SampleRate;
 } Camera;
 
 struct RayPayload {
 	vec3 color;
-	uint seed;
+	float seed;
 	vec3 normal;
     int reflectCount;
     float domeSampleDelta;
@@ -67,6 +68,10 @@ void main()
 
 		rayPayload.color = vec3(1.0f);
 		rayPayload.reflectCount = 0;
+		rayPayload.domeSampleDelta = 0.025f;
+		rayPayload.domePhi = 0.0f;
+		rayPayload.domeTheta = 0.0f;
+		rayPayload.domeSampleCount = 0;
 
 		vec3 BaseColor = vec3(0.0f);
 		vec3 finalColor = vec3(0.0f);
@@ -78,6 +83,10 @@ void main()
 	{
 		rayPayload.color = vec3(1.0f);
 		rayPayload.reflectCount = 0;
+		rayPayload.domeSampleDelta = 0.025f;
+		rayPayload.domePhi = 0.0f;
+		rayPayload.domeTheta = 0.0f;
+		rayPayload.domeSampleCount = 0;
 
 		vec3 HitValues = vec3(0.0f);
 		vec3 FinalColor = vec3(0.0f);

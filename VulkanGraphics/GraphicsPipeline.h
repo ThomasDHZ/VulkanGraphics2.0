@@ -9,8 +9,9 @@ struct RayTraceConstants
 	alignas(4) uint32_t frame = 0;
 	alignas(4) int      AntiAliasingCount = 100;
 	alignas(4) int      MaxRefeflectCount = 15;
-	alignas(4) int	    ApplyAntiAliasing = 1;
+	alignas(4) int	    ApplyAntiAliasing = 0;
 	alignas(4) float TestRoughness = 0.000000001f;
+	alignas(4) float SampleRate = .025;
 };
 
 struct ConstMeshInfo

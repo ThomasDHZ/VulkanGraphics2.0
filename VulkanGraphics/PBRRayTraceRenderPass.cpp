@@ -127,6 +127,7 @@ void PBRRayTraceRenderPass::SetUpTopLevelAccelerationStructure(std::shared_ptr<V
 void PBRRayTraceRenderPass::GUIUpdate()
 {
     ImGui::SliderInt("Apply Anti-Aliasing:", &RTXConst.ApplyAntiAliasing, 0, 1);
+    ImGui::SliderFloat("SphereSample:", &RTXConst.SampleRate, 0.0f, 3.0f);
     ImGui::SliderFloat("Roughness:", &RTXConst.TestRoughness, 0.0f, 3.0f);
     ImGui::SliderInt("Max Anti-Aliasing Coun", &RTXConst.AntiAliasingCount, 0, 15);
     ImGui::SliderInt("Max Refeflect Count", &RTXConst.MaxRefeflectCount, 0, 1024);
