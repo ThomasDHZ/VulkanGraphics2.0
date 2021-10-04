@@ -10,6 +10,8 @@ C:/VulkanSDK/1.2.189.2/Bin/glslc.exe Shader2D.vert -o Shader2DVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe Shader2D.frag -o Shader2DFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe IrradianceShader.vert -o IrradianceShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe IrradianceShader.frag -o IrradianceShaderFrag.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe PrefilterShader.vert -o PrefilterShaderVert.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe PrefilterShader.frag -o PrefilterShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.vert -o WireFrameShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.frag -o WireFrameShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv

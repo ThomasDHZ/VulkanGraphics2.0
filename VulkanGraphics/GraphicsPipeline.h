@@ -37,6 +37,11 @@ struct ConstSkyBoxView
 	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 };
 
+struct PrefilterSkybox
+{
+	alignas(4) float roughness = 0.0f;
+};
+
 struct ConstBloomProperites
 {
 	alignas(4) uint32_t BloomPass = 0;

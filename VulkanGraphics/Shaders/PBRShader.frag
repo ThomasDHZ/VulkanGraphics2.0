@@ -186,11 +186,13 @@ vec3 getNormalFromMap(MaterialInfo material, vec2 uv)
 void main()
 {		
     MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
+    vec2 uv = TexCoords;
 
-    vec3 albedo     = texture(TextureMap[material.AlbedoMapID], TexCoords).rgb;
-    float metallic  = texture(TextureMap[material.MatallicMapID], TexCoords).r;
-    float roughness = texture(TextureMap[material.RoughnessMapID], TexCoords).r;
-    float ao        = texture(TextureMap[material.AOMapID], TexCoords).r;
+
+    vec3 albedo     = texture(TextureMap[material.AlbedoMapID], uv).rgb;
+    float metallic  = texture(TextureMap[material.MatallicMapID], uv).r;
+    float roughness = texture(TextureMap[material.RoughnessMapID], uv).r;
+    float ao        = texture(TextureMap[material.AOMapID], uv).r;
 
     vec3 N = getNormalFromMap(material, TexCoords);
     vec3 V = normalize(Mesh.CameraPos - FragPos);
@@ -247,5 +249,5 @@ void main()
     // vec3 ambient = vec3(0.002);
     
     vec3 color = ambient + Lo;
-    outColor = vec4(color, material.Alpha);
+    outColor = vec4(irradiance, material.Alpha);
 }

@@ -862,5 +862,11 @@
     <None Include="Shaders\IrradianceShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
+    <None Include="Shaders\PrefilterShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\PrefilterShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

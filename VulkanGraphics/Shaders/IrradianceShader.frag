@@ -5,19 +5,6 @@
 #extension GL_EXT_debug_printf : enable
 #extension GL_EXT_multiview : enable
 
-#include "Lighting.glsl"
-#include "material.glsl"
-#include "vertex.glsl"
-
-struct VertexData
-{
-	vec3 Position;
-	vec3 Normal;
-	vec2 UV;
-	vec3 Tangent;
-	vec3 BiTangent;
-};
-
 layout(binding = 0) uniform samplerCube CubeMap;
 
 layout(location = 0) in vec3 WorldPos;

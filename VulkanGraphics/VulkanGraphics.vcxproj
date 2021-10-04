@@ -399,6 +399,8 @@
     <None Include="Shaders\pbrraygen.rgen" />
     <None Include="Shaders\PBRShader.frag" />
     <None Include="Shaders\PBRShader.vert" />
+    <None Include="Shaders\PrefilterShader.frag" />
+    <None Include="Shaders\PrefilterShader.vert" />
     <None Include="Shaders\raygen.rgen" />
     <None Include="Shaders\RTVertexBuilder.glsl" />
     <None Include="Shaders\RTXRandom.glsl" />
