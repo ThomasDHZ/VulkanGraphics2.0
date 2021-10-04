@@ -30,11 +30,13 @@ void AccelerationStructure::AcclerationCommandBuffer(std::shared_ptr<VulkanEngin
 	CommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	CommandBufferAllocateInfo.commandBufferCount = 1;
 
+
 	VkCommandBuffer cmdBuffer;
 	vkAllocateCommandBuffers(engine->Device, &CommandBufferAllocateInfo, &cmdBuffer);
 
 	VkCommandBufferBeginInfo cmdBufferBeginInfo{};
 	cmdBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	cmdBufferBeginInfo.flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
 	auto AccelerationStructureBuildRangeInfoPtr = AccelerationStructureBuildRangeInfo.data();
 	vkBeginCommandBuffer(cmdBuffer, &cmdBufferBeginInfo);
