@@ -11,7 +11,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     prefilterRenderPass = PrefilterRenderPass(engine);
     brdfRenderPass = BRDFRenderPass();
 
-  //  AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(irradianceRenderPass.RenderedCubeMap);
+    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(prefilterRenderPass.RenderedCubeMap);
     pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
 
