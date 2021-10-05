@@ -196,9 +196,23 @@ void PrefilterRenderPass::Draw()
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    VkRect2D rect2D{};
+    rect2D.extent.width = CubeMapSize;
+    rect2D.extent.height = CubeMapSize;
+    rect2D.offset.x = 0.0f;
+    rect2D.offset.y = 0.0f;
+
+    VkViewport viewport{};
+    viewport.width = static_cast<float>(CubeMapSize);
+    viewport.height = static_cast<float>(CubeMapSize);
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
     PrefilterSkybox prefiliter;
     prefiliter.roughness = 1.0f;
 
+    vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
+    vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
     vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], prefilterPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterSkybox), &prefiliter);
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterPipeline->ShaderPipelineLayout, 0, 1, &prefilterPipeline->DescriptorSet, 0, nullptr);
