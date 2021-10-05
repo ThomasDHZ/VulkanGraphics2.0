@@ -15,7 +15,7 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
-	uint32_t CubeMapSize;
+	uint32_t CubeMapSize = 0;
 	uint32_t CubeMapMipLevels = 0;
 
 	std::shared_ptr<RenderedCubeMapTexture> DrawToCubeMap;
@@ -23,13 +23,13 @@ private:
 
 public:
 	PrefilterRenderPass();
-	PrefilterRenderPass(std::shared_ptr<VulkanEngine> engine);
+	PrefilterRenderPass(uint32_t cubeMapSize);
 	~PrefilterRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
 	std::shared_ptr<PrefilterPipeline> prefilterPipeline;
 
-	void RebuildSwapChain();
+	void RebuildSwapChain(uint32_t cubeMapSize);
 
 	void Draw();
 	void Destroy();

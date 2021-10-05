@@ -20,13 +20,13 @@ private:
 
 public:
 	IrradianceRenderPass();
-	IrradianceRenderPass(std::shared_ptr<VulkanEngine> engine);
+	IrradianceRenderPass(uint32_t cubeMapSize);
 	~IrradianceRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
 	std::shared_ptr<IrradiancePipeline> irradiancePipeline;
 
-	void RebuildSwapChain();
+	void RebuildSwapChain(uint32_t cubeMapSize);
 
 	void Draw();
 	void Destroy();

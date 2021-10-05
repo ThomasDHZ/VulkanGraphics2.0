@@ -15,9 +15,9 @@ private:
 
 	PBRRenderPass pbrRenderer;
 	IrradianceRenderPass irradianceRenderPass;
-	EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
+	//EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
 	PrefilterRenderPass prefilterRenderPass;
-	BRDFRenderPass brdfRenderPass;
+	//BRDFRenderPass brdfRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
 
 public:

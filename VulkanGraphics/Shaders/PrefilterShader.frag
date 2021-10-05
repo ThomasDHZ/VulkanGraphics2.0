@@ -6,6 +6,7 @@
 
 layout(push_constant) uniform PrefilterInfo
 {
+    uint SkyboxSize;
 	float Roughness;
 } Prefilter;
 
@@ -91,7 +92,7 @@ void main()
             float HdotV = max(dot(H, V), 0.0);
             float pdf = D * NdotH / (4.0 * HdotV) + 0.0001; 
 
-            float resolution = 512.0;
+            float resolution = Prefilter.SkyboxSize;
             float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
             float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
 

@@ -7,16 +7,10 @@ PrefilterRenderPass::PrefilterRenderPass() : BaseRenderPass()
 {
 }
 
-PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
+PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
-    CubeMapSize = 512.0f;
-    CubeMapMipLevels = 10;
-    //float TempCubeMapSize;
-    //while (CubeMapSize)
-    //{
-    //    CubeMapSize /= 2;
-    //    CubeMapMipLevels++;
-    //}
+    CubeMapSize = cubeMapSize;
+    CubeMapMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(cubeMapSize, cubeMapSize)))) + 1;
 
     DrawToCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize)));
     RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize), CubeMapMipLevels));
@@ -161,8 +155,9 @@ void PrefilterRenderPass::SetUpCommandBuffers()
     }
 }
 
-void PrefilterRenderPass::RebuildSwapChain()
+void PrefilterRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 {
+    CubeMapSize = cubeMapSize;
     prefilterPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -178,6 +173,21 @@ void PrefilterRenderPass::RebuildSwapChain()
     CreateRendererFramebuffers();
     prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, CubeMapSize);
     SetUpCommandBuffers();
+
+    Draw();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 void PrefilterRenderPass::Draw()
@@ -226,6 +236,7 @@ void PrefilterRenderPass::Draw()
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
+        prefiliter.SkyboxSize = CubeMapMipLevels;
         prefiliter.roughness = (float)CubeMapSize / (float)(CubeMapMipLevels - 1);
 
         vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);

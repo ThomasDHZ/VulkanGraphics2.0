@@ -39,6 +39,7 @@ struct ConstSkyBoxView
 
 struct PrefilterSkybox
 {
+	alignas(4) uint32_t SkyboxSize = 0.0f;
 	alignas(4) float roughness = 0.0f;
 };
 

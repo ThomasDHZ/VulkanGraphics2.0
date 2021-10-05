@@ -7,9 +7,9 @@ IrradianceRenderPass::IrradianceRenderPass() : BaseRenderPass()
 {
 }
 
-IrradianceRenderPass::IrradianceRenderPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
+IrradianceRenderPass::IrradianceRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
-    CubeMapSize = 512.0f;
+    CubeMapSize = cubeMapSize;
     RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize)));
 
     CreateRenderPass();
@@ -151,8 +151,9 @@ void IrradianceRenderPass::SetUpCommandBuffers()
     }
 }
 
-void IrradianceRenderPass::RebuildSwapChain()
+void IrradianceRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 {
+    CubeMapSize = cubeMapSize;
     irradiancePipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -168,6 +169,21 @@ void IrradianceRenderPass::RebuildSwapChain()
     CreateRendererFramebuffers();
     irradiancePipeline->UpdateGraphicsPipeLine(RenderPass, CubeMapSize);
     SetUpCommandBuffers();
+
+    Draw();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 void IrradianceRenderPass::Draw()
@@ -181,8 +197,8 @@ void IrradianceRenderPass::Draw()
     }
 
     std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
-    clearValues[1].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+    clearValues[1].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
