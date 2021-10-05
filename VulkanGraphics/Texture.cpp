@@ -498,7 +498,7 @@ void Texture::UpdateCubeImageLayout(VkImageLayout oldImageLayout, VkImageLayout 
 	VkImageSubresourceRange ImageSubresourceRange{};
 	ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 	ImageSubresourceRange.baseMipLevel = 0;
-	ImageSubresourceRange.levelCount = 1;
+	ImageSubresourceRange.levelCount = MipMapLevels;
 	ImageSubresourceRange.layerCount = 6;
 
 	VkImageMemoryBarrier barrier = {};

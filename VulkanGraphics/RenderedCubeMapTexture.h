@@ -3,8 +3,8 @@
 class RenderedCubeMapTexture : public Texture
 {
 private:
-    void CreateTextureImage(uint32_t mipLevels);
-    void CreateTextureView(uint32_t mipLevels);
+    void CreateTextureImage();
+    void CreateTextureView();
     void CreateTextureSampler();
 public:
     RenderedCubeMapTexture();
@@ -12,5 +12,5 @@ public:
     RenderedCubeMapTexture(glm::ivec2 TextureResolution, uint32_t mipLevels = 1);
     ~RenderedCubeMapTexture();
 
-    void RecreateRendererTexture(uint32_t mipLevels = 1);
+    void RecreateRendererTexture();
 };

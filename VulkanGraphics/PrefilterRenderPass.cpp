@@ -19,7 +19,7 @@ PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<VulkanEngine> engine) :
     //}
 
     DrawToCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize)));
-    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize)));
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize), CubeMapMipLevels));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -218,8 +218,8 @@ void PrefilterRenderPass::Draw()
     rect2D.offset.x = 0.0f;
     rect2D.offset.y = 0.0f;
 
-   /* for (int x = 0; x < CubeMapMipLevels; x++)
-    {*/
+    for (int x = 0; x < CubeMapMipLevels; x++)
+    {
         VkViewport viewport{};
         viewport.width = CubeMapSize;
         viewport.height = CubeMapSize;
@@ -280,17 +280,9 @@ void PrefilterRenderPass::Draw()
         ReturnMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         ReturnMemoryBarrior.dstAccessMask = 0;
         vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnMemoryBarrior);
-//}
+}
 
-    VkImageMemoryBarrier SkyBoxBarrierEnd = {};
-    SkyBoxBarrierEnd.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-    SkyBoxBarrierEnd.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-    SkyBoxBarrierEnd.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    SkyBoxBarrierEnd.image = RenderedCubeMap->Image;
-    SkyBoxBarrierEnd.subresourceRange = SkyBoxSubresourceRange;
-    SkyBoxBarrierEnd.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    SkyBoxBarrierEnd.dstAccessMask = 0;
-    vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SkyBoxBarrierEnd);
+    RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
