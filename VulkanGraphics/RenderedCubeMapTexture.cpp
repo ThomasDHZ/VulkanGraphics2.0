@@ -4,20 +4,20 @@ RenderedCubeMapTexture::RenderedCubeMapTexture() : Texture()
 {
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedCubeMap)
+RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, uint32_t mipLevels) : Texture(TextureType::vkRenderedCubeMap)
 {
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
 
-    CreateTextureImage();
-    CreateTextureView();
+    CreateTextureImage(mipLevels);
+    CreateTextureView(mipLevels);
     CreateTextureSampler();
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(glm::ivec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedCubeMap)
+RenderedCubeMapTexture::RenderedCubeMapTexture(glm::ivec2 TextureResolution, uint32_t mipLevels) : Texture(TextureResolution, TextureType::vkRenderedCubeMap)
 {
-    CreateTextureImage();
-    CreateTextureView();
+    CreateTextureImage(mipLevels);
+    CreateTextureView(mipLevels);
     CreateTextureSampler();
 }
 
@@ -25,7 +25,7 @@ RenderedCubeMapTexture::~RenderedCubeMapTexture()
 {
 }
 
-void RenderedCubeMapTexture::CreateTextureImage()
+void RenderedCubeMapTexture::CreateTextureImage(uint32_t mipLevels)
 {
     VkImageCreateInfo TextureInfo = {};
     TextureInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -33,7 +33,7 @@ void RenderedCubeMapTexture::CreateTextureImage()
     TextureInfo.extent.width = Width;
     TextureInfo.extent.height = Height;
     TextureInfo.extent.depth = 1;
-    TextureInfo.mipLevels = 1;
+    TextureInfo.mipLevels = mipLevels;
     TextureInfo.arrayLayers = 6;
     TextureInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     TextureInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
@@ -46,7 +46,7 @@ void RenderedCubeMapTexture::CreateTextureImage()
     Texture::CreateTextureImage(TextureInfo);
 }
 
-void RenderedCubeMapTexture::CreateTextureView()
+void RenderedCubeMapTexture::CreateTextureView(uint32_t mipLevels)
 {
     VkImageViewCreateInfo TextureImageViewInfo = {};
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -54,7 +54,7 @@ void RenderedCubeMapTexture::CreateTextureView()
     TextureImageViewInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
     TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
-    TextureImageViewInfo.subresourceRange.levelCount = 1;
+    TextureImageViewInfo.subresourceRange.levelCount = mipLevels;
     TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
     TextureImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
     TextureImageViewInfo.subresourceRange.layerCount = 6;
@@ -87,10 +87,10 @@ void RenderedCubeMapTexture::CreateTextureSampler()
     }
 }
 
-void RenderedCubeMapTexture::RecreateRendererTexture()
+void RenderedCubeMapTexture::RecreateRendererTexture(uint32_t mipLevels)
 {
     Texture::Delete();
-    CreateTextureImage();
-    CreateTextureView();
+    CreateTextureImage(mipLevels);
+    CreateTextureView(mipLevels);
     CreateTextureSampler();
 }

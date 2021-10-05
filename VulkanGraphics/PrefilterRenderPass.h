@@ -16,6 +16,8 @@ private:
 	void SetUpCommandBuffers();
 
 	uint32_t CubeMapSize;
+	uint32_t CubeMapMipLevels = 0;
+
 	std::shared_ptr<RenderedCubeMapTexture> DrawToCubeMap;
 	VkFramebuffer PrefilterMapFrameBuffer;
 
