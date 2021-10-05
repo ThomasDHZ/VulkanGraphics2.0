@@ -221,8 +221,8 @@ void PrefilterRenderPass::Draw()
     for (int x = 0; x < CubeMapMipLevels; x++)
     {
         VkViewport viewport{};
-        viewport.width = CubeMapSize;
-        viewport.height = CubeMapSize;
+        viewport.width = static_cast<float>(CubeMapSize * std::pow(0.5f, x));
+        viewport.height = static_cast<float>(CubeMapSize * std::pow(0.5f, x));
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
@@ -262,12 +262,12 @@ void PrefilterRenderPass::Draw()
 
         copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         copyRegion.dstSubresource.baseArrayLayer = 0;
-        copyRegion.dstSubresource.mipLevel = 0;
+        copyRegion.dstSubresource.mipLevel = x;
         copyRegion.dstSubresource.layerCount = 6;
         copyRegion.dstOffset = { 0, 0, 0 };
 
-        copyRegion.extent.width = (uint32_t)DrawToCubeMap->Width;
-        copyRegion.extent.height = (uint32_t)DrawToCubeMap->Height;
+        copyRegion.extent.width = (uint32_t)viewport.width;
+        copyRegion.extent.height = (uint32_t)viewport.height;
         copyRegion.extent.depth = 1;
         vkCmdCopyImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], DrawToCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, RenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
