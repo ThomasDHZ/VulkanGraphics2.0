@@ -12,7 +12,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     //brdfRenderPass = BRDFRenderPass();
 
     AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(prefilterRenderPass.RenderedCubeMap);
-    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap);
+    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
 
 }
@@ -27,7 +27,7 @@ void PBRRenderer::RebuildSwapChain()
     irradianceRenderPass.RebuildSwapChain(2048.0f);
     prefilterRenderPass.RebuildSwapChain(2048.0f);
    // brdfRenderPass.RebuildSwapChain();
-    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap);
+    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap);
     FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
 
 }
