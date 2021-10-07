@@ -238,6 +238,7 @@ private:
             material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
             material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
             material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/depth.bmp", VK_FORMAT_R8G8B8A8_UNORM);
             material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
             material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
 

@@ -128,10 +128,8 @@ layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
 
 const float PI = 3.14159265359;
-vec3 getNormalFromMap(MaterialInfo material)
+mat3 getTBNFromMap()
 {
-    vec3 tangentNormal = texture(TextureMap[material.NormalMapID], TexCoords).xyz * 2.0 - 1.0;
-
     vec3 Q1  = dFdx(FragPos);
     vec3 Q2  = dFdy(FragPos);
     vec2 st1 = dFdx(TexCoords);
@@ -142,7 +140,7 @@ vec3 getNormalFromMap(MaterialInfo material)
     vec3 B  = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);
 
-    return normalize(TBN * tangentNormal);
+    return TBN;
 }
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -219,9 +217,10 @@ void main()
         ao = texture(TextureMap[material.AOMapID], TexCoords).r;
     }
 
-
+    mat3 TBN = getTBNFromMap();
+    vec3 normal = texture(TextureMap[material.NormalMapID], TexCoords).xyz * 2.0 - 1.0;
     // input lighting data
-    vec3 N = getNormalFromMap(material);
+    vec3 N = normalize(TBN * normal);
     vec3 V = normalize(Mesh.CameraPos - FragPos);
     vec3 R = reflect(-V, N); 
 
