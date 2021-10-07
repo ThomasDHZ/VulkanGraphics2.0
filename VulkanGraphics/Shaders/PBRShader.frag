@@ -188,40 +188,89 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }  
 // ----------------------------------------------------------------------------
+
+vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
+{
+    const float heightScale = meshProperties[Mesh.MeshIndex].heightScale;
+    const float minLayers = meshProperties[Mesh.MeshIndex].minLayers;
+    const float maxLayers = meshProperties[Mesh.MeshIndex].maxLayers;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+
+    viewDir.y = -viewDir.y;
+    vec2 P = viewDir.xy / viewDir.z * heightScale;
+    vec2 deltaTexCoords = P / numLayers;
+
+    vec2  currentTexCoords = texCoords;
+    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
+
+    while (currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
+        currentLayerDepth += layerDepth;
+    }
+
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    float afterDepth = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
+
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
+
 void main()
 {		
-        MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
-
+   MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
+   vec2 UV = TexCoords + meshProperties[Mesh.MeshIndex].UVOffset;
+   if(texture(TextureMap[material.AlphaMapID], UV).r == 0.0f ||
+      texture(TextureMap[material.DiffuseMapID], UV).a == 0.0f)
+   {
+	 discard;
+   }
     // material properties
     vec3 albedo = vec3(0.0f); 
     if(material.AlbedoMapID != 0)
     {
-        albedo = texture(TextureMap[material.AlbedoMapID], TexCoords).rgb;
+        albedo = texture(TextureMap[material.AlbedoMapID], UV).rgb;
     }   
 
     float metallic = 0.0f;
     if(material.MatallicMapID != 0)
     {
-        metallic = texture(TextureMap[material.MatallicMapID], TexCoords).r;
+        metallic = texture(TextureMap[material.MatallicMapID], UV).r;
     }
 
     float roughness = 0.0f;
     if(material.RoughnessMapID != 0)
     {
-        roughness = texture(TextureMap[material.RoughnessMapID], TexCoords).r;
+        roughness = texture(TextureMap[material.RoughnessMapID], UV).r;
     }
 
     float ao = 0.0f;
     if(material.AOMapID != 0)
     {
-        ao = texture(TextureMap[material.AOMapID], TexCoords).r;
+        ao = texture(TextureMap[material.AOMapID], UV).r;
     }
 
+    vec3 V = normalize(Mesh.CameraPos - FragPos);
     mat3 TBN = getTBNFromMap();
-    vec3 normal = texture(TextureMap[material.NormalMapID], TexCoords).xyz * 2.0 - 1.0;
+    if(material.DepthMapID != 0)
+    {
+            UV = ParallaxMapping(material, UV,  V);       
+            if(UV.x > 1.0 || UV.y > 1.0 || UV.x < 0.0 || UV.y < 0.0)
+            {
+              discard;
+            }
+    }
+
+    vec3 normal = texture(TextureMap[material.NormalMapID], UV).xyz * 2.0 - 1.0;
     // input lighting data
     vec3 N = normalize(TBN * normal);
-    vec3 V = normalize(Mesh.CameraPos - FragPos);
     vec3 R = reflect(-V, N); 
 
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
