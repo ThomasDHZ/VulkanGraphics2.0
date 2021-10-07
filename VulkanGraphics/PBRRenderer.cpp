@@ -11,9 +11,9 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     prefilterRenderPass = PrefilterRenderPass(2048.0f);
     brdfRenderPass = BRDFRenderPass(2048.0f);
 
-    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(prefilterRenderPass.RenderedCubeMap);
+  //  AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(TextureManagerPtr::GetTextureManagerPtr()->GetTextureByBufferIndex(0));
     pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap);
-    FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
+    FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
 }
 
@@ -28,7 +28,7 @@ void PBRRenderer::RebuildSwapChain()
     prefilterRenderPass.RebuildSwapChain(2048.0f);
     brdfRenderPass.RebuildSwapChain(2048.0f);
     pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap);
-    FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
+    FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
 }
 
@@ -39,11 +39,9 @@ void PBRRenderer::GUIUpdate()
 
 void PBRRenderer::Draw()
 {
-    frameCount++;
-
    // equirectangularToCubemapRenderPass.Draw();
     irradianceRenderPass.Draw();
-    prefilterRenderPass.Draw();
+prefilterRenderPass.Draw();
     brdfRenderPass.Draw();
     pbrRenderer.Draw();
     FrameBufferRenderer.Draw();
@@ -51,8 +49,8 @@ void PBRRenderer::Draw()
 
 void PBRRenderer::Destroy()
 {
-    irradianceRenderPass.Destroy();
-    pbrRenderer.Destroy();
+  //  irradianceRenderPass.Destroy();
+  //  pbrRenderer.Destroy();
     FrameBufferRenderer.Destroy();
 }
 
@@ -64,7 +62,7 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
     CommandBufferSubmitList.emplace_back(prefilterRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(brdfRenderPass.GetCommandBuffer());
 
-    CommandBufferSubmitList.emplace_back(pbrRenderer.GetCommandBuffer());
+CommandBufferSubmitList.emplace_back(pbrRenderer.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.GetCommandBuffer());
     return CommandBufferSubmitList;
 }

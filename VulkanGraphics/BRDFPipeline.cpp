@@ -57,24 +57,8 @@ void BRDFPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    VkViewport viewport = {};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-    viewport.height = (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-
-    VkRect2D scissor = {};
-    scissor.offset = { 0, 0 };
-    scissor.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
-
-    VkPipelineViewportStateCreateInfo viewportState = {};
+    VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
-    viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
 
     VkPipelineRasterizationStateCreateInfo rasterizer = {};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -114,19 +98,12 @@ void BRDFPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     ColorBlending.blendConstants[2] = 0.0f;
     ColorBlending.blendConstants[3] = 0.0f;
 
-    VkPushConstantRange pushConstantRange{};
-    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-    pushConstantRange.offset = 0;
-    pushConstantRange.size = sizeof(ConstBloomProperites);
+    VkPipelineLayoutCreateInfo PipelineLayoutInfo = {};
+    PipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    PipelineLayoutInfo.setLayoutCount = 1;
+    PipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
-    pipelineLayoutInfo.pushConstantRangeCount = 1;
-    pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-
-    if (vkCreatePipelineLayout(VulkanPtr::GetDevice(), &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
+    if (vkCreatePipelineLayout(VulkanPtr::GetDevice(), &PipelineLayoutInfo, nullptr, &ShaderPipelineLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("Failed to create FrameBuffer Pipeline Layout.");
     }

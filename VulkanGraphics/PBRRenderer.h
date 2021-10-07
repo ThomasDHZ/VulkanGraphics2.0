@@ -11,13 +11,12 @@ class PBRRenderer : public BaseRenderer
 {
 private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
-	int frameCount = 0;
 
-	PBRRenderPass pbrRenderer;
 	IrradianceRenderPass irradianceRenderPass;
 	//EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
 	PrefilterRenderPass prefilterRenderPass;
 	BRDFRenderPass brdfRenderPass;
+	PBRRenderPass pbrRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
 
 public:

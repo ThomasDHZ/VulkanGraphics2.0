@@ -256,11 +256,11 @@ void main()
     const float MAX_REFLECTION_LOD = 4.0;
     vec3 prefilteredColor = textureLod(PrefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;   
 
- // //  vec2 brdf  = texture(BRDFMap, vec2(max(dot(N, V), 0.0), roughness)).rg;
-   // vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
-    vec3 ambient = (kD * diffuse) * ao;
+    vec2 brdf  = texture(BRDFMap, vec2(max(dot(N, V), 0.0), roughness)).rg;
+    vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+    vec3 ambient = (kD * diffuse + specular) * ao;
     // vec3 ambient = vec3(0.002);
     
     vec3 color = ambient + Lo;
-    outColor = vec4(texture(BRDFMap, uv).rg, 0.0f, material.Alpha);
+    outColor = vec4(specular, material.Alpha);
 }
