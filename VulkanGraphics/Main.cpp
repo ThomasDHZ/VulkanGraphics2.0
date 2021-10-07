@@ -94,10 +94,28 @@ private:
         LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
 
         PointLightBuffer plight = PointLightBuffer();
-        plight.position = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+        plight.position = glm::vec4(-10.0f, 10.0f, 10.0f, 0.0f);
         plight.ambient = glm::vec4(0.2f);
-        plight.diffuse = glm::vec4(0.8f, 0.0f, 0.0f, 1.0f);
+        plight.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
         plight.specular = glm::vec4(1.0f);
+
+        PointLightBuffer plight2 = PointLightBuffer();
+        plight2.position = glm::vec4(10.0f, 10.0f, 10.0f, 0.0f);
+        plight2.ambient = glm::vec4(0.2f);
+        plight2.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
+        plight2.specular = glm::vec4(1.0f);
+
+        PointLightBuffer plight3 = PointLightBuffer();
+        plight3.position = glm::vec4(-10.0f, -10.0f, 10.0f, 0.0f);
+        plight3.ambient = glm::vec4(0.2f);
+        plight3.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
+        plight3.specular = glm::vec4(1.0f);
+
+        PointLightBuffer plight4 = PointLightBuffer();
+        plight4.position = glm::vec4(10.0f, -10.0f, 10.0f, 0.0f);
+        plight4.ambient = glm::vec4(0.2f);
+        plight4.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
+        plight4.specular = glm::vec4(1.0f);
 
         SphereAreaLightBuffer spherelight = SphereAreaLightBuffer();
         spherelight.position = glm::vec4(0.5f, 1.0f, 0.3f, 1.0f);
@@ -113,7 +131,9 @@ private:
         slight.specular = glm::vec4(1.0f);
 
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
-        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight2);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight3);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight4);
         LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
@@ -123,12 +143,12 @@ private:
 
         
         MaterialTexture material;
-        material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-        material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-        material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-        material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+        material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+        material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+        material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
        
         auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
         gameObject->MeshList[0]->MeshMaterial = mat;
