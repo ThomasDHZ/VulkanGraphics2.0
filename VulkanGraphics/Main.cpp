@@ -73,14 +73,32 @@ private:
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
+        //std::string CubeMapFiles[6];
+        //CubeMapFiles[0] = "../texture/skybox/right.jpg";
+        //CubeMapFiles[1] = "../texture/skybox/left.jpg";
+        //CubeMapFiles[2] = "../texture/skybox/top.jpg";
+        //CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
+        //CubeMapFiles[4] = "../texture/skybox/back.jpg";
+        //CubeMapFiles[5] = "../texture/skybox/front.jpg";
+
+        //std::string CubeMapFiles[6];
+        //CubeMapFiles[0] = "../texture/skybox/CosmicCoolCloudLeft.png";
+        //CubeMapFiles[1] = "../texture/skybox/CosmicCoolCloudRight.png";
+        //CubeMapFiles[2] = "../texture/skybox/CosmicCoolCloudTop.png";
+        //CubeMapFiles[3] = "../texture/skybox/CosmicCoolCloudBottom.png";
+        //CubeMapFiles[4] = "../texture/skybox/CosmicCoolCloudBack.png";
+        //CubeMapFiles[5] = "../texture/skybox/CosmicCoolCloudFront.png";
+
         std::string CubeMapFiles[6];
-        CubeMapFiles[0] = "../texture/skybox/right.jpg";
-        CubeMapFiles[1] = "../texture/skybox/left.jpg";
-        CubeMapFiles[2] = "../texture/skybox/top.jpg";
-        CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
-        CubeMapFiles[4] = "../texture/skybox/back.jpg";
-        CubeMapFiles[5] = "../texture/skybox/front.jpg";
+        CubeMapFiles[0] = "../texture/skybox/hot_lf.png";
+        CubeMapFiles[1] = "../texture/skybox/hot_rt.png";
+        CubeMapFiles[2] = "../texture/skybox/hot_up.png";
+        CubeMapFiles[3] = "../texture/skybox/hot_dn.png";
+        CubeMapFiles[4] = "../texture/skybox/hot_bk.png";
+        CubeMapFiles[5] = "../texture/skybox/hot_ft.png";
+
         AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+
         AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
 
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
@@ -137,21 +155,96 @@ private:
         LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
-        std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
-        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+        {
+            std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
+            AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-        
-        MaterialTexture material;
-        material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-        material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-        material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-        material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
-       
-        auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
-        gameObject->MeshList[0]->MeshMaterial = mat;
+
+            MaterialTexture material;
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+
+            auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
+            gameObject->MeshList[0]->MeshMaterial = mat;
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
+        }
+        {
+            std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
+            AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+
+
+            MaterialTexture material;
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+
+            auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("grass", material);
+            gameObject->MeshList[0]->MeshMaterial = mat;
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(-3.0f, 0.0f, 0.0f);
+        }
+        {
+            std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
+            AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+
+
+            MaterialTexture material;
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/gold/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+
+            auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Gold", material);
+            gameObject->MeshList[0]->MeshMaterial = mat;
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+        }
+        {
+            std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
+            AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+
+
+            MaterialTexture material;
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/plastic/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+
+            auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("sphere", material);
+            gameObject->MeshList[0]->MeshMaterial = mat;
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(3.0f, 0.0f, 0.0f);
+        }
+        {
+            std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
+            AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+
+
+            MaterialTexture material;
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/wall/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+
+            auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("wall", material);
+            gameObject->MeshList[0]->MeshMaterial = mat;
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(6.0f, 0.0f, 0.0f);
+        }
     }
 
     void mainLoop() {

@@ -195,10 +195,29 @@ void main()
         MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
 
     // material properties
-    vec3 albedo = pow(texture(TextureMap[material.AlbedoMapID], TexCoords).rgb, vec3(2.2));
-    float metallic = texture(TextureMap[material.MatallicMapID], TexCoords).r;
-    float roughness = texture(TextureMap[material.RoughnessMapID], TexCoords).r;
-    float ao = texture(TextureMap[material.AOMapID], TexCoords).r;
+    vec3 albedo = vec3(0.0f); 
+    if(material.AlbedoMapID != 0)
+    {
+        albedo = texture(TextureMap[material.AlbedoMapID], TexCoords).rgb;
+    }   
+
+    float metallic = 0.0f;
+    if(material.MatallicMapID != 0)
+    {
+        metallic = texture(TextureMap[material.MatallicMapID], TexCoords).r;
+    }
+
+    float roughness = 0.0f;
+    if(material.RoughnessMapID != 0)
+    {
+        roughness = texture(TextureMap[material.RoughnessMapID], TexCoords).r;
+    }
+
+    float ao = 0.0f;
+    if(material.AOMapID != 0)
+    {
+        ao = texture(TextureMap[material.AOMapID], TexCoords).r;
+    }
 
 
     // input lighting data
@@ -268,11 +287,5 @@ void main()
     vec3 ambient = (kD * diffuse + specular) * ao;
     
     vec3 color = ambient + Lo;
-
-    // HDR tonemapping
-    color = color / (color + vec3(1.0));
-    // gamma correct
-    color = pow(color, vec3(1.0/2.2)); 
-
     outColor = vec4(color , 1.0);
     }
