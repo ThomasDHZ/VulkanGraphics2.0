@@ -868,5 +868,11 @@
     <None Include="Shaders\PrefilterShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
+    <None Include="Shaders\BRDFShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\BRDFShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

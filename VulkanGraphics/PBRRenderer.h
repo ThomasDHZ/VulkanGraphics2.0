@@ -17,7 +17,7 @@ private:
 	IrradianceRenderPass irradianceRenderPass;
 	//EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
 	PrefilterRenderPass prefilterRenderPass;
-	//BRDFRenderPass brdfRenderPass;
+	BRDFRenderPass brdfRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
 
 public:

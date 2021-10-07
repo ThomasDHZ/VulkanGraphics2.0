@@ -116,6 +116,7 @@ layout(binding = 12) buffer RectangleAreaLightBuffer
 
 layout(binding = 13) uniform samplerCube IrradianceMap;
 layout(binding = 14) uniform samplerCube PrefilterMap;
+layout(binding = 15) uniform sampler2D BRDFMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -255,11 +256,11 @@ void main()
     const float MAX_REFLECTION_LOD = 4.0;
     vec3 prefilteredColor = textureLod(PrefilterMap, R,  roughness * MAX_REFLECTION_LOD).rgb;   
 
-   // vec2 brdf  = texture(brdfLUT, vec2(max(dot(N, V), 0.0), roughness)).rg;
-    //vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+ // //  vec2 brdf  = texture(BRDFMap, vec2(max(dot(N, V), 0.0), roughness)).rg;
+   // vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
     vec3 ambient = (kD * diffuse) * ao;
     // vec3 ambient = vec3(0.002);
     
     vec3 color = ambient + Lo;
-    outColor = vec4(prefilteredColor, material.Alpha);
+    outColor = vec4(texture(BRDFMap, uv).rg, 0.0f, material.Alpha);
 }

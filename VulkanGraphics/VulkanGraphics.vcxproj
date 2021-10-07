@@ -381,6 +381,8 @@
     <None Include="Shaders\anyhit.rahit" />
     <None Include="Shaders\anyhit1.rahit" />
     <None Include="Shaders\BlinePhongLighting.glsl" />
+    <None Include="Shaders\BRDFShader.frag" />
+    <None Include="Shaders\BRDFShader.vert" />
     <None Include="Shaders\closesthit.rchit" />
     <None Include="Shaders\compile.bat" />
     <None Include="Shaders\frag.frag" />

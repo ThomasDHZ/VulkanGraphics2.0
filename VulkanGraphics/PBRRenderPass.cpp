@@ -7,7 +7,7 @@ PBRRenderPass::PBRRenderPass() : BaseRenderPass()
 {
 }
 
-PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap) : BaseRenderPass()
+PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap) : BaseRenderPass()
 {
     ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
@@ -17,7 +17,7 @@ PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_p
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline = std::make_shared<PBRPipeline>(PBRPipeline(RenderPass, IrradianceMap, PrefilerMap));
+    pbrPipeline = std::make_shared<PBRPipeline>(PBRPipeline(RenderPass, IrradianceMap, PrefilerMap, BRDFMap));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
     SetUpCommandBuffers();
 }
@@ -185,7 +185,7 @@ void PBRRenderPass::SetUpCommandBuffers()
     }
 }
 
-void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap)
+void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap)
 {
     ColorTexture->RecreateRendererTexture();
     RenderedTexture->RecreateRendererTexture();
@@ -207,7 +207,7 @@ void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> Irr
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap);
+    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }

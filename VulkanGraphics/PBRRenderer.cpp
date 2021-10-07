@@ -9,10 +9,10 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
    // equirectangularToCubemapRenderPass = EquirectangularToCubemapRenderPass();
     irradianceRenderPass = IrradianceRenderPass(2048.0f);
     prefilterRenderPass = PrefilterRenderPass(2048.0f);
-    //brdfRenderPass = BRDFRenderPass();
+    brdfRenderPass = BRDFRenderPass(2048.0f);
 
     AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(prefilterRenderPass.RenderedCubeMap);
-    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap);
+    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
 
 }
@@ -26,8 +26,8 @@ void PBRRenderer::RebuildSwapChain()
     //equirectangularToCubemapRenderPass.RebuildSwapChain();
     irradianceRenderPass.RebuildSwapChain(2048.0f);
     prefilterRenderPass.RebuildSwapChain(2048.0f);
-   // brdfRenderPass.RebuildSwapChain();
-    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap);
+    brdfRenderPass.RebuildSwapChain(2048.0f);
+    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap);
     FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedTexture);
 
 }
@@ -44,7 +44,7 @@ void PBRRenderer::Draw()
    // equirectangularToCubemapRenderPass.Draw();
     irradianceRenderPass.Draw();
     prefilterRenderPass.Draw();
-   // brdfRenderPass.Draw();
+    brdfRenderPass.Draw();
     pbrRenderer.Draw();
     FrameBufferRenderer.Draw();
 }
@@ -62,7 +62,7 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
     //  CommandBufferSubmitList.emplace_back(equirectangularToCubemapRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(irradianceRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(prefilterRenderPass.GetCommandBuffer());
-    //  CommandBufferSubmitList.emplace_back(brdfRenderPass.GetCommandBuffer());
+    CommandBufferSubmitList.emplace_back(brdfRenderPass.GetCommandBuffer());
 
     CommandBufferSubmitList.emplace_back(pbrRenderer.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.GetCommandBuffer());
