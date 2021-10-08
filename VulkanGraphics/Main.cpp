@@ -114,25 +114,25 @@ private:
         PointLightBuffer plight = PointLightBuffer();
         plight.position = glm::vec4(-10.0f, 10.0f, 10.0f, 0.0f);
         plight.ambient = glm::vec4(0.2f);
-        plight.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        plight.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
         plight.specular = glm::vec4(1.0f);
 
         PointLightBuffer plight2 = PointLightBuffer();
         plight2.position = glm::vec4(10.0f, 10.0f, 10.0f, 0.0f);
         plight2.ambient = glm::vec4(0.2f);
-        plight2.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        plight2.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
         plight2.specular = glm::vec4(1.0f);
 
         PointLightBuffer plight3 = PointLightBuffer();
         plight3.position = glm::vec4(-10.0f, -10.0f, 10.0f, 0.0f);
         plight3.ambient = glm::vec4(0.2f);
-        plight3.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        plight3.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
         plight3.specular = glm::vec4(1.0f);
 
         PointLightBuffer plight4 = PointLightBuffer();
         plight4.position = glm::vec4(10.0f, -10.0f, 10.0f, 0.0f);
         plight4.ambient = glm::vec4(0.2f);
-        plight4.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        plight4.diffuse = glm::vec4(300.0f, 300.0f, 300.0f, 1.0f);
         plight4.specular = glm::vec4(1.0f);
 
         SphereAreaLightBuffer spherelight = SphereAreaLightBuffer();
@@ -155,24 +155,28 @@ private:
         LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
-        //{
-        //    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //    gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
-        //    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+   /*     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.gltf")));
+        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);*/
+
+        {
+            std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
+            AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
 
-        //    MaterialTexture material;
-        //    material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        //    material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        //    material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //    material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //    material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //    material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+            MaterialTexture material;
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/rusted_iron/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
 
-        //    auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
-        //    gameObject->MeshList[0]->MeshMaterial = mat;
-        //    gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
-        //}
+            auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
+            gameObject->MeshList[0]->MeshMaterial = mat;
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
+        }
         //{
         //    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         //    gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
@@ -246,25 +250,25 @@ private:
         //    gameObject->MeshList[0]->MeshMaterial = mat;
         //    gameObject->MeshList[0]->MeshPosition = glm::vec3(6.0f, 0.0f, 0.0f);
         //}
-        {
-    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-    gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/plain.obj")));
-    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+        //{
+        //    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+        //    gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/plain.obj")));
+        //    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
 
-    MaterialTexture material;
-    material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-    material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_height.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-    material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_normal-ogl.png", VK_FORMAT_R8G8B8A8_UNORM);
+        //    MaterialTexture material;
+        //    material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+        //    material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+        //    material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+        //    material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+        //    material.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_height.png", VK_FORMAT_R8G8B8A8_UNORM);
+        //    material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+        //    material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/dusty-cobble_normal-ogl.png", VK_FORMAT_R8G8B8A8_UNORM);
 
-    auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
-    gameObject->MeshList[0]->MeshMaterial = mat;
-    gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-}
+        //    auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
+        //    gameObject->MeshList[0]->MeshMaterial = mat;
+        //    gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+        //}
     }
 
     void mainLoop() {
