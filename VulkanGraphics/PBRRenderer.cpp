@@ -59,7 +59,7 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
 
     //  CommandBufferSubmitList.emplace_back(equirectangularToCubemapRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(irradianceRenderPass.GetCommandBuffer());
-    CommandBufferSubmitList.emplace_back(prefilterRenderPass.GetCommandBuffer());
+    //CommandBufferSubmitList.emplace_back(prefilterRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(brdfRenderPass.GetCommandBuffer());
 
 CommandBufferSubmitList.emplace_back(pbrRenderer.GetCommandBuffer());

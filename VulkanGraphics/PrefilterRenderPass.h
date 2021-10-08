@@ -14,6 +14,7 @@ private:
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
+	void WriteCommandBuffers();
 
 	uint32_t CubeMapSize = 0;
 	uint32_t CubeMapMipLevels = 0;
