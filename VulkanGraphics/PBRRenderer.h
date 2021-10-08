@@ -11,6 +11,7 @@ class PBRRenderer : public BaseRenderer
 {
 private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
+	float CubeMapSamplerSize = 64.0f;
 
 	IrradianceRenderPass irradianceRenderPass;
 	//EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
