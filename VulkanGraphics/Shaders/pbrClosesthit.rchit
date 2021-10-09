@@ -294,15 +294,56 @@ vec3 Irradiate()
 //}
 //
 
+vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
+{
+        float tmin = 0.001;
+	    float tmax = LightDistance;
+	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	    shadowed = true;  
+	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
+	    if (shadowed) 
+        {
+            LightResult *= 0.3f;
+	    }
+
+    return LightResult;
+}
+
 void main() 
 {
     vertex = BuildVertexInfo();
     MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+    vec2 UV = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
 
-    vec3 albedo     = texture(TextureMap[material.AlbedoMapID], vertex.uv).rgb;
-    float metallic  = texture(TextureMap[material.MatallicMapID], vertex.uv).r;
-    float roughness = texture(TextureMap[material.RoughnessMapID], vertex.uv).r;
-    float ao        = texture(TextureMap[material.AOMapID], vertex.uv).r;
+    vec3 albedo = material.Albedo; 
+    if(material.AlbedoMapID != 0)
+    {
+        albedo = texture(TextureMap[material.AlbedoMapID], UV).rgb;
+    }   
+
+    float metallic = material.Matallic; 
+    if(material.MatallicMapID != 0)
+    {
+        metallic = texture(TextureMap[material.MatallicMapID], UV).r;
+    }
+
+    float roughness = material.Roughness; 
+    if(material.RoughnessMapID != 0)
+    {
+        roughness = texture(TextureMap[material.RoughnessMapID], UV).r;
+    }
+
+    float ao = material.AmbientOcclusion;
+    if(material.AOMapID != 0)
+    {
+        ao = texture(TextureMap[material.AOMapID], UV).r;
+    }
+
+    float alpha = material.Alpha;
+    if(material.Alpha != 0)
+    {
+        alpha = texture(TextureMap[material.AlphaMapID], UV).r;
+    }
 
     vec3 N = getNormalFromMap(material, vertex);
     vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
@@ -347,18 +388,19 @@ void main()
 
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo = RTXShadow(Lo, specular, L, 10000.0f);
     }   
     
     // ambient lighting (we now use IBL as the ambient term)
-    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
-    vec3 kD = 1.0 - kS;
-    kD *= 1.0 - metallic;	 
-    
-    vec3 irradiance = Irradiate(vertex.normal);
-    vec3 diffuse      = irradiance * albedo;
-    vec3 ambient = (kD * diffuse) * ao;
+//    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
+//    vec3 kD = 1.0 - kS;
+//    kD *= 1.0 - metallic;	 
+//    
+//    vec3 irradiance = Irradiate(vertex.normal);
+//    vec3 diffuse      = irradiance * albedo;
+//    vec3 ambient = (kD * diffuse) * ao;
     // vec3 ambient = vec3(0.002);
-
+    vec3 ambient = vec3(0.03) * albedo * ao;
     vec3 color = ambient + Lo;
     rayHitInfo.color = color;
 //	//rayHitInfo.distance = gl_RayTmaxNV;

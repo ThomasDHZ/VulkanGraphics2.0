@@ -140,8 +140,8 @@ mat3 TBN;
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
 vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index);
-vec3 RTXShadow(vec3 LightResult, vec3 LightDirection, float LightDistance);
 vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir);
+vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance);
 
 void main()
 {
@@ -171,14 +171,14 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
-     {
-        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
-     }
-     for(int x = 0; x < scenedata.PointLightCount; x++)
-     {
-        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
-     }
+//    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+//     {
+//        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
+//     }
+//     for(int x = 0; x < scenedata.PointLightCount; x++)
+//     {
+//        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+//     }
        for(int x = 0; x < scenedata.SpotLightCount; x++)
        {
             baseColor += CalcNormalSpotLight(FragPos, normal, vertex.uv, x);   
@@ -205,31 +205,6 @@ void main()
     rayHitInfo.color = result;
 	//rayHitInfo.distance = gl_RayTmaxNV;
 	rayHitInfo.normal = vertex.normal;
-}
-
-vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
-{
-     if(scenedata.Shadowed == 1)
-     {
-        float tmin = 0.001;
-	    float tmax = LightDistance;
-	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	    shadowed = true;  
-	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
-	    if (shadowed) 
-        {
-            LightResult *= 0.3f;
-	    }
-        else
-        {
-           LightResult += LightSpecular;
-        }
-    }
-    else
-    {
-           LightResult += LightSpecular;
-    }
-    return LightResult;
 }
 
 vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
@@ -267,7 +242,9 @@ vec3 CalcNormalDirLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
-    return (ambient + diffuse + specular);
+    vec3 result = (ambient + diffuse);
+    result = RTXShadow(result, specular, lightDir, 10000.0f);
+    return result;
 }
 
 vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
@@ -305,7 +282,10 @@ vec3 CalcNormalPointLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (1.0f + PLight[index].linear * LightDistance + PLight[index].quadratic * (LightDistance * LightDistance));
 
-    return (ambient + diffuse + specular) * attenuation;
+    vec3 result = (ambient + diffuse);
+    result = RTXShadow(result, specular, lightDir, 10000.0f);
+    result *= attenuation;
+    return result;
 }
 
 vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
@@ -347,7 +327,10 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (1.0f + SLight[index].linear * LightDistance + SLight[index].quadratic * (LightDistance * LightDistance));
 
-    return (ambient + diffuse + specular) * attenuation * intensity;
+    vec3 result = (ambient + diffuse);
+    result = RTXShadow(result, specular, lightDir, 10000.0f);
+    result *= attenuation;
+    return result;
 }
 
 vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir)
@@ -383,4 +366,29 @@ vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir)
     vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
 
     return finalTexCoords;
+}
+
+vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
+{
+     if(scenedata.Shadowed == 1)
+     {
+        float tmin = 0.001;
+	    float tmax = LightDistance;
+	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
+	    shadowed = true;  
+	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
+	    if (shadowed) 
+        {
+            LightResult *= 0.3f;
+	    }
+        else
+        {
+           LightResult += LightSpecular;
+        }
+    }
+    else
+    {
+           LightResult += LightSpecular;
+    }
+    return LightResult;
 }
