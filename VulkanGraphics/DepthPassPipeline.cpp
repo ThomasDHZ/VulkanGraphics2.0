@@ -1,12 +1,11 @@
-#include "BRDFPipeline.h"
-#include "Mesh.h"
-#include "AssetManager.h"
+#include "DepthPassPipeline.h"
 
-BRDFPipeline::BRDFPipeline() : GraphicsPipeline()
+
+DepthPassPipeline::DepthPassPipeline() : GraphicsPipeline()
 {
 }
 
-BRDFPipeline::BRDFPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
+DepthPassPipeline::DepthPassPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
@@ -14,25 +13,25 @@ BRDFPipeline::BRDFPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
     SetUpDescriptorSets();
 }
 
-BRDFPipeline::~BRDFPipeline()
+DepthPassPipeline::~DepthPassPipeline()
 {
 }
 
-void BRDFPipeline::SetUpDescriptorPool()
+void DepthPassPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void BRDFPipeline::SetUpDescriptorLayout()
+void DepthPassPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void BRDFPipeline::SetUpDescriptorSets()
+void DepthPassPipeline::SetUpDescriptorSets()
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -41,11 +40,11 @@ void BRDFPipeline::SetUpDescriptorSets()
 }
 
 
-void BRDFPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
+void DepthPassPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/BRDFShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/BRDFShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/DepthShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/DepthShaderFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -134,7 +133,7 @@ void BRDFPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void BRDFPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
+void DepthPassPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();

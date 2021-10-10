@@ -227,6 +227,8 @@
     <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="DepthPassPipeline.cpp" />
+    <ClCompile Include="DepthPassRendererPass.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="EquirectangularToCubemapPipeline.cpp" />
     <ClCompile Include="EquirectangularToCubemapRenderPass.cpp" />
@@ -340,6 +342,8 @@
     <ClInclude Include="CameraManager.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="DepthPassPipeline.h" />
+    <ClInclude Include="DepthPassRendererPass.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="EquirectangularToCubemapPipeline.h" />
     <ClInclude Include="EquirectangularToCubemapRenderPass.h" />
@@ -445,6 +449,8 @@
     <None Include="Shaders\BRDFShader.vert" />
     <None Include="Shaders\closesthit.rchit" />
     <None Include="Shaders\compile.bat" />
+    <None Include="Shaders\DepthShader.frag" />
+    <None Include="Shaders\DepthShader.vert" />
     <None Include="Shaders\frag.frag" />
     <None Include="Shaders\FrameBuffer.frag" />
     <None Include="Shaders\FrameBuffer.vert" />

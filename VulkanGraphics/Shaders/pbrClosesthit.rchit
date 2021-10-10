@@ -145,6 +145,104 @@ mat3 TBN;
 
 const float PI = 3.14159265359;
 
+mat3 getTBNFromMap(Vertex vertex);
+float DistributionGGX(vec3 N, vec3 H, float roughness);
+float GeometrySchlickGGX(float NdotV, float roughness);
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
+vec3 fresnelSchlick(float cosTheta, vec3 F0);
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
+vec3 Irradiate(vec3 N);
+vec3 PrefilterColor(vec3 N);
+vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
+vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
+vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
+vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
+
+void main()
+{		
+   MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
+   vec2 UV = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
+
+    vec3 albedo = material.Albedo; 
+    if(material.AlbedoMapID != 0)
+    {
+        albedo = texture(TextureMap[material.AlbedoMapID], UV).rgb;
+    }   
+
+    float metallic = material.Matallic; 
+    if(material.MatallicMapID != 0)
+    {
+        metallic = texture(TextureMap[material.MatallicMapID], UV).r;
+    }
+
+    float roughness = material.Roughness; 
+    if(material.RoughnessMapID != 0)
+    {
+        roughness = texture(TextureMap[material.RoughnessMapID], UV).r;
+    }
+
+    float ao = material.AmbientOcclusion;
+    if(material.AOMapID != 0)
+    {
+        ao = texture(TextureMap[material.AOMapID], UV).r;
+    }
+
+    float alpha = material.Alpha;
+    if(material.Alpha != 0)
+    {
+        alpha = texture(TextureMap[material.AlphaMapID], UV).r;
+    }
+
+    vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
+    mat3 TBN = getTBNFromMap(vertex);
+    if(material.DepthMapID != 0)
+    {
+            UV = ParallaxMapping(material, UV,  V);       
+    }
+
+    vec3 normal = texture(TextureMap[material.NormalMapID], UV).xyz * 2.0 - 1.0;
+    vec3 N = normalize(TBN * normal);
+    vec3 R = reflect(-V, N); 
+  
+    vec3 F0 = vec3(0.04); 
+    F0 = mix(F0, albedo, metallic);
+
+    vec3 Lo = vec3(0.0);
+    Lo += CalcDirectionalLight(F0, V, N, albedo, roughness, metallic);
+//    Lo += CalcPointLight(F0, V, N, albedo, roughness, metallic);
+//    Lo += CalcSpotLight(F0, V, N, albedo, roughness, metallic);
+
+    vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
+    
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallic;	  
+    
+    vec3 irradiance = Irradiate(vertex.normal);
+    vec3 diffuse      = irradiance * albedo;
+    
+    vec3 prefilteredColor = PrefilterColor(N);
+    vec3 specular = prefilteredColor;
+
+    vec3 ambient = (kD * diffuse + specular) * ao;
+    
+    vec3 color = ambient + Lo;
+
+    rayHitInfo.color = color;
+	//rayHitInfo.distance = gl_RayTmaxNV;
+	rayHitInfo.normal = vertex.normal;
+}
+
+mat3 getTBNFromMap(Vertex vertex)
+{
+    vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+    mat3 TBN = mat3(T, B, N);
+
+    return TBN;
+}
+
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -158,7 +256,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 
     return nom / denom;
 }
-// ----------------------------------------------------------------------------
+
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
     float r = (roughness + 1.0);
@@ -169,7 +267,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 
     return nom / denom;
 }
-// ----------------------------------------------------------------------------
+
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
     float NdotV = max(dot(N, V), 0.0);
@@ -179,25 +277,16 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
-// ----------------------------------------------------------------------------
+
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }
-// ----------------------------------------------------------------------------
-vec3 getNormalFromMap(MaterialInfo material, Vertex vertex)
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 {
-    vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-    vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-    vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
-    mat3 TBN = transpose(mat3(T, B, N));
-
-    vec3 normal = texture(TextureMap[material.NormalMapID], vertex.uv).xyz;
-         normal = normalize(normal * 2.0 - 1.0);
-    
-    return TBN * normal;
-}
-
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}  
 
 vec3 Irradiate(vec3 N)
 {
@@ -238,171 +327,146 @@ vec3 Irradiate(vec3 N)
     return irradiance;
 }
 
-vec3 Irradiate()
+vec3 PrefilterColor(vec3 N)
 {
-    vec3 irradiance = vec3(0.0f);
+    vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
+
+    vec3 prefilteredColor  = vec3(0.0f);
     if(rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
     {
-        uint seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, ConstMesh.frame);
-        float r1        = rnd(seed);
-        float r2        = rnd(seed);
-        float sq        = sqrt(1.0 - r2);
-        float phi       = 2 * PI * r1;
-
         vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
         vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT * (vec3(cos(phi) * sq, sin(phi) * sq, sqrt(r2))), vertex.normal);
+        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, N);
         
         rayHitInfo.reflectCount++;
         traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-        irradiance = mix(irradiance, rayHitInfo.color, .5f); 
+        prefilteredColor = mix(prefilteredColor, rayHitInfo.color, .5f); 
     }
 
-    return irradiance;
+    return prefilteredColor;
 }
 
-//vec3 PrefilterColor(Vertex vertex)
-//{
-//    vec3 N = getNormalFromMap(material, vertex.normal);
-//    vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
-//
-//    vec3 prefilteredColor  = vec3(0.0f);
-//    if(rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
-//    {
-//        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
-//        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-//
-//        uint seed = tea(gl_LaunchIDEXT.y * gl_LaunchSizeEXT.x + gl_LaunchIDEXT.x, ConstMesh.frame);
-//        float r1        = rnd(seed);
-//        float r2        = rnd(seed);
-//        float sq        = sqrt(1.0 - r2);
-//        float phi       = 2 * PI * r1;
-//
-//        vec3 L = normalize(gl_WorldRayDirectionEXT);
-//        vec3 R = reflect(L), vertex.normal) * NdotL;
-//        vec3 H = normalize(V + L);
-//        
-//        float NdotL = max(dot(N, L), 0.0);
-//        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, vertex.normal) * NdotL;
-//        
-//        rayHitInfo.reflectCount++;
-//        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-//        prefilteredColor = mix(prefilteredColor, rayHitInfo.color, .5f); 
-//    }
-//
-//    return prefilteredColor;
-//}
-//
-
-vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
+vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
-        float tmin = 0.001;
-	    float tmax = LightDistance;
-	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
-	    shadowed = true;  
-	    traceRayEXT(topLevelAS, gl_RayFlagsSkipClosestHitShaderEXT, 0xFF, 1, 0, 1, origin, tmin, LightDirection, tmax, 1);
-	    if (shadowed) 
-        {
-            LightResult *= 0.3f;
-	    }
-
-    return LightResult;
-}
-
-void main() 
-{
-    vertex = BuildVertexInfo();
-    MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-    vec2 UV = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
-
-    vec3 albedo = material.Albedo; 
-    if(material.AlbedoMapID != 0)
-    {
-        albedo = texture(TextureMap[material.AlbedoMapID], UV).rgb;
-    }   
-
-    float metallic = material.Matallic; 
-    if(material.MatallicMapID != 0)
-    {
-        metallic = texture(TextureMap[material.MatallicMapID], UV).r;
-    }
-
-    float roughness = material.Roughness; 
-    if(material.RoughnessMapID != 0)
-    {
-        roughness = texture(TextureMap[material.RoughnessMapID], UV).r;
-    }
-
-    float ao = material.AmbientOcclusion;
-    if(material.AOMapID != 0)
-    {
-        ao = texture(TextureMap[material.AOMapID], UV).r;
-    }
-
-    float alpha = material.Alpha;
-    if(material.Alpha != 0)
-    {
-        alpha = texture(TextureMap[material.AlphaMapID], UV).r;
-    }
-
-    vec3 N = getNormalFromMap(material, vertex);
-    vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
-    vec3 R = reflect(-V, N); 
-
-    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
-    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-    vec3 F0 = vec3(0.04); 
-    F0 = mix(F0, albedo, metallic);
-
-    // reflectance equation
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 1; ++i) 
+    for(int i = 0; i < scenedata.DirectionalLightCount; ++i) 
     {
-        // calculate per-light radiance
-        vec3 L = normalize(-DLight[i].direction);
+        vec3 L = normalize(DLight[i].direction - vertex.pos);
         vec3 H = normalize(V + L);
         vec3 radiance = DLight[i].diffuse;
 
-        // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);   
-        float G   = GeometrySmith(N, V, L, roughness);      
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
-           
-        vec3 numerator    = NDF * G * F; 
-        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
-        vec3 specular = numerator / denominator;
+        float G   = GeometrySmith(N, V, L, roughness);    
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);        
         
-        // kS is equal to Fresnel
+        vec3 nominator    = NDF * G * F;
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
+        vec3 specular = nominator / denominator;
+        
         vec3 kS = F;
-        // for energy conservation, the diffuse and specular light can't
-        // be above 1.0 (unless the surface emits light); to preserve this
-        // relationship the diffuse component (kD) should equal 1.0 - kS.
         vec3 kD = vec3(1.0) - kS;
-        // multiply kD by the inverse metalness such that only non-metals 
-        // have diffuse lighting, or a linear blend if partly metal (pure metals
-        // have no diffuse light).
-        kD *= 1.0 - metallic;	  
-
-        // scale light by NdotL
+        kD *= 1.0 - metallic;	                
+            
         float NdotL = max(dot(N, L), 0.0);        
-
-        // add to outgoing radiance Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
-        Lo = RTXShadow(Lo, specular, L, 10000.0f);
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     }   
-    
-    // ambient lighting (we now use IBL as the ambient term)
-//    vec3 kS = fresnelSchlick(max(dot(N, V), 0.0), F0);
-//    vec3 kD = 1.0 - kS;
-//    kD *= 1.0 - metallic;	 
-//    
-//    vec3 irradiance = Irradiate(vertex.normal);
-//    vec3 diffuse      = irradiance * albedo;
-//    vec3 ambient = (kD * diffuse) * ao;
-    // vec3 ambient = vec3(0.002);
-    vec3 ambient = vec3(0.03) * albedo * ao;
-    vec3 color = ambient + Lo;
-    rayHitInfo.color = color;
-//	//rayHitInfo.distance = gl_RayTmaxNV;
-	rayHitInfo.normal = vertex.normal;
+    return Lo;
+}
+
+vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
+{
+    vec3 Lo = vec3(0.0);
+    for(int i = 0; i < scenedata.PointLightCount; ++i) 
+    {
+        vec3 L = normalize(PLight[i].position - vertex.pos);
+        vec3 H = normalize(V + L);
+        float distance = length(PLight[i].position - vertex.pos);
+        float attenuation = 1.0 / (distance * distance);
+        vec3 radiance = PLight[i].diffuse * attenuation;
+
+        float NDF = DistributionGGX(N, H, roughness);   
+        float G   = GeometrySmith(N, V, L, roughness);    
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);        
+        
+        vec3 nominator    = NDF * G * F;
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
+        vec3 specular = nominator / denominator;
+        
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;	                
+            
+        float NdotL = max(dot(N, L), 0.0);        
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+    }   
+    return Lo;
+}
+
+vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
+{
+    vec3 Lo = vec3(0.0);
+    for(int i = 0; i < scenedata.SpotLightCount; ++i) 
+    {
+        vec3 L = normalize(SLight[i].position - vertex.pos);
+        vec3 H = normalize(V + L);
+
+        float theta = dot(L, normalize(-SLight[i].direction)); 
+        float epsilon = SLight[i].cutOff - SLight[i].outerCutOff;
+        float intensity = clamp((theta - SLight[i].outerCutOff) / epsilon, 0.0, 1.0);
+
+        float distance = length(SLight[i].position - vertex.pos);
+        float attenuation = 1.0 / (distance * distance) ;
+        attenuation *= intensity;
+        vec3 radiance = PLight[i].diffuse * attenuation;
+
+        float NDF = DistributionGGX(N, H, roughness);   
+        float G   = GeometrySmith(N, V, L, roughness);    
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);        
+        
+        vec3 nominator    = NDF * G * F;
+        float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
+        vec3 specular = nominator / denominator;
+
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;	                
+            
+        float NdotL = max(dot(N, L), 0.0);        
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
+    }   
+    return Lo;
+}
+
+vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
+{
+    const float heightScale = meshProperties[gl_InstanceCustomIndexEXT].heightScale;
+    const float minLayers = meshProperties[gl_InstanceCustomIndexEXT].minLayers;
+    const float maxLayers = meshProperties[gl_InstanceCustomIndexEXT].maxLayers;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+
+    viewDir.y = -viewDir.y;
+    vec2 P = viewDir.xy / viewDir.z * heightScale;
+    vec2 deltaTexCoords = P / numLayers;
+
+    vec2  currentTexCoords = texCoords;
+    float currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
+
+    while (currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentDepthMapValue = texture(TextureMap[material.DepthMapID], currentTexCoords).r;
+        currentLayerDepth += layerDepth;
+    }
+
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    float afterDepth = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(TextureMap[material.DepthMapID], prevTexCoords).r - currentLayerDepth + layerDepth;
+
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
 }

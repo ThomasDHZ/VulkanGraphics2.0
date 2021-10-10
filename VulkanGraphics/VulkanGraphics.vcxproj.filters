@@ -408,6 +408,12 @@
     <ClCompile Include="BRDFPipeline.cpp">
       <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="DepthPassRendererPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthPassPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -755,6 +761,12 @@
     <ClInclude Include="BRDFPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="DepthPassPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthPassRendererPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -872,6 +884,12 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\BRDFShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>
