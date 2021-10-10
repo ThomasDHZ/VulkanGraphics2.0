@@ -160,6 +160,7 @@ vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
 void main()
 {		
+   vertex = BuildVertexInfo();
    MaterialInfo material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
    vec2 UV = vertex.uv + meshProperties[gl_InstanceCustomIndexEXT].UVOffset;
 
