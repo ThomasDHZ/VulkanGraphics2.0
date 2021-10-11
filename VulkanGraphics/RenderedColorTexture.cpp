@@ -5,31 +5,7 @@ RenderedColorTexture::RenderedColorTexture() : Texture()
 {
 }
 
-RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedTexture)
-{
-    Width = engine->SwapChain.GetSwapChainResolution().width;
-    Height = engine->SwapChain.GetSwapChainResolution().height;
-
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-RenderedColorTexture::RenderedColorTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount)
-{
-    Width = engine->SwapChain.GetSwapChainResolution().width;
-    Height = engine->SwapChain.GetSwapChainResolution().height;
-
-    SampleCount = sampleCount;
-
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Texture(TextureType::vkRenderedTexture)
+RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     Width = TextureResolution.x;
     Height = TextureResolution.y;
@@ -40,7 +16,7 @@ RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Textu
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount) : Texture(TextureType::vkRenderedTexture)
+RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
     Width = TextureResolution.x;
     Height = TextureResolution.y;
@@ -115,19 +91,6 @@ void RenderedColorTexture::CreateTextureSampler()
     {
         throw std::runtime_error("Failed to create Sampler.");
     }
-}
-
-void RenderedColorTexture::RecreateRendererTexture()
-{
-    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
-
-    Texture::Delete();
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void RenderedColorTexture::RecreateRendererTexture(glm::vec2 TextureResolution)

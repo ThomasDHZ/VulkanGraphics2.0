@@ -9,7 +9,6 @@ BRDFRenderPass::BRDFRenderPass() : BaseRenderPass()
 BRDFRenderPass::BRDFRenderPass(uint32_t textureSize) : BaseRenderPass()
 {
     RenderPassResolution = glm::ivec2(textureSize, textureSize);
-    
     BRDFMap = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass();
@@ -143,6 +142,8 @@ void BRDFRenderPass::RebuildSwapChain(uint32_t textureSize)
 {
     RenderPassResolution = glm::ivec2(textureSize, textureSize); 
     brdfPipeline->Destroy();
+
+    BRDFMap->RecreateRendererTexture(RenderPassResolution);
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;

@@ -122,7 +122,7 @@ void DepthPassRendererPass::SetUpCommandBuffers()
 
 void DepthPassRendererPass::RebuildSwapChain()
 {
-    DepthTexture->RecreateRendererTexture();
+    DepthTexture->RecreateRendererTexture(RenderPassResolution);
     depthPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);

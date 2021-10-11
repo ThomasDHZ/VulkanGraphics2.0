@@ -5,32 +5,21 @@ RenderedDepthTexture::RenderedDepthTexture() : Texture()
 {
 }
 
-RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine) : Texture(TextureType::vkRenderedTexture)
+RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
-    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
-
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedDepthTexture::RenderedDepthTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount) : Texture(TextureType::vkRenderedTexture)
+RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution, VkSampleCountFlagBits sampleCount) : Texture(TextureResolution, TextureType::vkRenderedTexture)
 {
-    Width = engine->SwapChain.GetSwapChainResolution().width;
-    Height = engine->SwapChain.GetSwapChainResolution().height;
+    Width = TextureResolution.x;
+    Height = TextureResolution.y;
 
     SampleCount = sampleCount;
 
-    CreateTextureImage();
-    CreateTextureView();
-    CreateTextureSampler();
-    ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
-
-RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
-{
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();
@@ -101,10 +90,10 @@ void RenderedDepthTexture::CreateTextureSampler()
     }
 }
 
-void RenderedDepthTexture::RecreateRendererTexture()
+void RenderedDepthTexture::RecreateRendererTexture(glm::ivec2& TextureResolution)
 {
-    Width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-    Height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+    Width = TextureResolution.x;
+    Height = TextureResolution.y;
 
     Texture::Delete();
     CreateTextureImage();

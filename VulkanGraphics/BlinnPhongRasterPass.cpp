@@ -11,11 +11,11 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine)
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
-    ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
-    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
-    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
-    RenderedBloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
-    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
+    ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
+    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
+    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
+    RenderedBloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
+    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -191,11 +191,11 @@ void BlinnPhongRasterPass::RebuildSwapChain()
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
-    ColorTexture->RecreateRendererTexture();
-    RenderedTexture->RecreateRendererTexture();
-    BloomTexture->RecreateRendererTexture();
-    RenderedBloomTexture->RecreateRendererTexture();
-    DepthTexture->RecreateRendererTexture();
+    ColorTexture->RecreateRendererTexture(RenderPassResolution);
+    RenderedTexture->RecreateRendererTexture(RenderPassResolution);
+    BloomTexture->RecreateRendererTexture(RenderPassResolution);
+    RenderedBloomTexture->RecreateRendererTexture(RenderPassResolution);
+    DepthTexture->RecreateRendererTexture(RenderPassResolution);
 
     blinnphongPipeline->Destroy();
     skyboxPipeline->Destroy();

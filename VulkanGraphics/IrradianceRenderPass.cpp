@@ -154,6 +154,7 @@ void IrradianceRenderPass::SetUpCommandBuffers()
 void IrradianceRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
+    RenderedCubeMap->RecreateRendererTexture();
     irradiancePipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
