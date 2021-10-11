@@ -288,10 +288,6 @@
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
-    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp" />
-    <ClCompile Include="RenderedGBufferNormalTexture.cpp" />
-    <ClCompile Include="RenderedGBufferPositionTexture.cpp" />
-    <ClCompile Include="RenderedGTBNTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="RendererManager.cpp" />
@@ -405,10 +401,6 @@
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedCubeMapTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
-    <ClInclude Include="RenderedGBufferAlbedoTexture.h" />
-    <ClInclude Include="RenderedGBufferNormalTexture.h" />
-    <ClInclude Include="RenderedGBufferPositionTexture.h" />
-    <ClInclude Include="RenderedGTBNTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
     <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="RendererManager.h" />

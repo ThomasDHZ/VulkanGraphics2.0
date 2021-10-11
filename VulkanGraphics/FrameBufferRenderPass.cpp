@@ -6,6 +6,8 @@ FrameBufferRenderPass::FrameBufferRenderPass() : BaseRenderPass()
 
 FrameBufferRenderPass::FrameBufferRenderPass(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : BaseRenderPass()
 {
+    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
+
     CreateRenderPass();
     CreateRendererFramebuffers();
     frameBufferPipeline = std::make_shared<FrameBufferPipeline>(FrameBufferPipeline(RenderPass, RenderedTexture, BloomTexture));
@@ -105,6 +107,7 @@ void FrameBufferRenderPass::CreateRendererFramebuffers()
 
 void FrameBufferRenderPass::RebuildSwapChain(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
+    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
     frameBufferPipeline->Destroy();
 
     vkDestroyRenderPass(VulkanPtr::GetDevice(), RenderPass, nullptr);

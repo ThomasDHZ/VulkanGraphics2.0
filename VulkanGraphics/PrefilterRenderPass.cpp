@@ -9,15 +9,15 @@ PrefilterRenderPass::PrefilterRenderPass() : BaseRenderPass()
 
 PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
-    CubeMapSize = cubeMapSize;
-    CubeMapMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(cubeMapSize, cubeMapSize)))) + 1;
+    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
+    CubeMapMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(RenderPassResolution.x, RenderPassResolution.y)))) + 1;
 
-    DrawToCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize)));
-    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize), CubeMapMipLevels));
+    DrawToCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x)));
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x), CubeMapMipLevels));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    prefilterPipeline = std::make_shared<PrefilterPipeline>(PrefilterPipeline(RenderPass, CubeMapSize));
+    prefilterPipeline = std::make_shared<PrefilterPipeline>(PrefilterPipeline(RenderPass, RenderPassResolution.x));
     SetUpCommandBuffers();
     RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();
@@ -113,8 +113,8 @@ void PrefilterRenderPass::CreateRendererFramebuffers()
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = CubeMapSize;
-        frameBufferCreateInfo.height = CubeMapSize;
+        frameBufferCreateInfo.width = RenderPassResolution.x;
+        frameBufferCreateInfo.height = RenderPassResolution.y;
         frameBufferCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
@@ -160,8 +160,8 @@ void PrefilterRenderPass::WriteCommandBuffers()
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent.width = CubeMapSize;
-    renderPassInfo.renderArea.extent.height = CubeMapSize;
+    renderPassInfo.renderArea.extent.width = RenderPassResolution.x;
+    renderPassInfo.renderArea.extent.height = RenderPassResolution.y;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -174,21 +174,21 @@ void PrefilterRenderPass::WriteCommandBuffers()
     ImageSubresourceRange.layerCount = 6;
 
     VkRect2D rect2D{};
-    rect2D.extent.width = CubeMapSize;
-    rect2D.extent.height = CubeMapSize;
+    rect2D.extent.width = RenderPassResolution.x;
+    rect2D.extent.height = RenderPassResolution.y;
     rect2D.offset.x = 0.0f;
     rect2D.offset.y = 0.0f;
 
     for (int x = 0; x < CubeMapMipLevels; x++)
     {
         VkViewport viewport{};
-        viewport.width = static_cast<float>(CubeMapSize * std::pow(0.5f, x));
-        viewport.height = static_cast<float>(CubeMapSize * std::pow(0.5f, x));
+        viewport.width = static_cast<float>(RenderPassResolution.x * std::pow(0.5f, x));
+        viewport.height = static_cast<float>(RenderPassResolution.y * std::pow(0.5f, x));
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
         prefiliter.SkyboxSize = CubeMapMipLevels;
-        prefiliter.roughness = (float)CubeMapSize / (float)(CubeMapMipLevels - 1);
+        prefiliter.roughness = (float)RenderPassResolution.x / (float)(CubeMapMipLevels - 1);
 
         vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
         vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
@@ -246,7 +246,7 @@ void PrefilterRenderPass::WriteCommandBuffers()
 
 void PrefilterRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 {
-    CubeMapSize = cubeMapSize;
+    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     prefilterPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -260,7 +260,7 @@ void PrefilterRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, CubeMapSize);
+    prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x);
     SetUpCommandBuffers();
 
     Draw();
@@ -287,8 +287,8 @@ void PrefilterRenderPass::Draw()
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent.width = CubeMapSize;
-    renderPassInfo.renderArea.extent.height = CubeMapSize;
+    renderPassInfo.renderArea.extent.width = RenderPassResolution.x;
+    renderPassInfo.renderArea.extent.height = RenderPassResolution.y;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
@@ -301,21 +301,21 @@ void PrefilterRenderPass::Draw()
     ImageSubresourceRange.layerCount = 6;
 
     VkRect2D rect2D{};
-    rect2D.extent.width = CubeMapSize;
-    rect2D.extent.height = CubeMapSize;
+    rect2D.extent.width = RenderPassResolution.x;
+    rect2D.extent.height = RenderPassResolution.y;
     rect2D.offset.x = 0.0f;
     rect2D.offset.y = 0.0f;
 
     for (int x = 0; x < CubeMapMipLevels; x++)
     {
         VkViewport viewport{};
-        viewport.width = static_cast<float>(CubeMapSize * std::pow(0.5f, x));
-        viewport.height = static_cast<float>(CubeMapSize * std::pow(0.5f, x));
+        viewport.width = static_cast<float>(RenderPassResolution.x * std::pow(0.5f, x));
+        viewport.height = static_cast<float>(RenderPassResolution.y * std::pow(0.5f, x));
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
         prefiliter.SkyboxSize = CubeMapMipLevels;
-        prefiliter.roughness = (float)CubeMapSize / (float)(CubeMapMipLevels - 1);
+        prefiliter.roughness = (float)RenderPassResolution.x / (float)(CubeMapMipLevels - 1);
 
         vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
         vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);

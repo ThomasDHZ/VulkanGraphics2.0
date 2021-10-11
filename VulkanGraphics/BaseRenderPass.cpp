@@ -2,6 +2,7 @@
 
 BaseRenderPass::BaseRenderPass()
 {
+
 }
 
 BaseRenderPass::~BaseRenderPass()

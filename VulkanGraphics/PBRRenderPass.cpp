@@ -9,6 +9,8 @@ PBRRenderPass::PBRRenderPass() : BaseRenderPass()
 
 PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap) : BaseRenderPass()
 {
+    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
+
     ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), VK_SAMPLE_COUNT_1_BIT));
     BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(EnginePtr::GetEnginePtr(), EnginePtr::GetEnginePtr()->MaxSampleCount));
@@ -187,6 +189,8 @@ void PBRRenderPass::SetUpCommandBuffers()
 
 void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap)
 {
+    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
+
     ColorTexture->RecreateRendererTexture();
     RenderedTexture->RecreateRendererTexture();
     BloomTexture->RecreateRendererTexture();

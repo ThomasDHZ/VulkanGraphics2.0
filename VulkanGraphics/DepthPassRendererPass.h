@@ -6,8 +6,6 @@
 class DepthPassRendererPass : public BaseRenderPass
 {
 private:
-	uint32_t DepthTextureSize = 0;
-
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();

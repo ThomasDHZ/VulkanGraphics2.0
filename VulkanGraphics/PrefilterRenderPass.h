@@ -16,7 +16,6 @@ private:
 	void SetUpCommandBuffers();
 	void WriteCommandBuffers();
 
-	uint32_t CubeMapSize = 0;
 	uint32_t CubeMapMipLevels = 0;
 
 	std::shared_ptr<RenderedCubeMapTexture> DrawToCubeMap;

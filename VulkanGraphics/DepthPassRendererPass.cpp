@@ -7,9 +7,8 @@ DepthPassRendererPass::DepthPassRendererPass() : BaseRenderPass()
 
 DepthPassRendererPass::DepthPassRendererPass(uint32_t depthTextureSize) : BaseRenderPass()
 {
-    auto a = RenderedDepthTexture(glm::ivec2(DepthTextureSize));
-    DepthTextureSize = depthTextureSize;
-    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(glm::ivec2(DepthTextureSize)));
+    RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize);
+    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -93,8 +92,8 @@ void DepthPassRendererPass::CreateRendererFramebuffers()
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width;
-        frameBufferCreateInfo.height = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+        frameBufferCreateInfo.width = RenderPassResolution.x;
+        frameBufferCreateInfo.height = RenderPassResolution.y;
         frameBufferCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
@@ -174,14 +173,14 @@ void DepthPassRendererPass::Draw()
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)DepthTextureSize;
-    viewport.height = (float)DepthTextureSize;
+    viewport.width = (float)RenderPassResolution.x;
+    viewport.height = (float)RenderPassResolution.y;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D rect2D{};
     rect2D.offset = { 0, 0 };
-    rect2D.extent = { DepthTextureSize, DepthTextureSize };
+    rect2D.extent = { (uint32_t)RenderPassResolution.x, (uint32_t)RenderPassResolution.y };
 
     vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
     vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);

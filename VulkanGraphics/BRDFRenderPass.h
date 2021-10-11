@@ -13,7 +13,6 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
-	uint32_t TextureSize;
 	VkFramebuffer IrradianceMapFrameBuffer;
 
 public:

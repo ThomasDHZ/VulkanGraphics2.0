@@ -9,12 +9,12 @@ IrradianceRenderPass::IrradianceRenderPass() : BaseRenderPass()
 
 IrradianceRenderPass::IrradianceRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
-    CubeMapSize = cubeMapSize;
-    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize)));
+    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    irradiancePipeline = std::make_shared<IrradiancePipeline>(IrradiancePipeline(RenderPass, CubeMapSize));
+    irradiancePipeline = std::make_shared<IrradiancePipeline>(IrradiancePipeline(RenderPass, RenderPassResolution.x));
     SetUpCommandBuffers();
 
     Draw();
@@ -123,8 +123,8 @@ void IrradianceRenderPass::CreateRendererFramebuffers()
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = CubeMapSize;
-        frameBufferCreateInfo.height = CubeMapSize;
+        frameBufferCreateInfo.width = RenderPassResolution.x;
+        frameBufferCreateInfo.height = RenderPassResolution.y;
         frameBufferCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
@@ -153,7 +153,7 @@ void IrradianceRenderPass::SetUpCommandBuffers()
 
 void IrradianceRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 {
-    CubeMapSize = cubeMapSize;
+    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     irradiancePipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -167,7 +167,7 @@ void IrradianceRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    irradiancePipeline->UpdateGraphicsPipeLine(RenderPass, CubeMapSize);
+    irradiancePipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x);
     SetUpCommandBuffers();
 
     Draw();
@@ -205,8 +205,8 @@ void IrradianceRenderPass::Draw()
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent.width = CubeMapSize;
-    renderPassInfo.renderArea.extent.height = CubeMapSize;
+    renderPassInfo.renderArea.extent.width = RenderPassResolution.x;
+    renderPassInfo.renderArea.extent.height = RenderPassResolution.y;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 

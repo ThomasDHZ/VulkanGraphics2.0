@@ -156,18 +156,6 @@
     <ClCompile Include="RenderedCubeMapTexture.cpp">
       <Filter>Source Files\texture</Filter>
     </ClCompile>
-    <ClCompile Include="RenderedGBufferAlbedoTexture.cpp">
-      <Filter>Source Files\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedGBufferNormalTexture.cpp">
-      <Filter>Source Files\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedGBufferPositionTexture.cpp">
-      <Filter>Source Files\texture</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderedGTBNTexture.cpp">
-      <Filter>Source Files\texture</Filter>
-    </ClCompile>
     <ClCompile Include="RenderedRayTracedColorTexture.cpp">
       <Filter>Source Files\texture</Filter>
     </ClCompile>
@@ -489,18 +477,6 @@
       <Filter>Header Files\texture</Filter>
     </ClInclude>
     <ClInclude Include="RenderedRayTracedColorTexture.h">
-      <Filter>Header Files\texture</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGTBNTexture.h">
-      <Filter>Header Files\texture</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGBufferPositionTexture.h">
-      <Filter>Header Files\texture</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGBufferNormalTexture.h">
-      <Filter>Header Files\texture</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderedGBufferAlbedoTexture.h">
       <Filter>Header Files\texture</Filter>
     </ClInclude>
     <ClInclude Include="RenderedCubeMapTexture.h">

@@ -8,8 +8,9 @@ BRDFRenderPass::BRDFRenderPass() : BaseRenderPass()
 
 BRDFRenderPass::BRDFRenderPass(uint32_t textureSize) : BaseRenderPass()
 {
-    TextureSize = textureSize;
-    BRDFMap = std::make_shared<RenderedColorTexture>(RenderedColorTexture(glm::ivec2(TextureSize), VK_SAMPLE_COUNT_1_BIT));
+    RenderPassResolution = glm::ivec2(textureSize, textureSize);
+    
+    BRDFMap = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -110,8 +111,8 @@ void BRDFRenderPass::CreateRendererFramebuffers()
         frameBufferCreateInfo.renderPass = RenderPass;
         frameBufferCreateInfo.attachmentCount = static_cast<uint32_t>(AttachmentList.size());
         frameBufferCreateInfo.pAttachments = AttachmentList.data();
-        frameBufferCreateInfo.width = TextureSize;
-        frameBufferCreateInfo.height = TextureSize;
+        frameBufferCreateInfo.width = RenderPassResolution.x;
+        frameBufferCreateInfo.height = RenderPassResolution.y;
         frameBufferCreateInfo.layers = 1;
 
         if (vkCreateFramebuffer(EnginePtr::GetEnginePtr()->Device, &frameBufferCreateInfo, nullptr, &SwapChainFramebuffers[i]))
@@ -140,7 +141,7 @@ void BRDFRenderPass::SetUpCommandBuffers()
 
 void BRDFRenderPass::RebuildSwapChain(uint32_t textureSize)
 {
-    TextureSize = textureSize;
+    RenderPassResolution = glm::ivec2(textureSize, textureSize); 
     brdfPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -191,22 +192,22 @@ void BRDFRenderPass::Draw()
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent.width = TextureSize;
-    renderPassInfo.renderArea.extent.height = TextureSize;
+    renderPassInfo.renderArea.extent.width = RenderPassResolution.x;
+    renderPassInfo.renderArea.extent.height = RenderPassResolution.y;
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float)TextureSize;
-    viewport.height = (float)TextureSize;
+    viewport.width = (float)RenderPassResolution.x;
+    viewport.height = (float)RenderPassResolution.y;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D rect2D{};
     rect2D.offset = { 0, 0 };
-    rect2D.extent = { (uint32_t)TextureSize, (uint32_t)TextureSize };
+    rect2D.extent = { (uint32_t)RenderPassResolution.x, (uint32_t)RenderPassResolution.y };
 
     vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
     vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
