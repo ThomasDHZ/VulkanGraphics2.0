@@ -90,8 +90,11 @@ void RenderedCubeMapTexture::CreateTextureSampler()
     }
 }
 
-void RenderedCubeMapTexture::RecreateRendererTexture()
+void RenderedCubeMapTexture::RecreateRendererTexture(glm::ivec2 TextureResolution)
 {
+    Width = TextureResolution.x;
+    Height = TextureResolution.y;
+
     Texture::Delete();
     CreateTextureImage();
     CreateTextureView();

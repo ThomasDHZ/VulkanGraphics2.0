@@ -12,5 +12,5 @@ public:
     RenderedCubeMapTexture(glm::ivec2 TextureResolution, uint32_t mipLevels = 1);
     ~RenderedCubeMapTexture();
 
-    void RecreateRendererTexture();
+    void RecreateRendererTexture(glm::ivec2 TextureResolution);
 };

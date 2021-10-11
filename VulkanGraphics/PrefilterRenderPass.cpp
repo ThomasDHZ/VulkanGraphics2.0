@@ -247,6 +247,8 @@ void PrefilterRenderPass::WriteCommandBuffers()
 void PrefilterRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
+    DrawToCubeMap->RecreateRendererTexture(RenderPassResolution);
+    RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
     prefilterPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -262,8 +264,7 @@ void PrefilterRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
     CreateRendererFramebuffers();
     prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x);
     SetUpCommandBuffers();
-
-    Draw();
+    RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void PrefilterRenderPass::Draw()
