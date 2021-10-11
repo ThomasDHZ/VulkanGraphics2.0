@@ -155,20 +155,16 @@ void DepthPassRendererPass::Draw()
     renderPassInfo.renderPass = RenderPass;
     renderPassInfo.framebuffer = SwapChainFramebuffers[EnginePtr::GetEnginePtr()->ImageIndex];
     renderPassInfo.renderArea.offset = { 0, 0 };
-    renderPassInfo.renderArea.extent = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution();
+    renderPassInfo.renderArea.extent.width = RenderPassResolution.x;
+    renderPassInfo.renderArea.extent.height = RenderPassResolution.y;
 
     std::array<VkClearValue, 1> clearValues{};
-    clearValues[4].depthStencil = { 1.0f, 0 };
+    clearValues[0].depthStencil = { 1.0f, 0 };
 
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-    LightSceneInfo lightSceneInfo;
-    //cubeMapInfo.view = glm::mat4(glm::mat3(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix()));
-    //cubeMapInfo.proj = glm::perspective(glm::radians(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
-    //cubeMapInfo.proj[1][1] *= -1;
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -184,7 +180,6 @@ void DepthPassRendererPass::Draw()
 
     vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
     vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
-    vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstMeshInfo), &lightSceneInfo);
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSet, 0, nullptr);
     for (auto& mesh : MeshManagerPtr::GetMeshManagerPtr()->MeshList)
@@ -193,7 +188,17 @@ void DepthPassRendererPass::Draw()
         {
             if (mesh->ShowMesh)
             {
+                LightSceneInfo lightSceneInfo;
+                lightSceneInfo.MeshIndex = mesh->MeshBufferIndex;
+                lightSceneInfo.MeshView = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix();
+                lightSceneInfo.CameraPos = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetPosition();
+                lightSceneInfo.LightView = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->GetLightViewMatrix();
+                lightSceneInfo.LightProjection = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->GetLightProjectionMatrix();
+                lightSceneInfo.LightProjection[1][1] *= -1;
+
                 VkDeviceSize offsets[] = { 0 };
+
+                vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstMeshInfo), &lightSceneInfo);
                 vkCmdBindVertexBuffers(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &mesh->VertexBuffer.Buffer, offsets);
                 if (mesh->IndexCount == 0)
                 {

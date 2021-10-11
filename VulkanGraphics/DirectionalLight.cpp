@@ -11,11 +11,13 @@ DirectionalLight::DirectionalLight(std::shared_ptr<VulkanEngine> engine) : Light
 
 DirectionalLight::DirectionalLight(DirectionalLightBuffer light) : Light<DirectionalLightBuffer>(EnginePtr::GetEnginePtr())
 {
-	lightViewCamera = std::make_shared<LightViewCamera>(LightViewCamera(EnginePtr::GetEnginePtr(), glm::vec3(0.0f, 10.0f, 0.0f), LightBuffer.UniformDataInfo.direction));
-	CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(lightViewCamera);
-
 	LightBuffer.UniformDataInfo = light;
 	Update();
+
+	float near_plane = 0.1f;
+	float far_plane = 100.0f;
+	LightViewMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	LightProjectionMatrix = glm::lookAt(LightBuffer.UniformDataInfo.direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 }
 
 DirectionalLight::~DirectionalLight()
@@ -25,7 +27,11 @@ DirectionalLight::~DirectionalLight()
 void DirectionalLight::Update()
 {
 	Light::Update();
-	lightViewCamera->Update(EnginePtr::GetEnginePtr(), glm::vec3(0.0f, 100.0f, 0.0f), LightBuffer.UniformDataInfo.direction);
+
+	float near_plane = 0.1f;
+	float far_plane = 100.0f;
+	LightViewMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+	LightProjectionMatrix = glm::lookAt(LightBuffer.UniformDataInfo.direction, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 }
 
 void DirectionalLight::Destroy()

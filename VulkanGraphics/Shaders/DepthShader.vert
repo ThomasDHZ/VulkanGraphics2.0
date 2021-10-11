@@ -12,7 +12,6 @@ layout(push_constant) uniform LightSceneInfo
     mat4 MeshView;
 	mat4 LightProjection;
     mat4 LightView;
-    vec3 CameraPos;
 } scene;
 
 
@@ -51,12 +50,6 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec4 aTangent;
 layout (location = 4) in vec4 aBitangent;
-
-layout(location = 0) out vec3 FragPos;
-layout(location = 1) out vec2 TexCoords;
-layout(location = 2) out vec3 Normal;
-layout(location = 3) out vec3 Tangent;
-layout(location = 4) out vec3 BiTangent;
 
 void main() 
 {

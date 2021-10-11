@@ -7,7 +7,9 @@
 class DirectionalLight : public Light<DirectionalLightBuffer>
 {
 private:
-	std::shared_ptr<LightViewCamera> lightViewCamera;
+	glm::mat4 LightViewMatrix;
+	glm::mat4 LightProjectionMatrix;
+
 public:
 	DirectionalLight();
 	DirectionalLight(std::shared_ptr<VulkanEngine> engine);
@@ -16,5 +18,8 @@ public:
 
 	void Update() override;
 	void Destroy() override;
+
+	glm::mat4 GetLightViewMatrix() { return LightViewMatrix; }
+	glm::mat4 GetLightProjectionMatrix() { return LightProjectionMatrix; }
 };
 
