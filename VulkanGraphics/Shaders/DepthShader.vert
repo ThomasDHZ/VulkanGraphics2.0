@@ -6,13 +6,15 @@
 
 #include "material.glsl"
 
-layout(push_constant) uniform MeshInfo
+layout(push_constant) uniform LightSceneInfo
 {
 	uint MeshIndex;
-    mat4 proj;
-    mat4 view;
+    mat4 MeshView;
+	mat4 LightProjection;
+    mat4 LightView;
     vec3 CameraPos;
-} Mesh;
+} scene;
+
 
 layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
@@ -41,11 +43,8 @@ layout(binding = 1) buffer MeshProperties
 	float maxLayers;
 } meshProperties[];
 
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
-layout(binding = 7) uniform sampler2D TextureMap[];
-layout(binding = 8) uniform sampler3D Texture3DMap[];
-layout(binding = 9) uniform samplerCube CubeMap[];
+layout(binding = 2) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 3) uniform sampler2D TextureMap[];
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;
@@ -61,12 +60,7 @@ layout(location = 4) out vec3 BiTangent;
 
 void main() 
 {
-    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0));    
-    TexCoords = aTexCoords;
-    Normal = aNormal;
-	Tangent = aTangent.rgb;
-	BiTangent = aBitangent.rgb;
-
-    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
+    mat4 LightMatrix = scene.LightProjection * scene.LightView;
+    gl_Position = LightMatrix * scene.MeshView * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
 
 }

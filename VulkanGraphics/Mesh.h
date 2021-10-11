@@ -112,7 +112,29 @@ public:
 
 	virtual void Update();
 	virtual void Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList);
+
 	virtual void Draw(VkCommandBuffer& commandBuffer);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
+	
 	virtual void Destory();
+
+	template <class T>
+	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, T ShaderConstBuffer)
+	{
+		if (ShowMesh)
+		{
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
+			vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(T), &ShaderConstBuffer);
+			if (IndexCount == 0)
+			{
+				vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
+			}
+			else
+			{
+				vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+				vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
+			}
+		}
+	}
 };

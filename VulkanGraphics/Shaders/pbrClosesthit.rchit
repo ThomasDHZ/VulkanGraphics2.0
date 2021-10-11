@@ -152,11 +152,59 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 vec3 Irradiate(vec3 N);
-vec3 PrefilterColor(vec3 N);
+vec3 PrefilterColor();
 vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
 vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
+
+float VanDerCorput(uint n, uint base)
+{
+    float invBase = 1.0 / float(base);
+    float denom   = 1.0;
+    float result  = 0.0;
+
+    for(uint i = 0u; i < 32u; ++i)
+    {
+        if(n > 0u)
+        {
+            denom   = mod(float(n), 2.0);
+            result += denom * invBase;
+            invBase = invBase / 2.0;
+            n       = uint(float(n) / 2.0);
+        }
+    }
+
+    return result;
+}
+
+vec2 HammersleyNoBitOps(uint i, uint N)
+{
+    return vec2(float(i)/float(N), VanDerCorput(i, 2u));
+}
+
+vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
+{
+	float a = roughness*roughness;
+	
+	float phi = 2.0 * PI * Xi.x;
+	float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y));
+	float sinTheta = sqrt(1.0 - cosTheta*cosTheta);
+	
+	// from spherical coordinates to cartesian coordinates - halfway vector
+	vec3 H;
+	H.x = cos(phi) * sinTheta;
+	H.y = sin(phi) * sinTheta;
+	H.z = cosTheta;
+	
+	// from tangent-space H vector to world-space sample vector
+	vec3 up          = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+	vec3 tangent   = normalize(cross(up, N));
+	vec3 bitangent = cross(N, tangent);
+	
+	vec3 sampleVec = tangent * H.x + bitangent * H.y + N * H.z;
+	return normalize(sampleVec);
+}
 
 void main()
 {		
@@ -222,7 +270,7 @@ void main()
     vec3 irradiance = Irradiate(vertex.normal);
     vec3 diffuse      = irradiance * albedo;
     
-    vec3 prefilteredColor = PrefilterColor(N);
+    vec3 prefilteredColor = PrefilterColor();
     vec3 specular = prefilteredColor;
 
     vec3 ambient = (kD * diffuse + specular) * ao;
@@ -328,20 +376,21 @@ vec3 Irradiate(vec3 N)
     return irradiance;
 }
 
-vec3 PrefilterColor(vec3 N)
+vec3 PrefilterColor()
 {
+    vec3 N = normalize(vertex.pos);
     vec3 V = normalize(ConstMesh.CameraPos - vertex.pos);
 
-    vec3 prefilteredColor  = vec3(0.0f);
+    vec3 prefilteredColor = vec3(0.0);
     if(rayHitInfo.reflectCount != ConstMesh.MaxRefeflectCount)
     {
-        vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
-        vec3 origin   = hitPos.xyz + vertex.normal * 0.001f;
-        vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, N);
+            vec3 hitPos = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_RayTmaxEXT;
+            vec3 origin   = hitPos.xyz + N * 0.001f;
+            vec3 rayDir   = reflect(gl_WorldRayDirectionEXT, N);
         
-        rayHitInfo.reflectCount++;
-        traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
-        prefilteredColor = mix(prefilteredColor, rayHitInfo.color, .5f); 
+            rayHitInfo.reflectCount++;
+            traceRayEXT(topLevelAS, gl_RayFlagsNoneEXT, 0xff, 0, 0, 0, origin, 0.001f, rayDir, 10000.0f, 0);
+            prefilteredColor = mix(prefilteredColor, rayHitInfo.color, .5f); 
     }
 
     return prefilteredColor;

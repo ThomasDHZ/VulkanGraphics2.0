@@ -48,6 +48,14 @@ struct ConstBloomProperites
 	alignas(4) uint32_t BloomPass = 0;
 };
 
+struct LightSceneInfo
+{
+	alignas(4) uint32_t MeshIndex;
+	alignas(16) glm::mat4 MeshView;
+	alignas(16) glm::mat4 LightProjection;
+	alignas(16) glm::mat4 LightView;
+	alignas(16) glm::vec3 CameraPos;
+};
 
 class GraphicsPipeline
 {
