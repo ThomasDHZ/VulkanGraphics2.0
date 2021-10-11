@@ -24,9 +24,9 @@ PBRRenderer::~PBRRenderer()
 void PBRRenderer::RebuildSwapChain()
 {
     //equirectangularToCubemapRenderPass.RebuildSwapChain();
-    irradianceRenderPass.RebuildSwapChain(2048.0f*2);
-    prefilterRenderPass.RebuildSwapChain(2048.0f * 2);
-    brdfRenderPass.RebuildSwapChain(2048.0f * 2);
+    irradianceRenderPass.RebuildSwapChain(CubeMapSamplerSize);
+    prefilterRenderPass.RebuildSwapChain(CubeMapSamplerSize);
+    brdfRenderPass.RebuildSwapChain(CubeMapSamplerSize);
     pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap);
     FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
