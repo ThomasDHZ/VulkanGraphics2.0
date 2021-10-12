@@ -20,6 +20,7 @@ Mesh::Mesh(std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
 	IndexCount = indices.size();
 	PrimitiveCount = static_cast<uint32_t>(indices.size()) / 3;
 	BoneCount = 0;
+	MeshMaterial = MaterialManagerPtr::GetMaterialManagerPtr()->GetDefaultMaterial();
 	MeshTimer = std::make_shared<Timer>(Timer());
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());
@@ -39,6 +40,7 @@ Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, Me
 	IndexCount = IndexList.size();
 	PrimitiveCount = static_cast<uint32_t>(IndexList.size()) / 3;
 	BoneCount = 0;
+	MeshMaterial = MaterialManagerPtr::GetMaterialManagerPtr()->GetDefaultMaterial();
 	MeshTimer = std::make_shared<Timer>(Timer());
 
 	BottomLevelAccelerationBuffer = AccelerationStructure(EnginePtr::GetEnginePtr());

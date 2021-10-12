@@ -84,16 +84,16 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
     for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
     {
-        GUIChanged |= ImGui::SliderFloat3(("Albedo " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("Matallic " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Matallic, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("Roughness" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Roughness, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("AmbientOcclusion " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.AmbientOcclusion, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("minLayers" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.minLayers, 0.0f, 3.0f);
-        GUIChanged |= ImGui::SliderFloat(("maxLayers " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.maxLayers, 0.0f, 3.0f);
-        GUIChanged |= ImGui::SliderFloat(("heightScale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 3.0f);
-        //GUIChanged |= ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
-        //GUIChanged |= ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
-        //GUIChanged |= ImGui::SliderFloat3(("Mesh Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshScale.x, 0.0f, 3.0f);
+        //GUIChanged |= ImGui::SliderFloat3(("Albedo " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("Matallic " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Matallic, 0.0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("Roughness" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Roughness, 0.0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("AmbientOcclusion " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.AmbientOcclusion, 0.0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("minLayers" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.minLayers, 0.0f, 3.0f);
+        //GUIChanged |= ImGui::SliderFloat(("maxLayers " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.maxLayers, 0.0f, 3.0f);
+        //GUIChanged |= ImGui::SliderFloat(("heightScale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 3.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshScale.x, 0.0f, 3.0f);
         //GUIChanged |= ImGui::SliderFloat2(("UV Ofset" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVScale.x, 0.0f, 2.0f);
         //GUIChanged |= ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
