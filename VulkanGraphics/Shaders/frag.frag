@@ -113,6 +113,7 @@ layout(binding = 12) buffer RectangleAreaLightBuffer
 	vec3 specular;
 	float Luminosity;
 } RectangleLight[];
+layout(binding = 13) uniform sampler2D ShadowMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;

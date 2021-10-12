@@ -7,7 +7,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass() : BaseRenderPass()
 {
 }
 
-BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine) : BaseRenderPass()
+BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture) : BaseRenderPass()
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
@@ -19,7 +19,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass));
+    blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass, ShadowMapTexture));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
     SetUpCommandBuffers();
 }
@@ -187,7 +187,7 @@ void BlinnPhongRasterPass::SetUpCommandBuffers()
     }
 }
 
-void BlinnPhongRasterPass::RebuildSwapChain()
+void BlinnPhongRasterPass::RebuildSwapChain(std::shared_ptr<RenderedDepthTexture> ShadowMapTexture)
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
@@ -211,7 +211,7 @@ void BlinnPhongRasterPass::RebuildSwapChain()
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass);
+    blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTexture);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }

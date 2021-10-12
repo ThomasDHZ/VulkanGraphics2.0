@@ -51,10 +51,9 @@ struct ConstBloomProperites
 struct LightSceneInfo
 {
 	alignas(4) uint32_t MeshIndex;
-	alignas(16) glm::mat4 MeshView;
-	alignas(16) glm::mat4 LightProjection;
-	alignas(16) glm::mat4 LightView;
-	alignas(16) glm::vec3 CameraPos;
+	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+	alignas(16) glm::mat4 view = glm::mat4(1.0f);
+	alignas(16) glm::vec3 CameraPos = glm::vec3(0.0f);
 };
 
 class GraphicsPipeline

@@ -18,7 +18,7 @@ private:
 
 public:
 	BlinnPhongRasterPass();
-	BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine);
+	BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
 	~BlinnPhongRasterPass();
 
 	std::shared_ptr<RenderedColorTexture> RenderedTexture;
@@ -28,7 +28,7 @@ public:
 	std::shared_ptr<BlinnPhongPipeline> blinnphongPipeline;
 	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
 
-	void RebuildSwapChain();
+	void RebuildSwapChain(std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
 
 	void Draw();
 	void Destroy();
