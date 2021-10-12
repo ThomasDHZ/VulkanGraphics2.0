@@ -3,6 +3,7 @@
 #include "BlinnPhongRasterPass.h"
 #include "FrameBufferRenderPass.h"
 #include "DepthPassRendererPass.h"
+#include "DepthDebugRenderPass.h"
 
 class BlinnPhongRasterRenderer : public BaseRenderer
 {
@@ -10,6 +11,7 @@ private:
 	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
 
 	DepthPassRendererPass DepthRenderPass;
+	DepthDebugRenderPass DebugDepthRenderPass;
 	BlinnPhongRasterPass BlinnRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
 

@@ -402,6 +402,12 @@
     <ClCompile Include="DepthPassPipeline.cpp">
       <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="DepthDebugRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthDebugPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -743,6 +749,12 @@
     <ClInclude Include="DepthPassRendererPass.h">
       <Filter>Header Files\Rendering\RenderPass</Filter>
     </ClInclude>
+    <ClInclude Include="DepthDebugRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthDebugPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -866,6 +878,12 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\DepthShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthDebugShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthDebugShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

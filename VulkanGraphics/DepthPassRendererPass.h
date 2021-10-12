@@ -19,7 +19,7 @@ public:
 
 	std::shared_ptr<DepthPassPipeline> depthPipeline;
 
-	void RebuildSwapChain();
+	void RebuildSwapChain(uint32_t depthTextureSize);
 
 	void Draw();
 	void Destroy();
