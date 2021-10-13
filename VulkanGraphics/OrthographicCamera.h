@@ -13,9 +13,7 @@ public:
 	OrthographicCamera(glm::vec2 viewScreenSize, float zoom);
 	OrthographicCamera(glm::vec2 viewScreenSize, glm::vec2 position);
 	OrthographicCamera(glm::vec2 viewScreenSize, glm::vec2 position, float zoom);
-	OrthographicCamera(glm::vec2 viewScreenSize, glm::vec3 position);
-	OrthographicCamera(glm::vec2 viewScreenSize, glm::vec3 position, float zoom);
 
-	void Update(std::shared_ptr<VulkanEngine> engine);
-	void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
+	virtual void Update(std::shared_ptr<VulkanEngine> engine);
+	virtual void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
 };

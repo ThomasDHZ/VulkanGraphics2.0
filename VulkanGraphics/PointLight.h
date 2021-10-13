@@ -1,12 +1,19 @@
 #pragma once
 #include "Light.h"
+#include "OrthographicLightViewCamera.h"
 class PointLight : public Light<PointLightBuffer>
 {
 private:
+	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
+
 public:
 	PointLight();
-	PointLight(std::shared_ptr<VulkanEngine> engine);
 	PointLight(PointLightBuffer light);
 	~PointLight();
+
+	void Update() override;
+	void Destroy() override;
+
+	glm::mat3 GetLightSpaceMatrix() { return lightViewCamera->GetLightSpaceMatrix(); }
 };
 

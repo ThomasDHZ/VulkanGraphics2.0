@@ -17,6 +17,7 @@ struct PointLightBuffer {
 	alignas(4) float linear = 0.022f;
 	alignas(4) float quadratic = 0.0019f;
 	alignas(4) float Luminosity = 100.0f;
+	alignas(16) glm::mat3 lightSpaceMatrix;
 };
 
 struct SpotLightBuffer {

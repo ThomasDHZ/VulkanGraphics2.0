@@ -2,13 +2,13 @@
 #include "Light.h"
 #include "LightViewCamera.h"
 #include "CameraManager.h"
+#include "OrthographicLightViewCamera.h"
 
 
 class DirectionalLight : public Light<DirectionalLightBuffer>
 {
 private:
-	glm::mat4 LightViewMatrix;
-	glm::mat4 LightProjectionMatrix;
+	std::vector<OrthographicLightViewCamera> lightViewCamera;
 
 public:
 	DirectionalLight();
@@ -18,8 +18,5 @@ public:
 
 	void Update() override;
 	void Destroy() override;
-
-	glm::mat4 GetLightViewMatrix() { return LightViewMatrix; }
-	glm::mat4 GetLightProjectionMatrix() { return LightProjectionMatrix; }
 };
 

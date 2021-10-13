@@ -71,6 +71,7 @@ layout(binding = 3) buffer PointLight2
     float constant;
     float linear;
     float quadratic;
+    mat4 lightSpaceMatrix;
 } PLight[];
 
 layout(binding = 4) buffer SpotLight2

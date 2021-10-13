@@ -191,14 +191,10 @@ void DepthPassRendererPass::Draw()
             {
                 LightSceneInfo lightSceneInfo;
                 lightSceneInfo.MeshIndex = mesh->MeshBufferIndex;
-                lightSceneInfo.CameraPos = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetPosition();
-                lightSceneInfo.view = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix();
-                lightSceneInfo.proj = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetProjectionMatrix();
-                lightSceneInfo.proj[1][1] *= -1;
-
+                lightSceneInfo.lightSpaceMatrix = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->GetLightSpaceMatrix();
                 VkDeviceSize offsets[] = { 0 };
 
-                vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstMeshInfo), &lightSceneInfo);
+                vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
                 vkCmdBindVertexBuffers(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &mesh->VertexBuffer.Buffer, offsets);
                 if (mesh->IndexCount == 0)
                 {
