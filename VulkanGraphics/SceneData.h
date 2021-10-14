@@ -69,7 +69,8 @@ struct RectangleAreaLightBuffer
 
 struct SceneDataBuffer 
 {
-	alignas(16) glm::mat4 lightSpaceMatrix;
+	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 	alignas(4)  uint32_t DirectionalLightCount = 0;
 	alignas(4)  uint32_t PointLightCount = 0;
 	alignas(4)  uint32_t SpotLightCount = 0;

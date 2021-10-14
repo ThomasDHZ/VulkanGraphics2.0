@@ -14,8 +14,10 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject {
-    mat4 lightSpaceMatrix;
+layout(binding = 0) uniform UniformBufferObject 
+{
+    mat4 proj;
+    mat4 view;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
@@ -56,6 +58,7 @@ layout(location = 1) out vec2 TexCoords;
 layout(location = 2) out vec3 Normal;
 layout(location = 3) out vec3 Tangent;
 layout(location = 4) out vec3 BiTangent;
+layout(location = 5) out vec4 LightSpace;
 
 void main() 
 {
@@ -64,7 +67,7 @@ void main()
     Normal = aNormal;
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
-
+    LightSpace = ubo.proj * ubo.view * vec4(inPosition, 1.0);
     gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
 
 }

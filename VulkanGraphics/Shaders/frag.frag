@@ -16,7 +16,8 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 0) uniform UniformBufferObject 
 {
-    mat4 lightSpaceMatrix;
+    mat4 proj;
+    mat4 view;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
@@ -122,6 +123,7 @@ layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec3 Normal;
 layout(location = 3) in vec3 Tangent;
 layout(location = 4) in vec3 BiTangent;
+layout(location = 5) in vec4 LightSpace;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
@@ -167,7 +169,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main() 
 {
     material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
-    vec4 FragPosLightSpace = scenedata.lightSpaceMatrix * vec4(FragPos, 1.0f);
+    vec4 FragPosLightSpace = mat4(1.0f) * vec4(FragPos, 1.0f);
     vec3 color = texture(TextureMap[material.DiffuseMapID], TexCoords).rgb;
     vec3 normal = normalize(Normal);
     vec3 lightColor = vec3(0.3);
