@@ -14,7 +14,9 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject {
+layout(binding = 0) uniform UniformBufferObject 
+{
+    mat4 lightSpaceMatrix;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
@@ -57,7 +59,6 @@ layout(binding = 3) buffer PointLight
     float linear;
     float quadratic;
     float Luminosity;
-    mat4 lightSpaceMatrix;
 } PLight[];
 
 layout(binding = 4) buffer SpotLight
@@ -166,7 +167,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main() 
 {
     material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
-    vec4 FragPosLightSpace = PLight[0].lightSpaceMatrix * vec4(FragPos, 1.0f);
+    vec4 FragPosLightSpace = scenedata.lightSpaceMatrix * vec4(FragPos, 1.0f);
     vec3 color = texture(TextureMap[material.DiffuseMapID], TexCoords).rgb;
     vec3 normal = normalize(Normal);
     vec3 lightColor = vec3(0.3);

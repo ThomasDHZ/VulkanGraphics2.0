@@ -17,7 +17,6 @@ struct PointLightBuffer {
 	alignas(4) float linear = 0.022f;
 	alignas(4) float quadratic = 0.0019f;
 	alignas(4) float Luminosity = 100.0f;
-	alignas(16) glm::mat3 lightSpaceMatrix;
 };
 
 struct SpotLightBuffer {
@@ -68,7 +67,9 @@ struct RectangleAreaLightBuffer
 	alignas(4) float Luminosity = 100.0f;
 };
 
-struct SceneDataBuffer {
+struct SceneDataBuffer 
+{
+	alignas(16) glm::mat4 lightSpaceMatrix;
 	alignas(4)  uint32_t DirectionalLightCount = 0;
 	alignas(4)  uint32_t PointLightCount = 0;
 	alignas(4)  uint32_t SpotLightCount = 0;

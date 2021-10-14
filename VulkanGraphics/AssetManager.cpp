@@ -39,6 +39,7 @@ void AssetManager::Update()
     guiManager->Update();
     ObjManager->Update();
 
+    SceneData->UniformDataInfo.lightSpaceMatrix = lightManager->PointLightList[0]->GetLightSpaceMatrix();
     SceneData->UniformDataInfo.DirectionalLightCount = lightManager->GetDirectionalLightCount();
     SceneData->UniformDataInfo.PointLightCount = lightManager->GetPointLightCount();
     SceneData->UniformDataInfo.SpotLightCount = lightManager->GetSpotLightCount();

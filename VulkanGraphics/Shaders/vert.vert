@@ -15,15 +15,13 @@ layout(push_constant) uniform MeshInfo
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject {
-    mat4 model;
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
+    mat4 lightSpaceMatrix;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
+    uint SphereAreaLightCount;
+    uint TubeAreaLightCount;
+    uint RectangleAreaLightCount;
 	float timer;
     int Shadowed;
     int temp;
