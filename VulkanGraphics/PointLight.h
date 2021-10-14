@@ -4,7 +4,7 @@
 class PointLight : public Light<PointLightBuffer>
 {
 private:
-	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
+
 
 public:
 	PointLight();
@@ -14,6 +14,7 @@ public:
 	void Update() override;
 	void Destroy() override;
 
+	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
 	glm::mat3 GetLightSpaceMatrix() { return lightViewCamera->GetLightSpaceMatrix(); }
 };
 

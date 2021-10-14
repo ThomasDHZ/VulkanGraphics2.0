@@ -189,9 +189,20 @@ void DepthPassRendererPass::Draw()
         {
             if (mesh->ShowMesh)
             {
+                glm::mat4 lightProjection, lightView;
+                float near_plane = -10.0f, far_plane = 10.0f;
+
+                glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(-2.0f, 4.0f, -1.0f));
+                transform = glm::rotate(transform, glm::radians(270.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+                lightView = glm::inverse(transform);
+                lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+                lightProjection[1][1] *= -1;
+
                 LightSceneInfo lightSceneInfo;
                 lightSceneInfo.MeshIndex = mesh->MeshBufferIndex;
-                lightSceneInfo.lightSpaceMatrix = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->GetLightSpaceMatrix();
+                lightSceneInfo.proj = lightProjection;
+                lightSceneInfo.view = lightView;
                 VkDeviceSize offsets[] = { 0 };
 
                 vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
