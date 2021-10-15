@@ -57,7 +57,6 @@ layout(binding = 3) buffer PointLight
     float linear;
     float quadratic;
     float Luminosity;
-    mat4 lightSpaceMatrix;
 } PLight[];
 
 layout(binding = 4) buffer SpotLight

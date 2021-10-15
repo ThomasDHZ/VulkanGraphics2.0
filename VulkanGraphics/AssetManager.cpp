@@ -39,9 +39,6 @@ void AssetManager::Update()
     guiManager->Update();
     ObjManager->Update();
 
-    SceneData->UniformDataInfo.proj = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetProjectionMatrix();
-    SceneData->UniformDataInfo.proj[1][1] *= -1;
-    SceneData->UniformDataInfo.view = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetViewMatrix();
     SceneData->UniformDataInfo.DirectionalLightCount = lightManager->GetDirectionalLightCount();
     SceneData->UniformDataInfo.PointLightCount = lightManager->GetPointLightCount();
     SceneData->UniformDataInfo.SpotLightCount = lightManager->GetSpotLightCount();
