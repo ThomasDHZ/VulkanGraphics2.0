@@ -170,7 +170,7 @@ void main()
 {
     material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
 
-    vec3 color = texture(TextureMap[material.DiffuseMapID], TexCoords).rgb;
+    vec3 color = material.Diffuse;
     vec3 normal = normalize(Normal);
     vec3 lightColor = vec3(0.3);
     // ambient
