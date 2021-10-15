@@ -104,18 +104,18 @@ private:
 
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
 
-        PointLightBuffer plight = PointLightBuffer();
-        plight.position = glm::vec4(-2.0f, 4.0f, -1.0f, 0.0f);
-        plight.ambient = glm::vec4(0.2f);
-        plight.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        plight.specular = glm::vec4(1.0f);
-        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
-        //DirectionalLightBuffer dlight = DirectionalLightBuffer();
-        //dlight.direction = glm::vec4(1.0f);
-        //dlight.ambient = glm::vec4(0.2f);
-        //dlight.diffuse = glm::vec4(0.5f);
-        //dlight.specular = glm::vec4(1.0f);
-        //LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
+        //PointLightBuffer plight = PointLightBuffer();
+        //plight.position = glm::vec4(-2.0f, 4.0f, -1.0f, 0.0f);
+        //plight.ambient = glm::vec4(0.2f);
+        //plight.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        //plight.specular = glm::vec4(1.0f);
+        //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
+        DirectionalLightBuffer dlight = DirectionalLightBuffer();
+        dlight.direction = glm::vec4(1.0f);
+        dlight.ambient = glm::vec4(0.2f);
+        dlight.diffuse = glm::vec4(0.5f);
+        dlight.specular = glm::vec4(1.0f);
+        LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
         //LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
 
         //PointLightBuffer plight = PointLightBuffer();
@@ -212,7 +212,7 @@ private:
         material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
 
 
-        {
+       {
             std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
             gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
             AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
@@ -265,9 +265,9 @@ private:
         //gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/vulkanscene_shadow.obj")));
         //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-        //std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/vulkanscene_shadow.obj")));
-        //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+ /*       std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/RayReflectionTest.obj")));
+        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);*/
 
 
         //std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));

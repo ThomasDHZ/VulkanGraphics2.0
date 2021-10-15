@@ -8,14 +8,13 @@
 class DirectionalLight : public Light<DirectionalLightBuffer>
 {
 private:
-	std::vector<OrthographicLightViewCamera> lightViewCamera;
 
 public:
 	DirectionalLight();
-	DirectionalLight(std::shared_ptr<VulkanEngine> engine);
 	DirectionalLight(DirectionalLightBuffer light);
 	~DirectionalLight();
 
+	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
 	void Update() override;
 	void Destroy() override;
 };

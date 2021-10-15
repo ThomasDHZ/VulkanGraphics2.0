@@ -226,14 +226,14 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-//   for(int x = 0; x < scenedata.DirectionalLightCount; x++)
-//   {
-//        result += CalcNormalDirLight(normal, texCoords, x);
-//   }
-   for(int x = 0; x < scenedata.PointLightCount; x++)
+   for(int x = 0; x < scenedata.DirectionalLightCount; x++)
    {
-        result += CalcNormalPointLight(normal, texCoords, x);   
+        result += CalcNormalDirLight(normal, texCoords, x);
    }
+//   for(int x = 0; x < scenedata.PointLightCount; x++)
+//   {
+//        result += CalcNormalPointLight(normal, texCoords, x);   
+//   }
 //   for(int x = 0; x < scenedata.SpotLightCount; x++)
 //   {
 //        result += CalcNormalSpotLight(normal, texCoords, x);   
@@ -305,7 +305,8 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
-    return (ambient + diffuse + specular);
+    float shadow = ShadowCalculation(LightSpace);  
+    return (ambient + (1.0 - shadow) * (diffuse + specular));
 }
 
 vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)

@@ -176,9 +176,9 @@ void DepthPassRendererPass::Draw()
             {
                 LightSceneInfo lightSceneInfo;
                 lightSceneInfo.MeshIndex = mesh->MeshBufferIndex;
-                lightSceneInfo.proj = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera->GetProjectionMatrix();
+                lightSceneInfo.proj = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetProjectionMatrix();
                 lightSceneInfo.proj[1][1] *= -1;
-                lightSceneInfo.view = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera->GetViewMatrix();
+                lightSceneInfo.view = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetViewMatrix();
 
                 VkDeviceSize offsets[] = { 0 };
 

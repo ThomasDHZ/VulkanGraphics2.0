@@ -5,13 +5,10 @@ DirectionalLight::DirectionalLight() : Light<DirectionalLightBuffer>()
 
 }
 
-DirectionalLight::DirectionalLight(std::shared_ptr<VulkanEngine> engine) : Light<DirectionalLightBuffer>(engine)
-{
-}
-
 DirectionalLight::DirectionalLight(DirectionalLightBuffer light) : Light<DirectionalLightBuffer>(EnginePtr::GetEnginePtr())
 {
 	LightBuffer.UniformDataInfo = light;
+	lightViewCamera = std::make_shared<OrthographicLightViewCamera>(OrthographicLightViewCamera(-LightBuffer.UniformDataInfo.direction));
 	Update();
 }
 
@@ -22,6 +19,7 @@ DirectionalLight::~DirectionalLight()
 void DirectionalLight::Update()
 {
 	Light::Update();
+	lightViewCamera->Update(-LightBuffer.UniformDataInfo.direction);
 }
 
 void DirectionalLight::Destroy()
