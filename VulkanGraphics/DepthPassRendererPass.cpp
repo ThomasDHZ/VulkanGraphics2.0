@@ -7,7 +7,7 @@ DepthPassRendererPass::DepthPassRendererPass() : BaseRenderPass()
 
 DepthPassRendererPass::DepthPassRendererPass(uint32_t depthTextureSize) : BaseRenderPass()
 {
-    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
+    RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize);
     DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution));
 
     CreateRenderPass();
@@ -166,21 +166,6 @@ void DepthPassRendererPass::Draw()
     renderPassInfo.pClearValues = clearValues.data();
 
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)RenderPassResolution.x;
-    viewport.height = (float)RenderPassResolution.y;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-
-    VkRect2D rect2D{};
-    rect2D.offset = { 0, 0 };
-    rect2D.extent = { (uint32_t)RenderPassResolution.x, (uint32_t)RenderPassResolution.y };
-
-    vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
-    vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSet, 0, nullptr);
     for (auto& mesh : MeshManagerPtr::GetMeshManagerPtr()->MeshList)
@@ -195,9 +180,6 @@ void DepthPassRendererPass::Draw()
                 lightSceneInfo.proj[1][1] *= -1;
                 lightSceneInfo.view = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera->GetViewMatrix();
 
-                EnginePtr::GetEnginePtr()->Mat4Logger("view:", lightSceneInfo.view);
-                EnginePtr::GetEnginePtr()->Mat4Logger("proj:", lightSceneInfo.proj);
-                EnginePtr::GetEnginePtr()->Mat4Logger("mvp:", lightSceneInfo.proj * lightSceneInfo.view);
                 VkDeviceSize offsets[] = { 0 };
 
                 vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
