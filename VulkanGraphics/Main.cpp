@@ -212,7 +212,7 @@ private:
         material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
 
 
- /*       {
+        {
             std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
             gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
             AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
@@ -259,11 +259,11 @@ private:
 
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
             gameObject->MeshList[0]->MeshMaterial = mat;
-        }*/
+        }
 
-        std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+    /*    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/vulkanscene_shadow.obj")));
-        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);*/
 
 
         //std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));

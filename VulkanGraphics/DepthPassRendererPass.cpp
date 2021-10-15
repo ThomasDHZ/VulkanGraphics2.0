@@ -7,7 +7,7 @@ DepthPassRendererPass::DepthPassRendererPass() : BaseRenderPass()
 
 DepthPassRendererPass::DepthPassRendererPass(uint32_t depthTextureSize) : BaseRenderPass()
 {
-    RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize);
+    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
     DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution));
 
     CreateRenderPass();
@@ -122,7 +122,7 @@ void DepthPassRendererPass::SetUpCommandBuffers()
 
 void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
 {
-    RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize);
+    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
     DepthTexture->RecreateRendererTexture(RenderPassResolution);
     depthPipeline->Destroy();
 
@@ -195,6 +195,9 @@ void DepthPassRendererPass::Draw()
                 lightSceneInfo.proj[1][1] *= -1;
                 lightSceneInfo.view = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera->GetViewMatrix();
 
+                EnginePtr::GetEnginePtr()->Mat4Logger("view:", lightSceneInfo.view);
+                EnginePtr::GetEnginePtr()->Mat4Logger("proj:", lightSceneInfo.proj);
+                EnginePtr::GetEnginePtr()->Mat4Logger("mvp:", lightSceneInfo.proj * lightSceneInfo.view);
                 VkDeviceSize offsets[] = { 0 };
 
                 vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
