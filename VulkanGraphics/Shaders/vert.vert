@@ -67,7 +67,7 @@ void main()
     Normal = aNormal;
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
-    LightSpace = ubo.proj * ubo.view * vec4(inPosition, 1.0);
+    LightSpace = ubo.proj * ubo.view * vec4(FragPos, 1.0);
     gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
 
 }

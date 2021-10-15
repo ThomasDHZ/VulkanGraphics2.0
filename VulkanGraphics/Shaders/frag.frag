@@ -169,7 +169,7 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 void main() 
 {
     material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
-    vec4 FragPosLightSpace = mat4(1.0f) * vec4(FragPos, 1.0f);
+
     vec3 color = texture(TextureMap[material.DiffuseMapID], TexCoords).rgb;
     vec3 normal = normalize(Normal);
     vec3 lightColor = vec3(0.3);
@@ -187,7 +187,7 @@ void main()
     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
     vec3 specular = spec * lightColor;    
     // calculate shadow
-    float shadow = ShadowCalculation(FragPosLightSpace);                      
+    float shadow = ShadowCalculation(LightSpace);                      
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
     
     outColor = vec4(lighting, 1.0);
