@@ -17,3 +17,4 @@ public:
 
 	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
 };
+

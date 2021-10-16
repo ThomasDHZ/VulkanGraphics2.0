@@ -9,9 +9,8 @@
 layout(push_constant) uniform LightSceneInfo
 {
 	uint MeshIndex;
-    mat4 MeshView;
-	mat4 LightProjection;
-    mat4 LightView;
+    mat4 proj;
+    mat4 view;
 } scene;
 
 
@@ -53,7 +52,5 @@ layout (location = 4) in vec4 aBitangent;
 
 void main() 
 {
-    mat4 LightMatrix = scene.LightProjection * scene.LightView;
-    gl_Position = LightMatrix * scene.MeshView * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
-
+    gl_Position = scene.proj * scene.view * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
 }

@@ -42,7 +42,7 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
 
     vkDestroySwapchainKHR(engine->Device, engine->SwapChain.GetSwapChain(), nullptr);
 
-   // AssetManagerPtr::GetAssetPtr()->Update();
+    AssetManagerPtr::GetAssetPtr()->Update();
     engine->SwapChain.RebuildSwapChain(window->GetWindowPtr(), engine->Device, engine->PhysicalDevice, engine->Surface);
 
     interfaceRenderPass.RebuildSwapChain();
@@ -84,16 +84,16 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
     for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
     {
-        GUIChanged |= ImGui::SliderFloat3(("Albedo " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("Matallic " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Matallic, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("Roughness" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Roughness, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("AmbientOcclusion " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.AmbientOcclusion, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("minLayers" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.minLayers, 0.0f, 3.0f);
-        GUIChanged |= ImGui::SliderFloat(("maxLayers " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.maxLayers, 0.0f, 3.0f);
-        GUIChanged |= ImGui::SliderFloat(("heightScale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 3.0f);
-        //GUIChanged |= ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
-        //GUIChanged |= ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
-        //GUIChanged |= ImGui::SliderFloat3(("Mesh Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshScale.x, 0.0f, 3.0f);
+        //GUIChanged |= ImGui::SliderFloat3(("Albedo " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("Matallic " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Matallic, 0.0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("Roughness" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Roughness, 0.0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("AmbientOcclusion " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.AmbientOcclusion, 0.0f, 1.0f);
+        //GUIChanged |= ImGui::SliderFloat(("minLayers" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.minLayers, 0.0f, 3.0f);
+        //GUIChanged |= ImGui::SliderFloat(("maxLayers " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.maxLayers, 0.0f, 3.0f);
+        //GUIChanged |= ImGui::SliderFloat(("heightScale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.heightScale, 0.0f, 3.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Pos " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshPosition.x, -100.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Rot " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshRotation.x, -360.0f, 360.0f);
+        GUIChanged |= ImGui::SliderFloat3(("Mesh Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshScale.x, 0.0f, 3.0f);
         //GUIChanged |= ImGui::SliderFloat2(("UV Ofset" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshProperties.UniformDataInfo.UVOffset.x, 0.0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat2(("UV Scale " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVScale.x, 0.0f, 2.0f);
         //GUIChanged |= ImGui::SliderFloat2(("UV Flip " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->UVFlip.x, 0.0f, 1.0f);
@@ -177,7 +177,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     if (GUIChanged)
     {
         MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
-        rayTraceRenderer.rayTraceRenderPass.Frame = 0;
+        //rayTraceRenderer.rayTraceRenderPass.Frame = 0;
         GUIChanged = false;
     }
 
@@ -281,7 +281,8 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
     submitInfo.pCommandBuffers = CommandBufferSubmitList.data();
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = &EnginePtr::GetEnginePtr()->PresentImageSemaphores[EnginePtr::GetEnginePtr()->ImageIndex];
-    if (vkQueueSubmit(EnginePtr::GetEnginePtr()->GraphicsQueue, 1, &submitInfo, EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
+    VkResult a = vkQueueSubmit(EnginePtr::GetEnginePtr()->GraphicsQueue, 1, &submitInfo, EnginePtr::GetEnginePtr()->inFlightFences[EnginePtr::GetEnginePtr()->CMDIndex]);
+    if (a != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
@@ -309,11 +310,7 @@ void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)
     interfaceRenderPass.Destroy();
     BlinnRenderer.Destroy();
     rayTraceRenderer.Destroy(engine);
+    pbrRayTraceRenderer.Destroy(engine);
     renderer2D.Destroy();
     pbrRenderer.Destroy();
-
-   // blinnPhongRenderer.Destroy();
-    //pbrRayTraceRenderer.Destroy();
-    //hybridRenderer.Destroy();
-    //guiRenderer.Destroy();
 }

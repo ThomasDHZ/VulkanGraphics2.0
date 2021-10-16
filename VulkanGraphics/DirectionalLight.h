@@ -18,3 +18,4 @@ public:
 	void Update() override;
 	void Destroy() override;
 };
+

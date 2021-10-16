@@ -18,17 +18,14 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 0) uniform UniformBufferObject 
 {
-	DirectionalLight dlight;
-	PointLight plight[5];
-	SpotLight sLight;
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
+    mat4 proj;
+    mat4 view;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
+    uint SphereAreaLightCount;
+    uint TubeAreaLightCount;
+    uint RectangleAreaLightCount;
 	float timer;
     int Shadowed;
     int temp;

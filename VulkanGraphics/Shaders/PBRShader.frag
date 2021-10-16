@@ -15,6 +15,8 @@ layout(push_constant) uniform MeshInfo
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject {
+    mat4 proj;
+    mat4 view;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
@@ -57,6 +59,7 @@ layout(binding = 3) buffer PointLight
     float linear;
     float quadratic;
     float Luminosity;
+    mat4 lightSpaceMatrix;
 } PLight[];
 
 layout(binding = 4) buffer SpotLight

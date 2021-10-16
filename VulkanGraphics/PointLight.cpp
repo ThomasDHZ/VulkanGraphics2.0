@@ -4,16 +4,24 @@ PointLight::PointLight() : Light<PointLightBuffer>()
 {
 }
 
-PointLight::PointLight(std::shared_ptr<VulkanEngine> engine) : Light<PointLightBuffer>(engine)
-{
-}
-
 PointLight::PointLight(PointLightBuffer light) : Light<PointLightBuffer>(EnginePtr::GetEnginePtr())
 {
 	LightBuffer.UniformDataInfo = light;
+	lightViewCamera = std::make_shared<OrthographicLightViewCamera>(OrthographicLightViewCamera(LightBuffer.UniformDataInfo.position));
 	Update();
 }
 
 PointLight::~PointLight()
 {
+}
+
+void PointLight::Update()
+{
+	Light::Update();
+	lightViewCamera->Update(LightBuffer.UniformDataInfo.position);
+}
+
+void PointLight::Destroy()
+{
+	Light::Destroy();
 }

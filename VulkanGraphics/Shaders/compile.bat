@@ -16,8 +16,12 @@ C:/VulkanSDK/1.2.189.2/Bin/glslc.exe BRDFShader.vert -o BRDFShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe BRDFShader.frag -o BRDFShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthShader.vert -o DepthShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthShader.frag -o DepthShaderFrag.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthDebugShader.vert -o DepthDebugShaderVert.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthDebugShader.frag -o DepthDebugShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.vert -o WireFrameShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.frag -o WireFrameShaderFrag.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe TestVert.vert -o TestVert.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe TestFrag.frag -o TestFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 anyhit.rahit -o anyhit.rahit.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 anyhit1.rahit -o anyhit1.rahit.spv

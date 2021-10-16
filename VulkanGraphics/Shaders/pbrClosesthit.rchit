@@ -38,6 +38,8 @@ hitAttributeEXT vec2 attribs;
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform UBO 
 {
+    mat4 proj;
+    mat4 view;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;

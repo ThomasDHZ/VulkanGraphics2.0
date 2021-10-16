@@ -92,9 +92,9 @@ void BlinnPhongRasterPass::CreateRenderPass()
     ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 
     std::vector<VkAttachmentReference> MultiSampleReferenceList;
-    MultiSampleReferenceList.emplace_back(VkAttachmentReference{ 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    MultiSampleReferenceList.emplace_back(VkAttachmentReference {2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     MultiSampleReferenceList.emplace_back(VkAttachmentReference{ 3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-
+    
     VkAttachmentReference depthReference = { 4, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL };
 
     VkSubpassDescription subpassDescription = {};

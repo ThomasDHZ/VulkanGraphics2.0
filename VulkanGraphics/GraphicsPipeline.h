@@ -73,3 +73,4 @@ public:
 	virtual void UpdateGraphicsPipeLine();
 	virtual void Destroy();
 };
+
