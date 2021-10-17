@@ -137,40 +137,41 @@ vec3 CalcNormalSpotLight(vec3 normal, vec2 uv, int index);
 vec3 CalcSphereAreaLight(vec3 normal, vec2 uv, int index);
 vec3 CalcTubeAreaLight(vec3 normal, vec2 uv, int index);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
-float ShadowCalculation(vec4 fragPosLightSpace)
+float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset)
 {
-    // perform perspective divide
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(ShadowMap, projCoords.xy).r; 
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoords.z;
-    // calculate bias (based on depth map resolution and slope)
-    vec3 normal = normalize(Normal);
-    vec3 lightDir = normalize(PLight[0].position - FragPos);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    // check whether current frag pos is in shadow
-    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
-    // PCF
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(ShadowMap, 0);
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(ShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
-        }    
-    }
-    shadow /= 9.0;
-    
-    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
-    if(projCoords.z > 1.0)
-        shadow = 0.0;
-        
+    float shadow = 1.0f;
+	if ( fragPosLightSpace.z > -1.0 && fragPosLightSpace.z < 1.0 ) 
+	{
+		float dist = texture( ShadowMap, fragPosLightSpace.st + offset ).r;
+		if ( fragPosLightSpace.w > 0.0 && dist < fragPosLightSpace.z ) 
+		{
+			shadow = 0.1f;
+		}
+	}
     return shadow;
+}
+
+float filterPCF(vec4 sc)
+{
+	ivec2 texDim = textureSize(ShadowMap, 0);
+	float scale = 1.5;
+	float dx = scale * 1.0 / float(texDim.x);
+	float dy = scale * 1.0 / float(texDim.y);
+
+	float shadowFactor = 0.0;
+	int count = 0;
+	int range = 1;
+	
+	for (int x = -range; x <= range; x++)
+	{
+		for (int y = -range; y <= range; y++)
+		{
+			shadowFactor += ShadowCalculation(sc, vec2(dx*x, dy*y));
+			count++;
+		}
+	
+	}
+	return shadowFactor / count;
 }
 
 void main() 
@@ -305,8 +306,8 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
-    float shadow = ShadowCalculation(LightSpace);  
-    return (ambient + (1.0 - shadow) * (diffuse + specular));
+    float shadow = filterPCF(LightSpace/ LightSpace.w);  
+   return shadow * diffuse;
 }
 
 vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
@@ -344,7 +345,7 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (1.0f + PLight[index].linear * LightDistance + PLight[index].quadratic * (LightDistance * LightDistance));
 
-    float shadow = ShadowCalculation(LightSpace);  
+   float shadow = filterPCF(LightSpace/ LightSpace.w);  
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
 }
 

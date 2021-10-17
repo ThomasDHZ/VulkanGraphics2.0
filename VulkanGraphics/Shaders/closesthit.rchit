@@ -173,18 +173,18 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-//    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
-//     {
-//        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
-//     }
+    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+     {
+        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
+     }
 //     for(int x = 0; x < scenedata.PointLightCount; x++)
 //     {
 //        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
 //     }
-       for(int x = 0; x < scenedata.SpotLightCount; x++)
-       {
-            baseColor += CalcNormalSpotLight(FragPos, normal, vertex.uv, x);   
-       }
+//       for(int x = 0; x < scenedata.SpotLightCount; x++)
+//       {
+//            baseColor += CalcNormalSpotLight(FragPos, normal, vertex.uv, x);   
+//       }
 
 
     if(material.Reflectivness > 0.0f &&
