@@ -259,6 +259,7 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	deviceFeatures.fragmentStoresAndAtomics = VK_TRUE;
 	deviceFeatures.vertexPipelineStoresAndAtomics = VK_TRUE;
 	deviceFeatures.sampleRateShading = VK_TRUE;
+	deviceFeatures.multiViewport = VK_TRUE;
 
 	VkPhysicalDeviceFeatures2 deviceFeatures2{};
 	deviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;

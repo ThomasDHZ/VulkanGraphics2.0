@@ -417,6 +417,21 @@
     <ClCompile Include="OrthographicLightViewCamera.cpp">
       <Filter>Source Files\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="DepthCubeMapPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderedCubeMapDepthTexture.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthCubeMapRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthCubeDebugRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="DepthCubeDebugPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -767,6 +782,21 @@
     <ClInclude Include="OrthographicLightViewCamera.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="DepthCubeMapPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthCubeMapRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedCubeMapDepthTexture.h">
+      <Filter>Header Files\texture</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthCubeDebugRenderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthCubeDebugPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -902,6 +932,18 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\TestVert.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthCubeShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthCubeShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthCubeDebugShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DepthCubeDebugShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

@@ -1,26 +1,42 @@
-#include "DepthPassRendererPass.h"
+#include "DepthCubeMapRenderPass.h"
 #include "GraphicsPipeline.h"
+#include "Skybox.h"
 
-DepthPassRendererPass::DepthPassRendererPass() : BaseRenderPass()
+DepthCubeMapRenderPass::DepthCubeMapRenderPass() : BaseRenderPass()
 {
 }
 
-DepthPassRendererPass::DepthPassRendererPass(uint32_t depthTextureSize) : BaseRenderPass()
+DepthCubeMapRenderPass::DepthCubeMapRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
-    RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize);
-    DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution));
+    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
+    RenderedCubeMap = std::make_shared<RenderedCubeMapDepthTexture>(RenderedCubeMapDepthTexture(RenderPassResolution));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthPipeline = std::make_shared<DepthPassPipeline>(DepthPassPipeline(RenderPass));
+    depthCubeMapPipeline = std::make_shared<DepthCubeMapPipeline>(DepthCubeMapPipeline(RenderPass, RenderPassResolution.x));
     SetUpCommandBuffers();
+
+    Draw();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
-DepthPassRendererPass::~DepthPassRendererPass()
+DepthCubeMapRenderPass::~DepthCubeMapRenderPass()
 {
 }
 
-void DepthPassRendererPass::CreateRenderPass()
+void DepthCubeMapRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
@@ -63,6 +79,17 @@ void DepthPassRendererPass::CreateRenderPass()
     SecondDependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
     DependencyList.emplace_back(SecondDependency);
 
+
+    const uint32_t viewMask = 0b00111111;
+    const uint32_t correlationMask = 0b00111111;
+
+    VkRenderPassMultiviewCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_MULTIVIEW_CREATE_INFO;
+    createInfo.subpassCount = 1;
+    createInfo.pViewMasks = &viewMask;
+    createInfo.correlationMaskCount = 1;
+    createInfo.pCorrelationMasks = &correlationMask;
+
     VkRenderPassCreateInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassInfo.attachmentCount = static_cast<uint32_t>(AttachmentDescriptionList.size());
@@ -71,6 +98,7 @@ void DepthPassRendererPass::CreateRenderPass()
     renderPassInfo.pSubpasses = &subpassDescription;
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
+    renderPassInfo.pNext = &createInfo;
 
     if (vkCreateRenderPass(EnginePtr::GetEnginePtr()->Device, &renderPassInfo, nullptr, &RenderPass))
     {
@@ -78,14 +106,14 @@ void DepthPassRendererPass::CreateRenderPass()
     }
 }
 
-void DepthPassRendererPass::CreateRendererFramebuffers()
+void DepthCubeMapRenderPass::CreateRendererFramebuffers()
 {
     SwapChainFramebuffers.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
 
     for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(DepthTexture->View);
+        AttachmentList.emplace_back(RenderedCubeMap->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -103,7 +131,7 @@ void DepthPassRendererPass::CreateRendererFramebuffers()
     }
 }
 
-void DepthPassRendererPass::SetUpCommandBuffers()
+void DepthCubeMapRenderPass::SetUpCommandBuffers()
 {
     CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
     for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
@@ -120,11 +148,11 @@ void DepthPassRendererPass::SetUpCommandBuffers()
     }
 }
 
-void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
+void DepthCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 {
-    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
-    DepthTexture->RecreateRendererTexture(RenderPassResolution);
-    depthPipeline->Destroy();
+    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
+    RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
+    depthCubeMapPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -137,11 +165,26 @@ void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthPipeline->UpdateGraphicsPipeLine(RenderPass);
+    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x);
     SetUpCommandBuffers();
+
+    Draw();
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
+    VkFenceCreateInfo fenceCreateInfo{};
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = 0;
+    VkFence fence;
+    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
+    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
+    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
+    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
-void DepthPassRendererPass::Draw()
+void DepthCubeMapRenderPass::Draw()
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -151,6 +194,9 @@ void DepthPassRendererPass::Draw()
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
+    std::array<VkClearValue, 1> clearValues{};
+    clearValues[0].depthStencil = { 1.0f, 0 };
+
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = RenderPass;
@@ -158,16 +204,12 @@ void DepthPassRendererPass::Draw()
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent.width = RenderPassResolution.x;
     renderPassInfo.renderArea.extent.height = RenderPassResolution.y;
-
-    std::array<VkClearValue, 1> clearValues{};
-    clearValues[0].depthStencil = { 1.0f, 0 };
-
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthCubeMapPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthCubeMapPipeline->ShaderPipelineLayout, 0, 1, &depthCubeMapPipeline->DescriptorSet, 0, nullptr);
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSet, 0, nullptr);
     for (auto& mesh : MeshManagerPtr::GetMeshManagerPtr()->MeshList)
     {
         if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
@@ -184,7 +226,7 @@ void DepthPassRendererPass::Draw()
 
                 VkDeviceSize offsets[] = { 0 };
 
-                vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
+                vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthCubeMapPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
                 vkCmdBindVertexBuffers(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &mesh->VertexBuffer.Buffer, offsets);
                 if (mesh->IndexCount == 0)
                 {
@@ -199,14 +241,15 @@ void DepthPassRendererPass::Draw()
         }
     }
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
 }
 
-void DepthPassRendererPass::Destroy()
+void DepthCubeMapRenderPass::Destroy()
 {
-    DepthTexture->Delete();
-    depthPipeline->Destroy();
+    depthCubeMapPipeline->Destroy();
+
     BaseRenderPass::Destroy();
 }

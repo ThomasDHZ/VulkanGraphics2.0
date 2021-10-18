@@ -8,7 +8,6 @@ LightManager::LightManager()
 
 LightManager::LightManager(std::shared_ptr<VulkanEngine> Engine, std::shared_ptr<CameraManager> cameraManager)
 {
-	engine = Engine;
 }
 
 LightManager::~LightManager()

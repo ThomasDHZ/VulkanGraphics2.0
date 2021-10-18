@@ -21,6 +21,6 @@ public:
 
 	void RebuildSwapChain(std::shared_ptr<RenderedDepthTexture> depthTexture);
 
-	void Draw(std::shared_ptr<RenderedDepthTexture> depthTexture);
+	void Draw();
 	void Destroy();
 };

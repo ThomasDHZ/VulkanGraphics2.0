@@ -19,7 +19,7 @@ class LightManager
 	friend class RectangleAreaLight;
 
 private:
-	std::shared_ptr<VulkanEngine> engine;
+
 public:
 	std::vector<std::shared_ptr<DirectionalLight>> DirectionalLightList;
 	std::vector<std::shared_ptr<PointLight>> PointLightList;
