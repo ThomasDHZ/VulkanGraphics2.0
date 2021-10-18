@@ -16,8 +16,7 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 0) uniform UniformBufferObject 
 {
-    mat4 proj;
-    mat4 view;
+    mat4 lightSpaceMatrix;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
@@ -73,7 +72,7 @@ void main()
     Normal = aNormal;
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
-    LightSpace = (biasMat * ubo.proj * ubo.view  *  meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
+    LightSpace = (biasMat * ubo.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
     gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
 
 }
