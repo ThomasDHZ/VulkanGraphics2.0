@@ -49,8 +49,11 @@ prefilterRenderPass.Draw();
 
 void PBRRenderer::Destroy()
 {
-  //  irradianceRenderPass.Destroy();
-  //  pbrRenderer.Destroy();
+    irradianceRenderPass.Destroy();
+    prefilterRenderPass.Destroy();
+    brdfRenderPass.Destroy();
+    irradianceRenderPass.Destroy();
+    pbrRenderer.Destroy();
     FrameBufferRenderer.Destroy();
 }
 

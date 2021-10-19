@@ -225,6 +225,7 @@ void BRDFRenderPass::Draw()
 
 void BRDFRenderPass::Destroy()
 {
+    BRDFMap->Delete();
     brdfPipeline->Destroy();
     BaseRenderPass::Destroy();
 }

@@ -203,8 +203,8 @@ void main()
 
     vec3 Lo = vec3(0.0);
     Lo += CalcDirectionalLight(F0, V, N, albedo, roughness, metallic);
-//    Lo += CalcPointLight(F0, V, N, albedo, roughness, metallic);
-//    Lo += CalcSpotLight(F0, V, N, albedo, roughness, metallic);
+    Lo += CalcPointLight(F0, V, N, albedo, roughness, metallic);
+    Lo += CalcSpotLight(F0, V, N, albedo, roughness, metallic);
 
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     

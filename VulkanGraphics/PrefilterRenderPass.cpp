@@ -388,7 +388,8 @@ void PrefilterRenderPass::Draw()
 
 void PrefilterRenderPass::Destroy()
 {
+    DrawToCubeMap->Delete();
+    RenderedCubeMap->Delete();
     prefilterPipeline->Destroy();
-
     BaseRenderPass::Destroy();
 }

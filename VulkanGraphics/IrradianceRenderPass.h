@@ -15,8 +15,6 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
-	VkFramebuffer IrradianceMapFrameBuffer;
-
 public:
 	IrradianceRenderPass();
 	IrradianceRenderPass(uint32_t cubeMapSize);

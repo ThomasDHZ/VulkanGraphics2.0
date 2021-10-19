@@ -11,8 +11,6 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
-	VkFramebuffer IrradianceMapFrameBuffer;
-
 public:
 	DepthCubeMapRenderPass();
 	DepthCubeMapRenderPass(uint32_t cubeMapSize);

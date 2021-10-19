@@ -224,7 +224,7 @@ void IrradianceRenderPass::Draw()
 
 void IrradianceRenderPass::Destroy()
 {
+    RenderedCubeMap->Delete();
     irradiancePipeline->Destroy();
-
     BaseRenderPass::Destroy();
 }

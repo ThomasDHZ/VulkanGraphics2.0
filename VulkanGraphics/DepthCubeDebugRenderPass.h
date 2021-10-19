@@ -10,8 +10,6 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
-	VkFramebuffer IrradianceMapFrameBuffer;
-
 public:
 	DepthCubeDebugRenderPass();
 	DepthCubeDebugRenderPass(std::shared_ptr<RenderedCubeMapDepthTexture> depthTexture);
