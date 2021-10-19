@@ -266,6 +266,11 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	deviceFeatures2.features = deviceFeatures;
 	deviceFeatures2.pNext = &PhysicalDeviceRobustness2Features;
 
+	VkPhysicalDeviceVulkan11Features PhysicalDeviceVulkan11Features{};
+	PhysicalDeviceVulkan11Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+	PhysicalDeviceVulkan11Features.multiview = VK_TRUE;
+	PhysicalDeviceVulkan11Features.pNext = &deviceFeatures2;
+
 	VkDeviceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
@@ -273,7 +278,7 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 	createInfo.pEnabledFeatures = nullptr;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(DeviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = DeviceExtensions.data();
-	createInfo.pNext = &deviceFeatures2;
+	createInfo.pNext = &PhysicalDeviceVulkan11Features;
 
 #ifdef NDEBUG
 	createInfo.enabledLayerCount = 0;
