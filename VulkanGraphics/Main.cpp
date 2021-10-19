@@ -50,7 +50,7 @@ public:
         initVulkan();
         mainLoop();
 
-        AssetManagerPtr::GetAssetPtr()->Delete();
+       AssetManagerPtr::GetAssetPtr()->Delete();
         renderer.Destroy(EnginePtr::GetEnginePtr());
         EnginePtr::GetEnginePtr()->Destroy();
         WindowPtr::GetWindowPtr()->Destroy();

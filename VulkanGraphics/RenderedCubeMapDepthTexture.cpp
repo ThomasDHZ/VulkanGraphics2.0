@@ -55,7 +55,7 @@ void RenderedCubeMapDepthTexture::CreateTextureView()
     TextureImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     TextureImageViewInfo.image = Image;
     TextureImageViewInfo.format = VK_FORMAT_D32_SFLOAT;
-    TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    TextureImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
     TextureImageViewInfo.subresourceRange.baseMipLevel = 0;
     TextureImageViewInfo.subresourceRange.levelCount = MipMapLevels;
     TextureImageViewInfo.subresourceRange.baseArrayLayer = 0;
