@@ -222,9 +222,6 @@
     <ClCompile Include="AnimatorCompute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LightViewCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -582,9 +579,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AnimatorCompute.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LightViewCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">

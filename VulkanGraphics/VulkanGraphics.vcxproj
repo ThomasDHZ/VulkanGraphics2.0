@@ -264,7 +264,6 @@
     <ClCompile Include="Level2D.cpp" />
     <ClCompile Include="LevelTile.cpp" />
     <ClCompile Include="LightManager.cpp" />
-    <ClCompile Include="LightViewCamera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
@@ -385,7 +384,6 @@
     <ClInclude Include="LevelTile.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightManager.h" />
-    <ClInclude Include="LightViewCamera.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="MegaMan.h" />

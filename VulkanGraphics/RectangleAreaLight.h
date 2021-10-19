@@ -1,6 +1,5 @@
 #pragma once
 #include "Light.h"
-#include "LightViewCamera.h"
 #include "CameraManager.h"
 
 class RectangleAreaLight : public Light<RectangleAreaLightBuffer>

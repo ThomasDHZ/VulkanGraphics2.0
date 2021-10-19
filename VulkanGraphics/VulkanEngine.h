@@ -49,10 +49,10 @@ private:
 	uint32_t NextObjID = 1;
 	uint32_t NextID = 0;
 
-    void SetUpDeviceFeatures(GLFWwindow* window);
+	void SetUpDeviceFeatures(GLFWwindow* window);
 
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
-    bool checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
+	bool checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
 
 	VkSampleCountFlagBits GetMaxUsableSampleCount(VkPhysicalDevice GPUDevice);
 
