@@ -15,8 +15,7 @@ layout(push_constant) uniform MeshInfo
 } Mesh;
 
 layout(binding = 0) uniform UniformBufferObject {
-    mat4 proj;
-    mat4 view;
+    mat4 lightSpaceMatrix;
     uint DirectionalLightCount;
     uint PointLightCount;
     uint SpotLightCount;
