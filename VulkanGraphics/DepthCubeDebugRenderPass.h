@@ -2,6 +2,7 @@
 #include "BaseRenderPass.h"
 #include "DepthCubeDebugPipeline.h"
 #include "RenderedColorTexture.h"
+#include "RenderedCubeMapTexture.h"
 
 class DepthCubeDebugRenderPass : public BaseRenderPass
 {
@@ -15,7 +16,7 @@ public:
 	DepthCubeDebugRenderPass(std::shared_ptr<RenderedCubeMapDepthTexture> depthTexture);
 	~DepthCubeDebugRenderPass();
 
-	std::shared_ptr<RenderedColorTexture> DebugTexture;
+	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
 	std::shared_ptr<DepthCubeDebugPipeline> depthCubeMapPipeline;
 
 	void RebuildSwapChain(std::shared_ptr<RenderedCubeMapDepthTexture> depthTexture);

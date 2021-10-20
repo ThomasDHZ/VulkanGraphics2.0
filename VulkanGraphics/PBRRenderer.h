@@ -6,6 +6,10 @@
 #include "EquirectangularToCubemapRenderPass.h"
 #include "PrefilterRenderPass.h"
 #include "BRDFRenderPass.h"
+#include "DepthPassRendererPass.h"
+#include "DepthCubeMapRenderPass.h"
+#include "DepthDebugRenderPass.h"
+#include "DepthCubeDebugRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
@@ -13,6 +17,10 @@ private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
 	float CubeMapSamplerSize = 64.0f;
 
+	DepthPassRendererPass DepthRenderPass;
+	DepthCubeMapRenderPass depthCubeMapRenderPass;
+	DepthDebugRenderPass DebugDepthRenderPass;
+	DepthCubeDebugRenderPass debugCubeDepthRenderPass;
 	IrradianceRenderPass irradianceRenderPass;
 	//EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
 	PrefilterRenderPass prefilterRenderPass;

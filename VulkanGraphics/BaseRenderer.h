@@ -7,6 +7,8 @@
 class BaseRenderer
 {
 protected:
+	bool GUIChangedFlag = false;
+	bool ShadowDebugFlag = false;
 
 public:
 	BaseRenderer();

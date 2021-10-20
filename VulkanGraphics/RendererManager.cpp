@@ -77,6 +77,33 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     ImGui::SliderInt("Active Renderer", &ActiveRenderer, 0, 2);
     ImGui::Checkbox("Ray Tracing:", &EnginePtr::GetEnginePtr()->RayTraceFlag);
 
+    if (ActiveRenderer == 0)
+    {
+        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
+        {
+            BlinnRenderer.GUIUpdate();
+        }
+        else
+        {
+            // rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
+        }
+    }
+    else if (ActiveRenderer == 1)
+    {
+        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
+        {
+            pbrRenderer.GUIUpdate();
+        }
+        else
+        {
+            //  pbrRayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
+        }
+    }
+    else if (ActiveRenderer == 2)
+    {
+        //  renderer2D.GUIUpdate();
+    }
+
     //for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
  //{
 
@@ -179,33 +206,6 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
         //rayTraceRenderer.rayTraceRenderPass.Frame = 0;
         GUIChanged = false;
-    }
-
-    if (ActiveRenderer == 0)
-    {
-        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
-        {
-            BlinnRenderer.GUIUpdate();
-        }
-        else
-        {
-           // rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
-        }
-    }
-    else if (ActiveRenderer == 1)
-    {
-        if (EnginePtr::GetEnginePtr()->RayTraceFlag == false)
-        {
-            pbrRenderer.GUIUpdate();
-        }
-        else
-        {
-          //  pbrRayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
-        }
-    }    
-    else if (ActiveRenderer == 2)
-    {
-      //  renderer2D.GUIUpdate();
     }
 
    /* guiRenderer.GUIUpdate();*/
