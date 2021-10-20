@@ -8,28 +8,15 @@ DepthCubeMapRenderPass::DepthCubeMapRenderPass() : BaseRenderPass()
 
 DepthCubeMapRenderPass::DepthCubeMapRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
+    cubeSampler = std::make_shared<CubeSampler>(CubeSampler(EnginePtr::GetEnginePtr()));
+
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap = std::make_shared<RenderedCubeMapDepthTexture>(RenderedCubeMapDepthTexture(RenderPassResolution));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline = std::make_shared<DepthCubeMapPipeline>(DepthCubeMapPipeline(RenderPass, RenderPassResolution.x));
+    depthCubeMapPipeline = std::make_shared<DepthCubeMapPipeline>(DepthCubeMapPipeline(RenderPass, RenderPassResolution.x, cubeSampler));
     SetUpCommandBuffers();
-
-    Draw();
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
 }
 
 DepthCubeMapRenderPass::~DepthCubeMapRenderPass()
@@ -165,23 +152,24 @@ void DepthCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x);
+    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x, cubeSampler);
     SetUpCommandBuffers();
+}
 
-    Draw();
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
+void DepthCubeMapRenderPass::Update()
+{
+    const glm::vec3 LightPos = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->LightBuffer.UniformDataInfo.position;
+    float near_plane = 1.0f;
+    float far_plane = 25.0f;
+    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)RenderedCubeMap->Width / (float)RenderedCubeMap->Height, near_plane, far_plane);
+    std::vector<glm::mat4> shadowTransforms;
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[0] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[1] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[2] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[3] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[4] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[5] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->Update();
 }
 
 void DepthCubeMapRenderPass::Draw()

@@ -423,12 +423,6 @@
     <ClCompile Include="DepthCubeMapRenderPass.cpp">
       <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="DepthCubeDebugRenderPass.cpp">
-      <Filter>Source Files\Rendering\RenderPass</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthCubeDebugPipeline.cpp">
-      <Filter>Source Files\Rendering\Pipelines</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -779,17 +773,8 @@
     <ClInclude Include="DepthCubeMapPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="DepthCubeMapRenderPass.h">
-      <Filter>Header Files\Rendering\RenderPass</Filter>
-    </ClInclude>
     <ClInclude Include="RenderedCubeMapDepthTexture.h">
       <Filter>Header Files\texture</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthCubeDebugRenderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthCubeDebugPipeline.h">
-      <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -932,12 +917,6 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\DepthCubeShader.vert">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
-    <None Include="Shaders\DepthCubeDebugShader.frag">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
-    <None Include="Shaders\DepthCubeDebugShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

@@ -7,6 +7,8 @@
 class DepthCubeMapRenderPass : public BaseRenderPass
 {
 private:
+	std::shared_ptr<CubeSampler> cubeSampler;
+
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
@@ -21,6 +23,7 @@ public:
 
 	void RebuildSwapChain(uint32_t cubeMapSize);
 
+	void Update();
 	void Draw();
 	void Destroy();
 };

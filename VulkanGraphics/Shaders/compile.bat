@@ -20,8 +20,6 @@ C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthCubeShader.vert -o DepthCubeShaderVert
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthCubeShader.frag -o DepthCubeShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthDebugShader.vert -o DepthDebugShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthDebugShader.frag -o DepthDebugShaderFrag.spv
-C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthCubeDebugShader.vert -o DepthCubeDebugShaderVert.spv
-C:/VulkanSDK/1.2.189.2/Bin/glslc.exe DepthCubeDebugShader.frag -o DepthCubeDebugShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.vert -o WireFrameShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.frag -o WireFrameShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe TestVert.vert -o TestVert.spv

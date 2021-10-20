@@ -13,32 +13,6 @@ layout(push_constant) uniform LightSceneInfo
     mat4 lightSpaceMatrix;
 } scene;
 
-mat4 MVP[6] = {{{0.000000, 0.000000, 1.010101, 1.000000},
-                       {0.000000, -1.000000, 0.000000, 0.000000},
-                       {-1.000000, 0.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, -0.101010, 0.000000}},
-                      {{0.000000, 0.000000, -1.010101, -1.000000},
-                       {0.000000, -1.000000, 0.000000, 0.000000},
-                       {1.000000, 0.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, -0.101010, 0.000000}},
-                      {{1.000000, 0.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, 1.010101, 1.000000},
-                       {0.000000, 1.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, -0.101010, 0.000000}},
-                      {{1.000000, 0.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, -1.010101, -1.000000},
-                       {0.000000, -1.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, -0.101010, 0.000000}},
-                      {{1.000000, 0.000000, 0.000000, 0.000000},
-                       {0.000000, -1.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, 1.010101, 1.000000},
-                       {0.000000, 0.000000, -0.101010, 0.000000}},
-                      {{-1.000000, 0.000000, 0.000000, 0.000000},
-                       {0.000000, -1.000000, 0.000000, 0.000000},
-                       {0.000000, 0.000000, -1.010101, -1.000000},
-                       {0.000000, 0.000000, -0.101010, 0.000000}}};
-
-
 layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 viewInverse;
@@ -69,6 +43,11 @@ layout(binding = 1) buffer MeshProperties
 layout(binding = 2) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 3) uniform sampler2D TextureMap[];
 
+layout(binding = 4) uniform CubeSampler 
+{
+    mat4 lightSpaceMatrix[6];
+} SkyboxSamples;
+
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
@@ -77,5 +56,5 @@ layout (location = 4) in vec4 aBitangent;
 
 void main() 
 {
-    gl_Position = MVP[gl_ViewIndex] * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
+    gl_Position = SkyboxSamples.lightSpaceMatrix[gl_ViewIndex] * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
 }

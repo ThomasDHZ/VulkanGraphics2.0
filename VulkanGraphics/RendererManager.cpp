@@ -63,6 +63,7 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
     }
 
     AssetManagerPtr::GetAssetPtr()->Update();
+    BlinnRenderer.Update();
     //if (EnginePtr::GetEnginePtr()->RayTraceFlag)
     //{
    /*    rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());

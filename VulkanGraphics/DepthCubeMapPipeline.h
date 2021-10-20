@@ -8,13 +8,13 @@ class DepthCubeMapPipeline : public GraphicsPipeline
 private:
 	void SetUpDescriptorPool();
 	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets();
+	void SetUpDescriptorSets(std::shared_ptr<CubeSampler> cubeSampler);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
 public:
 	DepthCubeMapPipeline();
-	DepthCubeMapPipeline(const VkRenderPass& renderPass, float CubeMapSize);
+	DepthCubeMapPipeline(const VkRenderPass& renderPass, float CubeMapSize, std::shared_ptr<CubeSampler> cubeSampler);
 	~DepthCubeMapPipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize, std::shared_ptr<CubeSampler> cubeSampler);
 };
 

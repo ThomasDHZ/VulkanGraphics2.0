@@ -94,6 +94,11 @@ struct MeshProperties
 	alignas(4) float maxLayers = 32;
 };
 
+struct CubeSamplerBuffer
+{
+	alignas(16) glm::mat4 LightSpaceMatrix[6];
+};
+
 template <class T>
 class UniformData
 {
@@ -133,5 +138,6 @@ public:
 	}
 };
 
+typedef UniformData<CubeSamplerBuffer> CubeSampler;
 typedef UniformData<SceneDataBuffer> SceneDataUniformBuffer;
 typedef UniformData<MeshProperties> MeshPropertiesUniformBuffer;

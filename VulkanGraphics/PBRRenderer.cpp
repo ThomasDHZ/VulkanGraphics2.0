@@ -9,13 +9,12 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     DepthRenderPass = DepthPassRendererPass(512);
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
     DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTexture);
-    // debugCubeDepthRenderPass = DepthCubeDebugRenderPass(depthCubeMapRenderPass.RenderedCubeMap);
    // equirectangularToCubemapRenderPass = EquirectangularToCubemapRenderPass();
     irradianceRenderPass = IrradianceRenderPass(CubeMapSamplerSize);
     prefilterRenderPass = PrefilterRenderPass(CubeMapSamplerSize);
     brdfRenderPass = BRDFRenderPass(CubeMapSamplerSize);
 
-  //  AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(TextureManagerPtr::GetTextureManagerPtr()->GetTextureByBufferIndex(0));
+   // AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
     pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
@@ -30,7 +29,6 @@ void PBRRenderer::RebuildSwapChain()
     DepthRenderPass.RebuildSwapChain(512);
     depthCubeMapRenderPass.RebuildSwapChain(1024);
     DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
-    //debugCubeDepthRenderPass.RebuildSwapChain(depthCubeMapRenderPass.RenderedCubeMap);
     //equirectangularToCubemapRenderPass.RebuildSwapChain();
     irradianceRenderPass.RebuildSwapChain(CubeMapSamplerSize);
     prefilterRenderPass.RebuildSwapChain(CubeMapSamplerSize);
@@ -64,12 +62,10 @@ void PBRRenderer::Draw()
     if (ShadowDebugFlag)
     {
         DebugDepthRenderPass.Draw();
-        // debugCubeDepthRenderPass.Draw();
     }
 
     DepthRenderPass.Draw();
     depthCubeMapRenderPass.Draw();
-   // equirectangularToCubemapRenderPass.Draw();
     irradianceRenderPass.Draw();
 prefilterRenderPass.Draw();
     brdfRenderPass.Draw();
@@ -80,7 +76,6 @@ prefilterRenderPass.Draw();
 void PBRRenderer::Destroy()
 {
     DebugDepthRenderPass.Destroy();
-    debugCubeDepthRenderPass.Destroy();
     irradianceRenderPass.Destroy();
     prefilterRenderPass.Destroy();
     brdfRenderPass.Destroy();
