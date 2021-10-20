@@ -375,13 +375,12 @@ private:
 
 
             MaterialTexture material;
-           // material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/space-cruiser-panels2_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/space-cruiser-panels2_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-         //   material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/space-cruiser-panels2_metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-         //   material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/space-cruiser-panels2_roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-            material.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/space-cruiser-panels2_roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-         //   material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/space-cruiser-panels2_ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/space-cruiser-panels2_normal-ogl.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
 
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
             gameObject->MeshList[0]->MeshMaterial = mat;

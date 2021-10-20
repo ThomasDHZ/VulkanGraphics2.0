@@ -7,7 +7,7 @@ PBRRenderPass::PBRRenderPass() : BaseRenderPass()
 {
 }
 
-PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap) : BaseRenderPass()
+PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture) : BaseRenderPass()
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
@@ -19,7 +19,7 @@ PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_p
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline = std::make_shared<PBRPipeline>(PBRPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap));
+    pbrPipeline = std::make_shared<PBRPipeline>(PBRPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap, ShadowMapTexture));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
     SetUpCommandBuffers();
 }
@@ -187,7 +187,7 @@ void PBRRenderPass::SetUpCommandBuffers()
     }
 }
 
-void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap)
+void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture)
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
@@ -211,7 +211,7 @@ void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> Irr
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap);
+    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTexture);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }

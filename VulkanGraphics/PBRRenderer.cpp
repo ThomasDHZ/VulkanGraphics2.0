@@ -16,7 +16,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     brdfRenderPass = BRDFRenderPass(CubeMapSamplerSize);
 
   //  AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(TextureManagerPtr::GetTextureManagerPtr()->GetTextureByBufferIndex(0));
-    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap);
+    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
 }
@@ -35,7 +35,7 @@ void PBRRenderer::RebuildSwapChain()
     irradianceRenderPass.RebuildSwapChain(CubeMapSamplerSize);
     prefilterRenderPass.RebuildSwapChain(CubeMapSamplerSize);
     brdfRenderPass.RebuildSwapChain(CubeMapSamplerSize);
-    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap);
+    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTexture);
     FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
     if (ShadowDebugFlag)

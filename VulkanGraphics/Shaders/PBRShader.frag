@@ -119,12 +119,14 @@ layout(binding = 12) buffer RectangleAreaLightBuffer
 layout(binding = 13) uniform samplerCube IrradianceMap;
 layout(binding = 14) uniform samplerCube PrefilterMap;
 layout(binding = 15) uniform sampler2D BRDFMap;
+layout(binding = 16) uniform sampler2D ShadowMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec3 Normal;
 layout(location = 3) in vec3 Tangent;
 layout(location = 4) in vec3 BiTangent;
+layout(location = 5) in vec4 LightSpace;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
@@ -141,6 +143,42 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
 vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
+float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset)
+{
+    float shadow = 1.0f;
+	if ( fragPosLightSpace.z > -1.0 && fragPosLightSpace.z < 1.0 ) 
+	{
+		float dist = texture( ShadowMap, fragPosLightSpace.st + offset ).r;
+		if ( fragPosLightSpace.w > 0.0 && dist < fragPosLightSpace.z ) 
+		{
+			shadow = 0.1f;
+		}
+	}
+    return shadow;
+}
+
+float filterPCF(vec4 sc)
+{
+	ivec2 texDim = textureSize(ShadowMap, 0);
+	float scale = 1.5;
+	float dx = scale * 1.0 / float(texDim.x);
+	float dy = scale * 1.0 / float(texDim.y);
+
+	float shadowFactor = 0.0;
+	int count = 0;
+	int range = 1;
+	
+	for (int x = -range; x <= range; x++)
+	{
+		for (int y = -range; y <= range; y++)
+		{
+			shadowFactor += ShadowCalculation(sc, vec2(dx*x, dy*y));
+			count++;
+		}
+	
+	}
+	return shadowFactor / count;
+}
 
 void main()
 {		
@@ -202,8 +240,8 @@ void main()
 
     vec3 Lo = vec3(0.0);
     Lo += CalcDirectionalLight(F0, V, N, albedo, roughness, metallic);
-    Lo += CalcPointLight(F0, V, N, albedo, roughness, metallic);
-    Lo += CalcSpotLight(F0, V, N, albedo, roughness, metallic);
+//    Lo += CalcPointLight(F0, V, N, albedo, roughness, metallic);
+//    Lo += CalcSpotLight(F0, V, N, albedo, roughness, metallic);
 
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     
@@ -284,11 +322,13 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < scenedata.DirectionalLightCount; ++i) 
+    float shadow = filterPCF(LightSpace/ LightSpace.w);  
+    for(int i = 0; i < 1; ++i) 
     {
         vec3 L = normalize(DLight[i].direction - FragPos);
         vec3 H = normalize(V + L);
         vec3 radiance = DLight[i].diffuse;
+        radiance *= shadow * 5.0f;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -297,15 +337,17 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
         vec3 nominator    = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
         vec3 specular = nominator / denominator;
-        
+        specular *= shadow * 5.0f;
+
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
         kD *= 1.0 - metallic;	                
             
-        float NdotL = max(dot(N, L), 0.0);        
+        float NdotL = max(dot(N, L), 0.0);
+
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     }   
-    return Lo;
+    return Lo * shadow;
 }
 
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
