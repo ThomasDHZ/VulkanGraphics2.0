@@ -5,6 +5,7 @@
 #include "DepthPassRendererPass.h"
 #include "DepthDebugRenderPass.h"
 #include "DepthCubeMapRenderPass.h"
+#include "ReflectionCubeMapRenderPass.h"
 
 class BlinnPhongRasterRenderer : public BaseRenderer
 {
@@ -14,6 +15,7 @@ private:
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;
 	DepthDebugRenderPass DebugDepthRenderPass;
+	ReflectionCubeMapRenderPass ReflectionRenderPass;
 	BlinnPhongRasterPass BlinnRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
 

@@ -10,8 +10,9 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine>
     DepthRenderPass = DepthPassRendererPass(512);
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
     DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTexture);
+    ReflectionRenderPass = ReflectionCubeMapRenderPass(1024);
 
-    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
+   // AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(ReflectionRenderPass.RenderedCubeMap);
     BlinnRenderPass = BlinnPhongRasterPass(engine, DepthRenderPass.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 }
@@ -25,6 +26,8 @@ void BlinnPhongRasterRenderer::RebuildSwapChain()
     DepthRenderPass.RebuildSwapChain(512);
     depthCubeMapRenderPass.RebuildSwapChain(1024);
     DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
+    ReflectionRenderPass.RebuildSwapChain(1024);
+
     BlinnRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
 
     if (ShadowDebugFlag)
@@ -62,6 +65,8 @@ void BlinnPhongRasterRenderer::Draw()
 
     DepthRenderPass.Draw();
     depthCubeMapRenderPass.Draw();
+    ReflectionRenderPass.Draw();
+
     BlinnRenderPass.Draw();
     FrameBufferRenderer.Draw();
 }
@@ -70,7 +75,7 @@ void BlinnPhongRasterRenderer::Destroy()
 {
 
     DebugDepthRenderPass.Destroy();
-    DepthRenderPass.Destroy();
+    ReflectionRenderPass.Destroy();
     BlinnRenderPass.Destroy();
     FrameBufferRenderer.Destroy();
 }
@@ -84,6 +89,7 @@ std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitL
 
     CommandBufferSubmitList.emplace_back(DepthRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(depthCubeMapRenderPass.GetCommandBuffer());
+    CommandBufferSubmitList.emplace_back(ReflectionRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(BlinnRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.GetCommandBuffer());
     return CommandBufferSubmitList;
