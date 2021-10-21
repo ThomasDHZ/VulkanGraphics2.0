@@ -423,6 +423,9 @@
     <ClCompile Include="DepthCubeMapRenderPass.cpp">
       <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="DebugLightPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -776,6 +779,9 @@
     <ClInclude Include="RenderedCubeMapDepthTexture.h">
       <Filter>Header Files\texture</Filter>
     </ClInclude>
+    <ClInclude Include="DebugLightPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -917,6 +923,12 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\DepthCubeShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DebugLightShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\DebugLightShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

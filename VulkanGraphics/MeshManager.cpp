@@ -66,10 +66,7 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderL
 {
     for (auto& mesh : MeshList)
     {
-        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
-        {
-            mesh->Draw(commandBuffer, ShaderLayout, CameraView);
-        }
+        mesh->Draw(commandBuffer, ShaderLayout, CameraView);
     }
 }
 

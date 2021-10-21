@@ -1,10 +1,12 @@
 #pragma once
 #include "Light.h"
 #include "OrthographicLightViewCamera.h"
+#include "GameObject.h"
+
 class PointLight : public Light<PointLightBuffer>
 {
 private:
-
+	std::shared_ptr<GameObject> DebugMesh;
 
 public:
 	PointLight();

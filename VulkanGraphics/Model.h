@@ -67,9 +67,9 @@ public:
 	glm::mat4 ModelTransform;
 
 	Model();
-	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	Model(const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags = Mesh_Draw);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw);
+	Model(const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw);
 	~Model();
 
 	void Update(bool RayTraceFlag);

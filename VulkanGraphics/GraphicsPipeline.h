@@ -1,6 +1,7 @@
 #pragma once
 #include "Vulkanengine.h"
 
+
 struct RayTraceConstants
 {
 	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
@@ -20,6 +21,14 @@ struct ConstMeshInfo
 	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
 	alignas(16) glm::mat4 view = glm::mat4(1.0f);
 	alignas(16) glm::vec3 CameraPos = glm::vec3(0.0f);
+};
+
+struct ConstLightDebug
+{
+	alignas(4) uint32_t MeshIndex;
+	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
+	alignas(16) glm::mat4 view = glm::mat4(1.0f);
+	alignas(16) glm::vec4 LightColor = glm::vec4(1.0f);
 };
 
 struct PrefilterConst

@@ -170,7 +170,7 @@ void DepthPassRendererPass::Draw()
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSet, 0, nullptr);
     for (auto& mesh : MeshManagerPtr::GetMeshManagerPtr()->MeshList)
     {
-        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
+        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw)
         {
             if (mesh->ShowMesh)
             {

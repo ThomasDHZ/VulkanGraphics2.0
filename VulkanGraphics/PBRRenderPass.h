@@ -5,6 +5,7 @@
 #include "RenderedColorTexture.h"
 #include "SkyBoxRenderPipeline.h"
 #include "PBRPipeline.h"
+#include "DebugLightPipeline.h"
 
 class PBRRenderPass : public BaseRenderPass
 {
@@ -26,6 +27,7 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<PBRPipeline> pbrPipeline;
+	std::shared_ptr<DebugLightPipeline> debugLightPipeline;
 	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
 
 	void RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);

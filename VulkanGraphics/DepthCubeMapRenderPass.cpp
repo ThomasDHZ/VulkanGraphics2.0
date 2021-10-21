@@ -200,7 +200,7 @@ void DepthCubeMapRenderPass::Draw()
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     for (auto& mesh : MeshManagerPtr::GetMeshManagerPtr()->MeshList)
     {
-        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
+        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw)
         {
             if (mesh->ShowMesh)
             {

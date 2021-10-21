@@ -20,6 +20,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine,
     CreateRenderPass();
     CreateRendererFramebuffers();
     blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass, ShadowMapTexture));
+    debugLightPipeline = std::make_shared<DebugLightPipeline>(DebugLightPipeline(RenderPass, ShadowMapTexture));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
     SetUpCommandBuffers();
 }
@@ -198,6 +199,7 @@ void BlinnPhongRasterPass::RebuildSwapChain(std::shared_ptr<RenderedDepthTexture
     DepthTexture->RecreateRendererTexture(RenderPassResolution);
 
     blinnphongPipeline->Destroy();
+    debugLightPipeline->Destroy();
     skyboxPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -212,6 +214,7 @@ void BlinnPhongRasterPass::RebuildSwapChain(std::shared_ptr<RenderedDepthTexture
     CreateRenderPass();
     CreateRendererFramebuffers();
     blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTexture);
+    debugLightPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTexture);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
@@ -255,10 +258,57 @@ void BlinnPhongRasterPass::Draw()
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
     static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipelineLayout, 0, 1, &blinnphongPipeline->DescriptorSet, 0, nullptr);
-    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], blinnphongPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+    for (auto& mesh : MeshManagerPtr::GetMeshManagerPtr()->MeshList)
+    {
+        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw)
+        {
+            ConstMeshInfo meshInfo;
+            meshInfo.MeshIndex = mesh->MeshBufferIndex;
+            meshInfo.CameraPos = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetPosition();
+            meshInfo.view = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix();
+            meshInfo.proj = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetProjectionMatrix();
+            meshInfo.proj[1][1] *= -1;
 
+            VkDeviceSize offsets[] = { 0 };
+            vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipeline);
+            vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipelineLayout, 0, 1, &blinnphongPipeline->DescriptorSet, 0, nullptr);
+            vkCmdBindVertexBuffers(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &mesh->VertexBuffer.Buffer, offsets);
+            vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], blinnphongPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstMeshInfo), &meshInfo);
+            if (mesh->IndexCount == 0)
+            {
+                vkCmdDraw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->VertexCount, 1, 0, 0);
+            }
+            else
+            {
+                vkCmdBindIndexBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdDrawIndexed(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->IndexCount, 1, 0, 0, 0);
+            }
+        }
+        else if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_Debug)
+        {
+            ConstLightDebug LightInfo;
+            LightInfo.MeshIndex = mesh->MeshBufferIndex;
+            LightInfo.LightColor = glm::vec4(1.0f, 1.0f, 1.0f, 0.25f);
+            LightInfo.view = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix();
+            LightInfo.proj = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetProjectionMatrix();
+            LightInfo.proj[1][1] *= -1;
+
+            VkDeviceSize offsets[] = { 0 };
+            vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, debugLightPipeline->ShaderPipeline);
+            vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, debugLightPipeline->ShaderPipelineLayout, 0, 1, &debugLightPipeline->DescriptorSet, 0, nullptr);
+            vkCmdBindVertexBuffers(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &mesh->VertexBuffer.Buffer, offsets);
+            vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], debugLightPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstLightDebug), &LightInfo);
+            if (mesh->IndexCount == 0)
+            {
+                vkCmdDraw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->VertexCount, 1, 0, 0);
+            }
+            else
+            {
+                vkCmdBindIndexBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+                vkCmdDrawIndexed(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->IndexCount, 1, 0, 0, 0);
+            }
+        }
+    }
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -274,6 +324,7 @@ void BlinnPhongRasterPass::Destroy()
     DepthTexture->Delete();
 
     blinnphongPipeline->Destroy();
+    debugLightPipeline->Destroy();
     skyboxPipeline->Destroy();
 
     BaseRenderPass::Destroy();

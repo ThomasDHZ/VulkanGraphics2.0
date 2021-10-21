@@ -52,6 +52,12 @@ public:
 	uint32_t GetMaterialDescriptorCount() { return materialManager->GetMaterialDescriptorCount(); }
 	uint32_t GetTextureBufferDescriptorCount() { return textureManager->GetTextureBufferDescriptorCount(); }
 	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager->Get3DTextureBufferDescriptorCount(); }
+
+	template <class T>
+	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, T ShaderConstBuffer)
+	{
+		meshManager->Draw(commandBuffer, ShaderLayout, ShaderConstBuffer);
+	}
 };
 
 class AssetManagerPtr

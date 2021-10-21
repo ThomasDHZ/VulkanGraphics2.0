@@ -2,11 +2,13 @@
 #include "Light.h"
 #include "CameraManager.h"
 #include "OrthographicLightViewCamera.h"
+#include "GameObject.h"
 
 
 class DirectionalLight : public Light<DirectionalLightBuffer>
 {
 private:
+	std::shared_ptr<GameObject> DebugMesh;
 
 public:
 	DirectionalLight();

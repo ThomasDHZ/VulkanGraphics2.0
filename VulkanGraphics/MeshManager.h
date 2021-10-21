@@ -37,6 +37,15 @@ public:
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);
 
 	uint32_t GetMeshDescriptorCount();
+
+	template <class T>
+	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, T ShaderConstBuffer)
+	{
+		for (auto& mesh : MeshList)
+		{
+			mesh->Draw(commandBuffer, ShaderLayout, ShaderConstBuffer);
+		}
+	}
 };
 
 class MeshManagerPtr
