@@ -5,7 +5,6 @@
 #include "MeshManager.h"
 #include "RenderedColorTexture.h"
 #include "SkyBoxRenderPipeline.h"
-#include "DebugLightPipeline.h"
 
 class BlinnPhongRasterPass : public BaseRenderPass
 {
@@ -27,7 +26,6 @@ public:
 	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
 	std::shared_ptr<BlinnPhongPipeline> blinnphongPipeline;
-	std::shared_ptr<DebugLightPipeline> debugLightPipeline;
 	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
 
 	void RebuildSwapChain(std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);

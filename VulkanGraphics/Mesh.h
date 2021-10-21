@@ -15,10 +15,11 @@
 
 enum MeshDrawFlags
 {
-	//Mesh_Draw_All = 0x00,
-	Mesh_Draw = 0x01,
-	Mesh_Draw_Debug = 0x02,
-	Mesh_SkyBox = 0x04,
+	Mesh_Draw_All = 0x00,
+	Mesh_Skip_Forward_Renderer = 0x01,
+	Mesh_Skip_RayTrace_Renderer = 0x02,
+	Mesh_Skip_Water_Renderer = 0x04,
+	Mesh_SkyBox = 0x08,
 };
 enum MeshTypeFlag
 {
@@ -54,7 +55,7 @@ protected:
 		};
 	}
 public:
-	MeshDrawFlags DrawFlags = Mesh_Draw;
+	MeshDrawFlags DrawFlags = Mesh_Draw_All;
 	MeshTypeFlag MeshType = Mesh_Type_Normal;
 
 	uint32_t ParentModelID = 0;
@@ -100,11 +101,11 @@ public:
 	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
 
 	Mesh();
-	Mesh(std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw);
-	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw);
-	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw);
-	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType = Mesh_Type_Normal, MeshDrawFlags MeshDrawFlags = Mesh_Draw);
-	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags = Mesh_Draw);
+	Mesh(std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType = Mesh_Type_Normal, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
 	~Mesh();
 
 	void SetUpMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
@@ -122,20 +123,17 @@ public:
 	{
 		if (ShowMesh)
 		{
-			if (DrawFlags == MeshDrawFlags::Mesh_Draw)
+			VkDeviceSize offsets[] = { 0 };
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
+			vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(T), &ShaderConstBuffer);
+			if (IndexCount == 0)
 			{
-				VkDeviceSize offsets[] = { 0 };
-				vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
-				vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(T), &ShaderConstBuffer);
-				if (IndexCount == 0)
-				{
-					vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
-				}
-				else
-				{
-					vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-					vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
-				}
+				vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
+			}
+			else
+			{
+				vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+				vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
 			}
 		}
 	}

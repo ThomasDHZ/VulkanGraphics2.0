@@ -227,7 +227,6 @@
     <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="CubeMapTexture.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
-    <ClCompile Include="DebugLightPipeline.cpp" />
     <ClCompile Include="DepthCubeMapPipeline.cpp" />
     <ClCompile Include="DepthCubeMapRenderPass.cpp" />
     <ClCompile Include="DepthDebugPipeline.cpp" />
@@ -344,7 +343,6 @@
     <ClInclude Include="CameraManager.h" />
     <ClInclude Include="CubeMapTexture.h" />
     <ClInclude Include="DDSTextureLoader.h" />
-    <ClInclude Include="DebugLightPipeline.h" />
     <ClInclude Include="DepthCubeMapPipeline.h" />
     <ClInclude Include="DepthDebugPipeline.h" />
     <ClInclude Include="DepthDebugRenderPass.h" />
@@ -452,8 +450,6 @@
     <None Include="Shaders\BRDFShader.vert" />
     <None Include="Shaders\closesthit.rchit" />
     <None Include="Shaders\compile.bat" />
-    <None Include="Shaders\DebugLightShader.frag" />
-    <None Include="Shaders\DebugLightShader.vert" />
     <None Include="Shaders\DepthCubeShader.frag" />
     <None Include="Shaders\DepthCubeShader.vert" />
     <None Include="Shaders\DepthDebugShader.frag" />

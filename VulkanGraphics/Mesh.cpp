@@ -323,49 +323,24 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, 
 {
     if (ShowMesh)
 	{
-		if (DrawFlags == MeshDrawFlags::Mesh_Draw)
-		{
-			ConstMeshInfo meshInfo;
-			meshInfo.MeshIndex = MeshBufferIndex;
-			meshInfo.CameraPos = CameraView->GetPosition();
-			meshInfo.view = CameraView->GetViewMatrix();
-			meshInfo.proj = CameraView->GetProjectionMatrix();
-			meshInfo.proj[1][1] *= -1;
+		ConstMeshInfo meshInfo;
+		meshInfo.MeshIndex = MeshBufferIndex;
+		meshInfo.CameraPos = CameraView->GetPosition();
+		meshInfo.view = CameraView->GetViewMatrix();
+		meshInfo.proj = CameraView->GetProjectionMatrix();
+		meshInfo.proj[1][1] *= -1;
 
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
-			vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstMeshInfo), &meshInfo);
-			if (IndexCount == 0)
-			{
-				vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
-			}
-			else
-			{
-				vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-				vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
-			}
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
+		vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstMeshInfo), &meshInfo);
+		if (IndexCount == 0)
+		{
+			vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
 		}
-		else if (DrawFlags == MeshDrawFlags::Mesh_Draw_Debug)
+		else
 		{
-			ConstLightDebug LightInfo;
-			LightInfo.MeshIndex = MeshBufferIndex;
-			LightInfo.LightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-			LightInfo.view = CameraView->GetViewMatrix();
-			LightInfo.proj = CameraView->GetProjectionMatrix();
-			LightInfo.proj[1][1] *= -1;
-
-			VkDeviceSize offsets[] = { 0 };
-			vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
-			vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstLightDebug), &LightInfo);
-			if (IndexCount == 0)
-			{
-				vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
-			}
-			else
-			{
-				vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-				vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
-			}
+			vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32); 
+			vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
 		}
 	}
 }
