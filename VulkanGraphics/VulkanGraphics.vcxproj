@@ -479,6 +479,8 @@
     <None Include="Shaders\PrefilterShader.frag" />
     <None Include="Shaders\PrefilterShader.vert" />
     <None Include="Shaders\raygen.rgen" />
+    <None Include="Shaders\ReflectionShader.frag" />
+    <None Include="Shaders\ReflectionShader.vert" />
     <None Include="Shaders\RTVertexBuilder.glsl" />
     <None Include="Shaders\RTXRandom.glsl" />
     <None Include="Shaders\Shader2D.frag" />

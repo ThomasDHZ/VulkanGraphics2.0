@@ -931,5 +931,11 @@
     <None Include="Shaders\DepthCubeShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
+    <None Include="Shaders\ReflectionShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\ReflectionShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
