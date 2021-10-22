@@ -12,8 +12,8 @@ PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize) : BaseRenderPass(
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     CubeMapMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(RenderPassResolution.x, RenderPassResolution.y)))) + 1;
 
-    DrawToCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x)));
-    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x), CubeMapMipLevels));
+    DrawToCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x), VK_SAMPLE_COUNT_1_BIT));
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x), VK_SAMPLE_COUNT_1_BIT, CubeMapMipLevels));
 
     CreateRenderPass();
     CreateRendererFramebuffers();

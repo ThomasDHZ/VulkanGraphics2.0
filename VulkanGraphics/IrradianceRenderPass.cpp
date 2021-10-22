@@ -10,7 +10,7 @@ IrradianceRenderPass::IrradianceRenderPass() : BaseRenderPass()
 IrradianceRenderPass::IrradianceRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
-    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution));
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass();
     CreateRendererFramebuffers();

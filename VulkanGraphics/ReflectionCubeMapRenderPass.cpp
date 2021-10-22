@@ -11,15 +11,15 @@ ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass(std::shared_ptr<VulkanE
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
-    ColorTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
-    RenderedTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
-    BloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
-    RenderedBloomTexture = std::make_shared<RenderedColorTexture>(RenderedColorTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
+    ColorTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
+    RenderedTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
+    BloomTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
+    RenderedBloomTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
     DepthTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass, ShadowMapTexture));
+    reflectionPipeline = std::make_shared<ReflectionCubeMapPipeline>(ReflectionCubeMapPipeline(RenderPass, ShadowMapTexture));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
     SetUpCommandBuffers();
 }
@@ -197,7 +197,7 @@ void ReflectionCubeMapRenderPass::RebuildSwapChain(std::shared_ptr<RenderedDepth
     RenderedBloomTexture->RecreateRendererTexture(RenderPassResolution);
     DepthTexture->RecreateRendererTexture(RenderPassResolution);
 
-    blinnphongPipeline->Destroy();
+    reflectionPipeline->Destroy();
     skyboxPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -211,7 +211,7 @@ void ReflectionCubeMapRenderPass::RebuildSwapChain(std::shared_ptr<RenderedDepth
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTexture);
+    reflectionPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTexture);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
@@ -255,9 +255,9 @@ void ReflectionCubeMapRenderPass::Draw()
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
     static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipeline);
-    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipelineLayout, 0, 1, &blinnphongPipeline->DescriptorSet, 0, nullptr);
-    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], blinnphongPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, reflectionPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, reflectionPipeline->ShaderPipelineLayout, 0, 1, &reflectionPipeline->DescriptorSet, 0, nullptr);
+    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], reflectionPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
@@ -273,7 +273,7 @@ void ReflectionCubeMapRenderPass::Destroy()
     RenderedBloomTexture->Delete();
     DepthTexture->Delete();
 
-    blinnphongPipeline->Destroy();
+    reflectionPipeline->Destroy();
     skyboxPipeline->Destroy();
 
     BaseRenderPass::Destroy();

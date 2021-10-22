@@ -4,20 +4,22 @@ RenderedCubeMapTexture::RenderedCubeMapTexture() : Texture()
 {
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, uint32_t mipLevels) : Texture(TextureType::vkRenderedCubeMap)
+RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount, uint32_t mipLevels) : Texture(TextureType::vkRenderedCubeMap)
 {
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
     MipMapLevels = mipLevels;
+    SampleCount = sampleCount;
 
     CreateTextureImage();
     CreateTextureView();
     CreateTextureSampler();
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(glm::ivec2 TextureResolution, uint32_t mipLevels) : Texture(TextureResolution, TextureType::vkRenderedCubeMap)
+RenderedCubeMapTexture::RenderedCubeMapTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount, uint32_t mipLevels) : Texture(TextureResolution, TextureType::vkRenderedCubeMap)
 {
     MipMapLevels = mipLevels;
+    SampleCount = sampleCount;
 
     CreateTextureImage();
     CreateTextureView();
@@ -43,7 +45,7 @@ void RenderedCubeMapTexture::CreateTextureImage()
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     TextureInfo.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-    TextureInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    TextureInfo.samples = SampleCount;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     Texture::CreateTextureImage(TextureInfo);
