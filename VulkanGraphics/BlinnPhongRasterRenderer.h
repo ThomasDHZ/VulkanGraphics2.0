@@ -11,7 +11,7 @@ class BlinnPhongRasterRenderer : public BaseRenderer
 {
 private:
 	static constexpr RendererID rendererID = RendererID::BlinnPhong_Raster_Renderer;
-
+	bool cubeMapCheck = false;
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;
 	DepthDebugRenderPass DebugDepthRenderPass;

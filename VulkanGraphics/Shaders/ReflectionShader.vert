@@ -3,6 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
+#extension GL_EXT_multiview : enable
 
 #include "material.glsl"
 
@@ -46,6 +47,11 @@ layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
 layout(binding = 9) uniform samplerCube CubeMap;
 
+layout(binding = 14) uniform CubeSampler 
+{
+    mat4 lightSpaceMatrix[6];
+} ReflectionSamples;
+
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
@@ -78,6 +84,6 @@ void main()
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
     LightSpace = (biasMat * ubo.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
-    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
+    gl_Position =  ReflectionSamples.lightSpaceMatrix[gl_ViewIndex] * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
 
 }

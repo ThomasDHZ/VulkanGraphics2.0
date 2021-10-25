@@ -15,7 +15,7 @@ ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass(uint32_t cubeMapSize, s
     RenderedCubeBloom = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline = std::make_shared<ReflectionCubeMapPipeline>(ReflectionCubeMapPipeline(RenderPass, RenderPassResolution.x, ShadowMapTexture));
+    depthCubeMapPipeline = std::make_shared<ReflectionCubeMapPipeline>(ReflectionCubeMapPipeline(RenderPass, RenderPassResolution.x, ShadowMapTexture, cubeSampler));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, VK_SAMPLE_COUNT_1_BIT);
     SetUpCommandBuffers();
 }
@@ -170,7 +170,7 @@ void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize, std::sh
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x, ShadowMapTexture);
+    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x, ShadowMapTexture, cubeSampler);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, VK_SAMPLE_COUNT_1_BIT);
     SetUpCommandBuffers();
 }

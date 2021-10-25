@@ -9,13 +9,13 @@ class ReflectionCubeMapPipeline : public GraphicsPipeline
 private:
 	void SetUpDescriptorPool();
 	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets(std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	void SetUpDescriptorSets(std::shared_ptr<RenderedDepthTexture> ShadowMapTexture, std::shared_ptr<CubeSampler> cubeSampler);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
 public:
 	ReflectionCubeMapPipeline();
-	ReflectionCubeMapPipeline(const VkRenderPass& renderPass, float CubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	ReflectionCubeMapPipeline(const VkRenderPass& renderPass, float CubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture, std::shared_ptr<CubeSampler> cubeSampler);
 	~ReflectionCubeMapPipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture, std::shared_ptr<CubeSampler> cubeSampler);
 };
 
