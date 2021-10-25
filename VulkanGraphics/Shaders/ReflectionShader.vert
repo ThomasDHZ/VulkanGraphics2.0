@@ -73,31 +73,31 @@ layout(location = 5) out vec4 LightSpace;
 
 void main() 
 {
-    if(gl_VertexIndex == 0)
-	{
-        if(gl_ViewIndex == 0)
-        {
-		    debugPrintfEXT("Reflection00: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][0]);
-             debugPrintfEXT("Reflection01: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][1]);
-              debugPrintfEXT("Reflection02: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][2]);
-               debugPrintfEXT("Reflection03: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][3]);
-
-                debugPrintfEXT("Reflection10: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][0]);
-                 debugPrintfEXT("Reflection11: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][1]);
-                  debugPrintfEXT("Reflection12: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][2]);
-                   debugPrintfEXT("Reflection13: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][3]);
-
-                    debugPrintfEXT("Reflection20: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][0]);
-                     debugPrintfEXT("Reflection21: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][1]);
-                      debugPrintfEXT("Reflection22: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][2]);
-                       debugPrintfEXT("Reflection23: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][3]);
-
-                        debugPrintfEXT("Reflection30: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][0]);
-                         debugPrintfEXT("Reflection31: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][1]);
-                          debugPrintfEXT("Reflection32: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][2]);
-                           debugPrintfEXT("Reflection33: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][3]);
-        }
-	}
+//    if(gl_VertexIndex == 0)
+//	{
+//        if(gl_ViewIndex == 0)
+//        {
+//		    debugPrintfEXT("Reflection00: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][0]);
+//             debugPrintfEXT("Reflection01: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][1]);
+//              debugPrintfEXT("Reflection02: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][2]);
+//               debugPrintfEXT("Reflection03: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][0][3]);
+//
+//                debugPrintfEXT("Reflection10: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][0]);
+//                 debugPrintfEXT("Reflection11: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][1]);
+//                  debugPrintfEXT("Reflection12: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][2]);
+//                   debugPrintfEXT("Reflection13: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][1][3]);
+//
+//                    debugPrintfEXT("Reflection20: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][0]);
+//                     debugPrintfEXT("Reflection21: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][1]);
+//                      debugPrintfEXT("Reflection22: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][2]);
+//                       debugPrintfEXT("Reflection23: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][2][3]);
+//
+//                        debugPrintfEXT("Reflection30: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][0]);
+//                         debugPrintfEXT("Reflection31: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][1]);
+//                          debugPrintfEXT("Reflection32: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][2]);
+//                           debugPrintfEXT("Reflection33: %f \n", ReflectionSamples.lightSpaceMatrix[gl_ViewIndex][3][3]);
+//        }
+//	}
 
     FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0));    
     TexCoords = aTexCoords;

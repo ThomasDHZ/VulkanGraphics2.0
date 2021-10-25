@@ -102,28 +102,39 @@ std::shared_ptr<Texture3D> TextureManager::LoadTexture3D(glm::ivec3& TextureReso
 //	return texture;
 //}
 
-void TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	 std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	 CubeMapList.emplace_back(texture);
+	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return texture;
 }
 
-void TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	CubeMapList.emplace_back(texture);
+	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return texture;
 }
 
-void TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
 {
-	CubeMap = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
+	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
+	CubeMapList.emplace_back(texture);
+	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return texture;
 }
 
-void TextureManager::LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::shared_ptr<CubeMapTexture> cubeMapTexture)
 {
-	CubeMap = cubeMapTexture;
+	CubeMapList.emplace_back(cubeMapTexture);
+	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return cubeMapTexture;
 }
 
 void TextureManager::DeleteTexture2DByID(uint32_t TextureID)
@@ -177,9 +188,9 @@ void TextureManager::UnloadAllTextures()
 
 void TextureManager::UnloadCubeMap()
 {
-	if (CubeMap != nullptr)
+	for (auto& CubeMapList : Texture3DList)
 	{
-		CubeMap->Delete();
+		CubeMapList->Delete();
 	}
 }
 
@@ -230,6 +241,11 @@ void TextureManager::UpdateBufferIndex()
 	for (int x = 0; x < Texture3DList.size(); x++)
 	{
 		Texture3DList[x]->TextureBufferIndex = x;
+	}
+
+	for (int x = 0; x < CubeMapList.size(); x++)
+	{
+		CubeMapList[x]->TextureBufferIndex = x;
 	}
 }
 
@@ -324,22 +340,29 @@ std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescrip
 	return DescriptorImageList;
 }
 
-VkDescriptorImageInfo TextureManager::GetSkyBoxTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetSkyBoxTextureBufferListDescriptor()
 {
-	VkDescriptorImageInfo DescriptorImage{};
-	if (CubeMap.get() != nullptr)
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	if (CubeMapList.size() == 0)
 	{
-		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		DescriptorImage.imageView = CubeMap->GetTextureView();
-		DescriptorImage.sampler = CubeMap->GetTextureSampler();
+		VkDescriptorImageInfo nullBuffer;
+		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		nullBuffer.imageView = VK_NULL_HANDLE;
+		nullBuffer.sampler = Texture2DList[0]->Sampler;
+		DescriptorImageList.emplace_back(nullBuffer);
 	}
 	else
 	{
-		DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		DescriptorImage.imageView = VK_NULL_HANDLE;
-		DescriptorImage.sampler = Texture2DList[0]->Sampler;
+		for (auto texture : CubeMapList)
+		{
+			VkDescriptorImageInfo DescriptorImage{};
+			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			DescriptorImage.imageView = texture->GetTextureView();
+			DescriptorImage.sampler = texture->GetTextureSampler();
+			DescriptorImageList.emplace_back(DescriptorImage);
+		}
 	}
-	return DescriptorImage;
+	return DescriptorImageList;
 }
 
 uint32_t TextureManager::GetTextureBufferDescriptorCount()

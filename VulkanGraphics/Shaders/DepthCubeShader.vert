@@ -56,30 +56,30 @@ layout (location = 4) in vec4 aBitangent;
 
 void main() 
 {
-    if(gl_VertexIndex == 0)
-	{
-        if(gl_ViewIndex == 0)
-        {
-		    debugPrintfEXT("CubeDepth00: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][0]);
-             debugPrintfEXT("CubeDepth01: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][1]);
-              debugPrintfEXT("CubeDepth02: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][2]);
-               debugPrintfEXT("CubeDepth03: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][3]);
-
-                debugPrintfEXT("CubeDepth10: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][0]);
-                 debugPrintfEXT("CubeDepth11: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][1]);
-                  debugPrintfEXT("CubeDepth12: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][2]);
-                   debugPrintfEXT("CubeDepth13: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][3]);
-
-                    debugPrintfEXT("CubeDepth20: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][0]);
-                     debugPrintfEXT("CubeDepth21: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][1]);
-                      debugPrintfEXT("CubeDepth22: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][2]);
-                       debugPrintfEXT("CubeDepth23: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][3]);
-
-                        debugPrintfEXT("CubeDepth30: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][0]);
-                         debugPrintfEXT("CubeDepth31: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][1]);
-                          debugPrintfEXT("CubeDepth32: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][2]);
-                           debugPrintfEXT("CubeDepth33: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][3]);
-        }
-	}
+//    if(gl_VertexIndex == 0)
+//	{
+//        if(gl_ViewIndex == 0)
+//        {
+//		    debugPrintfEXT("CubeDepth00: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][0]);
+//             debugPrintfEXT("CubeDepth01: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][1]);
+//              debugPrintfEXT("CubeDepth02: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][2]);
+//               debugPrintfEXT("CubeDepth03: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][0][3]);
+//
+//                debugPrintfEXT("CubeDepth10: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][0]);
+//                 debugPrintfEXT("CubeDepth11: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][1]);
+//                  debugPrintfEXT("CubeDepth12: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][2]);
+//                   debugPrintfEXT("CubeDepth13: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][1][3]);
+//
+//                    debugPrintfEXT("CubeDepth20: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][0]);
+//                     debugPrintfEXT("CubeDepth21: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][1]);
+//                      debugPrintfEXT("CubeDepth22: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][2]);
+//                       debugPrintfEXT("CubeDepth23: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][2][3]);
+//
+//                        debugPrintfEXT("CubeDepth30: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][0]);
+//                         debugPrintfEXT("CubeDepth31: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][1]);
+//                          debugPrintfEXT("CubeDepth32: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][2]);
+//                           debugPrintfEXT("CubeDepth33: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][3]);
+//        }
+//	}
     gl_Position = SkyboxSamples.lightSpaceMatrix[gl_ViewIndex] * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
 }
