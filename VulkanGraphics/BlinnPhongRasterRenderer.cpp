@@ -12,7 +12,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine>
     DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTexture);
     ReflectionRenderPass = ReflectionCubeMapRenderPass(1024);
 
-   // AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(ReflectionRenderPass.RenderedCubeMap);
+    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(ReflectionRenderPass.RenderedCubeMap);
     BlinnRenderPass = BlinnPhongRasterPass(engine, DepthRenderPass.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 }
@@ -54,6 +54,7 @@ void BlinnPhongRasterRenderer::GUIUpdate()
 void BlinnPhongRasterRenderer::Update()
 {
     depthCubeMapRenderPass.Update();
+    ReflectionRenderPass.Update();
 }
 
 void BlinnPhongRasterRenderer::Draw()

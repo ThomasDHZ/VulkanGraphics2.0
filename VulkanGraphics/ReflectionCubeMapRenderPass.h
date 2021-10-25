@@ -23,7 +23,7 @@ public:
 	ReflectionCubeMapRenderPass(uint32_t cubeMapSize);
 	~ReflectionCubeMapRenderPass();
 
-	std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap;
+	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
 	std::shared_ptr<DepthCubeMapPipeline> depthCubeMapPipeline;
 
 	void RebuildSwapChain(uint32_t cubeMapSize);
