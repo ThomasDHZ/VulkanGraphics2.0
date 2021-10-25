@@ -10,8 +10,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine>
     DepthRenderPass = DepthPassRendererPass(512);
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
     DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTexture);
-    ReflectionRenderPass = ReflectionCubeMapRenderPass(1024, DepthRenderPass.DepthTexture);
-
+    ReflectionRenderPass = ReflectionCubeMapRenderPass(64, DepthRenderPass.DepthTexture);
 
     BlinnRenderPass = BlinnPhongRasterPass(engine, DepthRenderPass.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
@@ -47,14 +46,14 @@ void BlinnPhongRasterRenderer::GUIUpdate()
     GUIChangedFlag |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
     ImGui::Checkbox("Cube Debug", &cubeMapCheck);
 
-    if (cubeMapCheck)
-    {
-        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(ReflectionRenderPass.RenderedCubeMap);
-    }
-    else
-    {
-        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
-    }
+    //if (cubeMapCheck)
+    //{
+    //    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(ReflectionRenderPass.RenderedCubeMap);
+    //}
+    //else
+    //{
+    //    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
+    //}
 
     if (GUIChangedFlag)
     {
@@ -88,6 +87,7 @@ void BlinnPhongRasterRenderer::Destroy()
 {
 
     DebugDepthRenderPass.Destroy();
+    depthCubeMapRenderPass.Destroy();
     ReflectionRenderPass.Destroy();
     BlinnRenderPass.Destroy();
     FrameBufferRenderer.Destroy();

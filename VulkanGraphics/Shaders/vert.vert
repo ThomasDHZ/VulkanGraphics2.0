@@ -67,9 +67,9 @@ layout(location = 5) out vec4 LightSpace;
 
 void main() 
 {
-//    	if(gl_VertexIndex == 0)
+//    if(gl_VertexIndex == 0)
 //	{
-//		debugPrintfEXT("Temp: %i \n", ubo.DirectionalLightCount);
+//		debugPrintfEXT(": %i \n", ubo.DirectionalLightCount);
 //	}
 
     FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0));    
