@@ -5,11 +5,11 @@ SkyBoxRenderPipeline::SkyBoxRenderPipeline() : GraphicsPipeline()
 {
 }
 
-SkyBoxRenderPipeline::SkyBoxRenderPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
+SkyBoxRenderPipeline::SkyBoxRenderPipeline(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
-    SetUpShaderPipeLine(renderPass);
+    SetUpShaderPipeLine(renderPass, SampleCount);
     SetUpDescriptorSets();
 }
 
@@ -42,7 +42,7 @@ void SkyBoxRenderPipeline::SetUpDescriptorSets()
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void SkyBoxRenderPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
+void SkyBoxRenderPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("Shaders/SkyBoxRenderShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -104,7 +104,7 @@ void SkyBoxRenderPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     VkPipelineMultisampleStateCreateInfo multisampling = {};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling.sampleShadingEnable = VK_TRUE;
-    multisampling.rasterizationSamples = EnginePtr::GetEnginePtr()->MaxSampleCount;
+    multisampling.rasterizationSamples = SampleCount;
 
     VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
     colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -168,11 +168,11 @@ void SkyBoxRenderPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void SkyBoxRenderPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
+void SkyBoxRenderPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
-    SetUpShaderPipeLine(renderPass);
+    SetUpShaderPipeLine(renderPass, SampleCount);
     SetUpDescriptorSets();
 }

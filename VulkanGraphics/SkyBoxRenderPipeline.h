@@ -9,11 +9,11 @@ private:
 	void SetUpDescriptorPool();
 	void SetUpDescriptorLayout();
 	void SetUpDescriptorSets();
-	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
+	void SetUpShaderPipeLine(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount);
 public:
 	SkyBoxRenderPipeline();
-	SkyBoxRenderPipeline(const VkRenderPass& renderPass);
+	SkyBoxRenderPipeline(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount);
 	~SkyBoxRenderPipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount);
 };

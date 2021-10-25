@@ -8,6 +8,7 @@
 #include "RenderedCubeMapTexture.h"
 #include "RenderedCubeMapDepthTexture.h"
 #include "DepthCubeMapPipeline.h"
+#include "ReflectionCubeMapPipeline.h"
 
 class ReflectionCubeMapRenderPass : public BaseRenderPass
 {
@@ -20,13 +21,15 @@ private:
 
 public:
 	ReflectionCubeMapRenderPass();
-	ReflectionCubeMapRenderPass(uint32_t cubeMapSize);
+	ReflectionCubeMapRenderPass(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
 	~ReflectionCubeMapRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
-	std::shared_ptr<DepthCubeMapPipeline> depthCubeMapPipeline;
+	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeBloom;
+	std::shared_ptr<ReflectionCubeMapPipeline> depthCubeMapPipeline;
+	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
 
-	void RebuildSwapChain(uint32_t cubeMapSize);
+	void RebuildSwapChain(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
 
 	void Update();
 	void Draw();

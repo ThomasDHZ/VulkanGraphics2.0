@@ -20,7 +20,7 @@ PBRRenderPass::PBRRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_p
     CreateRenderPass();
     CreateRendererFramebuffers();
     pbrPipeline = std::make_shared<PBRPipeline>(PBRPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap, ShadowMapTexture));
-    skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass);
+    skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
     SetUpCommandBuffers();
 }
 
@@ -212,7 +212,7 @@ void PBRRenderPass::RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> Irr
     CreateRenderPass();
     CreateRendererFramebuffers();
     pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTexture);
-    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass);
+    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
     SetUpCommandBuffers();
 }
 

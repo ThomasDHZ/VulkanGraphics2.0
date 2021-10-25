@@ -6,16 +6,17 @@ ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass() : BaseRenderPass()
 {
 }
 
-ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
+ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture) : BaseRenderPass()
 {
     cubeSampler = std::make_shared<CubeSampler>(CubeSampler(EnginePtr::GetEnginePtr()));
 
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
-
+    RenderedCubeBloom = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline = std::make_shared<DepthCubeMapPipeline>(DepthCubeMapPipeline(RenderPass, RenderPassResolution.x, cubeSampler));
+    depthCubeMapPipeline = std::make_shared<ReflectionCubeMapPipeline>(ReflectionCubeMapPipeline(RenderPass, RenderPassResolution.x, ShadowMapTexture));
+    skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, VK_SAMPLE_COUNT_1_BIT);
     SetUpCommandBuffers();
 }
 
@@ -38,8 +39,20 @@ void ReflectionCubeMapRenderPass::CreateRenderPass()
     ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     AttachmentDescriptionList.emplace_back(ColorAttachment);
 
+    VkAttachmentDescription BloomAttachment = {};
+    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BloomAttachment);
+
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
+    ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -103,6 +116,7 @@ void ReflectionCubeMapRenderPass::CreateRendererFramebuffers()
     {
         std::vector<VkImageView> AttachmentList;
         AttachmentList.emplace_back(RenderedCubeMap->View);
+        AttachmentList.emplace_back(RenderedCubeBloom->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -137,11 +151,13 @@ void ReflectionCubeMapRenderPass::SetUpCommandBuffers()
     }
 }
 
-void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
+void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture)
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
+    RenderedCubeBloom->RecreateRendererTexture(RenderPassResolution);
     depthCubeMapPipeline->Destroy();
+    skyboxPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -154,7 +170,8 @@ void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x, cubeSampler);
+    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x, ShadowMapTexture);
+    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, VK_SAMPLE_COUNT_1_BIT);
     SetUpCommandBuffers();
 }
 
@@ -184,8 +201,9 @@ void ReflectionCubeMapRenderPass::Draw()
         throw std::runtime_error("failed to begin recording command buffer!");
     }
 
-    std::array<VkClearValue, 1> clearValues{};
-    clearValues[0].depthStencil = { 1.0f, 0 };
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
+    clearValues[1].color = { {1.0f, 1.0f, 0.0f, 1.0f} };
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -197,39 +215,20 @@ void ReflectionCubeMapRenderPass::Draw()
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    ConstSkyBoxView cubeMapInfo;
+    cubeMapInfo.view = glm::mat4(glm::mat3(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix()));
+    cubeMapInfo.proj = glm::perspective(glm::radians(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetZoom()), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 100.0f);
+    cubeMapInfo.proj[1][1] *= -1;
+
+    vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], skyboxPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &cubeMapInfo);
+    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
+    static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthCubeMapPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthCubeMapPipeline->ShaderPipelineLayout, 0, 1, &depthCubeMapPipeline->DescriptorSet, 0, nullptr);
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    for (auto& mesh : MeshManagerPtr::GetMeshManagerPtr()->MeshList)
-    {
-        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
-        {
-            if (mesh->ShowMesh)
-            {
-                glm::mat4 view = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetViewMatrix();
-                glm::mat4 proj = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetProjectionMatrix();
-                proj[1][1] *= -1;
-
-                LightSceneInfo lightSceneInfo;
-                lightSceneInfo.MeshIndex = mesh->MeshBufferIndex;
-                lightSceneInfo.lightSpaceMatrix = proj * view;
-
-                VkDeviceSize offsets[] = { 0 };
-
-                vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthCubeMapPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
-                vkCmdBindVertexBuffers(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &mesh->VertexBuffer.Buffer, offsets);
-                if (mesh->IndexCount == 0)
-                {
-                    vkCmdDraw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->VertexCount, 1, 0, 0);
-                }
-                else
-                {
-                    vkCmdBindIndexBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
-                    vkCmdDrawIndexed(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], mesh->IndexCount, 1, 0, 0, 0);
-                }
-            }
-        }
-    }
+    AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthCubeMapPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
@@ -240,6 +239,7 @@ void ReflectionCubeMapRenderPass::Draw()
 void ReflectionCubeMapRenderPass::Destroy()
 {
     RenderedCubeMap->Delete();
+    skyboxPipeline->Destroy();
     depthCubeMapPipeline->Destroy();
     BaseRenderPass::Destroy();
 }
