@@ -74,13 +74,13 @@ private:
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
-        //std::string CubeMapFiles[6];
-        //CubeMapFiles[0] = "../texture/skybox/right.jpg";
-        //CubeMapFiles[1] = "../texture/skybox/left.jpg";
-        //CubeMapFiles[2] = "../texture/skybox/top.jpg";
-        //CubeMapFiles[3] = "../texture/skybox/bottom.jpg";
-        //CubeMapFiles[4] = "../texture/skybox/back.jpg";
-        //CubeMapFiles[5] = "../texture/skybox/front.jpg";
+        std::string SkyCubeMapFiles[6];
+        SkyCubeMapFiles[0] = "../texture/skybox/right.jpg";
+        SkyCubeMapFiles[1] = "../texture/skybox/left.jpg";
+        SkyCubeMapFiles[2] = "../texture/skybox/top.jpg";
+        SkyCubeMapFiles[3] = "../texture/skybox/bottom.jpg";
+        SkyCubeMapFiles[4] = "../texture/skybox/back.jpg";
+        SkyCubeMapFiles[5] = "../texture/skybox/front.jpg";
 
         //std::string CubeMapFiles[6];
         //CubeMapFiles[0] = "../texture/skybox/CosmicCoolCloudLeft.png";
@@ -99,8 +99,7 @@ private:
         CubeMapFiles[5] = "../texture/skybox/hot_ft.png";
 
         AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
-        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
-        auto a = AssetManagerPtr::GetAssetPtr()->textureManager->GetAllCubeMapTextures();
+        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(SkyCubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
         AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
 
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());

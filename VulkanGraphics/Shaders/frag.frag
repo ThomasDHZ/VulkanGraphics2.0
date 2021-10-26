@@ -249,10 +249,10 @@ void main()
 
     vec3 I = normalize(FragPos2 - ViewPos);
     vec3 R = reflect(I, normalize(normal));
-    vec3 Reflection = texture(CubeMap[0], R).rgb;
-    vec3 finalMix = mix(result, Reflection, material.Reflectivness);
+    vec3 Reflection = texture(CubeMap[1], R).rgb;
+    vec3 finalMix = mix(result, Reflection, .5);
 
-    outColor = vec4(result, material.Alpha);
+    outColor = vec4(finalMix, material.Alpha);
     outBloom = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     if(material.DiffuseMapID != 0)
     {
