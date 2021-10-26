@@ -387,3 +387,15 @@ uint32_t TextureManager::Get3DTextureBufferDescriptorCount()
 		return 1;
 	}
 }
+
+uint32_t TextureManager::GetCubeMapBufferDescriptorCount()
+{
+	if (CubeMapList.size() > 0)
+	{
+		return CubeMapList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}

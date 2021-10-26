@@ -47,6 +47,7 @@ public:
 	std::shared_ptr<Texture> GetTexture3DByBufferIndex(unsigned int Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
 	std::shared_ptr<Texture> Get3DTexture(unsigned int TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
 	std::shared_ptr<CubeMapTexture> GetCubeMapTexture(uint32_t TextureBufferIndex) { return CubeMapList[TextureBufferIndex]; }
+	std::vector<std::shared_ptr<CubeMapTexture>> GetAllCubeMapTextures() { return CubeMapList; }
 
 	void UnloadAllTextures();
 	void UnloadCubeMap();
@@ -59,6 +60,7 @@ public:
 
 	uint32_t GetTextureBufferDescriptorCount();
 	uint32_t Get3DTextureBufferDescriptorCount();
+	uint32_t GetCubeMapBufferDescriptorCount();
 };
 
 class TextureManagerPtr

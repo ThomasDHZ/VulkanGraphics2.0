@@ -99,7 +99,8 @@ private:
         CubeMapFiles[5] = "../texture/skybox/hot_ft.png";
 
         AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
-
+        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+        auto a = AssetManagerPtr::GetAssetPtr()->textureManager->GetAllCubeMapTextures();
         AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
 
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());

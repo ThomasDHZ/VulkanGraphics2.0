@@ -52,6 +52,7 @@ public:
 	uint32_t GetMaterialDescriptorCount() { return materialManager->GetMaterialDescriptorCount(); }
 	uint32_t GetTextureBufferDescriptorCount() { return textureManager->GetTextureBufferDescriptorCount(); }
 	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager->Get3DTextureBufferDescriptorCount(); }
+	uint32_t GetCubeMapBufferDescriptorCount() { return textureManager->GetCubeMapBufferDescriptorCount(); }
 };
 
 class AssetManagerPtr
