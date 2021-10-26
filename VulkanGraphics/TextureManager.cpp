@@ -102,34 +102,34 @@ std::shared_ptr<Texture3D> TextureManager::LoadTexture3D(glm::ivec3& TextureReso
 //	return texture;
 //}
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+std::shared_ptr<Texture> TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	 std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	 std::shared_ptr<Texture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 	 CubeMapList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
+std::shared_ptr<Texture> TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	const std::shared_ptr<Texture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 	CubeMapList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
+std::shared_ptr<Texture> TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
 {
-	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
+	const std::shared_ptr<Texture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
 	CubeMapList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
-std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::shared_ptr<CubeMapTexture> cubeMapTexture)
+std::shared_ptr<Texture> TextureManager::LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture)
 {
 	CubeMapList.emplace_back(cubeMapTexture);
 	UpdateBufferIndex();

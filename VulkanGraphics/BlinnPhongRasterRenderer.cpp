@@ -12,6 +12,9 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine>
     DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTexture);
     ReflectionRenderPass = ReflectionCubeMapRenderPass(64, DepthRenderPass.DepthTexture);
 
+    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
+    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(ReflectionRenderPass.RenderedCubeMap);
+
     BlinnRenderPass = BlinnPhongRasterPass(engine, DepthRenderPass.DepthTexture);
     FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 }
@@ -22,38 +25,18 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 
 void BlinnPhongRasterRenderer::RebuildSwapChain()
 {
-
-
     DepthRenderPass.RebuildSwapChain(512);
     depthCubeMapRenderPass.RebuildSwapChain(1024);
     DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
     ReflectionRenderPass.RebuildSwapChain(1024, DepthRenderPass.DepthTexture);
-
     BlinnRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
-
-    if (ShadowDebugFlag)
-    {
-        FrameBufferRenderer.RebuildSwapChain(DebugDepthRenderPass.DebugTexture, DebugDepthRenderPass.DebugTexture);
-    }
-    else
-    {
-        FrameBufferRenderer.RebuildSwapChain(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
-    }
+    FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 }
 
 void BlinnPhongRasterRenderer::GUIUpdate()
 {
     GUIChangedFlag |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
     ImGui::Checkbox("Cube Debug", &cubeMapCheck);
-
-    //if (cubeMapCheck)
-    //{
-    //    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(ReflectionRenderPass.RenderedCubeMap);
-    //}
-    //else
-    //{
-    //    AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
-    //}
 
     if (GUIChangedFlag)
     {
