@@ -166,7 +166,7 @@ void LightManager::DeleteRectangleAreaLight(uint32_t LightBufferIndex)
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
-std::vector<VkDescriptorBufferInfo> LightManager::GetDirectionalLightBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> LightManager::GetDirectionalLightBufferDescriptorList()
 {
 	std::vector<VkDescriptorBufferInfo> DirectionalLightBufferList{};
 	if (DirectionalLightList.size() == 0)
@@ -192,7 +192,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetDirectionalLightBufferListD
 	return DirectionalLightBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> LightManager::GetPointLightBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> LightManager::GetPointLightBufferDescriptorList()
 {
 	std::vector<VkDescriptorBufferInfo> PointLightBufferList{};
 	if (PointLightList.size() == 0)
@@ -218,7 +218,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetPointLightBufferListDescrip
 	return PointLightBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> LightManager::GetSpotLightBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> LightManager::GetSpotLightBufferDescriptorList()
 {
 	std::vector<VkDescriptorBufferInfo> SpotLightBufferList{};
 	if (SpotLightList.size() == 0)
@@ -244,7 +244,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetSpotLightBufferListDescript
 	return SpotLightBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> LightManager::GetSphereAreaLightDescriptor()
+std::vector<VkDescriptorBufferInfo> LightManager::GetSphereAreaLightDescriptorList()
 {
 	std::vector<VkDescriptorBufferInfo> SphereAreaLightBufferList{};
 	if (SphereAreaLightList.size() == 0)
@@ -270,7 +270,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetSphereAreaLightDescriptor()
 	return SphereAreaLightBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> LightManager::GetTubeAreaLightDescriptor()
+std::vector<VkDescriptorBufferInfo> LightManager::GetTubeAreaLightDescriptorList()
 {
 	std::vector<VkDescriptorBufferInfo> TubeAreaLightBufferList{};
 	if (TubeAreaLightList.size() == 0)
@@ -296,7 +296,7 @@ std::vector<VkDescriptorBufferInfo> LightManager::GetTubeAreaLightDescriptor()
 	return TubeAreaLightBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> LightManager::GetRectangleAreaLightDescriptor()
+std::vector<VkDescriptorBufferInfo> LightManager::GetRectangleAreaLightDescriptorList()
 {
 	std::vector<VkDescriptorBufferInfo> RectangleAreaLightBufferList{};
 	if (RectangleAreaLightList.size() == 0)

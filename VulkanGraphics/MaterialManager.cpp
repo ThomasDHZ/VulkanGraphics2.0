@@ -71,7 +71,7 @@ std::shared_ptr<Material> MaterialManager::GetMaterialByName(const std::string M
 	return nullptr;
 }
 
-std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferListDescriptor()
+std::vector<VkDescriptorBufferInfo> MaterialManager::GetMaterialBufferDescriptorList()
 {
 	std::vector<VkDescriptorBufferInfo> MaterialBufferList{};
 	if (MaterialList.size() == 0)

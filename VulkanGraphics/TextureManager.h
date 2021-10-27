@@ -70,9 +70,9 @@ public:
 	void UpdateBufferIndex();
 	void Destory();
 
-	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferListDescriptor();
-	std::vector<VkDescriptorImageInfo>  GetTexture3DBufferListDescriptor();
-	std::vector<VkDescriptorImageInfo>  GetCubeMapTextureBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferDescriptorList();
+	std::vector<VkDescriptorImageInfo>  GetTexture3DBufferDescriptorList();
+	std::vector<VkDescriptorImageInfo>  GetCubeMapTextureBufferDescriptorList();
 
 	uint32_t GetTextureBufferDescriptorCount();
 	uint32_t Get3DTextureBufferDescriptorCount();

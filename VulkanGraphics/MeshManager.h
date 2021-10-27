@@ -28,10 +28,10 @@ public:
 	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
 	void Destroy();
 		
-	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors();
-	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors();
-	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors();
-	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors();
+	std::vector<VkDescriptorBufferInfo> GetVertexBufferDescriptorsList();
+	std::vector<VkDescriptorBufferInfo> GetIndexBufferDescriptorsList();
+	std::vector<VkDescriptorBufferInfo> GetTransformBufferDescriptorsList();
+	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesDescriptorsList();
 
 	std::shared_ptr<Mesh> GetMeshIndex(uint32_t MeshID);
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);

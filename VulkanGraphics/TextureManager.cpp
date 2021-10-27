@@ -322,7 +322,7 @@ std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string 
 	return Texture3DList[0];
 }
 
-std::vector<VkDescriptorImageInfo> TextureManager::GetTexture2DBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetTexture2DBufferDescriptorList()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
 	if (Texture2DList.size() == 0)
@@ -347,7 +347,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetTexture2DBufferListDescrip
 	return DescriptorImageList;
 }
 
-std::vector<VkDescriptorImageInfo> TextureManager::GetTexture3DBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetTexture3DBufferDescriptorList()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
 	if (Texture3DList.size() == 0)
@@ -372,7 +372,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetTexture3DBufferListDescrip
 	return DescriptorImageList;
 }
 
-std::vector<VkDescriptorImageInfo> TextureManager::GetCubeMapTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetCubeMapTextureBufferDescriptorList()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
 	if (CubeMapList.size() == 0)

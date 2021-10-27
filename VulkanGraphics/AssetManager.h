@@ -39,20 +39,32 @@ public:
 
 	std::vector<std::shared_ptr<Mesh>> GetMeshByType(MeshTypeFlag type);
 
-	std::vector<VkDescriptorBufferInfo> GetVertexBufferListDescriptors() { return meshManager->GetVertexBufferListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetIndexBufferListDescriptors() { return meshManager->GetIndexBufferListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors() { return meshManager->GetTransformBufferListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors() { return meshManager->GetMeshPropertiesListDescriptors(); }
-	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor() { return materialManager->GetMaterialBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferListDescriptor() { return textureManager->GetTexture2DBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  GetTexture3DBufferListDescriptor() { return textureManager->GetTexture3DBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  GetCubeMapTextureBufferListDescriptor() { return textureManager->GetCubeMapTextureBufferListDescriptor(); }
+	std::vector<VkDescriptorBufferInfo> GetVertexBufferDescriptorsList() { return meshManager->GetVertexBufferDescriptorsList(); }
+	std::vector<VkDescriptorBufferInfo> GetIndexBufferDescriptorsList() { return meshManager->GetIndexBufferDescriptorsList(); }
+	std::vector<VkDescriptorBufferInfo> GetTransformBufferDescriptorsList() { return meshManager->GetTransformBufferDescriptorsList(); }
+	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesDescriptorsList() { return meshManager->GetMeshPropertiesDescriptorsList(); }
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferDescriptorList() { return materialManager->GetMaterialBufferDescriptorList(); }
+	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferDescriptorList() { return textureManager->GetTexture2DBufferDescriptorList(); }
+	std::vector<VkDescriptorImageInfo>  GetTexture3DBufferDescriptorList() { return textureManager->GetTexture3DBufferDescriptorList(); }
+	std::vector<VkDescriptorImageInfo>  GetCubeMapTextureBufferDescriptorList() { return textureManager->GetCubeMapTextureBufferDescriptorList(); }
+	std::vector<VkDescriptorBufferInfo> GetDirectionalLightBufferDescriptorList() { return lightManager->GetDirectionalLightBufferDescriptorList(); }
+	std::vector<VkDescriptorBufferInfo> GetPointLightBufferDescriptorList() { return lightManager->GetPointLightBufferDescriptorList(); }
+	std::vector<VkDescriptorBufferInfo> GetSpotLightBufferDescriptorList() { return lightManager->GetSpotLightBufferDescriptorList(); }
+	std::vector<VkDescriptorBufferInfo> GetSphereAreaLightDescriptorList() { return lightManager->GetSphereAreaLightDescriptorList(); }
+	std::vector<VkDescriptorBufferInfo> GetTubeAreaLightDescriptorList() { return lightManager->GetTubeAreaLightDescriptorList(); }
+	std::vector<VkDescriptorBufferInfo> GetRectangleAreaLightDescriptorList() { return lightManager->GetRectangleAreaLightDescriptorList(); }
 
 	uint32_t GetMeshDescriptorCount() { return meshManager->GetMeshDescriptorCount(); }
 	uint32_t GetMaterialDescriptorCount() { return materialManager->GetMaterialDescriptorCount(); }
 	uint32_t GetTextureBufferDescriptorCount() { return textureManager->GetTextureBufferDescriptorCount(); }
 	uint32_t Get3DTextureBufferDescriptorCount() { return textureManager->Get3DTextureBufferDescriptorCount(); }
 	uint32_t GetCubeMapBufferDescriptorCount() { return textureManager->GetCubeMapBufferDescriptorCount(); }
+	uint32_t GetDirectionalLightCount() { return lightManager->DirectionalLightList.size(); }
+	uint32_t GetPointLightCount() { return lightManager->PointLightList.size(); }
+	uint32_t GetSpotLightCount() { return lightManager->SpotLightList.size(); }
+	uint32_t GetSphereAreaLightCount() { return lightManager->SphereAreaLightList.size(); }
+	uint32_t GetTubeAreaLightCount() { return lightManager->TubeAreaLightList.size(); }
+	uint32_t GetRectangleAreaLightCount() { return lightManager->RectangleAreaLightList.size(); }
 };
 
 class AssetManagerPtr

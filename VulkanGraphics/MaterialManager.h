@@ -21,7 +21,7 @@ public:
 	std::shared_ptr<Material> GetDefaultMaterial();
 	std::shared_ptr<Material> GetMaterialByID(uint32_t MaterialID);
 	std::shared_ptr<Material> GetMaterialByName(const std::string MaterialName);
-	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetMaterialBufferDescriptorList();
 	uint32_t GetMaterialDescriptorCount();
 };
 

@@ -81,7 +81,7 @@ void MeshManager::Destroy()
     }
 }
 
-std::vector<VkDescriptorBufferInfo> MeshManager::GetVertexBufferListDescriptors()
+std::vector<VkDescriptorBufferInfo> MeshManager::GetVertexBufferDescriptorsList()
 {
     std::vector<VkDescriptorBufferInfo> VertexBufferInfoList;
     if (MeshList.size() == 0)
@@ -106,7 +106,7 @@ std::vector<VkDescriptorBufferInfo> MeshManager::GetVertexBufferListDescriptors(
     return VertexBufferInfoList;
 }
 
-std::vector<VkDescriptorBufferInfo> MeshManager::GetIndexBufferListDescriptors()
+std::vector<VkDescriptorBufferInfo> MeshManager::GetIndexBufferDescriptorsList()
 {
     std::vector<VkDescriptorBufferInfo> IndexBufferInfoList;
     if (MeshList.size() == 0)
@@ -131,7 +131,7 @@ std::vector<VkDescriptorBufferInfo> MeshManager::GetIndexBufferListDescriptors()
     return IndexBufferInfoList;
 }
 
-std::vector<VkDescriptorBufferInfo> MeshManager::GetTransformBufferListDescriptors()
+std::vector<VkDescriptorBufferInfo> MeshManager::GetTransformBufferDescriptorsList()
 {
     std::vector<VkDescriptorBufferInfo> TransformBufferList{};
     if (MeshList.size() == 0)
@@ -156,7 +156,7 @@ std::vector<VkDescriptorBufferInfo> MeshManager::GetTransformBufferListDescripto
     return TransformBufferList;
 }
 
-std::vector<VkDescriptorBufferInfo> MeshManager::GetMeshPropertiesListDescriptors()
+std::vector<VkDescriptorBufferInfo> MeshManager::GetMeshPropertiesDescriptorsList()
 {
     std::vector<VkDescriptorBufferInfo> MeshPropertiesmBufferList{};
     if (MeshList.size() == 0)

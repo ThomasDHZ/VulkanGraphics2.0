@@ -56,12 +56,12 @@ public:
 	void DeleteTubeAreaLight(uint32_t LightBufferIndex);
 	void DeleteRectangleAreaLight(uint32_t LightBufferIndex);
 
-	std::vector<VkDescriptorBufferInfo> GetDirectionalLightBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetPointLightBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetSpotLightBufferListDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetSphereAreaLightDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetTubeAreaLightDescriptor();
-	std::vector<VkDescriptorBufferInfo> GetRectangleAreaLightDescriptor();
+	std::vector<VkDescriptorBufferInfo> GetDirectionalLightBufferDescriptorList();
+	std::vector<VkDescriptorBufferInfo> GetPointLightBufferDescriptorList();
+	std::vector<VkDescriptorBufferInfo> GetSpotLightBufferDescriptorList();
+	std::vector<VkDescriptorBufferInfo> GetSphereAreaLightDescriptorList();
+	std::vector<VkDescriptorBufferInfo> GetTubeAreaLightDescriptorList();
+	std::vector<VkDescriptorBufferInfo> GetRectangleAreaLightDescriptorList();
 
 	uint32_t GetDirectionalLightDescriptorCount();
 	uint32_t GetPointLightDescriptorCount();
@@ -70,7 +70,7 @@ public:
 	uint32_t GetTubeAreaLightDescriptorCount();
 	uint32_t GetRectangleAreaLightDescriptorCount();
 
-	uint32_t GetDirectionalLightCount(){ return DirectionalLightList.size();	}
+	uint32_t GetDirectionalLightCount(){ return DirectionalLightList.size(); }
 	uint32_t GetPointLightCount() { return PointLightList.size(); }
 	uint32_t GetSpotLightCount() { return SpotLightList.size(); }
 	uint32_t GetSphereAreaLightCount() { return SphereAreaLightList.size(); }
