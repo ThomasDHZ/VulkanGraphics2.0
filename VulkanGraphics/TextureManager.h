@@ -34,18 +34,22 @@ public:
 	std::shared_ptr<Texture> LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);
 	std::shared_ptr<Texture> LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat);
 	std::shared_ptr<Texture> LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture);
-	void DeleteTexture2DByID(uint32_t Texture2DID);
-	void DeleteTexture3DByID(uint32_t Texture3DID);
+	void DeleteTexture2DByID(uint32_t TextureID);
+	void DeleteTexture3DByID(uint32_t TextureID);
+	void DeleteCubeMapTextureByID(uint32_t TextureID);
 	void DeleteTexture2DByBufferIndex(uint32_t Texture2DBufferIndex);
 	void DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex);
+	void DeleteCubeMapTextureByBufferIndex(uint32_t CubeMapTextureBufferIndex);
 
 	std::shared_ptr<Texture2D> GetTexture2DByName(const std::string TextureName);
 	std::shared_ptr<Texture3D> Get3DTextureByName(const std::string TextureName);
 	std::shared_ptr<Texture2D> GetTextureByID(uint32_t TextureID);
 	std::shared_ptr<Texture3D> GetTexture3DByID(uint32_t TextureID);
-	std::shared_ptr<Texture2D> GetTextureByBufferIndex(unsigned int TextureBufferIndex) { return Texture2DList[TextureBufferIndex]; };
-	std::shared_ptr<Texture> GetTexture3DByBufferIndex(unsigned int Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
-	std::shared_ptr<Texture> Get3DTexture(unsigned int TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
+	std::shared_ptr<Texture> GetCubeMapTextureByID(uint32_t TextureID);
+	std::shared_ptr<Texture2D> GetTextureByBufferIndex(uint32_t TextureBufferIndex) { return Texture2DList[TextureBufferIndex]; };
+	std::shared_ptr<Texture3D> GetTexture3DByBufferIndex(uint32_t Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
+	std::shared_ptr<Texture> GetCubeTextureByBufferIndex(uint32_t Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
+	std::shared_ptr<Texture> Get3DTexture(uint32_t TextureBufferIndex) { return CubeMapList[TextureBufferIndex]; };
 	std::shared_ptr<Texture> GetCubeMapTexture(uint32_t TextureBufferIndex) { return CubeMapList[TextureBufferIndex]; }
 	std::vector<std::shared_ptr<Texture>> GetAllCubeMapTextures() { return CubeMapList; }
 
@@ -54,9 +58,9 @@ public:
 	void UpdateBufferIndex();
 	void Destory();
 
-	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor();
-	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor();
-	std::vector<VkDescriptorImageInfo>  GetSkyBoxTextureBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  GetTexture3DBufferListDescriptor();
+	std::vector<VkDescriptorImageInfo>  GetCubeMapTextureBufferListDescriptor();
 
 	uint32_t GetTextureBufferDescriptorCount();
 	uint32_t Get3DTextureBufferDescriptorCount();

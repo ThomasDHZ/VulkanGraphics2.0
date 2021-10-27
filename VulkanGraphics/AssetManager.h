@@ -44,9 +44,9 @@ public:
 	std::vector<VkDescriptorBufferInfo> GetTransformBufferListDescriptors() { return meshManager->GetTransformBufferListDescriptors(); }
 	std::vector<VkDescriptorBufferInfo> GetMeshPropertiesListDescriptors() { return meshManager->GetMeshPropertiesListDescriptors(); }
 	std::vector<VkDescriptorBufferInfo> GetMaterialBufferListDescriptor() { return materialManager->GetMaterialBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  GetTextureBufferListDescriptor() { return textureManager->GetTextureBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  Get3DTextureBufferListDescriptor() { return textureManager->Get3DTextureBufferListDescriptor(); }
-	std::vector<VkDescriptorImageInfo>  GetSkyBoxTextureBufferListDescriptor() { return textureManager->GetSkyBoxTextureBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferListDescriptor() { return textureManager->GetTexture2DBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  GetTexture3DBufferListDescriptor() { return textureManager->GetTexture3DBufferListDescriptor(); }
+	std::vector<VkDescriptorImageInfo>  GetCubeMapTextureBufferListDescriptor() { return textureManager->GetCubeMapTextureBufferListDescriptor(); }
 
 	uint32_t GetMeshDescriptorCount() { return meshManager->GetMeshDescriptorCount(); }
 	uint32_t GetMaterialDescriptorCount() { return materialManager->GetMaterialDescriptorCount(); }

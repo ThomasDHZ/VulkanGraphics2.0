@@ -155,6 +155,15 @@ void TextureManager::DeleteTexture3DByID(uint32_t TextureID)
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
+void TextureManager::DeleteCubeMapTextureByID(uint32_t TextureID)
+{
+	auto texture = GetCubeMapTextureByID(TextureID);
+	texture->Delete();
+	CubeMapList.erase(CubeMapList.begin() + texture->TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
 void TextureManager::DeleteTexture2DByBufferIndex(uint32_t Texture2DBufferIndex)
 {
 	auto texture = GetTextureByBufferIndex(Texture2DBufferIndex);
@@ -169,6 +178,15 @@ void TextureManager::DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex)
 	auto texture = GetTexture3DByBufferIndex(Texture3DBufferIndex);
 	texture->Delete();
 	Texture3DList.erase(Texture3DList.begin() + Texture3DBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteCubeMapTextureByBufferIndex(uint32_t CubeMapTextureBufferIndex)
+{
+	auto texture = GetTexture3DByBufferIndex(CubeMapTextureBufferIndex);
+	texture->Delete();
+	CubeMapList.erase(CubeMapList.begin() + CubeMapTextureBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
@@ -231,6 +249,20 @@ std::shared_ptr<Texture3D> TextureManager::GetTexture3DByID(uint32_t TextureID)
 	return nullptr;
 }
 
+std::shared_ptr<Texture> TextureManager::GetCubeMapTextureByID(uint32_t TextureID)
+{
+	for (auto& texture : CubeMapList)
+	{
+		if (texture->TextureID == TextureID)
+		{
+			return texture;
+		}
+	}
+
+	std::cout << "CubeMap with ID: " << TextureID << "not found." << std::endl;
+	return nullptr;
+}
+
 void TextureManager::UpdateBufferIndex()
 {
 	for (int x = 0; x < Texture2DList.size(); x++)
@@ -290,7 +322,7 @@ std::shared_ptr<Texture3D> TextureManager::Get3DTextureByName(const std::string 
 	return Texture3DList[0];
 }
 
-std::vector<VkDescriptorImageInfo> TextureManager::GetTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetTexture2DBufferListDescriptor()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
 	if (Texture2DList.size() == 0)
@@ -315,7 +347,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetTextureBufferListDescripto
 	return DescriptorImageList;
 }
 
-std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetTexture3DBufferListDescriptor()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
 	if (Texture3DList.size() == 0)
@@ -340,7 +372,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::Get3DTextureBufferListDescrip
 	return DescriptorImageList;
 }
 
-std::vector<VkDescriptorImageInfo> TextureManager::GetSkyBoxTextureBufferListDescriptor()
+std::vector<VkDescriptorImageInfo> TextureManager::GetCubeMapTextureBufferListDescriptor()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
 	if (CubeMapList.size() == 0)
@@ -348,7 +380,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetSkyBoxTextureBufferListDes
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		nullBuffer.imageView = VK_NULL_HANDLE;
-		nullBuffer.sampler = Texture2DList[0]->Sampler;
+		nullBuffer.sampler = CubeMapList[0]->Sampler;
 		DescriptorImageList.emplace_back(nullBuffer);
 	}
 	else
