@@ -17,7 +17,7 @@ class TextureManager
 private:
 	std::vector<std::shared_ptr<Texture2D>> Texture2DList;
 	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
-	std::vector<std::shared_ptr<Texture>> CubeMapList;
+	std::vector<std::shared_ptr<CubeMapTexture>> CubeMapList;
 	std::vector<std::shared_ptr<RenderedColorTexture>> RenderedColorTextureList;
 	std::vector<std::shared_ptr<RenderedDepthTexture>> RenderedDepthTextureList;
 	std::vector<std::shared_ptr<RenderedCubeMapTexture>> RenderedCubeMapTextureList;
@@ -37,18 +37,31 @@ public:
 	std::shared_ptr<Texture2D> LoadTexture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
 	std::shared_ptr<Texture3D> LoadTexture3D(const std::string TextureLocation, VkFormat format);
 	std::shared_ptr<Texture3D> LoadTexture3D(glm::ivec3& TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
-	std::shared_ptr<Texture> LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
-	std::shared_ptr<Texture> LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);
-	std::shared_ptr<Texture> LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat);
-	std::shared_ptr<Texture> LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture);
+	std::shared_ptr<CubeMapTexture> LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
+	std::shared_ptr<CubeMapTexture> LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);
+	std::shared_ptr<CubeMapTexture> LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat);
+	std::shared_ptr<CubeMapTexture> LoadCubeMap(std::shared_ptr<CubeMapTexture> cubeMapTexture);
+	std::shared_ptr<RenderedColorTexture> LoadRenderedColorTexture(std::shared_ptr<RenderedColorTexture> renderedColorTexture);
+	std::shared_ptr<RenderedDepthTexture> LoadRenderedDepthTexture(std::shared_ptr<RenderedDepthTexture> renderedDepthTexture);
+	std::shared_ptr<RenderedCubeMapTexture> LoadRenderedCubeMapTexture(std::shared_ptr<RenderedCubeMapTexture> renderedCubeMapTexture);
+	std::shared_ptr<RenderedCubeMapDepthTexture> LoadRenderedCubeMapDepthTexture(std::shared_ptr<RenderedCubeMapDepthTexture> renderedCubeMapDepthTexture);
 	//std::shared_ptr<FontTexture> LoadFontTexture(void* GlyphData, uint32_t width, uint32_t height);
 
 	void DeleteTexture2DByID(uint32_t TextureID);
 	void DeleteTexture3DByID(uint32_t TextureID);
 	void DeleteCubeMapTextureByID(uint32_t TextureID);
-	void DeleteTexture2DByBufferIndex(uint32_t Texture2DBufferIndex);
-	void DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex);
-	void DeleteCubeMapTextureByBufferIndex(uint32_t CubeMapTextureBufferIndex);
+	void DeleteRenderedColorTextureByID(uint32_t TextureID);
+	void DeleteRenderedDepthTextureByID(uint32_t TextureID);
+	void DeleteRenderedCubeMapTextureByID(uint32_t TextureID);
+	void DeleteRenderedCubeMapDepthTextureByID(uint32_t TextureID);
+
+	void DeleteTexture2DByBufferIndex(uint32_t TextureBufferIndex);
+	void DeleteTexture3DByBufferIndex(uint32_t TextureBufferIndex);
+	void DeleteCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex);
+	void DeleteRenderedColorTextureByBufferIndex(uint32_t TextureBufferIndex);
+	void DeleteRenderedDepthTextureByBufferIndex(uint32_t TextureBufferIndex);
+	void DeleteRenderedCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex);
+	void DeleteRenderedCubeMapDepthTextureByBufferIndex(uint32_t TextureBufferIndex);
 
 	std::shared_ptr<Texture2D> GetTexture2DByName(const std::string TextureName);
 	std::shared_ptr<Texture3D> Get3DTextureByName(const std::string TextureName);
@@ -56,27 +69,42 @@ public:
 	std::shared_ptr<Texture2D> GetTextureByID(uint32_t TextureID);
 	std::shared_ptr<Texture3D> GetTexture3DByID(uint32_t TextureID);
 	std::shared_ptr<Texture> GetCubeMapTextureByID(uint32_t TextureID);
+	std::shared_ptr<RenderedColorTexture> GetRenderedColorTextureByID(uint32_t TextureID);
+	std::shared_ptr<RenderedDepthTexture> GetRenderedDepthTextureByID(uint32_t TextureID);
+	std::shared_ptr<RenderedCubeMapTexture> GetRenderedCubeMapTextureByID(uint32_t TextureID);
+	std::shared_ptr<RenderedCubeMapDepthTexture> GetRenderedCubeMapDepthTextureByID(uint32_t TextureID);
 
 	std::shared_ptr<Texture2D> GetTextureByBufferIndex(uint32_t TextureBufferIndex) { return Texture2DList[TextureBufferIndex]; };
-	std::shared_ptr<Texture3D> GetTexture3DByBufferIndex(uint32_t Texture3DBufferIndex) { return Texture3DList[Texture3DBufferIndex]; };
-	std::shared_ptr<Texture> GetCubeMapTextureByBufferIndex(uint32_t CubeMapTextureBufferIndex) { return CubeMapList[CubeMapTextureBufferIndex]; };
+	std::shared_ptr<Texture3D> GetTexture3DByBufferIndex(uint32_t TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
+	std::shared_ptr<CubeMapTexture> GetCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex) { return CubeMapList[TextureBufferIndex]; };
+	std::shared_ptr<RenderedColorTexture> GetRenderedColorTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedColorTextureList[TextureBufferIndex]; };
+	std::shared_ptr<RenderedDepthTexture> GetRenderedDepthTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedDepthTextureList[TextureBufferIndex]; };
+	std::shared_ptr<RenderedCubeMapTexture> GetRenderedCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedCubeMapTextureList[TextureBufferIndex]; };
+	std::shared_ptr<RenderedCubeMapDepthTexture> GetRenderedCubeMapDepthTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedCubeMapDepthTextureList[TextureBufferIndex]; };
 
 	std::vector<std::shared_ptr<Texture2D>> GetAllTexture2D() { return Texture2DList; }
 	std::vector<std::shared_ptr<Texture3D>> GetAllTexture3DList() { return Texture3DList; }
-	std::vector<std::shared_ptr<Texture>> GetAllCubeMapTextures() { return CubeMapList; }
+	std::vector<std::shared_ptr<CubeMapTexture>> GetAllCubeMapTextures() { return CubeMapList; }
 
 	void UnloadAllTextures();
-	void UnloadCubeMap();
 	void UpdateBufferIndex();
 	void Destory();
 
 	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferDescriptorList();
 	std::vector<VkDescriptorImageInfo>  GetTexture3DBufferDescriptorList();
 	std::vector<VkDescriptorImageInfo>  GetCubeMapTextureBufferDescriptorList();
+	std::vector<VkDescriptorImageInfo>  GetRenderedColorTextureBufferDescriptorList();
+	std::vector<VkDescriptorImageInfo>  GetRenderedDepthTextureBufferDescriptorList();
+	std::vector<VkDescriptorImageInfo>  GetRenderedCubeMapTextureBufferDescriptorList();
+	std::vector<VkDescriptorImageInfo>  GetRenderedCubeMapDepthTextureBufferDescriptorList();
 
 	uint32_t GetTextureBufferDescriptorCount();
 	uint32_t Get3DTextureBufferDescriptorCount();
 	uint32_t GetCubeMapBufferDescriptorCount();
+	uint32_t GetRenderedColorTextureBufferCount();
+	uint32_t GetRenderedDepthTextureBufferCount();
+	uint32_t GetRenderedCubeMapTextureBufferCount();
+	uint32_t GetRenderedCubeMapDepthTextureBufferCount();
 };
 
 class TextureManagerPtr

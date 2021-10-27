@@ -102,39 +102,71 @@ std::shared_ptr<Texture3D> TextureManager::LoadTexture3D(glm::ivec3& TextureReso
 //	return texture;
 //}
 
-std::shared_ptr<Texture> TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
 {
-	 std::shared_ptr<Texture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	 std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 	 CubeMapList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
-std::shared_ptr<Texture> TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat)
 {
-	const std::shared_ptr<Texture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
+	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapFiles, textureFormat));
 	CubeMapList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
-std::shared_ptr<Texture> TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat)
 {
-	const std::shared_ptr<Texture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
+	const std::shared_ptr<CubeMapTexture> texture = std::make_shared<CubeMapTexture>(CubeMapTexture(CubeMapLocation, textureFormat));
 	CubeMapList.emplace_back(texture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return texture;
 }
 
-std::shared_ptr<Texture> TextureManager::LoadCubeMap(std::shared_ptr<Texture> cubeMapTexture)
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(std::shared_ptr<CubeMapTexture> cubeMapTexture)
 {
 	CubeMapList.emplace_back(cubeMapTexture);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 	return cubeMapTexture;
+}
+
+std::shared_ptr<RenderedColorTexture> TextureManager::LoadRenderedColorTexture(std::shared_ptr<RenderedColorTexture> renderedColorTexture)
+{
+	RenderedColorTextureList.emplace_back(renderedColorTexture);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return renderedColorTexture;
+}
+
+std::shared_ptr<RenderedDepthTexture> TextureManager::LoadRenderedDepthTexture(std::shared_ptr<RenderedDepthTexture> renderedDepthTexture)
+{
+	RenderedDepthTextureList.emplace_back(renderedDepthTexture);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return renderedDepthTexture;
+}
+
+std::shared_ptr<RenderedCubeMapTexture> TextureManager::LoadRenderedCubeMapTexture(std::shared_ptr<RenderedCubeMapTexture> renderedCubeMapTexture)
+{
+	RenderedCubeMapTextureList.emplace_back(renderedCubeMapTexture);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return renderedCubeMapTexture;
+}
+
+std::shared_ptr<RenderedCubeMapDepthTexture> TextureManager::LoadRenderedCubeMapDepthTexture(std::shared_ptr<RenderedCubeMapDepthTexture> renderedCubeMapDepthTexture)
+{
+	RenderedCubeMapDepthTextureList.emplace_back(renderedCubeMapDepthTexture);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+	return renderedCubeMapDepthTexture;
 }
 
 void TextureManager::DeleteTexture2DByID(uint32_t TextureID)
@@ -164,29 +196,101 @@ void TextureManager::DeleteCubeMapTextureByID(uint32_t TextureID)
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
-void TextureManager::DeleteTexture2DByBufferIndex(uint32_t Texture2DBufferIndex)
+void TextureManager::DeleteRenderedColorTextureByID(uint32_t TextureID)
 {
-	auto texture = GetTextureByBufferIndex(Texture2DBufferIndex);
+	auto texture = GetRenderedColorTextureByID(TextureID);
 	texture->Delete();
-	Texture2DList.erase(Texture2DList.begin() + Texture2DBufferIndex);
+	RenderedColorTextureList.erase(RenderedColorTextureList.begin() + texture->TextureBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
-void TextureManager::DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex)
+void TextureManager::DeleteRenderedDepthTextureByID(uint32_t TextureID)
 {
-	auto texture = GetTexture3DByBufferIndex(Texture3DBufferIndex);
+	auto texture = GetRenderedDepthTextureByID(TextureID);
 	texture->Delete();
-	Texture3DList.erase(Texture3DList.begin() + Texture3DBufferIndex);
+	RenderedDepthTextureList.erase(RenderedDepthTextureList.begin() + texture->TextureBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
-void TextureManager::DeleteCubeMapTextureByBufferIndex(uint32_t CubeMapTextureBufferIndex)
+void TextureManager::DeleteRenderedCubeMapTextureByID(uint32_t TextureID)
 {
-	auto texture = GetCubeMapTextureByBufferIndex(CubeMapTextureBufferIndex);
+	auto texture = GetRenderedCubeMapTextureByID(TextureID);
 	texture->Delete();
-	CubeMapList.erase(CubeMapList.begin() + CubeMapTextureBufferIndex);
+	RenderedCubeMapTextureList.erase(RenderedCubeMapTextureList.begin() + texture->TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteRenderedCubeMapDepthTextureByID(uint32_t TextureID)
+{
+	auto texture = GetRenderedCubeMapDepthTextureByID(TextureID);
+	texture->Delete();
+	RenderedCubeMapDepthTextureList.erase(RenderedCubeMapDepthTextureList.begin() + texture->TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteTexture2DByBufferIndex(uint32_t TextureBufferIndex)
+{
+	auto texture = GetTextureByBufferIndex(TextureBufferIndex);
+	texture->Delete();
+	Texture2DList.erase(Texture2DList.begin() + TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteTexture3DByBufferIndex(uint32_t TextureBufferIndex)
+{
+	auto texture = GetTexture3DByBufferIndex(TextureBufferIndex);
+	texture->Delete();
+	Texture3DList.erase(Texture3DList.begin() + TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex)
+{
+	auto texture = GetCubeMapTextureByBufferIndex(TextureBufferIndex);
+	texture->Delete();
+	CubeMapList.erase(CubeMapList.begin() + TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteRenderedColorTextureByBufferIndex(uint32_t TextureBufferIndex)
+{
+	auto texture = GetRenderedColorTextureByBufferIndex(TextureBufferIndex);
+	texture->Delete();
+	RenderedColorTextureList.erase(RenderedColorTextureList.begin() + TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteRenderedDepthTextureByBufferIndex(uint32_t TextureBufferIndex)
+{
+	auto texture = GetCubeMapTextureByBufferIndex(TextureBufferIndex);
+	texture->Delete();
+	RenderedDepthTextureList.erase(RenderedDepthTextureList.begin() + TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteRenderedCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex)
+{
+	auto texture = GetCubeMapTextureByBufferIndex(TextureBufferIndex);
+	texture->Delete();
+	RenderedCubeMapTextureList.erase(RenderedCubeMapTextureList.begin() + TextureBufferIndex);
+	UpdateBufferIndex();
+	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+}
+
+void TextureManager::DeleteRenderedCubeMapDepthTextureByBufferIndex(uint32_t TextureBufferIndex)
+{
+	auto texture = GetRenderedCubeMapDepthTextureByBufferIndex(TextureBufferIndex);
+	texture->Delete();
+	RenderedCubeMapDepthTextureList.erase(RenderedCubeMapDepthTextureList.begin() + TextureBufferIndex);
 	UpdateBufferIndex();
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
@@ -202,15 +306,33 @@ void TextureManager::UnloadAllTextures()
 	{
 		texture->Delete();
 	}
-}
 
-void TextureManager::UnloadCubeMap()
-{
-	for (auto& CubeMapList : Texture3DList)
+	for (auto& texture : CubeMapList)
 	{
-		CubeMapList->Delete();
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedColorTextureList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedDepthTextureList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedCubeMapTextureList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedCubeMapDepthTextureList)
+	{
+		texture->Delete();
 	}
 }
+
 
 void TextureManager::Destory()
 {
@@ -218,7 +340,6 @@ void TextureManager::Destory()
 	NullSampler = VK_NULL_HANDLE;
 
 	UnloadAllTextures();
-	UnloadCubeMap();
 }
 
 std::shared_ptr<Texture2D> TextureManager::GetTextureByID(uint32_t TextureID)
@@ -263,6 +384,62 @@ std::shared_ptr<Texture> TextureManager::GetCubeMapTextureByID(uint32_t TextureI
 	return nullptr;
 }
 
+std::shared_ptr<RenderedColorTexture> TextureManager::GetRenderedColorTextureByID(uint32_t TextureID)
+{
+	for (auto& texture : RenderedColorTextureList)
+	{
+		if (texture->TextureID == TextureID)
+		{
+			return texture;
+		}
+	}
+
+	std::cout << "RenderedColorTexture with ID: " << TextureID << "not found." << std::endl;
+	return nullptr;
+}
+
+std::shared_ptr<RenderedDepthTexture> TextureManager::GetRenderedDepthTextureByID(uint32_t TextureID)
+{
+	for (auto& texture : RenderedDepthTextureList)
+	{
+		if (texture->TextureID == TextureID)
+		{
+			return texture;
+		}
+	}
+
+	std::cout << "RenderedDepthTexture with ID: " << TextureID << "not found." << std::endl;
+	return nullptr;
+}
+
+std::shared_ptr<RenderedCubeMapTexture> TextureManager::GetRenderedCubeMapTextureByID(uint32_t TextureID)
+{
+	for (auto& texture : RenderedCubeMapTextureList)
+	{
+		if (texture->TextureID == TextureID)
+		{
+			return texture;
+		}
+	}
+
+	std::cout << "RenderedCubeMapTexture with ID: " << TextureID << "not found." << std::endl;
+	return nullptr;
+}
+
+std::shared_ptr<RenderedCubeMapDepthTexture> TextureManager::GetRenderedCubeMapDepthTextureByID(uint32_t TextureID)
+{
+	for (auto& texture : RenderedCubeMapDepthTextureList)
+	{
+		if (texture->TextureID == TextureID)
+		{
+			return texture;
+		}
+	}
+
+	std::cout << "RenderedCubeMapDepthTexture with ID: " << TextureID << "not found." << std::endl;
+	return nullptr;
+}
+
 void TextureManager::UpdateBufferIndex()
 {
 	for (int x = 0; x < Texture2DList.size(); x++)
@@ -278,6 +455,26 @@ void TextureManager::UpdateBufferIndex()
 	for (int x = 0; x < CubeMapList.size(); x++)
 	{
 		CubeMapList[x]->TextureBufferIndex = x;
+	}
+
+	for (int x = 0; x < RenderedColorTextureList.size(); x++)
+	{
+		RenderedColorTextureList[x]->TextureBufferIndex = x;
+	}
+
+	for (int x = 0; x < RenderedDepthTextureList.size(); x++)
+	{
+		RenderedDepthTextureList[x]->TextureBufferIndex = x;
+	}
+
+	for (int x = 0; x < RenderedCubeMapTextureList.size(); x++)
+	{
+		RenderedCubeMapTextureList[x]->TextureBufferIndex = x;
+	}
+
+	for (int x = 0; x < RenderedCubeMapDepthTextureList.size(); x++)
+	{
+		RenderedCubeMapDepthTextureList[x]->TextureBufferIndex = x;
 	}
 }
 
@@ -397,6 +594,106 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetCubeMapTextureBufferDescri
 	return DescriptorImageList;
 }
 
+std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedColorTextureBufferDescriptorList()
+{
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	if (CubeMapList.size() == 0)
+	{
+		VkDescriptorImageInfo nullBuffer;
+		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		nullBuffer.imageView = VK_NULL_HANDLE;
+		nullBuffer.sampler = NullSampler;
+		DescriptorImageList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (auto texture : RenderedColorTextureList)
+		{
+			VkDescriptorImageInfo DescriptorImage{};
+			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			DescriptorImage.imageView = texture->GetTextureView();
+			DescriptorImage.sampler = texture->GetTextureSampler();
+			DescriptorImageList.emplace_back(DescriptorImage);
+		}
+	}
+	return DescriptorImageList;
+}
+
+std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedDepthTextureBufferDescriptorList()
+{
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	if (CubeMapList.size() == 0)
+	{
+		VkDescriptorImageInfo nullBuffer;
+		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		nullBuffer.imageView = VK_NULL_HANDLE;
+		nullBuffer.sampler = NullSampler;
+		DescriptorImageList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (auto texture : RenderedDepthTextureList)
+		{
+			VkDescriptorImageInfo DescriptorImage{};
+			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			DescriptorImage.imageView = texture->GetTextureView();
+			DescriptorImage.sampler = texture->GetTextureSampler();
+			DescriptorImageList.emplace_back(DescriptorImage);
+		}
+	}
+	return DescriptorImageList;
+}
+
+std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedCubeMapTextureBufferDescriptorList()
+{
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	if (CubeMapList.size() == 0)
+	{
+		VkDescriptorImageInfo nullBuffer;
+		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		nullBuffer.imageView = VK_NULL_HANDLE;
+		nullBuffer.sampler = NullSampler;
+		DescriptorImageList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (auto texture : RenderedCubeMapTextureList)
+		{
+			VkDescriptorImageInfo DescriptorImage{};
+			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			DescriptorImage.imageView = texture->GetTextureView();
+			DescriptorImage.sampler = texture->GetTextureSampler();
+			DescriptorImageList.emplace_back(DescriptorImage);
+		}
+	}
+	return DescriptorImageList;
+}
+
+std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedCubeMapDepthTextureBufferDescriptorList()
+{
+	std::vector<VkDescriptorImageInfo> DescriptorImageList;
+	if (CubeMapList.size() == 0)
+	{
+		VkDescriptorImageInfo nullBuffer;
+		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		nullBuffer.imageView = VK_NULL_HANDLE;
+		nullBuffer.sampler = NullSampler;
+		DescriptorImageList.emplace_back(nullBuffer);
+	}
+	else
+	{
+		for (auto texture : RenderedCubeMapDepthTextureList)
+		{
+			VkDescriptorImageInfo DescriptorImage{};
+			DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			DescriptorImage.imageView = texture->GetTextureView();
+			DescriptorImage.sampler = texture->GetTextureSampler();
+			DescriptorImageList.emplace_back(DescriptorImage);
+		}
+	}
+	return DescriptorImageList;
+}
+
 uint32_t TextureManager::GetTextureBufferDescriptorCount()
 {
 	if (Texture2DList.size() > 0)
@@ -425,6 +722,54 @@ uint32_t TextureManager::GetCubeMapBufferDescriptorCount()
 	if (CubeMapList.size() > 0)
 	{
 		return CubeMapList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+uint32_t TextureManager::GetRenderedColorTextureBufferCount()
+{
+	if (RenderedColorTextureList.size() > 0)
+	{
+		return RenderedColorTextureList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+uint32_t TextureManager::GetRenderedDepthTextureBufferCount()
+{
+	if (RenderedDepthTextureList.size() > 0)
+	{
+		return RenderedDepthTextureList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+uint32_t TextureManager::GetRenderedCubeMapTextureBufferCount()
+{
+	if (RenderedCubeMapTextureList.size() > 0)
+	{
+		return RenderedCubeMapTextureList.size();
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+uint32_t TextureManager::GetRenderedCubeMapDepthTextureBufferCount()
+{
+	if (RenderedCubeMapDepthTextureList.size() > 0)
+	{
+		return RenderedCubeMapDepthTextureList.size();
 	}
 	else
 	{
