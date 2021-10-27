@@ -24,8 +24,6 @@ C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.vert -o WireFrameShaderVert
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe WireFrameShader.frag -o WireFrameShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe ReflectionShader.vert -o ReflectionShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe ReflectionShader.frag -o ReflectionShaderFrag.spv
-C:/VulkanSDK/1.2.189.2/Bin/glslc.exe TestVert.vert -o TestVert.spv
-C:/VulkanSDK/1.2.189.2/Bin/glslc.exe TestFrag.frag -o TestFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 closesthit.rchit -o closesthit.rchit.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 anyhit.rahit -o anyhit.rahit.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe --target-env=vulkan1.2 --target-spv=spv1.4 anyhit1.rahit -o anyhit1.rahit.spv

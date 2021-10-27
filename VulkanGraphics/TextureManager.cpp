@@ -184,7 +184,7 @@ void TextureManager::DeleteTexture3DByBufferIndex(uint32_t Texture3DBufferIndex)
 
 void TextureManager::DeleteCubeMapTextureByBufferIndex(uint32_t CubeMapTextureBufferIndex)
 {
-	auto texture = GetTexture3DByBufferIndex(CubeMapTextureBufferIndex);
+	auto texture = GetCubeMapTextureByBufferIndex(CubeMapTextureBufferIndex);
 	texture->Delete();
 	CubeMapList.erase(CubeMapList.begin() + CubeMapTextureBufferIndex);
 	UpdateBufferIndex();
@@ -330,7 +330,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetTexture2DBufferListDescrip
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		nullBuffer.imageView = VK_NULL_HANDLE;
-		nullBuffer.sampler = Texture2DList[0]->Sampler;
+		nullBuffer.sampler = NullSampler;
 		DescriptorImageList.emplace_back(nullBuffer);
 	}
 	else
@@ -355,7 +355,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetTexture3DBufferListDescrip
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		nullBuffer.imageView = VK_NULL_HANDLE;
-		nullBuffer.sampler = Texture2DList[0]->Sampler;
+		nullBuffer.sampler = NullSampler;
 		DescriptorImageList.emplace_back(nullBuffer);
 	}
 	else
@@ -380,7 +380,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetCubeMapTextureBufferListDe
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		nullBuffer.imageView = VK_NULL_HANDLE;
-		nullBuffer.sampler = CubeMapList[0]->Sampler;
+		nullBuffer.sampler = NullSampler;
 		DescriptorImageList.emplace_back(nullBuffer);
 	}
 	else

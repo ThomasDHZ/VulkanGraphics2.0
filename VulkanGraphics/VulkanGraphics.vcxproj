@@ -488,8 +488,6 @@
     <None Include="Shaders\shadow.rmiss" />
     <None Include="Shaders\SkyBoxRenderShader.frag" />
     <None Include="Shaders\SkyBoxRenderShader.vert" />
-    <None Include="Shaders\TestFrag.frag" />
-    <None Include="Shaders\TestVert.vert" />
     <None Include="Shaders\vert.vert" />
     <None Include="Shaders\Vertex.glsl" />
     <None Include="Shaders\WireframeShader.frag" />

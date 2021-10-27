@@ -919,12 +919,6 @@
     <None Include="Shaders\DepthDebugShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
-    <None Include="Shaders\TestFrag.frag">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
-    <None Include="Shaders\TestVert.vert">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
     <None Include="Shaders\DepthCubeShader.frag">
       <Filter>Shader\RasterShaders</Filter>
     </None>
