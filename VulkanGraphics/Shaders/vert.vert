@@ -57,13 +57,8 @@ layout(location = 1) out vec2 TexCoords;
 layout(location = 2) out vec3 Normal;
 layout(location = 3) out vec3 Tangent;
 layout(location = 4) out vec3 BiTangent;
-layout(location = 5) out vec4 LightSpace;
 
-    const mat4 biasMat = mat4( 
-	0.5, 0.0, 0.0, 0.0,
-	0.0, 0.5, 0.0, 0.0,
-	0.0, 0.0, 1.0, 0.0,
-	0.5, 0.5, 0.0, 1.0 );
+
 
 void main() 
 {
@@ -77,7 +72,5 @@ void main()
     Normal = aNormal;
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
-    LightSpace = (biasMat * ubo.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
     gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
-
 }

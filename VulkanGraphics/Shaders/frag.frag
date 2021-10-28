@@ -122,7 +122,6 @@ layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec3 Normal;
 layout(location = 3) in vec3 Tangent;
 layout(location = 4) in vec3 BiTangent;
-layout(location = 5) in vec4 LightSpace;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
@@ -305,6 +304,14 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
+
+    const mat4 biasMat = mat4( 
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.5, 0.5, 0.0, 1.0 );
+
+    vec4 LightSpace = (biasMat * scenedata.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
     float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
     return (ambient + (shadow) * (diffuse + specular));
 }
@@ -344,6 +351,13 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (1.0f + PLight[index].linear * LightDistance + PLight[index].quadratic * (LightDistance * LightDistance));
 
+        const mat4 biasMat = mat4( 
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.5, 0.5, 0.0, 1.0 );
+
+    vec4 LightSpace = (biasMat * scenedata.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
    float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
 }
