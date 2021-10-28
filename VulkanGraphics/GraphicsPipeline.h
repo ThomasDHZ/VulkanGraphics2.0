@@ -57,7 +57,7 @@ struct LightSceneInfo
 class GraphicsPipeline
 {
 protected:
-
+	VkDescriptorImageInfo nullBufferInfo;
 
 public:
 	VkDescriptorPool DescriptorPool = VK_NULL_HANDLE;

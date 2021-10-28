@@ -77,7 +77,11 @@ void BlinnPhongPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedDepthTextur
     std::vector<VkDescriptorBufferInfo> SphereAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptorList();
     std::vector<VkDescriptorBufferInfo> TubeAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptorList();
     std::vector<VkDescriptorBufferInfo> RectangleAreaBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptorList();
-    VkDescriptorImageInfo ShadowMapBuffer = EnginePtr::GetEnginePtr()->AddTextureDescriptor(ShadowMapTexture->View, ShadowMapTexture->Sampler);
+    VkDescriptorImageInfo ShadowMapBuffer = nullBufferInfo;
+    if (ShadowMapTexture != nullptr)
+    {
+        ShadowMapBuffer = EnginePtr::GetEnginePtr()->AddTextureDescriptor(ShadowMapTexture->View, ShadowMapTexture->Sampler);
+    }
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(0, DescriptorSet, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));

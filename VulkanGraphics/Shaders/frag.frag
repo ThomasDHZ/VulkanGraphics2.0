@@ -306,7 +306,7 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
     float LightIntensity = DLight[index].Luminosity / (LightDistance * LightDistance);
 
     float shadow = filterPCF(LightSpace/ LightSpace.w);  
-    return (ambient + diffuse + specular);
+    return (ambient + (shadow) * (diffuse + specular));
 }
 
 vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
