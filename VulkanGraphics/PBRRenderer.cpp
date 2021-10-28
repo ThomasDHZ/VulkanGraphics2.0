@@ -8,14 +8,14 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
     DepthRenderPass = DepthPassRendererPass(512);
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
-    DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTexture);
+  //  DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTextureList[0]);
    // equirectangularToCubemapRenderPass = EquirectangularToCubemapRenderPass();
     irradianceRenderPass = IrradianceRenderPass(CubeMapSamplerSize);
     prefilterRenderPass = PrefilterRenderPass(CubeMapSamplerSize);
     brdfRenderPass = BRDFRenderPass(CubeMapSamplerSize);
 
    // AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
-    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTexture);
+    pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, nullptr);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
 }
@@ -28,17 +28,17 @@ void PBRRenderer::RebuildSwapChain()
 {
     DepthRenderPass.RebuildSwapChain(512);
     depthCubeMapRenderPass.RebuildSwapChain(1024);
-    DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
+   // DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList[0]);
     //equirectangularToCubemapRenderPass.RebuildSwapChain();
     irradianceRenderPass.RebuildSwapChain(CubeMapSamplerSize);
     prefilterRenderPass.RebuildSwapChain(CubeMapSamplerSize);
     brdfRenderPass.RebuildSwapChain(CubeMapSamplerSize);
-    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTexture);
+    pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList[0]);
     FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 
     if (ShadowDebugFlag)
     {
-        FrameBufferRenderer.RebuildSwapChain(DebugDepthRenderPass.DebugTexture, DebugDepthRenderPass.DebugTexture);
+       // FrameBufferRenderer.RebuildSwapChain(DebugDepthRenderPass.DebugTexture, DebugDepthRenderPass.DebugTexture);
     }
     else
     {
@@ -61,7 +61,7 @@ void PBRRenderer::Draw()
 {
     if (ShadowDebugFlag)
     {
-        DebugDepthRenderPass.Draw();
+     //   DebugDepthRenderPass.Draw();
     }
 
     DepthRenderPass.Draw();
@@ -75,7 +75,7 @@ prefilterRenderPass.Draw();
 
 void PBRRenderer::Destroy()
 {
-    DebugDepthRenderPass.Destroy();
+   // DebugDepthRenderPass.Destroy();
     irradianceRenderPass.Destroy();
     prefilterRenderPass.Destroy();
     brdfRenderPass.Destroy();
@@ -88,7 +88,7 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
 {
     if (ShadowDebugFlag)
     {
-        CommandBufferSubmitList.emplace_back(DebugDepthRenderPass.GetCommandBuffer());
+       // CommandBufferSubmitList.emplace_back(DebugDepthRenderPass.GetCommandBuffer());
         //  CommandBufferSubmitList.emplace_back(debugCubeDepthRenderPass.GetCommandBuffer());
     }
 

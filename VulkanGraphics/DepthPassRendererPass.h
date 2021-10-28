@@ -10,13 +10,14 @@ private:
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
+	std::shared_ptr<RenderedDepthTexture> DepthToTexture;
 public:
 	DepthPassRendererPass();
 	DepthPassRendererPass(uint32_t depthTextureSize);
 	~DepthPassRendererPass();
 
-	std::shared_ptr<RenderedDepthTexture> DepthTexture;
 
+	std::vector<std::shared_ptr<RenderedDepthTexture>> DepthTextureList;
 	std::shared_ptr<DepthPassPipeline> depthPipeline;
 
 	void RebuildSwapChain(uint32_t depthTextureSize);

@@ -43,7 +43,7 @@ void RenderedDepthTexture::CreateTextureImage()
     TextureInfo.format = VK_FORMAT_D32_SFLOAT;
     TextureInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     TextureInfo.initialLayout = ImageLayout;
-    TextureInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+    TextureInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
     TextureInfo.samples = SampleCount;
     TextureInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 

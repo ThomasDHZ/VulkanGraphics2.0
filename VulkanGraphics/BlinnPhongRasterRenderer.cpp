@@ -9,7 +9,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine>
 {
     DepthRenderPass = DepthPassRendererPass(512);
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
-    DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTexture);
+    //DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTextureList[0]);
     ReflectionRenderPass = ReflectionCubeMapRenderPass(64, nullptr);
     BlinnRenderPass = BlinnPhongRasterPass(engine, nullptr);
     FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
@@ -23,9 +23,9 @@ void BlinnPhongRasterRenderer::RebuildSwapChain()
 {
     DepthRenderPass.RebuildSwapChain(512);
     depthCubeMapRenderPass.RebuildSwapChain(1024);
-    DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
-    ReflectionRenderPass.RebuildSwapChain(1024, DepthRenderPass.DepthTexture);
-    BlinnRenderPass.RebuildSwapChain(DepthRenderPass.DepthTexture);
+   // DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList[0]);
+    ReflectionRenderPass.RebuildSwapChain(1024, DepthRenderPass.DepthTextureList[0]);
+    BlinnRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList[0]);
     FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 }
 
@@ -51,7 +51,7 @@ void BlinnPhongRasterRenderer::Draw()
 {
     if (ShadowDebugFlag)
     {
-        DebugDepthRenderPass.Draw();
+      //  DebugDepthRenderPass.Draw();
     }
 
     DepthRenderPass.Draw();
@@ -63,7 +63,7 @@ void BlinnPhongRasterRenderer::Draw()
 
 void BlinnPhongRasterRenderer::Destroy()
 {
-    DebugDepthRenderPass.Destroy();
+   // DebugDepthRenderPass.Destroy();
     depthCubeMapRenderPass.Destroy();
     ReflectionRenderPass.Destroy();
     BlinnRenderPass.Destroy();
@@ -74,7 +74,7 @@ std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitL
 {
     if (ShadowDebugFlag)
     {
-        CommandBufferSubmitList.emplace_back(DebugDepthRenderPass.GetCommandBuffer());
+      // CommandBufferSubmitList.emplace_back(DebugDepthRenderPass.GetCommandBuffer());
     }
 
     CommandBufferSubmitList.emplace_back(DepthRenderPass.GetCommandBuffer());

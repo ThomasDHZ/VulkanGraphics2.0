@@ -14,7 +14,7 @@ private:
 	bool cubeMapCheck = false;
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;
-	DepthDebugRenderPass DebugDepthRenderPass;
+	//DepthDebugRenderPass DebugDepthRenderPass;
 	ReflectionCubeMapRenderPass ReflectionRenderPass;
 	BlinnPhongRasterPass BlinnRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
