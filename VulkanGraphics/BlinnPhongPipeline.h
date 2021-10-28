@@ -6,15 +6,15 @@
 class BlinnPhongPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool();
-	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets(std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	void SetUpDescriptorPool(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
+	void SetUpDescriptorLayout(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
+	void SetUpDescriptorSets(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	BlinnPhongPipeline();
-	BlinnPhongPipeline(const VkRenderPass& renderPass, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	BlinnPhongPipeline(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
 	~BlinnPhongPipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
 };
 

@@ -597,7 +597,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetCubeMapTextureBufferDescri
 std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedColorTextureBufferDescriptorList()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
-	if (CubeMapList.size() == 0)
+	if (RenderedColorTextureList.size() == 0)
 	{
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -622,7 +622,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedColorTextureBuffer
 std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedDepthTextureBufferDescriptorList()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
-	if (CubeMapList.size() == 0)
+	if (RenderedDepthTextureList.size() == 0)
 	{
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -647,7 +647,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedDepthTextureBuffer
 std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedCubeMapTextureBufferDescriptorList()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
-	if (CubeMapList.size() == 0)
+	if (RenderedCubeMapTextureList.size() == 0)
 	{
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -672,7 +672,7 @@ std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedCubeMapTextureBuff
 std::vector<VkDescriptorImageInfo> TextureManager::GetRenderedCubeMapDepthTextureBufferDescriptorList()
 {
 	std::vector<VkDescriptorImageInfo> DescriptorImageList;
-	if (CubeMapList.size() == 0)
+	if (RenderedCubeMapDepthTextureList.size() == 0)
 	{
 		VkDescriptorImageInfo nullBuffer;
 		nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
