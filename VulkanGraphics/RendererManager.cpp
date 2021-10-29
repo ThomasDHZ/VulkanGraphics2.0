@@ -14,8 +14,8 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
   //  renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
     pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
 
-   // rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
-  //  pbrRayTraceRenderer = PBRRayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
+    rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
+    pbrRayTraceRenderer = PBRRayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
 }
 
 RendererManager::~RendererManager()
@@ -50,8 +50,8 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
     pbrRenderer.RebuildSwapChain();
     //renderer2D.RebuildSwapChain();
 
-    //rayTraceRenderer.RebuildSwapChain(engine, window);
-    //pbrRayTraceRenderer.RebuildSwapChain(engine, window);
+    rayTraceRenderer.RebuildSwapChain(engine, window);
+    pbrRayTraceRenderer.RebuildSwapChain(engine, window);
 }
 
 void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
@@ -66,8 +66,8 @@ void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_p
     BlinnRenderer.Update();
     //if (EnginePtr::GetEnginePtr()->RayTraceFlag)
     //{
-   /*    rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
-       pbrRayTraceRenderer.pbrRayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());*/
+       rayTraceRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
+       pbrRayTraceRenderer.pbrRayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
        // hybridRenderer.rayTraceRenderPass.SetUpTopLevelAccelerationStructure(engine, AssetManagerPtr::GetAssetPtr());
    // }
 }
@@ -86,7 +86,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         }
         else
         {
-            // rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
+             rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
         }
     }
     else if (ActiveRenderer == 1)
@@ -97,7 +97,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         }
         else
         {
-            //  pbrRayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
+              pbrRayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
         }
     }
     else if (ActiveRenderer == 2)
@@ -168,7 +168,6 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         GUIChanged |= ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("DLight Alumin " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.Luminosity, 0.0f, 500.0f);
         ImGui::LabelText("______", "______");
     }
 
@@ -182,7 +181,6 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         GUIChanged |= ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("PLight Alumin " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.Luminosity, 0.0f, 500.0f);
         ImGui::LabelText("______", "______");
     }
 
@@ -197,7 +195,6 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         GUIChanged |= ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("SLight Alumin " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.Luminosity, 0.00f, 500.0f);
 
         ImGui::LabelText("______", "______");
     }
@@ -205,7 +202,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     if (GUIChanged)
     {
         MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
-        //rayTraceRenderer.rayTraceRenderPass.Frame = 0;
+        rayTraceRenderer.rayTraceRenderPass.Frame = 0;
         GUIChanged = false;
     }
 
@@ -244,8 +241,8 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         }
         else
         {
-         //   rayTraceRenderer.Draw(engine, window);
-         //   rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+            rayTraceRenderer.Draw(engine, window);
+            rayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
         }
     }
     else if (ActiveRenderer == 1)
@@ -257,8 +254,8 @@ void RendererManager::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_ptr
         }
         else
         {
-         //   pbrRayTraceRenderer.Draw(engine, window);
-          //  pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
+            pbrRayTraceRenderer.Draw(engine, window);
+            pbrRayTraceRenderer.AddToCommandBufferSubmitList(CommandBufferSubmitList);
         }
     }
     else if (ActiveRenderer == 2)
