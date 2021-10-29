@@ -69,6 +69,7 @@ public:
     void UpdateImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int facecount);
     void UpdateImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateDepthImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateCubeImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateCubeImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void CopyTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
