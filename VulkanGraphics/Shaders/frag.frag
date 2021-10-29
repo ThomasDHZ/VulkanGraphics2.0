@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "lighting.glsl"
 #include "material.glsl"
 
@@ -15,20 +16,7 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject 
-{
-    mat4 lightSpaceMatrix;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-    uint SphereAreaLightCount;
-    uint TubeAreaLightCount;
-    uint RectangleAreaLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
-
+layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;
@@ -192,23 +180,23 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-   for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+   for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
    {
         result += CalcNormalDirLight(normal, texCoords, x);
    }
-//   for(int x = 0; x < scenedata.PointLightCount; x++)
+//   for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
 //   {
 //        result += CalcNormalPointLight(normal, texCoords, x);   
 //   }
-//   for(int x = 0; x < scenedata.SpotLightCount; x++)
+//   for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
 //   {
 //        result += CalcNormalSpotLight(normal, texCoords, x);   
 //   }
-//   for(int x = 0; x < scenedata.SphereAreaLightCount; x++)
+//   for(int x = 0; x < sceneBuffer.sceneData.SphereAreaLightCount; x++)
 //   {
 //       // result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);
 //   }
-//   for(int x = 0; x < scenedata.TubeAreaLightCount; x++)
+//   for(int x = 0; x < sceneBuffer.sceneData.TubeAreaLightCount; x++)
 //   {
 //       // result += CalcTubeAreaLight(normal, texCoords, x);   
 //   }
@@ -316,7 +304,7 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
 	0.0, 0.0, 1.0, 0.0,
 	0.5, 0.5, 0.0, 1.0 );
 
-    vec4 LightSpace = (biasMat * scenedata.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
+    vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
    float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
 }

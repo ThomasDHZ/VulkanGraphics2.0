@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "material.glsl"
 
 layout(push_constant) uniform MeshInfo
@@ -14,19 +15,7 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject {
-    mat4 lightSpaceMatrix;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-    uint SphereAreaLightCount;
-    uint TubeAreaLightCount;
-    uint RectangleAreaLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} ubo;
-
+layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;
@@ -71,7 +60,7 @@ void main()
     Normal = aNormal;
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
-    LightSpace = (biasMat * ubo.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
+    LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
     gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(inPosition, 1.0);
 
 }

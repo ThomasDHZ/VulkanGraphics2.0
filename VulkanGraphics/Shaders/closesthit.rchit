@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -31,19 +32,7 @@ layout(location = 1) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 2) uniform UBO 
-{
-    mat4 lightSpaceMatrix;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-    uint SphereAreaLightCount;
-    uint TubeAreaLightCount;
-    uint RectangleAreaLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
+layout(binding = 2) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 3) buffer MeshProperties 
 {
 	mat4 ModelTransform;
@@ -172,15 +161,15 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-    for(int x = 0; x < scenedata.DirectionalLightCount; x++)
+    for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
      {
         baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
      }
-//     for(int x = 0; x < scenedata.PointLightCount; x++)
+//     for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
 //     {
 //        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
 //     }
-//       for(int x = 0; x < scenedata.SpotLightCount; x++)
+//       for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
 //       {
 //            baseColor += CalcNormalSpotLight(FragPos, normal, vertex.uv, x);   
 //       }
@@ -371,8 +360,8 @@ vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir)
 
 vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float LightDistance)
 {
-     if(scenedata.Shadowed == 1)
-     {
+//     if(scenedata.Shadowed == 1)
+//     {
         float tmin = 0.001;
 	    float tmax = LightDistance;
 	    vec3 origin = gl_WorldRayOriginEXT + gl_WorldRayDirectionEXT * gl_HitTEXT;
@@ -386,10 +375,10 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
         {
            LightResult += LightSpecular;
         }
-    }
-    else
-    {
-           LightResult += LightSpecular;
-    }
+//    }
+//    else
+//    {
+//           LightResult += LightSpecular;
+//    }
     return LightResult;
 }

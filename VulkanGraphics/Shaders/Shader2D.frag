@@ -3,6 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "Lighting.glsl"
 #include "material.glsl"
 #include "vertex.glsl"
@@ -24,21 +25,7 @@ struct VertexData
 	vec3 BiTangent;
 };
 
-layout(binding = 0) uniform UniformBufferObject 
-{
-    mat4 proj;
-    mat4 view;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-    uint SphereAreaLightCount;
-    uint TubeAreaLightCount;
-    uint RectangleAreaLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
-
+layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;

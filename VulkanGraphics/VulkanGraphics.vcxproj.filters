@@ -931,5 +931,11 @@
     <None Include="Shaders\ReflectionShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
+    <None Include="Shaders\MeshProperties.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
+    <None Include="Shaders\SceneProperties.glsl">
+      <Filter>Shader\Include</Filter>
+    </None>
   </ItemGroup>
 </Project>

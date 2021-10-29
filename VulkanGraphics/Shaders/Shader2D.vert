@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "Lighting.glsl"
 #include "material.glsl"
 #include "vertex.glsl"
@@ -16,20 +17,7 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject 
-{
-    mat4 proj;
-    mat4 view;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-    uint SphereAreaLightCount;
-    uint TubeAreaLightCount;
-    uint RectangleAreaLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} ubo;
+layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;

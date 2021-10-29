@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "material.glsl"
 
 layout(push_constant) uniform MeshInfo
@@ -14,19 +15,7 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) uniform UniformBufferObject {
-    mat4 lightSpaceMatrix;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-    uint SphereAreaLightCount;
-    uint TubeAreaLightCount;
-    uint RectangleAreaLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
-
+layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshProperties 
 {
 	mat4 ModelTransform;
@@ -240,8 +229,8 @@ void main()
 
     vec3 Lo = vec3(0.0);
     Lo += CalcDirectionalLight(F0, V, N, albedo, roughness, metallic);
-//    Lo += CalcPointLight(F0, V, N, albedo, roughness, metallic);
-//    Lo += CalcSpotLight(F0, V, N, albedo, roughness, metallic);
+    Lo += CalcPointLight(F0, V, N, albedo, roughness, metallic);
+    Lo += CalcSpotLight(F0, V, N, albedo, roughness, metallic);
 
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F0, roughness);
     
@@ -323,12 +312,12 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 {
     vec3 Lo = vec3(0.0);
     float shadow = filterPCF(LightSpace/ LightSpace.w);  
-    for(int i = 0; i < 1; ++i) 
+    for(int i = 0; i < sceneBuffer.sceneData.DirectionalLightCount; ++i) 
     {
         vec3 L = normalize(DLight[i].direction - FragPos);
         vec3 H = normalize(V + L);
         vec3 radiance = DLight[i].diffuse;
-        radiance *= shadow * 5.0f;
+       // radiance *= shadow * 5.0f;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -337,7 +326,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
         vec3 nominator    = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
         vec3 specular = nominator / denominator;
-        specular *= shadow * 5.0f;
+       // specular *= shadow * 5.0f;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
@@ -347,13 +336,13 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     }   
-    return Lo * shadow;
+    return Lo;// * shadow;
 }
 
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < scenedata.PointLightCount; ++i) 
+    for(int i = 0; i < sceneBuffer.sceneData.PointLightCount; ++i) 
     {
         vec3 L = normalize(PLight[i].position - FragPos);
         vec3 H = normalize(V + L);
@@ -382,7 +371,7 @@ vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float
 vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < scenedata.SpotLightCount; ++i) 
+    for(int i = 0; i < sceneBuffer.sceneData.SpotLightCount; ++i) 
     {
         vec3 L = normalize(SLight[i].position - FragPos);
         vec3 H = normalize(V + L);

@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -36,20 +37,7 @@ layout(location = 1) rayPayloadEXT bool shadowed;
 hitAttributeEXT vec2 attribs;
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 2) uniform UBO 
-{
-    mat4 proj;
-    mat4 view;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-    uint SphereAreaLightCount;
-    uint TubeAreaLightCount;
-    uint RectangleAreaLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
+layout(binding = 2) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 3) buffer MeshProperties 
 {
 	mat4 ModelTransform;
@@ -401,7 +389,7 @@ vec3 PrefilterColor()
 vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < scenedata.DirectionalLightCount; ++i) 
+    for(int i = 0; i < sceneBuffer.sceneData.DirectionalLightCount; ++i) 
     {
         vec3 L = normalize(DLight[i].direction - vertex.pos);
         vec3 H = normalize(V + L);
@@ -428,7 +416,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < scenedata.PointLightCount; ++i) 
+    for(int i = 0; i < sceneBuffer.sceneData.PointLightCount; ++i) 
     {
         vec3 L = normalize(PLight[i].position - vertex.pos);
         vec3 H = normalize(V + L);
@@ -457,7 +445,7 @@ vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float
 vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < scenedata.SpotLightCount; ++i) 
+    for(int i = 0; i < sceneBuffer.sceneData.SpotLightCount; ++i) 
     {
         vec3 L = normalize(SLight[i].position - vertex.pos);
         vec3 H = normalize(V + L);

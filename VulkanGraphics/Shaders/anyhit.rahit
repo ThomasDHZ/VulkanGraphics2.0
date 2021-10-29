@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "SceneProperties.glsl"
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -32,20 +33,7 @@ layout(location = 0) rayPayloadInEXT RayPayload rayHitInfo;
 hitAttributeEXT vec2 attribs;
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
-layout(binding = 2) uniform UBO 
-{
-    mat4 viewInverse;
-	mat4 projInverse;
-	mat4 view;
-	mat4 proj;
-    vec3 viewPos;
-    uint DirectionalLightCount;
-    uint PointLightCount;
-    uint SpotLightCount;
-	float timer;
-    int Shadowed;
-    int temp;
-} scenedata;
+layout(binding = 2) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 3) buffer MeshProperties 
 {
 	mat4 ModelTransform;

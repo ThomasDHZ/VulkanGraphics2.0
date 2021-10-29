@@ -468,6 +468,7 @@
     <None Include="Shaders\Lighting.glsl" />
     <None Include="Shaders\Material.glsl" />
     <None Include="Shaders\MaterialBuilder.glsl" />
+    <None Include="Shaders\MeshProperties.glsl" />
     <None Include="Shaders\miss.rmiss" />
     <None Include="Shaders\pbranyhit.rahit" />
     <None Include="Shaders\pbranyhit1.rahit" />
@@ -483,6 +484,7 @@
     <None Include="Shaders\ReflectionShader.vert" />
     <None Include="Shaders\RTVertexBuilder.glsl" />
     <None Include="Shaders\RTXRandom.glsl" />
+    <None Include="Shaders\SceneProperties.glsl" />
     <None Include="Shaders\Shader2D.frag" />
     <None Include="Shaders\Shader2D.vert" />
     <None Include="Shaders\shadow.rmiss" />
