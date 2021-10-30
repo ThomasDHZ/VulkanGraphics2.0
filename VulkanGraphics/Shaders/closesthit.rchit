@@ -5,6 +5,7 @@
 #extension GL_EXT_debug_printf : enable
 
 #include "SceneProperties.glsl"
+#include "MeshProperties.glsl"
 #include "Vertex.glsl"
 #include "Lighting.glsl"
 #include "Material.glsl"
@@ -33,18 +34,7 @@ hitAttributeEXT vec2 attribs;
 
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
-layout(binding = 3) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
-
+layout(binding = 3) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 4) buffer DirectionalLight2
 { 
     vec3 direction;
@@ -136,10 +126,10 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
 void main()
 {
    vertex = BuildVertexInfo();
-   material = MaterialList[meshProperties[gl_InstanceCustomIndexEXT].MaterialIndex].material;
-   const vec3 T = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
-   const vec3 B = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
-   const vec3 N = normalize(mat3(meshProperties[gl_InstanceCustomIndexEXT].ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
+   material = MaterialList[meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MaterialIndex].material;
+   const vec3 T = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.tangent));
+   const vec3 B = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vec3(vertex.BiTangant));
+   const vec3 N = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * MeshTransform[gl_InstanceCustomIndexEXT].Transform) * vertex.normal);
    TBN = transpose(mat3(T, B, N));
 
     vec3 result = vec3(0.0f);
@@ -325,9 +315,9 @@ vec3 CalcNormalSpotLight(vec3 FragPos, vec3 normal, vec2 uv, int index)
 
 vec2 ParallaxMapping( MaterialInfo material, vec2 texCoords, vec3 viewDir)
 { 
-    const float heightScale = meshProperties[gl_InstanceCustomIndexEXT].heightScale;
-    const float minLayers = meshProperties[gl_InstanceCustomIndexEXT].minLayers;
-    const float maxLayers = meshProperties[gl_InstanceCustomIndexEXT].maxLayers;
+    const float heightScale = meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.heightScale;
+    const float minLayers = meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.minLayers;
+    const float maxLayers = meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.maxLayers;
 
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
     float layerDepth = 1.0 / numLayers;

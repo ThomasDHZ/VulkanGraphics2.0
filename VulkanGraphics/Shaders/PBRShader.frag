@@ -5,6 +5,7 @@
 #extension GL_EXT_debug_printf : enable
 
 #include "SceneProperties.glsl"
+#include "MeshProperties.glsl"
 #include "material.glsl"
 
 layout(push_constant) uniform MeshInfo
@@ -16,18 +17,7 @@ layout(push_constant) uniform MeshInfo
 } Mesh;
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
-layout(binding = 1) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
-
+layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 2) buffer DirectionalLight
 { 
     vec3 direction;
@@ -171,8 +161,8 @@ float filterPCF(vec4 sc)
 
 void main()
 {		
-   MaterialInfo material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
-   vec2 UV = TexCoords + meshProperties[Mesh.MeshIndex].UVOffset;
+   MaterialInfo material = MaterialList[meshBuffer[Mesh.MeshIndex].meshProperties.MaterialIndex].material;
+   vec2 UV = TexCoords + meshBuffer[Mesh.MeshIndex].meshProperties.UVOffset;
    if(texture(TextureMap[material.AlphaMapID], UV).r == 0.0f ||
       texture(TextureMap[material.DiffuseMapID], UV).a == 0.0f)
    {
@@ -254,9 +244,9 @@ void main()
 
 mat3 getTBNFromMap()
 {
-    vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
-    vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
-    vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
+    vec3 T = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
+    vec3 B = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
+    vec3 N = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
     mat3 TBN = mat3(T, B, N);
 
     return TBN;
@@ -405,9 +395,9 @@ vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float 
 
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
 {
-    const float heightScale = meshProperties[Mesh.MeshIndex].heightScale;
-    const float minLayers = meshProperties[Mesh.MeshIndex].minLayers;
-    const float maxLayers = meshProperties[Mesh.MeshIndex].maxLayers;
+    const float heightScale = meshBuffer[Mesh.MeshIndex].meshProperties.heightScale;
+    const float minLayers = meshBuffer[Mesh.MeshIndex].meshProperties.minLayers;
+    const float maxLayers = meshBuffer[Mesh.MeshIndex].meshProperties.maxLayers;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
     float layerDepth = 1.0 / numLayers;
     float currentLayerDepth = 0.0;

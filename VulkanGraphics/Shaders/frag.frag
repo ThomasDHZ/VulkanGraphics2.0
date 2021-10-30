@@ -5,6 +5,7 @@
 #extension GL_EXT_debug_printf : enable
 
 #include "SceneProperties.glsl"
+#include "MeshProperties.glsl"
 #include "lighting.glsl"
 #include "material.glsl"
 
@@ -17,18 +18,7 @@ layout(push_constant) uniform MeshInfo
 } Mesh;
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
-layout(binding = 1) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
-
+layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 2) buffer DirectionalLightBuffer{ DirectionalLight directionalLight; } DLight[];
 layout(binding = 3) buffer PointLightBuffer { PointLight pointLight; } PLight[];
 layout(binding = 4) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
@@ -129,30 +119,30 @@ float filterPCF(vec4 sc, int index)
 
 void main() 
 {
-   material = MaterialList[meshProperties[Mesh.MeshIndex].MaterialIndex].material;
-   vec2 texCoords = TexCoords + meshProperties[Mesh.MeshIndex].UVOffset;
+   material = MaterialList[meshBuffer[Mesh.MeshIndex].meshProperties.MaterialIndex].material;
+   vec2 texCoords = TexCoords + meshBuffer[Mesh.MeshIndex].meshProperties.UVOffset;
    if(texture(TextureMap[material.AlphaMapID], texCoords).r == 0.0f ||
       texture(TextureMap[material.DiffuseMapID], texCoords).a == 0.0f)
    {
 	 discard;
    }
-   texCoords *= meshProperties[Mesh.MeshIndex].UVScale;
-   if(meshProperties[Mesh.MeshIndex].UVFlip.y == 1.0f)
+   texCoords *= meshBuffer[Mesh.MeshIndex].meshProperties.UVScale;
+   if(meshBuffer[Mesh.MeshIndex].meshProperties.UVFlip.y == 1.0f)
    {
         texCoords.y = 1.0f - texCoords.y;
    }
-   if(meshProperties[Mesh.MeshIndex].UVFlip.x == 1.0f)
+   if(meshBuffer[Mesh.MeshIndex].meshProperties.UVFlip.x == 1.0f)
    {
         texCoords.x = 1.0f - texCoords.x;
    }
-   if(meshProperties[Mesh.MeshIndex].UVFlip.y == 1.0f)
+   if(meshBuffer[Mesh.MeshIndex].meshProperties.UVFlip.y == 1.0f)
    {
         texCoords.y = 1.0f - texCoords.y;
    }
 
-   vec3 T = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
-   vec3 B = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
-   vec3 N = normalize(mat3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
+   vec3 T = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
+   vec3 B = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
+   vec3 N = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
    TBN = transpose(mat3(T, B, N));
    
    vec3 result = vec3(0.0f);
@@ -258,7 +248,7 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
 
     float LightDistance = length(LightPos - FragPos2);
 
-    vec4 LightSpace = (LightBiasMatrix *  DLight[index].directionalLight.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
+    vec4 LightSpace = (LightBiasMatrix *  DLight[index].directionalLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
     float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
     return (ambient + (shadow) * (diffuse + specular));
 }
@@ -304,7 +294,7 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
 	0.0, 0.0, 1.0, 0.0,
 	0.5, 0.5, 0.0, 1.0 );
 
-    vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
+    vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
    float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
 }
@@ -456,9 +446,9 @@ vec3 CalcSphereAreaLight(vec3 normal, vec2 uv, int index)
 
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir)
 {
-    const float heightScale = meshProperties[Mesh.MeshIndex].heightScale;
-    const float minLayers = meshProperties[Mesh.MeshIndex].minLayers;
-    const float maxLayers = meshProperties[Mesh.MeshIndex].maxLayers;
+    const float heightScale = meshBuffer[Mesh.MeshIndex].meshProperties.heightScale;
+    const float minLayers = meshBuffer[Mesh.MeshIndex].meshProperties.minLayers;
+    const float maxLayers = meshBuffer[Mesh.MeshIndex].meshProperties.maxLayers;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
     float layerDepth = 1.0 / numLayers;
     float currentLayerDepth = 0.0;

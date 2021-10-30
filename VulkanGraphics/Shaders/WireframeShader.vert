@@ -4,6 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "MeshProperties.glsl"
 #include "Lighting.glsl"
 #include "material.glsl"
 #include "vertex.glsl"
@@ -16,17 +17,7 @@ layout(push_constant) uniform MeshInfo
     vec3 CameraPos;
 } Mesh;
 
-layout(binding = 0) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
+layout(binding = 0) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 1) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout (location = 0) in vec3 aPos;
@@ -39,7 +30,7 @@ layout(location = 0) out vec3 FragPos;
 
 void main() 
 {
-    FragPos = vec3(meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
+    FragPos = vec3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
 
-    gl_Position = Mesh.proj * Mesh.view * meshProperties[Mesh.MeshIndex].ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
+    gl_Position = Mesh.proj * Mesh.view * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
 }

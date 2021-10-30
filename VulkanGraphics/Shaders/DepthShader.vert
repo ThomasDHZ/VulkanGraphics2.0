@@ -5,6 +5,7 @@
 #extension GL_EXT_debug_printf : enable
 
 #include "SceneProperties.glsl"
+#include "MeshProperties.glsl"
 #include "material.glsl"
 
 layout(push_constant) uniform LightSceneInfo
@@ -15,18 +16,7 @@ layout(push_constant) uniform LightSceneInfo
 
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
-layout(binding = 1) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
-
+layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 2) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 3) uniform sampler2D TextureMap[];
 
@@ -38,5 +28,5 @@ layout (location = 4) in vec4 aBitangent;
 
 void main() 
 {
-    gl_Position = scene.lightSpaceMatrix * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
+    gl_Position = scene.lightSpaceMatrix * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
 }

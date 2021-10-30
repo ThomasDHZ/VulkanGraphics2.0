@@ -3,6 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_debug_printf : enable
 
+#include "MeshProperties.glsl"
 #include "Lighting.glsl"
 #include "material.glsl"
 #include "vertex.glsl"
@@ -24,18 +25,7 @@ struct VertexData
 	vec3 BiTangent;
 };
 
-layout(binding = 0) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
-
+layout(binding = 0) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 1) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout(location = 0) in vec3 FragPos;

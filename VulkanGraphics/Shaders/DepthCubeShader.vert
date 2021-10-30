@@ -6,6 +6,7 @@
 #extension GL_EXT_multiview : enable
 
 #include "SceneProperties.glsl"
+#include "MeshProperties.glsl"
 #include "material.glsl"
 
 layout(push_constant) uniform LightSceneInfo
@@ -15,18 +16,7 @@ layout(push_constant) uniform LightSceneInfo
 } scene;
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
-layout(binding = 1) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-    vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
-
+layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 2) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 3) uniform sampler2D TextureMap[];
 
@@ -68,5 +58,5 @@ void main()
 //                           debugPrintfEXT("CubeDepth33: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][3]);
 //        }
 //	}
-    gl_Position = SkyboxSamples.lightSpaceMatrix[gl_ViewIndex] * meshProperties[scene.MeshIndex].ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
+    gl_Position = SkyboxSamples.lightSpaceMatrix[gl_ViewIndex] * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
 }
