@@ -28,41 +28,9 @@ struct VertexData
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
-layout(binding = 2) buffer DirectionalLight2
-{ 
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-} DLight[];
-
-layout(binding = 3) buffer PointLight2
-{ 
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float constant;
-    float linear;
-    float quadratic;
-    mat4 lightSpaceMatrix;
-} PLight[];
-
-layout(binding = 4) buffer SpotLight2
-{ 
-   vec3 position;
-   vec3 direction;
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
-
-   float cutOff;
-   float outerCutOff;
-   float constant;
-   float linear;
-   float quadratic;
-} SLight[];
-
+layout(binding = 2) buffer DirectionalLightBuffer{ DirectionalLight directionalLight; } DLight[];
+layout(binding = 3) buffer PointLightBuffer { PointLight pointLight; } PLight[];
+layout(binding = 4) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer MaterialInfos { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
@@ -80,12 +48,12 @@ layout(location = 1) out vec4 outBloom;
 
 vec3 CalcNormalDirLight(MaterialInfo material, vec3 FragPos, vec3 normal, vec2 uv, mat3 TBN)
 {
-    vec3 LightPos = DLight[0].direction;
+    vec3 LightPos = DLight[0].directionalLight.direction;
     vec3 ViewPos = ConstMesh.CameraPos;
     vec3 FragPos2 = FragPos;
     if (material.NormalMapID != 0)
     {
-        LightPos = TBN * DLight[0].direction;
+        LightPos = TBN * DLight[0].directionalLight.direction;
         ViewPos = TBN * ConstMesh.CameraPos;
         FragPos2 = TBN * FragPos;
     }
@@ -97,17 +65,17 @@ vec3 CalcNormalDirLight(MaterialInfo material, vec3 FragPos, vec3 normal, vec2 u
     const vec3 halfwayDir = normalize(lightDir + ViewDir);
     const float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0f);
 
-    vec3 ambient = DLight[0].ambient * material.Diffuse.rgb;
-    vec3 diffuse = DLight[0].diffuse * diff * material.Diffuse.rgb;
-    vec3 specular = DLight[0].specular * spec * material.Specular;
+    vec3 ambient = DLight[0].directionalLight.ambient * material.Diffuse.rgb;
+    vec3 diffuse = DLight[0].directionalLight.diffuse * diff * material.Diffuse.rgb;
+    vec3 specular = DLight[0].directionalLight.specular * spec * material.Specular;
     if (material.DiffuseMapID != 0)
     {
-        ambient = DLight[0].ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
-        diffuse = DLight[0].diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        ambient = DLight[0].directionalLight.ambient * vec3(texture(TextureMap[material.DiffuseMapID], uv));
+        diffuse = DLight[0].directionalLight.diffuse * diff * vec3(texture(TextureMap[material.DiffuseMapID], uv));
     }
     if (material.SpecularMapID != 0)
     {
-        specular = DLight[0].specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
+        specular = DLight[0].directionalLight.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
     return vec3(ambient + diffuse + specular);

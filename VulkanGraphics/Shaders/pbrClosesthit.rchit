@@ -40,43 +40,9 @@ hitAttributeEXT vec2 attribs;
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 3) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
-layout(binding = 4) buffer DirectionalLight2
-{ 
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float Luminosity;
-} DLight[];
-
-layout(binding = 5) buffer PointLight2
-{ 
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float constant;
-    float linear;
-    float quadratic;
-    float Luminosity;
-} PLight[];
-
-layout(binding = 6) buffer SpotLight2
-{ 
-   vec3 position;
-   vec3 direction;
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
-
-   float cutOff;
-   float outerCutOff;
-   float constant;
-   float linear;
-   float quadratic;
-   float Luminosity;
-} SLight[];
-
+layout(binding = 4) buffer DirectionalLightBuffer{ DirectionalLight directionalLight; } DLight[];
+layout(binding = 5) buffer PointLightBuffer { PointLight pointLight; } PLight[];
+layout(binding = 6) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
 layout(binding = 7, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 8) buffer Indices { uint i[]; } indices[];
 layout(binding = 9) buffer Transform { mat4 Transform; } MeshTransform[];
@@ -84,37 +50,9 @@ layout(binding = 10) buffer MaterialInfos { MaterialInfo material; } MaterialLis
 layout(binding = 11) uniform sampler2D TextureMap[];
 layout(binding = 12) uniform sampler3D Texture3DMap[];
 layout(binding = 13, set = 0) uniform samplerCube CubeMap[];
-
-layout(binding = 14) buffer SphereAreaLightBuffer {
-	vec3 position;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float SphereRadius;
-	float Luminosity;
-} SphereLight[];
-
-layout(binding = 15) buffer TubeAreaLightBuffer {
-	vec3 StartPos;
-	vec3 EndPos;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-    float TubeRadius;
-	float Luminosity;
-} TubeLight[];
-
-layout(binding = 16) buffer RectangleAreaLightBuffer
-{
-	vec3 VertexPos1;
-	vec3 VertexPos2;
-	vec3 VertexPos3;
-	vec3 VertexPos4;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float Luminosity;
-} RectangleLight[];
+layout(binding = 14) buffer SphereAreaLightBuffer { SphereAreaLight sphereLight; } sphereLightBuffer[];
+layout(binding = 15) buffer TubeAreaLightBuffer { TubeAreaLight tubeAreaLight; } tubeLightBuffer[];
+layout(binding = 16) buffer RectangleAreaLightBuffer { RectangleAreaLight rectangleAreaLight; } rectangleAreaLightBuffer[];
 
 Vertex vertex;
 #include "RTVertexBuilder.glsl"
@@ -381,9 +319,9 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < sceneBuffer.sceneData.DirectionalLightCount; ++i) 
     {
-        vec3 L = normalize(DLight[i].direction - vertex.pos);
+        vec3 L = normalize(DLight[i].directionalLight.direction - vertex.pos);
         vec3 H = normalize(V + L);
-        vec3 radiance = DLight[i].diffuse;
+        vec3 radiance = DLight[i].directionalLight.diffuse;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -408,11 +346,11 @@ vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < sceneBuffer.sceneData.PointLightCount; ++i) 
     {
-        vec3 L = normalize(PLight[i].position - vertex.pos);
+        vec3 L = normalize(PLight[i].pointLight.position - vertex.pos);
         vec3 H = normalize(V + L);
-        float distance = length(PLight[i].position - vertex.pos);
+        float distance = length(PLight[i].pointLight.position - vertex.pos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = PLight[i].diffuse * attenuation;
+        vec3 radiance = PLight[i].pointLight.diffuse * attenuation;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    

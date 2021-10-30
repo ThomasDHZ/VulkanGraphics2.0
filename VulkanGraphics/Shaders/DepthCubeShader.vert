@@ -19,7 +19,6 @@ layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } scene
 layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
 layout(binding = 2) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 3) uniform sampler2D TextureMap[];
-
 layout(binding = 4) uniform CubeSampler 
 {
     mat4 lightSpaceMatrix[6];

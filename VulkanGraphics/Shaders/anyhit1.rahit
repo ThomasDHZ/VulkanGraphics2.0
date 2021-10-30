@@ -36,40 +36,9 @@ hitAttributeEXT vec2 attribs;
 layout(binding = 0, set = 0) uniform accelerationStructureEXT topLevelAS;
 layout(binding = 2) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 3) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
-layout(binding = 4) buffer DirectionalLight2
-{ 
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-} DLight[];
-
-layout(binding = 5) buffer PointLight2
-{ 
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float constant;
-    float linear;
-    float quadratic;
-} PLight[];
-
-layout(binding = 6) buffer SpotLight2
-{ 
-   vec3 position;
-   vec3 direction;
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
-
-   float cutOff;
-   float outerCutOff;
-   float constant;
-   float linear;
-   float quadratic;
-} SLight[];
-
+layout(binding = 4) buffer DirectionalLightBuffer{ DirectionalLight directionalLight; } DLight[];
+layout(binding = 5) buffer PointLightBuffer { PointLight pointLight; } PLight[];
+layout(binding = 6) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
 layout(binding = 7, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 8) buffer Indices { uint i[]; } indices[];
 layout(binding = 9) buffer Transform { mat4 Transform; } MeshTransform[];

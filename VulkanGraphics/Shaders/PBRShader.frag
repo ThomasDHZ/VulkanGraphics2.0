@@ -7,6 +7,7 @@
 #include "SceneProperties.glsl"
 #include "MeshProperties.glsl"
 #include "material.glsl"
+#include "lighting.glsl"
 
 layout(push_constant) uniform MeshInfo
 {
@@ -18,83 +19,17 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
-layout(binding = 2) buffer DirectionalLight
-{ 
-    vec3 direction;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float Luminosity;
-} DLight[];
-
-layout(binding = 3) buffer PointLight
-{ 
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float constant;
-    float linear;
-    float quadratic;
-    float Luminosity;
-    mat4 lightSpaceMatrix;
-} PLight[];
-
-layout(binding = 4) buffer SpotLight
-{ 
-   vec3 position;
-   vec3 direction;
-   vec3 ambient;
-   vec3 diffuse;
-   vec3 specular;
-
-   float cutOff;
-   float outerCutOff;
-   float constant;
-   float linear;
-   float quadratic;
-   float Luminosity;
-} SLight[];
-
+layout(binding = 2) buffer DirectionalLightBuffer{ DirectionalLight directionalLight; } DLight[];
+layout(binding = 3) buffer PointLightBuffer { PointLight pointLight; } PLight[];
+layout(binding = 4) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
 layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
 layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
 layout(binding = 9) uniform samplerCube CubeMap[];
-
-layout(binding = 10) buffer SphereAreaLightBuffer {
-	vec3 position;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float SphereRadius;
-    float linear;
-    float quadratic;
-	float Luminosity;
-} SphereLight[];
-
-layout(binding = 11) buffer TubeAreaLightBuffer {
-	vec3 StartPos;
-	vec3 EndPos;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-    float TubeRadius;
-	float Luminosity;
-} TubeLight[];
-
-layout(binding = 12) buffer RectangleAreaLightBuffer
-{
-	vec3 VertexPos1;
-	vec3 VertexPos2;
-	vec3 VertexPos3;
-	vec3 VertexPos4;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-	float Luminosity;
-} RectangleLight[];
-
+layout(binding = 10) buffer SphereAreaLightBuffer { SphereAreaLight sphereLight; } sphereLightBuffer[];
+layout(binding = 11) buffer TubeAreaLightBuffer { TubeAreaLight tubeAreaLight; } tubeLightBuffer[];
+layout(binding = 12) buffer RectangleAreaLightBuffer { RectangleAreaLight rectangleAreaLight; } rectangleAreaLightBuffer[];
 layout(binding = 13) uniform samplerCube IrradianceMap;
 layout(binding = 14) uniform samplerCube PrefilterMap;
 layout(binding = 15) uniform sampler2D BRDFMap;
@@ -304,9 +239,9 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
     float shadow = filterPCF(LightSpace/ LightSpace.w);  
     for(int i = 0; i < sceneBuffer.sceneData.DirectionalLightCount; ++i) 
     {
-        vec3 L = normalize(-DLight[i].direction);
+        vec3 L = normalize(-DLight[i].directionalLight.direction);
         vec3 H = normalize(V + L);
-        vec3 radiance = DLight[i].diffuse;
+        vec3 radiance = DLight[i].directionalLight.diffuse;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -324,7 +259,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     }   
-    return Lo * shadow;
+    return vec3(shadow);
 }
 
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
@@ -332,11 +267,11 @@ vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < sceneBuffer.sceneData.PointLightCount; ++i) 
     {
-        vec3 L = normalize(PLight[i].position - FragPos);
+        vec3 L = normalize(PLight[i].pointLight.position - FragPos);
         vec3 H = normalize(V + L);
-        float distance = length(PLight[i].position - FragPos);
+        float distance = length(PLight[i].pointLight.position - FragPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = PLight[i].diffuse * attenuation;
+        vec3 radiance = PLight[i].pointLight.diffuse * attenuation;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -361,17 +296,17 @@ vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float 
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < sceneBuffer.sceneData.SpotLightCount; ++i) 
     {
-        vec3 L = normalize(SLight[i].position - FragPos);
+        vec3 L = normalize(SLight[i].spotLight.position - FragPos);
         vec3 H = normalize(V + L);
 
-        float theta = dot(L, normalize(-SLight[i].direction)); 
-        float epsilon = SLight[i].cutOff - SLight[i].outerCutOff;
-        float intensity = clamp((theta - SLight[i].outerCutOff) / epsilon, 0.0, 1.0);
+        float theta = dot(L, normalize(-SLight[i].spotLight.direction)); 
+        float epsilon = SLight[i].spotLight.cutOff - SLight[i].spotLight.outerCutOff;
+        float intensity = clamp((theta - SLight[i].spotLight.outerCutOff) / epsilon, 0.0, 1.0);
 
-        float distance = length(SLight[i].position - FragPos);
+        float distance = length(SLight[i].spotLight.position - FragPos);
         float attenuation = 1.0 / (distance * distance) ;
         attenuation *= intensity;
-        vec3 radiance = PLight[i].diffuse * attenuation;
+        vec3 radiance = SLight[i].spotLight.diffuse * attenuation;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
