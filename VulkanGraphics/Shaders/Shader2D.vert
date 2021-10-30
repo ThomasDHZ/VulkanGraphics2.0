@@ -7,7 +7,6 @@
 #include "SceneProperties.glsl"
 #include "MeshProperties.glsl"
 #include "Lighting.glsl"
-#include "material.glsl"
 #include "vertex.glsl"
 
 layout(push_constant) uniform MeshInfo
@@ -37,11 +36,11 @@ layout(location = 4) out vec3 BiTangent;
 
 void main() 
 {
-    FragPos = vec3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0));    
+    FragPos = vec3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform *  meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform  * vec4(aPos, 1.0));    
     TexCoords = aTexCoords;
     Normal = aNormal;
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
 
-    gl_Position = Mesh.proj * Mesh.view * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform * vec4(aPos, 1.0);
+    gl_Position = Mesh.proj * Mesh.view * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform *  meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform  * vec4(aPos, 1.0);
 }

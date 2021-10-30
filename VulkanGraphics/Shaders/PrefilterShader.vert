@@ -3,7 +3,6 @@
 #extension GL_EXT_multiview : enable
 
 #include "Lighting.glsl"
-#include "material.glsl"
 #include "vertex.glsl"
 
 mat4 MVP[6] = {{{0.000000, 0.000000, 1.010101, 1.000000},

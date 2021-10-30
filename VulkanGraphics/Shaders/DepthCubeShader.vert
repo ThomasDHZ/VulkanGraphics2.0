@@ -7,7 +7,6 @@
 
 #include "SceneProperties.glsl"
 #include "MeshProperties.glsl"
-#include "material.glsl"
 
 layout(push_constant) uniform LightSceneInfo
 {
@@ -57,5 +56,5 @@ void main()
 //                           debugPrintfEXT("CubeDepth33: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][3]);
 //        }
 //	}
-    gl_Position = SkyboxSamples.lightSpaceMatrix[gl_ViewIndex] * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
+    gl_Position = SkyboxSamples.lightSpaceMatrix[gl_ViewIndex] * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * meshBuffer[scene.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0);
 }

@@ -6,7 +6,6 @@
 
 #include "SceneProperties.glsl"
 #include "MeshProperties.glsl"
-#include "material.glsl"
 #include "lighting.glsl"
 
 layout(push_constant) uniform MeshInfo
@@ -179,9 +178,9 @@ void main()
 
 mat3 getTBNFromMap()
 {
-    vec3 T = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
-    vec3 B = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
-    vec3 N = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
+    vec3 T = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform ) * vec3(Tangent));
+    vec3 B = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform ) * vec3(BiTangent));
+    vec3 N = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform ) * Normal);
     mat3 TBN = mat3(T, B, N);
 
     return TBN;

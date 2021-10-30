@@ -2,7 +2,6 @@
 #extension GL_ARB_separate_shader_objects : enable
 
 #include "Lighting.glsl"
-#include "material.glsl"
 #include "vertex.glsl"
 
 layout(push_constant) uniform CubeMapView

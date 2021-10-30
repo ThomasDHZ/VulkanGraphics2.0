@@ -6,7 +6,6 @@
 
 #include "SceneProperties.glsl"
 #include "MeshProperties.glsl"
-#include "material.glsl"
 
 layout(push_constant) uniform LightSceneInfo
 {
@@ -28,5 +27,5 @@ layout (location = 4) in vec4 aBitangent;
 
 void main() 
 {
-    gl_Position = scene.lightSpaceMatrix * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * MeshTransform[scene.MeshIndex].Transform * vec4(inPosition, 1.0);
+    gl_Position = scene.lightSpaceMatrix * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * meshBuffer[scene.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0);
 }

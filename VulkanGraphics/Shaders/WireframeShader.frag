@@ -5,7 +5,6 @@
 
 #include "MeshProperties.glsl"
 #include "Lighting.glsl"
-#include "material.glsl"
 #include "vertex.glsl"
 
 layout(push_constant) uniform MeshInfo

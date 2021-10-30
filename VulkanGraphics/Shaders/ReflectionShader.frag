@@ -7,7 +7,6 @@
 #include "SceneProperties.glsl"
 #include "MeshProperties.glsl"
 #include "lighting.glsl"
-#include "material.glsl"
 
 layout(push_constant) uniform MeshInfo
 {
@@ -111,9 +110,9 @@ void main()
         texCoords.y = 1.0f - texCoords.y;
    }
 
-   vec3 T = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(Tangent));
-   vec3 B = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec3(BiTangent));
-   vec3 N = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * Normal);
+   vec3 T = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform *  meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform ) * vec3(Tangent));
+   vec3 B = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform *  meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform ) * vec3(BiTangent));
+   vec3 N = normalize(mat3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform ) * Normal);
    TBN = transpose(mat3(T, B, N));
    
    vec3 result = vec3(0.0f);

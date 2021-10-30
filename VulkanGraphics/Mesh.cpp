@@ -226,18 +226,19 @@ void Mesh::SetUpMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& Ind
 
 void Mesh::Update()
 {
-	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->GetMaterialBufferIndex();
-	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
-	MeshProperties.UniformDataInfo.UVScale = UVScale;
-	MeshProperties.UniformDataInfo.UVFlip = UVFlip;
-	MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
-
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
+
+	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->GetMaterialBufferIndex();
+	MeshProperties.UniformDataInfo.MeshTransform = MeshTransform;
+	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
+	MeshProperties.UniformDataInfo.UVScale = UVScale;
+	MeshProperties.UniformDataInfo.UVFlip = UVFlip;
+	MeshProperties.UniformDataInfo.ModelTransform = glm::mat4(1.0f);
 
 	glm::mat4 FinalTransform = MeshTransform;
 	glm::mat4 transformMatrix2 = glm::transpose(MeshTransform);
@@ -260,18 +261,19 @@ void Mesh::Update()
 
 void Mesh::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList)
 {
-	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->GetMaterialBufferIndex();
-	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
-	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
-	MeshProperties.UniformDataInfo.UVScale = UVScale;
-	MeshProperties.UniformDataInfo.UVFlip = UVFlip;
-
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::translate(MeshTransform, MeshPosition);
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
+
+	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->GetMaterialBufferIndex();
+	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
+	MeshProperties.UniformDataInfo.MeshTransform = MeshTransform;
+	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
+	MeshProperties.UniformDataInfo.UVScale = UVScale;
+	MeshProperties.UniformDataInfo.UVFlip = UVFlip;
 
 	if (BoneList.size() != 0)
 	{
