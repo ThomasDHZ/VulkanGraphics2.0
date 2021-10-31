@@ -1,7 +1,9 @@
 #pragma once
 #include "Vulkanengine.h"
 #include "TextureManager.h"
-#include "SceneData.h"
+
+const uint32_t DefaultTextureID = 0;
+const uint32_t DefaultAlphaTextureID = 1;
 
 struct MaterialTexture
 {
@@ -149,7 +151,7 @@ private:
 	std::string MaterialName;
 	uint32_t MaterialID = 0;
 	uint32_t MaterialBufferIndex = 0;
-	MaterialData MaterialBufferData;
+
 	VulkanBuffer MaterialBuffer;
 
 public:
@@ -180,6 +182,7 @@ public:
 	void UpdateAlphaProperty(float Alpha);
 	void Delete();
 
+	MaterialData MaterialBufferData;
 	void SetMaterialBufferIndex(uint32_t BufferIndex) { MaterialBufferIndex = BufferIndex; }
 
 	std::string GetMaterialName() { return MaterialName; }

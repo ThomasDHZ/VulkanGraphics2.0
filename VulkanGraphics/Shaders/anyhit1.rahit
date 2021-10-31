@@ -52,7 +52,7 @@ void main()
 {
    const Vertex vertex = BuildVertexInfo();
    vec2 texCoords = vertex.uv;
-   const MaterialInfo material = MaterialList[meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MaterialIndex].material;
+   const MaterialInfo material = meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.material;
    
    const vec3 T = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MeshTransform) * vec3(vertex.tangent));
    const vec3 B = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MeshTransform) * vec3(vertex.BiTangant));

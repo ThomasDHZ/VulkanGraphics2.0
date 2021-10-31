@@ -233,6 +233,7 @@ void Mesh::Update()
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
 
+	MeshProperties.UniformDataInfo.material = MeshMaterial->MaterialBufferData;
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->GetMaterialBufferIndex();
 	MeshProperties.UniformDataInfo.MeshTransform = MeshTransform;
 	MeshProperties.UniformDataInfo.UVOffset = UVOffset;
@@ -268,6 +269,7 @@ void Mesh::Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_pt
 	MeshTransform = glm::rotate(MeshTransform, glm::radians(MeshRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	MeshTransform = glm::scale(MeshTransform, MeshScale);
 
+	MeshProperties.UniformDataInfo.material = MeshMaterial->MaterialBufferData;
 	MeshProperties.UniformDataInfo.MaterialBufferIndex = MeshMaterial->GetMaterialBufferIndex();
 	MeshProperties.UniformDataInfo.ModelTransform = ModelMatrix;
 	MeshProperties.UniformDataInfo.MeshTransform = MeshTransform;

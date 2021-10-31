@@ -1,9 +1,6 @@
 #pragma once
 #include "VulkanBuffer.h"
-
-
-const uint32_t DefaultTextureID = 0;
-const uint32_t DefaultAlphaTextureID = 1;
+#include "Material.h"
 
 struct DirectionalLightBuffer {
 	alignas(16) glm::vec3 direction;
@@ -87,39 +84,9 @@ struct SceneDataBuffer
 	alignas(4)  float temp2 = 1.0f;
 };
 
-struct MaterialBuffer
-{
-	alignas(16) glm::vec3 Ambient = glm::vec3(0.2f);
-	alignas(16) glm::vec3 Diffuse = glm::vec3(0.6f);
-	alignas(16) glm::vec3 Specular = glm::vec3(1.0f);
-	alignas(4) float Shininess = 32;
-	alignas(4) float Reflectivness = 0.0f;
-
-	alignas(4) uint32_t DiffuseMapID = DefaultTextureID;
-	alignas(4) uint32_t SpecularMapID = DefaultTextureID;
-	alignas(4) uint32_t NormalMapID = DefaultTextureID;
-	alignas(4) uint32_t DepthMapID = DefaultTextureID;
-	alignas(4) uint32_t AlphaMapID = DefaultAlphaTextureID;
-	alignas(4) uint32_t EmissionMapID = DefaultTextureID;
-	alignas(4) uint32_t ShadowMapID = DefaultTextureID;
-
-
-	//PBR
-	alignas(16) glm::vec3 Albedo = glm::vec3(0.5, 0.0f, 0.0f);
-	alignas(4) float Matallic = .75f;
-	alignas(4) float Roughness = .5f;
-	alignas(4) float AmbientOcclusion = 1.0f;
-	alignas(4) float Alpha = 1.0f;
-
-	alignas(4) uint32_t AlbedoMapID = 0;
-	alignas(4) uint32_t MatallicMapID = 0;
-	alignas(4) uint32_t RoughnessMapID = 0;
-	alignas(4) uint32_t AOMapID = 0;
-};
-
 struct MeshProperties
 {
-	MaterialBuffer material;
+	MaterialData material;
 	alignas(16) glm::mat4 ModelTransform = glm::mat4(1.0f);
 	alignas(16) glm::mat4 MeshTransform = glm::mat4(1.0f);
 	alignas(8) glm::vec2 UVOffset = glm::vec2(0.0f);

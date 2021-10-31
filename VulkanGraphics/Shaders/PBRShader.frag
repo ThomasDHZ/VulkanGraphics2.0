@@ -95,7 +95,7 @@ float filterPCF(vec4 sc)
 
 void main()
 {		
-   MaterialInfo material = MaterialList[meshBuffer[Mesh.MeshIndex].meshProperties.MaterialIndex].material;
+   MaterialInfo material = meshBuffer[Mesh.MeshIndex].meshProperties.material;
    vec2 UV = TexCoords + meshBuffer[Mesh.MeshIndex].meshProperties.UVOffset;
    if(texture(TextureMap[material.AlphaMapID], UV).r == 0.0f ||
       texture(TextureMap[material.DiffuseMapID], UV).a == 0.0f)

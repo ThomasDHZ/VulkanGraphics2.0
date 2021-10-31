@@ -64,7 +64,7 @@ vec3 RTXShadow(vec3 LightResult, vec3 LightSpecular, vec3 LightDirection, float 
 void main()
 {
    vertex = BuildVertexInfo();
-   material = MaterialList[meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MaterialIndex].material;
+   material = meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.material;
    const vec3 T = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MeshTransform) * vec3(vertex.tangent));
    const vec3 B = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MeshTransform) * vec3(vertex.BiTangant));
    const vec3 N = normalize(mat3(meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.ModelTransform * meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MeshTransform) * vertex.normal);

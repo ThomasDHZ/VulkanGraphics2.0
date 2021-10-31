@@ -126,7 +126,7 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
 void main()
 {		
    vertex = BuildVertexInfo();
-   MaterialInfo material = MaterialList[meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.MaterialIndex].material;
+   MaterialInfo material = meshBuffer[gl_InstanceCustomIndexEXT].meshProperties.material;
    vec2 UV = vertex.uv;
 
     vec3 albedo = material.Albedo; 

@@ -82,7 +82,7 @@ vec3 CalcNormalDirLight(MaterialInfo material, vec3 FragPos, vec3 normal, vec2 u
 
 void main() 
 {
-   MaterialInfo material = MaterialList[meshBuffer[ConstMesh.MeshIndex].meshProperties.MaterialIndex].material;
+   MaterialInfo material = meshBuffer[ConstMesh.MeshIndex].meshProperties.material;
    vec2 texCoords = TexCoords + meshBuffer[ConstMesh.MeshIndex].meshProperties.UVOffset;
    texCoords *= meshBuffer[ConstMesh.MeshIndex].meshProperties.UVScale;
    if(meshBuffer[ConstMesh.MeshIndex].meshProperties.UVFlip.x == 1.0f)
