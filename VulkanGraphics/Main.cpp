@@ -274,11 +274,11 @@ private:
         //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
 
-        //std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.gltf")));
-        //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+        std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.gltf")));
+        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-        {
+     /*   {
             std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
             gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
             AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
@@ -367,7 +367,7 @@ private:
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("wall", material);
             gameObject->MeshList[0]->MeshMaterial = mat;
             gameObject->MeshList[0]->MeshPosition = glm::vec3(6.0f, 0.0f, 0.0f);
-        }
+        }*/
         //{
         //    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         //    gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/plain.obj")));

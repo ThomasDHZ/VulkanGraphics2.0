@@ -21,8 +21,6 @@ layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties;
 layout(binding = 2) buffer DirectionalLightBuffer{ DirectionalLight directionalLight; } DLight[];
 layout(binding = 3) buffer PointLightBuffer { PointLight pointLight; } PLight[];
 layout(binding = 4) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
-layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
-layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
 layout(binding = 9) uniform samplerCube CubeMap[];
@@ -258,7 +256,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     }   
-    return vec3(shadow);
+    return Lo;
 }
 
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
