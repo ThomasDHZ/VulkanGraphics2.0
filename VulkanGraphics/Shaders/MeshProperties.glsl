@@ -2,7 +2,7 @@
 
 struct MeshProperties
 {
-	//MaterialInfo material;
+	MaterialInfo material;
 	mat4 ModelTransform;
 	mat4 MeshTransform;
 	vec2 UVOffset;

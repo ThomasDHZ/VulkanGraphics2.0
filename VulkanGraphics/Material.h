@@ -1,9 +1,7 @@
 #pragma once
 #include "Vulkanengine.h"
 #include "TextureManager.h"
-
-const uint32_t DefaultTextureID = 0;
-const uint32_t DefaultAlphaTextureID = 1;
+#include "SceneData.h"
 
 struct MaterialTexture
 {
