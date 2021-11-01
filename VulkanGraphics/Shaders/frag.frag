@@ -27,7 +27,7 @@ layout(binding = 9) uniform samplerCube CubeMap[];
 layout(binding = 10) buffer SphereAreaLightBuffer { SphereAreaLight sphereLight; } sphereLightBuffer[];
 layout(binding = 11) buffer TubeAreaLightBuffer { TubeAreaLight tubeAreaLight; } tubeLightBuffer[];
 layout(binding = 12) buffer RectangleAreaLightBuffer { RectangleAreaLight rectangleAreaLight; } rectangleAreaLightBuffer[];
-layout(binding = 13) uniform sampler2D ShadowMap[];
+layout(binding = 13) uniform sampler2DArray ShadowMap;
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -52,7 +52,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset, int index)
     float shadow = 1.0f;
 	if ( fragPosLightSpace.z > -1.0 && fragPosLightSpace.z < 1.0 ) 
 	{
-		float dist = texture( ShadowMap[index], fragPosLightSpace.st + offset ).r;
+		float dist = texture(ShadowMap, vec3(fragPosLightSpace.st + offset, index) ).r;
 		if ( fragPosLightSpace.w > 0.0 && dist < fragPosLightSpace.z ) 
 		{
 			shadow = 0.1f;
@@ -63,7 +63,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset, int index)
 
 float filterPCF(vec4 sc, int index)
 {
-	ivec2 texDim = textureSize(ShadowMap[index], 0);
+	ivec2 texDim = textureSize(ShadowMap, 0).xy;
 	float scale = 1.5;
 	float dx = scale * 1.0 / float(texDim.x);
 	float dy = scale * 1.0 / float(texDim.y);

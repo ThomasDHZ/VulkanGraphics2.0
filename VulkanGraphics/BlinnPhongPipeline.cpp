@@ -6,7 +6,7 @@ BlinnPhongPipeline::BlinnPhongPipeline() : GraphicsPipeline()
 {
 }
 
-BlinnPhongPipeline::BlinnPhongPipeline(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList) : GraphicsPipeline()
+BlinnPhongPipeline::BlinnPhongPipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture2DArray> ShadowMapTextureList) : GraphicsPipeline()
 {
     SetUpDescriptorPool(ShadowMapTextureList);
     SetUpDescriptorLayout(ShadowMapTextureList);
@@ -18,13 +18,13 @@ BlinnPhongPipeline::~BlinnPhongPipeline()
 {
 }
 
-void BlinnPhongPipeline::SetUpDescriptorPool(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList)
+void BlinnPhongPipeline::SetUpDescriptorPool(std::shared_ptr<Texture2DArray> ShadowMapTextureList)
 {
-    uint32_t count = (uint32_t)ShadowMapTextureList.size();
+  /*  uint32_t count = (uint32_t)ShadowMapTextureList.size();
     if (count == 0)
     {
         count = 1;
-    }
+    }*/
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount()));    
@@ -39,17 +39,17 @@ void BlinnPhongPipeline::SetUpDescriptorPool(std::vector<std::shared_ptr<Rendere
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptorCount()));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptorCount()));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptorCount()));
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, count));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void BlinnPhongPipeline::SetUpDescriptorLayout(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList)
+void BlinnPhongPipeline::SetUpDescriptorLayout(std::shared_ptr<Texture2DArray> ShadowMapTextureList)
 {
-    uint32_t count = (uint32_t)ShadowMapTextureList.size();
-    if (count == 0)
-    {
-        count = 1;
-    }
+    //uint32_t count = (uint32_t)ShadowMapTextureList.size();
+    //if (count == 0)
+    //{
+    //    count = 1;
+    //}
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount() });
@@ -62,33 +62,32 @@ void BlinnPhongPipeline::SetUpDescriptorLayout(std::vector<std::shared_ptr<Rende
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 10, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 11, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptorCount() });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 12, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptorCount() });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 13, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, count });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 13, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
 
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void BlinnPhongPipeline::SetUpDescriptorSets(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList)
+void BlinnPhongPipeline::SetUpDescriptorSets(std::shared_ptr<Texture2DArray> ShadowMapTextureList)
 {
-    std::vector<VkDescriptorImageInfo> ShadowDescriptorImageList;
-    if (ShadowMapTextureList.size() == 0)
-    {
-        VkDescriptorImageInfo nullBuffer;
-        nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        nullBuffer.imageView = VK_NULL_HANDLE;
-        nullBuffer.sampler = NullSampler;
-        ShadowDescriptorImageList.emplace_back(nullBuffer);
-    }
-    else
-    {
-        for (auto texture : ShadowMapTextureList)
-        {
+    //std::vector<VkDescriptorImageInfo> ShadowDescriptorImageList;
+    //if (ShadowMapTextureList.size() == 0)
+    //{
+    //    VkDescriptorImageInfo nullBuffer;
+    //    nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    //    nullBuffer.imageView = VK_NULL_HANDLE;
+    //    nullBuffer.sampler = NullSampler;
+    //    ShadowDescriptorImageList.emplace_back(nullBuffer);
+    //}
+    //else
+    //{
+    //    for (auto texture : ShadowMapTextureList)
+    //    {
             VkDescriptorImageInfo DescriptorImage{};
             DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            DescriptorImage.imageView = texture->GetTextureView();
-            DescriptorImage.sampler = texture->GetTextureSampler();
-            ShadowDescriptorImageList.emplace_back(DescriptorImage);
-        }
-    }
+            DescriptorImage.imageView = ShadowMapTextureList->GetTextureView();
+            DescriptorImage.sampler = ShadowMapTextureList->GetTextureSampler();
+    //    }
+    //}
 
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
@@ -119,7 +118,7 @@ void BlinnPhongPipeline::SetUpDescriptorSets(std::vector<std::shared_ptr<Rendere
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(10, DescriptorSet, SphereAreaLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(11, DescriptorSet, TubeAreaLightBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(12, DescriptorSet, RectangleAreaBufferInfoList, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(13, DescriptorSet, ShadowDescriptorImageList));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(13, DescriptorSet, DescriptorImage));
 
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -260,7 +259,7 @@ void BlinnPhongPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void BlinnPhongPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList)
+void BlinnPhongPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture2DArray> ShadowMapTextureList)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool(ShadowMapTextureList);

@@ -7,6 +7,7 @@
 enum TextureType
 {
     vkTexture2D,
+    vkTexture2DArray,
     vkTexture3D,
     vkTextureCube,
     vkHeightMap,
@@ -47,6 +48,7 @@ public:
     VkImageLayout ImageLayout;
     VkSampleCountFlagBits SampleCount = VK_SAMPLE_COUNT_1_BIT;
     uint32_t MipMapLevels = 1;
+    uint32_t LayerCount = 1;
 
     int Width;
     int Height;
