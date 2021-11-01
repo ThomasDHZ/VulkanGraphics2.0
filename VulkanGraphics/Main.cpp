@@ -110,37 +110,13 @@ private:
         plight.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         plight.specular = glm::vec4(1.0f);
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);*/
-
-        //24, -164, -239
-
-
         DirectionalLightBuffer dlight = DirectionalLightBuffer();
-        dlight.direction = glm::vec4(-301.132, -74.717, 69.317, 1.0f);
+        dlight.direction = glm::vec4(1.0f);
         dlight.ambient = glm::vec4(0.2f);
         dlight.diffuse = glm::vec4(0.5f);
         dlight.specular = glm::vec4(1.0f);
         LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
-
-        DirectionalLightBuffer dlight2 = DirectionalLightBuffer();
-        dlight2.direction = glm::vec4(1.0f, -178.8f, 199.0, 1.0f);
-        dlight2.ambient = glm::vec4(0.2f);
-        dlight2.diffuse = glm::vec4(0.5f);
-        dlight2.specular = glm::vec4(1.0f);
-        LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight2);
-
-        DirectionalLightBuffer dlight3 = DirectionalLightBuffer();
-        dlight3.direction = glm::vec4(215.0f, -210.0f, -6.7, 1.0f);
-        dlight3.ambient = glm::vec4(0.2f);
-        dlight3.diffuse = glm::vec4(0.5f);
-        dlight3.specular = glm::vec4(1.0f);
-        LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight3);
-
-        DirectionalLightBuffer dlight4 = DirectionalLightBuffer();
-        dlight4.direction = glm::vec4(24.0f, -164.0f, -239.0f, 1.0f);
-        dlight4.ambient = glm::vec4(0.2f);
-        dlight4.diffuse = glm::vec4(0.5f);
-        dlight4.specular = glm::vec4(1.0f);
-        LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight4);
+        LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
 
         PointLightBuffer plight = PointLightBuffer();
         plight.position = glm::vec4(-10.0f, 10.0f, 10.0f, 0.0f);

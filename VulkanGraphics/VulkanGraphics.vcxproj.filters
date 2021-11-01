@@ -429,9 +429,6 @@
     <ClCompile Include="ReflectionCubeMapRenderPass.cpp">
       <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="Texture2DArray.cpp">
-      <Filter>Source Files\texture</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -790,9 +787,6 @@
     </ClInclude>
     <ClInclude Include="ReflectionCubeMapRenderPass.h">
       <Filter>Header Files\Rendering\RenderPass</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture2DArray.h">
-      <Filter>Header Files\texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

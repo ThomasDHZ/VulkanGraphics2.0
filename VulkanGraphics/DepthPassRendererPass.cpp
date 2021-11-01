@@ -7,15 +7,19 @@ DepthPassRendererPass::DepthPassRendererPass() : BaseRenderPass()
 
 DepthPassRendererPass::DepthPassRendererPass(uint32_t depthTextureSize) : BaseRenderPass()
 {
-    cubeSampler = std::make_shared<LightSampler>(LightSampler(EnginePtr::GetEnginePtr()));
-
     RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize);
     DepthToTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution));
-    LightDepthMaps = std::make_shared<Texture2DArray>(Texture2DArray(RenderPassResolution, 7));
+   
+    for (int x = 0; x < 2; x++)
+    {
+        DepthTextureList.emplace_back(std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution)));
+        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
+    DepthToTexture->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthPipeline = std::make_shared<DepthPassPipeline>(DepthPassPipeline(RenderPass, cubeSampler));
+    depthPipeline = std::make_shared<DepthPassPipeline>(DepthPassPipeline(RenderPass));
     SetUpCommandBuffers(); 
 }
 
@@ -66,16 +70,6 @@ void DepthPassRendererPass::CreateRenderPass()
     SecondDependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
     DependencyList.emplace_back(SecondDependency);
 
-    const uint32_t viewMask = 0b00000011;
-    const uint32_t correlationMask = 0b00000011;
-
-    VkRenderPassMultiviewCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_MULTIVIEW_CREATE_INFO;
-    createInfo.subpassCount = 1;
-    createInfo.pViewMasks = &viewMask;
-    createInfo.correlationMaskCount = 1;
-    createInfo.pCorrelationMasks = &correlationMask;
-
     VkRenderPassCreateInfo renderPassInfo = {};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassInfo.attachmentCount = static_cast<uint32_t>(AttachmentDescriptionList.size());
@@ -84,7 +78,6 @@ void DepthPassRendererPass::CreateRenderPass()
     renderPassInfo.pSubpasses = &subpassDescription;
     renderPassInfo.dependencyCount = static_cast<uint32_t>(DependencyList.size());
     renderPassInfo.pDependencies = DependencyList.data();
-    renderPassInfo.pNext = &createInfo;
 
     if (vkCreateRenderPass(EnginePtr::GetEnginePtr()->Device, &renderPassInfo, nullptr, &RenderPass))
     {
@@ -99,7 +92,7 @@ void DepthPassRendererPass::CreateRendererFramebuffers()
     for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(LightDepthMaps->View);
+        AttachmentList.emplace_back(DepthToTexture->View);
 
         VkFramebufferCreateInfo frameBufferCreateInfo = {};
         frameBufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -134,29 +127,18 @@ void DepthPassRendererPass::SetUpCommandBuffers()
     }
 }
 
-void DepthPassRendererPass::Update()
-{
-    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
-    {
-        for (auto& light : LightManagerPtr::GetLightManagerPtr()->DirectionalLightList)
-        {
-            cubeSampler->UniformDataInfo.LightSpaceMatrix[x] = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.LightSpaceMatrix;
-        }
-    }
-    cubeSampler->Update();
-}
-
 void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
     DepthToTexture->RecreateRendererTexture(RenderPassResolution);
-    LightDepthMaps->RecreateRendererTexture(RenderPassResolution, 7);
-    depthPipeline->Destroy();
+
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
-{
-    DepthTextureList.emplace_back(std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution)));
-    DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-}
+    {
+        DepthTextureList[x]->RecreateRendererTexture(RenderPassResolution);
+        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
+    depthPipeline->Destroy();
+
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
@@ -168,7 +150,7 @@ void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthPipeline->UpdateGraphicsPipeLine(RenderPass, cubeSampler);
+    depthPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
 
@@ -196,7 +178,8 @@ void DepthPassRendererPass::Draw()
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
+    {
         vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSet, 0, nullptr);
@@ -206,8 +189,8 @@ void DepthPassRendererPass::Draw()
             {
                 if (mesh->ShowMesh)
                 {
-                    glm::mat4 view = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetViewMatrix();
-                    glm::mat4 proj = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetProjectionMatrix();
+                    glm::mat4 view = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->lightViewCamera->GetViewMatrix();
+                    glm::mat4 proj = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->lightViewCamera->GetProjectionMatrix();
                     proj[1][1] *= -1;
 
                     LightSceneInfo lightSceneInfo;
@@ -230,8 +213,57 @@ void DepthPassRendererPass::Draw()
                 }
             }
         }
-            vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
-       
+        vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+
+       DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+        VkImageSubresourceRange ImageSubresourceRange{};
+        ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        ImageSubresourceRange.baseMipLevel = 0;
+        ImageSubresourceRange.levelCount = 1;
+        ImageSubresourceRange.layerCount = 1;
+
+        VkImageMemoryBarrier SrcMemoryBarrior{};
+        SrcMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        SrcMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        SrcMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        SrcMemoryBarrior.image = DepthToTexture->Image;
+        SrcMemoryBarrior.subresourceRange = ImageSubresourceRange;
+        SrcMemoryBarrior.srcAccessMask = 0;
+        SrcMemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SrcMemoryBarrior);
+
+
+        VkImageCopy copyRegion = {};
+        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        copyRegion.srcSubresource.baseArrayLayer = 0;
+        copyRegion.srcSubresource.mipLevel = 0;
+        copyRegion.srcSubresource.layerCount = 1;
+        copyRegion.srcOffset = { 0, 0, 0 };
+
+        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        copyRegion.dstSubresource.baseArrayLayer = 0;
+        copyRegion.dstSubresource.mipLevel = 0;
+        copyRegion.dstSubresource.layerCount = 1;
+        copyRegion.dstOffset = { 0, 0, 0 };
+
+        copyRegion.extent.width = (uint32_t)RenderPassResolution.x;
+        copyRegion.extent.height = (uint32_t)RenderPassResolution.y;
+        copyRegion.extent.depth = 1;
+        vkCmdCopyImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], DepthToTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DepthTextureList[x]->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+        VkImageMemoryBarrier ReturnSrcMemoryBarrior{};
+        ReturnSrcMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        ReturnSrcMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        ReturnSrcMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        ReturnSrcMemoryBarrior.image = DepthToTexture->Image;
+        ReturnSrcMemoryBarrior.subresourceRange = ImageSubresourceRange;
+        ReturnSrcMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        ReturnSrcMemoryBarrior.dstAccessMask = 0;
+        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnSrcMemoryBarrior);
+   
+        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
@@ -241,6 +273,10 @@ void DepthPassRendererPass::Draw()
 void DepthPassRendererPass::Destroy()
 {
     DepthToTexture->Delete();
+    for (auto& light : DepthTextureList)
+    {
+        light->Delete();
+    }
     depthPipeline->Destroy();
     BaseRenderPass::Destroy();
 }
