@@ -16,7 +16,7 @@ private:
 	bool GUIChanged = false;
 
 	BlinnPhongRasterRenderer BlinnRenderer;
-	//PBRRenderer pbrRenderer;
+	PBRRenderer pbrRenderer;
 	//Renderer2D renderer2D;
 
 	//RayTraceRenderer rayTraceRenderer;
