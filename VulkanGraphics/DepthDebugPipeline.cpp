@@ -32,7 +32,7 @@ void DepthDebugPipeline::SetUpDescriptorLayout()
 }
 
 void DepthDebugPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedDepthTexture> depthTexture)
-{
+{/*
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     VkDescriptorImageInfo depthBuffer = nullBufferInfo;
     if (depthTexture != nullptr)
@@ -43,7 +43,7 @@ void DepthDebugPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedDepthTextur
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, depthBuffer));
 
-    vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);*/
 }
 
 

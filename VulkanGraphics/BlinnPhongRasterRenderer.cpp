@@ -26,7 +26,7 @@ void BlinnPhongRasterRenderer::RebuildSwapChain()
    // DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList[0]);
     ReflectionRenderPass.RebuildSwapChain(1024, DepthRenderPass.DepthTextureList[0]);
     BlinnRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList);
-    FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
+    FrameBufferRenderer.RebuildSwapChain(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
 }
 
 void BlinnPhongRasterRenderer::GUIUpdate()
@@ -63,10 +63,11 @@ void BlinnPhongRasterRenderer::Draw()
 
 void BlinnPhongRasterRenderer::Destroy()
 {
-   // DebugDepthRenderPass.Destroy();
+  //  DebugDepthRenderPass.Destroy();
+    DepthRenderPass.Destroy();
     depthCubeMapRenderPass.Destroy();
     ReflectionRenderPass.Destroy();
-    BlinnRenderPass.Destroy();
+    BlinnRenderPass.Destroy(); 
     FrameBufferRenderer.Destroy();
 }
 

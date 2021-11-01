@@ -82,11 +82,11 @@ void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> Ir
     VkDescriptorImageInfo IrradianceMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(IrradianceMap->View, IrradianceMap->Sampler);
     VkDescriptorImageInfo PrefilerMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(PrefilerMap->View, PrefilerMap->Sampler);
     VkDescriptorImageInfo BRDFMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(BRDFMap->View, BRDFMap->Sampler);
-    VkDescriptorImageInfo ShadowMapBuffer = nullBufferInfo;
-    if (ShadowMapTexture != nullptr)
-    {
-        ShadowMapBuffer = EnginePtr::GetEnginePtr()->AddTextureDescriptor(ShadowMapTexture->View, ShadowMapTexture->Sampler);
-    }
+    //VkDescriptorImageInfo ShadowMapBuffer = nullBufferInfo;
+    //if (ShadowMapTexture != nullptr)
+    //{
+    //    ShadowMapBuffer = EnginePtr::GetEnginePtr()->AddTextureDescriptor(ShadowMapTexture->View, ShadowMapTexture->Sampler);
+    //}
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(0, DescriptorSet, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
@@ -103,7 +103,7 @@ void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> Ir
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(13, DescriptorSet, IrradianceMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(14, DescriptorSet, PrefilerMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(15, DescriptorSet, BRDFMapImage));
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowMapBuffer));
+ //   DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowMapBuffer));
 
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
