@@ -21,6 +21,8 @@ layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties;
 layout(binding = 2) buffer DirectionalLightBuffer{ DirectionalLight directionalLight; } DLight[];
 layout(binding = 3) buffer PointLightBuffer { PointLight pointLight; } PLight[];
 layout(binding = 4) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
+layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer Material { MaterialInfo material; } MaterialList[];
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
 layout(binding = 9) uniform samplerCube CubeMap[];
@@ -216,7 +218,7 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
 
     float LightDistance = length(LightPos - FragPos2);
 
-    vec4 LightSpace = (LightBiasMatrix *  DLight[index].directionalLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+    vec4 LightSpace = (LightBiasMatrix *  DLight[index].directionalLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
     float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
     return (ambient + (shadow) * (diffuse + specular));
 }
@@ -262,7 +264,7 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
 	0.0, 0.0, 1.0, 0.0,
 	0.5, 0.5, 0.0, 1.0 );
 
-    vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+    vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * MeshTransform[Mesh.MeshIndex].Transform) * vec4(FragPos, 1.0);
    float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
     return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
 }

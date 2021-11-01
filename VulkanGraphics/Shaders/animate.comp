@@ -4,7 +4,7 @@
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
 
-#include "Lighting.glsl"
+#include "MeshProperties.glsl"
 
 layout(push_constant) uniform MeshInfo
 {
@@ -36,21 +36,8 @@ struct Vertex
 
 layout(binding = 0, scalar) buffer Vertices { Vertex v[]; }vertices;
 layout(binding = 1, scalar) buffer Bonesz { Bones b[]; }bone;
-
-layout(binding = 3) buffer MeshProperties 
-{
-	mat4 ModelTransform;
-	vec2 UVOffset;
-	vec2 UVScale;
-    vec2 UVFlip;
-    uint MaterialIndex;
-    float heightScale;
-	float minLayers;
-	float maxLayers;
-} meshProperties[];
-
-layout(binding = 5, scalar) buffer BoneTransform { mat4 Transform[]; } MeshBoneTransform;
-layout(binding = 6) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 2) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
+layout(binding = 3, scalar) buffer BoneTransform { mat4 Transform[]; } MeshBoneTransform;
 
 void main()
 {
@@ -64,7 +51,7 @@ void main()
   BoneTransform += MeshBoneTransform.Transform[b.BoneID[3]] * b.BoneWeights[3];
   vec4 BonePosition = BoneTransform * vec4(v0.Position, 1.0);
 
-  v0.Position = vec3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[0].Transform * BonePosition);
-  v0.Normal = normalize(transpose(inverse(mat3(meshProperties[ConstMesh.MeshIndex].ModelTransform * MeshTransform[0].Transform * BoneTransform))) * v0.Normal);
+  v0.Position = vec3(meshBuffer[ConstMesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[ConstMesh.MeshIndex].meshProperties.MeshTransform * BonePosition);
+  v0.Normal = normalize(transpose(inverse(mat3(meshBuffer[ConstMesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[ConstMesh.MeshIndex].meshProperties.MeshTransform * BoneTransform))) * v0.Normal);
   vertices.v[gl_GlobalInvocationID.x] = v0;
 }

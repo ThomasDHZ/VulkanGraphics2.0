@@ -19,6 +19,8 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
+layout(binding = 5) buffer Transform { mat4 Transform; } MeshTransform[];
+layout(binding = 6) buffer MaterialInfos2 { MaterialInfo material; } MaterialList[];
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
