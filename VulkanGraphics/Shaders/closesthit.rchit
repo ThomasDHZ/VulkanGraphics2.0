@@ -87,14 +87,14 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-    for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
-     {
-        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
-     }
-//     for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
+//    for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
 //     {
-//        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+//        baseColor += CalcNormalDirLight(FragPos, normal, vertex.uv, x);
 //     }
+     for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
+     {
+        baseColor += CalcNormalPointLight(FragPos, normal, vertex.uv, x);   
+     }
 //       for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
 //       {
 //            baseColor += CalcNormalSpotLight(FragPos, normal, vertex.uv, x);   

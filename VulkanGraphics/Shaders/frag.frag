@@ -137,14 +137,14 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-   for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
-   {
-        result += CalcNormalDirLight(normal, texCoords, x);
-   }
-//   for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
+//   for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
 //   {
-//        result += CalcNormalPointLight(normal, texCoords, x);   
+//        result += CalcNormalDirLight(normal, texCoords, x);
 //   }
+   for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
+   {
+        result += CalcNormalPointLight(normal, texCoords, x);   
+   }
 //   for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
 //   {
 //        result += CalcNormalSpotLight(normal, texCoords, x);   
@@ -215,9 +215,9 @@ vec3 CalcNormalDirLight(vec3 normal, vec2 uv, int index)
 
     float LightDistance = length(LightPos - FragPos2);
 
-   vec4 LightSpace = (LightBiasMatrix *  DLight[index].directionalLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
-    float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
-    return (ambient + (shadow) * (diffuse + specular));
+//   vec4 LightSpace = (LightBiasMatrix *  DLight[index].directionalLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+//    float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
+    return (ambient + diffuse + specular);
 }
 
 vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
@@ -261,9 +261,9 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
 	0.0, 0.0, 1.0, 0.0,
 	0.5, 0.5, 0.0, 1.0 );
 
- vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
-   float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
-    return (ambient + (1.0 - shadow) * (diffuse + specular)) * attenuation;
+// vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+//   float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 vec3 CalcNormalSpotLight(vec3 normal, vec2 uv, int index)
