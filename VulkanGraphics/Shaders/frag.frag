@@ -28,6 +28,7 @@ layout(binding = 10) buffer SphereAreaLightBuffer { SphereAreaLight sphereLight;
 layout(binding = 11) buffer TubeAreaLightBuffer { TubeAreaLight tubeAreaLight; } tubeLightBuffer[];
 layout(binding = 12) buffer RectangleAreaLightBuffer { RectangleAreaLight rectangleAreaLight; } rectangleAreaLightBuffer[];
 layout(binding = 13) uniform sampler2D ShadowMap[];
+layout(binding = 14) uniform samplerCube ShadowCubeMap[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
