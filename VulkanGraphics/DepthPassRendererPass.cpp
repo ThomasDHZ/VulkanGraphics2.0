@@ -9,8 +9,7 @@ DepthPassRendererPass::DepthPassRendererPass(uint32_t depthTextureSize) : BaseRe
 {
     RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize);
     DepthToTexture = std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution));
-   
-    for (int x = 0; x < 2; x++)
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
     {
         DepthTextureList.emplace_back(std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution)));
         DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -20,7 +19,7 @@ DepthPassRendererPass::DepthPassRendererPass(uint32_t depthTextureSize) : BaseRe
     CreateRenderPass();
     CreateRendererFramebuffers();
     depthPipeline = std::make_shared<DepthPassPipeline>(DepthPassPipeline(RenderPass));
-    SetUpCommandBuffers(); 
+    SetUpCommandBuffers();
 }
 
 DepthPassRendererPass::~DepthPassRendererPass()
@@ -132,9 +131,10 @@ void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
     DepthToTexture->RecreateRendererTexture(RenderPassResolution);
 
+    DepthTextureList.clear();
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
     {
-        DepthTextureList[x]->RecreateRendererTexture(RenderPassResolution);
+        DepthTextureList.emplace_back(std::make_shared<RenderedDepthTexture>(RenderedDepthTexture(RenderPassResolution)));
         DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
     depthPipeline->Destroy();
@@ -215,7 +215,7 @@ void DepthPassRendererPass::Draw()
         }
         vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-  /*     DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         VkImageSubresourceRange ImageSubresourceRange{};
         ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
@@ -262,7 +262,7 @@ void DepthPassRendererPass::Draw()
         ReturnSrcMemoryBarrior.dstAccessMask = 0;
         vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnSrcMemoryBarrior);
    
-        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);*/
+        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
@@ -273,10 +273,7 @@ void DepthPassRendererPass::Draw()
 void DepthPassRendererPass::Destroy()
 {
     DepthToTexture->Delete();
-    for (auto& light : DepthTextureList)
-    {
-        light->Delete();
-    }
+    DepthTextureList[0]->Delete();
     depthPipeline->Destroy();
     BaseRenderPass::Destroy();
 }

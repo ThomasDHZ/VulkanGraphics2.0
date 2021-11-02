@@ -50,7 +50,7 @@ public:
         initVulkan();
         mainLoop();
 
-        AssetManagerPtr::GetAssetPtr()->Delete();
+       AssetManagerPtr::GetAssetPtr()->Delete();
         renderer.Destroy(EnginePtr::GetEnginePtr());
         EnginePtr::GetEnginePtr()->Destroy();
         WindowPtr::GetWindowPtr()->Destroy();
@@ -104,12 +104,12 @@ private:
 
         renderer = RendererManager(EnginePtr::GetEnginePtr(), WindowPtr::GetWindowPtr());
 
-        /*       PointLightBuffer plight = PointLightBuffer();
-               plight.position = glm::vec4(-2.0f, 4.0f, -1.0f, 0.0f);
-               plight.ambient = glm::vec4(0.2f);
-               plight.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-               plight.specular = glm::vec4(1.0f);
-               LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);*/
+ /*       PointLightBuffer plight = PointLightBuffer();
+        plight.position = glm::vec4(-2.0f, 4.0f, -1.0f, 0.0f);
+        plight.ambient = glm::vec4(0.2f);
+        plight.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        plight.specular = glm::vec4(1.0f);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);*/
         DirectionalLightBuffer dlight = DirectionalLightBuffer();
         dlight.direction = glm::vec4(1.0f);
         dlight.ambient = glm::vec4(0.2f);
@@ -156,118 +156,118 @@ private:
         slight.specular = glm::vec4(1.0f);
 
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
-        //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight2);
-        //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight3);
-        //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight4);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight2);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight3);
+        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight4);
         LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
         LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
-        // std::vector<Vertex> vertices =
-        // {
-        //     {{-1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{ 1.0f,  1.0f, -1.0f},   { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{ 1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { { 1.0f,  1.0f, -1.0f},  { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f, -1.0f, -1.0f},  { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f,  1.0f, -1.0f},  { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       // std::vector<Vertex> vertices =
+       // {
+       //     {{-1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{ 1.0f,  1.0f, -1.0f},   { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{ 1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { { 1.0f,  1.0f, -1.0f},  { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f, -1.0f, -1.0f},  { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f,  1.0f, -1.0f},  { 0.0f }, {0.0f,  0.0f, -1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
 
-        //     {{-1.0f, -1.0f,  1.0f},   { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{ 1.0f, -1.0f,  1.0f},   { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{ 1.0f,  1.0f,  1.0f},   { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { { 1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f, -1.0f,  1.0f},  { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{-1.0f, -1.0f,  1.0f},   { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{ 1.0f, -1.0f,  1.0f},   { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{ 1.0f,  1.0f,  1.0f},   { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { { 1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f, -1.0f,  1.0f},  { 0.0f }, {0.0f,  0.0f, 1.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
 
-        //     {{-1.0f,  1.0f,  1.0f},   { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{ -1.0f,  1.0f, -1.0f},   { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{-1.0f, -1.0f, -1.0f},   { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f, -1.0f, -1.0f},  { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f, -1.0f,  1.0f},  { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f,  1.0f,  1.0f},  { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{-1.0f,  1.0f,  1.0f},   { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{ -1.0f,  1.0f, -1.0f},   { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{-1.0f, -1.0f, -1.0f},   { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f, -1.0f, -1.0f},  { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f, -1.0f,  1.0f},  { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f,  1.0f,  1.0f},  { 0.0f }, {-1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
 
-        //     {{1.0f,  1.0f,  1.0f},   { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{1.0f, -1.0f, -1.0f},   { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{ 1.0f,  1.0f, -1.0f},   { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {1.0f, -1.0f, -1.0f},  { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {1.0f,  1.0f,  1.0f},  { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { { 1.0f, -1.0f,  1.0f},  { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{1.0f,  1.0f,  1.0f},   { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{1.0f, -1.0f, -1.0f},   { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{ 1.0f,  1.0f, -1.0f},   { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {1.0f, -1.0f, -1.0f},  { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {1.0f,  1.0f,  1.0f},  { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { { 1.0f, -1.0f,  1.0f},  { 0.0f }, {1.0f,  0.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
 
-        //     {{-1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{1.0f, -1.0f,  1.0f},   { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {1.0f, -1.0f,  1.0f},  { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f, -1.0f,  1.0f},  { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f, -1.0f, -1.0f},  { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{-1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{1.0f, -1.0f, -1.0f},   { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{1.0f, -1.0f,  1.0f},   { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {1.0f, -1.0f,  1.0f},  { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f, -1.0f,  1.0f},  { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f, -1.0f, -1.0f},  { 0.0f }, {0.0f, -1.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
 
-        //     {{-1.0f,  1.0f, -1.0f},   { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{1.0f,  1.0f , 1.0f},   { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     {{1.0f,  1.0f, -1.0f},   { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f,  1.0f, -1.0f},  { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     { {-1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        // };
+       //     {{-1.0f,  1.0f, -1.0f},   { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{1.0f,  1.0f , 1.0f},   { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     {{1.0f,  1.0f, -1.0f},   { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {1.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {1.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f,  1.0f, -1.0f},  { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {0.0f,  0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     { {-1.0f,  1.0f,  1.0f},  { 0.0f }, {0.0f,  1.0f,  0.0f}, { 0.0f }, {0.0f, 1.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       // };
 
-        // MaterialTexture material;
-        // material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
-        // material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
+       // MaterialTexture material;
+       // material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
+       // material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
 
 
-        //{
-        //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //     gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
-        //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
-        //     gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 1.5f, 0.0f);
-        //     gameObject->MeshList[0]->MeshScale = glm::vec3(0.5f);
+       //{
+       //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+       //     gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
+       //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+       //     gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 1.5f, 0.0f);
+       //     gameObject->MeshList[0]->MeshScale = glm::vec3(0.5f);
 
-        //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
-        //     gameObject->MeshList[0]->MeshMaterial = mat;
-        // }
-        // {
-        //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //     gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
-        //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
-        //     gameObject->MeshList[0]->MeshPosition = glm::vec3(2.0f, 0.0f, 1.0);
-        //     gameObject->MeshList[0]->MeshScale = glm::vec3(0.5f);
+       //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
+       //     gameObject->MeshList[0]->MeshMaterial = mat;
+       // }
+       // {
+       //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+       //     gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
+       //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+       //     gameObject->MeshList[0]->MeshPosition = glm::vec3(2.0f, 0.0f, 1.0);
+       //     gameObject->MeshList[0]->MeshScale = glm::vec3(0.5f);
 
-        //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
-        //     gameObject->MeshList[0]->MeshMaterial = mat;
-        // }
-        // {
-        //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //     gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
-        //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
-        //     gameObject->MeshList[0]->MeshPosition = glm::vec3(-1.0f, 0.0f, 2.0);
-        //     gameObject->MeshList[0]->MeshRotation = glm::vec3(60.0f, 0.0f, 60.0);
-        //     gameObject->MeshList[0]->MeshScale = glm::vec3(0.25f);
+       //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
+       //     gameObject->MeshList[0]->MeshMaterial = mat;
+       // }
+       // {
+       //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+       //     gameObject->AddChildMesh(std::make_shared<Mesh>(vertices));
+       //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+       //     gameObject->MeshList[0]->MeshPosition = glm::vec3(-1.0f, 0.0f, 2.0);
+       //     gameObject->MeshList[0]->MeshRotation = glm::vec3(60.0f, 0.0f, 60.0);
+       //     gameObject->MeshList[0]->MeshScale = glm::vec3(0.25f);
 
-        //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
-        //     gameObject->MeshList[0]->MeshMaterial = mat;
-        // }
-        // {
-        //     std::vector<Vertex> floorvertices =
-        //     {
-        //         {{25.0f, -0.5f,  25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {25.0f,  0.0f}, { 25.0f,  0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //         {{ -25.0f, -0.5f,  25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //         {{ -25.0f, -0.5f, -25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 25.0f}, { 0.0f, 25.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //         {{25.0f, -0.5f,  25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {25.0f,  0.0f}, {25.0f,  0.0f}, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //         {{ -25.0f, -0.5f, -25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 25.0f }, { 0.0f, 25.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //         {{25.0f, -0.5f, -25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {25.0f, 25.0f}, {25.0f, 25.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
-        //     };
-        //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //     gameObject->AddChildMesh(std::make_shared<Mesh>(floorvertices));
-        //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+       //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
+       //     gameObject->MeshList[0]->MeshMaterial = mat;
+       // }
+       // {
+       //     std::vector<Vertex> floorvertices =
+       //     {
+       //         {{25.0f, -0.5f,  25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {25.0f,  0.0f}, { 25.0f,  0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //         {{ -25.0f, -0.5f,  25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f}, { 0.0f, 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //         {{ -25.0f, -0.5f, -25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 25.0f}, { 0.0f, 25.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //         {{25.0f, -0.5f,  25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {25.0f,  0.0f}, {25.0f,  0.0f}, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //         {{ -25.0f, -0.5f, -25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {0.0f, 25.0f }, { 0.0f, 25.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //         {{25.0f, -0.5f, -25.0f }, { 0.0f }, {0.0f, 1.0f, 0.0f}, { 0.0f }, {25.0f, 25.0f}, {25.0f, 25.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }, {0.0f, 0.0f, 0.0f}, { 0.0f }},
+       //     };
+       //     std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+       //     gameObject->AddChildMesh(std::make_shared<Mesh>(floorvertices));
+       //     AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-        //     MaterialTexture material;
-        //     material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
-        //     material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
+       //     MaterialTexture material;
+       //     material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
+       //     material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/wood.png", VK_FORMAT_R8G8B8A8_SRGB);
 
-        //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
-        //     gameObject->MeshList[0]->MeshMaterial = mat;
-        // }
+       //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
+       //     gameObject->MeshList[0]->MeshMaterial = mat;
+       // }
 
-        std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/vulkanscene_shadowbox.obj")));
-        AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+        //        std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+        //gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/vulkanscene_shadow.obj")));
+        //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
         //std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         //gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/TestAnimModel/model.dae")));
@@ -282,7 +282,7 @@ private:
         //gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.gltf")));
         //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-      /*  {
+        {
             std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
             gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
             AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
@@ -371,25 +371,25 @@ private:
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("wall", material);
             gameObject->MeshList[0]->MeshMaterial = mat;
             gameObject->MeshList[0]->MeshPosition = glm::vec3(6.0f, 0.0f, 0.0f);
-        }*/
-        //{
-        //    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        //    gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/plain.obj")));
-        //    AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
+        }
+        {
+            std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/platform.obj")));
+            AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
 
-        //    MaterialTexture material;
-        //    material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        //    material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
-        //    material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //    material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //    material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/ao.png", VK_FORMAT_R8G8B8A8_UNORM);
-        //    material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/grass/normal.png", VK_FORMAT_R8G8B8A8_UNORM);
+            MaterialTexture material;
+            material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_albedo.png", VK_FORMAT_R8G8B8A8_SRGB);
+            material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_Metallic.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_Roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_ao.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_Normal-ogl.png", VK_FORMAT_R8G8B8A8_UNORM);
 
-        //    auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
-        //    gameObject->MeshList[0]->MeshMaterial = mat;
-        //    gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-        //}
+            auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
+            gameObject->MeshList[0]->MeshMaterial = mat;
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+        }
     }
 
     void mainLoop() {

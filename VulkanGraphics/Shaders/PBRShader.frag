@@ -239,6 +239,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
         vec3 L = normalize(-DLight[i].directionalLight.direction);
         vec3 H = normalize(V + L);
         vec3 radiance = DLight[i].directionalLight.diffuse;
+        radiance *= shadow;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -247,6 +248,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
         vec3 nominator    = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
         vec3 specular = nominator / denominator;
+        specular *= shadow;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
@@ -256,7 +258,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 
         Lo += (kD * albedo / PI + specular) * radiance * NdotL; 
     }   
-    return vec3(shadow);
+    return Lo;
 }
 
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)

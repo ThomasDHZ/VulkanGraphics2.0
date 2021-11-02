@@ -237,7 +237,6 @@ void DepthCubeMapRenderPass::Draw()
 
 void DepthCubeMapRenderPass::Destroy()
 {
-    cubeSampler->Destroy();
     RenderedCubeMap->Delete();
     depthCubeMapPipeline->Destroy();
     BaseRenderPass::Destroy();

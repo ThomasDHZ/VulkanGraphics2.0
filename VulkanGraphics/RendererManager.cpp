@@ -11,11 +11,11 @@ RendererManager::RendererManager(std::shared_ptr<VulkanEngine> engine, std::shar
     interfaceRenderPass = InterfaceRenderPass(engine);
 
     BlinnRenderer = BlinnPhongRasterRenderer(engine);
+  //  renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
     pbrRenderer = PBRRenderer(EnginePtr::GetEnginePtr());
+
     rayTraceRenderer = RayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
     pbrRayTraceRenderer = PBRRayTraceRenderer(EnginePtr::GetEnginePtr(), window, AssetManagerPtr::GetAssetPtr());
-  ////  renderer2D = Renderer2D(EnginePtr::GetEnginePtr());
-
 }
 
 RendererManager::~RendererManager()
@@ -48,9 +48,10 @@ void RendererManager::RebuildSwapChain(std::shared_ptr<VulkanEngine> engine, std
     interfaceRenderPass.RebuildSwapChain();
     BlinnRenderer.RebuildSwapChain();
     pbrRenderer.RebuildSwapChain();
+    //renderer2D.RebuildSwapChain();
+
     rayTraceRenderer.RebuildSwapChain(engine, window);
     pbrRayTraceRenderer.RebuildSwapChain(engine, window);
-    //renderer2D.RebuildSwapChain();
 }
 
 void RendererManager::Update(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<VulkanWindow> window, uint32_t currentImage)
@@ -85,7 +86,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         }
         else
         {
-            rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
+             rayTraceRenderer.GUIUpdate(EnginePtr::GetEnginePtr());
         }
     }
     else if (ActiveRenderer == 1)
@@ -201,7 +202,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     if (GUIChanged)
     {
         MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
-        rayTraceRenderer.rayTraceRenderPass.Frame = 0;
+        //rayTraceRenderer.rayTraceRenderPass.Frame = 0;
         GUIChanged = false;
     }
 
@@ -308,6 +309,6 @@ void RendererManager::Destroy(std::shared_ptr<VulkanEngine> engine)
     BlinnRenderer.Destroy();
     pbrRenderer.Destroy();
     rayTraceRenderer.Destroy(engine);
-    pbrRayTraceRenderer.Destroy(engine); 
+    pbrRayTraceRenderer.Destroy(engine);
     //renderer2D.Destroy();
 }

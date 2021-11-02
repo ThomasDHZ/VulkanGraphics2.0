@@ -7,7 +7,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass() : BaseRenderPass()
 {
 }
 
-BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> ShadowCubeMap) : BaseRenderPass()
+BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList) : BaseRenderPass()
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
@@ -19,7 +19,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine,
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass, ShadowMapTextureList, ShadowCubeMap));
+    blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass, ShadowMapTextureList));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
     SetUpCommandBuffers();
 }
@@ -187,7 +187,7 @@ void BlinnPhongRasterPass::SetUpCommandBuffers()
     }
 }
 
-void BlinnPhongRasterPass::RebuildSwapChain(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> ShadowCubeMap)
+void BlinnPhongRasterPass::RebuildSwapChain(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList)
 {
     RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
 
@@ -211,7 +211,7 @@ void BlinnPhongRasterPass::RebuildSwapChain(std::vector<std::shared_ptr<Rendered
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTextureList, ShadowCubeMap);
+    blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTextureList);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
     SetUpCommandBuffers();
 }
