@@ -128,7 +128,7 @@ void DepthPassRendererPass::SetUpCommandBuffers()
 
 void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
 {
-    RenderPassResolution = glm::ivec2(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width, EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height);
+    RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize); 
     DepthToTexture->RecreateRendererTexture(RenderPassResolution);
 
     DepthTextureList.clear();
@@ -178,8 +178,22 @@ void DepthPassRendererPass::Draw()
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
+    VkRect2D rect2D{};
+    rect2D.extent.width = RenderPassResolution.x;
+    rect2D.extent.height = RenderPassResolution.y;
+    rect2D.offset.x = 0.0f;
+    rect2D.offset.y = 0.0f;
+
+    VkViewport viewport{};
+    viewport.width = (float)RenderPassResolution.x;
+    viewport.height = (float)RenderPassResolution.y;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
     {
+        vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
+        vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
         vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
         vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthPipeline->ShaderPipelineLayout, 0, 1, &depthPipeline->DescriptorSet, 0, nullptr);
@@ -261,7 +275,7 @@ void DepthPassRendererPass::Draw()
         ReturnSrcMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         ReturnSrcMemoryBarrior.dstAccessMask = 0;
         vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnSrcMemoryBarrior);
-   
+
         DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
