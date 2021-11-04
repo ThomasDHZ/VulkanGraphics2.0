@@ -27,14 +27,14 @@
                 Save 3ds Max Profile: Yes;
                 Formatted Arrays: Yes;
             </comments>
-            <source_data>file:///C:/Users/dotha/source/repos/VulkanGraphics/Models/Crate.dae</source_data>
+            <source_data>file://Untitled</source_data>
         </contributor>
-        <created>2021-03-28T00:04:11Z</created>
-        <modified>2021-03-28T00:04:11Z</modified>
+        <created>2021-11-03T23:40:08Z</created>
+        <modified>2021-11-03T23:40:08Z</modified>
         <up_axis>Y_UP</up_axis>
     </asset>
     <library_cameras>
-        <camera id="Camera-Camera" name="Camera">
+        <camera id="Camera-camera003" name="Camera">
             <optics>
                 <technique_common>
                     <perspective>
@@ -49,7 +49,7 @@
                     <param sid="focalLen" name="Focal_Length" type="float">0.05</param>
                     <param sid="distort" name="Lens_Distortion" type="float">0</param>
                     <param sid="squeeze" name="Lens_Squeeze" type="float">1</param>
-                    <param sid="focusDist" name="Focus_Distance" type="float">3125</param>
+                    <param sid="focusDist" name="Focus_Distance" type="float">4</param>
                     <param sid="fStop" name="F-Stop" type="float">4</param>
                     <param sid="blurLen" name="Blur_Length" type="float">0.5</param>
                     <param sid="blurOff" name="Blur_Offset" type="float">0</param>
@@ -70,10 +70,7 @@
     </library_cameras>
     <library_images>
         <image id="Image0001" name="Image0001">
-            <init_from>../Models/../texture/container2_specular.png</init_from>
-        </image>
-        <image id="Image0002" name="Image0002">
-            <init_from>../Models/../texture/create_diffuseOriginal.bmp</init_from>
+            <init_from>../texture/Brick_diffuseOriginal.bmp</init_from>
         </image>
     </library_images>
     <library_materials>
@@ -84,19 +81,6 @@
     <library_effects>
         <effect id="Effect-Default" name="Default">
             <profile_COMMON>
-                <newparam sid="Image0002-surface">
-                    <surface type="2D">
-                        <init_from>Image0002</init_from>
-                        <format>A8R8G8B8</format>
-                    </surface>
-                </newparam>
-                <newparam sid="Image0002-sampler">
-                    <sampler2D>
-                        <source>Image0002-surface</source>
-                        <minfilter>LINEAR_MIPMAP_LINEAR</minfilter>
-                        <magfilter>LINEAR</magfilter>
-                    </sampler2D>
-                </newparam>
                 <newparam sid="Image0001-surface">
                     <surface type="2D">
                         <init_from>Image0001</init_from>
@@ -113,10 +97,10 @@
                 <technique sid="common">
                     <phong>
                         <diffuse>
-                            <texture texture="Image0002-sampler" texcoord="Texture" />
+                            <texture texture="Image0001-sampler" texcoord="Texture" />
                         </diffuse>
                         <specular>
-                            <texture texture="Image0001-sampler" texcoord="Texture" />
+                            <color sid="specular_effect_rgb">0.2 0.2 0.2 1</color>
                         </specular>
                         <shininess>
                             <float sid="specular_effect_rgb">256</float>
@@ -127,29 +111,39 @@
         </effect>
     </library_effects>
     <library_geometries>
-        <geometry id="Geometry-Mesh" name="Mesh">
+        <geometry id="Geometry-mesh002" name="Mesh">
             <mesh>
-                <source id="Geometry-Mesh-positions" name="positions">
-                    <float_array id="Geometry-Mesh-positions-array" count="24">
-                        -0.58132 -0.584295 -0.601309
-                        0.587271 -0.584295 -0.601309
-                        0.587271 -0.584295 0.567282
-                        -0.58132 -0.584295 0.567282
-                        -0.58132 0.584295 -0.601309
-                        0.587271 0.584295 -0.601309
-                        0.587271 0.584295 0.567282
-                        -0.58132 0.584295 0.567282
+                <source id="Geometry-mesh002-positions" name="positions">
+                    <float_array id="Geometry-mesh002-positions-array" count="54">
+                        -2.537 -2.5375 -0.00435125
+                        0.000500081 -2.5375 -0.00435125
+                        2.538 -2.5375 -0.00435125
+                        2.538 -2.5375 0.0025
+                        2.538 -2.5375 0.00935125
+                        0.000500081 -2.5375 0.00935125
+                        -2.537 -2.5375 0.00935125
+                        -2.537 -2.5375 0.0025
+                        0.000500081 -2.5375 0.0025
+                        -2.537 2.5375 -0.00435125
+                        0.000500081 2.5375 -0.00435125
+                        2.538 2.5375 -0.00435125
+                        2.538 2.5375 0.0025
+                        2.538 2.5375 0.00935125
+                        0.000500081 2.5375 0.00935125
+                        -2.537 2.5375 0.00935125
+                        -2.537 2.5375 0.0025
+                        0.000500081 2.5375 0.0025
                     </float_array>
                     <technique_common>
-                        <accessor count="8" source="#Geometry-Mesh-positions-array" stride="3">
+                        <accessor count="18" source="#Geometry-mesh002-positions-array" stride="3">
                             <param name="X" type="float" />
                             <param name="Y" type="float" />
                             <param name="Z" type="float" />
                         </accessor>
                     </technique_common>
                 </source>
-                <source id="Geometry-Mesh-normals" name="normals">
-                    <float_array id="Geometry-Mesh-normals-array" count="18">
+                <source id="Geometry-mesh002-normals" name="normals">
+                    <float_array id="Geometry-mesh002-normals-array" count="18">
                         0 -1 0
                         0 0 -1
                         1 0 0
@@ -158,36 +152,41 @@
                         0 1 0
                     </float_array>
                     <technique_common>
-                        <accessor count="6" source="#Geometry-Mesh-normals-array" stride="3">
+                        <accessor count="6" source="#Geometry-mesh002-normals-array" stride="3">
                             <param name="X" type="float" />
                             <param name="Y" type="float" />
                             <param name="Z" type="float" />
                         </accessor>
                     </technique_common>
                 </source>
-                <source id="Geometry-Mesh-Texture" name="Texture">
-                    <float_array id="Geometry-Mesh-Texture-array" count="8">
+                <source id="Geometry-mesh002-Texture" name="Texture">
+                    <float_array id="Geometry-mesh002-Texture-array" count="18">
                         0 0
-                        1 0
-                        1 1
+                        0.5 0
+                        0.5 0.5
+                        0 0.5
+                        0.5 1
                         0 1
+                        1 0
+                        1 0.5
+                        1 1
                     </float_array>
                     <technique_common>
-                        <accessor count="4" source="#Geometry-Mesh-Texture-array" stride="2">
+                        <accessor count="9" source="#Geometry-mesh002-Texture-array" stride="2">
                             <param name="S" type="float" />
                             <param name="T" type="float" />
                         </accessor>
                     </technique_common>
                 </source>
-                <vertices id="Geometry-Mesh-vertices">
-                    <input semantic="POSITION" source="#Geometry-Mesh-positions" />
+                <vertices id="Geometry-mesh002-vertices">
+                    <input semantic="POSITION" source="#Geometry-mesh002-positions" />
                 </vertices>
-                <polylist count="6" material="Material-Default">
-                    <input semantic="VERTEX" source="#Geometry-Mesh-vertices" offset="0" />
-                    <input semantic="NORMAL" source="#Geometry-Mesh-normals" offset="1" />
-                    <input semantic="TEXCOORD" source="#Geometry-Mesh-Texture" offset="2" set="0" />
-                    <vcount>4 4 4 4 4 4</vcount>
-                    <p>0 0 0 1 0 1 2 0 2 3 0 3 4 1 3 5 1 2 1 1 1 0 1 0 5 2 3 6 2 2 2 2 1 1 2 0 6 3 2 7 3 3 3 3 0 2 3 1 7 4 2 4 4 3 0 4 0 3 4 1 4 5 0 7 5 3 6 5 2 5 5 1</p>
+                <polylist count="16" material="Material-Default">
+                    <input semantic="VERTEX" source="#Geometry-mesh002-vertices" offset="0" />
+                    <input semantic="NORMAL" source="#Geometry-mesh002-normals" offset="1" />
+                    <input semantic="TEXCOORD" source="#Geometry-mesh002-Texture" offset="2" set="0" />
+                    <vcount>4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4</vcount>
+                    <p>0 0 0 1 0 1 8 0 2 7 0 3 7 0 3 8 0 2 5 0 4 6 0 5 1 0 1 2 0 6 3 0 7 8 0 2 8 0 2 3 0 7 4 0 8 5 0 4 9 1 5 10 1 4 1 1 1 0 1 0 10 1 4 11 1 8 2 1 6 1 1 1 11 2 5 12 2 4 3 2 1 2 2 0 12 2 4 13 2 8 4 2 6 3 2 1 13 3 8 14 3 4 5 3 1 4 3 6 14 3 4 15 3 5 6 3 0 5 3 1 15 4 8 16 4 4 7 4 1 6 4 6 16 4 4 9 4 5 0 4 0 7 4 1 9 5 0 16 5 3 17 5 2 10 5 1 16 5 3 15 5 5 14 5 4 17 5 2 10 5 1 17 5 2 12 5 7 11 5 6 17 5 2 14 5 4 13 5 8 12 5 7</p>
                 </polylist>
                 <extra>
                     <technique profile="modo401">
@@ -201,14 +200,14 @@
         </geometry>
     </library_geometries>
     <library_lights>
-        <light id="Light-polyRender018" name="Render">
+        <light id="Light-polyRender006" name="Render">
             <technique_common>
                 <ambient>
                     <color sid="ambient_light_rgb">0 0 0</color>
                 </ambient>
             </technique_common>
         </light>
-        <light id="Light-Directional_Light" name="Directional_Light">
+        <light id="Light-sunLight013" name="Directional_Light">
             <technique_common>
                 <directional>
                     <color sid="directional_light_rgb">1 1 1</color>
@@ -324,28 +323,11 @@
     </library_nodes>
     <library_visual_scenes>
         <visual_scene id="DefaultScene">
-            <node id="polyRender018" name="Render" type="NODE">
-                <instance_light url="#Light-polyRender018" />
+            <node id="polyRender006" name="Render" type="NODE">
+                <instance_light url="#Light-polyRender006" />
             </node>
-            <node id="Texture_GroupNode" name="Texture_Group" type="NODE">
-                <node id="create_diffuseOriginal__Image___Texture_Node" name="create_diffuseOriginal__Image___Texture_" type="NODE">
-                    <translate sid="translation004">0 0 0</translate>
-                    <rotate sid="rotation008Y">0 1 0 0</rotate>
-                    <rotate sid="rotation008X">1 0 0 0</rotate>
-                    <rotate sid="rotation008Z">0 0 1 0</rotate>
-                    <scale sid="scale012">1 1 1</scale>
-                </node>
-                <node id="container2_specular__Image___Texture_Node" name="container2_specular__Image___Texture_" type="NODE">
-                    <translate sid="translation005">0 0 0</translate>
-                    <rotate sid="rotation009Y">0 1 0 0</rotate>
-                    <rotate sid="rotation009X">1 0 0 0</rotate>
-                    <rotate sid="rotation009Z">0 0 1 0</rotate>
-                    <scale sid="scale013">-0.8 -0.8 -0.8</scale>
-                </node>
-            </node>
-            <node id="Geometry-MeshNode" name="Mesh" type="NODE">
-                <scale sid="scale011">-0.8 -0.8 -0.8</scale>
-                <instance_geometry url="#Geometry-Mesh">
+            <node id="Geometry-mesh002Node" name="Mesh" type="NODE">
+                <instance_geometry url="#Geometry-mesh002">
                     <bind_material>
                         <technique_common>
                             <instance_material symbol="Material-Default" target="#Material-Default">
@@ -355,33 +337,28 @@
                     </bind_material>
                 </instance_geometry>
             </node>
-            <node id="Camera-CameraNode" name="Camera" type="NODE">
-                <translate sid="translation003">2241.29 840.36 2008.97</translate>
-                <rotate sid="rotation007Y">0 1 0 48.1285</rotate>
-                <rotate sid="rotation007X">1 0 0 -15.5997</rotate>
-                <rotate sid="rotation007Z">0 0 1 1.18419e-015</rotate>
-                <instance_camera url="#Camera-Camera" />
+            <node id="Camera-camera003Node" name="Camera" type="NODE">
+                <translate sid="translation004">0 0.75 4</translate>
+                <rotate sid="rotation005Y">0 1 0 0</rotate>
+                <rotate sid="rotation005X">1 0 0 -5</rotate>
+                <rotate sid="rotation005Z">0 0 1 0</rotate>
+                <instance_camera url="#Camera-camera003" />
             </node>
-            <node id="txtrLocator001Node" name="create_diffuseOriginal__Image___Texture_" type="NODE">
-                <translate sid="translation022">0 0 0</translate>
-                <rotate sid="rotation021Y">0 1 0 0</rotate>
-                <rotate sid="rotation021X">1 0 0 0</rotate>
-                <rotate sid="rotation021Z">0 0 1 0</rotate>
-                <scale sid="scale020">1 1 1</scale>
+            <node id="groupLocator026Node" name="Texture_Group" type="NODE">
+                <node id="txtrLocator022Node" name="Brick_diffuseOriginal__Image___Texture_" type="NODE">
+                    <translate sid="translation025">0 0 0</translate>
+                    <rotate sid="rotation024Y">0 1 0 0</rotate>
+                    <rotate sid="rotation024X">1 0 0 0</rotate>
+                    <rotate sid="rotation024Z">0 0 1 0</rotate>
+                    <scale sid="scale023">1 1 1</scale>
+                </node>
             </node>
-            <node id="txtrLocator002Node" name="container2_specular__Image___Texture_" type="NODE">
-                <translate sid="translation025">0 0 0</translate>
-                <rotate sid="rotation024Y">0 1 0 0</rotate>
-                <rotate sid="rotation024X">1 0 0 0</rotate>
-                <rotate sid="rotation024Z">0 0 1 0</rotate>
-                <scale sid="scale023">1 1 1</scale>
-            </node>
-            <node id="Light-Directional_LightNode" name="Directional_Light" type="NODE">
-                <translate sid="translation006">-2 2 2</translate>
-                <rotate sid="rotation010Y">0 1 0 -45</rotate>
-                <rotate sid="rotation010X">1 0 0 -30</rotate>
-                <rotate sid="rotation010Z">0 0 1 0</rotate>
-                <instance_light url="#Light-Directional_Light" />
+            <node id="Light-sunLight013Node" name="Directional_Light" type="NODE">
+                <translate sid="translation015">-2 2 2</translate>
+                <rotate sid="rotation016Y">0 1 0 -45</rotate>
+                <rotate sid="rotation016X">1 0 0 -30</rotate>
+                <rotate sid="rotation016Z">0 0 1 0</rotate>
+                <instance_light url="#Light-sunLight013" />
             </node>
             <extra>
                 <technique profile="modo401">

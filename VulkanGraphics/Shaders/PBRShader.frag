@@ -101,6 +101,17 @@ void main()
 	 discard;
    }
 
+    vec3 V = normalize(Mesh.CameraPos - FragPos);
+    mat3 TBN = getTBNFromMap();
+    if(material.DepthMapID != 0)
+    {
+            UV = ParallaxMapping(material, UV,  V);       
+            if(UV.x > 1.0 || UV.y > 1.0 || UV.x < 0.0 || UV.y < 0.0)
+            {
+              discard;
+            }
+    }
+
     vec3 albedo = material.Albedo; 
     if(material.AlbedoMapID != 0)
     {
@@ -129,17 +140,6 @@ void main()
     if(material.Alpha != 0)
     {
         alpha = texture(TextureMap[material.AlphaMapID], UV).r;
-    }
-
-    vec3 V = normalize(Mesh.CameraPos - FragPos);
-    mat3 TBN = getTBNFromMap();
-    if(material.DepthMapID != 0)
-    {
-            UV = ParallaxMapping(material, UV,  V);       
-            if(UV.x > 1.0 || UV.y > 1.0 || UV.x < 0.0 || UV.y < 0.0)
-            {
-              discard;
-            }
     }
 
     vec3 normal = texture(TextureMap[material.NormalMapID], UV).xyz * 2.0 - 1.0;
@@ -239,7 +239,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
         vec3 L = normalize(-DLight[i].directionalLight.direction);
         vec3 H = normalize(V + L);
         vec3 radiance = DLight[i].directionalLight.diffuse;
-        radiance *= shadow;
+       // radiance *= shadow;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -248,7 +248,7 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
         vec3 nominator    = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
         vec3 specular = nominator / denominator;
-        specular *= shadow;
+       // specular *= shadow;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
