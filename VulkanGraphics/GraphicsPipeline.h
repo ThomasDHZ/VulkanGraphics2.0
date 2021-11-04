@@ -57,6 +57,7 @@ struct LightSceneInfo
 class GraphicsPipeline
 {
 protected:
+	VkSampler NullSampler = VK_NULL_HANDLE;
 	VkDescriptorImageInfo nullBufferInfo;
 
 public:

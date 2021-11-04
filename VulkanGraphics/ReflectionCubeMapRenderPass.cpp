@@ -239,7 +239,9 @@ void ReflectionCubeMapRenderPass::Draw()
 
 void ReflectionCubeMapRenderPass::Destroy()
 {
+    cubeSampler->Destroy();
     RenderedCubeMap->Delete();
+    RenderedCubeBloom->Delete();
     skyboxPipeline->Destroy();
     depthCubeMapPipeline->Destroy();
     BaseRenderPass::Destroy();

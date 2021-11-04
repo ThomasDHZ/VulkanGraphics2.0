@@ -190,7 +190,7 @@ void DepthPassRendererPass::Draw()
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
-    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
+    for (int x = 0; x < DepthTextureList.size(); x++)
     {
         vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
         vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
@@ -287,7 +287,10 @@ void DepthPassRendererPass::Draw()
 void DepthPassRendererPass::Destroy()
 {
     DepthToTexture->Delete();
-    DepthTextureList[0]->Delete();
+    for (int x = 0; x < DepthTextureList.size(); x++)
+    {
+        DepthTextureList[x]->Delete();
+    }
     depthPipeline->Destroy();
     BaseRenderPass::Destroy();
 }

@@ -3,7 +3,6 @@
 
 GraphicsPipeline::GraphicsPipeline()
 {
-    VkSampler NullSampler;
     VkSamplerCreateInfo NullSamplerInfo = {};
     NullSamplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     NullSamplerInfo.magFilter = VK_FILTER_NEAREST;
@@ -50,11 +49,13 @@ void GraphicsPipeline::UpdateGraphicsPipeLine()
 
 void GraphicsPipeline::Destroy()
 {
+    vkDestroySampler(VulkanPtr::GetDevice(), NullSampler, nullptr);
     vkDestroyPipeline(VulkanPtr::GetDevice(), ShaderPipeline, nullptr);
     vkDestroyPipelineLayout(VulkanPtr::GetDevice(), ShaderPipelineLayout, nullptr);
     vkDestroyDescriptorPool(VulkanPtr::GetDevice(), DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(VulkanPtr::GetDevice(), DescriptorSetLayout, nullptr);
 
+    NullSampler = VK_NULL_HANDLE;
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
     DescriptorPool = VK_NULL_HANDLE;
