@@ -374,7 +374,7 @@ private:
         }
         {
             std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/platform.obj")));
+            gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Crate.dae")));
             AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
 
@@ -385,6 +385,7 @@ private:
             material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_Roughness.png", VK_FORMAT_R8G8B8A8_UNORM);
             material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_ao.png", VK_FORMAT_R8G8B8A8_UNORM);
             material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_Normal-ogl.png", VK_FORMAT_R8G8B8A8_UNORM);
+            material.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("C:/Users/dotha/source/repos/VulkanGraphics/texture/pbr/Sand/sandy_rocks1_Height.png", VK_FORMAT_R8G8B8A8_UNORM);
 
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
             gameObject->MeshList[0]->MeshMaterial = mat;
