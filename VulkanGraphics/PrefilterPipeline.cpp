@@ -6,7 +6,7 @@ PrefilterPipeline::PrefilterPipeline() : GraphicsPipeline()
 {
 }
 
-PrefilterPipeline::PrefilterPipeline(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize) : GraphicsPipeline()
+PrefilterPipeline::PrefilterPipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
@@ -32,7 +32,7 @@ void PrefilterPipeline::SetUpDescriptorLayout()
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void PrefilterPipeline::SetUpDescriptorSets(std::shared_ptr<CubeMapTexture> cubeMapTexture)
+void PrefilterPipeline::SetUpDescriptorSets(std::shared_ptr<Texture> cubeMapTexture)
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     VkDescriptorImageInfo CubeMapBufferImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(cubeMapTexture->View, cubeMapTexture->Sampler);
@@ -153,7 +153,7 @@ void PrefilterPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, floa
     }
 }
 
-void PrefilterPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize)
+void PrefilterPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();

@@ -23,13 +23,13 @@ private:
 
 public:
 	PrefilterRenderPass();
-	PrefilterRenderPass(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize);
+	PrefilterRenderPass(std::shared_ptr<Texture> cubeMapTexture, uint32_t cubeMapSize);
 	~PrefilterRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
 	std::shared_ptr<PrefilterPipeline> prefilterPipeline;
 
-	void RebuildSwapChain(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize);
+	void RebuildSwapChain(std::shared_ptr<Texture> cubeMapTexture, uint32_t cubeMapSize);
 
 	void Draw();
 	void Destroy();

@@ -6,7 +6,7 @@ IrradiancePipeline::IrradiancePipeline() : GraphicsPipeline()
 {
 }
 
-IrradiancePipeline::IrradiancePipeline(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize) : GraphicsPipeline()
+IrradiancePipeline::IrradiancePipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
@@ -32,7 +32,7 @@ void IrradiancePipeline::SetUpDescriptorLayout()
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void IrradiancePipeline::SetUpDescriptorSets(std::shared_ptr<CubeMapTexture> cubeMapTexture)
+void IrradiancePipeline::SetUpDescriptorSets(std::shared_ptr<Texture> cubeMapTexture)
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     VkDescriptorImageInfo CubeMapBufferImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(cubeMapTexture->View, cubeMapTexture->Sampler);
@@ -42,7 +42,7 @@ void IrradiancePipeline::SetUpDescriptorSets(std::shared_ptr<CubeMapTexture> cub
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
-void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize)
+void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
     PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/IrradianceShaderVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -162,7 +162,7 @@ void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, std
     }
 }
 
-void IrradiancePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize)
+void IrradiancePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();

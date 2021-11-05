@@ -19,7 +19,8 @@ private:
 
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;
-	////DepthDebugRenderPass DebugDepthRenderPass;
+	IrradianceRenderPass ReflectionIrradianceRenderPass;
+	PrefilterRenderPass ReflectionPrefilterRenderPass;
 	IrradianceRenderPass irradianceRenderPass;
 	PrefilterRenderPass prefilterRenderPass;
 	BRDFRenderPass brdfRenderPass;
