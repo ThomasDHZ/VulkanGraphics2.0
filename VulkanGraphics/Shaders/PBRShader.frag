@@ -30,14 +30,13 @@ layout(binding = 12) buffer RectangleAreaLightBuffer { RectangleAreaLight rectan
 layout(binding = 13) uniform samplerCube IrradianceMap;
 layout(binding = 14) uniform samplerCube PrefilterMap;
 layout(binding = 15) uniform sampler2D BRDFMap;
-layout(binding = 16) uniform sampler2D ShadowMap;
+layout(binding = 16) uniform sampler2D ShadowMap[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
 layout(location = 2) in vec3 Normal;
 layout(location = 3) in vec3 Tangent;
 layout(location = 4) in vec3 BiTangent;
-layout(location = 5) in vec4 LightSpace;
 
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outBloom;
@@ -54,12 +53,13 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
 vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
 vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic);
 vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
-float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset)
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset, int index)
 {
     float shadow = 1.0f;
 	if ( fragPosLightSpace.z > -1.0 && fragPosLightSpace.z < 1.0 ) 
 	{
-		float dist = texture( ShadowMap, fragPosLightSpace.st + offset ).r;
+		float dist = texture( ShadowMap[index], fragPosLightSpace.st + offset ).r;
 		if ( fragPosLightSpace.w > 0.0 && dist < fragPosLightSpace.z ) 
 		{
 			shadow = 0.1f;
@@ -68,9 +68,9 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset)
     return shadow;
 }
 
-float filterPCF(vec4 sc)
+float filterPCF(vec4 sc, int index)
 {
-	ivec2 texDim = textureSize(ShadowMap, 0);
+	ivec2 texDim = textureSize(ShadowMap[index], 0);
 	float scale = 1.5;
 	float dx = scale * 1.0 / float(texDim.x);
 	float dy = scale * 1.0 / float(texDim.y);
@@ -83,7 +83,7 @@ float filterPCF(vec4 sc)
 	{
 		for (int y = -range; y <= range; y++)
 		{
-			shadowFactor += ShadowCalculation(sc, vec2(dx*x, dy*y));
+			shadowFactor += ShadowCalculation(sc, vec2(dx*x, dy*y), index);
 			count++;
 		}
 	
@@ -232,10 +232,18 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 
 vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
+    const mat4 biasMat = mat4( 
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.5, 0.5, 0.0, 1.0 );
+
     vec3 Lo = vec3(0.0);
-    float shadow = filterPCF(LightSpace/ LightSpace.w);  
     for(int i = 0; i < sceneBuffer.sceneData.DirectionalLightCount; ++i) 
     {
+        vec4 LightSpace = (LightBiasMatrix *  DLight[i].directionalLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+        float shadow = filterPCF(LightSpace/ LightSpace.w, i);  
+
         vec3 L = normalize(-DLight[i].directionalLight.direction);
         vec3 H = normalize(V + L);
         vec3 radiance = DLight[i].directionalLight.diffuse;

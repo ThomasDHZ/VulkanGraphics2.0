@@ -6,20 +6,25 @@ PBRPipeline::PBRPipeline() : GraphicsPipeline()
 {
 }
 
-PBRPipeline::PBRPipeline(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture) : GraphicsPipeline()
+PBRPipeline::PBRPipeline(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList) : GraphicsPipeline()
 {
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorPool(ShadowMapTextureList);
+    SetUpDescriptorLayout(ShadowMapTextureList);
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTexture);
+    SetUpDescriptorSets(IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList);
 }
 
 PBRPipeline::~PBRPipeline()
 {
 }
 
-void PBRPipeline::SetUpDescriptorPool()
+void PBRPipeline::SetUpDescriptorPool(std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList)
 {
+    uint32_t count = (uint32_t)ShadowMapTextureList.size();
+    if (count == 0)
+    {
+        count = 1;
+    }
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount()));
@@ -37,12 +42,17 @@ void PBRPipeline::SetUpDescriptorPool()
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, count));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
-void PBRPipeline::SetUpDescriptorLayout()
+void PBRPipeline::SetUpDescriptorLayout(std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList)
 {
+    uint32_t count = (uint32_t)ShadowMapTextureList.size();
+    if (count == 0)
+    {
+        count = 1;
+    }
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_ALL, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount() });
@@ -58,12 +68,34 @@ void PBRPipeline::SetUpDescriptorLayout()
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 13, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 14, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 15, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 16, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 16, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, count });
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture)
+void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList)
 {
+    std::vector<VkDescriptorImageInfo> ShadowDescriptorImageList;
+    if (ShadowMapTextureList.size() == 0)
+    {
+        VkDescriptorImageInfo nullBuffer;
+        nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        nullBuffer.imageView = VK_NULL_HANDLE;
+        nullBuffer.sampler = NullSampler;
+        ShadowDescriptorImageList.emplace_back(nullBuffer);
+    }
+    else
+    {
+        for (auto texture : ShadowMapTextureList)
+        {
+            VkDescriptorImageInfo DescriptorImage{};
+            DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            DescriptorImage.imageView = texture->GetTextureView();
+            DescriptorImage.sampler = texture->GetTextureSampler();
+            ShadowDescriptorImageList.emplace_back(DescriptorImage);
+        }
+    }
+
+    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     VkDescriptorBufferInfo SceneDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = AssetManagerPtr::GetAssetPtr()->GetMeshPropertiesDescriptorsList();
@@ -82,11 +114,6 @@ void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> Ir
     VkDescriptorImageInfo IrradianceMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(IrradianceMap->View, IrradianceMap->Sampler);
     VkDescriptorImageInfo PrefilerMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(PrefilerMap->View, PrefilerMap->Sampler);
     VkDescriptorImageInfo BRDFMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(BRDFMap->View, BRDFMap->Sampler);
-    VkDescriptorImageInfo ShadowMapBuffer = nullBufferInfo;
-    if (ShadowMapTexture != nullptr)
-    {
-        ShadowMapBuffer = EnginePtr::GetEnginePtr()->AddTextureDescriptor(ShadowMapTexture->View, ShadowMapTexture->Sampler);
-    }
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(0, DescriptorSet, SceneDataBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
@@ -103,7 +130,7 @@ void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> Ir
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(13, DescriptorSet, IrradianceMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(14, DescriptorSet, PrefilerMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(15, DescriptorSet, BRDFMapImage));
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowMapBuffer));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowDescriptorImageList));
 
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
@@ -244,11 +271,11 @@ void PBRPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void PBRPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture)
+void PBRPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorPool(ShadowMapTextureList);
+    SetUpDescriptorLayout(ShadowMapTextureList);
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTexture);
+    SetUpDescriptorSets(IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList);
 }
