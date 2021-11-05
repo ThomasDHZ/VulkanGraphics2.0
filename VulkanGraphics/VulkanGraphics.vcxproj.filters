@@ -429,6 +429,12 @@
     <ClCompile Include="ReflectionCubeMapRenderPass.cpp">
       <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="PBRReflectionRenderPass.cpp">
+      <Filter>Source Files\Rendering\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="PBRReflectionPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -788,6 +794,12 @@
     <ClInclude Include="ReflectionCubeMapRenderPass.h">
       <Filter>Header Files\Rendering\RenderPass</Filter>
     </ClInclude>
+    <ClInclude Include="PBRReflectionRenderPass.h">
+      <Filter>Header Files\Rendering\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="PBRReflectionPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -941,6 +953,12 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\PBRReflectionViewPassShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\PBRReflectionShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\PBRReflectionShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

@@ -2,6 +2,8 @@ C:/VulkanSDK/1.2.189.2/Bin/glslc.exe vert.vert -o vert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe frag.frag -o frag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe PBRShader.vert -o PBRShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe PBRShader.frag -o PBRShaderFrag.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe PBRReflectionShader.vert -o PBRReflectionShaderVert.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe PBRReflectionShader.frag -o PBRReflectionShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe FrameBuffer.vert -o FrameBufferVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe FrameBuffer.frag -o FrameBufferFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe SkyBoxRenderShader.vert -o SkyBoxRenderShaderVert.spv

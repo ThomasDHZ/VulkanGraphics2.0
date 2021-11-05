@@ -9,6 +9,7 @@
 #include "DepthPassRendererPass.h"
 #include "DepthCubeMapRenderPass.h"
 #include "DepthDebugRenderPass.h"
+#include "PBRReflectionRenderPass.h"
 
 class PBRRenderer : public BaseRenderer
 {
@@ -22,6 +23,7 @@ private:
 	IrradianceRenderPass irradianceRenderPass;
 	PrefilterRenderPass prefilterRenderPass;
 	BRDFRenderPass brdfRenderPass;
+	PBRReflectionRenderPass reflectionPBRPass;
 	PBRRenderPass pbrRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
 

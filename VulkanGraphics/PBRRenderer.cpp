@@ -15,6 +15,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     brdfRenderPass = BRDFRenderPass(CubeMapSamplerSize);
 
     // // AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
+    reflectionPBRPass = PBRReflectionRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 }
@@ -32,6 +33,7 @@ void PBRRenderer::RebuildSwapChain()
     irradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
     prefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
     brdfRenderPass.RebuildSwapChain(CubeMapSamplerSize);
+    reflectionPBRPass.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
 }
@@ -59,6 +61,7 @@ void PBRRenderer::Draw()
     irradianceRenderPass.Draw();
     prefilterRenderPass.Draw();
     brdfRenderPass.Draw();
+    reflectionPBRPass.Draw();
     pbrRenderer.Draw();
     FrameBufferRenderer.Draw();
 }
@@ -71,6 +74,7 @@ void PBRRenderer::Destroy()
     irradianceRenderPass.Destroy();
     prefilterRenderPass.Destroy();
     brdfRenderPass.Destroy();
+    reflectionPBRPass.Destroy();
     pbrRenderer.Destroy();
     FrameBufferRenderer.Destroy();
 }
@@ -89,6 +93,7 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
     CommandBufferSubmitList.emplace_back(irradianceRenderPass.GetCommandBuffer());
     //CommandBufferSubmitList.emplace_back(prefilterRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(brdfRenderPass.GetCommandBuffer());
+    CommandBufferSubmitList.emplace_back(reflectionPBRPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(pbrRenderer.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(FrameBufferRenderer.GetCommandBuffer());
     return CommandBufferSubmitList;

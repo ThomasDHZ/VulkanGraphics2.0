@@ -278,6 +278,8 @@
     <ClCompile Include="PBRRayTracedPipeline.cpp" />
     <ClCompile Include="PBRRayTraceRenderer.cpp" />
     <ClCompile Include="PBRRayTraceRenderPass.cpp" />
+    <ClCompile Include="PBRReflectionPipeline.cpp" />
+    <ClCompile Include="PBRReflectionRenderPass.cpp" />
     <ClCompile Include="PBRRenderer.cpp" />
     <ClCompile Include="PBRRenderPass.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
@@ -396,6 +398,8 @@
     <ClInclude Include="PBRRayTracedPipeline.h" />
     <ClInclude Include="PBRRayTraceRenderer.h" />
     <ClInclude Include="PBRRayTraceRenderPass.h" />
+    <ClInclude Include="PBRReflectionPipeline.h" />
+    <ClInclude Include="PBRReflectionRenderPass.h" />
     <ClInclude Include="PBRRenderer.h" />
     <ClInclude Include="PBRRenderPass.h" />
     <ClInclude Include="PerspectiveCamera.h" />
@@ -475,6 +479,8 @@
     <None Include="Shaders\pbrClosesthit.rchit" />
     <None Include="Shaders\pbrmiss.rmiss" />
     <None Include="Shaders\pbrraygen.rgen" />
+    <None Include="Shaders\PBRReflectionShader.frag" />
+    <None Include="Shaders\PBRReflectionShader.vert" />
     <None Include="Shaders\PBRReflectionViewPassShader.frag" />
     <None Include="Shaders\PBRReflectionViewPassShader.vert" />
     <None Include="Shaders\PBRShader.frag" />
