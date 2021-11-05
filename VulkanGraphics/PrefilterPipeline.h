@@ -8,13 +8,13 @@ class PrefilterPipeline : public GraphicsPipeline
 private:
 	void SetUpDescriptorPool();
 	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets();
+	void SetUpDescriptorSets(std::shared_ptr<CubeMapTexture> cubeMapTexture);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
 public:
 	PrefilterPipeline();
-	PrefilterPipeline(const VkRenderPass& renderPass, float CubeMapSize);
+	PrefilterPipeline(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize);
 	~PrefilterPipeline();
 
-	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
+	void UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize);
 };
 

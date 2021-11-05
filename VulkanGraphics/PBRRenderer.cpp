@@ -10,8 +10,8 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
     ////  DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTextureList[0]);
     // equirectangularToCubemapRenderPass = EquirectangularToCubemapRenderPass();
-    irradianceRenderPass = IrradianceRenderPass(CubeMapSamplerSize);
-    prefilterRenderPass = PrefilterRenderPass(CubeMapSamplerSize);
+    irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+    prefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
     brdfRenderPass = BRDFRenderPass(CubeMapSamplerSize);
 
     // // AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(depthCubeMapRenderPass.RenderedCubeMap);
@@ -29,8 +29,8 @@ void PBRRenderer::RebuildSwapChain()
     depthCubeMapRenderPass.RebuildSwapChain(1024);
     //// DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList[0]);
     // //equirectangularToCubemapRenderPass.RebuildSwapChain();
-    irradianceRenderPass.RebuildSwapChain(CubeMapSamplerSize);
-    prefilterRenderPass.RebuildSwapChain(CubeMapSamplerSize);
+    irradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+    prefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
     brdfRenderPass.RebuildSwapChain(CubeMapSamplerSize);
     pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);

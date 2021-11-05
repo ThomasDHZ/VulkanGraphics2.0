@@ -475,6 +475,8 @@
     <None Include="Shaders\pbrClosesthit.rchit" />
     <None Include="Shaders\pbrmiss.rmiss" />
     <None Include="Shaders\pbrraygen.rgen" />
+    <None Include="Shaders\PBRReflectionViewPassShader.frag" />
+    <None Include="Shaders\PBRReflectionViewPassShader.vert" />
     <None Include="Shaders\PBRShader.frag" />
     <None Include="Shaders\PBRShader.vert" />
     <None Include="Shaders\PrefilterShader.frag" />

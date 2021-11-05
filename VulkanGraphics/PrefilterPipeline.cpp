@@ -6,12 +6,12 @@ PrefilterPipeline::PrefilterPipeline() : GraphicsPipeline()
 {
 }
 
-PrefilterPipeline::PrefilterPipeline(const VkRenderPass& renderPass, float CubeMapSize) : GraphicsPipeline()
+PrefilterPipeline::PrefilterPipeline(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize) : GraphicsPipeline()
 {
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass, CubeMapSize);
-    SetUpDescriptorSets();
+    SetUpDescriptorSets(cubeMapTexture);
 }
 
 PrefilterPipeline::~PrefilterPipeline()
@@ -21,24 +21,24 @@ PrefilterPipeline::~PrefilterPipeline()
 void PrefilterPipeline::SetUpDescriptorPool()
 {
     std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManagerPtr::GetAssetPtr()->GetCubeMapBufferDescriptorCount()));
+    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
     DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
 }
 
 void PrefilterPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, AssetManagerPtr::GetAssetPtr()->GetCubeMapBufferDescriptorCount() });
+    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
     DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
-void PrefilterPipeline::SetUpDescriptorSets()
+void PrefilterPipeline::SetUpDescriptorSets(std::shared_ptr<CubeMapTexture> cubeMapTexture)
 {
     DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-    std::vector<VkDescriptorImageInfo> TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->textureManager->GetCubeMapTextureBufferDescriptorList();
+    VkDescriptorImageInfo CubeMapBufferImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(cubeMapTexture->View, cubeMapTexture->Sampler);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, TextureBufferInfo));
+    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, CubeMapBufferImage));
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
@@ -153,11 +153,11 @@ void PrefilterPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, floa
     }
 }
 
-void PrefilterPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, float CubeMapSize)
+void PrefilterPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<CubeMapTexture> cubeMapTexture, float CubeMapSize)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorPool();
     SetUpDescriptorLayout();
     SetUpShaderPipeLine(renderPass, CubeMapSize);
-    SetUpDescriptorSets();
+    SetUpDescriptorSets(cubeMapTexture);
 }

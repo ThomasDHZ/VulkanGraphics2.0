@@ -21,7 +21,7 @@ layout(binding = 3) uniform sampler2D TextureMap[];
 layout(binding = 4) uniform CubeSampler 
 {
     mat4 lightSpaceMatrix[6];
-} SkyboxSamples;
+} ReflectionView;
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;
@@ -56,5 +56,5 @@ void main()
 //                           debugPrintfEXT("CubeDepth33: %f \n", SkyboxSamples.lightSpaceMatrix[gl_ViewIndex][3][3]);
 //        }
 //	}
-    gl_Position = SkyboxSamples.lightSpaceMatrix[gl_ViewIndex] * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * meshBuffer[scene.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0);
+    gl_Position = ReflectionView.lightSpaceMatrix[gl_ViewIndex] * meshBuffer[scene.MeshIndex].meshProperties.ModelTransform * meshBuffer[scene.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0);
 }

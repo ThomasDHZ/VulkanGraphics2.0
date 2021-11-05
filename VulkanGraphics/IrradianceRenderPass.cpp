@@ -7,14 +7,14 @@ IrradianceRenderPass::IrradianceRenderPass() : BaseRenderPass()
 {
 }
 
-IrradianceRenderPass::IrradianceRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
+IrradianceRenderPass::IrradianceRenderPass(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize) : BaseRenderPass()
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    irradiancePipeline = std::make_shared<IrradiancePipeline>(IrradiancePipeline(RenderPass, RenderPassResolution.x));
+    irradiancePipeline = std::make_shared<IrradiancePipeline>(IrradiancePipeline(RenderPass, cubeMapTexture, RenderPassResolution.x));
     SetUpCommandBuffers();
 
     Draw();
@@ -151,7 +151,7 @@ void IrradianceRenderPass::SetUpCommandBuffers()
     }
 }
 
-void IrradianceRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
+void IrradianceRenderPass::RebuildSwapChain(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize)
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
@@ -168,7 +168,7 @@ void IrradianceRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    irradiancePipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x);
+    irradiancePipeline->UpdateGraphicsPipeLine(RenderPass, cubeMapTexture, RenderPassResolution.x);
     SetUpCommandBuffers();
 
     Draw();

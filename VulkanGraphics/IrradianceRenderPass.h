@@ -17,13 +17,13 @@ private:
 
 public:
 	IrradianceRenderPass();
-	IrradianceRenderPass(uint32_t cubeMapSize);
+	IrradianceRenderPass(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize);
 	~IrradianceRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
 	std::shared_ptr<IrradiancePipeline> irradiancePipeline;
 
-	void RebuildSwapChain(uint32_t cubeMapSize);
+	void RebuildSwapChain(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize);
 
 	void Draw();
 	void Destroy();

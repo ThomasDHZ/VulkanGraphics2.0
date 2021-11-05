@@ -7,7 +7,7 @@ PrefilterRenderPass::PrefilterRenderPass() : BaseRenderPass()
 {
 }
 
-PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
+PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize) : BaseRenderPass()
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     CubeMapMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(RenderPassResolution.x, RenderPassResolution.y)))) + 1;
@@ -17,7 +17,7 @@ PrefilterRenderPass::PrefilterRenderPass(uint32_t cubeMapSize) : BaseRenderPass(
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    prefilterPipeline = std::make_shared<PrefilterPipeline>(PrefilterPipeline(RenderPass, RenderPassResolution.x));
+    prefilterPipeline = std::make_shared<PrefilterPipeline>(PrefilterPipeline(RenderPass, cubeMapTexture, RenderPassResolution.x));
     SetUpCommandBuffers();
     RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     Draw();
@@ -244,7 +244,7 @@ void PrefilterRenderPass::WriteCommandBuffers()
     }
 }
 
-void PrefilterRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
+void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<CubeMapTexture> cubeMapTexture, uint32_t cubeMapSize)
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     DrawToCubeMap->RecreateRendererTexture(RenderPassResolution);
@@ -262,7 +262,7 @@ void PrefilterRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x);
+    prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, cubeMapTexture, RenderPassResolution.x);
     SetUpCommandBuffers();
     RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
