@@ -435,6 +435,9 @@
     <ClCompile Include="PBRReflectionPipeline.cpp">
       <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="MultiViewSkyBoxPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -800,6 +803,9 @@
     <ClInclude Include="PBRReflectionPipeline.h">
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="MultiViewSkyBoxPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -959,6 +965,12 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\PBRReflectionShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\MultiViewSkyboxShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\MultiViewSkyboxShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

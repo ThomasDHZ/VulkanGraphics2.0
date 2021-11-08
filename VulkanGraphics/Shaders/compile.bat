@@ -8,6 +8,8 @@ C:/VulkanSDK/1.2.189.2/Bin/glslc.exe FrameBuffer.vert -o FrameBufferVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe FrameBuffer.frag -o FrameBufferFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe SkyBoxRenderShader.vert -o SkyBoxRenderShaderVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe SkyBoxRenderShader.frag -o SkyBoxRenderShaderFrag.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe MultiViewSkyboxShader.vert -o MultiViewSkyboxShaderVert.spv
+C:/VulkanSDK/1.2.189.2/Bin/glslc.exe MultiViewSkyboxShader.frag -o MultiViewSkyboxShaderFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe Shader2D.vert -o Shader2DVert.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe Shader2D.frag -o Shader2DFrag.spv
 C:/VulkanSDK/1.2.189.2/Bin/glslc.exe IrradianceShader.vert -o IrradianceShaderVert.spv
