@@ -9,6 +9,7 @@
 class PBRReflectionRenderPass : public BaseRenderPass
 {
 private:
+	std::shared_ptr<CubeSampler> cubeSampler;
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();

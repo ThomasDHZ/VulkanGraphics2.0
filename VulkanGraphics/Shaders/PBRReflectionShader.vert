@@ -3,6 +3,7 @@
 #extension GL_EXT_nonuniform_qualifier : enable
 #extension GL_EXT_scalar_block_layout : enable
 #extension GL_EXT_debug_printf : enable
+#extension GL_EXT_multiview : enable
 
 #include "SceneProperties.glsl"
 #include "MeshProperties.glsl"
@@ -20,6 +21,10 @@ layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties;
 layout(binding = 7) uniform sampler2D TextureMap[];
 layout(binding = 8) uniform sampler3D Texture3DMap[];
 layout(binding = 9) uniform samplerCube CubeMap[];
+layout(binding = 17) uniform CubeSampler 
+{
+    mat4 lightSpaceMatrix[6];
+} ReflectionView;
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;
@@ -40,6 +45,6 @@ void main()
     Normal = aNormal;
 	Tangent = aTangent.rgb;
 	BiTangent = aBitangent.rgb;
-    gl_Position = Mesh.proj * Mesh.view * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0);
+    gl_Position = ReflectionView.lightSpaceMatrix[gl_ViewIndex] * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0);
 
 }

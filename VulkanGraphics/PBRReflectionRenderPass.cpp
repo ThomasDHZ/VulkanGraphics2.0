@@ -8,6 +8,7 @@ PBRReflectionRenderPass::PBRReflectionRenderPass() : BaseRenderPass()
 
 PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList) : BaseRenderPass()
 {
+    cubeSampler = std::make_shared<CubeSampler>(CubeSampler(EnginePtr::GetEnginePtr()));
     RenderPassResolution = renderPassResolution;
 
     ColorTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
@@ -17,7 +18,7 @@ PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline = std::make_shared<PBRReflectionPipeline>(PBRReflectionPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap, ShadowMapTextureList));
+    pbrPipeline = std::make_shared<PBRReflectionPipeline>(PBRReflectionPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap, ShadowMapTextureList, cubeSampler));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
     SetUpCommandBuffers();
 }
@@ -204,13 +205,26 @@ void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, 
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList);
+    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList, cubeSampler);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
     SetUpCommandBuffers();
 }
 
 void PBRReflectionRenderPass::Draw()
 {
+    const glm::vec3 LightPos = glm::vec3(-0.365314275f, 0.866172075f, 0.537497699f);
+    float near_plane = 1.0f;
+    float far_plane = 25.0f;
+    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)RenderPassResolution.x / (float)RenderPassResolution.y, near_plane, far_plane);
+    std::vector<glm::mat4> shadowTransforms;
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[0] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[1] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[2] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[3] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[4] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[5] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->Update();
+
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;

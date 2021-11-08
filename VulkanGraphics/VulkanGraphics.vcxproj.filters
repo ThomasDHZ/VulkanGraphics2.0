@@ -949,12 +949,6 @@
     <None Include="Shaders\SceneProperties.glsl">
       <Filter>Shader\Include</Filter>
     </None>
-    <None Include="Shaders\PBRReflectionViewPassShader.frag">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
-    <None Include="Shaders\PBRReflectionViewPassShader.vert">
-      <Filter>Shader\RasterShaders</Filter>
-    </None>
     <None Include="Shaders\PBRReflectionShader.frag">
       <Filter>Shader\RasterShaders</Filter>
     </None>
