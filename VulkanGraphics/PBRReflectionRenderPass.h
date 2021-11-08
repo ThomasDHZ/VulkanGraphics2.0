@@ -18,7 +18,7 @@ private:
 
 public:
 	PBRReflectionRenderPass();
-	PBRReflectionRenderPass(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList);
+	PBRReflectionRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList);
 	~PBRReflectionRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedTexture;
@@ -27,7 +27,7 @@ public:
 	std::shared_ptr<PBRReflectionPipeline> pbrPipeline;
 	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
 
-	void RebuildSwapChain(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList);
+	void RebuildSwapChain(glm::ivec2 renderPassResolution, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList);
 
 	void Draw();
 	void Destroy();
