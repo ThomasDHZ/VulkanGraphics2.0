@@ -11,15 +11,13 @@ PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution
     cubeSampler = std::make_shared<CubeSampler>(CubeSampler(EnginePtr::GetEnginePtr()));
     RenderPassResolution = renderPassResolution;
 
-    ColorTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
-    BloomTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, EnginePtr::GetEnginePtr()->MaxSampleCount));
     RenderedBloomTexture = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass();
     CreateRendererFramebuffers();
     pbrPipeline = std::make_shared<PBRReflectionPipeline>(PBRReflectionPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap, ShadowMapTextureList, cubeSampler));
-    skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
+    skyboxPipeline = std::make_shared<MultiViewSkyboxPipeline>(MultiViewSkyboxPipeline(RenderPass, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], renderPassResolution.x));
     SetUpCommandBuffers();
 }
 
@@ -31,63 +29,36 @@ void PBRReflectionRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 
-    VkAttachmentDescription AlebdoAttachment = {};
-    AlebdoAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    AlebdoAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
-    AlebdoAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    AlebdoAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    AlebdoAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    AlebdoAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    AlebdoAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    AlebdoAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(AlebdoAttachment);
+    VkAttachmentDescription SampledAttachment = {};
+    SampledAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    SampledAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    SampledAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    SampledAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    SampledAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    SampledAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    SampledAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    SampledAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(SampledAttachment);
 
-    VkAttachmentDescription BloomAttachment = {};
-    BloomAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    BloomAttachment.samples = EnginePtr::GetEnginePtr()->MaxSampleCount;
-    BloomAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    BloomAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    BloomAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    BloomAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    BloomAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    BloomAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(BloomAttachment);
-
-    VkAttachmentDescription MultiSampledAttachment = {};
-    MultiSampledAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
-    MultiSampledAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    MultiSampledAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    MultiSampledAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    MultiSampledAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    MultiSampledAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    MultiSampledAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    MultiSampledAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(MultiSampledAttachment);
-
-    VkAttachmentDescription BloomMultiSampledTexture = {};
-    BloomMultiSampledTexture.format = VK_FORMAT_R8G8B8A8_UNORM;
-    BloomMultiSampledTexture.samples = VK_SAMPLE_COUNT_1_BIT;
-    BloomMultiSampledTexture.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    BloomMultiSampledTexture.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    BloomMultiSampledTexture.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    BloomMultiSampledTexture.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    BloomMultiSampledTexture.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    BloomMultiSampledTexture.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    AttachmentDescriptionList.emplace_back(BloomMultiSampledTexture);
+    VkAttachmentDescription BloomSampledTexture = {};
+    BloomSampledTexture.format = VK_FORMAT_R8G8B8A8_UNORM;
+    BloomSampledTexture.samples = VK_SAMPLE_COUNT_1_BIT;
+    BloomSampledTexture.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomSampledTexture.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    BloomSampledTexture.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    BloomSampledTexture.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    BloomSampledTexture.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    BloomSampledTexture.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    AttachmentDescriptionList.emplace_back(BloomSampledTexture);
 
     std::vector<VkAttachmentReference> ColorRefsList;
     ColorRefsList.emplace_back(VkAttachmentReference{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
     ColorRefsList.emplace_back(VkAttachmentReference{ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 
-    std::vector<VkAttachmentReference> MultiSampleReferenceList;
-    MultiSampleReferenceList.emplace_back(VkAttachmentReference{ 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-    MultiSampleReferenceList.emplace_back(VkAttachmentReference{ 3, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
-
     VkSubpassDescription subpassDescription = {};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassDescription.colorAttachmentCount = static_cast<uint32_t>(ColorRefsList.size());
     subpassDescription.pColorAttachments = ColorRefsList.data();
-    subpassDescription.pResolveAttachments = MultiSampleReferenceList.data();
 
     std::vector<VkSubpassDependency> DependencyList;
 
@@ -144,8 +115,6 @@ void PBRReflectionRenderPass::CreateRendererFramebuffers()
     for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
     {
         std::vector<VkImageView> AttachmentList;
-        AttachmentList.emplace_back(ColorTexture->View);
-        AttachmentList.emplace_back(BloomTexture->View);
         AttachmentList.emplace_back(RenderedTexture->View);
         AttachmentList.emplace_back(RenderedBloomTexture->View);
 
@@ -186,9 +155,7 @@ void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, 
 {
     RenderPassResolution = renderPassResolution;
 
-    ColorTexture->RecreateRendererTexture(RenderPassResolution);
     RenderedTexture->RecreateRendererTexture(RenderPassResolution);
-    BloomTexture->RecreateRendererTexture(RenderPassResolution);
     RenderedBloomTexture->RecreateRendererTexture(RenderPassResolution);
 
     pbrPipeline->Destroy();
@@ -206,16 +173,16 @@ void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, 
     CreateRenderPass();
     CreateRendererFramebuffers();
     pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList, cubeSampler);
-    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
+    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], renderPassResolution.x);
     SetUpCommandBuffers();
 }
 
 void PBRReflectionRenderPass::Draw()
 {
-    const glm::vec3 LightPos = glm::vec3(-0.365314275f, 0.866172075f, 0.537497699f);
+    const glm::vec3 LightPos = reflectPos;
     float near_plane = 1.0f;
     float far_plane = 25.0f;
-    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)RenderPassResolution.x / (float)RenderPassResolution.y, near_plane, far_plane);
+    glm::mat4 shadowProj = glm::ortho(XNearFar.x, XNearFar.y, YNearFar.x, YNearFar.y, ZNearFar.x, ZNearFar.y);
     std::vector<glm::mat4> shadowTransforms;
     cubeSampler->UniformDataInfo.LightSpaceMatrix[0] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     cubeSampler->UniformDataInfo.LightSpaceMatrix[1] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
@@ -241,11 +208,9 @@ void PBRReflectionRenderPass::Draw()
     renderPassInfo.renderArea.extent.width = RenderPassResolution.x;
     renderPassInfo.renderArea.extent.height = RenderPassResolution.y;
 
-    std::array<VkClearValue, 4> clearValues{};
+    std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
     clearValues[1].color = { {1.0f, 1.0f, 0.0f, 1.0f} };
-    clearValues[2].color = { {0.0f, 1.0f, 0.0f, 1.0f} };
-    clearValues[3].color = { {1.0f, 1.0f, 0.0f, 1.0f} };
 
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
@@ -264,14 +229,8 @@ void PBRReflectionRenderPass::Draw()
 
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    ConstSkyBoxView cubeMapInfo;
-    cubeMapInfo.view = glm::mat4(glm::mat3(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix()));
-    cubeMapInfo.proj = glm::perspective(glm::radians(CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetZoom()), RenderPassResolution.x / (float)RenderPassResolution.y, 0.1f, 100.0f);
-    cubeMapInfo.proj[1][1] *= -1;
-
     vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
     vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
-    vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], skyboxPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstSkyBoxView), &cubeMapInfo);
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
     static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
@@ -288,9 +247,7 @@ void PBRReflectionRenderPass::Draw()
 
 void PBRReflectionRenderPass::Destroy()
 {
-    ColorTexture->Delete();
     RenderedTexture->Delete();
-    BloomTexture->Delete();
     RenderedBloomTexture->Delete();
 
     pbrPipeline->Destroy();

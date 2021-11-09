@@ -65,6 +65,12 @@ void PBRRenderer::RebuildSwapChain()
 
 void PBRRenderer::GUIUpdate()
 {
+    
+
+    ImGui::SliderFloat3("reflect Pos " , &reflectionPBRPass.reflectPos.x, -5.0f, 5.0f);
+    ImGui::SliderFloat2("XNearFar ", &reflectionPBRPass.XNearFar.x, -5.0f, 5.0f);
+    ImGui::SliderFloat2("YNearFar ", &reflectionPBRPass.YNearFar.x, -5.0f, 5.0f);
+    ImGui::SliderFloat2("ZNearFar ", &reflectionPBRPass.ZNearFar.x, -5.0f, 5.0f);
     GUIChangedFlag |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
 
     if (GUIChangedFlag)
