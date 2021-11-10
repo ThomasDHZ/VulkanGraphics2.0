@@ -19,12 +19,12 @@ private:
 
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;
-	IrradianceRenderPass ReflectionIrradianceRenderPass;
-	PrefilterRenderPass ReflectionPrefilterRenderPass;
+	//IrradianceRenderPass ReflectionIrradianceRenderPass;
+	//PrefilterRenderPass ReflectionPrefilterRenderPass;
+	//	PBRReflectionRenderPass reflectionPBRPass;
 	IrradianceRenderPass irradianceRenderPass;
 	PrefilterRenderPass prefilterRenderPass;
 	BRDFRenderPass brdfRenderPass;
-	PBRReflectionRenderPass reflectionPBRPass;
 	PBRRenderPass pbrRenderer;
 	FrameBufferRenderPass FrameBufferRenderer;
 
