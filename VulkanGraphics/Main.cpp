@@ -300,6 +300,7 @@ material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D(".
 auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
 gameObject->MeshList[0]->MeshMaterial = mat;
 gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
+
         }
 
    /*     {

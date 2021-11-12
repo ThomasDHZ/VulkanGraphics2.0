@@ -299,6 +299,7 @@
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
     <ClCompile Include="RenderedDepthTexture.cpp" />
     <ClCompile Include="RenderedRayTracedColorTexture.cpp" />
+    <ClCompile Include="RenderedTextureImage.cpp" />
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="RendererManager.cpp" />
     <ClCompile Include="RenderPass2D.cpp" />
@@ -422,6 +423,7 @@
     <ClInclude Include="RenderedCubeMapTexture.h" />
     <ClInclude Include="RenderedDepthTexture.h" />
     <ClInclude Include="RenderedRayTracedColorTexture.h" />
+    <ClInclude Include="RenderedTextureImage.h" />
     <ClInclude Include="Renderer2D.h" />
     <ClInclude Include="RendererManager.h" />
     <ClInclude Include="RenderPass2D.h" />

@@ -18,10 +18,10 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     }
     //Reflection Pass
     {
-        //ReflectionIrradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        //ReflectionPrefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+        ReflectionIrradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+        ReflectionPrefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
 
-        //reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(512), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
+        reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(512), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     }
     //Main Render Pass
     {
@@ -48,10 +48,10 @@ void PBRRenderer::RebuildSwapChain()
     }
     //Reflection Pass
     {
-        //ReflectionIrradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        //ReflectionPrefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+        ReflectionIrradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+        ReflectionPrefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
 
-        //reflectionPBRPass.RebuildSwapChain(glm::ivec2(512), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
+        reflectionPBRPass.RebuildSwapChain(glm::ivec2(512), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     }
     //Main Render Pass
     {
@@ -69,7 +69,8 @@ void PBRRenderer::GUIUpdate()
 
     if (SaveScreenShotFlag)
     {
-        ImageProccessor::RenderTexture(pbrRenderer.RenderedTexture);
+      //  ImageProccessor::RenderTexture(TextureManagerPtr::GetTextureManagerPtr()->GetAllTexture2D()[2]);
+        ImageProccessor::RenderCubeMapTexture(ReflectionPrefilterRenderPass.RenderedCubeMap);
         SaveScreenShotFlag = false;
     }
 
@@ -97,10 +98,10 @@ void PBRRenderer::Draw()
     }
     //Reflection Pass
     {
-        //ReflectionIrradianceRenderPass.Draw();
-        //ReflectionPrefilterRenderPass.Draw();
+        ReflectionIrradianceRenderPass.Draw();
+        ReflectionPrefilterRenderPass.Draw();
 
-        //reflectionPBRPass.Draw();
+        reflectionPBRPass.Draw();
     }
     //Main Render Pass
     {
@@ -123,10 +124,10 @@ void PBRRenderer::Destroy()
     }
     //Reflection Pass
     {
-        //ReflectionIrradianceRenderPass.Destroy();
-        //ReflectionPrefilterRenderPass.Destroy();
+        ReflectionIrradianceRenderPass.Destroy();
+        ReflectionPrefilterRenderPass.Destroy();
 
-        //reflectionPBRPass.Destroy();
+        reflectionPBRPass.Destroy();
     }
     //Main Render Pass
     {
@@ -148,9 +149,9 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
     }
     //Reflection Pass
     {
-        //CommandBufferSubmitList.emplace_back(ReflectionIrradianceRenderPass.GetCommandBuffer());
+        CommandBufferSubmitList.emplace_back(ReflectionIrradianceRenderPass.GetCommandBuffer());
 
-        //CommandBufferSubmitList.emplace_back(reflectionPBRPass.GetCommandBuffer());
+        CommandBufferSubmitList.emplace_back(reflectionPBRPass.GetCommandBuffer());
     }
     //Main Render Pass
     {

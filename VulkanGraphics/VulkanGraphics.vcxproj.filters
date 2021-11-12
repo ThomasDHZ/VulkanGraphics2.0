@@ -438,6 +438,9 @@
     <ClCompile Include="MultiViewSkyboxPipeline.cpp">
       <Filter>Source Files\Rendering\Pipelines</Filter>
     </ClCompile>
+    <ClCompile Include="RenderedTextureImage.cpp">
+      <Filter>Source Files\texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -807,6 +810,9 @@
       <Filter>Header Files\Rendering\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="ImageProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderedTextureImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
