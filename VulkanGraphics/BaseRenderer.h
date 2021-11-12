@@ -1,5 +1,6 @@
 #pragma once
 #include "Vulkanengine.h"
+#include "ImageProcessor.h"
 #include "InterfaceRenderPass.h"
 #include "Mesh.h"
 #include "Texture2D.h"

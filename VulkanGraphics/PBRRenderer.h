@@ -16,6 +16,7 @@ class PBRRenderer : public BaseRenderer
 private:
 	static constexpr RendererID rendererID = RendererID::PBR_Raster_Renderer;
 	float CubeMapSamplerSize = 64.0f;
+	bool SaveScreenShotFlag = false;
 
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;

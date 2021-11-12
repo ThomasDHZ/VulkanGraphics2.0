@@ -65,7 +65,13 @@ void PBRRenderer::RebuildSwapChain()
 
 void PBRRenderer::GUIUpdate()
 {
-    
+    ImGui::Checkbox("Screenshot:", &SaveScreenShotFlag);
+
+    if (SaveScreenShotFlag)
+    {
+        ImageProccessor::RenderTexture(pbrRenderer.RenderedTexture);
+        SaveScreenShotFlag = false;
+    }
 
     //ImGui::SliderFloat3("reflect Pos " , &reflectionPBRPass.reflectPos.x, -5.0f, 5.0f);
     //ImGui::SliderFloat2("XNearFar ", &reflectionPBRPass.XNearFar.x, -5.0f, 5.0f);

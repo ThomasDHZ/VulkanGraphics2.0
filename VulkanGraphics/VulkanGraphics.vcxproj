@@ -367,6 +367,7 @@
     <ClInclude Include="GUIMesh.h" />
     <ClInclude Include="GUIObject.h" />
     <ClInclude Include="HeightMapTexture.h" />
+    <ClInclude Include="ImageProcessor.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_glfw.h" />

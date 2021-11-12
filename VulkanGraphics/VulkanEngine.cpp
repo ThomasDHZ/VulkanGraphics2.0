@@ -551,6 +551,14 @@ uint32_t VulkanEngine::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags
 	throw std::runtime_error("failed to find suitable memory type!");
 }
 
+uint32_t VulkanEngine::getMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound)
+{
+
+					*memTypeFound = true;
+					return 1;
+
+}
+
 uint64_t VulkanEngine::GetBufferDeviceAddress(VkBuffer buffer)
 {
 	VkBufferDeviceAddressInfoKHR BufferDevice{};

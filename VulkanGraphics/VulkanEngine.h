@@ -121,6 +121,7 @@ public:
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer, VkCommandPool& commandPool);
 
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+	uint32_t getMemoryType(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr);
 	uint64_t GetBufferDeviceAddress(VkBuffer buffer);
 	VkPipelineShaderStageCreateInfo CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages);
 
