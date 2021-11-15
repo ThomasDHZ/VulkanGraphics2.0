@@ -43,6 +43,7 @@
 #include "AssetManager.h"
 #include "GameObject.h"
 #include "Skybox.h"
+#include "SceneManager.h"
 
 class HelloTriangleApplication {
 public:
@@ -73,6 +74,7 @@ private:
         GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
+        SceneManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
         std::string SkyCubeMapFiles[6];
         SkyCubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -412,6 +414,8 @@ gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
         //    gameObject->MeshList[0]->MeshMaterial = mat;
         //    gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
         //}
+
+     //   SceneManagerPtr::GetSceneManagerPtr()->LoadScene();
     }
 
     void mainLoop() {

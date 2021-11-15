@@ -46,6 +46,41 @@ void LightManager::UpdateImGui()
 {
 }
 
+void LightManager::ClearLights()
+{
+	for (auto& directionalLight : DirectionalLightList)
+	{
+		directionalLight->Destroy();
+	}
+	for (auto& pointLight : PointLightList)
+	{
+		pointLight->Destroy();
+	}
+	for (auto& spotLight : SpotLightList)
+	{
+		spotLight->Destroy();
+	}
+	for (auto& SphereAreaLight : SphereAreaLightList)
+	{
+		SphereAreaLight->Destroy();
+	}
+	for (auto& TubeAreaLight : TubeAreaLightList)
+	{
+		TubeAreaLight->Destroy();
+	}
+	for (auto& RectangleAreaLight : RectangleAreaLightList)
+	{
+		RectangleAreaLight->Destroy();
+	}
+	
+	DirectionalLightList.clear();
+	PointLightList.clear();
+	SpotLightList.clear();
+	SphereAreaLightList.clear();
+	TubeAreaLightList.clear();
+	RectangleAreaLightList.clear();
+}
+
 void LightManager::AddDirectionalLight(std::shared_ptr<DirectionalLight> light)
 {
 	DirectionalLightList.emplace_back(light);

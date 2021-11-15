@@ -28,3 +28,9 @@ void CameraManager::Update()
     ActiveCamera = CameraList[cameraIndex];
     ActiveCamera->Update(engine);
 }
+
+void CameraManager::ClearCameras()
+{
+    ActiveCamera = nullptr;
+    CameraList.clear();
+}

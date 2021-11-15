@@ -73,6 +73,15 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderL
     }
 }
 
+void MeshManager::ClearMeshs()
+{
+    for (auto mesh : MeshList)
+    {
+        mesh->Destory();
+    }
+    MeshList.clear();
+}
+
 void MeshManager::Destroy()
 {
     for (auto mesh : MeshList)

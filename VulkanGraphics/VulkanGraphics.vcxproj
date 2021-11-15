@@ -303,6 +303,7 @@
     <ClCompile Include="Renderer2D.cpp" />
     <ClCompile Include="RendererManager.cpp" />
     <ClCompile Include="RenderPass2D.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Shader2DPipeline.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SkyBoxRenderPipeline.cpp" />
@@ -428,6 +429,7 @@
     <ClInclude Include="RendererManager.h" />
     <ClInclude Include="RenderPass2D.h" />
     <ClInclude Include="SceneData.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Shader2DPipeline.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SkyBoxRenderPipeline.h" />

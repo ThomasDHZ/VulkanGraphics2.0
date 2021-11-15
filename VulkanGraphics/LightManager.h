@@ -34,7 +34,7 @@ public:
 
 	void Update();
 	void UpdateImGui();
-
+	void ClearLights();
 
 	void AddDirectionalLight(std::shared_ptr<DirectionalLight> light);
 	void AddDirectionalLight(std::shared_ptr<CameraManager> cameraManager, DirectionalLightBuffer light);

@@ -26,6 +26,7 @@ public:
 	void Update(std::shared_ptr<Camera> camera);
 	void UpdateBufferIndex();
 	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
+	void ClearMeshs();
 	void Destroy();
 		
 	std::vector<VkDescriptorBufferInfo> GetVertexBufferDescriptorsList();

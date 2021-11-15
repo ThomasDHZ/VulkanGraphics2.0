@@ -86,8 +86,8 @@ public:
 	std::vector<std::shared_ptr<Texture3D>> GetAllTexture3DList() { return Texture3DList; }
 	std::vector<std::shared_ptr<CubeMapTexture>> GetAllCubeMapTextures() { return CubeMapList; }
 
-	void UnloadAllTextures();
 	void UpdateBufferIndex();
+	void ClearTextures();
 	void Destory();
 
 	std::vector<VkDescriptorImageInfo>  GetTexture2DBufferDescriptorList();

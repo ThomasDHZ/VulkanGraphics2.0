@@ -16,6 +16,7 @@ public:
 	~CameraManager();
 
 	void Update();
+	void ClearCameras();
 };
 
 class CameraManagerPtr

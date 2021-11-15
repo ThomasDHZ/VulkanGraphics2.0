@@ -56,6 +56,14 @@ void ObjectManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& la
 	}
 }
 
+void ObjectManager::ClearObjects()
+{
+	for (auto& obj : ObjectList)
+	{
+		obj->Destory();
+	}
+}
+
 void ObjectManager::Destory()
 {
 	for (auto& obj : ObjectList)

@@ -18,6 +18,7 @@ public:
 	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList);
 	void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& layout, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& layout);
+	void ClearObjects();
 	void Destory();
 	std::shared_ptr<Model> GetModel(uint32_t ModelID);
 };

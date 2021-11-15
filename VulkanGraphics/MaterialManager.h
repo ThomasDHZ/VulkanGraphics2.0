@@ -14,6 +14,7 @@ public:
 	uint32_t GetMaterialBufferIDByMaterialID(uint32_t MaterialID);
 	void UpdateBufferIndex();
 	void DeleteMaterial(uint32_t MaterialID);
+	void ClearMaterials();
 	void Destory();
 
 	std::shared_ptr<Material> LoadMaterial(std::string MaterialName, std::shared_ptr<Material> material);

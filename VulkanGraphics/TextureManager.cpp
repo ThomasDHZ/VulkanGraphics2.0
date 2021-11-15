@@ -295,8 +295,11 @@ void TextureManager::DeleteRenderedCubeMapDepthTextureByBufferIndex(uint32_t Tex
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
-void TextureManager::UnloadAllTextures()
+void TextureManager::Destory()
 {
+	vkDestroySampler(EnginePtr::GetEnginePtr()->Device, NullSampler, nullptr);
+	NullSampler = VK_NULL_HANDLE;
+
 	for (auto& texture : Texture2DList)
 	{
 		texture->Delete();
@@ -331,15 +334,6 @@ void TextureManager::UnloadAllTextures()
 	{
 		texture->Delete();
 	}
-}
-
-
-void TextureManager::Destory()
-{
-	vkDestroySampler(EnginePtr::GetEnginePtr()->Device, NullSampler, nullptr);
-	NullSampler = VK_NULL_HANDLE;
-
-	UnloadAllTextures();
 }
 
 std::shared_ptr<Texture2D> TextureManager::GetTextureByID(uint32_t TextureID)
@@ -476,6 +470,52 @@ void TextureManager::UpdateBufferIndex()
 	{
 		RenderedCubeMapDepthTextureList[x]->TextureBufferIndex = x;
 	}
+}
+
+void TextureManager::ClearTextures()
+{
+	for (auto& texture : Texture2DList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : Texture3DList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : CubeMapList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedColorTextureList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedDepthTextureList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedCubeMapTextureList)
+	{
+		texture->Delete();
+	}
+
+	for (auto& texture : RenderedCubeMapDepthTextureList)
+	{
+		texture->Delete();
+	}
+
+	Texture2DList.clear();
+	Texture3DList.clear();
+	CubeMapList.clear();
+	RenderedColorTextureList.clear();
+	RenderedDepthTextureList.clear();
+	RenderedCubeMapTextureList.clear();
+	RenderedCubeMapDepthTextureList.clear();
 }
 
 uint32_t TextureManager::IsTextureLoaded(std::string name)

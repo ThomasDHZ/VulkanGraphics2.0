@@ -441,6 +441,9 @@
     <ClCompile Include="RenderedTextureImage.cpp">
       <Filter>Source Files\texture</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Source Files\managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -814,6 +817,9 @@
     </ClInclude>
     <ClInclude Include="RenderedTextureImage.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Header Files\managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

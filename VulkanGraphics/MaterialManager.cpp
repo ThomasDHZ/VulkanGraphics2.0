@@ -141,6 +141,15 @@ void MaterialManager::DeleteMaterial(uint32_t MaterialID)
 	EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
 }
 
+void MaterialManager::ClearMaterials()
+{
+	for (auto& material : MaterialList)
+	{
+		material->Delete();
+	}
+	MaterialList.clear();
+}
+
 void MaterialManager::Destory()
 {
 	for (auto& material : MaterialList)
