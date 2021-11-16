@@ -25,8 +25,8 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     }
     //Main Render Pass
     {
-        irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        prefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+        irradianceRenderPass = IrradianceRenderPass(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
+        prefilterRenderPass = PrefilterRenderPass(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
 
         pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
         FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
@@ -55,8 +55,8 @@ void PBRRenderer::RebuildSwapChain()
     }
     //Main Render Pass
     {
-       irradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-       prefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+       irradianceRenderPass.RebuildSwapChain(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
+       prefilterRenderPass.RebuildSwapChain(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
 
         pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
         FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
@@ -65,20 +65,13 @@ void PBRRenderer::RebuildSwapChain()
 
 void PBRRenderer::GUIUpdate()
 {
-    ImGui::Checkbox("Screenshot:", &SaveScreenShotFlag);
+    
 
-    if (SaveScreenShotFlag)
-    {
-      //  ImageProccessor::RenderTexture(TextureManagerPtr::GetTextureManagerPtr()->GetAllTexture2D()[2]);
-        ImageProccessor::RenderCubeMapTexture(ReflectionPrefilterRenderPass.RenderedCubeMap);
-        SaveScreenShotFlag = false;
-    }
-
-    //ImGui::SliderFloat3("reflect Pos " , &reflectionPBRPass.reflectPos.x, -5.0f, 5.0f);
-    //ImGui::SliderFloat2("XNearFar ", &reflectionPBRPass.XNearFar.x, -5.0f, 5.0f);
-    //ImGui::SliderFloat2("YNearFar ", &reflectionPBRPass.YNearFar.x, -5.0f, 5.0f);
-    //ImGui::SliderFloat2("ZNearFar ", &reflectionPBRPass.ZNearFar.x, -5.0f, 5.0f);
-    //GUIChangedFlag |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
+    ImGui::SliderFloat3("reflect Pos " , &reflectionPBRPass.reflectPos.x, -5.0f, 5.0f);
+    ImGui::SliderFloat2("XNearFar ", &reflectionPBRPass.XNearFar.x, -5.0f, 5.0f);
+    ImGui::SliderFloat2("YNearFar ", &reflectionPBRPass.YNearFar.x, -5.0f, 5.0f);
+    ImGui::SliderFloat2("ZNearFar ", &reflectionPBRPass.ZNearFar.x, -5.0f, 5.0f);
+    GUIChangedFlag |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
 
     if (GUIChangedFlag)
     {

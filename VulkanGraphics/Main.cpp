@@ -43,7 +43,6 @@
 #include "AssetManager.h"
 #include "GameObject.h"
 #include "Skybox.h"
-#include "SceneManager.h"
 
 class HelloTriangleApplication {
 public:
@@ -74,7 +73,6 @@ private:
         GuiManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         ObjManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
         AssetManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
-        SceneManagerPtr::SetUpPtr(EnginePtr::GetEnginePtr());
 
         std::string SkyCubeMapFiles[6];
         SkyCubeMapFiles[0] = "../texture/skybox/right.jpg";
@@ -100,7 +98,7 @@ private:
         CubeMapFiles[4] = "../texture/skybox/hot_bk.png";
         CubeMapFiles[5] = "../texture/skybox/hot_ft.png";
 
-       // AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
+        AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(CubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
         AssetManagerPtr::GetAssetPtr()->textureManager->LoadCubeMap(SkyCubeMapFiles, VK_FORMAT_R8G8B8A8_UNORM);
         AssetManagerPtr::GetAssetPtr()->meshManager->AddMesh(std::make_shared<Skybox>(Skybox(EnginePtr::GetEnginePtr(), AssetManagerPtr::GetAssetPtr())));
 
@@ -284,28 +282,7 @@ private:
         //gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Sponza/Sponza.gltf")));
         //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
-{
-std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/RobotOrbThing.obj")));
-AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
-
-
-MaterialTexture material;
-material.DiffuseMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("../Models/mechSphere_Metal_01_BaseColor.bmp", VK_FORMAT_R8G8B8A8_SRGB);
-material.AlbedoMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("../Models/mechSphere_Metal_01_BaseColor.bmp", VK_FORMAT_R8G8B8A8_SRGB);
-material.MatallicMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("../Models/mechSphere_Metal_01_Metallic.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-material.RoughnessMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("../Models/mechSphere_Metal_01_Roughness.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-//material.AOMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("../Models/mechSphere_Metal_01_BaseColor.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-material.NormalMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("../Models/mechSphere_Metal_01_Normal.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-//material.DepthMap = TextureManagerPtr::GetTextureManagerPtr()->LoadTexture2D("../Models/mechSphere_Metal_01_Height.bmp", VK_FORMAT_R8G8B8A8_UNORM);
-
-auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("RustedIron", material);
-gameObject->MeshList[0]->MeshMaterial = mat;
-gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
-
-        }
-
-   /*     {
+        {
             std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
             gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/sphere.obj")));
             AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
@@ -394,7 +371,7 @@ gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("wall", material);
             gameObject->MeshList[0]->MeshMaterial = mat;
             gameObject->MeshList[0]->MeshPosition = glm::vec3(6.0f, 0.0f, 0.0f);
-        }*/
+        }
         //{
         //    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         //    gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/Crate.dae")));
@@ -414,8 +391,6 @@ gameObject->MeshList[0]->MeshPosition = glm::vec3(-6.0f, 0.0f, 0.0f);
         //    gameObject->MeshList[0]->MeshMaterial = mat;
         //    gameObject->MeshList[0]->MeshPosition = glm::vec3(0.0f, 0.0f, 0.0f);
         //}
-
-     //   SceneManagerPtr::GetSceneManagerPtr()->LoadScene();
     }
 
     void mainLoop() {
