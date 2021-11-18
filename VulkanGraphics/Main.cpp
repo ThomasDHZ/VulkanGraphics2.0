@@ -352,7 +352,7 @@ private:
 
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("sphere", material);
             gameObject->MeshList[0]->MeshMaterial = mat;
-            gameObject->MeshList[0]->MeshPosition = glm::vec3(3.0f, 0.0f, 0.0f);
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(6.0f, 0.0f, 0.0f);
         }
         {
             std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
@@ -370,7 +370,7 @@ private:
 
             auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("wall", material);
             gameObject->MeshList[0]->MeshMaterial = mat;
-            gameObject->MeshList[0]->MeshPosition = glm::vec3(6.0f, 0.0f, 0.0f);
+            gameObject->MeshList[0]->MeshPosition = glm::vec3(3.0f, 0.0f, 0.0f);
         }
         //{
         //    std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));

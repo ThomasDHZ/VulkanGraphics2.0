@@ -8,7 +8,14 @@ OrthographicCamera::OrthographicCamera() : Camera()
 	ViewMatrix = glm::mat4(1.0f);
 }
 
-OrthographicCamera::OrthographicCamera(float width, float height) : Camera()
+OrthographicCamera::OrthographicCamera(std::string Name) : Camera(Name)
+{
+	Position = glm::vec3(0.0f);
+	ProjectionMatrix = glm::mat4(1.0f);
+	ViewMatrix = glm::mat4(1.0f);
+}
+
+OrthographicCamera::OrthographicCamera(std::string Name, float width, float height) : Camera(Name)
 {
 	Width = width;
 	Height = height;
@@ -22,7 +29,7 @@ OrthographicCamera::OrthographicCamera(float width, float height) : Camera()
 	ViewMatrix = glm::mat4(1.0f);
 }
 
-OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize) : Camera()
+OrthographicCamera::OrthographicCamera(std::string Name, glm::vec2 viewScreenSize) : Camera(Name)
 {
 	Width = viewScreenSize.x;
 	Height = viewScreenSize.y;
@@ -36,7 +43,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize) : Camera()
 	ViewMatrix = glm::mat4(1.0f);
 }
 
-OrthographicCamera::OrthographicCamera(float width, float height, float zoom) : Camera()
+OrthographicCamera::OrthographicCamera(std::string Name, float width, float height, float zoom) : Camera(Name)
 {
 	Width = width;
 	Height = height;
@@ -50,7 +57,7 @@ OrthographicCamera::OrthographicCamera(float width, float height, float zoom) : 
 	ViewMatrix = glm::mat4(1.0f);
 }
 
-OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, float zoom) : Camera()
+OrthographicCamera::OrthographicCamera(std::string Name, glm::vec2 viewScreenSize, float zoom) : Camera(Name)
 {
 	Width = viewScreenSize.x;
 	Height = viewScreenSize.y;
@@ -64,7 +71,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, float zoom) : C
 	ViewMatrix = glm::mat4(1.0f);
 }
 
-OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, glm::vec2 position)
+OrthographicCamera::OrthographicCamera(std::string Name, glm::vec2 viewScreenSize, glm::vec2 position) : Camera(Name)
 {
 	Width = viewScreenSize.x;
 	Height = viewScreenSize.y;
@@ -78,7 +85,7 @@ OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, glm::vec2 posit
 	ViewMatrix = glm::mat4(1.0f);
 }
 
-OrthographicCamera::OrthographicCamera(glm::vec2 viewScreenSize, glm::vec2 position, float zoom)
+OrthographicCamera::OrthographicCamera(std::string Name, glm::vec2 viewScreenSize, glm::vec2 position, float zoom) : Camera(Name)
 {
 	Width = viewScreenSize.x;
 	Height = viewScreenSize.y;

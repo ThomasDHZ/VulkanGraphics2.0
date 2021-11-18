@@ -36,8 +36,10 @@ protected:
 
 public:
     Camera();
+    Camera(std::string Name);
     ~Camera();
 
+    std::string CameraName;
     CameraType cameraType;
     glm::vec3 Position;
 

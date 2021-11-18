@@ -1,6 +1,6 @@
 #include "PerspectiveCamera.h"
 
-PerspectiveCamera::PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position) : Camera()
+PerspectiveCamera::PerspectiveCamera(std::string Name, glm::vec2 ScreenSize, glm::vec3 position) : Camera(Name)
 {
     Position = position;
     Up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -18,7 +18,7 @@ PerspectiveCamera::PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position) :
     Pitch = 0.0f;
 }
 
-PerspectiveCamera::PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw)
+PerspectiveCamera::PerspectiveCamera(std::string Name, glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw) : Camera(Name)
 {
     Position = position;
     Up = glm::vec3(0.0f, 1.0f, 0.0f);

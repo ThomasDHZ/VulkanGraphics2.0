@@ -4,7 +4,7 @@ OrthographicLightViewCamera::OrthographicLightViewCamera() : OrthographicCamera(
 {
 }
 
-OrthographicLightViewCamera::OrthographicLightViewCamera(glm::vec3 LightPos) : OrthographicCamera()
+OrthographicLightViewCamera::OrthographicLightViewCamera(std::string Name, glm::vec3 LightPos) : OrthographicCamera()
 {
 	cameraType = CameraType::Orthographic_Camera;
 

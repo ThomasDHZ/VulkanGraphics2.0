@@ -6,17 +6,20 @@
 #include "PBRPipeline.h"
 #include "PBRReflectionPipeline.h"
 #include "MultiViewSkyboxPipeline.h"
+#include "ReflectionViewCamera.h"
 
 class PBRReflectionRenderPass : public BaseRenderPass
 {
 private:
 	std::shared_ptr<CubeSampler> cubeSampler;
+	std::shared_ptr<ReflectionViewCamera> reflectionViewCamera;
+
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();
 
 public:
-	glm::vec3 reflectPos = glm::vec3(-0.365314275f, 0.866172075f, 0.537497699f);
+	glm::vec3 reflectPos = glm::vec3(0.0f, 0.472f, 0.7f);
 	glm::vec2 XNearFar = glm::vec2(-3.0f, 3.0f);
 	glm::vec2 YNearFar = glm::vec2(-3.0f, 3.0f);
 	glm::vec2 ZNearFar = glm::vec2(-3.0f, 3.0f);

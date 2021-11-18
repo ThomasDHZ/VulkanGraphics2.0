@@ -294,6 +294,7 @@
     <ClCompile Include="RectangleAreaLight.cpp" />
     <ClCompile Include="ReflectionCubeMapPipeline.cpp" />
     <ClCompile Include="ReflectionCubeMapRenderPass.cpp" />
+    <ClCompile Include="ReflectionViewCamera.cpp" />
     <ClCompile Include="RenderedColorTexture.cpp" />
     <ClCompile Include="RenderedCubeMapDepthTexture.cpp" />
     <ClCompile Include="RenderedCubeMapTexture.cpp" />
@@ -419,6 +420,7 @@
     <ClInclude Include="RectangleAreaLight.h" />
     <ClInclude Include="ReflectionCubeMapPipeline.h" />
     <ClInclude Include="ReflectionCubeMapRenderPass.h" />
+    <ClInclude Include="ReflectionViewCamera.h" />
     <ClInclude Include="RenderedColorTexture.h" />
     <ClInclude Include="RenderedCubeMapDepthTexture.h" />
     <ClInclude Include="RenderedCubeMapTexture.h" />

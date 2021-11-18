@@ -21,14 +21,14 @@ public:
     float Yaw;
     float Pitch;
 
-    PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position);
-    PerspectiveCamera(glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw);
+    PerspectiveCamera(std::string Name, glm::vec2 ScreenSize, glm::vec3 position);
+    PerspectiveCamera(std::string Name, glm::vec2 ScreenSize, glm::vec3 position, float pitch, float yaw);
     ~PerspectiveCamera();
 
-    void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
-    void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
-    void MouseScroll(float yoffset);
-    void Update(std::shared_ptr<VulkanEngine> engine);
+    virtual void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;
+    virtual void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
+    virtual void MouseScroll(float yoffset);
+    virtual void Update(std::shared_ptr<VulkanEngine> engine);
 
     glm::vec3 GetFront() { return Front; }
 };

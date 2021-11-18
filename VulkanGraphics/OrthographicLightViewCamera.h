@@ -9,7 +9,7 @@ private:
 public:
 
 	OrthographicLightViewCamera();
-	OrthographicLightViewCamera(glm::vec3 LightPos);
+	OrthographicLightViewCamera(std::string Name, glm::vec3 LightPos);
 
 	void Update(glm::vec3 LightPos);
 	void ProcessKeyboard(Camera_Movement direction, float deltaTime) override;

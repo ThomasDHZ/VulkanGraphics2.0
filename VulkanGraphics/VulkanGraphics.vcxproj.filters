@@ -444,6 +444,9 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files\managers</Filter>
     </ClCompile>
+    <ClCompile Include="ReflectionViewCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -820,6 +823,9 @@
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Header Files\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="ReflectionViewCamera.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

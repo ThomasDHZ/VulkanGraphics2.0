@@ -4,6 +4,11 @@ Camera::Camera()
 {
 }
 
+Camera::Camera(std::string Name)
+{
+    CameraName = Name;
+}
+
 Camera::~Camera()
 {
 }

@@ -8,6 +8,9 @@ PBRReflectionRenderPass::PBRReflectionRenderPass() : BaseRenderPass()
 
 PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList) : BaseRenderPass()
 {
+    reflectionViewCamera = std::make_shared<ReflectionViewCamera>(ReflectionViewCamera("ReflectionCamera", glm::vec2(1024.0f), reflectPos));
+    CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(reflectionViewCamera);
+
     cubeSampler = std::make_shared<CubeSampler>(CubeSampler(EnginePtr::GetEnginePtr()));
     RenderPassResolution = renderPassResolution;
 
@@ -179,6 +182,7 @@ void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, 
 
 void PBRReflectionRenderPass::Draw()
 {
+    reflectionViewCamera->Position = reflectPos;
     const glm::vec3 LightPos = reflectPos;
     float near_plane = 1.0f;
     float far_plane = 25.0f;
