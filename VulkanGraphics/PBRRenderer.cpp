@@ -21,7 +21,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
         ReflectionIrradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
         ReflectionPrefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
 
-        reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(512), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
+        reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     }
     //Main Render Pass
     {
@@ -51,7 +51,7 @@ void PBRRenderer::RebuildSwapChain()
         ReflectionIrradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
         ReflectionPrefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
 
-        reflectionPBRPass.RebuildSwapChain(glm::ivec2(512), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
+        reflectionPBRPass.RebuildSwapChain(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList);
     }
     //Main Render Pass
     {

@@ -6,9 +6,9 @@ PBRReflectionRenderPass::PBRReflectionRenderPass() : BaseRenderPass()
 {
 }
 
-PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList) : BaseRenderPass()
+PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList) : BaseRenderPass()
 {
-    reflectionViewCamera = std::make_shared<ReflectionViewCamera>(ReflectionViewCamera("ReflectionCamera", glm::vec2(1024.0f), reflectPos));
+    reflectionViewCamera = std::make_shared<ReflectionViewCamera>(ReflectionViewCamera("ReflectionCamera", glm::vec2(renderPassResolution), reflectViewPos));
     CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(reflectionViewCamera);
 
     cubeSampler = std::make_shared<CubeSampler>(CubeSampler(EnginePtr::GetEnginePtr()));
@@ -154,8 +154,9 @@ void PBRReflectionRenderPass::SetUpCommandBuffers()
     }
 }
 
-void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList)
+void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList)
 {
+    reflectPos = reflectViewPos;
     RenderPassResolution = renderPassResolution;
 
     RenderedTexture->RecreateRendererTexture(RenderPassResolution);
@@ -184,16 +185,14 @@ void PBRReflectionRenderPass::Draw()
 {
     reflectionViewCamera->Position = reflectPos;
     const glm::vec3 LightPos = reflectPos;
-    float near_plane = 1.0f;
-    float far_plane = 25.0f;
-    glm::mat4 shadowProj = glm::ortho(XNearFar.x, XNearFar.y, YNearFar.x, YNearFar.y, ZNearFar.x, ZNearFar.y);
-    std::vector<glm::mat4> shadowTransforms;
-    cubeSampler->UniformDataInfo.LightSpaceMatrix[0] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    cubeSampler->UniformDataInfo.LightSpaceMatrix[1] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    cubeSampler->UniformDataInfo.LightSpaceMatrix[2] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    cubeSampler->UniformDataInfo.LightSpaceMatrix[3] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-    cubeSampler->UniformDataInfo.LightSpaceMatrix[4] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    cubeSampler->UniformDataInfo.LightSpaceMatrix[5] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+
+    glm::mat4 reflectionProj = glm::ortho(XNearFar.x, XNearFar.y, YNearFar.x, YNearFar.y, ZNearFar.x, ZNearFar.y);
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[0] = reflectionProj * glm::lookAt(LightPos, LightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[1] = reflectionProj * glm::lookAt(LightPos, LightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[2] = reflectionProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[3] = reflectionProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[4] = reflectionProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[5] = reflectionProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     cubeSampler->Update();
 
     VkCommandBufferBeginInfo beginInfo{};
