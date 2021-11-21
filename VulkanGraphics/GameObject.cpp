@@ -23,27 +23,21 @@ void GameObject::AddChildMesh(std::shared_ptr<Mesh> mesh)
 	MeshManagerPtr::GetMeshManagerPtr()->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildMesh(std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags)
+void GameObject::AddChildMesh(std::vector<Vertex>& VertexList)
 {
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, MeshDrawFlags)));
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList)));
 	MeshManagerPtr::GetMeshManagerPtr()->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags)
+void GameObject::AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, MeshDrawFlags)));
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList)));
 	MeshManagerPtr::GetMeshManagerPtr()->AddMesh(MeshList.back());
 }
 
-void GameObject::AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags)
+void GameObject::AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 {
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, material, MeshDrawFlags)));
-	MeshManagerPtr::GetMeshManagerPtr()->AddMesh(MeshList.back());
-}
-
-void GameObject::AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType, MeshDrawFlags MeshDrawFlags)
-{
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, material, MeshType, MeshDrawFlags)));
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, material)));
 	MeshManagerPtr::GetMeshManagerPtr()->AddMesh(MeshList.back());
 }
 
@@ -57,9 +51,9 @@ void GameObject::AddChildModel(std::shared_ptr<Model> model)
 	}
 }
 
-void GameObject::AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags)
+void GameObject::AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
-	ModelList.emplace_back(std::make_shared<Model>(Model(VertexList, IndexList, DrawFlags)));
+	ModelList.emplace_back(std::make_shared<Model>(Model(VertexList, IndexList)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
@@ -67,9 +61,9 @@ void GameObject::AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint
 	}
 }
 
-void GameObject::AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags)
+void GameObject::AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
 {
-	ModelList.emplace_back(std::make_shared<Model>(Model(VertexList, IndexList, material, DrawFlags)));
+	ModelList.emplace_back(std::make_shared<Model>(Model(VertexList, IndexList, material)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);
@@ -77,9 +71,9 @@ void GameObject::AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint
 	}
 }
 
-void GameObject::AddChildModel(const std::string& FilePath, MeshDrawFlags DrawFlags)
+void GameObject::AddChildModel(const std::string& FilePath)
 {
-	ModelList.emplace_back(std::make_shared<Model>(Model(FilePath, DrawFlags)));
+	ModelList.emplace_back(std::make_shared<Model>(Model(FilePath)));
 	for (auto& mesh : ModelList.back()->MeshList)
 	{
 		MeshList.emplace_back(mesh);

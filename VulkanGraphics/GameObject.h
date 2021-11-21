@@ -17,14 +17,13 @@ public:
 	~GameObject();
 
 	void AddChildMesh(std::shared_ptr<Mesh> mesh);
-	void AddChildMesh(std::vector<Vertex>& VertexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	void AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	void AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
-	void AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshTypeFlag MeshType = Mesh_Type_Normal, MeshDrawFlags MeshDrawFlags = Mesh_Draw_All);
+	void AddChildMesh(std::vector<Vertex>& VertexList);
+	void AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	void AddChildMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
 	void AddChildModel(std::shared_ptr<Model> model);
-	void AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	void AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	void AddChildModel(const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	void AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	void AddChildModel(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
+	void AddChildModel(const std::string& FilePath);
 
 	virtual void Update() override;
 	virtual void Update(const glm::mat4& ModelMatrix, const std::vector<std::shared_ptr<Bone>>& BoneList);

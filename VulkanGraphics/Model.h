@@ -34,7 +34,7 @@ class Model
 private:
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
-	void LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene, MeshDrawFlags DrawFlags);
+	void LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<MeshBoneWeights> LoadBoneWeights(aiMesh* mesh, std::vector<Vertex>& VertexList);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
@@ -67,9 +67,9 @@ public:
 	glm::mat4 ModelTransform;
 
 	Model();
-	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, MeshDrawFlags DrawFlags = Mesh_Draw_All);
-	Model(const std::string& FilePath, MeshDrawFlags DrawFlags = Mesh_Draw_All);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
+	Model(const std::string& FilePath);
 	~Model();
 
 	void Update(bool RayTraceFlag);
