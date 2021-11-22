@@ -110,6 +110,10 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
     for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
     {
+        GUIChanged |= ImGui::CheckboxFlags(("MainPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Main_Pass);
+        GUIChanged |= ImGui::CheckboxFlags(("ShadowPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Shadow_Pass);
+        GUIChanged |= ImGui::CheckboxFlags(("ReflectionPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Reflection_Pass);
+
         //GUIChanged |= ImGui::SliderFloat3(("Albedo " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat(("Matallic " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Matallic, 0.0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat(("Roughness" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Roughness, 0.0f, 1.0f);
