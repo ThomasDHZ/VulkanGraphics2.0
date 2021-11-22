@@ -7,6 +7,7 @@
 class DepthCubeMapRenderPass : public BaseRenderPass
 {
 private:
+	static constexpr RendererDrawFlag RendererType = RendererDrawFlag::Renderer_Draw_Shadow_Pass;
 	std::shared_ptr<CubeSampler> cubeSampler;
 
 	void CreateRenderPass();

@@ -11,7 +11,7 @@ Mesh::Mesh(std::vector<Vertex>& VertexList)
 
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
-	DrawFlags = Mesh_Draw_All;
+	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -31,7 +31,7 @@ Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 {
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
-	DrawFlags = Mesh_Draw_All;
+	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -51,7 +51,7 @@ Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, st
 {
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshMaterial = material;
-	DrawFlags = Mesh_Draw_All;
+	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
 
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 
@@ -72,7 +72,7 @@ Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, st
 {
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshMaterial = material;
-	DrawFlags = Mesh_Draw_All;
+	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
 
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 

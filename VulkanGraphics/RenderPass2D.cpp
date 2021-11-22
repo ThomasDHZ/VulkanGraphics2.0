@@ -216,13 +216,13 @@ void RenderPass2D::Draw()
     {
         vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, wireFramePipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, wireFramePipeline->ShaderPipelineLayout, 0, 1, &wireFramePipeline->DescriptorSet, 0, nullptr);
-        AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], wireFramePipeline->ShaderPipelineLayout, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+        AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], wireFramePipeline->ShaderPipelineLayout, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
     }
     else
     {
         vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipeline);
         vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, TexturePipeline->ShaderPipelineLayout, 0, 1, &TexturePipeline->DescriptorSet, 0, nullptr);
-        AssetManagerPtr::GetAssetPtr()->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], TexturePipeline->ShaderPipelineLayout, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
+        AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], TexturePipeline->ShaderPipelineLayout, AssetManagerPtr::GetAssetPtr()->cameraManager->ActiveCamera);
     }
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 

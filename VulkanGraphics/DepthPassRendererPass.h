@@ -6,6 +6,8 @@
 class DepthPassRendererPass : public BaseRenderPass
 {
 private:
+	static constexpr RendererDrawFlag RendererType = RendererDrawFlag::Renderer_Draw_Shadow_Pass;
+
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();

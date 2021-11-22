@@ -9,6 +9,8 @@
 class BlinnPhongRasterPass : public BaseRenderPass
 {
 private:
+	static constexpr RendererDrawFlag RendererType = RendererDrawFlag::Renderer_Draw_Main_Pass;
+	
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
 	void SetUpCommandBuffers();

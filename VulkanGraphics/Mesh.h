@@ -13,23 +13,23 @@
 #include "InputManager.h"
 #include "Timer.h"
 
-enum MeshDrawFlags
+enum RendererDrawFlag
 {
-	Mesh_Draw_All = 0x00,
-	Mesh_Skip_Forward_Renderer = 0x01,
-	Mesh_Skip_RayTrace_Renderer = 0x02,
-	Mesh_Skip_Water_Renderer = 0x04,
-	Mesh_SkyBox = 0x08,
+	Renderer_Draw_None = 0,
+	Renderer_Draw_Main_Pass = 1 << 0,
+	Renderer_Draw_Shadow_Pass = 1 << 1,
+	Renderer_Draw_Reflection_Pass = 1 << 2,
+	Renderer_Draw_SkyBox = 1 << 3,
 };
 enum MeshTypeFlag
 {
-	Mesh_Type_Normal = 0x00,
-	Mesh_Type_2D_Level_Tile = 0x01,
-	Mesh_Type_2D_Level_Animated_Tile = 0x02,
-	Mesh_Type_2D_Sprite = 0x04,
-	Mesh_Type_Water = 0x08,
-	Mesh_Type_SkyBox = 0x16,
-	Mesh_Type_Billboard = 0x32
+	Mesh_Type_Normal = 0,
+	Mesh_Type_2D_Level_Tile = 1 << 0,
+	Mesh_Type_2D_Level_Animated_Tile = 1 << 1,
+	Mesh_Type_2D_Sprite = 1 << 2,
+	Mesh_Type_Water = 1 << 3,
+	Mesh_Type_SkyBox = 1 << 4,
+	Mesh_Type_Billboard = 1 << 5
 };
 
 struct MeshBoneWeights
@@ -55,7 +55,7 @@ protected:
 		};
 	}
 public:
-	MeshDrawFlags DrawFlags = Mesh_Draw_All;
+	int DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
 	MeshTypeFlag MeshType = Mesh_Type_Normal;
 
 	uint32_t ParentModelID = 0;

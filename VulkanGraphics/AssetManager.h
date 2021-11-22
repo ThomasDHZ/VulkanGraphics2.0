@@ -33,8 +33,7 @@ public:
 	void LoadFont(std::shared_ptr<VulkanEngine> engine, const std::string FontLocation);
 
 	void Update();
-	void Draw(VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
-	void DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> LightCameraView);
+	void Draw(RendererDrawFlag renderPass, VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Delete();
 

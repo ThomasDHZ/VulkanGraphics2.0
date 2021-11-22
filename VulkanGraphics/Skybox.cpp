@@ -55,7 +55,7 @@ Skybox::Skybox(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManage
 
 	MeshID = engine->GenerateID();
 	MeshMaterial = MaterialManagerPtr::GetMaterialManagerPtr()->GetDefaultMaterial();
-	DrawFlags = MeshDrawFlags::Mesh_SkyBox;
+	DrawFlags = RendererDrawFlag::Renderer_Draw_SkyBox;
 	MeshType = MeshTypeFlag::Mesh_Type_SkyBox;
 
 	MeshProperties = MeshPropertiesUniformBuffer(engine);

@@ -63,14 +63,9 @@ void AssetManager::Update()
     SceneData->Update();
 }
 
-void AssetManager::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView)
+void AssetManager::Draw(RendererDrawFlag renderPass, VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView)
 {
-   meshManager->Draw(commandBuffer, ShaderLayout, CameraView);
-}
-
-void AssetManager::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> LightCameraView)
-{
-    meshManager->DepthDraw(commandBuffer, ShaderLayout, LightCameraView);
+   meshManager->Draw(renderPass, commandBuffer, ShaderLayout, CameraView);
 }
 
 void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)

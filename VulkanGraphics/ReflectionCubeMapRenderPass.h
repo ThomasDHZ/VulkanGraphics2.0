@@ -13,6 +13,7 @@
 class ReflectionCubeMapRenderPass : public BaseRenderPass
 {
 private:
+	static constexpr RendererDrawFlag RendererType = RendererDrawFlag::Renderer_Draw_Reflection_Pass;
 	std::shared_ptr<CubeSampler> cubeSampler;
 
 	void CreateRenderPass();

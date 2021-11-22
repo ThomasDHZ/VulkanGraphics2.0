@@ -62,24 +62,23 @@ void MeshManager::UpdateBufferIndex()
 	}
 }
 
-void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView)
+void MeshManager::Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView)
 {
     for (auto& mesh : MeshList)
     {
-        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
+        if (renderPass & RendererDrawFlag::Renderer_Draw_Shadow_Pass)
         {
-            mesh->Draw(commandBuffer, ShaderLayout, CameraView);
+            if (mesh->DrawFlags & renderPass)
+            {
+                mesh->DepthDraw(commandBuffer, ShaderLayout, CameraView);
+            }
         }
-    }
-}
-
-void MeshManager::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> LightCameraView)
-{
-    for (auto& mesh : MeshList)
-    {
-        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
+        else
         {
-            mesh->DepthDraw(commandBuffer, ShaderLayout, LightCameraView);
+            if (mesh->DrawFlags & renderPass)
+            {
+                mesh->Draw(commandBuffer, ShaderLayout, CameraView);
+            }
         }
     }
 }
