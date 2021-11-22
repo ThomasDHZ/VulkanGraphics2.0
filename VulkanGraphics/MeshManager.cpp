@@ -73,6 +73,17 @@ void MeshManager::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderL
     }
 }
 
+void MeshManager::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> LightCameraView)
+{
+    for (auto& mesh : MeshList)
+    {
+        if (mesh->DrawFlags == MeshDrawFlags::Mesh_Draw_All)
+        {
+            mesh->DepthDraw(commandBuffer, ShaderLayout, LightCameraView);
+        }
+    }
+}
+
 void MeshManager::ClearMeshs()
 {
     for (auto mesh : MeshList)

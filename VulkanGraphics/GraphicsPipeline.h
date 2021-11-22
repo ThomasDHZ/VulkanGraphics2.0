@@ -1,6 +1,11 @@
 #pragma once
 #include "Vulkanengine.h"
 
+struct ConstMeshBase
+{
+	alignas(4) uint32_t MeshIndex;
+};
+
 struct RayTraceConstants
 {
 	alignas(16) glm::mat4 proj = glm::mat4(1.0f);
@@ -48,9 +53,8 @@ struct ConstBloomProperites
 	alignas(4) uint32_t BloomPass = 0;
 };
 
-struct LightSceneInfo
+struct LightSceneInfo : public ConstMeshBase
 {
-	alignas(4) uint32_t MeshIndex;
 	alignas(16) glm::mat4 lightSpaceMatrix = glm::mat4(1.0f);
 };
 

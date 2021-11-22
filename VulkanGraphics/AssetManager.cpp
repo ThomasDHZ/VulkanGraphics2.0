@@ -68,6 +68,11 @@ void AssetManager::Draw(VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderL
    meshManager->Draw(commandBuffer, ShaderLayout, CameraView);
 }
 
+void AssetManager::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> LightCameraView)
+{
+    meshManager->DepthDraw(commandBuffer, ShaderLayout, LightCameraView);
+}
+
 void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 {
    ObjManager->GUIDraw(commandBuffer, layout);

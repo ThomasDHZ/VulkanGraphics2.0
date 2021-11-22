@@ -327,6 +327,34 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, 
 	}
 }
 
+void Mesh::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> lightViewCamera)
+{
+	if (ShowMesh)
+	{
+		glm::mat4 view = lightViewCamera->GetViewMatrix();
+		glm::mat4 proj = lightViewCamera->GetProjectionMatrix();
+		proj[1][1] *= -1;
+
+		LightSceneInfo lightSceneInfo;
+		lightSceneInfo.MeshIndex = MeshBufferIndex;
+		lightSceneInfo.lightSpaceMatrix = proj * view;
+
+		VkDeviceSize offsets[] = { 0 };
+
+		vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(LightSceneInfo), &lightSceneInfo);
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
+		if(IndexCount == 0)
+		{
+			vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
+		}
+		else
+		{
+			vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
+		}
+	}
+}
+
 void Mesh::Destory()
 {
 	VertexBuffer.DestoryBuffer();
