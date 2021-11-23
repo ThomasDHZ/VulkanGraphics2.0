@@ -444,8 +444,11 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files\managers</Filter>
     </ClCompile>
+    <ClCompile Include="DirectionalShadowCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
     <ClCompile Include="ReflectionViewCamera.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -824,8 +827,11 @@
     <ClInclude Include="SceneManager.h">
       <Filter>Header Files\managers</Filter>
     </ClInclude>
+    <ClInclude Include="DirectionalShadowCamera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
     <ClInclude Include="ReflectionViewCamera.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

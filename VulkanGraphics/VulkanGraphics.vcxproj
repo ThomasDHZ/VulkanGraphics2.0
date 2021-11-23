@@ -234,6 +234,7 @@
     <ClCompile Include="DepthPassPipeline.cpp" />
     <ClCompile Include="DepthPassRendererPass.cpp" />
     <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="DirectionalShadowCamera.cpp" />
     <ClCompile Include="EquirectangularToCubemapPipeline.cpp" />
     <ClCompile Include="EquirectangularToCubemapRenderPass.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -357,6 +358,7 @@
     <ClInclude Include="DepthPassPipeline.h" />
     <ClInclude Include="DepthPassRendererPass.h" />
     <ClInclude Include="DirectionalLight.h" />
+    <ClInclude Include="DirectionalShadowCamera.h" />
     <ClInclude Include="EquirectangularToCubemapPipeline.h" />
     <ClInclude Include="EquirectangularToCubemapRenderPass.h" />
     <ClInclude Include="Font.h" />

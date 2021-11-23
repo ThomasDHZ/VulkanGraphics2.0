@@ -2,6 +2,7 @@
 #include "Light.h"
 #include "CameraManager.h"
 #include "OrthographicLightViewCamera.h"
+#include "DirectionalShadowCamera.h"
 
 
 class DirectionalLight : public Light<DirectionalLightBuffer>
@@ -13,7 +14,7 @@ public:
 	DirectionalLight(DirectionalLightBuffer light);
 	~DirectionalLight();
 
-	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
+	std::shared_ptr<DirectionalShadowCamera> lightViewCamera;
 	void Update() override;
 	void Destroy() override;
 };

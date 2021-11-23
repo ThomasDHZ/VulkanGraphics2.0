@@ -8,7 +8,7 @@ DirectionalLight::DirectionalLight() : Light<DirectionalLightBuffer>()
 DirectionalLight::DirectionalLight(DirectionalLightBuffer light) : Light<DirectionalLightBuffer>(EnginePtr::GetEnginePtr())
 {
 	LightBuffer.UniformDataInfo = light;
-	lightViewCamera = std::make_shared<OrthographicLightViewCamera>(OrthographicLightViewCamera("ShadowCamera", LightBuffer.UniformDataInfo.position, -LightBuffer.UniformDataInfo.direction));
+	lightViewCamera = std::make_shared<DirectionalShadowCamera>(DirectionalShadowCamera("ShadowCamera", LightBuffer.UniformDataInfo.position, -LightBuffer.UniformDataInfo.direction));
 	CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(lightViewCamera);
 	Update();
 }

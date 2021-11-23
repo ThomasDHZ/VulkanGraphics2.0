@@ -4,7 +4,7 @@
 
 class PerspectiveCamera : public Camera
 {
-private:
+protected:
     float YAW = -90.0f;
     float PITCH = 0.0f;
 
