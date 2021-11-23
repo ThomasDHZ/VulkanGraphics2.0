@@ -14,7 +14,7 @@ public:
 	DirectionalLight(DirectionalLightBuffer light);
 	~DirectionalLight();
 
-	std::shared_ptr<DirectionalShadowCamera> lightViewCamera;
+	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
 	void Update() override;
 	void Destroy() override;
 };
