@@ -46,12 +46,6 @@ void AssetManager::Update()
 
     lightMatrix[0] = proj * view;
 
-    view = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[1]->lightViewCamera->GetViewMatrix();
-    proj = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[1]->lightViewCamera->GetProjectionMatrix();
-    proj[1][1] *= -1;
-
-    lightMatrix[1] = proj * view;
-
     SceneData->UniformDataInfo.lightSpaceMatrix = lightMatrix[0];
     SceneData->UniformDataInfo.DirectionalLightCount = lightManager->GetDirectionalLightCount();
     SceneData->UniformDataInfo.PointLightCount = lightManager->GetPointLightCount();

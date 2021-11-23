@@ -3,6 +3,7 @@
 #include "Material.h"
 
 struct DirectionalLightBuffer {
+	alignas(16) glm::vec3 position;
 	alignas(16) glm::vec3 direction;
 	alignas(16) glm::vec3 ambient;
 	alignas(16) glm::vec3 diffuse;
