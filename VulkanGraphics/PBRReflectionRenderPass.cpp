@@ -6,7 +6,7 @@ PBRReflectionRenderPass::PBRReflectionRenderPass() : BaseRenderPass()
 {
 }
 
-PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList) : BaseRenderPass()
+PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap) : BaseRenderPass()
 {
     reflectionViewCamera = std::make_shared<ReflectionViewCamera>(ReflectionViewCamera("ReflectionCamera", glm::vec2(renderPassResolution), reflectViewPos));
     CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(reflectionViewCamera);
@@ -19,7 +19,7 @@ PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline = std::make_shared<PBRReflectionPipeline>(PBRReflectionPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap, ShadowMapTextureList, cubeSampler));
+    pbrPipeline = std::make_shared<PBRReflectionPipeline>(PBRReflectionPipeline(RenderPass, IrradianceMap, IrradianceMap, BRDFMap, ShadowMapTextureList, RenderedCubeMap, cubeSampler));
     skyboxPipeline = std::make_shared<MultiViewSkyboxPipeline>(MultiViewSkyboxPipeline(RenderPass, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], renderPassResolution.x));
     SetUpCommandBuffers();
 }
@@ -154,7 +154,7 @@ void PBRReflectionRenderPass::SetUpCommandBuffers()
     }
 }
 
-void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList)
+void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap)
 {
     reflectPos = reflectViewPos;
     RenderPassResolution = renderPassResolution;
@@ -176,7 +176,7 @@ void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, 
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList, cubeSampler);
+    pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList, RenderedCubeMap, cubeSampler);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], renderPassResolution.x);
     SetUpCommandBuffers();
 }

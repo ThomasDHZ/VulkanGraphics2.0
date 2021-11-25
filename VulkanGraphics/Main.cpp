@@ -156,11 +156,11 @@ private:
         slight.specular = glm::vec4(1.0f);
 
         LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight);
-        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight2);
-        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight3);
-        LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight4);
-        LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
-        LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
+        //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight2);
+        //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight3);
+        //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight4);
+        //LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
+        //LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
        // std::vector<Vertex> vertices =
        // {

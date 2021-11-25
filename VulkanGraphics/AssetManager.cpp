@@ -39,14 +39,6 @@ void AssetManager::Update()
     guiManager->Update();
     ObjManager->Update();
 
-    glm::mat4 lightMatrix[2];
-    glm::mat4 view = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetViewMatrix();
-    glm::mat4 proj = LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera->GetProjectionMatrix();
-    proj[1][1] *= -1;
-
-    lightMatrix[0] = proj * view;
-
-    SceneData->UniformDataInfo.lightSpaceMatrix = lightMatrix[0];
     SceneData->UniformDataInfo.DirectionalLightCount = lightManager->GetDirectionalLightCount();
     SceneData->UniformDataInfo.PointLightCount = lightManager->GetPointLightCount();
     SceneData->UniformDataInfo.SpotLightCount = lightManager->GetSpotLightCount();

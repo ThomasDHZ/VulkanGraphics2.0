@@ -31,6 +31,7 @@ layout(binding = 13) uniform samplerCube IrradianceMap;
 layout(binding = 14) uniform samplerCube PrefilterMap;
 layout(binding = 15) uniform sampler2D BRDFMap;
 layout(binding = 16) uniform sampler2D ShadowMap[];
+layout(binding = 18) uniform samplerCube CubeShadowMap[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
