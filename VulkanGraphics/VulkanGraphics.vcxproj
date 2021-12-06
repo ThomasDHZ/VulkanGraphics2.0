@@ -274,6 +274,7 @@
     <ClCompile Include="MultiViewSkyboxPipeline.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="ObjectViewCamera.cpp" />
     <ClCompile Include="OrthographicCamera.cpp" />
     <ClCompile Include="OrthographicLightViewCamera.cpp" />
     <ClCompile Include="PBRPipeline.cpp" />
@@ -400,6 +401,7 @@
     <ClInclude Include="MultiViewSkyboxPipeline.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="ObjectViewCamera.h" />
     <ClInclude Include="OrthographicCamera.h" />
     <ClInclude Include="OrthographicLightViewCamera.h" />
     <ClInclude Include="PBRPipeline.h" />

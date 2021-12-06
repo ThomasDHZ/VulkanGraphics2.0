@@ -1,6 +1,8 @@
 #pragma once
 #include "Vulkanengine.h"
+#include "CameraManager.h"
 #include "SceneData.h"
+#include "ObjectViewCamera.h"
 
 template <class T>
 class Light

@@ -450,6 +450,9 @@
     <ClCompile Include="ReflectionViewCamera.cpp">
       <Filter>Source Files\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectViewCamera.cpp">
+      <Filter>Source Files\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -831,6 +834,9 @@
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
     <ClInclude Include="ReflectionViewCamera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectViewCamera.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
   </ItemGroup>

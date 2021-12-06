@@ -9,6 +9,7 @@ enum CameraType
 {
     Perspective_Camera,
     Orthographic_Camera,
+    ObjectView_Camera,
     LightView_Camera
 };
 enum Camera_Movement {
