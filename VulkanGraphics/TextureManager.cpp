@@ -406,7 +406,7 @@ std::shared_ptr<RenderedDepthTexture> TextureManager::GetRenderedDepthTextureByI
 	return nullptr;
 }
 
-std::shared_ptr<RenderedCubeMapTexture> TextureManager::GetRenderedCubeMapTextureByID(uint32_t TextureID)
+std::shared_ptr<Texture> TextureManager::GetRenderedCubeMapTextureByID(uint32_t TextureID)
 {
 	for (auto& texture : RenderedCubeMapTextureList)
 	{

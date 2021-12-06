@@ -42,7 +42,7 @@ void main()
 //		debugPrintfEXT(": %i \n", ubo.DirectionalLightCount);
 //	}
 
-    FragPos = vec3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0));    
+    FragPos = inPosition;    
     TexCoords = aTexCoords;
     Normal = aNormal;
 	Tangent = aTangent.rgb;

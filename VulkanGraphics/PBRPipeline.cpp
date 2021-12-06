@@ -133,7 +133,7 @@ void PBRPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapTexture> Ir
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(13, DescriptorSet, IrradianceMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(14, DescriptorSet, PrefilerMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(15, DescriptorSet, BRDFMapImage));
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowDescriptorImageList));
+  //  DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowDescriptorImageList));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(17, DescriptorSet, RenderedCubeMapImage));
 
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);

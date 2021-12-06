@@ -51,7 +51,7 @@ vec2 ParallaxMapping(MaterialInfo material, vec2 texCoords, vec3 viewDir);
 
 float CubeShadow(vec3 TBNFragPos, vec3 LightPos)
 {
-    vec3 lightVec = TBNFragPos - LightPos;
+    vec3 lightVec = TBNFragPos - normalize(LightPos.xyz - TBNFragPos.xyz);
     float sampleDist = texture(CubeShadowMap, lightVec).r;
  
     return (sampleDist < sampleDist + .15f) ? 1.0f : 0.5f;
@@ -262,11 +262,15 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
         specular = PLight[index].pointLight.specular * spec * vec3(texture(TextureMap[material.SpecularMapID], uv));
     }
 
-    float LightDistance = length(LightPos - FragPos2);
+    float LightDistance = length(FragPos2 - FragPos2);
     float attenuation = 1.0 / (1.0f + PLight[index].pointLight.linear * LightDistance + PLight[index].pointLight.quadratic * (LightDistance * LightDistance));
 
     vec3 LightColor = (ambient + diffuse + specular) * attenuation;
-    return vec3(CubeShadow(FragPos2, LightPos));
+
+    vec3 lightVec = normalize(LightPos.xyz - LightPos.xyz);
+    float sampleDist = texture(CubeShadowMap, lightDir).r;
+    float shadow = (sampleDist < sampleDist + .15f) ? 1.0f : 0.5f;
+    return LightColor * shadow;
 }
 
 vec3 CalcNormalSpotLight(vec3 normal, vec2 uv, int index)

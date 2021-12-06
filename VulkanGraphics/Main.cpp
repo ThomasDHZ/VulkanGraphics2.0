@@ -274,7 +274,7 @@ private:
         //AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject2);
 
         std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
-        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/RayReflectionTest.obj")));
+        gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/PointLightTest.obj")));
         AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject);
 
 

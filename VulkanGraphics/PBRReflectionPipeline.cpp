@@ -136,7 +136,7 @@ void PBRReflectionPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedCubeMapT
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(13, DescriptorSet, IrradianceMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(14, DescriptorSet, PrefilerMapImage));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(15, DescriptorSet, BRDFMapImage));
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowDescriptorImageList));
+    //DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(16, DescriptorSet, ShadowDescriptorImageList));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(17, DescriptorSet, ViewMatrixBufferInfo, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER));
     DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(18, DescriptorSet, RenderedCubeMapImage));
 

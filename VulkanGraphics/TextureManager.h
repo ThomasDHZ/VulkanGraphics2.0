@@ -17,7 +17,7 @@ class TextureManager
 private:
 	std::vector<std::shared_ptr<Texture2D>> Texture2DList;
 	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
-	std::vector<std::shared_ptr<CubeMapTexture>> CubeMapList;
+
 	std::vector<std::shared_ptr<RenderedColorTexture>> RenderedColorTextureList;
 	std::vector<std::shared_ptr<RenderedDepthTexture>> RenderedDepthTextureList;
 	std::vector<std::shared_ptr<RenderedCubeMapTexture>> RenderedCubeMapTextureList;
@@ -27,6 +27,7 @@ private:
 
 	VkSampler NullSampler;
 public:
+	std::vector<std::shared_ptr<Texture>> CubeMapList;
 
 	TextureManager();
 	TextureManager(std::shared_ptr<VulkanEngine> Engine);
@@ -71,20 +72,20 @@ public:
 	std::shared_ptr<Texture> GetCubeMapTextureByID(uint32_t TextureID);
 	std::shared_ptr<RenderedColorTexture> GetRenderedColorTextureByID(uint32_t TextureID);
 	std::shared_ptr<RenderedDepthTexture> GetRenderedDepthTextureByID(uint32_t TextureID);
-	std::shared_ptr<RenderedCubeMapTexture> GetRenderedCubeMapTextureByID(uint32_t TextureID);
+	std::shared_ptr<Texture> GetRenderedCubeMapTextureByID(uint32_t TextureID);
 	std::shared_ptr<RenderedCubeMapDepthTexture> GetRenderedCubeMapDepthTextureByID(uint32_t TextureID);
 
 	std::shared_ptr<Texture2D> GetTextureByBufferIndex(uint32_t TextureBufferIndex) { return Texture2DList[TextureBufferIndex]; };
 	std::shared_ptr<Texture3D> GetTexture3DByBufferIndex(uint32_t TextureBufferIndex) { return Texture3DList[TextureBufferIndex]; };
-	std::shared_ptr<CubeMapTexture> GetCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex) { return CubeMapList[TextureBufferIndex]; };
+	std::shared_ptr<Texture> GetCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex) { return CubeMapList[TextureBufferIndex]; };
 	std::shared_ptr<RenderedColorTexture> GetRenderedColorTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedColorTextureList[TextureBufferIndex]; };
 	std::shared_ptr<RenderedDepthTexture> GetRenderedDepthTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedDepthTextureList[TextureBufferIndex]; };
-	std::shared_ptr<RenderedCubeMapTexture> GetRenderedCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedCubeMapTextureList[TextureBufferIndex]; };
+	std::shared_ptr<Texture> GetRenderedCubeMapTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedCubeMapTextureList[TextureBufferIndex]; };
 	std::shared_ptr<RenderedCubeMapDepthTexture> GetRenderedCubeMapDepthTextureByBufferIndex(uint32_t TextureBufferIndex) { return RenderedCubeMapDepthTextureList[TextureBufferIndex]; };
 
 	std::vector<std::shared_ptr<Texture2D>> GetAllTexture2D() { return Texture2DList; }
 	std::vector<std::shared_ptr<Texture3D>> GetAllTexture3DList() { return Texture3DList; }
-	std::vector<std::shared_ptr<CubeMapTexture>> GetAllCubeMapTextures() { return CubeMapList; }
+	std::vector<std::shared_ptr<Texture>> GetAllCubeMapTextures() { return CubeMapList; }
 
 	void UpdateBufferIndex();
 	void ClearTextures();
