@@ -30,6 +30,7 @@ public:
     virtual void Update(std::shared_ptr<VulkanEngine> engine);
     void Update(glm::vec3 position);
     void Update(glm::vec3 position, glm::vec3 direction);
+    virtual void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
 
     glm::mat3 GetLightSpaceMatrix() { return LightSpaceMatrix; };
 };

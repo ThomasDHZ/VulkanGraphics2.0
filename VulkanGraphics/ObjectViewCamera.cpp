@@ -60,7 +60,6 @@ void ObjectViewCamera::Update(glm::vec3 position)
 {
     Position = position;
     ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 10000.0f);
-    ProjectionMatrix[1][1] *= -1;
 
     ViewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-Position.x, -Position.y, -Position.z));
     ViewMatrix = glm::rotate(ViewMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -70,10 +69,10 @@ void ObjectViewCamera::Update(glm::vec3 position)
 
 void ObjectViewCamera::Update(glm::vec3 position, glm::vec3 direction)
 {
+
     Position = position;
 
     ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 10000.0f);
-    ProjectionMatrix[1][1] *= -1;
 
     glm::vec3 front;
     front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
@@ -85,4 +84,21 @@ void ObjectViewCamera::Update(glm::vec3 position, glm::vec3 direction)
     Up = glm::normalize(glm::cross(Right, Front));
 
     ViewMatrix = glm::lookAt(Position, Position + Front, Up);
+}
+
+void ObjectViewCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)
+{
+    xoffset *= MouseSensitivity;
+    yoffset *= MouseSensitivity;
+
+    Yaw += xoffset;
+    Pitch += yoffset;
+
+    if (constrainPitch)
+    {
+        if (Pitch > 89.0f)
+            Pitch = 89.0f;
+        if (Pitch < -89.0f)
+            Pitch = -89.0f;
+    }
 }

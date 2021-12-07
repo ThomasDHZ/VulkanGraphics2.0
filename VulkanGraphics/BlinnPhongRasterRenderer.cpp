@@ -7,9 +7,9 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
-  //  DepthRenderPass = DepthPassRendererPass(512);
+    DepthRenderPass = DepthPassRendererPass(512);
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
-    ////DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTextureList[0]);
+   // DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTextureList[0]);
     ReflectionRenderPass = ReflectionCubeMapRenderPass(64, nullptr);
     BlinnRenderPass = BlinnPhongRasterPass(engine, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap);
     FrameBufferRenderer = FrameBufferRenderPass(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
@@ -23,10 +23,10 @@ BlinnPhongRasterRenderer::~BlinnPhongRasterRenderer()
 
 void BlinnPhongRasterRenderer::RebuildSwapChain()
 {
-    //DepthRenderPass.RebuildSwapChain(512);
+    DepthRenderPass.RebuildSwapChain(512);
     depthCubeMapRenderPass.RebuildSwapChain(1024);
-   //// DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList[0]);
-    ReflectionRenderPass.RebuildSwapChain(1024, nullptr);
+    //DebugDepthRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList[0]);
+    ReflectionRenderPass.RebuildSwapChain(1024, DepthRenderPass.DepthTextureList[0]);
     BlinnRenderPass.RebuildSwapChain(DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap);
 
     FrameBufferRenderer.RebuildSwapChain(BlinnRenderPass.RenderedTexture, BlinnRenderPass.RenderedTexture);
@@ -57,7 +57,7 @@ void BlinnPhongRasterRenderer::Draw()
       //  DebugDepthRenderPass.Draw();
     }
 
-  //  DepthRenderPass.Draw();
+    DepthRenderPass.Draw();
     depthCubeMapRenderPass.Draw();
     ReflectionRenderPass.Draw();
     BlinnRenderPass.Draw();
@@ -66,7 +66,7 @@ void BlinnPhongRasterRenderer::Draw()
 
 void BlinnPhongRasterRenderer::Destroy()
 {
-   // DepthRenderPass.Destroy();
+    DepthRenderPass.Destroy();
    // DebugDepthRenderPass.Destroy();
     depthCubeMapRenderPass.Destroy();
     ReflectionRenderPass.Destroy();
@@ -81,7 +81,7 @@ std::vector<VkCommandBuffer> BlinnPhongRasterRenderer::AddToCommandBufferSubmitL
       // CommandBufferSubmitList.emplace_back(DebugDepthRenderPass.GetCommandBuffer());
     }
 
-  //  CommandBufferSubmitList.emplace_back(DepthRenderPass.GetCommandBuffer());
+    CommandBufferSubmitList.emplace_back(DepthRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(depthCubeMapRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(ReflectionRenderPass.GetCommandBuffer());
     CommandBufferSubmitList.emplace_back(BlinnRenderPass.GetCommandBuffer());
