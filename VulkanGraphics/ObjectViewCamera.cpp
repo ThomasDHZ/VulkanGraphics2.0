@@ -69,21 +69,12 @@ void ObjectViewCamera::Update(glm::vec3 position)
 
 void ObjectViewCamera::Update(glm::vec3 position, glm::vec3 direction)
 {
-
-    Position = position;
-
     ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 10000.0f);
-
-    glm::vec3 front;
-    front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    front.y = sin(glm::radians(Pitch));
-    front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-    Front = glm::normalize(front);
 
     Right = glm::normalize(glm::cross(Front, WorldUp));
     Up = glm::normalize(glm::cross(Right, Front));
 
-    ViewMatrix = glm::lookAt(Position, Position + Front, Up);
+    ViewMatrix = glm::lookAt(position, position + direction, Up);
 }
 
 void ObjectViewCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)

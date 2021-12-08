@@ -302,21 +302,21 @@ bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
 	{
 		VulkanCompatible = true;
 	}
-
+	RayTracingFeatureCompatible = CheckRayTracingCompatiblity(GPUDevice);
 	
-	if (CheckRayTracingCompatiblity(GPUDevice) &&
-		extensionsNotSupported.find(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) != extensionsNotSupported.end() &&
-		extensionsNotSupported.find(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) != extensionsNotSupported.end())
-	{
-		RayTraceFlag = CheckRayTracingCompatiblity(GPUDevice);
-	}
-	else
-	{
+	//if (CheckRayTracingCompatiblity(GPUDevice) &&
+	//	extensionsNotSupported.find(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) != extensionsNotSupported.end() &&
+	//	extensionsNotSupported.find(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) != extensionsNotSupported.end())
+	//{
+	//	RayTraceFlag = CheckRayTracingCompatiblity(GPUDevice);
+	//}
+	//else
+	//{
 
-			extensionsNotSupported.erase(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-			extensionsNotSupported.erase(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+	//		extensionsNotSupported.erase(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+	//		extensionsNotSupported.erase(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 
-	}
+	//}
 
 	return VulkanCompatible;
 }
