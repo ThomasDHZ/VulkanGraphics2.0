@@ -13,6 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "VulkanBuffer.h"
 #include <chrono>
+#include <stdexcept>
+#include <set>
 
 #define VKB_VALIDATION_LAYERS
 
@@ -52,7 +54,8 @@ private:
 	void SetUpDeviceFeatures(GLFWwindow* window);
 
 	void FindQueueFamilies(VkPhysicalDevice PhysicalDevice, VkSurfaceKHR Surface);
-	bool checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
+	std::set<std::string>  CheckDeviceExtensionSupport(VkPhysicalDevice GPUDevice);
+	bool CheckRayTracingCompatiblity(VkPhysicalDevice GPUDevice);
 
 	VkSampleCountFlagBits GetMaxUsableSampleCount(VkPhysicalDevice GPUDevice);
 
@@ -98,6 +101,8 @@ public:
 
 	glm::ivec2 ScreenResoulation;
 	VkSampleCountFlagBits MaxSampleCount = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+	bool VulkanCompatible = false;
+	bool RayTracingFeatureCompatible = false;
 	bool UpdateRendererFlag = false;
 	bool RayTraceFlag = false;
 

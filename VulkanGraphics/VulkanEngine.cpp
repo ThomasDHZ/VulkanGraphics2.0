@@ -1,6 +1,4 @@
 #include "Vulkanengine.h"
-#include <stdexcept>
-#include <set>
 
 std::shared_ptr<VulkanEngine> EnginePtr::enginePtr = nullptr;
 
@@ -15,8 +13,8 @@ VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 	ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
 
 	DeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-	//DeviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-	//DeviceExtensions.emplace_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+	DeviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+	DeviceExtensions.emplace_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
 	//DeviceExtensions.emplace_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
 	//DeviceExtensions.emplace_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
@@ -291,17 +289,36 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
 {
 	FindQueueFamilies(GPUDevice, Surface);
-	bool extensionsSupported = checkDeviceExtensionSupport(GPUDevice);
+	std::set<std::string> extensionsNotSupported = CheckDeviceExtensionSupport(GPUDevice);
 	VkPhysicalDeviceFeatures supportedFeatures = GetPhysicalDeviceFeatures(GPUDevice);
 	std::vector<VkSurfaceFormatKHR> SurfaceFormatList = GetSurfaceFormatList(GPUDevice);
 	std::vector<VkPresentModeKHR> PresentModeList = GetPresentModeList(GPUDevice, Surface);
 
-	return GraphicsFamily != -1 &&
+	if (GraphicsFamily != -1 &&
 		PresentFamily != -1 &&
-		extensionsSupported &&
 		SurfaceFormatList.size() != 0 &&
 		PresentModeList.size() != 0 &&
-		supportedFeatures.samplerAnisotropy;
+		supportedFeatures.samplerAnisotropy)
+	{
+		VulkanCompatible = true;
+	}
+
+	
+	if (CheckRayTracingCompatiblity(GPUDevice) &&
+		extensionsNotSupported.find(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) != extensionsNotSupported.end() &&
+		extensionsNotSupported.find(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) != extensionsNotSupported.end())
+	{
+		RayTraceFlag = CheckRayTracingCompatiblity(GPUDevice);
+	}
+	else
+	{
+
+			extensionsNotSupported.erase(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+			extensionsNotSupported.erase(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+
+	}
+
+	return VulkanCompatible;
 }
 
 std::vector<const char*> VulkanEngine::getRequiredExtensions() {
@@ -314,7 +331,7 @@ std::vector<const char*> VulkanEngine::getRequiredExtensions() {
 	return extensions;
 }
 
-bool VulkanEngine::checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice)
+std::set<std::string> VulkanEngine::CheckDeviceExtensionSupport(VkPhysicalDevice GPUDevice)
 {
 	uint32_t extensionCount;
 	vkEnumerateDeviceExtensionProperties(GPUDevice, nullptr, &extensionCount, nullptr);
@@ -324,11 +341,35 @@ bool VulkanEngine::checkDeviceExtensionSupport(VkPhysicalDevice GPUDevice)
 
 	std::set<std::string> requiredExtensions(DeviceExtensions.begin(), DeviceExtensions.end());
 
-	for (const auto& extension : availableExtensions) {
+	for (const auto& extension : availableExtensions)
+	{
 		requiredExtensions.erase(extension.extensionName);
 	}
 
-	return requiredExtensions.empty();
+	for (auto extension : requiredExtensions)
+	{
+		std::cout << extension << " is Required." << std::endl;
+	}
+
+	return requiredExtensions;
+}
+
+bool VulkanEngine::CheckRayTracingCompatiblity(VkPhysicalDevice GPUDevice)
+{
+	VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
+	AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+
+	VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
+	RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+	RayTracingPipelineFeatures.pNext = &AccelerationStructureFeatures;
+
+	VkPhysicalDeviceFeatures2 DeviceFeatures2{};
+	DeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	DeviceFeatures2.pNext = &RayTracingPipelineFeatures;
+	vkGetPhysicalDeviceFeatures2(GPUDevice, &DeviceFeatures2);
+
+	return RayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE &&
+		   AccelerationStructureFeatures.accelerationStructure == VK_TRUE;
 }
 
 VkPhysicalDeviceFeatures VulkanEngine::GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice)
