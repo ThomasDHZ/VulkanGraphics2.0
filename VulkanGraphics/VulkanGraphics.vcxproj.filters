@@ -79,6 +79,9 @@
     <Filter Include="Header Files\Camera">
       <UniqueIdentifier>{3bee23ef-1bc3-4c22-930b-a365c1f7dfb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader\Renderers">
+      <UniqueIdentifier>{70e31727-335f-435e-9be6-6dc80a8801a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

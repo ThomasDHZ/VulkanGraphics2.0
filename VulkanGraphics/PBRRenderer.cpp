@@ -22,6 +22,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
         ReflectionPrefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
 
         reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap);
+    
     }
     //Main Render Pass
     {
@@ -128,7 +129,7 @@ void PBRRenderer::Destroy()
     //Main Render Pass
     {
         irradianceRenderPass.Destroy();
-        // prefilterRenderPass = PrefilterRenderPass(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
+        prefilterRenderPass.Destroy();
 
         pbrRenderer.Destroy();
         FrameBufferRenderer.Destroy();
