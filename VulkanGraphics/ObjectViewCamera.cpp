@@ -70,29 +70,13 @@ void ObjectViewCamera::Update(glm::vec3 position)
 void ObjectViewCamera::Update(glm::vec3 position, glm::vec3 direction)
 {
 
-    //ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 10000.0f);
-
-    //Front = glm::normalize(position - (position + direction));
-    //Right = glm::normalize(glm::cross(Front, WorldUp));
-    //Up = glm::normalize(glm::cross(Right, Front));
-
-    //float near_plane = -10000.0f, far_plane = 10000.0f;
-    //ProjectionMatrix = glm::mat4(glm::vec4(Right.x, Right.y, Right.z, 0),
-    //    glm::vec4(Up.x, Up.y, Up.z, 0),
-    //    glm::vec4(Front.x, Front.y, Front.z, 0),
-    //    glm::vec4(0, 0, 0, 1));
-
-    //ViewMatrix = glm::mat4(glm::vec4(1, 0, 0, 0),
-    //    glm::vec4(0, 1, 0, 0),
-    //    glm::vec4(0, 0, 1, 0),
-    //    glm::vec4(position.x, position.y, position.z, 1));
-
     ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 10000.0f);
 
+    Front = glm::normalize(direction);
     Right = glm::normalize(glm::cross(Front, WorldUp));
     Up = glm::normalize(glm::cross(Right, Front));
 
-    ViewMatrix = glm::lookAt(position, direction, Up);
+    ViewMatrix = glm::lookAt(position, position + Front, Up);
 }
 
 void ObjectViewCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)

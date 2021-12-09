@@ -7,7 +7,7 @@ BlinnPhongRasterRenderer::BlinnPhongRasterRenderer() : BaseRenderer()
 
 BlinnPhongRasterRenderer::BlinnPhongRasterRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
-    DepthRenderPass = DepthPassRendererPass(512);
+    DepthRenderPass = DepthPassRendererPass(4096);
     depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
    //// DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTextureList[0]);
     ReflectionRenderPass = ReflectionCubeMapRenderPass(64, nullptr);

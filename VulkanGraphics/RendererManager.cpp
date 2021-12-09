@@ -132,6 +132,16 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         GUIChanged |= ImGui::CheckboxFlags(("ShadowPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Shadow_Pass);
         GUIChanged |= ImGui::CheckboxFlags(("ReflectionPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Reflection_Pass);
 
+        CameraManagerPtr::GetCameraManagerPtr()->CameraList;
+        std::vector<const char*> charVec(CameraManagerPtr::GetCameraManagerPtr()->CameraList.size(), nullptr);
+        for (int i = 0; i < CameraManagerPtr::GetCameraManagerPtr()->CameraList.size(); i++) {
+            charVec[i] = CameraManagerPtr::GetCameraManagerPtr()->CameraList[i]->CameraName.c_str();
+        }
+
+        GUIChanged |= ImGui::ListBox("sdfdsf", &selectedCamera, charVec.data(), charVec.size());
+        GUIChanged |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
+
+
         //GUIChanged |= ImGui::SliderFloat3(("Albedo " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat(("Matallic " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Matallic, 0.0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat(("Roughness" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Roughness, 0.0f, 1.0f);
@@ -227,6 +237,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
     if (GUIChanged)
     {
+        CameraManagerPtr::GetCameraManagerPtr()->SetActiveCamera(selectedCamera);
         MaterialManagerPtr::GetMaterialManagerPtr()->UpdateBufferIndex();
         rayTraceRenderer.rayTraceRenderPass.Frame = 0;
         GUIChanged = false;

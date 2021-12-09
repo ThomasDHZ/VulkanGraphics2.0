@@ -14,6 +14,8 @@ class RendererManager
 private:
 	int ActiveRenderer = 0;
 	bool GUIChanged = false;
+	int selectedCamera = 0;
+	bool ShadowDebugFlag = false;
 
 	BlinnPhongRasterRenderer BlinnRenderer;
 	PBRRenderer pbrRenderer;
