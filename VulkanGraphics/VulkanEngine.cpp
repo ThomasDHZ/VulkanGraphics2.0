@@ -13,8 +13,6 @@ VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 	ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
 
 	DeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
 	//DeviceExtensions.emplace_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
 	//DeviceExtensions.emplace_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
@@ -307,21 +305,8 @@ bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
 	{
 		VulkanCompatible = true;
 	}
+
 	RayTracingFeatureCompatible = CheckRayTracingCompatiblity(GPUDevice);
-	
-	//if (CheckRayTracingCompatiblity(GPUDevice) &&
-	//	extensionsNotSupported.find(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) != extensionsNotSupported.end() &&
-	//	extensionsNotSupported.find(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) != extensionsNotSupported.end())
-	//{
-	//	RayTraceFlag = CheckRayTracingCompatiblity(GPUDevice);
-	//}
-	//else
-	//{
-
-	//		extensionsNotSupported.erase(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-	//		extensionsNotSupported.erase(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
-
-	//}
 
 	return VulkanCompatible;
 }
@@ -343,6 +328,10 @@ std::set<std::string> VulkanEngine::CheckDeviceExtensionSupport(VkPhysicalDevice
 
 	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
 	vkEnumerateDeviceExtensionProperties(GPUDevice, nullptr, &extensionCount, availableExtensions.data());
+	for (auto availableExtension : availableExtensions)
+	{
+		FeatureList.emplace_back(availableExtension.extensionName);
+	}
 
 	std::set<std::string> requiredExtensions(DeviceExtensions.begin(), DeviceExtensions.end());
 
@@ -361,20 +350,42 @@ std::set<std::string> VulkanEngine::CheckDeviceExtensionSupport(VkPhysicalDevice
 
 bool VulkanEngine::CheckRayTracingCompatiblity(VkPhysicalDevice GPUDevice)
 {
-	VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
-	AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+	if (!RayTracingFeatureCompatible)
+	{
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
+		AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
 
-	VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
-	RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
-	RayTracingPipelineFeatures.pNext = &AccelerationStructureFeatures;
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
+		RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+		RayTracingPipelineFeatures.pNext = &AccelerationStructureFeatures;
 
-	VkPhysicalDeviceFeatures2 DeviceFeatures2{};
-	DeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-	DeviceFeatures2.pNext = &RayTracingPipelineFeatures;
-	vkGetPhysicalDeviceFeatures2(GPUDevice, &DeviceFeatures2);
+		VkPhysicalDeviceFeatures2 DeviceFeatures2{};
+		DeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		DeviceFeatures2.pNext = &RayTracingPipelineFeatures;
+		vkGetPhysicalDeviceFeatures2(GPUDevice, &DeviceFeatures2);
 
-	return RayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE &&
-		   AccelerationStructureFeatures.accelerationStructure == VK_TRUE;
+		if (RayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE &&
+			AccelerationStructureFeatures.accelerationStructure == VK_TRUE)
+		{
+			if (std::find(FeatureList.begin(), FeatureList.end(), VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) != FeatureList.end() &&
+				std::find(FeatureList.begin(), FeatureList.end(), VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)   != FeatureList.end())
+			{
+				RayTracingFeatureCompatible = true;
+				DeviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+				DeviceExtensions.emplace_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+			}
+			else
+			{
+				RayTracingFeatureCompatible = false;
+			}
+		}
+		else
+		{
+			std::cout << "GPU/MotherBoard isn't ray tracing compatible." << std::endl;
+		}
+	}
+
+	return RayTracingFeatureCompatible;
 }
 
 VkPhysicalDeviceFeatures VulkanEngine::GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice)

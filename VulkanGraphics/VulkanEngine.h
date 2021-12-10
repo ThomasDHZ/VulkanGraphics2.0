@@ -99,6 +99,8 @@ public:
 
 	std::vector<VkLayerProperties> VulkanLayers;
 
+	std::vector<std::string> FeatureList;
+
 	glm::ivec2 ScreenResoulation;
 	VkSampleCountFlagBits MaxSampleCount = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
 	bool VulkanCompatible = false;
