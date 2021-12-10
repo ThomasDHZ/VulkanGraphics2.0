@@ -59,7 +59,7 @@ void ObjectViewCamera::Update(std::shared_ptr<VulkanEngine> engine)
 void ObjectViewCamera::Update(glm::vec3 position)
 {
     Position = position;
-    ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 10000.0f);
+    ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 100.0f);
 
     ViewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-Position.x, -Position.y, -Position.z));
     ViewMatrix = glm::rotate(ViewMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -70,13 +70,22 @@ void ObjectViewCamera::Update(glm::vec3 position)
 void ObjectViewCamera::Update(glm::vec3 position, glm::vec3 direction)
 {
 
-    ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 10000.0f);
+    ProjectionMatrix = glm::perspective((float)(60.0f), EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height, 0.1f, 10000.0f);
 
-    Front = glm::normalize(direction);
-    Right = glm::normalize(glm::cross(Front, WorldUp));
-    Up = glm::normalize(glm::cross(Right, Front));
+    glm::vec3 LightDelta = glm::normalize(direction - OldLightPos);
+    Up = glm::normalize(Up);
+    glm::vec3 rotate = glm::cross(direction, Up);
+    glm::mat4 rotationMatrix = glm::mat3(1.0f);
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(LightDelta.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(LightDelta.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotationMatrix = glm::rotate(rotationMatrix, glm::radians(LightDelta.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::vec3 ViewDirection = rotationMatrix * glm::vec4(direction, 1.0f);
+
+
 
     ViewMatrix = glm::lookAt(position, position + Front, Up);
+
+    OldLightPos = position;
 }
 
 void ObjectViewCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)

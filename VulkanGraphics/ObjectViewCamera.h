@@ -20,6 +20,7 @@ public:
 
     float Yaw;
     float Pitch;
+    glm::vec3 OldLightPos;
     glm::mat3 LightSpaceMatrix = glm::mat3(1.0f);
 
 	ObjectViewCamera();
