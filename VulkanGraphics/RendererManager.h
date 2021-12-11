@@ -18,10 +18,10 @@ private:
 	bool ShadowDebugFlag = false;
 
 	BlinnPhongRasterRenderer BlinnRenderer;
-	//PBRRenderer pbrRenderer;
+	PBRRenderer pbrRenderer;
 	////////Renderer2D renderer2D;
-	//RayTraceRenderer rayTraceRenderer;
-	//PBRRayTraceRenderer pbrRayTraceRenderer;
+	RayTraceRenderer rayTraceRenderer;
+	PBRRayTraceRenderer pbrRayTraceRenderer;
 
 	InterfaceRenderPass interfaceRenderPass;
 

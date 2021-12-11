@@ -70,10 +70,16 @@ public:
     void UpdateImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateDepthImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateDepthImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
     void UpdateCubeImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int MipLevel);
     void UpdateCubeImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout);
+    void UpdateCubeImageLayout(VkCommandBuffer& commandBuffer, VkImageLayout oldImageLayout, VkImageLayout newImageLayout, int MipLevel);
+    void CopyDepthTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
     void CopyTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
-    void CopyTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture, int FaceCopy);
+    void CopyTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture, int MipLevel);
+    void CopyCubeMapTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture);
+    void CopyCubeMapTexture(VkCommandBuffer& commandBuffer, std::shared_ptr<Texture> CopyToTexture, int MipLevel);
     virtual void Delete();
     VkImageView GetTextureView() { return View; }
     VkSampler GetTextureSampler() { return Sampler; }

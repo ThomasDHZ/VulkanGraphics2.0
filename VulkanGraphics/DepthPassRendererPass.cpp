@@ -206,113 +206,16 @@ void DepthPassRendererPass::Draw()
         AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthPipeline->ShaderPipelineLayout, LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->lightViewCamera);
         vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-        VkImageMemoryBarrier DstMemoryBarrior{};
-        DstMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        DstMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        DstMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        DstMemoryBarrior.image = DepthTextureList[x]->Image;
-        DstMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        DstMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        DstMemoryBarrior.dstAccessMask = 0;
-        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &DstMemoryBarrior);
-
-        VkImageMemoryBarrier SrcMemoryBarrior{};
-        SrcMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        SrcMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        SrcMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        SrcMemoryBarrior.image = DepthToTexture->Image;
-        SrcMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        SrcMemoryBarrior.srcAccessMask = 0;
-        SrcMemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SrcMemoryBarrior);
-
-        VkImageCopy copyRegion = {};
-        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        copyRegion.srcSubresource.baseArrayLayer = 0;
-        copyRegion.srcSubresource.mipLevel = 0;
-        copyRegion.srcSubresource.layerCount = 1;
-        copyRegion.srcOffset = { 0, 0, 0 };
-
-        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        copyRegion.dstSubresource.baseArrayLayer = 0;
-        copyRegion.dstSubresource.mipLevel = 0;
-        copyRegion.dstSubresource.layerCount = 1;
-        copyRegion.dstOffset = { 0, 0, 0 };
-
-        copyRegion.extent.width = (uint32_t)RenderPassResolution.x;
-        copyRegion.extent.height = (uint32_t)RenderPassResolution.y;
-        copyRegion.extent.depth = 1;
-        vkCmdCopyImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], DepthToTexture->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, DepthTextureList[x]->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-
-        VkImageMemoryBarrier ReturnSrcMemoryBarrior{};
-        ReturnSrcMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        ReturnSrcMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        ReturnSrcMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        ReturnSrcMemoryBarrior.image = DepthToTexture->Image;
-        ReturnSrcMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        ReturnSrcMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        ReturnSrcMemoryBarrior.dstAccessMask = 0;
-        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnSrcMemoryBarrior);
-
-        VkImageMemoryBarrier ReturnDstMemoryBarrior{};
-        ReturnDstMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        ReturnDstMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        ReturnDstMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        ReturnDstMemoryBarrior.image = DepthTextureList[x]->Image;
-        ReturnDstMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        ReturnDstMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        ReturnDstMemoryBarrior.dstAccessMask = 0;
-        vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnDstMemoryBarrior);
+        DepthTextureList[x]->UpdateDepthImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        DepthToTexture->UpdateDepthImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        DepthToTexture->CopyDepthTexture(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], DepthTextureList[x]);
+        DepthToTexture->UpdateDepthImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        DepthTextureList[x]->UpdateDepthImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-
-   /* VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-
-    if (vkBeginCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &beginInfo) != VK_SUCCESS) {
-        throw std::runtime_error("failed to begin recording command buffer!");
-    }
-    for (int x = 0; x < DepthTextureList.size(); x++)
-    {
-        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    }
-    if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
-        throw std::runtime_error("failed to record command buffer!");
-    }
-
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);*/
-
-   /*
-
-        DepthTextureList[x]->UpdateDepthImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);*/
-    //}
-
- /*   if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
-        throw std::runtime_error("failed to record command buffer!");
-    }*/
 }
 
 void DepthPassRendererPass::Destroy()
