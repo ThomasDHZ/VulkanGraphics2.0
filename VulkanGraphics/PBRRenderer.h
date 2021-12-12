@@ -18,16 +18,16 @@ private:
 	float CubeMapSamplerSize = 512.0f;
 	int selected = 0;
 
-	//DepthPassRendererPass DepthRenderPass;
-	//DepthCubeMapRenderPass depthCubeMapRenderPass;
-	//IrradianceRenderPass ReflectionIrradianceRenderPass;
+	DepthPassRendererPass DepthRenderPass;
+	DepthCubeMapRenderPass depthCubeMapRenderPass;
+	IrradianceRenderPass ReflectionIrradianceRenderPass;
 	PrefilterRenderPass ReflectionPrefilterRenderPass;
-	//IrradianceRenderPass irradianceRenderPass;
-	//PrefilterRenderPass prefilterRenderPass;
-	//BRDFRenderPass brdfRenderPass;
-	//PBRReflectionRenderPass reflectionPBRPass;
-	//PBRRenderPass pbrRenderer;
-	//FrameBufferRenderPass FrameBufferRenderer;
+	IrradianceRenderPass irradianceRenderPass;
+	PrefilterRenderPass prefilterRenderPass;
+	BRDFRenderPass brdfRenderPass;
+	PBRReflectionRenderPass reflectionPBRPass;
+	PBRRenderPass pbrRenderer;
+	FrameBufferRenderPass FrameBufferRenderer;
 
 public:
 	PBRRenderer();

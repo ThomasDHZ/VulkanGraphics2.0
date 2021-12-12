@@ -14,14 +14,11 @@ PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<Texture> cubeMapTexture
 
     DrawToCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x), VK_SAMPLE_COUNT_1_BIT));
     RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(RenderPassResolution.x), VK_SAMPLE_COUNT_1_BIT, CubeMapMipLevels));
-    DrawToCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     CreateRenderPass();
     CreateRendererFramebuffers();
     prefilterPipeline = std::make_shared<PrefilterPipeline>(PrefilterPipeline(RenderPass, cubeMapTexture, RenderPassResolution.x));
     SetUpCommandBuffers();
-
     Draw();
 
     VkSubmitInfo submitInfo{};
@@ -36,6 +33,7 @@ PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<Texture> cubeMapTexture
     vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
     vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
     vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
+
 }
 
 PrefilterRenderPass::~PrefilterRenderPass()
@@ -158,12 +156,10 @@ void PrefilterRenderPass::SetUpCommandBuffers()
 
 void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTexture, uint32_t cubeMapSize)
 {
+    firstRun = true;
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     DrawToCubeMap->RecreateRendererTexture(RenderPassResolution);
     RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
-    DrawToCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
     prefilterPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
@@ -179,7 +175,6 @@ void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTextu
     CreateRendererFramebuffers();
     prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, cubeMapTexture, RenderPassResolution.x);
     SetUpCommandBuffers();
-
     Draw();
 
     VkSubmitInfo submitInfo{};
@@ -194,18 +189,32 @@ void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTextu
     vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
     vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
     vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
+
 }
 
 void PrefilterRenderPass::Draw()
 {
 
+
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
+    {
+
+        if (firstRun)
+        {
+            DrawToCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 0);
+        }
+        firstRun = false;
+    }
+
     if (vkBeginCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("failed to begin recording command buffer!");
     }
+
+    RenderedCubeMap->UpdateCubeImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 0);
 
     std::array<VkClearValue, 2> clearValues{};
     clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
@@ -223,20 +232,11 @@ void PrefilterRenderPass::Draw()
 
     PrefilterSkybox prefiliter;
 
-    VkImageSubresourceRange ImageSubresourceRange{};
-    ImageSubresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    ImageSubresourceRange.baseMipLevel = 0;
-    ImageSubresourceRange.levelCount = 1;
-    ImageSubresourceRange.layerCount = 6;
-
     VkRect2D rect2D{};
     rect2D.extent.width = RenderPassResolution.x;
     rect2D.extent.height = RenderPassResolution.y;
     rect2D.offset.x = 0.0f;
     rect2D.offset.y = 0.0f;
-
-   // RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
- //   RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     for (int x = 0; x < CubeMapMipLevels; x++)
     {
@@ -246,103 +246,45 @@ void PrefilterRenderPass::Draw()
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
 
-        RenderedCubeMap->UpdateCubeImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        prefiliter.SkyboxSize = CubeMapMipLevels;
+        prefiliter.roughness = (float)RenderPassResolution.x / (float)(CubeMapMipLevels - 1);
+
+        vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
+        vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
+        vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], prefilterPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterSkybox), &prefiliter);
+        vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterPipeline->ShaderPipeline);
+        vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterPipeline->ShaderPipelineLayout, 0, 1, &prefilterPipeline->DescriptorSet, 0, nullptr);
+        vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+        vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
+
         DrawToCubeMap->UpdateCubeImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
 
-        VkImageMemoryBarrier SrcMemoryBarrior{};
-SrcMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-SrcMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-SrcMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-SrcMemoryBarrior.image = DrawToCubeMap->Image;
-SrcMemoryBarrior.subresourceRange = ImageSubresourceRange;
-SrcMemoryBarrior.srcAccessMask = 0;
-SrcMemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SrcMemoryBarrior);
+        VkImageCopy copyRegion = {};
+        copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.srcSubresource.baseArrayLayer = 0;
+        copyRegion.srcSubresource.mipLevel = 0;
+        copyRegion.srcSubresource.layerCount = 6;
+        copyRegion.srcOffset = { 0, 0, 0 };
 
-VkImageCopy copyRegion = {};
-copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-copyRegion.srcSubresource.baseArrayLayer = 0;
-copyRegion.srcSubresource.mipLevel = 0;
-copyRegion.srcSubresource.layerCount = 6;
-copyRegion.srcOffset = { 0, 0, 0 };
+        copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        copyRegion.dstSubresource.baseArrayLayer = 0;
+        copyRegion.dstSubresource.mipLevel = x;
+        copyRegion.dstSubresource.layerCount = 6;
+        copyRegion.dstOffset = { 0, 0, 0 };
 
-copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-copyRegion.dstSubresource.baseArrayLayer = 0;
-copyRegion.dstSubresource.mipLevel = x;
-copyRegion.dstSubresource.layerCount = 6;
-copyRegion.dstOffset = { 0, 0, 0 };
-
-copyRegion.extent.width = (uint32_t)viewport.width;
-copyRegion.extent.height = (uint32_t)viewport.height;
-copyRegion.extent.depth = 1;
-vkCmdCopyImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], DrawToCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, RenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+        copyRegion.extent.width = (uint32_t)viewport.width;
+        copyRegion.extent.height = (uint32_t)viewport.height;
+        copyRegion.extent.depth = 1;
+        vkCmdCopyImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], DrawToCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, RenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
         DrawToCubeMap->UpdateCubeImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-        RenderedCubeMap->UpdateCubeImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-        //VkViewport viewport{};
-        //viewport.width = static_cast<float>(RenderPassResolution.x * std::pow(0.5f, x));
-        //viewport.height = static_cast<float>(RenderPassResolution.y * std::pow(0.5f, x));
-        //viewport.minDepth = 0.0f;
-        //viewport.maxDepth = 1.0f;
-
-        //prefiliter.SkyboxSize = CubeMapMipLevels;
-        //prefiliter.roughness = (float)RenderPassResolution.x / (float)(CubeMapMipLevels - 1);
-
-        //vkCmdSetViewport(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &viewport);
-        //vkCmdSetScissor(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], 0, 1, &rect2D);
-        //vkCmdPushConstants(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], prefilterPipeline->ShaderPipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PrefilterSkybox), &prefiliter);
-        //vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterPipeline->ShaderPipeline);
-        //vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, prefilterPipeline->ShaderPipelineLayout, 0, 1, &prefilterPipeline->DescriptorSet, 0, nullptr);
-        //vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        //static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
-        //vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
-
-
-        //VkImageMemoryBarrier SrcMemoryBarrior{};
-        //SrcMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        //SrcMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        //SrcMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        //SrcMemoryBarrior.image = DrawToCubeMap->Image;
-        //SrcMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        //SrcMemoryBarrior.srcAccessMask = 0;
-        //SrcMemoryBarrior.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-        //vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &SrcMemoryBarrior);
-
-        //VkImageCopy copyRegion = {};
-        //copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        //copyRegion.srcSubresource.baseArrayLayer = 0;
-        //copyRegion.srcSubresource.mipLevel = 0;
-        //copyRegion.srcSubresource.layerCount = 6;
-        //copyRegion.srcOffset = { 0, 0, 0 };
-
-        //copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        //copyRegion.dstSubresource.baseArrayLayer = 0;
-        //copyRegion.dstSubresource.mipLevel = x;
-        //copyRegion.dstSubresource.layerCount = 6;
-        //copyRegion.dstOffset = { 0, 0, 0 };
-
-        //copyRegion.extent.width = (uint32_t)viewport.width;
-        //copyRegion.extent.height = (uint32_t)viewport.height;
-        //copyRegion.extent.depth = 1;
-        //vkCmdCopyImage(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], DrawToCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, RenderedCubeMap->Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
-
-        //VkImageMemoryBarrier ReturnSrcMemoryBarrior{};
-        //ReturnSrcMemoryBarrior.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        //ReturnSrcMemoryBarrior.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-        //ReturnSrcMemoryBarrior.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        //ReturnSrcMemoryBarrior.image = DrawToCubeMap->Image;
-        //ReturnSrcMemoryBarrior.subresourceRange = ImageSubresourceRange;
-        //ReturnSrcMemoryBarrior.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        //ReturnSrcMemoryBarrior.dstAccessMask = 0;
-        //vkCmdPipelineBarrier(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &ReturnSrcMemoryBarrior);
     }
+    RenderedCubeMap->UpdateCubeImageLayout(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 0);
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");
     }
-
-    //RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void PrefilterRenderPass::Destroy()

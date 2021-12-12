@@ -19,6 +19,7 @@ private:
 
 	std::shared_ptr<RenderedCubeMapTexture> DrawToCubeMap;
 	VkFramebuffer PrefilterMapFrameBuffer;
+	bool firstRun = true;
 
 public:
 	PrefilterRenderPass();
