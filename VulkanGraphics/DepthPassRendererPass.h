@@ -10,7 +10,6 @@ private:
 
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 	std::shared_ptr<RenderedDepthTexture> DepthToTexture;
 public:

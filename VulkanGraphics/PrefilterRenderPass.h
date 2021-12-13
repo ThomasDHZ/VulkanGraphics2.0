@@ -13,7 +13,6 @@ class PrefilterRenderPass : public BaseRenderPass
 private:
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 	uint32_t CubeMapMipLevels = 0;
 

@@ -109,23 +109,6 @@ void DepthPassRendererPass::CreateRendererFramebuffers()
     }
 }
 
-void DepthPassRendererPass::SetUpCommandBuffers()
-{
-    CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
-    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
-    {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-
-        if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-    }
-}
-
 void DepthPassRendererPass::RebuildSwapChain(uint32_t depthTextureSize)
 {
     RenderPassResolution = glm::ivec2(depthTextureSize, depthTextureSize); 

@@ -11,7 +11,6 @@ class BRDFRenderPass : public BaseRenderPass
 private:
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 public:
 	BRDFRenderPass();

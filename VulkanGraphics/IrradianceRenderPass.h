@@ -13,7 +13,6 @@ class IrradianceRenderPass : public BaseRenderPass
 private:
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 public:
 	IrradianceRenderPass();

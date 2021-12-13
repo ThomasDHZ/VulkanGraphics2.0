@@ -18,7 +18,6 @@ private:
 
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 public:
 	ReflectionCubeMapRenderPass();

@@ -134,23 +134,6 @@ void ReflectionCubeMapRenderPass::CreateRendererFramebuffers()
     }
 }
 
-void ReflectionCubeMapRenderPass::SetUpCommandBuffers()
-{
-    CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
-    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
-    {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-
-        if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-    }
-}
-
 void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture)
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
@@ -183,24 +166,24 @@ void ReflectionCubeMapRenderPass::Update()
     {
         switch (x)
         {
-        case 0: // POSITIVE_X
+        case 0: 
             viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             break;
-        case 1:	// NEGATIVE_X
+        case 1:	
             viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             break;
-        case 2:	// POSITIVE_Y
+        case 2:
             viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             break;
-        case 3:	// NEGATIVE_Y
+        case 3:	
             viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             break;
-        case 4:	// POSITIVE_Z
+        case 4:	
             viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             break;
-        case 5:	// NEGATIVE_Z
+        case 5:	
             viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
             break;
         }

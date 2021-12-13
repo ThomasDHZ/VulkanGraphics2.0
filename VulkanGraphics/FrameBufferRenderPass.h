@@ -7,7 +7,6 @@ class FrameBufferRenderPass : public BaseRenderPass
 private:
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 public:
 	FrameBufferRenderPass();

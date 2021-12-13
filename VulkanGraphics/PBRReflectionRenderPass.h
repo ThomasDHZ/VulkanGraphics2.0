@@ -18,7 +18,6 @@ private:
 
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 public:
 	glm::vec3 reflectPos = glm::vec3(0.0f);

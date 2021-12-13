@@ -9,7 +9,6 @@ class DepthDebugRenderPass : public BaseRenderPass
 private:
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 public:
 	DepthDebugRenderPass();

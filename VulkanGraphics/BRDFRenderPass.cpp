@@ -121,23 +121,6 @@ void BRDFRenderPass::CreateRendererFramebuffers()
     }
 }
 
-void BRDFRenderPass::SetUpCommandBuffers()
-{
-    CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
-    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
-    {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-
-        if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-    }
-}
-
 void BRDFRenderPass::RebuildSwapChain(uint32_t textureSize)
 {
     RenderPassResolution = glm::ivec2(textureSize, textureSize); 

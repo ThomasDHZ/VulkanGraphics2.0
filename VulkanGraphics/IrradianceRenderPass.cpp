@@ -11,6 +11,7 @@ IrradianceRenderPass::IrradianceRenderPass(std::shared_ptr<Texture> cubeMapTextu
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
+    RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     CreateRenderPass();
     CreateRendererFramebuffers();
@@ -18,19 +19,7 @@ IrradianceRenderPass::IrradianceRenderPass(std::shared_ptr<Texture> cubeMapTextu
     SetUpCommandBuffers();
 
     Draw();
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
+    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 IrradianceRenderPass::~IrradianceRenderPass()
@@ -134,57 +123,25 @@ void IrradianceRenderPass::CreateRendererFramebuffers()
     }
 }
 
-void IrradianceRenderPass::SetUpCommandBuffers()
-{
-    CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
-    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
-    {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-
-        if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-    }
-}
-
 void IrradianceRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTexture, uint32_t cubeMapSize)
 {
-    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
-    RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
+    RenderedCubeMap->Delete();
     irradiancePipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
 
-    for (auto& framebuffer : SwapChainFramebuffers)
-    {
-        vkDestroyFramebuffer(EnginePtr::GetEnginePtr()->Device, framebuffer, nullptr);
-        framebuffer = VK_NULL_HANDLE;
-    }
+    RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
+    RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    irradiancePipeline->UpdateGraphicsPipeLine(RenderPass, cubeMapTexture, RenderPassResolution.x);
+    irradiancePipeline = std::make_shared<IrradiancePipeline>(IrradiancePipeline(RenderPass, cubeMapTexture, RenderPassResolution.x));
     SetUpCommandBuffers();
 
     Draw();
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
+    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 void IrradianceRenderPass::Draw()

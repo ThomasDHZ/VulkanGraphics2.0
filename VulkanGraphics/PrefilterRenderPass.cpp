@@ -19,21 +19,9 @@ PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<Texture> cubeMapTexture
     CreateRendererFramebuffers();
     prefilterPipeline = std::make_shared<PrefilterPipeline>(PrefilterPipeline(RenderPass, cubeMapTexture, RenderPassResolution.x));
     SetUpCommandBuffers();
+
     Draw();
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-
+    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 PrefilterRenderPass::~PrefilterRenderPass()
@@ -137,23 +125,6 @@ void PrefilterRenderPass::CreateRendererFramebuffers()
     }
 }
 
-void PrefilterRenderPass::SetUpCommandBuffers()
-{
-    CommandBuffer.resize(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
-    for (size_t i = 0; i < EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount(); i++)
-    {
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = EnginePtr::GetEnginePtr()->CommandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = 1;
-
-        if (vkAllocateCommandBuffers(EnginePtr::GetEnginePtr()->Device, &allocInfo, &CommandBuffer[i]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-    }
-}
-
 void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTexture, uint32_t cubeMapSize)
 {
     firstRun = true;
@@ -175,27 +146,13 @@ void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTextu
     CreateRendererFramebuffers();
     prefilterPipeline->UpdateGraphicsPipeLine(RenderPass, cubeMapTexture, RenderPassResolution.x);
     SetUpCommandBuffers();
+
     Draw();
-
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex];
-    VkFenceCreateInfo fenceCreateInfo{};
-    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fenceCreateInfo.flags = 0;
-    VkFence fence;
-    vkCreateFence(VulkanPtr::GetDevice(), &fenceCreateInfo, nullptr, &fence);
-    vkQueueSubmit(VulkanPtr::GetGraphicsQueue(), 1, &submitInfo, fence);
-    vkWaitForFences(VulkanPtr::GetDevice(), 1, &fence, VK_TRUE, UINT64_MAX);
-    vkDestroyFence(VulkanPtr::GetDevice(), fence, nullptr);
-
+    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 void PrefilterRenderPass::Draw()
 {
-
-
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;

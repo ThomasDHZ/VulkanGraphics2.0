@@ -14,9 +14,12 @@ public:
 
 	BaseRenderPass();
 	~BaseRenderPass();
-	virtual void Destroy();
+
 	void SaveScreenShot(VkImage FrameBufferImage);
 	void SaveScreenShot(std::shared_ptr<Texture> texture);
+	void OneTimeRenderPassSubmit(VkCommandBuffer* CMDBuffer);
+	virtual void SetUpCommandBuffers();
+	virtual void Destroy();
 
 	VkCommandBuffer GetCommandBuffer() { return CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]; }
 };

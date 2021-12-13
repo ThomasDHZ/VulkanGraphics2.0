@@ -14,7 +14,6 @@ private:
 
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
-	void SetUpCommandBuffers();
 
 	std::shared_ptr<RenderedColorTexture> ColorTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;
