@@ -58,8 +58,32 @@ struct LightSceneInfo : public ConstMeshBase
 	alignas(16) glm::mat4 lightSpaceMatrix = glm::mat4(1.0f);
 };
 
+struct DescriptorSetBindingStruct
+{
+	uint32_t DescriptorSlotNumber;
+	VkShaderStageFlags StageFlags;
+	VkDescriptorType DescriptorType;
+	VkWriteDescriptorSetAccelerationStructureKHR AccelerationStructureDescriptor;
+	std::vector<VkDescriptorImageInfo> TextureDescriptor;
+	std::vector<VkDescriptorBufferInfo> BufferDescriptor;
+	uint32_t Count;
+};
+
+
 class GraphicsPipeline
 {
+private:
+	std::vector<VkDescriptorPoolSize>  DescriptorPoolList{};
+	std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo{};
+	std::vector<VkWriteDescriptorSet> DescriptorList{};
+	std::vector<DescriptorSetBindingStruct> DescriptorBindingList{};
+
+	VkWriteDescriptorSet AddAccelerationBuffer(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure);
+	VkWriteDescriptorSet AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo, VkDescriptorType descriptorType);
+	VkWriteDescriptorSet AddTextureDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo, VkDescriptorType descriptorType);
+	VkWriteDescriptorSet AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo, VkDescriptorType descriptorType);
+	VkWriteDescriptorSet AddBufferDescriptorSet(unsigned int BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList, VkDescriptorType descriptorType);
+
 protected:
 	VkSampler NullSampler = VK_NULL_HANDLE;
 	VkDescriptorImageInfo nullBufferInfo;
@@ -73,6 +97,13 @@ public:
 
 	GraphicsPipeline();
 	~GraphicsPipeline();
+
+	void AddDescriptorSetBinding(unsigned int BindingNumber, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure, VkShaderStageFlags StageFlags);
+	void AddDescriptorSetBinding(unsigned int BindingNumber, VkDescriptorImageInfo& TextureImageInfo, VkShaderStageFlags StageFlags, VkDescriptorType BufferType);
+	void AddDescriptorSetBinding(unsigned int BindingNumber, std::vector<VkDescriptorImageInfo>& TextureImageInfo, VkShaderStageFlags StageFlags, VkDescriptorType BufferType, uint32_t DescriptorCount);
+	void AddDescriptorSetBinding(unsigned int BindingNumber, VkDescriptorBufferInfo& BufferInfo, VkDescriptorType BufferType, VkShaderStageFlags StageFlags);
+	void AddDescriptorSetBinding(unsigned int BindingNumber, std::vector<VkDescriptorBufferInfo>& BufferInfo, VkDescriptorType BufferType, VkShaderStageFlags StageFlags, uint32_t DescriptorCount);
+	void SubmitDescriptorSet();
 
 	virtual void UpdateGraphicsPipeLine();
 	virtual void Destroy();

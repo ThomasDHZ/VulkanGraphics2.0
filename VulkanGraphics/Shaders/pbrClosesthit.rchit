@@ -44,12 +44,9 @@ layout(binding = 5) buffer PointLightBuffer { PointLight pointLight; } PLight[];
 layout(binding = 6) buffer SpotLightBuffer { SpotLight spotLight; } SLight[];
 layout(binding = 7, scalar) buffer Vertices { Vertex v[]; } vertices[];
 layout(binding = 8) buffer Indices { uint i[]; } indices[];
-layout(binding = 11) uniform sampler2D TextureMap[];
-layout(binding = 12) uniform sampler3D Texture3DMap[];
-layout(binding = 13, set = 0) uniform samplerCube CubeMap[];
-layout(binding = 14) buffer SphereAreaLightBuffer { SphereAreaLight sphereLight; } sphereLightBuffer[];
-layout(binding = 15) buffer TubeAreaLightBuffer { TubeAreaLight tubeAreaLight; } tubeLightBuffer[];
-layout(binding = 16) buffer RectangleAreaLightBuffer { RectangleAreaLight rectangleAreaLight; } rectangleAreaLightBuffer[];
+layout(binding = 9) uniform sampler2D TextureMap[];
+layout(binding = 10) uniform sampler3D Texture3DMap[];
+layout(binding = 11) uniform samplerCube CubeMap[];
 
 Vertex vertex;
 #include "RTVertexBuilder.glsl"

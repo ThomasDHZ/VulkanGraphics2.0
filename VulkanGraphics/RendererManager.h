@@ -21,7 +21,7 @@ private:
 	PBRRenderer pbrRenderer;
 	////////Renderer2D renderer2D;
 	RayTraceRenderer rayTraceRenderer;
-	PBRRayTraceRenderer pbrRayTraceRenderer;
+	//PBRRayTraceRenderer pbrRayTraceRenderer;
 
 	InterfaceRenderPass interfaceRenderPass;
 

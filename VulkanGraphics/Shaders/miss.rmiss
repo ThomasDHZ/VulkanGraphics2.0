@@ -22,7 +22,7 @@ struct RayHitInfo
 };
 
 layout(location = 0) rayPayloadInEXT RayHitInfo rayPayload;
-layout(binding = 13, set = 0) uniform samplerCube CubeMap[];
+layout(binding = 11, set = 0) uniform samplerCube CubeMap[];
 void main()
 {
 	rayPayload.color = texture(CubeMap[0], gl_WorldRayDirectionEXT).rgb;
