@@ -7,9 +7,7 @@
 class FrameBufferPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool();
-	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
+	void SetUpDescriptorBindings(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	FrameBufferPipeline();

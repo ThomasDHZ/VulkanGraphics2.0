@@ -5,9 +5,7 @@
 class Shader2DPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool();
-	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets();
+	void SetUpDescriptorBindings();
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	Shader2DPipeline();

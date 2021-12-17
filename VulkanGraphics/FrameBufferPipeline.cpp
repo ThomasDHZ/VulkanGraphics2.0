@@ -7,43 +7,22 @@ FrameBufferPipeline::FrameBufferPipeline() : GraphicsPipeline()
 
 FrameBufferPipeline::FrameBufferPipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture) : GraphicsPipeline()
 {
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings(RenderedTexture, BloomTexture);
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(RenderedTexture, BloomTexture);
 }
 
 FrameBufferPipeline::~FrameBufferPipeline()
 {
 }
 
-void FrameBufferPipeline::SetUpDescriptorPool()
+void FrameBufferPipeline::SetUpDescriptorBindings(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
-}
-
-void FrameBufferPipeline::SetUpDescriptorLayout()
-{
-    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
-}
-
-void FrameBufferPipeline::SetUpDescriptorSets(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
-{
-    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-
     VkDescriptorImageInfo RenderedTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(RenderedTexture->View, RenderedTexture->Sampler);
     VkDescriptorImageInfo BloomTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(BloomTexture->View, BloomTexture->Sampler);
 
-    std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, RenderedTextureBufferInfo));
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(1, DescriptorSet, BloomTextureBufferInfo));
-    vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    AddTextureDescriptorSetBinding(0, RenderedTextureBufferInfo, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR);
+    AddTextureDescriptorSetBinding(1, BloomTextureBufferInfo, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR);
+    SubmitDescriptorSet();
 }
 
 void FrameBufferPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
@@ -158,8 +137,6 @@ void FrameBufferPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 void FrameBufferPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings(RenderedTexture, BloomTexture);
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(RenderedTexture, BloomTexture);
 }

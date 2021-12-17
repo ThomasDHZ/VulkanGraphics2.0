@@ -7,43 +7,17 @@ DepthDebugPipeline::DepthDebugPipeline() : GraphicsPipeline()
 
 DepthDebugPipeline::DepthDebugPipeline(const VkRenderPass& renderPass, std::shared_ptr<RenderedDepthTexture> depthTexture) : GraphicsPipeline()
 {
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings(depthTexture);
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(depthTexture);
 }
 
 DepthDebugPipeline::~DepthDebugPipeline()
 {
 }
 
-void DepthDebugPipeline::SetUpDescriptorPool()
+void DepthDebugPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedDepthTexture> depthTexture)
 {
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
-}
-
-void DepthDebugPipeline::SetUpDescriptorLayout()
-{
-    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
-}
-
-void DepthDebugPipeline::SetUpDescriptorSets(std::shared_ptr<RenderedDepthTexture> depthTexture)
-{
-    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-    VkDescriptorImageInfo depthBuffer = nullBufferInfo;
-    if (depthTexture != nullptr)
-    {
-        depthBuffer = EnginePtr::GetEnginePtr()->AddTextureDescriptor(depthTexture->View, depthTexture->Sampler);
-    }
-
-    std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, depthBuffer));
-
-    vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    SubmitDescriptorSet();
 }
 
 
@@ -149,8 +123,6 @@ void DepthDebugPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 void DepthDebugPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedDepthTexture> depthTexture)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings(depthTexture);
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets(depthTexture);
 }

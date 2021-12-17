@@ -8,38 +8,19 @@ IrradiancePipeline::IrradiancePipeline() : GraphicsPipeline()
 
 IrradiancePipeline::IrradiancePipeline(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize) : GraphicsPipeline()
 {
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings(cubeMapTexture);
     SetUpShaderPipeLine(renderPass, cubeMapTexture, CubeMapSize);
-    SetUpDescriptorSets(cubeMapTexture);
 }
 
 IrradiancePipeline::~IrradiancePipeline()
 {
 }
 
-void IrradiancePipeline::SetUpDescriptorPool()
+void IrradiancePipeline::SetUpDescriptorBindings(std::shared_ptr<Texture> cubeMapTexture)
 {
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
-}
-
-void IrradiancePipeline::SetUpDescriptorLayout()
-{
-    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
-    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
-}
-
-void IrradiancePipeline::SetUpDescriptorSets(std::shared_ptr<Texture> cubeMapTexture)
-{
-    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
     VkDescriptorImageInfo CubeMapBufferImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(cubeMapTexture->View, cubeMapTexture->Sampler);
-
-    std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, CubeMapBufferImage));
-    vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    AddTextureDescriptorSetBinding(0, CubeMapBufferImage, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR);
+    SubmitDescriptorSet();
 }
 
 void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize)
@@ -165,8 +146,6 @@ void IrradiancePipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, std
 void IrradiancePipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<Texture> cubeMapTexture, float CubeMapSize)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings(cubeMapTexture);
     SetUpShaderPipeLine(renderPass, cubeMapTexture, CubeMapSize);
-    SetUpDescriptorSets(cubeMapTexture);
 }

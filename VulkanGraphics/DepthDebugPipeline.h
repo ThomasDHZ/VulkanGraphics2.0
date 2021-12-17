@@ -6,9 +6,7 @@
 class DepthDebugPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool();
-	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets(std::shared_ptr<RenderedDepthTexture> depthTexture);
+	void SetUpDescriptorBindings(std::shared_ptr<RenderedDepthTexture> depthTexture);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	DepthDebugPipeline();

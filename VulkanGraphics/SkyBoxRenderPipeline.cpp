@@ -7,39 +7,19 @@ SkyBoxRenderPipeline::SkyBoxRenderPipeline() : GraphicsPipeline()
 
 SkyBoxRenderPipeline::SkyBoxRenderPipeline(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount) : GraphicsPipeline()
 {
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings();
     SetUpShaderPipeLine(renderPass, SampleCount);
-    SetUpDescriptorSets();
 }
 
 SkyBoxRenderPipeline::~SkyBoxRenderPipeline()
 {
 }
 
-void SkyBoxRenderPipeline::SetUpDescriptorPool()
+void SkyBoxRenderPipeline::SetUpDescriptorBindings()
 {
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {}; 
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AssetManagerPtr::GetAssetPtr()->GetCubeMapBufferDescriptorCount()));
-    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
-}
-
-void SkyBoxRenderPipeline::SetUpDescriptorLayout()
-{
-    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, AssetManagerPtr::GetAssetPtr()->GetCubeMapBufferDescriptorCount() });
-    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
-}
-
-void SkyBoxRenderPipeline::SetUpDescriptorSets()
-{
-    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->textureManager->GetCubeMapTextureBufferDescriptorList();
-
-    std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, TextureBufferInfo));
-    vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    AddTextureDescriptorSetBinding(0, TextureBufferInfo, AssetManagerPtr::GetAssetPtr()->GetCubeMapBufferDescriptorCount(), VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR);
+    SubmitDescriptorSet();
 }
 
 void SkyBoxRenderPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount)
@@ -171,8 +151,6 @@ void SkyBoxRenderPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, V
 void SkyBoxRenderPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, VkSampleCountFlagBits SampleCount)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings();
     SetUpShaderPipeLine(renderPass, SampleCount);
-    SetUpDescriptorSets();
 }

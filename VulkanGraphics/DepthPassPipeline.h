@@ -5,9 +5,7 @@
 class DepthPassPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool();
-	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets();
+	void SetUpDescriptorBindings();
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	DepthPassPipeline();

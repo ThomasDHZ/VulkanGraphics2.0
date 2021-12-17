@@ -25,7 +25,6 @@ struct VertexData
 };
 
 layout(binding = 0) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
-layout(binding = 1) buffer Transform { mat4 Transform; } MeshTransform[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 0) out vec4 outColor;

@@ -6,9 +6,7 @@
 class PrefilterPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool();
-	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets(std::shared_ptr<Texture> cubeMapTexture);
+	void SetUpDescriptorBindings(std::shared_ptr<Texture> cubeMapTexture);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
 public:
 	PrefilterPipeline();
