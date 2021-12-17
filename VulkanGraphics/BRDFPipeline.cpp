@@ -8,36 +8,17 @@ BRDFPipeline::BRDFPipeline() : GraphicsPipeline()
 
 BRDFPipeline::BRDFPipeline(const VkRenderPass& renderPass) : GraphicsPipeline()
 {
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings();
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets();
 }
 
 BRDFPipeline::~BRDFPipeline()
 {
 }
 
-void BRDFPipeline::SetUpDescriptorPool()
+void BRDFPipeline::SetUpDescriptorBindings()
 {
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
-}
-
-void BRDFPipeline::SetUpDescriptorLayout()
-{
-    std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-    LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR, 1 });
-    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
-}
-
-void BRDFPipeline::SetUpDescriptorSets()
-{
-    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-
-    std::vector<VkWriteDescriptorSet> DescriptorList;
-    vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+    SubmitDescriptorSet();
 }
 
 
@@ -137,8 +118,6 @@ void BRDFPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
 void BRDFPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorPool();
-    SetUpDescriptorLayout();
+    SetUpDescriptorBindings();
     SetUpShaderPipeLine(renderPass);
-    SetUpDescriptorSets();
 }

@@ -6,9 +6,7 @@
 class DepthCubeMapPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool();
-	void SetUpDescriptorLayout();
-	void SetUpDescriptorSets(std::shared_ptr<CubeSampler> cubeSampler);
+	void SetUpDescriptorBindings(std::shared_ptr<CubeSampler> cubeSampler);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize);
 public:
 	DepthCubeMapPipeline();

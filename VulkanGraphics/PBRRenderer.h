@@ -28,10 +28,10 @@ private:
 	PBRReflectionRenderPass reflectionPBRPass;
 
 	IrradianceRenderPass irradianceRenderPass;
-	//PrefilterRenderPass prefilterRenderPass;
+	PrefilterRenderPass prefilterRenderPass;
 
-	//PBRRenderPass pbrRenderer;
-	//FrameBufferRenderPass FrameBufferRenderer;
+	PBRRenderPass pbrRenderer;
+	FrameBufferRenderPass FrameBufferRenderer;
 
 public:
 	PBRRenderer();

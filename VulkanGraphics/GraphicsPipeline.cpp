@@ -41,43 +41,58 @@ GraphicsPipeline::~GraphicsPipeline()
 
 void GraphicsPipeline::SubmitDescriptorSet()
 {
-    if(DescriptorBindingList.size() > 0)
+    if (DescriptorBindingList.size() > 0)
     {
-        std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-        for (auto& DescriptorBinding : DescriptorBindingList)
         {
-            DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(DescriptorBinding.DescriptorType, DescriptorBinding.Count));
+            std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
+            for (auto& DescriptorBinding : DescriptorBindingList)
+            {
+                DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(DescriptorBinding.DescriptorType, DescriptorBinding.Count));
+            }
+            DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
         }
+        {
+            std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
+            for (auto& DescriptorBinding : DescriptorBindingList)
+            {
+                LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.DescriptorType, DescriptorBinding.StageFlags, DescriptorBinding.Count });
+            }
+            DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
+        }
+        {
+            DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+
+            std::vector<VkWriteDescriptorSet> DescriptorList;
+
+            for (auto& DescriptorBinding : DescriptorBindingList)
+            {
+
+
+                if (DescriptorBinding.BufferDescriptor.size() > 0)
+                {
+                    DescriptorList.emplace_back(AddBufferDescriptorSet(DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.BufferDescriptor, DescriptorBinding.DescriptorType));
+                }
+                else if (DescriptorBinding.TextureDescriptor.size() > 0)
+                {
+                    DescriptorList.emplace_back(AddTextureDescriptorSet(DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.TextureDescriptor, DescriptorBinding.DescriptorType));
+                }
+                else
+                {
+                    DescriptorList.emplace_back(AddAccelerationBuffer(DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.AccelerationStructureDescriptor));
+                }
+            }
+            vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+        }
+    }
+    else
+    {
+        DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
         DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
-    }
-    {
-        std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-        for (auto& DescriptorBinding : DescriptorBindingList)
-        {
-            LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.DescriptorType, DescriptorBinding.StageFlags, DescriptorBinding.Count });
-        }
+
+        LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
         DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
-    }
-    {
+   
         DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-        std::vector<VkWriteDescriptorSet> DescriptorList;
-        for (auto& DescriptorBinding : DescriptorBindingList)
-        {
-         
-           
-             if (DescriptorBinding.BufferDescriptor.size() > 0)
-            {
-                DescriptorList.emplace_back(AddBufferDescriptorSet(DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.BufferDescriptor, DescriptorBinding.DescriptorType));
-            }
-            else if (DescriptorBinding.TextureDescriptor.size() > 0)
-            {
-                DescriptorList.emplace_back(AddTextureDescriptorSet(DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.TextureDescriptor, DescriptorBinding.DescriptorType));
-            }
-            else
-             {
-                 DescriptorList.emplace_back(AddAccelerationBuffer(DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.AccelerationStructureDescriptor));
-             }
-        }
         vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
     }
 }
