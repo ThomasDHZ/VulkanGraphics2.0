@@ -17,9 +17,6 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
-layout(binding = 7) uniform sampler2D TextureMap[];
-layout(binding = 8) uniform sampler3D Texture3DMap[];
-layout(binding = 9) uniform samplerCube CubeMap;
 
 layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec3 aNormal;

@@ -6,7 +6,7 @@ ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass() : BaseRenderPass()
 {
 }
 
-ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture) : BaseRenderPass()
+ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass(uint32_t cubeMapSize, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList) : BaseRenderPass()
 {
     cubeSampler = std::make_shared<CubeSampler>(CubeSampler(EnginePtr::GetEnginePtr()));
 
@@ -15,7 +15,7 @@ ReflectionCubeMapRenderPass::ReflectionCubeMapRenderPass(uint32_t cubeMapSize, s
     RenderedCubeBloom = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline = std::make_shared<ReflectionCubeMapPipeline>(ReflectionCubeMapPipeline(RenderPass, RenderPassResolution.x, ShadowMapTexture, cubeSampler));
+    depthCubeMapPipeline = std::make_shared<ReflectionCubeMapPipeline>(ReflectionCubeMapPipeline(RenderPass, RenderPassResolution.x, ShadowMapTextureList, cubeSampler));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, VK_SAMPLE_COUNT_1_BIT);
     SetUpCommandBuffers();
 }
@@ -134,7 +134,7 @@ void ReflectionCubeMapRenderPass::CreateRendererFramebuffers()
     }
 }
 
-void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture)
+void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList)
 {
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
@@ -153,7 +153,7 @@ void ReflectionCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize, std::sh
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x, ShadowMapTexture, cubeSampler);
+    depthCubeMapPipeline->UpdateGraphicsPipeLine(RenderPass, RenderPassResolution.x, ShadowMapTextureList, cubeSampler);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, VK_SAMPLE_COUNT_1_BIT);
     SetUpCommandBuffers();
 }

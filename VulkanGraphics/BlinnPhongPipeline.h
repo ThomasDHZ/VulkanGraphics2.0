@@ -7,9 +7,7 @@
 class BlinnPhongPipeline : public GraphicsPipeline
 {
 private:
-	void SetUpDescriptorPool(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
-	void SetUpDescriptorLayout(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
-	void SetUpDescriptorSets(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap);
+	void SetUpDescriptorBindings(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap);
 	void SetUpShaderPipeLine(const VkRenderPass& renderPass);
 public:
 	BlinnPhongPipeline();

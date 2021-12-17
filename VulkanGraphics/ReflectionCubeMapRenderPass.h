@@ -21,7 +21,7 @@ private:
 
 public:
 	ReflectionCubeMapRenderPass();
-	ReflectionCubeMapRenderPass(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	ReflectionCubeMapRenderPass(uint32_t cubeMapSize, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
 	~ReflectionCubeMapRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
@@ -29,7 +29,7 @@ public:
 	std::shared_ptr<ReflectionCubeMapPipeline> depthCubeMapPipeline;
 	std::shared_ptr<SkyBoxRenderPipeline> skyboxPipeline;
 
-	void RebuildSwapChain(uint32_t cubeMapSize, std::shared_ptr<RenderedDepthTexture> ShadowMapTexture);
+	void RebuildSwapChain(uint32_t cubeMapSize, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList);
 
 	void Update();
 	void Draw();
