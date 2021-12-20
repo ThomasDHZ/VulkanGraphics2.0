@@ -65,8 +65,6 @@ private:
 	void InitializeCommandPool();
 	void InitializeSyncObjects();
 
-	VkShaderModule ReadShaderFile(const std::string& filename);
-
 public:
 	VkInstance Instance = VK_NULL_HANDLE;
 	VkDevice Device = VK_NULL_HANDLE;
@@ -129,7 +127,6 @@ public:
 
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	uint64_t GetBufferDeviceAddress(VkBuffer buffer);
-	VkPipelineShaderStageCreateInfo CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages);
 
 	uint32_t GetAlignedSize(uint32_t value, uint32_t alignment);
 	void Mat4Logger(std::string name, glm::mat4 matrix);

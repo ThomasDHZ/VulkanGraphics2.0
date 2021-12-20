@@ -78,6 +78,8 @@ private:
 	std::vector<VkWriteDescriptorSet> DescriptorList{};
 	std::vector<DescriptorSetBindingStruct> DescriptorBindingList{};
 
+	VkShaderModule ReadShaderFile(const std::string& filename);
+
 	VkWriteDescriptorSet AddAccelerationBuffer(uint32_t BindingNumber, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure);
 	VkWriteDescriptorSet AddTextureDescriptorSet(uint32_t BindingNumber, VkDescriptorImageInfo& TextureImageInfo, VkDescriptorType descriptorType);
 	VkWriteDescriptorSet AddTextureDescriptorSet(uint32_t BindingNumber, std::vector<VkDescriptorImageInfo>& TextureImageInfo, VkDescriptorType descriptorType);
@@ -87,6 +89,8 @@ private:
 protected:
 	VkSampler NullSampler = VK_NULL_HANDLE;
 	VkDescriptorImageInfo nullBufferInfo;
+
+	VkPipelineShaderStageCreateInfo CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages);
 
 	VkDescriptorPoolSize AddDsecriptorPoolBinding(VkDescriptorType descriptorType, uint32_t descriptorCount);
 	VkDescriptorPool CreateDescriptorPool(std::vector<VkDescriptorPoolSize> DescriptorPoolInfo);

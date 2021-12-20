@@ -468,35 +468,6 @@ void VulkanEngine::InitializeSyncObjects()
 	}
 }
 
-VkShaderModule VulkanEngine::ReadShaderFile(const std::string& filename)
-{
-	std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-	if (!file.is_open()) {
-		throw std::runtime_error("failed to open file!");
-	}
-
-	size_t fileSize = (size_t)file.tellg();
-	std::vector<char> buffer(fileSize);
-
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
-
-	file.close();
-
-	VkShaderModuleCreateInfo createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	createInfo.codeSize = buffer.size();
-	createInfo.pCode = reinterpret_cast<const uint32_t*>(buffer.data());
-
-	VkShaderModule shaderModule;
-	if (vkCreateShaderModule(Device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create shader module!");
-	}
-
-	return shaderModule;
-}
-
 void VulkanEngine::Destroy()
 {
 	SwapChain.Destroy(Device);
@@ -609,17 +580,6 @@ uint64_t VulkanEngine::GetBufferDeviceAddress(VkBuffer buffer)
 	BufferDevice.sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO;
 	BufferDevice.buffer = buffer;
 	return vkGetBufferDeviceAddressKHR(Device, &BufferDevice);
-}
-
-VkPipelineShaderStageCreateInfo VulkanEngine::CreateShader(const std::string& filename, VkShaderStageFlagBits shaderStages)
-{
-	VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	vertShaderStageInfo.stage = shaderStages;
-	vertShaderStageInfo.module = ReadShaderFile(filename);
-	vertShaderStageInfo.pName = "main";
-
-	return vertShaderStageInfo;
 }
 
 uint32_t VulkanEngine::GetAlignedSize(uint32_t value, uint32_t alignment)
