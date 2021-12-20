@@ -94,6 +94,7 @@ public:
 	VkDescriptorSet DescriptorSet = VK_NULL_HANDLE;
 	VkPipelineLayout ShaderPipelineLayout = VK_NULL_HANDLE;
 	VkPipeline ShaderPipeline = VK_NULL_HANDLE;
+	VkPipelineCache PipelineCache = VK_NULL_HANDLE;
 
 	GraphicsPipeline();
 	~GraphicsPipeline();

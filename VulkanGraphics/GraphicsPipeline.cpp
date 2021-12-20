@@ -108,11 +108,13 @@ void GraphicsPipeline::UpdateGraphicsPipeLine()
     vkDestroyPipelineLayout(VulkanPtr::GetDevice(), ShaderPipelineLayout, nullptr);
     vkDestroyDescriptorPool(VulkanPtr::GetDevice(), DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(VulkanPtr::GetDevice(), DescriptorSetLayout, nullptr);
+    vkDestroyPipelineCache(VulkanPtr::GetDevice(), PipelineCache, nullptr);
 
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
     DescriptorPool = VK_NULL_HANDLE;
     DescriptorSetLayout = VK_NULL_HANDLE;
+    PipelineCache = VK_NULL_HANDLE;
 }
 
 void GraphicsPipeline::Destroy()
@@ -122,12 +124,14 @@ void GraphicsPipeline::Destroy()
     vkDestroyPipelineLayout(VulkanPtr::GetDevice(), ShaderPipelineLayout, nullptr);
     vkDestroyDescriptorPool(VulkanPtr::GetDevice(), DescriptorPool, nullptr);
     vkDestroyDescriptorSetLayout(VulkanPtr::GetDevice(), DescriptorSetLayout, nullptr);
+    vkDestroyPipelineCache(VulkanPtr::GetDevice(), PipelineCache, nullptr);
 
     NullSampler = VK_NULL_HANDLE;
     ShaderPipeline = VK_NULL_HANDLE;
     ShaderPipelineLayout = VK_NULL_HANDLE;
     DescriptorPool = VK_NULL_HANDLE;
     DescriptorSetLayout = VK_NULL_HANDLE;
+    PipelineCache = VK_NULL_HANDLE;
 }
 
 VkWriteDescriptorSet GraphicsPipeline::AddAccelerationBuffer(uint32_t BindingNumber, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure)

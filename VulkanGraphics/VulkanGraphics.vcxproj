@@ -213,7 +213,7 @@
     <ClCompile Include="AnimationPlayer2D.cpp" />
     <ClCompile Include="AnimationPlayer3D.cpp" />
     <ClCompile Include="Animaton2D.cpp" />
-    <ClCompile Include="AnimatorCompute.cpp" />
+    <ClCompile Include="ComputeAnimationPipeline.cpp" />
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="BaseRenderer.cpp" />
     <ClCompile Include="BaseRenderPass.cpp" />
@@ -339,7 +339,7 @@
     <ClInclude Include="AnimationPlayer2D.h" />
     <ClInclude Include="AnimationPlayer3D.h" />
     <ClInclude Include="Animaton2D.h" />
-    <ClInclude Include="AnimatorCompute.h" />
+    <ClInclude Include="ComputeAnimationPipeline.h" />
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="BaseRenderer.h" />
     <ClInclude Include="BaseRenderPass.h" />

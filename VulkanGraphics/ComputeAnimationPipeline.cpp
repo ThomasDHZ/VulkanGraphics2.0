@@ -1,19 +1,16 @@
-#include "AnimatorCompute.h"
-
+#include "ComputeAnimationPipeline.h"
 #include "Vertex.h"
 #include "GraphicsPipeline.h"
 
-AnimatorCompute::AnimatorCompute()
+ComputeAnimationPipeline::ComputeAnimationPipeline()
 {
 }
 
-AnimatorCompute::AnimatorCompute(std::shared_ptr<Mesh> meshptr)
+ComputeAnimationPipeline::ComputeAnimationPipeline(std::shared_ptr<Mesh> meshptr)
 {
 	mesh = meshptr;
 
-	SetUpDescriptorPool();
-	SetUpDescriptorLayout();
-	SetUpDescriptorSets();
+	SetUpDescriptorBindings();
 	CreateShaderPipeLine();
 
 	VkCommandBufferAllocateInfo allocInfo{};
@@ -27,35 +24,13 @@ AnimatorCompute::AnimatorCompute(std::shared_ptr<Mesh> meshptr)
 	}
 }
 
-AnimatorCompute::~AnimatorCompute()
+ComputeAnimationPipeline::~ComputeAnimationPipeline()
 {
-}
-
-void AnimatorCompute::SetUpDescriptorPool()
-{
-	std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1));
-	descriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
-}
-
-void AnimatorCompute::SetUpDescriptorLayout()
-{
-	std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
-	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 2, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-	LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 3, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT, 1 });
-	descriptorLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 	
-void AnimatorCompute::SetUpDescriptorSets()
+void ComputeAnimationPipeline::SetUpDescriptorBindings()
 {
 	VertexBufferCopy = std::make_shared<VulkanBuffer>(mesh->VertexBuffer);
-
-	descriptorSets = EnginePtr::GetEnginePtr()->CreateDescriptorSets(descriptorPool, descriptorLayout);
 
 	VkDescriptorBufferInfo VertexBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->VertexBuffer);
 	VkDescriptorBufferInfo BoneWeightBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->BoneWeightBuffer);
@@ -63,15 +38,15 @@ void AnimatorCompute::SetUpDescriptorSets()
 	VkDescriptorBufferInfo BoneTransformBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->BoneTransformBuffer);
 	VkDescriptorBufferInfo TransformDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->TransformBuffer);
 
-	std::vector<VkWriteDescriptorSet> DescriptorList;
-	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(0, descriptorSets, VertexBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(1, descriptorSets, BoneWeightBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(2, descriptorSets, MeshDataBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddBufferDescriptorSet(3, descriptorSets, BoneTransformBufferInfo, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
-	vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
+	AddStorageBufferDescriptorSetBinding(0, VertexBufferInfo, VK_SHADER_STAGE_COMPUTE_BIT);
+	AddStorageBufferDescriptorSetBinding(1, BoneWeightBufferInfo, VK_SHADER_STAGE_COMPUTE_BIT);
+	AddStorageBufferDescriptorSetBinding(2, MeshDataBufferInfo, VK_SHADER_STAGE_COMPUTE_BIT);
+	AddStorageBufferDescriptorSetBinding(3, BoneTransformBufferInfo, VK_SHADER_STAGE_COMPUTE_BIT);
+	AddStorageBufferDescriptorSetBinding(4, TransformDataBufferInfo, VK_SHADER_STAGE_COMPUTE_BIT);
+	SubmitDescriptorSet();
 }
 
-void AnimatorCompute::CreateShaderPipeLine()
+void ComputeAnimationPipeline::CreateShaderPipeLine()
 {
 	auto ComputeShaderCode = EnginePtr::GetEnginePtr()->CreateShader("Shaders/animate.spv", VK_SHADER_STAGE_COMPUTE_BIT);
 
@@ -84,7 +59,7 @@ void AnimatorCompute::CreateShaderPipeLine()
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 1;
 	pipelineLayoutInfo.pushConstantRangeCount = 1;
-	pipelineLayoutInfo.pSetLayouts = &descriptorLayout;
+	pipelineLayoutInfo.pSetLayouts = &DescriptorSetLayout;
 	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 	vkCreatePipelineLayout(VulkanPtr::GetDevice(), &pipelineLayoutInfo, nullptr, &ShaderPipelineLayout);
 
@@ -105,7 +80,7 @@ void AnimatorCompute::CreateShaderPipeLine()
 	vkDestroyShaderModule(VulkanPtr::GetDevice(), ComputeShaderCode.module, nullptr);
 }
 
-void AnimatorCompute::Compute()
+void ComputeAnimationPipeline::Compute()
 {
 	ConstMeshInfo meshInfo;
 	meshInfo.MeshIndex = 0;
@@ -125,17 +100,10 @@ void AnimatorCompute::Compute()
 	BufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 	BufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	BufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	vkCmdPipelineBarrier(
-		commandBuffer,
-		VK_PIPELINE_STAGE_HOST_BIT,
-		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-		0,
-		0, nullptr,
-		1, &BufferMemoryBarrier,
-		0, nullptr);
+	vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, 0, 0, nullptr, 1, &BufferMemoryBarrier, 0, nullptr);
 
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipeline);
-	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipelineLayout, 0, 1, &descriptorSets, 0, 0);
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, ShaderPipelineLayout, 0, 1, &DescriptorSet, 0, 0);
 	vkCmdPushConstants(commandBuffer, ShaderPipelineLayout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof(ConstMeshInfo), &meshInfo);
 	vkCmdDispatch(commandBuffer, VertexBufferCopy->BufferSize, 1, 1);
 
@@ -145,30 +113,8 @@ void AnimatorCompute::Compute()
 	BufferMemoryBarrier.size = VK_WHOLE_SIZE;
 	BufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 	BufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	vkCmdPipelineBarrier(
-		commandBuffer,
-		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-		VK_PIPELINE_STAGE_TRANSFER_BIT,
-		0,
-		0, nullptr,
-		1, &BufferMemoryBarrier,
-		0, nullptr);
+	vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 1, &BufferMemoryBarrier, 0, nullptr);
 
 	mesh->VertexBuffer.CopyBufferToMemory(&mesh->VertexList[0], sizeof(Vertex) * mesh->VertexList.size());
 	vkEndCommandBuffer(commandBuffer);
-}
-
-void AnimatorCompute::Destroy()
-{
-	vkDestroyPipeline(VulkanPtr::GetDevice(), ShaderPipeline, nullptr);
-	vkDestroyPipelineLayout(VulkanPtr::GetDevice(), ShaderPipelineLayout, nullptr);
-	vkDestroyPipelineCache(VulkanPtr::GetDevice(), PipelineCache, nullptr);
-	vkDestroyDescriptorSetLayout(VulkanPtr::GetDevice(), descriptorLayout, nullptr);
-	vkDestroyDescriptorPool(VulkanPtr::GetDevice(), descriptorPool, nullptr);
-
-	ShaderPipeline = VK_NULL_HANDLE;
-	ShaderPipelineLayout = VK_NULL_HANDLE;
-	PipelineCache = VK_NULL_HANDLE;
-	descriptorLayout = VK_NULL_HANDLE;
-	descriptorPool = VK_NULL_HANDLE;
 }
