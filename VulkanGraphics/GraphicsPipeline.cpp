@@ -47,9 +47,9 @@ void GraphicsPipeline::SubmitDescriptorSet()
             std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
             for (auto& DescriptorBinding : DescriptorBindingList)
             {
-                DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(DescriptorBinding.DescriptorType, DescriptorBinding.Count));
+                DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(DescriptorBinding.DescriptorType, DescriptorBinding.Count));
             }
-            DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
+            DescriptorPool = CreateDescriptorPool(DescriptorPoolList);
         }
         {
             std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
@@ -57,10 +57,10 @@ void GraphicsPipeline::SubmitDescriptorSet()
             {
                 LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ DescriptorBinding.DescriptorSlotNumber, DescriptorBinding.DescriptorType, DescriptorBinding.StageFlags, DescriptorBinding.Count });
             }
-            DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
+            DescriptorSetLayout = CreateDescriptorSetLayout(LayoutBindingInfo);
         }
         {
-            DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+            DescriptorSet = CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
             std::vector<VkWriteDescriptorSet> DescriptorList;
 
@@ -86,13 +86,13 @@ void GraphicsPipeline::SubmitDescriptorSet()
     }
     else
     {
-        DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-        DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
+        DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+        DescriptorPool = CreateDescriptorPool(DescriptorPoolList);
 
         LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL, 1 });
-        DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
+        DescriptorSetLayout = CreateDescriptorSetLayout(LayoutBindingInfo);
    
-        DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+        DescriptorSet = CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
         vkUpdateDescriptorSets(VulkanPtr::GetDevice(), static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
     }
 }
@@ -294,4 +294,224 @@ void GraphicsPipeline::AddNullDescriptorSetBinding(uint32_t BindingNumber)
     DescriptorSetBinding.DescriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     DescriptorSetBinding.Count = 0;
     DescriptorBindingList.emplace_back(DescriptorSetBinding);
+}
+
+VkDescriptorPoolSize GraphicsPipeline::AddDsecriptorPoolBinding(VkDescriptorType descriptorType, uint32_t descriptorCount)
+{
+    VkDescriptorPoolSize DescriptorPoolBinding = {};
+    DescriptorPoolBinding.type = descriptorType;
+    DescriptorPoolBinding.descriptorCount = descriptorCount;
+
+    return DescriptorPoolBinding;
+}
+
+VkDescriptorPool GraphicsPipeline::CreateDescriptorPool(std::vector<VkDescriptorPoolSize> DescriptorPoolInfo)
+{
+    VkDescriptorPoolCreateInfo poolInfo = {};
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.poolSizeCount = static_cast<uint32_t>(DescriptorPoolInfo.size());
+    poolInfo.pPoolSizes = DescriptorPoolInfo.data();
+    poolInfo.maxSets = static_cast<uint32_t>(EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainImageCount());
+
+    VkDescriptorPool descriptorPool;
+    if (vkCreateDescriptorPool(EnginePtr::GetEnginePtr()->Device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create descriptor pool!");
+    }
+
+    return descriptorPool;
+}
+
+VkDescriptorSetLayout GraphicsPipeline::CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo)
+{
+    std::vector<VkDescriptorSetLayoutBinding> LayoutBindingList = {};
+
+    for (auto Binding : LayoutBindingInfo)
+    {
+        VkDescriptorSetLayoutBinding LayoutBinding = {};
+        LayoutBinding.binding = Binding.Binding;
+        LayoutBinding.descriptorCount = Binding.Count;
+        LayoutBinding.descriptorType = Binding.DescriptorType;
+        LayoutBinding.pImmutableSamplers = nullptr;
+        LayoutBinding.stageFlags = Binding.StageFlags;
+
+        LayoutBindingList.emplace_back(LayoutBinding);
+    }
+
+    VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = static_cast<uint32_t>(LayoutBindingList.size());
+    layoutInfo.pBindings = LayoutBindingList.data();
+
+    VkDescriptorSetLayout descriptorSet;
+    if (vkCreateDescriptorSetLayout(EnginePtr::GetEnginePtr()->Device, &layoutInfo, nullptr, &descriptorSet) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create descriptor set layout!");
+    }
+
+    return descriptorSet;
+}
+
+VkDescriptorSetLayout GraphicsPipeline::CreateDescriptorSetLayout(std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo, VkDescriptorSetLayoutBindingFlagsCreateInfoEXT& DescriptorSetLayoutBindingFlags)
+{
+    std::vector<VkDescriptorSetLayoutBinding> LayoutBindingList = {};
+
+    for (auto Binding : LayoutBindingInfo)
+    {
+        VkDescriptorSetLayoutBinding LayoutBinding = {};
+        LayoutBinding.binding = Binding.Binding;
+        LayoutBinding.descriptorCount = Binding.Count;
+        LayoutBinding.descriptorType = Binding.DescriptorType;
+        LayoutBinding.pImmutableSamplers = nullptr;
+        LayoutBinding.stageFlags = Binding.StageFlags;
+
+        LayoutBindingList.emplace_back(LayoutBinding);
+    }
+
+    VkDescriptorSetLayoutCreateInfo layoutInfo = {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = static_cast<uint32_t>(LayoutBindingList.size());
+    layoutInfo.pBindings = LayoutBindingList.data();
+    layoutInfo.pNext = &DescriptorSetLayoutBindingFlags;
+
+    VkDescriptorSetLayout descriptorSet;
+    if (vkCreateDescriptorSetLayout(EnginePtr::GetEnginePtr()->Device, &layoutInfo, nullptr, &descriptorSet) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create descriptor set layout!");
+    }
+
+    return descriptorSet;
+}
+
+VkDescriptorSet GraphicsPipeline::CreateDescriptorSets(VkDescriptorPool descriptorPool, VkDescriptorSetLayout layout)
+{
+
+    uint32_t variableDescCounts[] = { 1 };
+
+    VkDescriptorSetVariableDescriptorCountAllocateInfoEXT VariableDescriptorCountAllocateInfo{};
+    VariableDescriptorCountAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO_EXT;
+    VariableDescriptorCountAllocateInfo.descriptorSetCount = 1;
+    VariableDescriptorCountAllocateInfo.pDescriptorCounts = variableDescCounts;
+
+    VkDescriptorSetAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = descriptorPool;
+    allocInfo.descriptorSetCount = 1;
+    allocInfo.pSetLayouts = &layout;
+    allocInfo.pNext = &VariableDescriptorCountAllocateInfo;
+
+    VkDescriptorSet DescriptorSets;
+    if (vkAllocateDescriptorSets(EnginePtr::GetEnginePtr()->Device, &allocInfo, &DescriptorSets) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate descriptor sets!");
+    }
+
+    return DescriptorSets;
+}
+
+VkDescriptorBufferInfo GraphicsPipeline::AddBufferDescriptor(VulkanBuffer& buffer)
+{
+    VkDescriptorBufferInfo BufferInfo = {};
+    BufferInfo.buffer = buffer.Buffer;
+    BufferInfo.offset = 0;
+    BufferInfo.range = buffer.BufferSize;
+    return BufferInfo;
+}
+
+VkWriteDescriptorSet GraphicsPipeline::AddBufferDescriptorSet(uint32_t BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorBufferInfo& BufferInfo, VkDescriptorType descriptorType)
+{
+    VkWriteDescriptorSet BufferDescriptor = {};
+    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    BufferDescriptor.dstSet = DescriptorSet;
+    BufferDescriptor.dstBinding = BindingNumber;
+    BufferDescriptor.dstArrayElement = 0;
+    BufferDescriptor.descriptorType = descriptorType;
+    BufferDescriptor.descriptorCount = 1;
+    BufferDescriptor.pBufferInfo = &BufferInfo;
+    return BufferDescriptor;
+}
+
+VkWriteDescriptorSet GraphicsPipeline::AddBufferDescriptorSet(uint32_t BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorBufferInfo>& BufferInfoList, VkDescriptorType descriptorType)
+{
+    VkWriteDescriptorSet BufferDescriptor = {};
+    BufferDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    BufferDescriptor.dstSet = DescriptorSet;
+    BufferDescriptor.dstBinding = BindingNumber;
+    BufferDescriptor.dstArrayElement = 0;
+    BufferDescriptor.descriptorType = descriptorType;
+    BufferDescriptor.descriptorCount = static_cast<uint32_t>(BufferInfoList.size());
+    BufferDescriptor.pBufferInfo = BufferInfoList.data();
+    return BufferDescriptor;
+}
+
+VkWriteDescriptorSet GraphicsPipeline::AddTextureDescriptorSet(uint32_t BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+{
+    VkWriteDescriptorSet TextureDescriptor = {};
+    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    TextureDescriptor.dstSet = DescriptorSet;
+    TextureDescriptor.dstBinding = BindingNumber;
+    TextureDescriptor.dstArrayElement = 0;
+    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    TextureDescriptor.descriptorCount = 1;
+    TextureDescriptor.pImageInfo = &TextureImageInfo;
+    return TextureDescriptor;
+}
+
+VkWriteDescriptorSet GraphicsPipeline::AddTextureDescriptorSet(uint32_t BindingNumber, VkDescriptorSet& DescriptorSet, std::vector<VkDescriptorImageInfo>& TextureImageInfo)
+{
+    VkWriteDescriptorSet TextureDescriptor = {};
+    TextureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    TextureDescriptor.dstSet = DescriptorSet;
+    TextureDescriptor.dstBinding = BindingNumber;
+    TextureDescriptor.dstArrayElement = 0;
+    TextureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    TextureDescriptor.descriptorCount = static_cast<uint32_t>(TextureImageInfo.size());
+    TextureDescriptor.pImageInfo = TextureImageInfo.data();
+    return TextureDescriptor;
+}
+
+VkWriteDescriptorSet GraphicsPipeline::AddStorageImageBuffer(uint32_t BindingNumber, VkDescriptorSet& DescriptorSet, VkDescriptorImageInfo& TextureImageInfo)
+{
+    VkWriteDescriptorSet ImageDescriptor{};
+    ImageDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    ImageDescriptor.dstSet = DescriptorSet;
+    ImageDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+    ImageDescriptor.dstBinding = BindingNumber;
+    ImageDescriptor.pImageInfo = &TextureImageInfo;
+    ImageDescriptor.descriptorCount = 1;
+    return ImageDescriptor;
+}
+
+VkWriteDescriptorSet GraphicsPipeline::AddAccelerationBuffer(uint32_t BindingNumber, VkDescriptorSet& DescriptorSet, VkWriteDescriptorSetAccelerationStructureKHR& accelerationStructure)
+{
+    VkWriteDescriptorSet AccelerationDesciptorSet = {};
+    AccelerationDesciptorSet.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    AccelerationDesciptorSet.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+    AccelerationDesciptorSet.dstSet = DescriptorSet;
+    AccelerationDesciptorSet.dstBinding = BindingNumber;
+    AccelerationDesciptorSet.descriptorCount = 1;
+    AccelerationDesciptorSet.pNext = &accelerationStructure;
+    return AccelerationDesciptorSet;
+}
+
+VkWriteDescriptorSetAccelerationStructureKHR GraphicsPipeline::AddAcclerationStructureBinding(VkAccelerationStructureKHR& handle)
+{
+    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = {};
+    AccelerationDescriptorStructure.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+    AccelerationDescriptorStructure.accelerationStructureCount = 1;
+    AccelerationDescriptorStructure.pAccelerationStructures = &handle;
+    return AccelerationDescriptorStructure;
+}
+
+VkDescriptorImageInfo GraphicsPipeline::AddRayTraceReturnImageDescriptor(VkImageLayout ImageLayout, VkImageView& ImageView)
+{
+    VkDescriptorImageInfo RayTraceImageDescriptor{};
+    RayTraceImageDescriptor.imageView = ImageView;
+    RayTraceImageDescriptor.imageLayout = ImageLayout;
+    return RayTraceImageDescriptor;
+}
+
+VkDescriptorImageInfo GraphicsPipeline::AddTextureDescriptor(VkImageView view, VkSampler sampler)
+{
+    VkDescriptorImageInfo DescriptorImage{};
+    DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    DescriptorImage.imageView = view;
+    DescriptorImage.sampler = sampler;
+    return DescriptorImage;
 }

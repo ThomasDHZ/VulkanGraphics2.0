@@ -18,11 +18,11 @@ DepthCubeMapPipeline::~DepthCubeMapPipeline()
 
 void DepthCubeMapPipeline::SetUpDescriptorBindings(std::shared_ptr<CubeSampler>  cubeSampler)
 {
-    VkDescriptorBufferInfo SceneDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
+    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = AssetManagerPtr::GetAssetPtr()->GetMeshPropertiesDescriptorsList();
     std::vector<VkDescriptorBufferInfo> TransformBufferList = AssetManagerPtr::GetAssetPtr()->GetTransformBufferDescriptorsList();
     std::vector<VkDescriptorImageInfo> TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->GetTexture2DBufferDescriptorList();
-    VkDescriptorBufferInfo ViewMatrixBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(cubeSampler->VulkanBufferData);
+    VkDescriptorBufferInfo ViewMatrixBufferInfo = AddBufferDescriptor(cubeSampler->VulkanBufferData);
 
     AddUniformBufferDescriptorSetBinding(0, SceneDataBufferInfo);
     AddStorageBufferDescriptorSetBinding(1, MeshPropertyDataBufferInfo, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount());

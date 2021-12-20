@@ -17,8 +17,8 @@ FrameBufferPipeline::~FrameBufferPipeline()
 
 void FrameBufferPipeline::SetUpDescriptorBindings(std::shared_ptr<Texture> RenderedTexture, std::shared_ptr<Texture> BloomTexture)
 {
-    VkDescriptorImageInfo RenderedTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(RenderedTexture->View, RenderedTexture->Sampler);
-    VkDescriptorImageInfo BloomTextureBufferInfo = EnginePtr::GetEnginePtr()->AddTextureDescriptor(BloomTexture->View, BloomTexture->Sampler);
+    VkDescriptorImageInfo RenderedTextureBufferInfo = AddTextureDescriptor(RenderedTexture->View, RenderedTexture->Sampler);
+    VkDescriptorImageInfo BloomTextureBufferInfo = AddTextureDescriptor(BloomTexture->View, BloomTexture->Sampler);
 
     AddTextureDescriptorSetBinding(0, RenderedTextureBufferInfo, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR);
     AddTextureDescriptorSetBinding(1, BloomTextureBufferInfo, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR | VK_SHADER_STAGE_ANY_HIT_BIT_KHR);

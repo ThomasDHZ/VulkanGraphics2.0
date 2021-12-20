@@ -19,7 +19,7 @@ MultiViewSkyboxPipeline::~MultiViewSkyboxPipeline()
 
 void MultiViewSkyboxPipeline::SetUpDescriptorBindings(std::shared_ptr<Texture> cubeMapTexture)
 {
-    VkDescriptorImageInfo CubeMapBufferImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(cubeMapTexture->View, cubeMapTexture->Sampler);
+    VkDescriptorImageInfo CubeMapBufferImage = AddTextureDescriptor(cubeMapTexture->View, cubeMapTexture->Sampler);
     AddTextureDescriptorSetBinding(0, CubeMapBufferImage, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR);
     SubmitDescriptorSet();
 }

@@ -45,7 +45,7 @@ void PBRPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCubeMapTexture
         }
     }
 
-    VkDescriptorBufferInfo SceneDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
+    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
     std::vector<VkDescriptorBufferInfo> MeshPropertyDataBufferInfo = AssetManagerPtr::GetAssetPtr()->GetMeshPropertiesDescriptorsList();
     std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetDirectionalLightBufferDescriptorList();
     std::vector<VkDescriptorBufferInfo> PointLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetPointLightBufferDescriptorList();
@@ -59,10 +59,10 @@ void PBRPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCubeMapTexture
     std::vector<VkDescriptorBufferInfo> SphereAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptorList();
     std::vector<VkDescriptorBufferInfo> TubeAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptorList();
     std::vector<VkDescriptorBufferInfo> RectangleAreaBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptorList();
-    VkDescriptorImageInfo IrradianceMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(IrradianceMap->View, IrradianceMap->Sampler);
-    VkDescriptorImageInfo PrefilerMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(PrefilerMap->View, PrefilerMap->Sampler);
-    VkDescriptorImageInfo BRDFMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(BRDFMap->View, BRDFMap->Sampler);
-    VkDescriptorImageInfo RenderedCubeMapImage = EnginePtr::GetEnginePtr()->AddTextureDescriptor(RenderedCubeMap->View, RenderedCubeMap->Sampler);
+    VkDescriptorImageInfo IrradianceMapImage = AddTextureDescriptor(IrradianceMap->View, IrradianceMap->Sampler);
+    VkDescriptorImageInfo PrefilerMapImage = AddTextureDescriptor(PrefilerMap->View, PrefilerMap->Sampler);
+    VkDescriptorImageInfo BRDFMapImage = AddTextureDescriptor(BRDFMap->View, BRDFMap->Sampler);
+    VkDescriptorImageInfo RenderedCubeMapImage = AddTextureDescriptor(RenderedCubeMap->View, RenderedCubeMap->Sampler);
 
     AddUniformBufferDescriptorSetBinding(0, SceneDataBufferInfo);
     AddStorageBufferDescriptorSetBinding(1, MeshPropertyDataBufferInfo, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount());

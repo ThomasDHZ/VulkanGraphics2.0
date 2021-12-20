@@ -32,11 +32,11 @@ void ComputeAnimationPipeline::SetUpDescriptorBindings()
 {
 	VertexBufferCopy = std::make_shared<VulkanBuffer>(mesh->VertexBuffer);
 
-	VkDescriptorBufferInfo VertexBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->VertexBuffer);
-	VkDescriptorBufferInfo BoneWeightBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->BoneWeightBuffer);
-	VkDescriptorBufferInfo MeshDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->MeshProperties.VulkanBufferData);
-	VkDescriptorBufferInfo BoneTransformBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->BoneTransformBuffer);
-	VkDescriptorBufferInfo TransformDataBufferInfo = EnginePtr::GetEnginePtr()->AddBufferDescriptor(mesh->TransformBuffer);
+	VkDescriptorBufferInfo VertexBufferInfo = AddBufferDescriptor(mesh->VertexBuffer);
+	VkDescriptorBufferInfo BoneWeightBufferInfo = AddBufferDescriptor(mesh->BoneWeightBuffer);
+	VkDescriptorBufferInfo MeshDataBufferInfo = AddBufferDescriptor(mesh->MeshProperties.VulkanBufferData);
+	VkDescriptorBufferInfo BoneTransformBufferInfo = AddBufferDescriptor(mesh->BoneTransformBuffer);
+	VkDescriptorBufferInfo TransformDataBufferInfo = AddBufferDescriptor(mesh->TransformBuffer);
 
 	AddStorageBufferDescriptorSetBinding(0, VertexBufferInfo, VK_SHADER_STAGE_COMPUTE_BIT);
 	AddStorageBufferDescriptorSetBinding(1, BoneWeightBufferInfo, VK_SHADER_STAGE_COMPUTE_BIT);

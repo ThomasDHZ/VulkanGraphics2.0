@@ -29,11 +29,11 @@ void PBRRayTracedPipeline::UpdateGraphicsPipeLine(std::shared_ptr<VulkanEngine> 
 
 void PBRRayTracedPipeline::SetUpDescriptorBindings(std::shared_ptr<VulkanEngine> engine, std::shared_ptr<AssetManager> assetManager, AccelerationStructure& topLevelAS, std::shared_ptr<RenderedRayTracedColorTexture> RayTracedTexture)
 {
-    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+    DescriptorSet = CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
 
-    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = engine->AddAcclerationStructureBinding(topLevelAS.handle);
-    VkDescriptorImageInfo RayTracedTextureMaskDescriptor = engine->AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayTracedTexture->View);
-    VkDescriptorBufferInfo SceneDataBufferInfo = engine->AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
+    VkWriteDescriptorSetAccelerationStructureKHR AccelerationDescriptorStructure = AddAcclerationStructureBinding(topLevelAS.handle);
+    VkDescriptorImageInfo RayTracedTextureMaskDescriptor = AddRayTraceReturnImageDescriptor(VK_IMAGE_LAYOUT_GENERAL, RayTracedTexture->View);
+    VkDescriptorBufferInfo SceneDataBufferInfo = AddBufferDescriptor(AssetManagerPtr::GetAssetPtr()->SceneData->VulkanBufferData);
 
     std::vector<VkDescriptorBufferInfo> DirectionalLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetDirectionalLightBufferDescriptorList();
     std::vector<VkDescriptorBufferInfo> PointLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetPointLightBufferDescriptorList();
