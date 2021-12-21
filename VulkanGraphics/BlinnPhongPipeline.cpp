@@ -53,7 +53,7 @@ void BlinnPhongPipeline::SetUpDescriptorBindings(std::vector<std::shared_ptr<Ren
     std::vector<VkDescriptorBufferInfo> SphereAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetSphereAreaLightDescriptorList();
     std::vector<VkDescriptorBufferInfo> TubeAreaLightBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetTubeAreaLightDescriptorList();
     std::vector<VkDescriptorBufferInfo> RectangleAreaBufferInfoList = AssetManagerPtr::GetAssetPtr()->lightManager->GetRectangleAreaLightDescriptorList();
-
+    VkDescriptorImageInfo RenderedCubeMapDescriptor = AddTextureDescriptor(RenderedCubeMap->GetTextureView(), RenderedCubeMap->GetTextureSampler());
 
     AddUniformBufferDescriptorSetBinding(0, SceneDataBufferInfo);
     AddStorageBufferDescriptorSetBinding(1, MeshPropertyDataBufferInfo, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount());
@@ -67,6 +67,7 @@ void BlinnPhongPipeline::SetUpDescriptorBindings(std::vector<std::shared_ptr<Ren
     AddStorageBufferDescriptorSetBinding(9, TubeAreaLightBufferInfoList, LightManagerPtr::GetLightManagerPtr()->GetTubeAreaLightDescriptorCount());
     AddStorageBufferDescriptorSetBinding(10, RectangleAreaBufferInfoList, LightManagerPtr::GetLightManagerPtr()->GetRectangleAreaLightDescriptorCount());
     AddTextureDescriptorSetBinding(11, ShadowDescriptorImageList, 1);
+    AddTextureDescriptorSetBinding(12, RenderedCubeMapDescriptor);
     SubmitDescriptorSet();
 
 }

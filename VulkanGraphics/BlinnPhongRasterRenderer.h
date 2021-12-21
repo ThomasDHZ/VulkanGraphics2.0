@@ -15,7 +15,7 @@ private:
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;
 	//DepthDebugRenderPass DebugDepthRenderPass;
-	ReflectionCubeMapRenderPass ReflectionRenderPass;
+	//ReflectionCubeMapRenderPass ReflectionRenderPass;
 	BlinnPhongRasterPass BlinnRenderPass;
 	FrameBufferRenderPass FrameBufferRenderer;
 

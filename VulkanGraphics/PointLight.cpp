@@ -7,8 +7,9 @@ PointLight::PointLight() : Light<PointLightBuffer>()
 PointLight::PointLight(PointLightBuffer light) : Light<PointLightBuffer>(EnginePtr::GetEnginePtr())
 {
 	LightBuffer.UniformDataInfo = light;
-	lightViewCamera = std::make_shared<ObjectViewCamera>(ObjectViewCamera("PointShadowCamera", LightBuffer.UniformDataInfo.position, cameraDirection));
+	lightViewCamera = std::make_shared<OrthographicLightViewCamera>(OrthographicLightViewCamera("PointShadowCamera", LightBuffer.UniformDataInfo.position, cameraDirection));
 	CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(lightViewCamera);
+	auto a = CameraManagerPtr::GetCameraManagerPtr()->CameraList;
 	Update();
 }
 

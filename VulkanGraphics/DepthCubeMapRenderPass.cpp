@@ -142,9 +142,8 @@ void DepthCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 void DepthCubeMapRenderPass::Update()
 {
     const glm::vec3 LightPos = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->LightBuffer.UniformDataInfo.position;
-    float near_plane = 1.0f;
-    float far_plane = 25.0f;
-    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)RenderedCubeMap->Width / (float)RenderedCubeMap->Height, near_plane, far_plane);
+    float near_plane = -1000.0f, far_plane = 1000.0f;
+    glm::mat4 shadowProj = glm::ortho(-1000.0f, 1000.0f, -1000.0f, 1000.0f, near_plane, far_plane);
     std::vector<glm::mat4> shadowTransforms;
     cubeSampler->UniformDataInfo.LightSpaceMatrix[0] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     cubeSampler->UniformDataInfo.LightSpaceMatrix[1] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));

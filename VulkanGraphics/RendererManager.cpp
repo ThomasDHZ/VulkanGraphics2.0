@@ -209,7 +209,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     ImGui::LabelText("Point Light", "Point Light");
     for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->PointLightList.size(); x++)
     {
-        GUIChanged |= ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 100.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -2000.0f, 2000.0f);
         GUIChanged |= ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->cameraDirection.x, -180.0f, 180.0f);
         GUIChanged |= ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);

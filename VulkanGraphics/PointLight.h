@@ -1,5 +1,6 @@
 #pragma once
 #include "Light.h"
+#include "OrthographicLightViewCamera.h"
 
 class PointLight : public Light<PointLightBuffer>
 {
@@ -16,7 +17,7 @@ public:
 	void Update() override;
 	void Destroy() override;
 
-	std::shared_ptr<ObjectViewCamera> lightViewCamera;
+	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
 	glm::mat3 GetLightSpaceMatrix() { return lightViewCamera->GetLightSpaceMatrix(); }
 };
 
