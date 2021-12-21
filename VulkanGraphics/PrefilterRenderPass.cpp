@@ -21,7 +21,6 @@ PrefilterRenderPass::PrefilterRenderPass(std::shared_ptr<Texture> cubeMapTexture
     SetUpCommandBuffers();
 
     Draw();
-    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 PrefilterRenderPass::~PrefilterRenderPass()
@@ -148,7 +147,6 @@ void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTextu
     SetUpCommandBuffers();
 
     Draw();
-    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 void PrefilterRenderPass::Draw()

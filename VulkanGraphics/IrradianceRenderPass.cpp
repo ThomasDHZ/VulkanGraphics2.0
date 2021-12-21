@@ -19,7 +19,6 @@ IrradianceRenderPass::IrradianceRenderPass(std::shared_ptr<Texture> cubeMapTextu
     SetUpCommandBuffers();
 
     Draw();
-    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 IrradianceRenderPass::~IrradianceRenderPass()
@@ -141,7 +140,6 @@ void IrradianceRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapText
     SetUpCommandBuffers();
 
     Draw();
-    OneTimeRenderPassSubmit(&CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 }
 
 void IrradianceRenderPass::Draw()
