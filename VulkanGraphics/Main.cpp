@@ -161,7 +161,7 @@ private:
         //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight3);
         //LightManagerPtr::GetLightManagerPtr()->AddPointLight(plight4);
         //LightManagerPtr::GetLightManagerPtr()->AddSphereAreaLight(spherelight);
-        //LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
+        LightManagerPtr::GetLightManagerPtr()->AddSpotLight(slight);
 
        // std::vector<Vertex> vertices =
        // {

@@ -313,6 +313,7 @@
     <ClCompile Include="SparkManStage.cpp" />
     <ClCompile Include="SphereAreaLight.cpp" />
     <ClCompile Include="SpotLight.cpp" />
+    <ClCompile Include="SpotLightDepthRenderPass.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Texture2D.cpp" />
@@ -442,6 +443,7 @@
     <ClInclude Include="SparkManStage.h" />
     <ClInclude Include="SphereAreaLight.h" />
     <ClInclude Include="SpotLight.h" />
+    <ClInclude Include="SpotLightDepthRenderPass.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Texture2D.h" />

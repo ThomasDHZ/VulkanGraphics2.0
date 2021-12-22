@@ -8,5 +8,9 @@ public:
 	SpotLight(std::shared_ptr<VulkanEngine> engine);
 	SpotLight(SpotLightBuffer light);
 	~SpotLight();
+
+	std::shared_ptr<PerspectiveCamera> lightViewCamera;
+	void Update() override;
+	void Destroy() override;
 };
 

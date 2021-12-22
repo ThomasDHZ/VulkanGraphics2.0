@@ -29,6 +29,7 @@ layout(binding = 9) buffer TubeAreaLightBuffer { TubeAreaLight tubeAreaLight; } 
 layout(binding = 10) buffer RectangleAreaLightBuffer { RectangleAreaLight rectangleAreaLight; } rectangleAreaLightBuffer[];
 layout(binding = 11) uniform sampler2D ShadowMap[];
 layout(binding = 12) uniform samplerCube CubeShadowMap[];
+layout(binding = 13) uniform sampler2D SpotLightShadowMap[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -110,6 +111,43 @@ float ShadowCalculation(vec3 fragPos, vec3 lightPos, vec3 viewPos)
     // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
         
     return shadow;
+}
+
+float SpotLightShadowCalculation(vec4 fragPosLightSpace, vec2 offset, int index)
+{
+    float shadow = 1.0f;
+	if ( fragPosLightSpace.z > -1.0 && fragPosLightSpace.z < 1.0 ) 
+	{
+		float dist = texture( SpotLightShadowMap[index], fragPosLightSpace.st + offset ).r;
+		if ( fragPosLightSpace.w > 0.0 && dist < fragPosLightSpace.z ) 
+		{
+			shadow = 0.1f;
+		}
+	}
+    return shadow;
+}
+
+float SpotLightfilterPCF(vec4 sc, int index)
+{
+	ivec2 texDim = textureSize(SpotLightShadowMap[index], 0);
+	float scale = 1.5;
+	float dx = scale * 1.0 / float(texDim.x);
+	float dy = scale * 1.0 / float(texDim.y);
+
+	float shadowFactor = 0.0;
+	int count = 0;
+	int range = 1;
+	
+	for (int x = -range; x <= range; x++)
+	{
+		for (int y = -range; y <= range; y++)
+		{
+			shadowFactor += SpotLightShadowCalculation(sc, vec2(dx*x, dy*y), index);
+			count++;
+		}
+	
+	}
+	return shadowFactor / count;
 }
 
 float ShadowCalculation(vec4 fragPosLightSpace, vec2 offset, int index)
@@ -206,14 +244,14 @@ void main()
 //   {
 //        result += CalcNormalDirLight(normal, texCoords, x);
 //   }
-   for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
-   {
-        result += CalcNormalPointLight(normal, texCoords, x);   
-   }
-//   for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
+//   for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
 //   {
-//        result += CalcNormalSpotLight(normal, texCoords, x);   
+//        result += CalcNormalPointLight(normal, texCoords, x);   
 //   }
+   for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
+   {
+        result += CalcNormalSpotLight(normal, texCoords, x);   
+   }
 //   for(int x = 0; x < sceneBuffer.sceneData.SphereAreaLightCount; x++)
 //   {
 //       // result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);
@@ -326,10 +364,9 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
 	0.0, 0.0, 1.0, 0.0,
 	0.5, 0.5, 0.0, 1.0 );
 
-    vec4 LightSpace = (biasMat * sceneBuffer.sceneData.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
-    float shadow = ShadowCalculation(FragPos2, LightPos, ViewPos);  
-    //return ((ambient * shadow) + (diffuse + specular));
-    return (ambient + diffuse + specular);
+    vec4 LightSpace = (LightBiasMatrix *  PLight[index].pointLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+    float shadow = filterPCF(LightSpace/ LightSpace.w, index);  
+    return (ambient + (shadow) * (diffuse + specular));
 }
 
 //vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
@@ -386,7 +423,7 @@ vec3 CalcNormalSpotLight(vec3 normal, vec2 uv, int index)
     vec3 FragPos2 = FragPos;
     if (material.NormalMapID != 0)
     {
-        LightPos = TBN * SLight[index].spotLight.position;
+        LightPos = TBN * SLight[index].spotLight.direction;
         ViewPos = TBN * Mesh.CameraPos;
         FragPos2 = TBN * FragPos;
     }
@@ -418,7 +455,15 @@ vec3 CalcNormalSpotLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (1.0f + SLight[index].spotLight.linear * LightDistance + SLight[index].spotLight.quadratic * (LightDistance * LightDistance));
 
-    return (ambient + diffuse + specular) * attenuation * intensity;
+            const mat4 biasMat = mat4( 
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.5, 0.5, 0.0, 1.0 );
+
+   vec4 LightSpace = (LightBiasMatrix *  SLight[index].spotLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+    float shadow = ShadowCalculation(FragPos2, LightPos, ViewPos);  
+    return ((ambient * shadow) + (diffuse + specular)) * attenuation;
 }
 
 //vec3 CalcSphereAreaLight(vec3 normal, vec2 uv, int index)

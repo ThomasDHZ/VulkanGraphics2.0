@@ -6,9 +6,9 @@ BlinnPhongPipeline::BlinnPhongPipeline() : GraphicsPipeline()
 {
 }
 
-BlinnPhongPipeline::BlinnPhongPipeline(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap) : GraphicsPipeline()
+BlinnPhongPipeline::BlinnPhongPipeline(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList) : GraphicsPipeline()
 {
-    SetUpDescriptorBindings(ShadowMapTextureList, RenderedCubeMap);
+    SetUpDescriptorBindings(ShadowMapTextureList, RenderedCubeMap, SpotLightShadowMapTextureList);
     SetUpShaderPipeLine(renderPass);
 }
 
@@ -16,7 +16,7 @@ BlinnPhongPipeline::~BlinnPhongPipeline()
 {
 }
 
-void BlinnPhongPipeline::SetUpDescriptorBindings(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap)
+void BlinnPhongPipeline::SetUpDescriptorBindings(std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
 {
     std::vector<VkDescriptorImageInfo> ShadowDescriptorImageList;
     if (ShadowMapTextureList.size() == 0)
@@ -36,6 +36,27 @@ void BlinnPhongPipeline::SetUpDescriptorBindings(std::vector<std::shared_ptr<Ren
             DescriptorImage.imageView = texture->GetTextureView();
             DescriptorImage.sampler = texture->GetTextureSampler();
             ShadowDescriptorImageList.emplace_back(DescriptorImage);
+        }
+    }
+
+    std::vector<VkDescriptorImageInfo> SpotLightShadowDescriptorImageList;
+    if (ShadowMapTextureList.size() == 0)
+    {
+        VkDescriptorImageInfo nullBuffer;
+        nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        nullBuffer.imageView = VK_NULL_HANDLE;
+        nullBuffer.sampler = NullSampler;
+        SpotLightShadowDescriptorImageList.emplace_back(nullBuffer);
+    }
+    else
+    {
+        for (auto texture : SpotLightShadowMapTextureList)
+        {
+            VkDescriptorImageInfo DescriptorImage{};
+            DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            DescriptorImage.imageView = texture->GetTextureView();
+            DescriptorImage.sampler = texture->GetTextureSampler();
+            SpotLightShadowDescriptorImageList.emplace_back(DescriptorImage);
         }
     }
 
@@ -68,6 +89,7 @@ void BlinnPhongPipeline::SetUpDescriptorBindings(std::vector<std::shared_ptr<Ren
     AddStorageBufferDescriptorSetBinding(10, RectangleAreaBufferInfoList, LightManagerPtr::GetLightManagerPtr()->GetRectangleAreaLightDescriptorCount());
     AddTextureDescriptorSetBinding(11, ShadowDescriptorImageList, 1);
     AddTextureDescriptorSetBinding(12, RenderedCubeMapDescriptor);
+    AddTextureDescriptorSetBinding(13, SpotLightShadowDescriptorImageList, 1);
     SubmitDescriptorSet();
 
 }
@@ -208,9 +230,9 @@ void BlinnPhongPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void BlinnPhongPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap)
+void BlinnPhongPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::vector<std::shared_ptr<RenderedDepthTexture>>& ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
-    SetUpDescriptorBindings(ShadowMapTextureList, RenderedCubeMap);
+    SetUpDescriptorBindings(ShadowMapTextureList, RenderedCubeMap, SpotLightShadowMapTextureList);
     SetUpShaderPipeLine(renderPass);
 }
