@@ -20,11 +20,7 @@ DirectionalLight::~DirectionalLight()
 void DirectionalLight::Update()
 {
 	lightViewCamera->Update(-LightBuffer.UniformDataInfo.direction, LeftRight.x, LeftRight.y, TopBottom.x, TopBottom.y, NearFar.x, NearFar.y);
-	glm::mat4 view = lightViewCamera->GetViewMatrix();
-	glm::mat4 proj = lightViewCamera->GetProjectionMatrix();
-	proj[1][1] *= -1;
-
-	LightBuffer.UniformDataInfo.LightSpaceMatrix = proj * view;
+	LightBuffer.UniformDataInfo.LightSpaceMatrix = lightViewCamera->LightSpaceMatrix;
 
 	Light::Update();
 }

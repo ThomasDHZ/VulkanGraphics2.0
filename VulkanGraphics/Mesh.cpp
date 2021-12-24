@@ -332,13 +332,9 @@ void Mesh::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLay
 {
 	if (ShowMesh)
 	{
-		glm::mat4 view = lightViewCamera->GetViewMatrix();
-		glm::mat4 proj = lightViewCamera->GetProjectionMatrix();
-		proj[1][1] *= -1;
-
 		LightSceneInfo lightSceneInfo;
 		lightSceneInfo.MeshIndex = MeshBufferIndex;
-		lightSceneInfo.lightSpaceMatrix = proj * view;
+		lightSceneInfo.lightSpaceMatrix = lightViewCamera->LightSpaceMatrix;
 
 		VkDeviceSize offsets[] = { 0 };
 

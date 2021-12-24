@@ -26,7 +26,11 @@ void OrthographicLightViewCamera::Update(glm::vec3 Position, glm::vec3 LightPos)
 void OrthographicLightViewCamera::Update(glm::vec3 LightPos, float left, float right, float bottom, float top, float zNear, float zFar)
 {
 	ProjectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
+	ProjectionMatrix[1][1] *= -1;
+
 	ViewMatrix = glm::lookAt(LightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	LightSpaceMatrix = ProjectionMatrix * ViewMatrix;
 }
 
 void OrthographicLightViewCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)

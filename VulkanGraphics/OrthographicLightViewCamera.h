@@ -5,7 +5,6 @@
 class OrthographicLightViewCamera : public OrthographicCamera
 {
 private:
-	glm::mat3 LightSpaceMatrix = glm::mat3(1.0f);
 public:
 
 	OrthographicLightViewCamera();

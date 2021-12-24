@@ -43,6 +43,7 @@ public:
     std::string CameraName;
     CameraType cameraType;
     glm::vec3 Position;
+    glm::mat4 LightSpaceMatrix;
 
     virtual void Update(std::shared_ptr<VulkanEngine> engine) = 0;
     virtual void UpdateScreenSize(int NewWidth, int NewHeight);
