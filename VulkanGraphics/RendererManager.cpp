@@ -126,21 +126,67 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
 
     //ImGui::SliderInt("Active Camera", &AssetManagerPtr::GetAssetPtr()->cameraManager->cameraIndex, 0, AssetManagerPtr::GetAssetPtr()->cameraManager->CameraList.size());
 
+
+    CameraManagerPtr::GetCameraManagerPtr()->CameraList;
+    std::vector<const char*> charVec(CameraManagerPtr::GetCameraManagerPtr()->CameraList.size(), nullptr);
+    for (int i = 0; i < CameraManagerPtr::GetCameraManagerPtr()->CameraList.size(); i++) {
+        charVec[i] = CameraManagerPtr::GetCameraManagerPtr()->CameraList[i]->CameraName.c_str();
+    }
+
+    GUIChanged |= ImGui::ListBox("sdfdsf", &selectedCamera, charVec.data(), charVec.size());
+    GUIChanged |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
+
+    ImGui::LabelText("Directional Light", "Directional Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
+    {
+        //LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x = cos(glm::radians(glfwGetTime() * 360.0f)) * 40.0f;
+        //LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.y = -50.0f + sin(glm::radians(glfwGetTime() * 360.0f)) * 20.0f;
+        //LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.z = 25.0f + sin(glm::radians(glfwGetTime() * 360.0f)) * 5.0f;
+
+        GUIChanged |= ImGui::SliderFloat3(("DLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 2000.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -180.0f, 180.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat2(("DLight LeftRight " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LeftRight.x, -5000.0f, 5000.0f);
+        GUIChanged |= ImGui::SliderFloat2(("DLight TopBottom " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->TopBottom.x, -5000.0f, 5000.0f);
+        GUIChanged |= ImGui::SliderFloat2(("DLight NearFar " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->NearFar.x, -5000.0f, 5000.0f);
+        ImGui::LabelText("______", "______");
+    }
+
+    ImGui::LabelText("Point Light", "Point Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->PointLightList.size(); x++)
+    {
+        GUIChanged |= ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -2000.0f, 2000.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->cameraDirection.x, -180.0f, 180.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        ImGui::LabelText("______", "______");
+    }
+
+    ImGui::LabelText("SpotLight Light", "SpotLight Light");
+    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->SpotLightList.size(); x++)
+    {
+        GUIChanged |= ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -2000.0f, 2000.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -360.0f, 360.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
+
+        ImGui::LabelText("______", "______");
+    }
+
     for (int x = 0; x < MeshManagerPtr::GetMeshManagerPtr()->MeshList.size(); x++)
     {
         GUIChanged |= ImGui::CheckboxFlags(("MainPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Main_Pass);
         GUIChanged |= ImGui::CheckboxFlags(("ShadowPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Shadow_Pass);
         GUIChanged |= ImGui::CheckboxFlags(("ReflectionPass " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->DrawFlags, Renderer_Draw_Reflection_Pass);
-
-        CameraManagerPtr::GetCameraManagerPtr()->CameraList;
-        std::vector<const char*> charVec(CameraManagerPtr::GetCameraManagerPtr()->CameraList.size(), nullptr);
-        for (int i = 0; i < CameraManagerPtr::GetCameraManagerPtr()->CameraList.size(); i++) {
-            charVec[i] = CameraManagerPtr::GetCameraManagerPtr()->CameraList[i]->CameraName.c_str();
-        }
-
-        GUIChanged |= ImGui::ListBox("sdfdsf", &selectedCamera, charVec.data(), charVec.size());
-        GUIChanged |= ImGui::Checkbox("Shadow Debug", &ShadowDebugFlag);
-
 
         //GUIChanged |= ImGui::SliderFloat3(("Albedo " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Albedo.x, .0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat(("Matallic " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Matallic, 0.0f, 1.0f);
@@ -190,50 +236,6 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
     ////    GUIChanged |= ImGui::SliderFloat(("Tube Alumin " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->TubeAreaLightList[x]->LightBuffer.UniformDataInfo.Luminosity, 0.0f, 100000.0f);
     ////    ImGui::LabelText("______", "______");
     ////}
-
-    ImGui::LabelText("Directional Light", "Directional Light");
-    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->DirectionalLightList.size(); x++)
-    {
-        //LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x = cos(glm::radians(glfwGetTime() * 360.0f)) * 40.0f;
-        //LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.y = -50.0f + sin(glm::radians(glfwGetTime() * 360.0f)) * 20.0f;
-        //LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.z = 25.0f + sin(glm::radians(glfwGetTime() * 360.0f)) * 5.0f;
-
-        GUIChanged |= ImGui::SliderFloat3(("DLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.position.x, -100.0f, 2000.0f);
-        GUIChanged |= ImGui::SliderFloat3(("DLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.direction.x, -180.0f, 180.0f);
-        GUIChanged |= ImGui::SliderFloat3(("DLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat3(("DLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat3(("DLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        ImGui::LabelText("______", "______");
-    }
-
-    ImGui::LabelText("Point Light", "Point Light");
-    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->PointLightList.size(); x++)
-    {
-        GUIChanged |= ImGui::SliderFloat3(("PLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.position.x, -2000.0f, 2000.0f);
-        GUIChanged |= ImGui::SliderFloat3(("PLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->cameraDirection.x, -180.0f, 180.0f);
-        GUIChanged |= ImGui::SliderFloat3(("PLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat3(("PLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("PLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
-        ImGui::LabelText("______", "______");
-    }
-
-    ImGui::LabelText("SpotLight Light", "SpotLight Light");
-    for (int x = 0; x < LightManagerPtr::GetLightManagerPtr()->SpotLightList.size(); x++)
-    {
-        GUIChanged |= ImGui::SliderFloat3(("SLight position " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.position.x, -2000.0f, 2000.0f);
-        GUIChanged |= ImGui::SliderFloat3(("SLight direction " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.direction.x, -360.0f, 360.0f);
-        GUIChanged |= ImGui::SliderFloat3(("SLight ambient " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.ambient.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat3(("SLight Diffuse " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.diffuse.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat3(("SLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("SLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("SLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
-        GUIChanged |= ImGui::SliderFloat(("SLight quadratic " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->SpotLightList[x]->LightBuffer.UniformDataInfo.quadratic, 0.0f, 1.0f);
-
-        ImGui::LabelText("______", "______");
-    }
 
     if (GUIChanged)
     {

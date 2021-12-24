@@ -240,18 +240,18 @@ void main()
         normal = normalize(normal * 2.0 - 1.0);
      }
 
-//   for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
-//   {
-//        result += CalcNormalDirLight(normal, texCoords, x);
-//   }
+   for(int x = 0; x < sceneBuffer.sceneData.DirectionalLightCount; x++)
+   {
+        result += CalcNormalDirLight(normal, texCoords, x);
+   }
 //   for(int x = 0; x < sceneBuffer.sceneData.PointLightCount; x++)
 //   {
 //        result += CalcNormalPointLight(normal, texCoords, x);   
+////   }
+//   for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
+//   {
+//        result += CalcNormalSpotLight(normal, texCoords, x);   
 //   }
-   for(int x = 0; x < sceneBuffer.sceneData.SpotLightCount; x++)
-   {
-        result += CalcNormalSpotLight(normal, texCoords, x);   
-   }
 //   for(int x = 0; x < sceneBuffer.sceneData.SphereAreaLightCount; x++)
 //   {
 //       // result += CalcSphereAreaLight(FragPos2, normal, texCoords, x);

@@ -17,9 +17,16 @@ OrthographicLightViewCamera::OrthographicLightViewCamera(std::string Name, glm::
 
 void OrthographicLightViewCamera::Update(glm::vec3 Position, glm::vec3 LightPos)
 {
-    float near_plane = -1000.0f, far_plane = 1000.0f;
-    ProjectionMatrix = glm::ortho(-1000.0f, 1000.0f, -1000.0f, 1000.0f, near_plane, far_plane);
-	ViewMatrix = glm::lookAt(LightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+	
+	float farPlane = 3000.0f;
+	ProjectionMatrix = glm::ortho(-3000.0f, 3000.0f, -3000.0f, 3000.0f, 0.1f, farPlane);
+	ViewMatrix = glm::lookAt(Position * LightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+}
+
+void OrthographicLightViewCamera::Update(glm::vec3 LightPos, float left, float right, float bottom, float top, float zNear, float zFar)
+{
+	ProjectionMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
+	ViewMatrix = glm::lookAt(LightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void OrthographicLightViewCamera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
