@@ -19,6 +19,7 @@ BlinnPhongRasterPass::BlinnPhongRasterPass(std::shared_ptr<VulkanEngine> engine,
 
     CreateRenderPass();
     CreateRendererFramebuffers();
+    debugLightPipeline = std::make_shared<LightDebugPipeline>(LightDebugPipeline(RenderPass));
     blinnphongPipeline = std::make_shared<BlinnPhongPipeline>(BlinnPhongPipeline(RenderPass, ShadowMapTextureList, RenderedCubeMap, SpotLightShadowMapTextureList));
     skyboxPipeline = std::make_shared<SkyBoxRenderPipeline>(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
     SetUpCommandBuffers();
@@ -182,6 +183,7 @@ void BlinnPhongRasterPass::RebuildSwapChain(std::vector<std::shared_ptr<Rendered
 
     blinnphongPipeline->Destroy();
     skyboxPipeline->Destroy();
+    debugLightPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);
     RenderPass = VK_NULL_HANDLE;
@@ -196,6 +198,7 @@ void BlinnPhongRasterPass::RebuildSwapChain(std::vector<std::shared_ptr<Rendered
     CreateRendererFramebuffers();
     blinnphongPipeline->UpdateGraphicsPipeLine(RenderPass, ShadowMapTextureList, RenderedCubeMap, SpotLightShadowMapTextureList);
     skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, EnginePtr::GetEnginePtr()->MaxSampleCount);
+    debugLightPipeline->UpdateGraphicsPipeLine(RenderPass);
     SetUpCommandBuffers();
 }
 
@@ -257,6 +260,7 @@ void BlinnPhongRasterPass::Destroy()
     DepthTexture->Delete();
 
     blinnphongPipeline->Destroy();
+    debugLightPipeline->Destroy();
     skyboxPipeline->Destroy();
 
     BaseRenderPass::Destroy();

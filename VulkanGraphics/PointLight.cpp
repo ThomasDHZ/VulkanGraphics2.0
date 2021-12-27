@@ -19,8 +19,10 @@ PointLight::~PointLight()
 
 void PointLight::Update()
 {
+	lightViewCamera->Update(-LightBuffer.UniformDataInfo.position, LeftRight.x, LeftRight.y, TopBottom.x, TopBottom.y, NearFar.x, NearFar.y);
+	LightBuffer.UniformDataInfo.LightSpaceMatrix = lightViewCamera->LightSpaceMatrix;
+
 	Light::Update();
-	lightViewCamera->Update(LightBuffer.UniformDataInfo.position, cameraDirection);
 }
 
 void PointLight::Destroy()

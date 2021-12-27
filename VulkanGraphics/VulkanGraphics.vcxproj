@@ -262,6 +262,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Level2D.cpp" />
     <ClCompile Include="LevelTile.cpp" />
+    <ClCompile Include="LightDebugPipeline.cpp" />
     <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Material.cpp" />
@@ -391,6 +392,7 @@
     <ClInclude Include="Level2D.h" />
     <ClInclude Include="LevelTile.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="LightDebugPipeline.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
@@ -484,6 +486,8 @@
     <None Include="Shaders\FrameBuffer.vert" />
     <None Include="Shaders\IrradianceShader.frag" />
     <None Include="Shaders\IrradianceShader.vert" />
+    <None Include="Shaders\LightDebugShader.frag" />
+    <None Include="Shaders\LightDebugShader.vert" />
     <None Include="Shaders\Lighting.glsl" />
     <None Include="Shaders\Material.glsl" />
     <None Include="Shaders\MaterialBuilder.glsl" />

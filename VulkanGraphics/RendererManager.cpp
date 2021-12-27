@@ -164,6 +164,9 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         GUIChanged |= ImGui::SliderFloat3(("PLight specular " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.specular.x, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat(("PLight constant " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.constant, 0.0f, 1.0f);
         GUIChanged |= ImGui::SliderFloat(("PLight linear " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LightBuffer.UniformDataInfo.linear, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat2(("PLight LeftRight " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->LeftRight.x, -5000.0f, 5000.0f);
+        GUIChanged |= ImGui::SliderFloat2(("PLight TopBottom " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->TopBottom.x, -5000.0f, 5000.0f);
+        GUIChanged |= ImGui::SliderFloat2(("PLight NearFar " + std::to_string(x)).c_str(), &LightManagerPtr::GetLightManagerPtr()->PointLightList[x]->NearFar.x, -5000.0f, 5000.0f);
         ImGui::LabelText("______", "______");
     }
 

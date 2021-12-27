@@ -25,22 +25,9 @@ layout (location = 3) in vec4 aTangent;
 layout (location = 4) in vec4 aBitangent;
 
 layout(location = 0) out vec3 FragPos;
-layout(location = 1) out vec2 TexCoords;
-layout(location = 2) out vec3 Normal;
-layout(location = 3) out vec3 Tangent;
-layout(location = 4) out vec3 BiTangent;
 
 void main() 
 {
-//    if(gl_VertexIndex == 0)
-//	{
-//		debugPrintfEXT(": %i \n", ubo.DirectionalLightCount);
-//	}
-
     FragPos = vec3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0));    
-    TexCoords = aTexCoords;
-    Normal = aNormal;
-	Tangent = aTangent.rgb;
-	BiTangent = aBitangent.rgb;
     gl_Position = Mesh.proj * Mesh.view * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0);
 }

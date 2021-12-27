@@ -459,6 +459,9 @@
     <ClCompile Include="SpotLightDepthRenderPass.cpp">
       <Filter>Source Files\Rendering\RenderPass</Filter>
     </ClCompile>
+    <ClCompile Include="LightDebugPipeline.cpp">
+      <Filter>Source Files\Rendering\Pipelines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulkanWindow.h">
@@ -848,6 +851,9 @@
     <ClInclude Include="SpotLightDepthRenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LightDebugPipeline.h">
+      <Filter>Header Files\Rendering\Pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -1007,6 +1013,12 @@
       <Filter>Shader\RasterShaders</Filter>
     </None>
     <None Include="Shaders\MultiViewSkyboxShader.vert">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\LightDebugShader.frag">
+      <Filter>Shader\RasterShaders</Filter>
+    </None>
+    <None Include="Shaders\LightDebugShader.vert">
       <Filter>Shader\RasterShaders</Filter>
     </None>
   </ItemGroup>

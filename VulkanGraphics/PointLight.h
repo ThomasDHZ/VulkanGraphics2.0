@@ -8,6 +8,9 @@ private:
 
 public:
 
+	glm::vec2 LeftRight = glm::vec2(-3000.0f, 3000.0f);
+	glm::vec2 TopBottom = glm::vec2(-3000.0f, 3000.0f);
+	glm::vec2 NearFar = glm::vec2(0.1f, 3000.0f);
 	glm::vec3 cameraDirection = glm::vec3(0.0f);
 
 	PointLight();
