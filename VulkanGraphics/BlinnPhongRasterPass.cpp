@@ -245,6 +245,10 @@ void BlinnPhongRasterPass::Draw()
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, blinnphongPipeline->ShaderPipelineLayout, 0, 1, &blinnphongPipeline->DescriptorSet, 0, nullptr);
     AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], blinnphongPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
 
+    vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, debugLightPipeline->ShaderPipeline);
+    vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, debugLightPipeline->ShaderPipelineLayout, 0, 1, &debugLightPipeline->DescriptorSet, 0, nullptr);
+    AssetManagerPtr::GetAssetPtr()->Draw(RendererDrawFlag::Renderer_Draw_Debug, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], debugLightPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
         throw std::runtime_error("failed to record command buffer!");

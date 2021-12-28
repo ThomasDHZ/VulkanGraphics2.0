@@ -1,12 +1,16 @@
 #pragma once
 #include "Light.h"
 #include "OrthographicLightViewCamera.h"
+#include "Model.h"
+#include "MeshManager.h"
 
 class PointLight : public Light<PointLightBuffer>
 {
 private:
 
 public:
+
+	std::shared_ptr<Model> LightMeshDebug;
 
 	glm::vec2 LeftRight = glm::vec2(-3000.0f, 3000.0f);
 	glm::vec2 TopBottom = glm::vec2(-3000.0f, 3000.0f);

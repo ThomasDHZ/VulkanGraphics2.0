@@ -6,25 +6,25 @@ Model::Model()
 {
 }
 
-Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, int MeshDrawFlags)
 {
 	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, MaterialManagerPtr::GetMaterialManagerPtr()->GetDefaultMaterial())));
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, MaterialManagerPtr::GetMaterialManagerPtr()->GetDefaultMaterial(), MeshDrawFlags)));
 	MeshList.back()->ParentModelID = ModelID;
 	MeshList.back()->VertexList = VertexList;
 	MeshList.back()->MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
+Model::Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, int MeshDrawFlags)
 {
 	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
-	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, material)));
+	MeshList.emplace_back(std::make_shared<Mesh>(Mesh(VertexList, IndexList, material, MeshDrawFlags)));
 	MeshList.back()->ParentModelID = ModelID;
 	MeshList.back()->VertexList = VertexList;
 	MeshList.back()->MeshTransform = glm::mat4(1.0f);
 }
 
-Model::Model(const std::string& FilePath)
+Model::Model(const std::string& FilePath, int MeshDrawFlags)
 {
 	ModelID = EnginePtr::GetEnginePtr()->GenerateID();
 	Assimp::Importer ModelImporter;
@@ -39,7 +39,7 @@ Model::Model(const std::string& FilePath)
 	GlobalInverseTransformMatrix = AssimpToGLMMatrixConverter(Scene->mRootNode->mTransformation.Inverse());
 	LoadNodeTree(Scene->mRootNode);
 	LoadAnimations(Scene);
-	LoadMesh(FilePath, Scene->mRootNode, Scene);
+	LoadMesh(FilePath, Scene->mRootNode, Scene, MeshDrawFlags);
 
 	LoadMeshTransform(0, ModelTransform);
 
@@ -142,7 +142,7 @@ void Model::LoadBones(const aiNode* RootNode, const aiMesh* mesh, std::vector<Ve
 	}
 }
 
-void Model::LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene)
+void Model::LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene, int MeshDrawFlags)
 {
 	uint32_t TotalVertex = 0;
 	uint32_t TotalIndex = 0;
@@ -158,7 +158,7 @@ void Model::LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* s
 		
 		LoadBones(scene->mRootNode, mesh, vertices);
 
-		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(vertices, indices, materialID, boneWeights, BoneList.size())));
+		MeshList.emplace_back(std::make_shared<Mesh>(Mesh(vertices, indices, materialID, boneWeights, BoneList.size(), MeshDrawFlags)));
 		MeshList.back()->ParentModelID = ModelID;
 		MeshList.back()->VertexList = vertices;
 		MeshList.back()->MeshTransform = AssimpToGLMMatrixConverter(node->mTransformation);
@@ -176,7 +176,7 @@ void Model::LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* s
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		LoadMesh(FilePath, node->mChildren[i], scene);
+		LoadMesh(FilePath, node->mChildren[i], scene, MeshDrawFlags);
 	}
 }
 
@@ -386,7 +386,7 @@ void Model::LoadMeshTransform(const int NodeID, const glm::mat4 ParentMatrix)
 	}
 }
 
-void Model::Update(bool RayTraceFlag)
+void Model::Update()
 {
 	ModelTransform = glm::mat4(1.0f);
 	ModelTransform = glm::translate(ModelTransform, ModelPosition);
@@ -403,14 +403,6 @@ void Model::Update(bool RayTraceFlag)
 	for (auto& mesh : MeshList)
 	{
 		mesh->Update(ModelTransform, BoneList);
-	}
-}
-
-void Model::Update()
-{
-	for (auto& mesh : MeshList)
-	{
-		mesh->Update();
 	}
 }
 

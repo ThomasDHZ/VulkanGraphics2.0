@@ -211,7 +211,7 @@ void RendererManager::GUIUpdate(std::shared_ptr<VulkanEngine> engine)
         //GUIChanged |= ImGui::SliderFloat3(("Specular" + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Specular.x, 0.0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat(("Reflect " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Reflectivness, 0.0f, 1.0f);
         //GUIChanged |= ImGui::SliderFloat(("Shininess " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Shininess, 0.0f, 255.0f);
-        //GUIChanged |= ImGui::SliderFloat(("Alpha " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Alpha, 0.0f, 1.0f);
+        GUIChanged |= ImGui::SliderFloat(("Alpha " + std::to_string(x)).c_str(), &MeshManagerPtr::GetMeshManagerPtr()->MeshList[x]->MeshMaterial->MaterialTextureData.Alpha, 0.0f, 1.0f);
         ImGui::LabelText("______", "______");
     }
 

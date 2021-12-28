@@ -5,13 +5,13 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(std::vector<Vertex>& VertexList)
+Mesh::Mesh(std::vector<Vertex>& VertexList, int MeshDrawFlags)
 {
 	std::vector<uint32_t> indices{};
 
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
-	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
+	DrawFlags = MeshDrawFlags;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -27,11 +27,11 @@ Mesh::Mesh(std::vector<Vertex>& VertexList)
 	SetUpMesh(VertexList, indices);
 }
 
-Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
+Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, int MeshDrawFlags)
 {
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
-	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
+	DrawFlags = MeshDrawFlags;
 
 	MeshTransform = glm::mat4(1.0f);
 	MeshTransform = glm::transpose(MeshTransform);
@@ -47,11 +47,11 @@ Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList)
 	SetUpMesh(VertexList, IndexList);
 }
 
-Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material)
+Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, int MeshDrawFlags)
 {
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshMaterial = material;
-	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
+	DrawFlags = MeshDrawFlags;
 
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 
@@ -68,11 +68,11 @@ Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, st
 	SetUpMesh(VertexList, IndexList);
 }
 
-Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount)
+Mesh::Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, int MeshDrawFlags)
 {
 	MeshID = EnginePtr::GetEnginePtr()->GenerateID();
 	MeshMaterial = material;
-	DrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass;
+	DrawFlags = MeshDrawFlags;
 
 	MeshProperties = MeshPropertiesUniformBuffer(EnginePtr::GetEnginePtr());
 

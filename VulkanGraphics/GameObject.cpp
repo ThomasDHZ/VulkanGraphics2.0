@@ -91,9 +91,9 @@ void GameObject::Update()
 	{
 		switch (model->ModelType)
 		{
-		case ModelTypeEnum::Model_Type_Normal: model->Update(false); break;
+		case ModelTypeEnum::Model_Type_Normal: model->Update(); break;
 		//case ModelTypeEnum::Model_Type_2D_Level: static_cast<Level2D*>(model.get())->Update(); break;
-		default: model->Update(false);
+		default: model->Update();
 		};
 	}
 }

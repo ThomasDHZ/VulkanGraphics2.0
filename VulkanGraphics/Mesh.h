@@ -20,6 +20,7 @@ enum RendererDrawFlag
 	Renderer_Draw_Shadow_Pass = 1 << 1,
 	Renderer_Draw_Reflection_Pass = 1 << 2,
 	Renderer_Draw_SkyBox = 1 << 3,
+	Renderer_Draw_Debug = 1 << 4
 };
 enum MeshTypeFlag
 {
@@ -101,10 +102,10 @@ public:
 	VkAccelerationStructureBuildRangeInfoKHR AccelerationStructureBuildRangeInfo{};
 
 	Mesh();
-	Mesh(std::vector<Vertex>& VertexList);
-	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
-	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount);
+	Mesh(std::vector<Vertex>& VertexList, int MeshDrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, int MeshDrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, int MeshDrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass);
+	Mesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, std::vector<MeshBoneWeights>& boneWeights, uint32_t boneCount, int MeshDrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass);
 	~Mesh();
 
 	void SetUpMesh(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);

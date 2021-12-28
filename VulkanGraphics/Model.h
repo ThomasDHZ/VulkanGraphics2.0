@@ -34,7 +34,7 @@ class Model
 private:
 	void LoadNodeTree(const aiNode* Node, int parentNodeID = -1);
 	void LoadAnimations(const aiScene* scene);
-	void LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene);
+	void LoadMesh(const std::string& FilePath, aiNode* node, const aiScene* scene, int MeshDrawFlags);
 	std::vector<Vertex> LoadVertices(aiMesh* mesh);
 	std::vector<MeshBoneWeights> LoadBoneWeights(aiMesh* mesh, std::vector<Vertex>& VertexList);
 	std::vector<uint32_t> LoadIndices(aiMesh* mesh);
@@ -67,12 +67,11 @@ public:
 	glm::mat4 ModelTransform;
 
 	Model();
-	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList);
-	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material);
-	Model(const std::string& FilePath);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, int MeshDrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass);
+	Model(std::vector<Vertex>& VertexList, std::vector<uint32_t>& IndexList, std::shared_ptr<Material> material, int MeshDrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass);
+	Model(const std::string& FilePath, int MeshDrawFlags = Renderer_Draw_Main_Pass | Renderer_Draw_Shadow_Pass | Renderer_Draw_Reflection_Pass);
 	~Model();
 
-	void Update(bool RayTraceFlag);
 	virtual void Update();
 	void SubmitAnimationToCommandBuffer(std::vector<VkCommandBuffer>& CMDBufferList);
 	void AddMesh(std::shared_ptr<Mesh> mesh);

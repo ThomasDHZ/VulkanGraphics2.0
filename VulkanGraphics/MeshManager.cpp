@@ -73,6 +73,13 @@ void MeshManager::Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuff
                 mesh->DepthDraw(commandBuffer, ShaderLayout, CameraView);
             }
         }
+        else if (renderPass & RendererDrawFlag::Renderer_Draw_Debug)
+        {
+            if (mesh->DrawFlags & RendererDrawFlag::Renderer_Draw_Debug)
+            {
+                mesh->Draw(commandBuffer, ShaderLayout, CameraView);
+            }
+        }
         else
         {
             if (mesh->DrawFlags & renderPass)
