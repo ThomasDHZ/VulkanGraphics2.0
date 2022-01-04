@@ -7,7 +7,7 @@ PointLight::PointLight() : Light<PointLightBuffer>()
 PointLight::PointLight(PointLightBuffer light) : Light<PointLightBuffer>(EnginePtr::GetEnginePtr())
 {
 	LightBuffer.UniformDataInfo = light;
-	lightViewCamera = std::make_shared<OrthographicLightViewCamera>(OrthographicLightViewCamera("PointShadowCamera", LightBuffer.UniformDataInfo.position, cameraDirection));
+	lightViewCamera = std::make_shared<PerspectiveCamera>(PerspectiveCamera("PointShadowCamera", LightBuffer.UniformDataInfo.position, cameraDirection));
 	CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(lightViewCamera);
 
 	LightMeshDebug = std::make_shared<Model>(Model("../Models/Cube.obj", Renderer_Draw_Debug));
@@ -22,8 +22,8 @@ PointLight::~PointLight()
 
 void PointLight::Update()
 {
-	lightViewCamera->Update(-LightBuffer.UniformDataInfo.position, LeftRight.x, LeftRight.y, TopBottom.x, TopBottom.y, NearFar.x, NearFar.y);
-	LightBuffer.UniformDataInfo.LightSpaceMatrix = lightViewCamera->LightSpaceMatrix;
+	lightViewCamera->Position = LightBuffer.UniformDataInfo.position;
+	lightViewCamera->Update(EnginePtr::GetEnginePtr());
 
 	LightMeshDebug->MeshList[0]->MeshPosition = LightBuffer.UniformDataInfo.position;
 	LightMeshDebug->Update();

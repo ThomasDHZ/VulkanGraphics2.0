@@ -24,7 +24,6 @@ public:
 	void Update() override;
 	void Destroy() override;
 
-	std::shared_ptr<OrthographicLightViewCamera> lightViewCamera;
-	glm::mat3 GetLightSpaceMatrix() { return lightViewCamera->GetLightSpaceMatrix(); }
+	std::shared_ptr<PerspectiveCamera> lightViewCamera;
 };
 
