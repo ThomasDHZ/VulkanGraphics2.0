@@ -32,6 +32,7 @@ layout(binding = 12) uniform samplerCube PrefilterMap;
 layout(binding = 13) uniform sampler2D BRDFMap;
 layout(binding = 14) uniform sampler2D ShadowMap[];
 layout(binding = 15) uniform samplerCube CubeShadowMap[];
+layout(binding = 16) uniform samplerCube SpotShadowMap[];
 
 layout(location = 0) in vec3 FragPos;
 layout(location = 1) in vec2 TexCoords;
@@ -231,6 +232,68 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
 }  
 
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+float ShadowCalculation(vec3 fragPos, vec3 lightPos, vec3 viewPos)
+{
+    float far_plane = 3000.0f;
+    // get vector between fragment position and light position
+    vec3 fragToLight = fragPos - lightPos;
+    // use the fragment to light vector to sample from the depth map    
+    // float closestDepth = texture(depthMap, fragToLight).r;
+    // it is currently in linear range between [0,1], let's re-transform it back to original depth value
+    // closestDepth *= far_plane;
+    // now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // test for shadows
+    // float bias = 0.05; // we use a much larger bias since depth is now in [near_plane, far_plane] range
+    // float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
+    // PCF
+    // float shadow = 0.0;
+    // float bias = 0.05; 
+    // float samples = 4.0;
+    // float offset = 0.1;
+    // for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+    // {
+        // for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+        // {
+            // for(float z = -offset; z < offset; z += offset / (samples * 0.5))
+            // {
+                // float closestDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r; // use lightdir to lookup cubemap
+                // closestDepth *= far_plane;   // Undo mapping [0;1]
+                // if(currentDepth - bias > closestDepth)
+                    // shadow += 1.0;
+            // }
+        // }
+    // }
+    // shadow /= (samples * samples * samples);
+    float shadow = 0.0;
+    float bias = 0.15;
+    int samples = 20;
+    float viewDistance = length(viewPos - fragPos);
+    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(CubeShadowMap[0], fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= far_plane;   // undo mapping [0;1]
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+    shadow /= float(samples);
+        
+    // display closestDepth as debug (to visualize depth cubemap)
+    // FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
+        
+    return shadow;
+}
+
 vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
     const mat4 biasMat = mat4( 
@@ -257,7 +320,6 @@ vec3 CalcDirectionalLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness,
         vec3 nominator    = NDF * G * F;
         float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
         vec3 specular = nominator / denominator;
-        specular *= shadow;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
@@ -276,10 +338,12 @@ vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float
     for(int i = 0; i < sceneBuffer.sceneData.PointLightCount; ++i) 
     {
         vec3 L = normalize(PLight[i].pointLight.position - FragPos);
+        float shadow =  ShadowCalculation(FragPos, L, V);
+
         vec3 H = normalize(V + L);
         float distance = length(PLight[i].pointLight.position - FragPos);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = PLight[i].pointLight.diffuse * attenuation;
+        vec3 radiance = PLight[i].pointLight.diffuse * attenuation * shadow;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    
@@ -301,9 +365,18 @@ vec3 CalcPointLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float
 
 vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float metallic)
 {
+    const mat4 biasMat = mat4( 
+	0.5, 0.0, 0.0, 0.0,
+	0.0, 0.5, 0.0, 0.0,
+	0.0, 0.0, 1.0, 0.0,
+	0.5, 0.5, 0.0, 1.0 );
+
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < sceneBuffer.sceneData.SpotLightCount; ++i) 
     {
+        vec4 LightSpace = (LightBiasMatrix *  SLight[i].spotLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+        float shadow = filterPCF(LightSpace/ LightSpace.w, i);  
+
         vec3 L = normalize(SLight[i].spotLight.position - FragPos);
         vec3 H = normalize(V + L);
 
@@ -314,7 +387,7 @@ vec3 CalcSpotLight(vec3 F0, vec3 V, vec3 N, vec3 albedo, float roughness, float 
         float distance = length(SLight[i].spotLight.position - FragPos);
         float attenuation = 1.0 / (distance * distance) ;
         attenuation *= intensity;
-        vec3 radiance = SLight[i].spotLight.diffuse * attenuation;
+        vec3 radiance = SLight[i].spotLight.diffuse * attenuation * shadow;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);    

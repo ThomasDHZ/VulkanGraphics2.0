@@ -287,6 +287,7 @@
     <ClCompile Include="PBRRenderer.cpp" />
     <ClCompile Include="PBRRenderPass.cpp" />
     <ClCompile Include="PerspectiveCamera.cpp" />
+    <ClCompile Include="PerspectiveLightViewCamera.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="PrefilterPipeline.cpp" />
     <ClCompile Include="PrefilterRenderPass.cpp" />
@@ -416,6 +417,7 @@
     <ClInclude Include="PBRRenderer.h" />
     <ClInclude Include="PBRRenderPass.h" />
     <ClInclude Include="PerspectiveCamera.h" />
+    <ClInclude Include="PerspectiveLightViewCamera.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="PrefilterPipeline.h" />

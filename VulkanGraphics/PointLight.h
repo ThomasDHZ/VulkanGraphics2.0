@@ -3,6 +3,7 @@
 #include "OrthographicLightViewCamera.h"
 #include "Model.h"
 #include "MeshManager.h"
+#include "PerspectiveLightViewCamera.h"
 
 class PointLight : public Light<PointLightBuffer>
 {
@@ -24,6 +25,6 @@ public:
 	void Update() override;
 	void Destroy() override;
 
-	std::shared_ptr<PerspectiveCamera> lightViewCamera;
+	std::shared_ptr<PerspectiveLightViewCamera> lightViewCamera;
 };
 

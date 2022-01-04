@@ -22,6 +22,7 @@ private:
 
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;
+	DepthPassRendererPass SpotLightDepthRenderPass;
 
 	IrradianceRenderPass ReflectionIrradianceRenderPass;
 	PrefilterRenderPass ReflectionPrefilterRenderPass;

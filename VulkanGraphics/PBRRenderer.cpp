@@ -15,19 +15,20 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
     {
         DepthRenderPass = DepthPassRendererPass(512);
         depthCubeMapRenderPass = DepthCubeMapRenderPass(1024);
+        SpotLightDepthRenderPass = DepthPassRendererPass(512);
     }
     //Reflection Pass
     {
         ReflectionIrradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
         ReflectionPrefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap);
+        reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
     }
     ////Main Render Pass
     {
         irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
         prefilterRenderPass = PrefilterRenderPass(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
 
-        pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap);
+        pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
         FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
     }
 }
@@ -40,23 +41,25 @@ void PBRRenderer::RebuildSwapChain()
 {
     brdfRenderPass.RebuildSwapChain(CubeMapSamplerSize);
 
+
     //Shadow Pass
     {
         DepthRenderPass.RebuildSwapChain(512);
         depthCubeMapRenderPass.RebuildSwapChain(1024);
+        SpotLightDepthRenderPass.RebuildSwapChain(512);
     }
     //Reflection Pass
     {
         ReflectionIrradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
         ReflectionPrefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        reflectionPBRPass.RebuildSwapChain(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap);
+        reflectionPBRPass.RebuildSwapChain(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
     }
     ////Main Render Pass
     {
        irradianceRenderPass.RebuildSwapChain(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
        prefilterRenderPass.RebuildSwapChain(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
 
-        pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap);
+        pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
         FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
    }
 }
@@ -85,6 +88,7 @@ void PBRRenderer::Draw()
     {
         DepthRenderPass.Draw();
         depthCubeMapRenderPass.Draw();
+        SpotLightDepthRenderPass.Draw();
     }
     //Reflection Pass
     {
@@ -110,6 +114,7 @@ void PBRRenderer::Destroy()
     {
         DepthRenderPass.Destroy();
         depthCubeMapRenderPass.Destroy();
+        SpotLightDepthRenderPass.Destroy();
     }
     //Reflection Pass
     {
@@ -132,8 +137,9 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
 
     //Shadow Pass
     {
-       CommandBufferSubmitList.emplace_back(DepthRenderPass.GetCommandBuffer());
+        CommandBufferSubmitList.emplace_back(DepthRenderPass.GetCommandBuffer());
         CommandBufferSubmitList.emplace_back(depthCubeMapRenderPass.GetCommandBuffer());
+        CommandBufferSubmitList.emplace_back(SpotLightDepthRenderPass.GetCommandBuffer());
     }
     //Reflection Pass
     {

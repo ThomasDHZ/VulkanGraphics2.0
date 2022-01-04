@@ -18,7 +18,7 @@ layout(push_constant) uniform MeshInfo
 
 layout(binding = 0) uniform SceneDataBuffer { SceneProperties sceneData; } sceneBuffer;
 layout(binding = 1) buffer MeshPropertiesBuffer { MeshProperties meshProperties; } meshBuffer[];
-layout(binding = 16) uniform CubeSampler 
+layout(binding = 17) uniform CubeSampler 
 {
     mat4 lightSpaceMatrix[6];
 } ReflectionView;
