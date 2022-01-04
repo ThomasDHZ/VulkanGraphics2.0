@@ -21,7 +21,7 @@ private:
 	BRDFRenderPass brdfRenderPass;
 
 	DepthPassRendererPass DepthRenderPass;
-	DepthCubeMapRenderPass depthCubeMapRenderPass;
+	DepthPassRendererPass depthCubeMapRenderPass;
 	DepthPassRendererPass SpotLightDepthRenderPass;
 
 	IrradianceRenderPass ReflectionIrradianceRenderPass;
