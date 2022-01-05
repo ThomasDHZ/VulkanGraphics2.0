@@ -141,40 +141,40 @@ void DepthCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
 void DepthCubeMapRenderPass::Update()
 {
-    //const auto LightCamera = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera;
+    const auto LightCamera = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera;
 
-    //const auto Aspect = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
-    //glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(1.0f), Aspect, 0.1f, 10000.0f);
-    //glm::mat4 viewMatrix = glm::mat4(1.0f);
-    //for (int x = 0; x < 6; x++)
-    //{
-    //    switch (x)
-    //    {
-    //    case 0:
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    //        break;
-    //    case 1:
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    //        break;
-    //    case 2:
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    //        break;
-    //    case 3:
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    //        break;
-    //    case 4:
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    //        break;
-    //    case 5:
-    //        viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    //        break;
-    //    }
+    const auto Aspect = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
+    glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(1.0f), Aspect, 0.1f, 10000.0f);
+    glm::mat4 viewMatrix = glm::mat4(1.0f);
+    for (int x = 0; x < 6; x++)
+    {
+        switch (x)
+        {
+        case 0:
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case 1:
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case 2:
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case 3:
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case 4:
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case 5:
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            break;
+        }
 
-    //    cubeSampler->UniformDataInfo.LightSpaceMatrix[x] = LightCamera->GetProjectionMatrix() * viewMatrix;
-    //}
-    //cubeSampler->Update();
+        cubeSampler->UniformDataInfo.LightSpaceMatrix[x] = LightCamera->GetProjectionMatrix() * viewMatrix;
+    }
+    cubeSampler->Update();
 }
 
 void DepthCubeMapRenderPass::Draw()
@@ -203,7 +203,7 @@ void DepthCubeMapRenderPass::Draw()
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthCubeMapPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, depthCubeMapPipeline->ShaderPipelineLayout, 0, 1, &depthCubeMapPipeline->DescriptorSet, 0, nullptr);
     vkCmdBeginRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthCubeMapPipeline->ShaderPipelineLayout, LightManagerPtr::GetLightManagerPtr()->DirectionalLightList[0]->lightViewCamera);
+    AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], depthCubeMapPipeline->ShaderPipelineLayout, LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera);
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {
