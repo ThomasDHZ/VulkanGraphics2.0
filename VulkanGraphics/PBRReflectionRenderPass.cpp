@@ -6,7 +6,7 @@ PBRReflectionRenderPass::PBRReflectionRenderPass() : BaseRenderPass()
 {
 }
 
-PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::vector<std::shared_ptr<RenderedDepthTexture>>& RenderedCubeMap, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList) : BaseRenderPass()
+PBRReflectionRenderPass::PBRReflectionRenderPass(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList) : BaseRenderPass()
 {
     reflectionViewCamera = std::make_shared<ReflectionViewCamera>(ReflectionViewCamera("ReflectionCamera", glm::vec2(renderPassResolution), reflectViewPos));
     CameraManagerPtr::GetCameraManagerPtr()->CameraList.emplace_back(reflectionViewCamera);
@@ -137,7 +137,7 @@ void PBRReflectionRenderPass::CreateRendererFramebuffers()
     }
 }
 
-void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::vector<std::shared_ptr<RenderedDepthTexture>>& RenderedCubeMap, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
+void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, glm::vec3 reflectViewPos, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
 {
     reflectPos = reflectViewPos;
     RenderPassResolution = renderPassResolution;

@@ -6,7 +6,7 @@ PBRReflectionPipeline::PBRReflectionPipeline() : GraphicsPipeline()
 {
 }
 
-PBRReflectionPipeline::PBRReflectionPipeline(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::vector<std::shared_ptr<RenderedDepthTexture>>& RenderedCubeMap, std::shared_ptr<CubeSampler> cubeSampler, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList) : GraphicsPipeline()
+PBRReflectionPipeline::PBRReflectionPipeline(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::shared_ptr<CubeSampler> cubeSampler, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList) : GraphicsPipeline()
 {
     SetUpDescriptorBindings(IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList, RenderedCubeMap, cubeSampler, SpotLightShadowMapTextureList);
     SetUpShaderPipeLine(renderPass);
@@ -16,7 +16,7 @@ PBRReflectionPipeline::~PBRReflectionPipeline()
 {
 }
 
-void PBRReflectionPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::vector<std::shared_ptr<RenderedDepthTexture>>& RenderedCubeMap, std::shared_ptr<CubeSampler>  cubeSampler, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
+void PBRReflectionPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::shared_ptr<CubeSampler>  cubeSampler, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
 {
     uint32_t count = (uint32_t)ShadowMapTextureList.size();
     if (count == 0)
@@ -45,26 +45,26 @@ void PBRReflectionPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCube
         }
     }
 
-    std::vector<VkDescriptorImageInfo> PointShadowDescriptorImageList;
-    if (ShadowMapTextureList.size() == 0)
-    {
-        VkDescriptorImageInfo nullBuffer;
-        nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        nullBuffer.imageView = VK_NULL_HANDLE;
-        nullBuffer.sampler = NullSampler;
-        PointShadowDescriptorImageList.emplace_back(nullBuffer);
-    }
-    else
-    {
-        for (auto texture : RenderedCubeMap)
-        {
-            VkDescriptorImageInfo DescriptorImage{};
-            DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            DescriptorImage.imageView = texture->GetTextureView();
-            DescriptorImage.sampler = texture->GetTextureSampler();
-            PointShadowDescriptorImageList.emplace_back(DescriptorImage);
-        }
-    }
+    //std::vector<VkDescriptorImageInfo> PointShadowDescriptorImageList;
+    //if (ShadowMapTextureList.size() == 0)
+    //{
+    //    VkDescriptorImageInfo nullBuffer;
+    //    nullBuffer.imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    //    nullBuffer.imageView = VK_NULL_HANDLE;
+    //    nullBuffer.sampler = NullSampler;
+    //    PointShadowDescriptorImageList.emplace_back(nullBuffer);
+    //}
+    //else
+    //{
+    //    for (auto texture : RenderedCubeMap)
+    //    {
+    //        VkDescriptorImageInfo DescriptorImage{};
+    //        DescriptorImage.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    //        DescriptorImage.imageView = texture->GetTextureView();
+    //        DescriptorImage.sampler = texture->GetTextureSampler();
+    //        PointShadowDescriptorImageList.emplace_back(DescriptorImage);
+    //    }
+    //}
 
     std::vector<VkDescriptorImageInfo> SpotLightShadowDescriptorImageList;
     if (ShadowMapTextureList.size() == 0)
@@ -102,6 +102,7 @@ void PBRReflectionPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCube
     VkDescriptorImageInfo PrefilerMapImage = AddTextureDescriptor(PrefilerMap->View, PrefilerMap->Sampler);
     VkDescriptorImageInfo BRDFMapImage = AddTextureDescriptor(BRDFMap->View, BRDFMap->Sampler);
     VkDescriptorBufferInfo ViewMatrixBufferInfo = AddBufferDescriptor(cubeSampler->VulkanBufferData);
+    VkDescriptorImageInfo RenderedCubeMapImage = AddTextureDescriptor(RenderedCubeMap->View, RenderedCubeMap->Sampler);
 
     AddUniformBufferDescriptorSetBinding(0, SceneDataBufferInfo);
     AddStorageBufferDescriptorSetBinding(1, MeshPropertyDataBufferInfo, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount());
@@ -118,7 +119,7 @@ void PBRReflectionPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCube
     AddTextureDescriptorSetBinding(12, PrefilerMapImage);
     AddTextureDescriptorSetBinding(13, BRDFMapImage);
     AddTextureDescriptorSetBinding(14, ShadowDescriptorImageList, count);
-    AddTextureDescriptorSetBinding(15, PointShadowDescriptorImageList, count);
+    AddTextureDescriptorSetBinding(15, RenderedCubeMapImage);
     AddTextureDescriptorSetBinding(16, SpotLightShadowDescriptorImageList, count);
     AddUniformBufferDescriptorSetBinding(17, ViewMatrixBufferInfo);
     SubmitDescriptorSet();
@@ -244,7 +245,7 @@ void PBRReflectionPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass)
     }
 }
 
-void PBRReflectionPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::vector<std::shared_ptr<RenderedDepthTexture>>& RenderedCubeMap, std::shared_ptr<CubeSampler> cubeSampler, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
+void PBRReflectionPipeline::UpdateGraphicsPipeLine(const VkRenderPass& renderPass, std::shared_ptr<RenderedCubeMapTexture> IrradianceMap, std::shared_ptr<RenderedCubeMapTexture> PrefilerMap, std::shared_ptr<RenderedColorTexture> BRDFMap, std::vector<std::shared_ptr<RenderedDepthTexture>> ShadowMapTextureList, std::shared_ptr<RenderedCubeMapDepthTexture> RenderedCubeMap, std::shared_ptr<CubeSampler> cubeSampler, std::vector<std::shared_ptr<RenderedDepthTexture>>& SpotLightShadowMapTextureList)
 {
     GraphicsPipeline::UpdateGraphicsPipeLine();
     SetUpDescriptorBindings(IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList, RenderedCubeMap, cubeSampler, SpotLightShadowMapTextureList);
