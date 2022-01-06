@@ -62,7 +62,7 @@ vec3 gridSamplingDisk[20] = vec3[]
 
 float ShadowCalculation(vec3 fragPos, vec3 lightPos, vec3 viewPos)
 {
-    float far_plane = 3000.0f;
+    float far_plane = 200.0f;
     // get vector between fragment position and light position
     vec3 fragToLight = fragPos - lightPos;
     // use the fragment to light vector to sample from the depth map    
@@ -358,13 +358,6 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (1.0f + PLight[index].pointLight.linear * LightDistance + PLight[index].pointLight.quadratic * (LightDistance * LightDistance));
 
-        const mat4 biasMat = mat4( 
-	0.5, 0.0, 0.0, 0.0,
-	0.0, 0.5, 0.0, 0.0,
-	0.0, 0.0, 1.0, 0.0,
-	0.5, 0.5, 0.0, 1.0 );
-
-    vec4 LightSpace = (LightBiasMatrix *  PLight[index].pointLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
     float shadow = ShadowCalculation(FragPos2, LightPos, ViewPos);
     return (ambient + (shadow) * (diffuse + specular));
 }
