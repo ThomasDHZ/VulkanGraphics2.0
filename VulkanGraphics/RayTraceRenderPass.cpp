@@ -39,13 +39,20 @@ void RayTraceRenderPass::SetUpTopLevelAccelerationStructure(std::shared_ptr<Vulk
     {
         if (assetManager->meshManager->MeshList[x]->ShowMesh)
         {
-            glm::mat4 transformMatrix2 = glm::transpose(glm::mat4(1.0f));
+            glm::mat4 GLMTransformMatrix2 = glm::transpose(glm::mat4(1.0f));
             if (assetManager->meshManager->MeshList[x]->ParentModelID != 0)
             {
                 const auto model = assetManager->ObjManager->GetModel(assetManager->meshManager->MeshList[x]->ParentModelID);
-                transformMatrix2 = glm::transpose(model->ModelTransform);
+                if (model == nullptr)
+                {
+                    GLMTransformMatrix2 = glm::transpose(glm::mat4(1.0f));
+                }
+                else
+                {
+                    GLMTransformMatrix2 = glm::transpose(model->ModelTransform);
+                }
             }
-            VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(transformMatrix2);
+            VkTransformMatrixKHR transformMatrix = GLMToVkTransformMatrix(GLMTransformMatrix2);
 
             VkAccelerationStructureInstanceKHR AccelerationStructureInstance{};
             AccelerationStructureInstance.transform = transformMatrix;

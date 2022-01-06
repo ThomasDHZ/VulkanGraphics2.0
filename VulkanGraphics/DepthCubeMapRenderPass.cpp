@@ -141,39 +141,15 @@ void DepthCubeMapRenderPass::RebuildSwapChain(uint32_t cubeMapSize)
 
 void DepthCubeMapRenderPass::Update()
 {
-    const auto LightCamera = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->lightViewCamera;
-
-    const auto Aspect = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
-    glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(1.0f), Aspect, 0.1f, 10000.0f);
-    glm::mat4 viewMatrix = glm::mat4(1.0f);
-    for (int x = 0; x < 6; x++)
-    {
-        switch (x)
-        {
-        case 0:
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            break;
-        case 1:
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            break;
-        case 2:
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            break;
-        case 3:
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            break;
-        case 4:
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            break;
-        case 5:
-            viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-            break;
-        }
-
-        cubeSampler->UniformDataInfo.LightSpaceMatrix[x] = LightCamera->GetProjectionMatrix() * viewMatrix;
-    }
+    const glm::vec3 LightPos = LightManagerPtr::GetLightManagerPtr()->PointLightList[0]->LightBuffer.UniformDataInfo.position;
+    glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)RenderedCubeMap->Width / (float)RenderedCubeMap->Height, 0.1f, 200.0f);
+    std::vector<glm::mat4> shadowTransforms;
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[0] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[1] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[2] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[3] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[4] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    cubeSampler->UniformDataInfo.LightSpaceMatrix[5] = shadowProj * glm::lookAt(LightPos, LightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
     cubeSampler->Update();
 }
 
