@@ -358,8 +358,39 @@ vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)
     float LightDistance = length(LightPos - FragPos2);
     float attenuation = 1.0 / (1.0f + PLight[index].pointLight.linear * LightDistance + PLight[index].pointLight.quadratic * (LightDistance * LightDistance));
 
-    float shadow = ShadowCalculation(FragPos2, LightPos, ViewPos);
-    return (ambient + (shadow) * (diffuse + specular));
+
+	// Shadow value
+	float shadow = 0.0f;
+    float farPlane = 3000.0f;
+    vec4 LightSpace = (LightBiasMatrix *  PLight[index].pointLight.lightSpaceMatrix * meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform) * vec4(FragPos, 1.0);
+	
+	vec3 fragToLight = FragPos2 - LightPos;
+	float currentDepth = length(fragToLight);
+	float bias = max(0.5f * (1.0f - dot(normal, lightDir)), 0.0005f); 
+
+	// Not really a radius, more like half the width of a square
+	int sampleRadius = 2;
+	float offset = 0.02f;
+	for(int z = -sampleRadius; z <= sampleRadius; z++)
+	{
+		for(int y = -sampleRadius; y <= sampleRadius; y++)
+		{
+		    for(int x = -sampleRadius; x <= sampleRadius; x++)
+		    {
+		        float closestDepth = texture(CubeShadowMap[0], fragToLight + vec3(x, y, z) * offset).r;
+				// Remember that we divided by the farPlane?
+				// Also notice how the currentDepth is not in the range [0, 1]
+				closestDepth *= farPlane;
+				if (currentDepth > closestDepth + bias)
+					shadow += 1.0f;     
+		    }    
+		}
+	}
+	// Average shadow
+	shadow /= pow((sampleRadius * 2 + 1), 3);
+	
+
+    return (ambient + (1.0f - shadow) * (diffuse + specular));
 }
 
 //vec3 CalcNormalPointLight(vec3 normal, vec2 uv, int index)

@@ -119,7 +119,7 @@ private:
          //LightManagerPtr::GetLightManagerPtr()->AddDirectionalLight(CameraManagerPtr::GetCameraManagerPtr(), dlight);
 
         PointLightBuffer plight = PointLightBuffer();
-        plight.position = glm::vec4(-0.0f, 0.0f, 0.0f, 0.0f);
+        plight.position = glm::vec4(0.0f, 10.0f, 0.0f, 0.0f);
         plight.ambient = glm::vec4(0.2f);
         plight.diffuse = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         plight.specular = glm::vec4(1.0f);
@@ -264,6 +264,14 @@ private:
        //     auto mat = MaterialManagerPtr::GetMaterialManagerPtr()->LoadMaterial("Cube", material);
        //     gameObject->MeshList[0]->MeshMaterial = mat;
        // }
+
+//std::shared_ptr<GameObject> gameObject2 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+//gameObject2->AddChildModel(std::make_shared<Model>(Model("../Models/ground/scene.gltf")));
+//AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject2);
+//
+//std::shared_ptr<GameObject> gameObject3 = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
+//gameObject3->AddChildModel(std::make_shared<Model>(Model("../Models/trees/scene.gltf")));
+//AssetManagerPtr::GetAssetPtr()->ObjManager->ObjectList.emplace_back(gameObject3);
 
                 std::shared_ptr<GameObject> gameObject = std::make_shared<GameObject>(GameObject(EnginePtr::GetEnginePtr()));
         gameObject->AddChildModel(std::make_shared<Model>(Model("../Models/vulkanscene_shadow.obj")));
