@@ -18,8 +18,8 @@ public:
 	~InputManager();
 
 	void Update();
-	bool IsKeyPressed(KeyboardKey key) { return keyboard.IsKeyPressed(WindowPtr::GetWindowPtr(), key); }
-	bool IsKeyReleased(KeyboardKey key) { return keyboard.IsKeyReleased(WindowPtr::GetWindowPtr(), key); }
+	bool IsKeyPressed(int key) { return keyboard.IsKeyPressed(key); }
+	bool IsKeyReleased(int key) { return keyboard.IsKeyReleased(key); }
 };
 
 class InputManagerPtr

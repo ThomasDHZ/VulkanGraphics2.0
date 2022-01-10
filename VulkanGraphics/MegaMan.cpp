@@ -109,7 +109,7 @@ MegaMan::~MegaMan()
 
 void MegaMan::Update(float timer, std::vector<std::shared_ptr<LevelTile>> LevelTileLayout, std::vector<std::shared_ptr<Mesh>> MeshList)
 {
-    uint32_t newAnimation = 0;
+   /* uint32_t newAnimation = 0;
     if (InputManagerPtr::GetInputManagerPtr()->IsKeyPressed(KeyboardKey::KEY_SPACE))
     {
         newAnimation = kShootStandAnimation;
@@ -229,5 +229,5 @@ void MegaMan::Update(float timer, std::vector<std::shared_ptr<LevelTile>> LevelT
     {
         AnimationPlayer.SetAnimation(newAnimation);
     }
-    Sprite::Update(LevelTileLayout, MeshList);
+    Sprite::Update(LevelTileLayout, MeshList);*/
 }

@@ -10,7 +10,7 @@ InputManager::InputManager(std::shared_ptr<VulkanWindow> window)
 {
 	controller = GameController();
 	keyboard = Keyboard();
-	mouse = Mouse();
+//mouse = Mouse();
 }
 
 InputManager::~InputManager()
@@ -20,6 +20,6 @@ InputManager::~InputManager()
 void InputManager::Update()
 {
 	controller.Update();
-	keyboard.Update(WindowPtr::GetWindowPtr(), CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+	keyboard.Update(WindowPtr::GetWindowPtr()->GLFWindow, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
 	mouse.Update(WindowPtr::GetWindowPtr(), CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
 }
