@@ -10,6 +10,10 @@ Texture2D::Texture2D(std::shared_ptr<VulkanEngine> engine, TextureType textureTy
 {
 }
 
+Texture2D::Texture2D(glm::ivec2& TextureResolution, TextureType textureType) : Texture(TextureResolution, textureType)
+{
+}
+
 Texture2D::Texture2D(const std::string TextureLocation, VkFormat format) : Texture(TextureLocation, format, TextureType::vkTexture2D)
 {
 	CreateTextureView(format);

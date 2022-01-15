@@ -130,6 +130,8 @@ void PrefilterRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapTextu
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     DrawToCubeMap->RecreateRendererTexture(RenderPassResolution);
     RenderedCubeMap->RecreateRendererTexture(RenderPassResolution);
+   // auto a = TextureManagerPtr::GetTextureManagerPtr()->LoadCubeMap(RenderedCubeMap);
+
     prefilterPipeline->Destroy();
 
     vkDestroyRenderPass(EnginePtr::GetEnginePtr()->Device, RenderPass, nullptr);

@@ -1,7 +1,7 @@
 #pragma once
-#include "Texture.h"
+#include "CubeMapTexture.h"
 
-class RenderedCubeMapDepthTexture : public Texture
+class RenderedCubeMapDepthTexture : public CubeMapTexture
 {
 private:
     void CreateTextureImage();

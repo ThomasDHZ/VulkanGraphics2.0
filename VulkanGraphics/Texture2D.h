@@ -10,6 +10,7 @@ protected:
 public:
     Texture2D();
     Texture2D(std::shared_ptr<VulkanEngine> engine, TextureType textureType);
+    Texture2D(glm::ivec2& TextureResolution, TextureType textureType);
     Texture2D(const std::string TextureLocation, VkFormat format);
     Texture2D(glm::ivec2 TextureResolution, std::vector<Pixel>& PixelList, VkFormat format);
     Texture2D(glm::ivec2 TextureResolution, std::vector<glm::vec4>& PixelList, VkFormat format);

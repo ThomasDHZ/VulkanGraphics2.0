@@ -6,6 +6,14 @@ CubeMapTexture::CubeMapTexture() : Texture()
 {
 }
 
+CubeMapTexture::CubeMapTexture(TextureType textureFormat) : Texture(textureFormat)
+{
+}
+
+CubeMapTexture::CubeMapTexture(glm::ivec2 TextureResolution, TextureType textureFormat) : Texture(TextureResolution, textureFormat)
+{
+}
+
 CubeMapTexture::CubeMapTexture(CubeMapLayout CubeMapFiles, VkFormat textureFormat) : Texture(TextureType::vkTextureCube)
 {
 	LoadTexture(CubeMapFiles, textureFormat);

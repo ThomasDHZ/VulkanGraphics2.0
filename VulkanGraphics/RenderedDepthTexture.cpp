@@ -1,11 +1,11 @@
 #include "RenderedDepthTexture.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
-RenderedDepthTexture::RenderedDepthTexture() : Texture()
+RenderedDepthTexture::RenderedDepthTexture() : Texture2D()
 {
 }
 
-RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
+RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Texture2D(TextureResolution, TextureType::vkRenderedTexture)
 {
     CreateTextureImage();
     CreateTextureView();
@@ -13,7 +13,7 @@ RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution) : Text
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution, VkSampleCountFlagBits sampleCount) : Texture(TextureResolution, TextureType::vkRenderedTexture)
+RenderedDepthTexture::RenderedDepthTexture(glm::ivec2& TextureResolution, VkSampleCountFlagBits sampleCount) : Texture2D(TextureResolution, TextureType::vkRenderedTexture)
 {
     Width = TextureResolution.x;
     Height = TextureResolution.y;

@@ -1,11 +1,11 @@
 #include "RenderedColorTexture.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
-RenderedColorTexture::RenderedColorTexture() : Texture()
+RenderedColorTexture::RenderedColorTexture() : Texture2D()
 {
 }
 
-RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Texture(TextureResolution, TextureType::vkRenderedTexture)
+RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Texture2D(TextureResolution, TextureType::vkRenderedTexture)
 {
     Width = TextureResolution.x;
     Height = TextureResolution.y;
@@ -16,7 +16,7 @@ RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution) : Textu
     ImGui_ImplVulkan_AddTexture(ImGuiDescriptorSet, Sampler, View, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount) : Texture(TextureResolution, TextureType::vkRenderedTexture)
+RenderedColorTexture::RenderedColorTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount) : Texture2D(TextureResolution, TextureType::vkRenderedTexture)
 {
     Width = TextureResolution.x;
     Height = TextureResolution.y;

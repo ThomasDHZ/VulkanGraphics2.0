@@ -15,18 +15,17 @@
 class TextureManager
 {
 private:
-	std::vector<std::shared_ptr<Texture2D>> Texture2DList;
-	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
 
+	std::vector<std::shared_ptr<Texture3D>> Texture3DList;
 	std::vector<std::shared_ptr<RenderedColorTexture>> RenderedColorTextureList;
 	std::vector<std::shared_ptr<RenderedDepthTexture>> RenderedDepthTextureList;
 	std::vector<std::shared_ptr<RenderedCubeMapTexture>> RenderedCubeMapTextureList;
 	std::vector<std::shared_ptr<RenderedCubeMapDepthTexture>> RenderedCubeMapDepthTextureList;
-
 	uint32_t IsTextureLoaded(std::string name);
 
 	VkSampler NullSampler;
 public:
+	std::vector<std::shared_ptr<Texture2D>> Texture2DList;
 	std::vector<std::shared_ptr<Texture>> CubeMapList;
 
 	TextureManager();

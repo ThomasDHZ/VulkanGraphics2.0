@@ -1,10 +1,10 @@
 #include "RenderedCubeMapDepthTexture.h"
 
-RenderedCubeMapDepthTexture::RenderedCubeMapDepthTexture() : Texture()
+RenderedCubeMapDepthTexture::RenderedCubeMapDepthTexture() : CubeMapTexture()
 {
 }
 
-RenderedCubeMapDepthTexture::RenderedCubeMapDepthTexture(std::shared_ptr<VulkanEngine> engine, uint32_t mipLevels) : Texture(TextureType::vkRenderedCubeMap)
+RenderedCubeMapDepthTexture::RenderedCubeMapDepthTexture(std::shared_ptr<VulkanEngine> engine, uint32_t mipLevels) : CubeMapTexture(TextureType::vkRenderedCubeMap)
 {
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
@@ -15,7 +15,7 @@ RenderedCubeMapDepthTexture::RenderedCubeMapDepthTexture(std::shared_ptr<VulkanE
     CreateTextureSampler();
 }
 
-RenderedCubeMapDepthTexture::RenderedCubeMapDepthTexture(glm::ivec2 TextureResolution, uint32_t mipLevels) : Texture(TextureResolution, TextureType::vkRenderedCubeMap)
+RenderedCubeMapDepthTexture::RenderedCubeMapDepthTexture(glm::ivec2 TextureResolution, uint32_t mipLevels) : CubeMapTexture(TextureResolution, TextureType::vkRenderedCubeMap)
 {
     MipMapLevels = mipLevels;
 

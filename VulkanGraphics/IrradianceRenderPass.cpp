@@ -133,6 +133,7 @@ void IrradianceRenderPass::RebuildSwapChain(std::shared_ptr<Texture> cubeMapText
     RenderPassResolution = glm::ivec2(cubeMapSize, cubeMapSize);
     RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(RenderPassResolution, VK_SAMPLE_COUNT_1_BIT));
     RenderedCubeMap->UpdateCubeImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+   // auto a = TextureManagerPtr::GetTextureManagerPtr()->LoadCubeMap(RenderedCubeMap);
 
     CreateRenderPass();
     CreateRendererFramebuffers();

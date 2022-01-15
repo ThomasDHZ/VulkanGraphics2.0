@@ -20,6 +20,8 @@ private:
 	void CreateTextureSampler();
 public:
 	CubeMapTexture();
+	CubeMapTexture(TextureType textureFormat);
+	CubeMapTexture(glm::ivec2 TextureResolution, TextureType textureFormat);
 	CubeMapTexture(CubeMapLayout CubeMapFiles, VkFormat textureFormat);
 	CubeMapTexture(std::string CubeMapFiles[6], VkFormat textureFormat);
 	CubeMapTexture(std::string CubeMapLocation, VkFormat textureFormat);

@@ -1,10 +1,10 @@
 #include "RenderedCubeMapTexture.h"
 
-RenderedCubeMapTexture::RenderedCubeMapTexture() : Texture()
+RenderedCubeMapTexture::RenderedCubeMapTexture() : CubeMapTexture()
 {
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount, uint32_t mipLevels) : Texture(TextureType::vkRenderedCubeMap)
+RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> engine, VkSampleCountFlagBits sampleCount, uint32_t mipLevels) : CubeMapTexture(TextureType::vkRenderedCubeMap)
 {
     Width = engine->SwapChain.GetSwapChainResolution().width;
     Height = engine->SwapChain.GetSwapChainResolution().height;
@@ -16,7 +16,7 @@ RenderedCubeMapTexture::RenderedCubeMapTexture(std::shared_ptr<VulkanEngine> eng
     CreateTextureSampler();
 }
 
-RenderedCubeMapTexture::RenderedCubeMapTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount, uint32_t mipLevels) : Texture(TextureResolution, TextureType::vkRenderedCubeMap)
+RenderedCubeMapTexture::RenderedCubeMapTexture(glm::ivec2 TextureResolution, VkSampleCountFlagBits sampleCount, uint32_t mipLevels) : CubeMapTexture(TextureResolution, TextureType::vkRenderedCubeMap)
 {
     MipMapLevels = mipLevels;
     SampleCount = sampleCount;
