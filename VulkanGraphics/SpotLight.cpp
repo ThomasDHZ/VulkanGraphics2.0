@@ -26,7 +26,6 @@ void SpotLight::Update()
 
 	glm::mat4 view = lightViewCamera->GetViewMatrix();
 	glm::mat4 proj = lightViewCamera->GetProjectionMatrix();
-	proj[1][1] *= -1;
 
 	LightBuffer.UniformDataInfo.LightSpaceMatrix = proj * view;
 
