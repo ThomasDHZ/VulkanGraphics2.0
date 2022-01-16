@@ -98,6 +98,7 @@ void PerspectiveLightViewCamera::Update(std::shared_ptr<VulkanEngine> engine)
 
     const auto Aspect = engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height;
     ProjectionMatrix = glm::perspective(glm::radians(Zoom), Aspect, 0.1f, 10000.0f);
+    ProjectionMatrix[1][1] *= -1;
 
     LightSpaceMatrix = ProjectionMatrix * ViewMatrix;
 }

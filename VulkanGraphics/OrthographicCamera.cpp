@@ -123,5 +123,7 @@ void OrthographicCamera::Update(std::shared_ptr<VulkanEngine> engine)
 
 	const auto 	Aspect = engine->SwapChain.GetSwapChainResolution().width / (float)engine->SwapChain.GetSwapChainResolution().height;
 	ProjectionMatrix = glm::ortho(-Aspect * Zoom, Aspect * Zoom, -1.0f * Zoom, 1.0f * Zoom, -10.0f, 10.0f);
+	ProjectionMatrix[1][1] *= -1;
+
 	ViewScreenSize = glm::vec2((Aspect * Zoom) * 2, (1.0f * Zoom) * 2);
 }

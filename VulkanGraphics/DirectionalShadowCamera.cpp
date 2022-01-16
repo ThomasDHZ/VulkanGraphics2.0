@@ -36,4 +36,5 @@ void DirectionalShadowCamera::Update(glm::vec3 position, glm::vec3 direction)
 
     const auto Aspect = EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().width / (float)EnginePtr::GetEnginePtr()->SwapChain.GetSwapChainResolution().height;
     ProjectionMatrix = glm::perspective(glm::radians(Zoom), Aspect, 0.1f, 10000.0f);
+    ProjectionMatrix[1][1] *= -1;
 }
