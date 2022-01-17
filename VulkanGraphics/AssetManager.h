@@ -34,6 +34,7 @@ public:
 
 	void Update();
 	void Draw(RendererDrawFlag renderPass, VkCommandBuffer commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
+	void Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, ConstMeshInfo& a, std::shared_ptr<Camera> CameraView);
 	void GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout);
 	void Delete();
 

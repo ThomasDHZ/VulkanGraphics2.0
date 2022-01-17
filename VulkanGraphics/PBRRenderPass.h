@@ -13,6 +13,7 @@ private:
 
 	void CreateRenderPass();
 	void CreateRendererFramebuffers();
+	ConstMeshInfo meshInfo;
 
 	std::shared_ptr<RenderedColorTexture> ColorTexture;
 	std::shared_ptr<RenderedColorTexture> BloomTexture;

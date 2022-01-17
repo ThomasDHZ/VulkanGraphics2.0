@@ -5,7 +5,7 @@
 #include <memory>
 #include "GUIMesh.h"
 #include "MaterialManager.h"
-
+#include "GraphicsPipeline.h"
 
 class MeshManager
 {
@@ -26,6 +26,7 @@ public:
 	void Update(std::shared_ptr<Camera> camera);
 	void UpdateBufferIndex();
 	void Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
+	void Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, ConstMeshInfo& a, std::shared_ptr<Camera> CameraView);
 	void ClearMeshs();
 	void Destroy();
 		

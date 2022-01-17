@@ -54,6 +54,11 @@ void AssetManager::Draw(RendererDrawFlag renderPass, VkCommandBuffer commandBuff
    meshManager->Draw(renderPass, commandBuffer, ShaderLayout, CameraView);
 }
 
+void AssetManager::Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, ConstMeshInfo& meshInfo, std::shared_ptr<Camera> CameraView)
+{
+    meshManager->Draw(renderPass, commandBuffer, ShaderLayout, meshInfo, CameraView);
+}
+
 void AssetManager::GUIDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout layout)
 {
    ObjManager->GUIDraw(commandBuffer, layout);
