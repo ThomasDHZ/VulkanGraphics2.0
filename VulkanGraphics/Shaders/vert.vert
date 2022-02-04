@@ -32,10 +32,10 @@ layout(location = 4) out vec3 BiTangent;
 
 void main() 
 {
-//    if(gl_VertexIndex == 0)
-//	{
-//		debugPrintfEXT(": %i \n", ubo.DirectionalLightCount);
-//	}
+    if(gl_VertexIndex == 0)
+	{
+		debugPrintfEXT(": %i \n", Mesh.CameraPos);
+	}
 
     FragPos = vec3(meshBuffer[Mesh.MeshIndex].meshProperties.ModelTransform * meshBuffer[Mesh.MeshIndex].meshProperties.MeshTransform * vec4(inPosition, 1.0));    
     TexCoords = aTexCoords;

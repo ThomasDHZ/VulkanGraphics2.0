@@ -372,20 +372,20 @@ void Mesh::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLay
 
 void Mesh::Destory()
 {
-	VertexBuffer.DestoryBuffer();
-	IndexBuffer.DestoryBuffer();
-	TransformBuffer.DestoryBuffer();
-	TransformInverseBuffer.DestoryBuffer();
-	MeshProperties.Destroy();
+	//VertexBuffer.DestoryBuffer();
+	//IndexBuffer.DestoryBuffer();
+	//TransformBuffer.DestoryBuffer();
+	//TransformInverseBuffer.DestoryBuffer();
+	//MeshProperties.Destroy();
 
-	if (BoneTransformBuffer.BufferMemory != nullptr &&
-		BoneTransformBuffer.Buffer != nullptr)
-	{
-		BoneWeightBuffer.DestoryBuffer();
-		BoneTransformBuffer.DestoryBuffer();
-	}
-	if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
-	{
-		BottomLevelAccelerationBuffer.Destroy(EnginePtr::GetEnginePtr());
-	}
+	//if (BoneTransformBuffer.BufferMemory != nullptr &&
+	//	BoneTransformBuffer.Buffer != nullptr)
+	//{
+	//	BoneWeightBuffer.DestoryBuffer();
+	//	BoneTransformBuffer.DestoryBuffer();
+	//}
+	//if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
+	//{
+	//	BottomLevelAccelerationBuffer.Destroy(EnginePtr::GetEnginePtr());
+	//}
 }
