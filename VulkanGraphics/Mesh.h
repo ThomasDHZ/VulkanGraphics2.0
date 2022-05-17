@@ -115,7 +115,6 @@ public:
 
 	virtual void Draw(VkCommandBuffer& commandBuffer);
 	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> CameraView);
-	virtual void Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, void* ConstBufferData, uint32_t ConstBufferSize);
 	virtual void DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, std::shared_ptr<Camera> lightViewCamera);
 	
 	virtual void Destory();

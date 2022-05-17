@@ -60,7 +60,6 @@ void ObjectViewCamera::Update(glm::vec3 position)
 {
     Position = position;
     ProjectionMatrix = glm::perspective((float)(3.14159265358979323846f / 2.0), 1.0f, 0.1f, 100.0f);
-    ProjectionMatrix[1][1] *= -1;
 
     ViewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-Position.x, -Position.y, -Position.z));
     ViewMatrix = glm::rotate(ViewMatrix, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));

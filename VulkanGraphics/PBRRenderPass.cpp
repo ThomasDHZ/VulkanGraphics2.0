@@ -238,13 +238,9 @@ void PBRRenderPass::Draw()
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, skyboxPipeline->ShaderPipelineLayout, 0, 1, &skyboxPipeline->DescriptorSet, 0, nullptr);
     static_cast<Skybox*>(MeshManagerPtr::GetMeshManagerPtr()->GetMeshByType(MeshTypeFlag::Mesh_Type_SkyBox)[0].get())->Draw(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
 
-    meshInfo.CameraPos = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetPosition();
-    meshInfo.view = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetViewMatrix();
-    meshInfo.proj = CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera->GetProjectionMatrix();
-
     vkCmdBindPipeline(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, pbrPipeline->ShaderPipeline);
     vkCmdBindDescriptorSets(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, pbrPipeline->ShaderPipelineLayout, 0, 1, &pbrPipeline->DescriptorSet, 0, nullptr);
-    AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], pbrPipeline->ShaderPipelineLayout, meshInfo, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
+    AssetManagerPtr::GetAssetPtr()->Draw(RendererType, CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex], pbrPipeline->ShaderPipelineLayout, CameraManagerPtr::GetCameraManagerPtr()->ActiveCamera);
 
     vkCmdEndRenderPass(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]);
     if (vkEndCommandBuffer(CommandBuffer[EnginePtr::GetEnginePtr()->CMDIndex]) != VK_SUCCESS) {

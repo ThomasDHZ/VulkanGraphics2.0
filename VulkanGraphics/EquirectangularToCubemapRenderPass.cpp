@@ -8,7 +8,7 @@ EquirectangularToCubemapRenderPass::EquirectangularToCubemapRenderPass() : BaseR
 EquirectangularToCubemapRenderPass::EquirectangularToCubemapRenderPass(uint32_t cubeMapSize) : BaseRenderPass()
 {
     CubeMapSize = cubeMapSize;
-    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize)));
+    RenderedCubeMap = std::make_shared<RenderedCubeMapTexture>(RenderedCubeMapTexture(glm::ivec2(CubeMapSize), VK_SAMPLE_COUNT_1_BIT));
 
     CreateRenderPass();
     CreateRendererFramebuffers();

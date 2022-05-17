@@ -20,34 +20,39 @@ EquirectangularToCubemapPipeline::~EquirectangularToCubemapPipeline()
 
 void EquirectangularToCubemapPipeline::SetUpDescriptorPool()
 {
-    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
-    DescriptorPoolList.emplace_back(EnginePtr::GetEnginePtr()->AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
-    DescriptorPool = EnginePtr::GetEnginePtr()->CreateDescriptorPool(DescriptorPoolList);
+
 }
 
 void EquirectangularToCubemapPipeline::SetUpDescriptorLayout()
 {
     std::vector<DescriptorSetLayoutBindingInfo> LayoutBindingInfo = {};
     LayoutBindingInfo.emplace_back(DescriptorSetLayoutBindingInfo{ 0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR, 1 });
-    DescriptorSetLayout = EnginePtr::GetEnginePtr()->CreateDescriptorSetLayout(LayoutBindingInfo);
+    DescriptorSetLayout = CreateDescriptorSetLayout(LayoutBindingInfo);
 }
 
 void EquirectangularToCubemapPipeline::SetUpDescriptorSets()
 {
-    DescriptorSet = EnginePtr::GetEnginePtr()->CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
-    VkDescriptorImageInfo TextureBufferInfo = AssetManagerPtr::GetAssetPtr()->textureManager->GetEnvirnmentMapDescriptor();
+    std::vector<VkDescriptorPoolSize>  DescriptorPoolList = {};
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1));
+    DescriptorPoolList.emplace_back(AddDsecriptorPoolBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1));
+    DescriptorPool = CreateDescriptorPool(DescriptorPoolList);
+
+    DescriptorSet = CreateDescriptorSets(DescriptorPool, DescriptorSetLayout);
+
+    auto a = TextureManagerPtr::GetTextureManagerPtr()->environmentTexture;
+    VkDescriptorImageInfo CubeMapBufferImage = AddTextureDescriptor(a->View, a->Sampler);
+    AddTextureDescriptorSetBinding(0, CubeMapBufferImage, VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_MISS_BIT_KHR);
 
     std::vector<VkWriteDescriptorSet> DescriptorList;
-    DescriptorList.emplace_back(EnginePtr::GetEnginePtr()->AddTextureDescriptorSet(0, DescriptorSet, TextureBufferInfo));
+    DescriptorList.emplace_back(AddTextureDescriptorSet(0, DescriptorSet, CubeMapBufferImage));
     vkUpdateDescriptorSets(EnginePtr::GetEnginePtr()->Device, static_cast<uint32_t>(DescriptorList.size()), DescriptorList.data(), 0, nullptr);
 }
 
 void EquirectangularToCubemapPipeline::SetUpShaderPipeLine(const VkRenderPass& renderPass, float CubeMapSize)
 {
     std::vector<VkPipelineShaderStageCreateInfo> PipelineShaderStageList;
-    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/EnvironmentToCubeMapVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
-    PipelineShaderStageList.emplace_back(EnginePtr::GetEnginePtr()->CreateShader("shaders/EnvironmentToCubeMapFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
+    PipelineShaderStageList.emplace_back(CreateShader("shaders/EnvironmentToCubeMapVert.spv", VK_SHADER_STAGE_VERTEX_BIT));
+    PipelineShaderStageList.emplace_back(CreateShader("shaders/EnvironmentToCubeMapFrag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;

@@ -180,6 +180,7 @@ void RayTraceRenderPass::Draw(std::shared_ptr<VulkanEngine> engine, std::shared_
     VkStridedDeviceAddressRegionKHR callableShaderSbtEntry{};
 
     RTXConst.proj = glm::inverse(ViewCamera->GetProjectionMatrix());
+    RTXConst.proj[1][1] *= -1;
     RTXConst.view = glm::inverse(ViewCamera->GetViewMatrix());
     RTXConst.CameraPos = ViewCamera->GetPosition();
     RTXConst.frame = Frame++;

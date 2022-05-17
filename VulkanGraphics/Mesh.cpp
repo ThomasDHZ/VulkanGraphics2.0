@@ -311,6 +311,7 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, 
 		meshInfo.CameraPos = CameraView->GetPosition();
 		meshInfo.view = CameraView->GetViewMatrix();
 		meshInfo.proj = CameraView->GetProjectionMatrix();
+		meshInfo.proj[1][1] *= -1;
 
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
@@ -322,25 +323,6 @@ void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, 
 		else
 		{
 			vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32); 
-			vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
-		}
-	}
-}
-
-void Mesh::Draw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, void* ConstBufferData, uint32_t ConstBufferSize)
-{
-	if (ShowMesh)
-	{
-		VkDeviceSize offsets[] = { 0 };
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &VertexBuffer.Buffer, offsets);
-		vkCmdPushConstants(commandBuffer, ShaderLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(ConstBufferSize), &ConstBufferData);
-		if (IndexCount == 0)
-		{
-			vkCmdDraw(commandBuffer, VertexCount, 1, 0, 0);
-		}
-		else
-		{
-			vkCmdBindIndexBuffer(commandBuffer, IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 			vkCmdDrawIndexed(commandBuffer, IndexCount, 1, 0, 0, 0);
 		}
 	}
@@ -372,20 +354,20 @@ void Mesh::DepthDraw(VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLay
 
 void Mesh::Destory()
 {
-	//VertexBuffer.DestoryBuffer();
-	//IndexBuffer.DestoryBuffer();
-	//TransformBuffer.DestoryBuffer();
-	//TransformInverseBuffer.DestoryBuffer();
-	//MeshProperties.Destroy();
+	VertexBuffer.DestoryBuffer();
+	IndexBuffer.DestoryBuffer();
+	TransformBuffer.DestoryBuffer();
+	TransformInverseBuffer.DestoryBuffer();
+	MeshProperties.Destroy();
 
-	//if (BoneTransformBuffer.BufferMemory != nullptr &&
-	//	BoneTransformBuffer.Buffer != nullptr)
-	//{
-	//	BoneWeightBuffer.DestoryBuffer();
-	//	BoneTransformBuffer.DestoryBuffer();
-	//}
-	//if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
-	//{
-	//	BottomLevelAccelerationBuffer.Destroy(EnginePtr::GetEnginePtr());
-	//}
+	if (BoneTransformBuffer.BufferMemory != nullptr &&
+		BoneTransformBuffer.Buffer != nullptr)
+	{
+		BoneWeightBuffer.DestoryBuffer();
+		BoneTransformBuffer.DestoryBuffer();
+	}
+	if (BottomLevelAccelerationBuffer.handle != VK_NULL_HANDLE)
+	{
+		BottomLevelAccelerationBuffer.Destroy(EnginePtr::GetEnginePtr());
+	}
 }

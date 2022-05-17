@@ -93,6 +93,11 @@ std::shared_ptr<Texture3D> TextureManager::LoadTexture3D(glm::ivec3& TextureReso
 	return texture;
 }
 
+std::shared_ptr<CubeMapTexture> TextureManager::LoadCubeMap(CubeMapLayout CubeMapFiles, VkFormat textureFormat)
+{
+	return std::shared_ptr<CubeMapTexture>();
+}
+
 //std::shared_ptr<FontTexture> TextureManager::LoadFontTexture(void* GlyphData, uint32_t width, uint32_t height)
 //{
 //	const std::shared_ptr<FontTexture> texture = std::make_shared<FontTexture>(FontTexture(GlyphData, width, height));

@@ -1,6 +1,4 @@
 #include "Vulkanengine.h"
-#include <stdexcept>
-#include <set>
 
 std::shared_ptr<VulkanEngine> EnginePtr::enginePtr = nullptr;
 
@@ -15,11 +13,9 @@ VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 	ValidationLayers.emplace_back("VK_LAYER_KHRONOS_validation");
 
 	DeviceExtensions.emplace_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_MAINTENANCE3_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
-	DeviceExtensions.emplace_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+	//DeviceExtensions.emplace_back(VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME);
+	//DeviceExtensions.emplace_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
 	DeviceExtensions.emplace_back(VK_KHR_SPIRV_1_4_EXTENSION_NAME);
@@ -49,7 +45,7 @@ VulkanEngine::VulkanEngine(std::shared_ptr<VulkanWindow> window)
 	VkDebugUtilsMessengerCreateInfoEXT DebugInfo;
 	VulkanDebug.CreateDebugMessengerInfo(DebugInfo);
 
-	std::vector<VkValidationFeatureEnableEXT> enabledList = { VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT };
+	std::vector<VkValidationFeatureEnableEXT> enabledList = { VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_RESERVE_BINDING_SLOT_EXT };
 	std::vector<VkValidationFeatureDisableEXT> disabledList = {
 	VK_VALIDATION_FEATURE_DISABLE_THREAD_SAFETY_EXT, VK_VALIDATION_FEATURE_DISABLE_API_PARAMETERS_EXT,
 		VK_VALIDATION_FEATURE_DISABLE_OBJECT_LIFETIMES_EXT, VK_VALIDATION_FEATURE_DISABLE_CORE_CHECKS_EXT };
@@ -296,15 +292,23 @@ void VulkanEngine::SetUpDeviceFeatures(GLFWwindow* window)
 bool VulkanEngine::isDeviceSuitable(VkPhysicalDevice GPUDevice)
 {
 	FindQueueFamilies(GPUDevice, Surface);
+	std::set<std::string> extensionsNotSupported = CheckDeviceExtensionSupport(GPUDevice);
 	VkPhysicalDeviceFeatures supportedFeatures = GetPhysicalDeviceFeatures(GPUDevice);
 	std::vector<VkSurfaceFormatKHR> SurfaceFormatList = GetSurfaceFormatList(GPUDevice);
 	std::vector<VkPresentModeKHR> PresentModeList = GetPresentModeList(GPUDevice, Surface);
 
-	return GraphicsFamily != -1 &&
+	if (GraphicsFamily != -1 &&
 		PresentFamily != -1 &&
 		SurfaceFormatList.size() != 0 &&
 		PresentModeList.size() != 0 &&
-		supportedFeatures.samplerAnisotropy;
+		supportedFeatures.samplerAnisotropy)
+	{
+		VulkanCompatible = true;
+	}
+
+	RayTracingFeatureCompatible = CheckRayTracingCompatiblity(GPUDevice);
+
+	return VulkanCompatible;
 }
 
 std::vector<const char*> VulkanEngine::getRequiredExtensions() {
@@ -317,7 +321,72 @@ std::vector<const char*> VulkanEngine::getRequiredExtensions() {
 	return extensions;
 }
 
+std::set<std::string> VulkanEngine::CheckDeviceExtensionSupport(VkPhysicalDevice GPUDevice)
+{
+	uint32_t extensionCount;
+	vkEnumerateDeviceExtensionProperties(GPUDevice, nullptr, &extensionCount, nullptr);
 
+	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(GPUDevice, nullptr, &extensionCount, availableExtensions.data());
+	for (auto availableExtension : availableExtensions)
+	{
+		FeatureList.emplace_back(availableExtension.extensionName);
+	}
+
+	std::set<std::string> requiredExtensions(DeviceExtensions.begin(), DeviceExtensions.end());
+
+	for (const auto& extension : availableExtensions)
+	{
+		requiredExtensions.erase(extension.extensionName);
+	}
+
+	for (auto extension : requiredExtensions)
+	{
+		std::cout << extension << " is Required." << std::endl;
+	}
+
+	return requiredExtensions;
+}
+
+bool VulkanEngine::CheckRayTracingCompatiblity(VkPhysicalDevice GPUDevice)
+{
+	if (!RayTracingFeatureCompatible)
+	{
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR AccelerationStructureFeatures{};
+		AccelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+
+		VkPhysicalDeviceRayTracingPipelineFeaturesKHR RayTracingPipelineFeatures{};
+		RayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+		RayTracingPipelineFeatures.pNext = &AccelerationStructureFeatures;
+
+		VkPhysicalDeviceFeatures2 DeviceFeatures2{};
+		DeviceFeatures2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		DeviceFeatures2.pNext = &RayTracingPipelineFeatures;
+		vkGetPhysicalDeviceFeatures2(GPUDevice, &DeviceFeatures2);
+
+		if (RayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE &&
+			AccelerationStructureFeatures.accelerationStructure == VK_TRUE)
+		{
+			if (std::find(FeatureList.begin(), FeatureList.end(), VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) != FeatureList.end() &&
+				std::find(FeatureList.begin(), FeatureList.end(), VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME)   != FeatureList.end())
+			{
+				RayTracingFeatureCompatible = true;
+				DeviceExtensions.emplace_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+				DeviceExtensions.emplace_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+			}
+			else
+			{
+				RayTracingFeatureCompatible = false;
+			}
+		}
+		else
+		{
+			std::cout << "GPU/MotherBoard isn't ray tracing compatible." << std::endl;
+		}
+	}
+
+	return RayTracingFeatureCompatible;
+}
 
 VkPhysicalDeviceFeatures VulkanEngine::GetPhysicalDeviceFeatures(VkPhysicalDevice GPUDevice)
 {
@@ -401,21 +470,21 @@ void VulkanEngine::InitializeSyncObjects()
 
 void VulkanEngine::Destroy()
 {
-	//SwapChain.Destroy(Device);
+	SwapChain.Destroy(Device);
 
-	//vkDestroyCommandPool(Device, CommandPool, nullptr);
-	//CommandPool = VK_NULL_HANDLE;
+	vkDestroyCommandPool(Device, CommandPool, nullptr);
+	CommandPool = VK_NULL_HANDLE;
 
-	//for (size_t x = 0; x < MAX_FRAMES_IN_FLIGHT; x++)
-	//{
-	//	vkDestroySemaphore(Device, AcquireImageSemaphores[x], nullptr);
-	//	vkDestroySemaphore(Device, PresentImageSemaphores[x], nullptr);
-	//	vkDestroyFence(Device, inFlightFences[x], nullptr);
+	for (size_t x = 0; x < MAX_FRAMES_IN_FLIGHT; x++)
+	{
+		vkDestroySemaphore(Device, AcquireImageSemaphores[x], nullptr);
+		vkDestroySemaphore(Device, PresentImageSemaphores[x], nullptr);
+		vkDestroyFence(Device, inFlightFences[x], nullptr);
 
-	//	AcquireImageSemaphores[x] = VK_NULL_HANDLE;
-	//	PresentImageSemaphores[x] = VK_NULL_HANDLE;
-	//	inFlightFences[x] = VK_NULL_HANDLE;
-	//}
+		AcquireImageSemaphores[x] = VK_NULL_HANDLE;
+		PresentImageSemaphores[x] = VK_NULL_HANDLE;
+		inFlightFences[x] = VK_NULL_HANDLE;
+	}
 
 	vkDestroyDevice(Device, nullptr);
 	Device = VK_NULL_HANDLE;
@@ -512,7 +581,6 @@ uint64_t VulkanEngine::GetBufferDeviceAddress(VkBuffer buffer)
 	BufferDevice.buffer = buffer;
 	return vkGetBufferDeviceAddressKHR(Device, &BufferDevice);
 }
-
 
 uint32_t VulkanEngine::GetAlignedSize(uint32_t value, uint32_t alignment)
 {

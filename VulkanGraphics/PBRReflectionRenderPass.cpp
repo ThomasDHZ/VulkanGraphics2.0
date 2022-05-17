@@ -160,7 +160,7 @@ void PBRReflectionRenderPass::RebuildSwapChain(glm::ivec2 renderPassResolution, 
     CreateRenderPass();
     CreateRendererFramebuffers();
     pbrPipeline->UpdateGraphicsPipeLine(RenderPass, IrradianceMap, PrefilerMap, BRDFMap, ShadowMapTextureList, RenderedCubeMap, cubeSampler, SpotLightShadowMapTextureList);
-    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], renderPassResolution.x);
+    skyboxPipeline->UpdateGraphicsPipeLine(RenderPass, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], renderPassResolution.x);
     SetUpCommandBuffers();
 }
 

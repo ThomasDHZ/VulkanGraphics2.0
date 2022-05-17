@@ -90,15 +90,6 @@ void MeshManager::Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuff
     }
 }
 
-void MeshManager::Draw(RendererDrawFlag renderPass, VkCommandBuffer& commandBuffer, VkPipelineLayout& ShaderLayout, ConstMeshInfo& meshInfo, std::shared_ptr<Camera> CameraView)
-{
-    for (auto& mesh : MeshList)
-    {
-        meshInfo.MeshIndex = mesh->MeshBufferIndex;
-        mesh->Draw(commandBuffer, ShaderLayout, &meshInfo, sizeof(meshInfo));
-    }
-}
-
 void MeshManager::ClearMeshs()
 {
     for (auto mesh : MeshList)

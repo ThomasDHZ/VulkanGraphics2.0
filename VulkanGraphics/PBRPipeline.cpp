@@ -104,7 +104,7 @@ void PBRPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCubeMapTexture
     VkDescriptorImageInfo IrradianceMapImage = AddTextureDescriptor(IrradianceMap->View, IrradianceMap->Sampler);
     VkDescriptorImageInfo PrefilerMapImage = AddTextureDescriptor(PrefilerMap->View, PrefilerMap->Sampler);
     VkDescriptorImageInfo BRDFMapImage = AddTextureDescriptor(BRDFMap->View, BRDFMap->Sampler);
-    VkDescriptorImageInfo RenderedCubeMapImage = AddTextureDescriptor(RenderedCubeMap->View, RenderedCubeMap->Sampler);
+    VkDescriptorImageInfo RenderedCubeMapImage = AddTextureDescriptor(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2]->View, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2]->Sampler);
 
     AddUniformBufferDescriptorSetBinding(0, SceneDataBufferInfo);
     AddStorageBufferDescriptorSetBinding(1, MeshPropertyDataBufferInfo, AssetManagerPtr::GetAssetPtr()->GetMeshDescriptorCount());
@@ -113,7 +113,7 @@ void PBRPipeline::SetUpDescriptorBindings(std::shared_ptr<RenderedCubeMapTexture
     AddStorageBufferDescriptorSetBinding(4, SpotLightBufferInfoList, LightManagerPtr::GetLightManagerPtr()->GetSpotLightDescriptorCount());
     AddTextureDescriptorSetBinding(5, TextureBufferInfo, AssetManagerPtr::GetAssetPtr()->GetTextureBufferDescriptorCount());
     AddTextureDescriptorSetBinding(6, Texture3DBufferInfo, AssetManagerPtr::GetAssetPtr()->Get3DTextureBufferDescriptorCount());
-    AddTextureDescriptorSetBinding(7, CubeMapImage, AssetManagerPtr::GetAssetPtr()->GetCubeMapBufferDescriptorCount());
+    AddTextureDescriptorSetBinding(7, RenderedCubeMapImage, AssetManagerPtr::GetAssetPtr()->GetCubeMapBufferDescriptorCount());
     AddStorageBufferDescriptorSetBinding(8, SphereAreaLightBufferInfoList, LightManagerPtr::GetLightManagerPtr()->GetSphereAreaLightDescriptorCount());
     AddStorageBufferDescriptorSetBinding(9, TubeAreaLightBufferInfoList, LightManagerPtr::GetLightManagerPtr()->GetTubeAreaLightDescriptorCount());
     AddStorageBufferDescriptorSetBinding(10, RectangleAreaBufferInfoList, LightManagerPtr::GetLightManagerPtr()->GetRectangleAreaLightDescriptorCount());

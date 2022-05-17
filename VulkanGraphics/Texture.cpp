@@ -726,7 +726,15 @@ void Texture::CopyCubeMapTexture(VkCommandBuffer& commandBuffer, std::shared_ptr
 
 void Texture::Delete()
 {
+	vkDestroyImageView(VulkanPtr::GetDevice(), View, nullptr);
+	vkDestroyImage(VulkanPtr::GetDevice(), Image, nullptr);
+	vkFreeMemory(VulkanPtr::GetDevice(), Memory, nullptr);
+	vkDestroySampler(VulkanPtr::GetDevice(), Sampler, nullptr);
 
+	View = VK_NULL_HANDLE;
+	Image = VK_NULL_HANDLE;
+	Memory = VK_NULL_HANDLE;
+	Sampler = VK_NULL_HANDLE;
 }
 
 void Texture::GenerateMipmaps(VkFormat imageFormat)

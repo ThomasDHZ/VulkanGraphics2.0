@@ -10,6 +10,7 @@
 #include "DepthCubeMapRenderPass.h"
 #include "DepthDebugRenderPass.h"
 #include "PBRReflectionRenderPass.h"
+#include "EnvironmentTexture.h"
 
 class PBRRenderer : public BaseRenderer
 {
@@ -19,6 +20,7 @@ private:
 	int selected = 0;
 
 	BRDFRenderPass brdfRenderPass;
+	EquirectangularToCubemapRenderPass equirectangularToCubemapRenderPass;
 
 	DepthPassRendererPass DepthRenderPass;
 	DepthCubeMapRenderPass depthCubeMapRenderPass;

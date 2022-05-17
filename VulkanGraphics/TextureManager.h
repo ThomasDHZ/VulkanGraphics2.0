@@ -10,7 +10,7 @@
 #include "RenderedDepthTexture.h"
 #include "RenderedCubeMapTexture.h"
 #include "RenderedCubeMapDepthTexture.h"
-
+#include "EnvironmentTexture.h"
 
 class TextureManager
 {
@@ -27,6 +27,7 @@ private:
 public:
 	std::vector<std::shared_ptr<Texture2D>> Texture2DList;
 	std::vector<std::shared_ptr<Texture>> CubeMapList;
+	std::shared_ptr<EnvironmentTexture> environmentTexture = nullptr;
 
 	TextureManager();
 	TextureManager(std::shared_ptr<VulkanEngine> Engine);
@@ -41,6 +42,14 @@ public:
 	std::shared_ptr<CubeMapTexture> LoadCubeMap(std::string CubeMapFiles[6], VkFormat textureFormat);
 	std::shared_ptr<CubeMapTexture> LoadCubeMap(std::string CubeMapLocation, VkFormat textureFormat);
 	std::shared_ptr<CubeMapTexture> LoadCubeMap(std::shared_ptr<CubeMapTexture> cubeMapTexture);
+	std::shared_ptr<EnvironmentTexture> LoadEnvironmentMap(std::string environmentMapLocation, VkFormat textureFormat)
+	{
+		const std::shared_ptr<EnvironmentTexture> texture = std::make_shared<EnvironmentTexture>(EnvironmentTexture(environmentMapLocation, textureFormat));
+		UpdateBufferIndex();
+		EnginePtr::GetEnginePtr()->UpdateRendererFlag = true;
+		environmentTexture = texture;
+		return texture;
+	}
 	std::shared_ptr<RenderedColorTexture> LoadRenderedColorTexture(std::shared_ptr<RenderedColorTexture> renderedColorTexture);
 	std::shared_ptr<RenderedDepthTexture> LoadRenderedDepthTexture(std::shared_ptr<RenderedDepthTexture> renderedDepthTexture);
 	std::shared_ptr<RenderedCubeMapTexture> LoadRenderedCubeMapTexture(std::shared_ptr<RenderedCubeMapTexture> renderedCubeMapTexture);

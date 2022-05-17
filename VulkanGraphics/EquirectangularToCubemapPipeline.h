@@ -2,6 +2,7 @@
 #include "GraphicsPipeline.h"
 #include "SceneData.h"
 #include "Texture2D.h"
+#include "EnvironmentTexture.h"
 
 class EquirectangularToCubemapPipeline : public GraphicsPipeline
 {

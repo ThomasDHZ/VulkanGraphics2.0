@@ -7,7 +7,10 @@ PBRRenderer::PBRRenderer() : BaseRenderer()
 PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
 {
     ////  DebugDepthRenderPass = DepthDebugRenderPass(DepthRenderPass.DepthTextureList[0]);
-// equirectangularToCubemapRenderPass = EquirectangularToCubemapRenderPass();
+
+    TextureManagerPtr::GetTextureManagerPtr()->LoadEnvironmentMap("../texture/hdr/newport_loft.hdr", VK_FORMAT_R32G32B32A32_SFLOAT);
+    equirectangularToCubemapRenderPass = EquirectangularToCubemapRenderPass(CubeMapSamplerSize);
+    TextureManagerPtr::GetTextureManagerPtr()->CubeMapList.emplace_back(equirectangularToCubemapRenderPass.RenderedCubeMap);
 
     brdfRenderPass = BRDFRenderPass(CubeMapSamplerSize);
 
@@ -18,17 +21,18 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
         SpotLightDepthRenderPass = DepthPassRendererPass(512);
     }
     //Reflection Pass
-    {
-        ReflectionIrradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        ReflectionPrefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
-    }
+    //{
+    //    auto a = TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures();
+    //    ReflectionIrradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
+    //    ReflectionPrefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
+    //    reflectionPBRPass = PBRReflectionRenderPass(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
+    //}
     ////Main Render Pass
     {
-        irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        prefilterRenderPass = PrefilterRenderPass(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
+        irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
+        prefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
 
-        pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
+        pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], SpotLightDepthRenderPass.DepthTextureList);
         FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
     }
 }
@@ -40,7 +44,7 @@ PBRRenderer::~PBRRenderer()
 void PBRRenderer::RebuildSwapChain()
 {
     brdfRenderPass.RebuildSwapChain(CubeMapSamplerSize);
-
+    equirectangularToCubemapRenderPass.RebuildSwapChain(CubeMapSamplerSize);
 
     //Shadow Pass
     {
@@ -49,17 +53,17 @@ void PBRRenderer::RebuildSwapChain()
         SpotLightDepthRenderPass.RebuildSwapChain(512);
     }
     //Reflection Pass
-    {
-        ReflectionIrradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
-        ReflectionPrefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[0], CubeMapSamplerSize);
+  /*  {
+        ReflectionIrradianceRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
+        ReflectionPrefilterRenderPass.RebuildSwapChain(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
         reflectionPBRPass.RebuildSwapChain(glm::ivec2(CubeMapSamplerSize), glm::vec3(0.0f, 0.472f, 0.7f), ReflectionIrradianceRenderPass.RenderedCubeMap, ReflectionPrefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
-    }
+    }*/
     ////Main Render Pass
     {
-       irradianceRenderPass.RebuildSwapChain(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
-       prefilterRenderPass.RebuildSwapChain(reflectionPBRPass.RenderedTexture, CubeMapSamplerSize);
+        irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
+        prefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
 
-        pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
+        pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], SpotLightDepthRenderPass.DepthTextureList);
         FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
    }
 }
@@ -83,7 +87,7 @@ void PBRRenderer::GUIUpdate()
 void PBRRenderer::Draw()
 {
     brdfRenderPass.Draw();
-
+    equirectangularToCubemapRenderPass.Draw();
     //Shadow Pass
     {
         DepthRenderPass.Draw();
@@ -91,11 +95,11 @@ void PBRRenderer::Draw()
         SpotLightDepthRenderPass.Draw();
     }
     //Reflection Pass
-    {
-        ReflectionIrradianceRenderPass.Draw();
-        ReflectionPrefilterRenderPass.Draw();
-        reflectionPBRPass.Draw();
-    }
+    //{
+    //    ReflectionIrradianceRenderPass.Draw();
+    //    ReflectionPrefilterRenderPass.Draw();
+    //    reflectionPBRPass.Draw();
+    //}
     ////Main Render Pass
     {
         irradianceRenderPass.Draw();
@@ -109,7 +113,7 @@ void PBRRenderer::Draw()
 void PBRRenderer::Destroy()
 {
     brdfRenderPass.Destroy();
-
+    equirectangularToCubemapRenderPass.Destroy();
     //Shadow Pass
     {
         DepthRenderPass.Destroy();
@@ -117,11 +121,11 @@ void PBRRenderer::Destroy()
         SpotLightDepthRenderPass.Destroy();
     }
     //Reflection Pass
-    {
-        ReflectionIrradianceRenderPass.Destroy();
-        ReflectionPrefilterRenderPass.Destroy();
-        reflectionPBRPass.Destroy();
-    }
+    //{
+    //    ReflectionIrradianceRenderPass.Destroy();
+    //    ReflectionPrefilterRenderPass.Destroy();
+    //    reflectionPBRPass.Destroy();
+    //}
     ////Main Render Pass
     {
         irradianceRenderPass.Destroy();
@@ -142,11 +146,11 @@ std::vector<VkCommandBuffer> PBRRenderer::AddToCommandBufferSubmitList(std::vect
         CommandBufferSubmitList.emplace_back(SpotLightDepthRenderPass.GetCommandBuffer());
     }
     //Reflection Pass
-    {
-        CommandBufferSubmitList.emplace_back(ReflectionIrradianceRenderPass.GetCommandBuffer());
-        CommandBufferSubmitList.emplace_back(ReflectionPrefilterRenderPass.GetCommandBuffer());
-        CommandBufferSubmitList.emplace_back(reflectionPBRPass.GetCommandBuffer());
-    }
+    //{
+    //    CommandBufferSubmitList.emplace_back(ReflectionIrradianceRenderPass.GetCommandBuffer());
+    //    CommandBufferSubmitList.emplace_back(ReflectionPrefilterRenderPass.GetCommandBuffer());
+    //    CommandBufferSubmitList.emplace_back(reflectionPBRPass.GetCommandBuffer());
+    //}
     ////Main Render Pass
     {
         CommandBufferSubmitList.emplace_back(irradianceRenderPass.GetCommandBuffer());

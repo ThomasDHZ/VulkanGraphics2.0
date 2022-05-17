@@ -45,7 +45,6 @@ layout(location = 5) out vec4 LightSpace;
 
 void main() 
 {
-
 //    if(gl_VertexIndex == 0)
 //	{
 //        if(gl_ViewIndex == 0)
