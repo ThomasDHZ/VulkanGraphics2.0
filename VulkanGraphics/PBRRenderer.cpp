@@ -32,7 +32,7 @@ PBRRenderer::PBRRenderer(std::shared_ptr<VulkanEngine> engine) : BaseRenderer()
         irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
         prefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
 
-        pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], SpotLightDepthRenderPass.DepthTextureList);
+        pbrRenderer = PBRRenderPass(engine, irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
         FrameBufferRenderer = FrameBufferRenderPass(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
     }
 }
@@ -63,7 +63,7 @@ void PBRRenderer::RebuildSwapChain()
         irradianceRenderPass = IrradianceRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
         prefilterRenderPass = PrefilterRenderPass(TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], CubeMapSamplerSize);
 
-        pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, TextureManagerPtr::GetTextureManagerPtr()->GetAllCubeMapTextures()[2], SpotLightDepthRenderPass.DepthTextureList);
+        pbrRenderer.RebuildSwapChain(irradianceRenderPass.RenderedCubeMap, prefilterRenderPass.RenderedCubeMap, brdfRenderPass.BRDFMap, DepthRenderPass.DepthTextureList, depthCubeMapRenderPass.RenderedCubeMap, SpotLightDepthRenderPass.DepthTextureList);
         FrameBufferRenderer.RebuildSwapChain(pbrRenderer.RenderedTexture, pbrRenderer.RenderedBloomTexture);
    }
 }
