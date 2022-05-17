@@ -7,7 +7,7 @@
 #include "SkyBoxRenderPipeline.h"
 #include "RenderedCubeMapTexture.h"
 #include "IrradiancePipeline.h"
-
+#include "EquirectangularToCubemapPipeline.h"
 class EquirectangularToCubemapRenderPass : public BaseRenderPass
 {
 private:
@@ -24,7 +24,7 @@ public:
 	~EquirectangularToCubemapRenderPass();
 
 	std::shared_ptr<RenderedCubeMapTexture> RenderedCubeMap;
-	std::shared_ptr<IrradiancePipeline> irradiancePipeline;
+	std::shared_ptr<EquirectangularToCubemapPipeline> irradiancePipeline;
 
 	void RebuildSwapChain(uint32_t cubeMapSize);
 

@@ -12,7 +12,7 @@ EquirectangularToCubemapRenderPass::EquirectangularToCubemapRenderPass(uint32_t 
 
     CreateRenderPass();
     CreateRendererFramebuffers();
-    irradiancePipeline = std::make_shared<IrradiancePipeline>(IrradiancePipeline(RenderPass, CubeMapSize));
+    irradiancePipeline = std::make_shared<EquirectangularToCubemapPipeline>(EquirectangularToCubemapPipeline(RenderPass, CubeMapSize));
     SetUpCommandBuffers();
 
     Draw();
@@ -35,7 +35,7 @@ EquirectangularToCubemapRenderPass::~EquirectangularToCubemapRenderPass()
 {
 }
 
-void EquirectangularToCubemapRenderPass::EquirectangularToCubemapRenderPass()
+void EquirectangularToCubemapRenderPass::CreateRenderPass()
 {
     std::vector<VkAttachmentDescription> AttachmentDescriptionList;
 

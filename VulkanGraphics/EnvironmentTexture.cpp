@@ -6,14 +6,14 @@ EnvironmentTexture::EnvironmentTexture() : Texture()
 {
 }
 
-EnvironmentTexture::EnvironmentTexture(std::string TextureLocation, VkFormat format) : Texture(TextureTypeEnum::kEnvironmentTexture)
+EnvironmentTexture::EnvironmentTexture(std::string TextureLocation, VkFormat format) : Texture(TextureType::vkTexture2D)
 {
 	Width = 0;
 	Height = 0;
 	Depth = 1;
 
 	LoadTexture(TextureLocation, format);
-	CreateTextureView(TextureByteFormat);
+	CreateTextureView(format);
 	CreateTextureSampler();
 }
 
